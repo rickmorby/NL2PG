@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from json import dumps
 from typing import Any
 from pydantic import BaseModel, ConfigDict
+from bench.exception import FieldAccessError, UnknownFieldError
 
 
 class DTOInterface(ABC):
@@ -83,12 +84,12 @@ class AbstractDTO(BaseModel, DTOInterface, ABC):
         if not item.startswith("_"):
             getter_name = f"get_{item}"
             if hasattr(self.__class__, getter_name):
-                raise AttributeError(
+                raise FieldAccessError(
                     f"L'accesso diretto al campo '{item}' è proibito. "
                     f"Utilizzare {getter_name}() al suo posto."
                 )
 
-        raise AttributeError(
+        raise UnknownFieldError(
             f"L'oggetto '{self.__class__.__name__}' non possiede l'attributo '{item}'."
         )
 
