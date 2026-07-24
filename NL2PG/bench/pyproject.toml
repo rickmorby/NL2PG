@@ -32,6 +32,7 @@ packages = ["src/bench"]
 
 [tool.ruff]
 line-length = 100
+exclude = ["config/"]
 
 [tool.ruff.lint]
 select = [
