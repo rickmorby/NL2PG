@@ -1,46 +1,43 @@
-"""Modulo per la gestione globale delle eccezioni del benchmark.
+"""Modulo per la gestione globale delle eccezioni del benchmark basato su singledispatch.
 
 :author: Riccardo Morabito
 """
 
+from functools import singledispatch
 from logging import getLogger
-from sys import excepthook, stderr, exit as sys_exit, modules
+from sys import exit as sys_exit, modules
+from rich.console import Console
 from bench.exception.logging_exc import SymlinkError
 
-RED = "\033[91m"
-RESET = "\033[0m"
-
 _log = getLogger("bench.exception")
-_excepthook_original = excepthook
-
-_handler_registry: dict[type, callable] = {}
+_console = Console(stderr=True)
 
 
-def register_handler(exc_type: type, handler_func: callable) -> None:
-    """Registra un handler personalizzato per un tipo di eccezione."""
-    _handler_registry[exc_type] = handler_func
-
-
-def _global_handler(exc_type: type, exc_value: BaseException, exc_tb: object) -> None:
-    """Handler globale per qualsiasi eccezione non catturata."""
-    handler = _handler_registry.get(exc_type)
-    if handler is not None:
-        handler(exc_type, exc_value, exc_tb)
-        return
-
-    _log.critical("%s: %s", type(exc_value).__name__, exc_value)
-    print(f"{RED}[ERROR]: {exc_value}{RESET}", file=stderr)
+@singledispatch
+def handle_exception(exc: BaseException) -> None:
+    """Handler predefinito per eccezioni generiche non gestite specificamente."""
+    _log.critical("%s: %s", type(exc).__name__, exc)
+    _console.print(f"[bold red][ERROR][/bold red] {type(exc).__name__}: {exc}")
     sys_exit(1)
 
 
-def install_global_handler() -> None:
-    """Installa l'handler globale e registra gli handler predefiniti."""
-    _handler_registry.clear()
-    _handler_registry[SymlinkError] = _handle_symlink_error
-    modules["sys"].excepthook = _global_handler
-
-
-def _handle_symlink_error(exc_type: type, exc_value: BaseException, exc_tb: object) -> None:
-    """Handler per SymlinkError: il symlink non è essenziale, i log sono sul file dedicato."""
-    log_path = getattr(exc_value, "payload", None) or "file dedicato"
+@handle_exception.register(SymlinkError)
+def _handle_symlink_error(exc: SymlinkError) -> None:
+    """Handler specifico per SymlinkError: il symlink non è essenziale, i log sono sul file dedicato."""
+    log_path = getattr(exc, "payload", None) or "file dedicato"
     _log.warning("Symlink bench.log non creato. I log sono comunque registrati su: %s", log_path)
+
+
+def _global_excepthook(
+    exc_type: type[BaseException],
+    exc_value: BaseException,
+    exc_tb: object,
+) -> None:
+    """Hook globale assegnato a sys.excepthook che delega il dispatch a handle_exception."""
+    handle_exception(exc_value)
+
+
+def install_global_handler() -> None:
+    """Installa l'handler globale su sys.excepthook."""
+    modules["sys"].excepthook = _global_excepthook
+

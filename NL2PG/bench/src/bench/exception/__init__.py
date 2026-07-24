@@ -4,16 +4,22 @@
 """
 
 from bench.exception.base import BenchException
-from bench.exception.models_exc import FieldAccessError, UnknownFieldError
+from bench.exception.clients_exc import DatabaseClientError
+from bench.exception.handler import (
+    handle_exception,
+    install_global_handler,
+)
 from bench.exception.logging_exc import LoggingConfigError, SymlinkError
-from bench.exception.handler import install_global_handler, register_handler
+from bench.exception.models_exc import FieldAccessError, UnknownFieldError
 
 __all__ = [
     "BenchException",
+    "DatabaseClientError",
     "FieldAccessError",
-    "UnknownFieldError",
     "LoggingConfigError",
     "SymlinkError",
+    "UnknownFieldError",
+    "handle_exception",
     "install_global_handler",
-    "register_handler",
 ]
+
