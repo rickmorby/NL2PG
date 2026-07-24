@@ -3,6 +3,7 @@
 :author: Riccardo Morabito
 """
 
+from bench.adapters.outbound.llm import LLMClientAdapter
 from bench.adapters.outbound.logging import LoggingAdapter, TqdmHandler
 from bench.adapters.outbound.postgres import PostgresClientAdapter, PostgresSandboxAdapter
 
@@ -11,4 +12,5 @@ __all__ = [
     "TqdmHandler",
     "PostgresClientAdapter",
     "PostgresSandboxAdapter",
+    "LLMClientAdapter",
 ]

@@ -4,7 +4,11 @@
 """
 
 from bench.domain.exceptions.base import BenchException
-from bench.domain.exceptions.clients_exc import DatabaseClientError, LLMClientError
+from bench.domain.exceptions.clients_exc import (
+    DatabaseClientError,
+    LLMClientError,
+    ProviderConfigError,
+)
 from bench.domain.exceptions.handler import (
     handle_exception,
     install_global_handler,
@@ -16,6 +20,7 @@ __all__ = [
     "BenchException",
     "DatabaseClientError",
     "LLMClientError",
+    "ProviderConfigError",
     "FieldAccessError",
     "LoggingConfigError",
     "SymlinkError",

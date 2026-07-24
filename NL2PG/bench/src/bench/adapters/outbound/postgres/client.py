@@ -117,7 +117,8 @@ class PostgresClientAdapter(DatabasePort):
             with conn.cursor() as cur:
                 cur.execute(statement, params)
         except pg_errors.Error as e:
-            raise DatabaseClientError(f"Errore durante l'esecuzione dello statement SQL: {e}") from e
+            msg = f"Errore durante l'esecuzione dello statement SQL: {e}"
+            raise DatabaseClientError(msg) from e
 
     def execute_identifier(self, conn: Connection, template: str, identifier: str) -> None:
         """Esegue un comando DDL inserendo un identificatore dinamico con sql.Identifier."""
@@ -126,7 +127,8 @@ class PostgresClientAdapter(DatabasePort):
                 query_obj = sql.SQL(template).format(sql.Identifier(identifier))
                 cur.execute(query_obj)
         except pg_errors.Error as e:
-            raise DatabaseClientError(f"Errore durante l'esecuzione dell'identificatore SQL: {e}") from e
+            msg = f"Errore durante l'esecuzione dell'identificatore SQL: {e}"
+            raise DatabaseClientError(msg) from e
 
     def execute_query(
         self,
@@ -134,7 +136,7 @@ class PostgresClientAdapter(DatabasePort):
         query: str,
         params: tuple[Any, ...] | dict[str, Any] | None = None,
     ) -> tuple[list[str], list[tuple[Any, ...]]]:
-        """Esegue una query SELECT parametrizzata impostando statement_timeout e modalità read-only."""
+        """Esegue una query SELECT parametrizzata read-only."""
         try:
             conn.read_only = True
             with conn.cursor() as cur:

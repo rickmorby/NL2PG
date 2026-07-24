@@ -7,7 +7,7 @@ from bench.domain.exceptions.base import BenchException
 
 
 class FieldAccessError(BenchException):
-    """Sollevata quando si tenta di accedere direttamente a un campo privato DTO senza usare il getter."""
+    """Sollevata quando si tenta di accedere a un campo privato DTO senza getter."""
 
 
 class UnknownFieldError(BenchException):

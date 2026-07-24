@@ -23,7 +23,7 @@ def handle_exception(exc: BaseException) -> None:
 
 @handle_exception.register(SymlinkError)
 def _handle_symlink_error(exc: SymlinkError) -> None:
-    """Handler specifico per SymlinkError: il symlink non è essenziale, i log sono sul file dedicato."""
+    """Handler per SymlinkError: i log sono registrati sul file dedicato."""
     log_path = getattr(exc, "payload", None) or "file dedicato"
     _log.warning("Symlink bench.log non creato. I log sono comunque registrati su: %s", log_path)
 

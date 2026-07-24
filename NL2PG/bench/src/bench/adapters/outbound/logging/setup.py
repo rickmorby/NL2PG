@@ -20,8 +20,9 @@ class LoggingAdapter(LoggerPort):
         """Inizializza la configurazione con livello e identificativo run_id."""
         self._level = level
         self._run_id = run_id
-        self._config_dir = Path(__file__).resolve().parent.parent.parent.parent.parent.parent / "config"
-        self._log_dir = Path(__file__).resolve().parent.parent.parent.parent.parent.parent / "logs"
+        base_dir = Path(__file__).resolve().parent.parent.parent.parent.parent.parent
+        self._config_dir = base_dir / "config"
+        self._log_dir = base_dir / "logs"
 
     def get_config_dir(self) -> Path:
         """Restituisce la directory contenente i file di configurazione."""

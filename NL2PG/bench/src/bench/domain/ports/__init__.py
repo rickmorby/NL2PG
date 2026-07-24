@@ -3,10 +3,16 @@
 :author: Riccardo Morabito
 """
 
-from bench.domain.ports.outbound import DatabasePort, LoggerPort, SandboxPort
+from bench.domain.ports.outbound import (
+    DatabasePort,
+    LLMGeneratorPort,
+    LoggerPort,
+    SandboxPort,
+)
 
 __all__ = [
     "DatabasePort",
     "SandboxPort",
+    "LLMGeneratorPort",
     "LoggerPort",
 ]

@@ -12,3 +12,7 @@ class DatabaseClientError(BenchException):
 
 class LLMClientError(BenchException):
     """Errore sollevato durante le chiamate o i failover ai modelli LLM."""
+
+
+class ProviderConfigError(BenchException):
+    """Sollevata se il file di configurazione dei provider è assente o non valido."""

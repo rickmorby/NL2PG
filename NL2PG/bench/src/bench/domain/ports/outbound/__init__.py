@@ -4,10 +4,12 @@
 """
 
 from bench.domain.ports.outbound.database import DatabasePort, SandboxPort
+from bench.domain.ports.outbound.llm import LLMGeneratorPort
 from bench.domain.ports.outbound.logger import LoggerPort
 
 __all__ = [
     "DatabasePort",
     "SandboxPort",
+    "LLMGeneratorPort",
     "LoggerPort",
 ]

@@ -1,0 +1,34 @@
+{
+  "chains": {
+    "default":     ["openrouter/model-1", "nous/model-2"],
+    "critic":      ["openrouter/model-1", "nous/model-2"],
+    "calibration": ["openrouter/model-1", "nous/model-2"]
+  },
+  "models": {
+    "openrouter/model-1": {
+      "provider": "openai",
+      "model": "your-model-name",
+      "temperature": 0.7,
+      "max_tokens": 8192,
+      "request_timeout": 120,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE",
+      "structured_output_method": "json_mode"
+    },
+    "nous/model-2": {
+      "provider": "openai",
+      "model": "your-model-name-free",
+      "temperature": 0.7,
+      "max_tokens": 8192,
+      "request_timeout": 120,
+      "base_url": "https://inference-api.nousresearch.com/v1",
+      "api_key": "YOUR_NOUS_API_KEY_HERE",
+      "structured_output_method": "json_mode"
+    }
+  },
+  "retry": {
+    "per_model_attempts": 3,
+    "backoff_seconds": 2,
+    "quota_cooldown_seconds": 30
+  }
+}

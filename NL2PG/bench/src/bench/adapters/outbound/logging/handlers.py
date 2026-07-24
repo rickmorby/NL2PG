@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 
 class TqdmHandler(Handler):
-    """Handler di logging che invia i messaggi a tqdm.write per non interrompere le barre di progresso."""
+    """Handler di logging che invia i messaggi a tqdm.write per le barre di progresso."""
 
     def emit(self, record: LogRecord) -> None:
         """Emette il record di log formattato tramite tqdm.write."""

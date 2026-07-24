@@ -18,7 +18,7 @@ _log = getLogger("bench.adapters.postgres")
 
 
 class PostgresSandboxAdapter(SandboxPort):
-    """Adattatore per la gestione di schemi temporanei sandbox, validazione AST ed esecuzione transazionale."""
+    """Adattatore per la gestione di schemi temporanei sandbox ed esecuzione AST."""
 
     def __init__(self, client: PostgresClientAdapter):
         """Inizializza l'adattatore memorizzando l'istanza del client PostgreSQL."""
@@ -43,7 +43,7 @@ class PostgresSandboxAdapter(SandboxPort):
         raise DatabaseClientError("Impossibile generare uno schema effimero univoco.")
 
     def execute_ddl(self, schema: str, ddl: str) -> None:
-        """Valida l'AST del DDL tramite sqlglot ed esegue la creazione delle tabelle nello schema."""
+        """Valida l'AST del DDL tramite sqlglot ed esegue la creazione tabelle nello schema."""
         self._validate_schema_name(schema)
         statements = self._validate_and_split_sql(
             ddl,
@@ -55,7 +55,7 @@ class PostgresSandboxAdapter(SandboxPort):
                     self._client.execute_prepared(conn, stmt)
 
     def execute_inserts(self, schema: str, inserts: str) -> None:
-        """Valida l'AST degli INSERT tramite sqlglot ed inserisce i dati nello schema in transazione atomica."""
+        """Valida l'AST degli INSERT tramite sqlglot ed inserisce i dati nello schema."""
         self._validate_schema_name(schema)
         statements = self._validate_and_split_sql(
             inserts,
@@ -67,7 +67,7 @@ class PostgresSandboxAdapter(SandboxPort):
                     self._client.execute_prepared(conn, stmt)
 
     def run_query(self, schema: str, query: str) -> tuple[list[str], list[tuple[Any, ...]]]:
-        """Valida che la query sia una SELECT read-only ed esegue la lettura nello schema isolato."""
+        """Valida che la query sia una SELECT read-only ed esegue la lettura nello schema."""
         self._validate_schema_name(schema)
         statements = self._validate_and_split_sql(
             query,
@@ -79,7 +79,7 @@ class PostgresSandboxAdapter(SandboxPort):
             return self._client.execute_query(conn, statements[0])
 
     def drop_schema(self, schema: str) -> None:
-        """Elimina uno schema temporaneo e le relative tabelle liberando le risorse nel database."""
+        """Elimina uno schema temporaneo e le relative tabelle liberando le risorse."""
         self._validate_schema_name(schema)
         try:
             with self._client.get_sandbox_connection(autocommit=True) as conn:
