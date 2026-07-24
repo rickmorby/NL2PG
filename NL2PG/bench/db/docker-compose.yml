@@ -1,0 +1,20 @@
+services:
+  pg:
+    image: docker.io/library/postgres:16
+    environment:
+      POSTGRES_USER: bench
+      POSTGRES_PASSWORD: bench
+    ports:
+      - "5432:5432"
+    volumes:
+      - bench_pg:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bench -d bench_meta && pg_isready -U bench -d bench_sandbox"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  bench_pg:
