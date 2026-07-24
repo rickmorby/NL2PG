@@ -1,0 +1,22 @@
+[project]
+name = "bench"
+version = "0.2.0"
+description = "Synthetic SQL & Natural Language Benchmark Generator"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.2",
+    "sqlglot>=30.13.0",
+    "psycopg[binary]>=3.3.4",
+    "pyyaml>=6.0.3",
+    "tqdm>=4.69.0",
+    "rich>=15.0.0",
+    "typer>=0.27.0",
+    "langchain-openai>=1.4.1",
+    "langchain-anthropic>=1.5.1",
+    "langgraph>=1.2.9",
+]
+
+[tool.uv]
+package = false
