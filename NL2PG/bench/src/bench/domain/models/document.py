@@ -4,53 +4,53 @@
 """
 
 from typing import Any
-from pydantic import PrivateAttr
+from pydantic import Field
 from bench.domain.models.base import AbstractDTO
 
 
 class DifficultyDocumentDTO(AbstractDTO):
     """Difficoltà del task per l'esportazione."""
 
-    _label: str = PrivateAttr(default="")
-    _critic_score: float | None = PrivateAttr(default=None)
-    _calibration_pass_rate: float | None = PrivateAttr(default=None)
-    _calibration_model: str = PrivateAttr(default="")
+    label: str = ""
+    critic_score: float | None = None
+    calibration_pass_rate: float | None = None
+    calibration_model: str = ""
 
 
 class GoldResultDocumentDTO(AbstractDTO):
     """Risultato Gold per l'esportazione."""
 
-    _columns: list[str] = PrivateAttr(default_factory=list)
-    _rows: list[Any] = PrivateAttr(default_factory=list)
-    _order_sensitive: bool = PrivateAttr(default=False)
+    columns: list[str] = Field(default_factory=list)
+    rows: list[Any] = Field(default_factory=list)
+    order_sensitive: bool = False
 
 
 class GoldDocumentDTO(AbstractDTO):
     """Insieme di schema, dati, query e risultato Gold."""
 
-    _schema_ddl: str = PrivateAttr(default="")
-    _data_inserts: str = PrivateAttr(default="")
-    _query: str = PrivateAttr(default="")
-    _result: GoldResultDocumentDTO | None = PrivateAttr(default=None)
+    schema_ddl: str = ""
+    data_inserts: str = ""
+    query: str = ""
+    result: GoldResultDocumentDTO | None = None
 
 
 class EvaluationDocumentDTO(AbstractDTO):
     """Parametri per la valutazione del benchmark."""
 
-    _schema_matching: str = PrivateAttr(default="normalized_names")
-    _result_comparison: str = PrivateAttr(default="bag_semantics")
+    schema_matching: str = "normalized_names"
+    result_comparison: str = "bag_semantics"
 
 
 class BenchmarkTaskDocumentDTO(AbstractDTO):
     """Documento completo del task per l'esportazione in YAML."""
 
-    _id: str = PrivateAttr(default="")
-    _version: int = PrivateAttr(default=1)
-    _language: str = PrivateAttr(default="it")
-    _category: str = PrivateAttr(default="")
-    _spec: dict[str, Any] | None = PrivateAttr(default=None)
-    _difficulty: DifficultyDocumentDTO = PrivateAttr(default_factory=DifficultyDocumentDTO)
-    _story: str = PrivateAttr(default="")
-    _question: str = PrivateAttr(default="")
-    _gold: GoldDocumentDTO = PrivateAttr(default_factory=GoldDocumentDTO)
-    _evaluation: EvaluationDocumentDTO = PrivateAttr(default_factory=EvaluationDocumentDTO)
+    id: str = ""
+    version: int = 1
+    language: str = "it"
+    category: str = ""
+    spec: dict[str, Any] | None = None
+    difficulty: DifficultyDocumentDTO = Field(default_factory=DifficultyDocumentDTO)
+    story: str = ""
+    question: str = ""
+    gold: GoldDocumentDTO = Field(default_factory=GoldDocumentDTO)
+    evaluation: EvaluationDocumentDTO = Field(default_factory=EvaluationDocumentDTO)

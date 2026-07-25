@@ -3,26 +3,26 @@
 :author: Riccardo Morabito
 """
 
-from pydantic import PrivateAttr
+from pydantic import Field
 from bench.domain.models.base import AbstractDTO
 
 
 class TwistRuleDTO(AbstractDTO):
     """Regola per la mutazione di uno schema o dei dati."""
 
-    _twist_type: str = PrivateAttr(default="")
-    _target_value: str = PrivateAttr(default="")
-    _obsolete_value: str = PrivateAttr(default="")
-    _description: str = PrivateAttr(default="")
+    twist_type: str = ""
+    target_value: str = ""
+    obsolete_value: str = ""
+    description: str = ""
 
 
 class SpecDTO(AbstractDTO):
     """Specifica per la generazione di uno schema sintetico."""
 
-    _domain: str = PrivateAttr(default="")
-    _n_tables: int = PrivateAttr(default=0)
-    _hierarchy: str = PrivateAttr(default="")
-    _sql_features: list[str] = PrivateAttr(default_factory=list)
-    _twist: list[str] = PrivateAttr(default_factory=list)
-    _twist_rules: list[TwistRuleDTO] = PrivateAttr(default_factory=list)
-    _spec_hash: str = PrivateAttr(default="")
+    domain: str = ""
+    n_tables: int = 0
+    hierarchy: str = ""
+    sql_features: list[str] = Field(default_factory=list)
+    twist: list[str] = Field(default_factory=list)
+    twist_rules: list[TwistRuleDTO] = Field(default_factory=list)
+    spec_hash: str = ""

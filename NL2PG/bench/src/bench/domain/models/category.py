@@ -3,40 +3,40 @@
 :author: Riccardo Morabito
 """
 
-from pydantic import PrivateAttr
+from pydantic import Field
 from bench.domain.models.base import AbstractDTO
 
 
 class RawCategoryDTO(AbstractDTO):
     """Categoria grezza letta da file Markdown."""
 
-    _id: str = PrivateAttr(default="")
-    _title: str = PrivateAttr(default="")
-    _content: str = PrivateAttr(default="")
-    _sql_examples: list[str] = PrivateAttr(default_factory=list)
+    id: str = ""
+    title: str = ""
+    content: str = ""
+    sql_examples: list[str] = Field(default_factory=list)
 
 
 class CategoryDraftDTO(AbstractDTO):
     """Bozza di categoria generata dall'LLM."""
 
-    _name: str = PrivateAttr(default="")
-    _description: str = PrivateAttr(default="")
-    _sql_features: list[str] = PrivateAttr(default_factory=list)
-    _schema_type: str = PrivateAttr(default="")
-    _compositions: list[str] = PrivateAttr(default_factory=list)
-    _allowed_twists: list[str] = PrivateAttr(default_factory=list)
-    _constraints: str = PrivateAttr(default="")
+    name: str = ""
+    description: str = ""
+    sql_features: list[str] = Field(default_factory=list)
+    schema_type: str = ""
+    compositions: list[str] = Field(default_factory=list)
+    allowed_twists: list[str] = Field(default_factory=list)
+    constraints: str = ""
 
 
 class CategoryDTO(AbstractDTO):
     """Categoria validata per il benchmark."""
 
-    _id: str = PrivateAttr(default="")
-    _name: str = PrivateAttr(default="")
-    _description: str = PrivateAttr(default="")
-    _sql_features: list[str] = PrivateAttr(default_factory=list)
-    _schema_type: str = PrivateAttr(default="")
-    _compositions: list[str] = PrivateAttr(default_factory=list)
-    _allowed_twists: list[str] = PrivateAttr(default_factory=list)
-    _constraints: str = PrivateAttr(default="")
-    _sql_examples: list[str] = PrivateAttr(default_factory=list)
+    id: str = ""
+    name: str = ""
+    description: str = ""
+    sql_features: list[str] = Field(default_factory=list)
+    schema_type: str = ""
+    compositions: list[str] = Field(default_factory=list)
+    allowed_twists: list[str] = Field(default_factory=list)
+    constraints: str = ""
+    sql_examples: list[str] = Field(default_factory=list)

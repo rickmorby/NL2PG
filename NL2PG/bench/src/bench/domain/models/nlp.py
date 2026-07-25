@@ -3,43 +3,42 @@
 :author: Riccardo Morabito
 """
 
-from pydantic import PrivateAttr
 from bench.domain.models.base import AbstractDTO
 
 
 class StoryDTO(AbstractDTO):
     """Contesto narrativo del task."""
 
-    _story: str = PrivateAttr(default="")
+    story: str = ""
 
 
 class QuestionDTO(AbstractDTO):
     """Domanda finale in linguaggio naturale."""
 
-    _question: str = PrivateAttr(default="")
+    question: str = ""
 
 
 class CriticScoresDTO(AbstractDTO):
     """Punteggi di qualità assegnati dal Critic."""
 
-    _narrative: float = PrivateAttr(default=0.0)
-    _distractors: float = PrivateAttr(default=0.0)
-    _plot_twists: float = PrivateAttr(default=0.0)
-    _jargon: float = PrivateAttr(default=0.0)
-    _sql_composition: float = PrivateAttr(default=0.0)
+    narrative: float = 0.0
+    distractors: float = 0.0
+    plot_twists: float = 0.0
+    jargon: float = 0.0
+    sql_composition: float = 0.0
 
 
 class JudgeDTO(AbstractDTO):
     """Verdetto di qualità del Judge."""
 
-    _verdict: str = PrivateAttr(default="hard")
+    verdict: str = "hard"
 
 
 class CalibrationResultDTO(AbstractDTO):
     """Dati di calibrazione ed esecuzione del task."""
 
-    _pass_rate: float = PrivateAttr(default=0.0)
-    _passes: int = PrivateAttr(default=0)
-    _runs: int = PrivateAttr(default=0)
-    _first_pass_attempt: int | None = PrivateAttr(default=None)
-    _model: str = PrivateAttr(default="")
+    pass_rate: float = 0.0
+    passes: int = 0
+    runs: int = 0
+    first_pass_attempt: int | None = None
+    model: str = ""

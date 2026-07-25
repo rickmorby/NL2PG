@@ -77,7 +77,7 @@ class LLMClientAdapter(LLMGeneratorPort):
         if not model_ids:
             raise LLMClientError(f"Nessuna catena di modelli configurata per il ruolo {role!r}.")
 
-        force_model = opts.get_force_model()
+        force_model = opts.force_model
         if force_model:
             if force_model not in model_ids:
                 msg = f"Modello forzato {force_model!r} non in catena ruolo {role!r}."
@@ -92,7 +92,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             runnable = self.create_model_runnable(
                 model_id=model_id,
                 schema=schema,
-                temperature_override=opts.get_temperature_override(),
+                temperature_override=opts.temperature_override,
                 attempts=attempts,
             )
             runnables.append(runnable)
@@ -114,13 +114,13 @@ class LLMClientAdapter(LLMGeneratorPort):
         runnable_chain = self.build_chain_runnable(role, schema, opts)
 
         full_prompt = prompt
-        feedback = opts.get_error_feedback()
+        feedback = opts.error_feedback
         if feedback:
             full_prompt = f"{prompt}\n\nERRORE PRECEDENTE:\n{feedback}\n\nCorreggi e riprova."
 
         try:
             output = runnable_chain.invoke(full_prompt)
-            model_used = opts.get_force_model() or self.get_chain(role)[0]
+            model_used = opts.force_model or self.get_chain(role)[0]
             return CallResultDTO(
                 output=output,
                 model_used=model_used,

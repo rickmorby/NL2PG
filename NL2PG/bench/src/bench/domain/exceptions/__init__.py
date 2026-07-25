@@ -14,17 +14,15 @@ from bench.domain.exceptions.handler import (
     install_global_handler,
 )
 from bench.domain.exceptions.logging_exc import LoggingConfigError, SymlinkError
-from bench.domain.exceptions.models_exc import FieldAccessError, UnknownFieldError
+
 
 __all__ = [
     "BenchException",
     "DatabaseClientError",
     "LLMClientError",
     "ProviderConfigError",
-    "FieldAccessError",
     "LoggingConfigError",
     "SymlinkError",
-    "UnknownFieldError",
     "handle_exception",
     "install_global_handler",
 ]

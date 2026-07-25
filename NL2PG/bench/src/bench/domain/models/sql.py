@@ -3,39 +3,40 @@
 :author: Riccardo Morabito
 """
 
-from pydantic import PrivateAttr
+from typing import Any
+from pydantic import Field
 from bench.domain.models.base import AbstractDTO
 
 
 class SchemaDDLDTO(AbstractDTO):
     """Script DDL per la creazione dello schema."""
 
-    _ddl: str = PrivateAttr(default="")
+    ddl: str = ""
 
 
 class DataInsertsDTO(AbstractDTO):
     """Istruzioni INSERT per i dati sintetici."""
 
-    _inserts: str = PrivateAttr(default="")
+    inserts: str = ""
 
 
 class GoldQueryDTO(AbstractDTO):
     """Query SQL Gold di riferimento."""
 
-    _query: str = PrivateAttr(default="")
-    _intent: str = PrivateAttr(default="")
-    _order_sensitive: bool = PrivateAttr(default=False)
+    query: str = ""
+    intent: str = ""
+    order_sensitive: bool = False
 
 
 class GoldResultDTO(AbstractDTO):
     """Risultato dell'esecuzione della query Gold."""
 
-    _columns: list[str] = PrivateAttr(default_factory=list)
-    _rows: list[str] = PrivateAttr(default_factory=list)
-    _order_sensitive: bool = PrivateAttr(default=False)
+    columns: list[str] = Field(default_factory=list)
+    rows: list[Any] = Field(default_factory=list)
+    order_sensitive: bool = False
 
 
 class SolverOutputDTO(AbstractDTO):
     """Query generata da un solver in esame."""
 
-    _query: str = PrivateAttr(default="")
+    query: str = ""
