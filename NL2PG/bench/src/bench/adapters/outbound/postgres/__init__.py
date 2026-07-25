@@ -4,9 +4,20 @@
 """
 
 from bench.adapters.outbound.postgres.database_adapter import PostgresClientAdapter
+from bench.adapters.outbound.postgres.entities import FailoverEntity, RunEntity, TaskEntity
+from bench.adapters.outbound.postgres.mappers import FailoverMapper, TaskStateMapper
+from bench.adapters.outbound.postgres.repository_adapter import MetaRepositoryAdapter
 from bench.adapters.outbound.postgres.sandbox_adapter import PostgresSandboxAdapter
+from bench.adapters.outbound.postgres.schema_validator_adapter import PostgresSchemaValidatorAdapter
 
 __all__ = [
     "PostgresClientAdapter",
     "PostgresSandboxAdapter",
+    "PostgresSchemaValidatorAdapter",
+    "MetaRepositoryAdapter",
+    "RunEntity",
+    "TaskEntity",
+    "FailoverEntity",
+    "TaskStateMapper",
+    "FailoverMapper",
 ]

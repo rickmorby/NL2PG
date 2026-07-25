@@ -1,4 +1,4 @@
-"""Adattatore outbound per il trasporto database PostgreSQL basato su psycopg_pool.
+"""Adattatore outbound per il trasporto database PostgreSQL con psycopg_pool e SQLAlchemy.
 
 :author: Riccardo Morabito
 """
@@ -8,6 +8,9 @@ from logging import getLogger
 from typing import Any, Generator
 from psycopg import Connection, errors as pg_errors, rows, sql
 from psycopg_pool import ConnectionPool
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.engine import make_url
+from sqlalchemy.orm import Session, sessionmaker
 from bench.domain.exceptions import DatabaseClientError
 from bench.domain.ports.outbound.database_port import DatabasePort
 
@@ -15,7 +18,7 @@ _log = getLogger("bench.adapters.postgres")
 
 
 class PostgresClientAdapter(DatabasePort):
-    """Adattatore concreto per il database PostgreSQL con gestione nativa dei ConnectionPool."""
+    """Adattatore PostgreSQL con gestione di ConnectionPool e Sessioni ORM."""
 
     def __init__(
         self,
@@ -27,7 +30,7 @@ class PostgresClientAdapter(DatabasePort):
         statement_timeout_ms: int = 5000,
         lock_timeout_ms: int = 5000,
     ):
-        """Inizializza l'adattatore creando i pool per sandbox e meta database."""
+        """Inizializza l'adattatore creando i pool ed il sessionmaker dei metadati."""
         self._config = config or {}
         self._sandbox_dsn = sandbox_dsn or self._config.get("sandbox_dsn", "")
         self._meta_dsn = meta_dsn or self._config.get("meta_dsn", "")
@@ -59,6 +62,9 @@ class PostgresClientAdapter(DatabasePort):
             else None
         )
 
+        self._meta_engine: Engine | None = None
+        self._meta_sessionmaker: sessionmaker[Session] | None = None
+
     def get_sandbox_dsn(self) -> str:
         """Restituisce il DSN del database sandbox."""
         return self._sandbox_dsn
@@ -66,6 +72,32 @@ class PostgresClientAdapter(DatabasePort):
     def get_meta_dsn(self) -> str:
         """Restituisce il DSN del database dei metadati."""
         return self._meta_dsn
+
+    def get_meta_engine(self) -> Engine:
+        """Restituisce l'Engine SQLAlchemy collegato al database dei metadati."""
+        if not self._meta_engine:
+            if not self._meta_dsn:
+                msg = "DSN del database meta non configurato per l'Engine."
+                raise DatabaseClientError(msg)
+            url = make_url(self._meta_dsn).set(drivername="postgresql+psycopg")
+            self._meta_engine = create_engine(url)
+            self._meta_sessionmaker = sessionmaker(bind=self._meta_engine)
+        return self._meta_engine
+
+    @contextmanager
+    def get_meta_session(self) -> Generator[Session, None, None]:
+        """Context manager per l'acquisizione ed il rilascio di una Sessione SQLAlchemy ORM."""
+        if not self._meta_sessionmaker:
+            self.get_meta_engine()
+        assert self._meta_sessionmaker is not None
+        session = self._meta_sessionmaker()
+        try:
+            yield session
+        except Exception as e:
+            session.rollback()
+            raise DatabaseClientError(f"Errore durante l'esecuzione della sessione ORM: {e}") from e
+        finally:
+            session.close()
 
     def open(self) -> None:
         """Apre esplicitamente i connection pool."""
@@ -166,9 +198,11 @@ class PostgresClientAdapter(DatabasePort):
             raise DatabaseClientError(f"Errore durante l'esecuzione della query dict: {e}") from e
 
     def close(self) -> None:
-        """Chiude i pool rilasciando le connessioni aperte verso PostgreSQL."""
+        """Chiude i pool ed inattiva l'Engine SQLAlchemy del client."""
         if self._sandbox_pool and not self._sandbox_pool.closed:
             self._sandbox_pool.close()
         if self._meta_pool and not self._meta_pool.closed:
             self._meta_pool.close()
-        _log.info("Pool PostgreSQL chiusi correttamente.")
+        if self._meta_engine:
+            self._meta_engine.dispose()
+        _log.info("Client PostgreSQL e risorse ORM chiuse correttamente.")
