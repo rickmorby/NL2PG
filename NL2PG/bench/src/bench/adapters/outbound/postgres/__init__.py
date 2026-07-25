@@ -3,8 +3,8 @@
 :author: Riccardo Morabito
 """
 
-from bench.adapters.outbound.postgres.client import PostgresClientAdapter
-from bench.adapters.outbound.postgres.sandbox import PostgresSandboxAdapter
+from bench.adapters.outbound.postgres.database_adapter import PostgresClientAdapter
+from bench.adapters.outbound.postgres.sandbox_adapter import PostgresSandboxAdapter
 
 __all__ = [
     "PostgresClientAdapter",

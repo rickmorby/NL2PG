@@ -4,7 +4,7 @@
 """
 
 from bench.adapters.outbound.logging.handlers import TqdmHandler
-from bench.adapters.outbound.logging.setup import LoggingAdapter
+from bench.adapters.outbound.logging.logger_adapter import LoggingAdapter
 
 __all__ = [
     "TqdmHandler",

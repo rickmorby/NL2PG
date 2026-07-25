@@ -9,7 +9,7 @@ from typing import Any, Generator
 from psycopg import Connection, errors as pg_errors, rows, sql
 from psycopg_pool import ConnectionPool
 from bench.domain.exceptions import DatabaseClientError
-from bench.domain.ports.outbound.database import DatabasePort
+from bench.domain.ports.outbound.database_port import DatabasePort
 
 _log = getLogger("bench.adapters.postgres")
 

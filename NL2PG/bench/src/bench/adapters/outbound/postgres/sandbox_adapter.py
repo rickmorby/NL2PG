@@ -10,9 +10,9 @@ from re import compile as re_compile
 from string import ascii_lowercase, digits
 from typing import Any, Generator
 from sqlglot import parse as parse_sql, exp
-from bench.adapters.outbound.postgres.client import PostgresClientAdapter
+from bench.adapters.outbound.postgres.database_adapter import PostgresClientAdapter
 from bench.domain.exceptions import DatabaseClientError
-from bench.domain.ports.outbound.database import SandboxPort
+from bench.domain.ports.outbound.sandbox_port import SandboxPort
 
 _log = getLogger("bench.adapters.postgres")
 

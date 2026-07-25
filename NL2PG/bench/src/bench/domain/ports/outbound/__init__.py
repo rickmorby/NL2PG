@@ -3,9 +3,10 @@
 :author: Riccardo Morabito
 """
 
-from bench.domain.ports.outbound.database import DatabasePort, SandboxPort
-from bench.domain.ports.outbound.llm import LLMGeneratorPort
-from bench.domain.ports.outbound.logger import LoggerPort
+from bench.domain.ports.outbound.database_port import DatabasePort
+from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
+from bench.domain.ports.outbound.logger_port import LoggerPort
 
 __all__ = [
     "DatabasePort",

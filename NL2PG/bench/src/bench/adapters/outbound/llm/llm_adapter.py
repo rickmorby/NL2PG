@@ -1,4 +1,4 @@
-"""Adattatore outbound per generazione ed orchestrazione LLM tramite LangChain.
+"""Adattatore outbound per generazione ed orchestrazione LLM tramite LangChain (LLM adapter).
 
 :author: Riccardo Morabito
 """
@@ -10,7 +10,7 @@ from langchain_core.runnables import Runnable
 from pydantic import BaseModel
 from bench.domain.exceptions import LLMClientError
 from bench.domain.models.llm import CallOptionsDTO, CallResultDTO
-from bench.domain.ports.outbound.llm import LLMGeneratorPort
+from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 _log = getLogger("bench.adapters.llm")
 
