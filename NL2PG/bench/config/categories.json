@@ -1,0 +1,2631 @@
+{
+  "categories": [
+    {
+      "id": "Q01_S01",
+      "descrizione": "Query: selezione singola tabella con filtro WHERE. Schema: singola entità.",
+      "vincoli": "Filtrare righe su una singola tabella usando condizioni WHERE. Schema: singola entità: tabella autonoma con PK e attributi base.",
+      "tipo_schema": "single_entity",
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor",
+        "jargon",
+        "polysemy",
+        "ambiguity"
+      ],
+      "query_type": "Single-table selection",
+      "schema_type": "Single-entity",
+      "logical_pattern": "Baseline. Filtro/Aggregazione diretta su entità.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        1
+      ]
+    },
+    {
+      "id": "Q01_S07",
+      "descrizione": "Query: selezione singola tabella con filtro WHERE. Schema: auto-referenziamento.",
+      "vincoli": "Filtrare righe su una singola tabella usando condizioni WHERE. Schema: Tabella con FK verso se stessa (es. organigramma).",
+      "tipo_schema": "self_referencing",
+      "query_type": "Single-table selection",
+      "schema_type": "Self-referencing",
+      "logical_pattern": "Sinergia Strutturale. Identificare radici/foglie.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        7
+      ]
+    },
+    {
+      "id": "Q01_S11",
+      "descrizione": "Single-table selection with PK inference. Deduce which column to filter.",
+      "vincoli": "Filtrare righe su una singola tabella usando condizioni WHERE. Schema: PK non esplicita, va dedotta dal contesto.",
+      "tipo_schema": "primary_key_inference",
+      "query_type": "Single-table selection",
+      "schema_type": "PK inference",
+      "logical_pattern": "Inferenza PK. Dedurre quale colonna filtrare.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        11
+      ]
+    },
+    {
+      "id": "Q01_S14",
+      "descrizione": "Categoria di query che applicano vincoli di dominio (filtri impliciti) su una singola tabella.",
+      "vincoli": "La query deve operare su una singola tabella e includere vincoli di dominio impliciti.",
+      "tipo_schema": "domain_constraint",
+      "composizioni": [
+        "single_table_selection",
+        "domain_constraint"
+      ],
+      "twist_ammessi": [
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Single-table selection",
+      "schema_type": "Domain constraint",
+      "logical_pattern": "Vincolo Dominio. Aggiungere filtri impliciti.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        14
+      ]
+    },
+    {
+      "id": "Q01_S17",
+      "descrizione": "Soft Deletion. Filtrare record logicamente cancellati.",
+      "vincoli": "La query deve filtrare i record logicamente cancellati (es. deleted_at IS NULL).",
+      "tipo_schema": "soft_deletion",
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Single-table selection",
+      "schema_type": "Soft deletion",
+      "logical_pattern": "Soft Deletion. Filtrare record logicamente cancellati.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        17
+      ]
+    },
+    {
+      "id": "Q01_S20",
+      "descrizione": "Single-table selection with ENUM type inference and casting, increasing schema complexity without altering the basic SQL query structure.",
+      "vincoli": "Casting enumerato required.",
+      "tipo_schema": "enum_type",
+      "query_type": "Single-table selection",
+      "schema_type": "ENUM type inference",
+      "logical_pattern": "Tipo PG Nativo. Casting enumerato.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        20
+      ]
+    },
+    {
+      "id": "Q01_S26",
+      "descrizione": "Single-table selection with logical type mismatch, requiring casting.",
+      "vincoli": "Filtrare righe su una singola tabella usando condizioni WHERE. Schema: disallineamento tipo fisico/logico (es. TEXT per numeri).",
+      "tipo_schema": "type_mismatch",
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Single-table selection",
+      "schema_type": "Logical Type Mismatch",
+      "logical_pattern": "Mismatch Casting.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        26
+      ]
+    },
+    {
+      "id": "Q01_S27",
+      "descrizione": "Query: selezione singola tabella con filtro WHERE. Schema: FK implicite.",
+      "vincoli": "The query is a simple SELECT from one table, no joins, aggregations, or subqueries allowed.",
+      "tipo_schema": "implicit_fk",
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Single-table selection",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Semantic Mapping.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q01_S28",
+      "descrizione": "Query: selezione singola tabella con filtro WHERE. Schema: nomi abbreviati.",
+      "vincoli": "Schema uses abbreviated column names requiring decoding; query is a single-table selection with multiple conditions.",
+      "tipo_schema": "abbreviated_naming",
+      "twist_ammessi": [
+        "rename",
+        "jargon"
+      ],
+      "query_type": "Single-table selection",
+      "schema_type": "Abbreviated Naming",
+      "logical_pattern": "Decodifica Linguistica.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        28
+      ]
+    },
+    {
+      "id": "Q01_S29",
+      "descrizione": "Single-table selection with column splitting, using concatenation logic.",
+      "vincoli": "Filtrare righe su una singola tabella usando condizioni WHERE. Schema: Dati uniti divisi in più colonne fisiche.",
+      "tipo_schema": "column_splitting",
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Single-table selection",
+      "schema_type": "Column Splitting",
+      "logical_pattern": "Concatenazione.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        1
+      ],
+      "schema_type_ids": [
+        29
+      ]
+    },
+    {
+      "id": "Q02_S01",
+      "descrizione": "Query: aggregazione scalare senza GROUP BY. Schema: singola entità.",
+      "vincoli": "Direct filter and scalar aggregation on a single entity. No joins or grouping.",
+      "tipo_schema": "single_entity",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "Single-entity",
+      "logical_pattern": "Baseline. Filtro/Aggregazione diretta su entità.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        1
+      ]
+    },
+    {
+      "id": "Q02_S07",
+      "descrizione": "Scalar aggregation on self-referencing schema. Sinergia Strutturale. Identificare radici/foglie.",
+      "vincoli": "Usare COUNT/SUM/AVG/MAX/MIN senza GROUP BY per restituire un singolo valore. Schema: Tabella con FK verso se stessa (es. organigramma).",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "Self-referencing",
+      "logical_pattern": "Sinergia Strutturale. Identificare radici/foglie.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        7
+      ]
+    },
+    {
+      "id": "Q02_S11",
+      "descrizione": "Query: aggregazione scalare senza GROUP BY. Schema: inferenza chiave primaria.",
+      "vincoli": "Usare COUNT/SUM/AVG/MAX/MIN senza GROUP BY per restituire un singolo valore. Schema: PK non esplicita, va dedotta dal contesto.",
+      "tipo_schema": "primary_key_inference",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "PK inference",
+      "logical_pattern": "Inferenza PK. Dedurre quale colonna filtrare.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        11
+      ]
+    },
+    {
+      "id": "Q02_S14",
+      "descrizione": "Query di scalar aggregation su schema con vincolo di dominio, che aggiunge filtri impliciti.",
+      "vincoli": "Usare COUNT/SUM/AVG/MAX/MIN senza GROUP BY per restituire un singolo valore. Schema: vincoli CHECK/NOT NULL/UNIQUE dedotti dal testo.",
+      "tipo_schema": "domain_constraint",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "Domain constraint",
+      "logical_pattern": "Vincolo Dominio. Aggiungere filtri impliciti.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        14
+      ]
+    },
+    {
+      "id": "Q02_S17",
+      "descrizione": "Scalar aggregation query with soft deletion, filtering logically deleted records.",
+      "vincoli": "Usare COUNT/SUM/AVG/MAX/MIN senza GROUP BY per restituire un singolo valore. Schema: Flag/timestamp per cancellazione logica.",
+      "tipo_schema": "soft_deletion",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "Soft deletion",
+      "logical_pattern": "Soft Deletion. Filtrare record logicamente cancellati.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        17
+      ]
+    },
+    {
+      "id": "Q02_S20",
+      "descrizione": "Scalar aggregation query with ENUM type inference. Native PG type. Enumerated casting.",
+      "vincoli": "Usare COUNT/SUM/AVG/MAX/MIN senza GROUP BY per restituire un singolo valore. Schema: Colonna con tipo enumerato nativo PostgreSQL.",
+      "tipo_schema": "enum_type",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "ENUM type inference",
+      "logical_pattern": "Tipo PG Nativo. Casting enumerato.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        20
+      ]
+    },
+    {
+      "id": "Q02_S26",
+      "descrizione": "Scalar aggregation with logical type mismatch and mismatch casting pattern.",
+      "vincoli": "Usare COUNT/SUM/AVG/MAX/MIN senza GROUP BY per restituire un singolo valore. Schema: disallineamento tipo fisico/logico (es. TEXT per numeri).",
+      "tipo_schema": "type_mismatch",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "twist_ammessi": [
+        "ambiguity"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "Logical Type Mismatch",
+      "logical_pattern": "Mismatch Casting.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        26
+      ]
+    },
+    {
+      "id": "Q02_S27",
+      "descrizione": "Scalar aggregation query on an implicit foreign key schema, representing a semantic mapping from query type to schema type.",
+      "vincoli": "The primary SQL skeleton must remain unchanged; only linguistic variations are allowed.",
+      "tipo_schema": "implicit_fk",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "composizioni": [
+        "scalar_aggregation",
+        "implicit_fk"
+      ],
+      "twist_ammessi": [
+        "synonym",
+        "rephrase"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Semantic Mapping.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q02_S28",
+      "descrizione": "Scalar aggregation with abbreviated naming schema. The logical pattern involves linguistic decoding to understand the abbreviated names and perform scalar aggregation.",
+      "vincoli": "Narrative must encapsulate the exact logical pattern, justifying schema complexity without transforming the primary SQL query skeleton.",
+      "tipo_schema": "abbreviated_naming",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "twist_ammessi": [
+        "jargon",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "Abbreviated Naming",
+      "logical_pattern": "Decodifica Linguistica.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        28
+      ]
+    },
+    {
+      "id": "Q02_S29",
+      "descrizione": "Categoria di benchmark con tipo di query aggregazione scalare e tipo di schema suddivisione di colonna, pattern logico concatenazione.",
+      "vincoli": "Usare COUNT/SUM/AVG/MAX/MIN senza GROUP BY per restituire un singolo valore. Schema: Dati uniti divisi in più colonne fisiche.",
+      "tipo_schema": "column_splitting",
+      "feature_sql": [
+        "scalar_agg"
+      ],
+      "composizioni": [
+        "concatenazione"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor",
+        "jargon",
+        "polysemy",
+        "ambiguity"
+      ],
+      "query_type": "Scalar aggregation",
+      "schema_type": "Column Splitting",
+      "logical_pattern": "Concatenazione.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        2
+      ],
+      "schema_type_ids": [
+        29
+      ]
+    },
+    {
+      "id": "Q03_S01",
+      "descrizione": "Query: top-N con ORDER BY e LIMIT. Schema: singola entità.",
+      "vincoli": "Selezionare le prime N righe ordinate con ORDER BY e LIMIT. Schema: singola entità: tabella autonoma con PK e attributi base.",
+      "tipo_schema": "single_entity",
+      "feature_sql": [
+        "top_n"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "Single-entity",
+      "logical_pattern": "Baseline. Filtro/Aggregazione diretta su entità.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        1
+      ]
+    },
+    {
+      "id": "Q03_S07",
+      "descrizione": "Top-N query on a self-referencing schema to identify roots and leaves. The narrative must preserve the logical pattern without altering the primary SQL skeleton.",
+      "vincoli": "The SQL query must use TOP-N and self-join on the same table to find root-leaf relationships.",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "top_n"
+      ],
+      "twist_ammessi": [
+        "rephrase"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "Self-referencing",
+      "logical_pattern": "Sinergia Strutturale. Identificare radici/foglie.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        7
+      ]
+    },
+    {
+      "id": "Q03_S11",
+      "descrizione": "Query: top-N con ORDER BY e LIMIT. Schema: inferenza chiave primaria.",
+      "vincoli": "La query deve selezionare le prime N righe ordinando per una colonna, filtrando eventualmente su un valore di PK.",
+      "tipo_schema": "primary_key_inference",
+      "feature_sql": [
+        "top_n"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "PK inference",
+      "logical_pattern": "Inferenza PK. Dedurre quale colonna filtrare.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        11
+      ]
+    },
+    {
+      "id": "Q03_S14",
+      "descrizione": "Domain constraint with implicit filters.",
+      "vincoli": "Selezionare le prime N righe ordinate con ORDER BY e LIMIT. Schema: vincoli CHECK/NOT NULL/UNIQUE dedotti dal testo.",
+      "tipo_schema": "domain_constraint",
+      "feature_sql": [
+        "top_n"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "Domain constraint",
+      "logical_pattern": "Vincolo Dominio. Aggiungere filtri impliciti.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        14
+      ]
+    },
+    {
+      "id": "Q03_S17",
+      "descrizione": "Soft Deletion. Filtrare record logicamente cancellati.",
+      "vincoli": "Soft deletion: filtrare record logicamente cancellati.",
+      "tipo_schema": "soft_deletion",
+      "feature_sql": [
+        "top_n"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "synonym",
+        "distractor"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "Soft deletion",
+      "logical_pattern": "Soft Deletion. Filtrare record logicamente cancellati.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        17
+      ]
+    },
+    {
+      "id": "Q03_S20",
+      "descrizione": "Benchmark per query Top-N con inferenza di tipo ENUM",
+      "vincoli": "Nessun vincolo particolare",
+      "tipo_schema": "enum_type",
+      "feature_sql": [
+        "top_n"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "ENUM type inference",
+      "logical_pattern": "Tipo PG Nativo. Casting enumerato.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        20
+      ]
+    },
+    {
+      "id": "Q03_S26",
+      "descrizione": "Generare una narrativa che incapsuli il pattern logico di Mismatch Casting, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "vincoli": "Selezionare le prime N righe ordinate con ORDER BY e LIMIT. Schema: disallineamento tipo fisico/logico (es. TEXT per numeri).",
+      "tipo_schema": "type_mismatch",
+      "feature_sql": [
+        "top_n"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "Logical Type Mismatch",
+      "logical_pattern": "Mismatch Casting.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        26
+      ]
+    },
+    {
+      "id": "Q03_S27",
+      "descrizione": "Top-N query with implicit foreign key schema using semantic mapping.",
+      "vincoli": "Selezionare le prime N righe ordinate con ORDER BY e LIMIT. Schema: FK implicite: relazioni senza REFERENCES esplicito.",
+      "tipo_schema": "implicit_fk",
+      "feature_sql": [
+        "top_n"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Semantic Mapping.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q03_S28",
+      "descrizione": "Schema di query Top-N con nome abbreviato, che richiede decodifica linguistica.",
+      "vincoli": "Solo query di tipo Top-N su schema con nomi abbreviati, decodifica linguistica.",
+      "tipo_schema": "abbreviated_naming",
+      "feature_sql": [
+        "top_n"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "synonym",
+        "ambiguity"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "Abbreviated Naming",
+      "logical_pattern": "Decodifica Linguistica.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        28
+      ]
+    },
+    {
+      "id": "Q03_S29",
+      "descrizione": "Query Top-N con concatenazione su schema column splitting.",
+      "vincoli": "Selezionare le prime N righe ordinate con ORDER BY e LIMIT. Schema: Dati uniti divisi in più colonne fisiche.",
+      "tipo_schema": "column_splitting",
+      "feature_sql": [
+        "top_n"
+      ],
+      "composizioni": [
+        "concatenazione"
+      ],
+      "query_type": "Top-N",
+      "schema_type": "Column Splitting",
+      "logical_pattern": "Concatenazione.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        3
+      ],
+      "schema_type_ids": [
+        29
+      ]
+    },
+    {
+      "id": "Q04_Q11_Q14_S27_S30",
+      "descrizione": "Archetipo Composizionale: Nested-Complex Triple (JOIN + Subquery + Set Operation): Combinare simultaneamente un JOIN, una subquery annidata e un operatore insiemistico (UNION / INTERSECT / EXCEPT) applicato sopra i risultati di subquery. Zero-Data: il modello deve inventare uno schema con chiavi esterne implicite e molte tabelle di distrazione.",
+      "vincoli": "Zero-Data: il modello deve inventare uno schema con chiavi esterne implicite e molte tabelle di distrazione, e risolvere una query che unisce tabelle con JOIN, filtra con una subquery nella clausola WHERE, e fonde i risultati con un operatore insiemistico (UNION/INTERSECT/EXCEPT).",
+      "feature_sql": [
+        "join",
+        "subquery",
+        "set_op"
+      ],
+      "tipo_schema": "one_to_many",
+      "twist_ammessi": [
+        "distractor"
+      ],
+      "composizioni": [
+        "JOIN + Subquery + Set Operation"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "esempi_sql": [
+        "SELECT e.name\nFROM employees e\nJOIN departments d ON e.dept_id = d.id\nWHERE d.location = 'HQ'\n  AND e.salary > (SELECT AVG(salary) FROM employees)\nEXCEPT\nSELECT c.name\nFROM contractors c\nWHERE c.clearance = 'standard';"
+      ],
+      "query_type_ids": [
+        4,
+        11,
+        14
+      ],
+      "schema_type_ids": [
+        27,
+        30
+      ]
+    },
+    {
+      "id": "Q04_S02",
+      "descrizione": "A two-table join query on a one-to-many schema relationship, representing a baseline join pattern.",
+      "vincoli": "Collegare due tabelle tramite chiave primaria ed esterna. Schema: Una tabella padre + tabella figlia con FK.",
+      "tipo_schema": "one_to_many",
+      "feature_sql": [
+        "join"
+      ],
+      "query_type": "Two-table join",
+      "schema_type": "1:N relationship",
+      "logical_pattern": "Baseline Join.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        4
+      ],
+      "schema_type_ids": [
+        2
+      ]
+    },
+    {
+      "id": "Q04_S04",
+      "descrizione": "Estensione Entità 1:1. Query di join tra due tabelle con relazione uno a uno.",
+      "vincoli": "Two-table join with 1:1 relationship. The narrative must encapsulate the logical pattern without transforming the primary SQL query skeleton.",
+      "tipo_schema": "one_to_one",
+      "feature_sql": [
+        "join"
+      ],
+      "query_type": "Two-table join",
+      "schema_type": "1:1 relationship",
+      "logical_pattern": "Estensione Entità 1:1.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        4
+      ],
+      "schema_type_ids": [
+        4
+      ]
+    },
+    {
+      "id": "Q04_S05",
+      "descrizione": "Two-table join on a weak entity schema.",
+      "vincoli": "Collegare due tabelle tramite chiave primaria ed esterna. Schema: Entità la cui chiave include la FK del proprietario.",
+      "tipo_schema": "weak_entity",
+      "feature_sql": [
+        "join"
+      ],
+      "query_type": "Two-table join",
+      "schema_type": "Weak entity",
+      "logical_pattern": "Weak Entity Join.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        4
+      ],
+      "schema_type_ids": [
+        5
+      ]
+    },
+    {
+      "id": "Q04_S08",
+      "descrizione": "Two-table join on an ISA relationship (inheritance) schema. Query joins two tables representing a supertype and subtype.",
+      "vincoli": "ISA inheritance pattern",
+      "tipo_schema": "one_to_one",
+      "feature_sql": [
+        "join"
+      ],
+      "query_type": "Two-table join",
+      "schema_type": "ISA relationship",
+      "logical_pattern": "ISA / Ereditarietà.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        4
+      ],
+      "schema_type_ids": [
+        8
+      ]
+    },
+    {
+      "id": "Q04_S10",
+      "descrizione": "Query: join tra due tabelle con PK/FK. Schema: S10.",
+      "vincoli": "Collegare due tabelle tramite chiave primaria ed esterna.",
+      "tipo_schema": "one_to_many",
+      "feature_sql": [
+        "join"
+      ],
+      "twist_ammessi": [
+        "ambiguity"
+      ],
+      "query_type": "Two-table join",
+      "schema_type": "Implicit cardinality",
+      "logical_pattern": "Cardinalità Implicita.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        4
+      ],
+      "schema_type_ids": [
+        10
+      ]
+    },
+    {
+      "id": "Q04_S23",
+      "descrizione": "Query: join tra due tabelle con PK/FK. Schema: S23.",
+      "vincoli": "Polymorphic relationship schema",
+      "tipo_schema": "associative_entity",
+      "feature_sql": [
+        "join"
+      ],
+      "query_type": "Two-table join",
+      "schema_type": "Polymorphic relationship",
+      "logical_pattern": "Polimorfismo.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        4
+      ],
+      "schema_type_ids": [
+        23
+      ]
+    },
+    {
+      "id": "Q04_S27",
+      "descrizione": "Two-table join with implicit foreign key, semantic join pattern.",
+      "vincoli": "Join between two tables with implicit foreign key relationship.",
+      "tipo_schema": "implicit_fk",
+      "feature_sql": [
+        "join"
+      ],
+      "query_type": "Two-table join",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Join Semantico.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        4
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q04_S30",
+      "descrizione": "Query: join tra due tabelle con PK/FK. Schema: tabelle distrazione.",
+      "vincoli": "Two-table join only; schema includes many distracting tables.",
+      "tipo_schema": "large_scale_distraction",
+      "feature_sql": [
+        "join"
+      ],
+      "twist_ammessi": [
+        "distractor"
+      ],
+      "query_type": "Two-table join",
+      "schema_type": "Large-scale Distraction",
+      "logical_pattern": "Path Routing (Distrazione).",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        4
+      ],
+      "schema_type_ids": [
+        30
+      ]
+    },
+    {
+      "id": "Q05_S01",
+      "descrizione": "Grouped aggregation on a single entity, with direct filter/aggregation.",
+      "vincoli": "Raggruppare righe con GROUP BY e calcolare aggregati per gruppo. Schema: singola entità: tabella autonoma con PK e attributi base.",
+      "tipo_schema": "single_entity",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "Single-entity",
+      "logical_pattern": "Baseline. Filtro/Aggregazione diretta su entità.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        1
+      ]
+    },
+    {
+      "id": "Q05_S07",
+      "descrizione": "Query: aggregazione raggruppata con GROUP BY. Schema: auto-referenziamento.",
+      "vincoli": "Raggruppare righe con GROUP BY e calcolare aggregati per gruppo. Schema: Tabella con FK verso se stessa (es. organigramma).",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "Self-referencing",
+      "logical_pattern": "Sinergia Strutturale. Identificare radici/foglie.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        7
+      ]
+    },
+    {
+      "id": "Q05_S11",
+      "descrizione": "Query: aggregazione raggruppata con GROUP BY. Schema: inferenza chiave primaria.",
+      "vincoli": "PK inference; Grouped aggregation",
+      "tipo_schema": "primary_key_inference",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "PK inference",
+      "logical_pattern": "Inferenza PK. Dedurre quale colonna filtrare.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        11
+      ]
+    },
+    {
+      "id": "Q05_S14",
+      "descrizione": "Grouped aggregation query with domain constraints and implicit filters.",
+      "vincoli": "Raggruppare righe con GROUP BY e calcolare aggregati per gruppo. Schema: vincoli CHECK/NOT NULL/UNIQUE dedotti dal testo.",
+      "tipo_schema": "domain_constraint",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "Domain constraint",
+      "logical_pattern": "Vincolo Dominio. Aggiungere filtri impliciti.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        14
+      ]
+    },
+    {
+      "id": "Q05_S17",
+      "descrizione": "Filter out logically deleted records while performing a grouped aggregation.",
+      "vincoli": "Filtrare record logicamente cancellati",
+      "tipo_schema": "soft_deletion",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "Soft deletion",
+      "logical_pattern": "Soft Deletion. Filtrare record logicamente cancellati.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        17
+      ]
+    },
+    {
+      "id": "Q05_S20",
+      "descrizione": "Grouped aggregation with ENUM type inference.",
+      "vincoli": "Raggruppare righe con GROUP BY e calcolare aggregati per gruppo. Schema: Colonna con tipo enumerato nativo PostgreSQL.",
+      "tipo_schema": "enum_type",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "ENUM type inference",
+      "logical_pattern": "Tipo PG Nativo. Casting enumerato.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        20
+      ]
+    },
+    {
+      "id": "Q05_S26",
+      "descrizione": "Grouped aggregation with logical type mismatch, involving mismatch casting.",
+      "vincoli": "Raggruppare righe con GROUP BY e calcolare aggregati per gruppo. Schema: Colonna con tipo fisico diverso dal logico.",
+      "tipo_schema": "type_mismatch",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "composizioni": [
+        "Mismatch Casting"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "Logical Type Mismatch",
+      "logical_pattern": "Mismatch Casting.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        26
+      ]
+    },
+    {
+      "id": "Q05_S27",
+      "descrizione": "Pattern logico di mapping semantico: la query esegue una aggregazione raggruppata su una tabella che è collegata tramite una foreign key implicita a un'altra tabella. La complessità risiede nell'individuare la relazione nascosta e applicare l'aggregazione corretta senza un esplicito vincolo di integrità referenziale.",
+      "vincoli": "Il tipo di schema è Implicit FK, che richiede di considerare una relazione non esplicita tra tabelle.",
+      "tipo_schema": "implicit_fk",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "composizioni": [
+        "grouped_aggregation"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Semantic Mapping.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q05_S28",
+      "descrizione": "Categoria basata su decodifica linguistica con aggregazione raggruppata e schema con naming abbreviato.",
+      "vincoli": "Nessun vincolo specifico.",
+      "tipo_schema": "abbreviated_naming",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "twist_ammessi": [
+        "jargon",
+        "rename",
+        "ambiguity"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "Abbreviated Naming",
+      "logical_pattern": "Decodifica Linguistica.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        28
+      ]
+    },
+    {
+      "id": "Q05_S29",
+      "descrizione": "Grouped aggregation with concatenation pattern. The schema involves column splitting transformation.",
+      "vincoli": "Raggruppare righe con GROUP BY e calcolare aggregati per gruppo. Schema: Dati uniti divisi in più colonne fisiche.",
+      "tipo_schema": "column_splitting",
+      "feature_sql": [
+        "group_agg"
+      ],
+      "composizioni": [
+        "concatenation"
+      ],
+      "query_type": "Grouped aggregation",
+      "schema_type": "Column Splitting",
+      "logical_pattern": "Concatenazione.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        5
+      ],
+      "schema_type_ids": [
+        29
+      ]
+    },
+    {
+      "id": "Q06_S01",
+      "descrizione": "Query: condizioni congiuntive con AND. Schema: singola entità.",
+      "vincoli": "Filtrare con condizioni multiple combinate da AND nella clausola WHERE. Schema: singola entità: tabella autonoma con PK e attributi base.",
+      "tipo_schema": "single_entity",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "Single-entity",
+      "logical_pattern": "Baseline. Filtro/Aggregazione diretta su entità.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        1
+      ]
+    },
+    {
+      "id": "Q06_S07",
+      "descrizione": "Conjunctive query with self-referencing schema. Structural synergy: identify roots and leaves.",
+      "vincoli": "Filtrare con condizioni multiple combinate da AND nella clausola WHERE. Schema: Tabella con FK verso se stessa (es. organigramma).",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "Self-referencing",
+      "logical_pattern": "Sinergia Strutturale. Identificare radici/foglie.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        7
+      ]
+    },
+    {
+      "id": "Q06_S11",
+      "descrizione": "Query: condizioni congiuntive con AND. Schema: inferenza chiave primaria.",
+      "vincoli": "Filtrare con condizioni multiple combinate da AND nella clausola WHERE. Schema: PK non esplicita, va dedotta dal contesto.",
+      "tipo_schema": "primary_key_inference",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "composizioni": [
+        "pk_inference"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "PK inference",
+      "logical_pattern": "Inferenza PK. Dedurre quale colonna filtrare.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        11
+      ]
+    },
+    {
+      "id": "Q06_S14",
+      "descrizione": "Categoria di query congiuntive con vincolo di dominio. La query principale applica filtri impliciti basati su un vincolo di dominio.",
+      "vincoli": "Filtrare con condizioni multiple combinate da AND nella clausola WHERE. Schema: vincoli CHECK/NOT NULL/UNIQUE dedotti dal testo.",
+      "tipo_schema": "domain_constraint",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "Domain constraint",
+      "logical_pattern": "Vincolo Dominio. Aggiungere filtri impliciti.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        14
+      ]
+    },
+    {
+      "id": "Q06_S17",
+      "descrizione": "Query congiuntiva con soft deletion per filtrare i record logicamente cancellati.",
+      "vincoli": "La query deve includere una condizione per escludere i record eliminati logicamente (es. WHERE flag_eliminato = 0).",
+      "tipo_schema": "soft_deletion",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "twist_ammessi": [
+        "synonym",
+        "rephrase",
+        "ambiguity"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "Soft deletion",
+      "logical_pattern": "Soft Deletion. Filtrare record logicamente cancellati.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        17
+      ]
+    },
+    {
+      "id": "Q06_S20",
+      "descrizione": "Conjunctive query with ENUM type inference. Native PG enum type with casting.",
+      "vincoli": "Filtrare con condizioni multiple combinate da AND nella clausola WHERE. Schema: Colonna con tipo enumerato nativo PostgreSQL.",
+      "tipo_schema": "enum_type",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "ENUM type inference",
+      "logical_pattern": "Tipo PG Nativo. Casting enumerato.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        20
+      ]
+    },
+    {
+      "id": "Q06_S26",
+      "descrizione": "Conjunctive query with logical type mismatch (Mismatch Casting).",
+      "vincoli": "Filtrare con condizioni multiple combinate da AND nella clausola WHERE. Schema: Colonna con tipo fisico diverso dal logico.",
+      "tipo_schema": "type_mismatch",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "Logical Type Mismatch",
+      "logical_pattern": "Mismatch Casting.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        26
+      ]
+    },
+    {
+      "id": "Q06_S27",
+      "descrizione": "Conjunctive query on schema with implicit foreign keys, requiring semantic mapping.",
+      "vincoli": "Filtrare con condizioni multiple combinate da AND nella clausola WHERE. Schema: Relazioni senza REFERENCES esplicito.",
+      "tipo_schema": "implicit_fk",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Semantic Mapping.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q06_S28",
+      "descrizione": "Pattern di query congiuntiva con schema di naming abbreviato, richiede decodifica linguistica per comprendere il pattern logico e la complessità dello schema.",
+      "vincoli": "La narrativa deve incapsulare l'esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "tipo_schema": "abbreviated_naming",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "synonym",
+        "jargon",
+        "polysemy",
+        "ambiguity"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "Abbreviated Naming",
+      "logical_pattern": "Decodifica Linguistica.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        28
+      ]
+    },
+    {
+      "id": "Q06_S29",
+      "descrizione": "Categoria di benchmark per query congiuntive su schema con colonne suddivise. Il pattern logico è la concatenazione, che richiede di unire informazioni da diverse tabelle tramite join. La complessità dello schema deriva dalla normalizzazione che separa gli attributi in entità correlate.",
+      "vincoli": "La query deve essere congiuntiva (tutte le condizioni nella clausola WHERE sono AND). Lo schema presenta colonne suddivise in più tabelle collegate da chiavi esterne. La concatenazione è l'operazione logica principale.",
+      "tipo_schema": "column_splitting",
+      "feature_sql": [
+        "conjunctive"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Conjunctive query",
+      "schema_type": "Column Splitting",
+      "logical_pattern": "Concatenazione.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        6
+      ],
+      "schema_type_ids": [
+        29
+      ]
+    },
+    {
+      "id": "Q07_S03",
+      "descrizione": "Pattern with multi-table join (3+) and many-to-many schema, complete N:N relationship.",
+      "vincoli": "Collegare tre o più tabelle tramite chiavi esterne in sequenza. Schema: relazione molti-a-molti: tabella ponte con doppia FK.",
+      "tipo_schema": "many_to_many",
+      "feature_sql": [
+        "join",
+        "multi_join"
+      ],
+      "composizioni": [
+        "completo"
+      ],
+      "twist_ammessi": [
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Multi-table join (3+)",
+      "schema_type": "N:N relationship",
+      "logical_pattern": "N:N Completo.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        7
+      ],
+      "schema_type_ids": [
+        3
+      ]
+    },
+    {
+      "id": "Q07_S06",
+      "descrizione": "Multi-table join (3+) on associative entity with attributes.",
+      "vincoli": "The query must involve at least three tables with a many-to-many relationship via an associative entity that has attributes.",
+      "tipo_schema": "associative_entity",
+      "feature_sql": [
+        "join",
+        "multi_join"
+      ],
+      "composizioni": [
+        "many_to_many"
+      ],
+      "query_type": "Multi-table join (3+)",
+      "schema_type": "Associative with attributes",
+      "logical_pattern": "N:N con Attributi.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        7
+      ],
+      "schema_type_ids": [
+        6
+      ]
+    },
+    {
+      "id": "Q07_S09",
+      "descrizione": "Categoria che richiede una query con join multipli (almeno 3 tabelle) su uno schema normalizzato per attributi multi-valore, tipicamente realizzato tramite una tabella associativa. La complessità dello schema deriva dalla necessità di gestire relazioni molti-a-molti o attributi ripetuti, richiedendo l'uso di join per ricostruire l'informazione completa.",
+      "vincoli": "La query deve coinvolgere almeno tre tabelle tramite join. Lo schema deve rappresentare una normalizzazione multi-valore, con una tabella associativa (o ponte) che collega due entità principali.",
+      "tipo_schema": "associative_entity",
+      "feature_sql": [
+        "join",
+        "multi_join"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor",
+        "jargon"
+      ],
+      "query_type": "Multi-table join (3+)",
+      "schema_type": "Multi-valued normalization",
+      "logical_pattern": "Normalizzazione Multi-valore.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        7
+      ],
+      "schema_type_ids": [
+        9
+      ]
+    },
+    {
+      "id": "Q07_S19",
+      "descrizione": "Navigazione Profonda",
+      "vincoli": "Collegare tre o più tabelle tramite chiavi esterne in sequenza. Schema: Schema con 5+ tabelle interconnesse.",
+      "tipo_schema": "multi_entity",
+      "feature_sql": [
+        "join",
+        "multi_join"
+      ],
+      "composizioni": [
+        "multi_table_join",
+        "deep_navigation"
+      ],
+      "query_type": "Multi-table join (3+)",
+      "schema_type": "Multi-entity complex",
+      "logical_pattern": "Navigazione Profonda.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        7
+      ],
+      "schema_type_ids": [
+        19
+      ]
+    },
+    {
+      "id": "Q08_S02",
+      "descrizione": "Self-join su relazione 1:N, pattern di join baseline.",
+      "vincoli": "Unire una tabella con se stessa per relazioni gerarchiche. Schema: relazione uno-a-molti: tabella padre + figlia con FK.",
+      "tipo_schema": "one_to_many",
+      "feature_sql": [
+        "self_join"
+      ],
+      "query_type": "Self-join",
+      "schema_type": "1:N relationship",
+      "logical_pattern": "Baseline Join.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        8
+      ],
+      "schema_type_ids": [
+        2
+      ]
+    },
+    {
+      "id": "Q08_S04",
+      "descrizione": "Self-join su relazione 1:1 per estensione di entità.",
+      "vincoli": "Unire una tabella con se stessa per relazioni gerarchiche. Schema: Due tabelle collegate da FK con vincolo UNIQUE.",
+      "tipo_schema": "one_to_one",
+      "feature_sql": [
+        "self_join"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Self-join",
+      "schema_type": "1:1 relationship",
+      "logical_pattern": "Estensione Entità 1:1.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        8
+      ],
+      "schema_type_ids": [
+        4
+      ]
+    },
+    {
+      "id": "Q08_S05",
+      "descrizione": "Query: self-join su tabella gerarchica. Schema: entità debole.",
+      "vincoli": "Self-join on weak entity",
+      "tipo_schema": "weak_entity",
+      "feature_sql": [
+        "self_join"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase"
+      ],
+      "query_type": "Self-join",
+      "schema_type": "Weak entity",
+      "logical_pattern": "Weak Entity Join.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        8
+      ],
+      "schema_type_ids": [
+        5
+      ]
+    },
+    {
+      "id": "Q08_S08",
+      "descrizione": "Categoria che richiede una self-join su una relazione ISA (ereditarietà).",
+      "vincoli": "Unire una tabella con se stessa per relazioni gerarchiche.",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "self_join"
+      ],
+      "composizioni": [
+        "ISA",
+        "Ereditarietà"
+      ],
+      "query_type": "Self-join",
+      "schema_type": "ISA relationship",
+      "logical_pattern": "ISA / Ereditarietà.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        8
+      ],
+      "schema_type_ids": [
+        8
+      ]
+    },
+    {
+      "id": "Q08_S10",
+      "descrizione": "Categoria di benchmark che coinvolge self-join con cardinalità implicita.",
+      "vincoli": "Unire una tabella con se stessa per relazioni gerarchiche.",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "self_join"
+      ],
+      "query_type": "Self-join",
+      "schema_type": "Implicit cardinality",
+      "logical_pattern": "Cardinalità Implicita.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        8
+      ],
+      "schema_type_ids": [
+        10
+      ]
+    },
+    {
+      "id": "Q08_S23",
+      "descrizione": "Query using self-join on a table with a polymorphic relationship, where the same table references itself in different roles.",
+      "vincoli": "Self-join on polymorphic schema",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "self_join"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor",
+        "jargon",
+        "polysemy",
+        "ambiguity"
+      ],
+      "query_type": "Self-join",
+      "schema_type": "Polymorphic relationship",
+      "logical_pattern": "Polimorfismo.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        8
+      ],
+      "schema_type_ids": [
+        23
+      ]
+    },
+    {
+      "id": "Q08_S27",
+      "descrizione": "Self-join pattern with implicit foreign key, semantic join.",
+      "vincoli": "Unire una tabella con se stessa per relazioni gerarchiche. Schema: Relazioni senza REFERENCES esplicito.",
+      "tipo_schema": "implicit_fk",
+      "feature_sql": [
+        "self_join"
+      ],
+      "query_type": "Self-join",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Join Semantico.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        8
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q08_S30",
+      "descrizione": "Self-join query with large-scale distraction schema.",
+      "vincoli": "Genera una narrativa che incapsuli il pattern logico di self-join con distrazione su larga scala, giustificando la complessità dello schema senza modificare lo scheletro della query primaria.",
+      "tipo_schema": "large_scale_distraction",
+      "feature_sql": [
+        "self_join"
+      ],
+      "twist_ammessi": [
+        "distractor"
+      ],
+      "query_type": "Self-join",
+      "schema_type": "Large-scale Distraction",
+      "logical_pattern": "Path Routing (Distrazione).",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        8
+      ],
+      "schema_type_ids": [
+        30
+      ]
+    },
+    {
+      "id": "Q09_S01",
+      "descrizione": "Query: aggregazione con HAVING. Schema: singola entità.",
+      "vincoli": "No joins, direct filtering/aggregation on entity.",
+      "tipo_schema": "single_entity",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "Single-entity",
+      "logical_pattern": "Baseline. Filtro/Aggregazione diretta su entità.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        1
+      ]
+    },
+    {
+      "id": "Q09_S07",
+      "descrizione": "Query: aggregazione con HAVING. Schema: auto-referenziamento.",
+      "vincoli": "Filtrare gruppi dopo GROUP BY usando la clausola HAVING. Schema: Tabella con FK verso se stessa (es. organigramma).",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "Self-referencing",
+      "logical_pattern": "Sinergia Strutturale. Identificare radici/foglie.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        7
+      ]
+    },
+    {
+      "id": "Q09_S11",
+      "descrizione": "Lo schema presenta una complessità dovuta alla necessità di inferire la chiave primaria per applicare correttamente un filtro in una query che raggruppa i dati e utilizza HAVING. Questo richiede di dedurre quale colonna debba essere utilizzata per il filtraggio, aumentando la difficoltà di interpretazione dello schema.",
+      "vincoli": "Filtrare gruppi dopo GROUP BY usando la clausola HAVING. Schema: PK non esplicita, va dedotta dal contesto.",
+      "tipo_schema": "primary_key_inference",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "composizioni": [
+        "aggregazione raggruppata",
+        "having",
+        "inferenza chiave primaria"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "PK inference",
+      "logical_pattern": "Inferenza PK. Dedurre quale colonna filtrare.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        11
+      ]
+    },
+    {
+      "id": "Q09_S14",
+      "descrizione": "Grouped aggregation with HAVING clause for domain constraints, adding implicit filters.",
+      "vincoli": "Filtrare gruppi dopo GROUP BY usando la clausola HAVING. Schema: vincoli CHECK/NOT NULL/UNIQUE dedotti dal testo.",
+      "tipo_schema": "domain_constraint",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "twist_ammessi": [
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "Domain constraint",
+      "logical_pattern": "Vincolo Dominio. Aggiungere filtri impliciti.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        14
+      ]
+    },
+    {
+      "id": "Q09_S17",
+      "descrizione": "Soft Deletion. Filtrare record logicamente cancellati.",
+      "vincoli": "Filtrare gruppi dopo GROUP BY usando la clausola HAVING. Schema: Flag/timestamp per cancellazione logica.",
+      "tipo_schema": "soft_deletion",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "composizioni": [
+        "aggregazione con gruppo",
+        "clausola HAVING"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "Soft deletion",
+      "logical_pattern": "Soft Deletion. Filtrare record logicamente cancellati.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        17
+      ]
+    },
+    {
+      "id": "Q09_S20",
+      "descrizione": "Query: aggregazione con HAVING. Schema: tipo ENUM.",
+      "vincoli": "ENUM type inference",
+      "tipo_schema": "enum_type",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "composizioni": [
+        "GROUP BY",
+        "HAVING"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "ENUM type inference",
+      "logical_pattern": "Tipo PG Nativo. Casting enumerato.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        20
+      ]
+    },
+    {
+      "id": "Q09_S26",
+      "descrizione": "Query: aggregazione con HAVING. Schema: disallineamento tipo.",
+      "vincoli": "Filtrare gruppi dopo GROUP BY usando la clausola HAVING. Schema: Colonna con tipo fisico diverso dal logico.",
+      "tipo_schema": "type_mismatch",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "Logical Type Mismatch",
+      "logical_pattern": "Mismatch Casting.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        26
+      ]
+    },
+    {
+      "id": "Q09_S27",
+      "descrizione": "Query: aggregazione con HAVING. Schema: FK implicite.",
+      "vincoli": "Filtrare gruppi dopo GROUP BY usando la clausola HAVING. Schema: Relazioni senza REFERENCES esplicito.",
+      "tipo_schema": "implicit_fk",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Semantic Mapping.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q09_S28",
+      "descrizione": "Query con grouped aggregation e HAVING su schema con naming abbreviato, richiede decodifica linguistica.",
+      "vincoli": "Filtrare gruppi dopo GROUP BY usando la clausola HAVING. Schema: nomi abbreviati/acronimi aziendali.",
+      "tipo_schema": "abbreviated_naming",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "composizioni": [
+        "group_agg+having"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "jargon",
+        "ambiguity"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "Abbreviated Naming",
+      "logical_pattern": "Decodifica Linguistica.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        28
+      ]
+    },
+    {
+      "id": "Q09_S29",
+      "descrizione": "Query: aggregazione con HAVING. Schema: suddivisione colonne.",
+      "vincoli": "Filtrare gruppi dopo GROUP BY usando la clausola HAVING. Schema: Dati uniti divisi in più colonne fisiche.",
+      "tipo_schema": "column_splitting",
+      "feature_sql": [
+        "group_agg",
+        "having"
+      ],
+      "composizioni": [
+        "Grouped aggregation",
+        "HAVING"
+      ],
+      "twist_ammessi": [
+        "rename"
+      ],
+      "query_type": "Grouped aggregation + HAVING",
+      "schema_type": "Column Splitting",
+      "logical_pattern": "Concatenazione.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        9
+      ],
+      "schema_type_ids": [
+        29
+      ]
+    },
+    {
+      "id": "Q11_Q12_Q02_S19",
+      "descrizione": "Relativized Aggregate Comparison: Confrontare un valore di riga (o un aggregato per gruppo) contro un aggregato di base calcolato su tutta la tabella o sullo stesso gruppo, tramite subquery scalare o correlata.",
+      "vincoli": "Il modello deve inventare un dominio con entità raggruppabili e calcolare un aggregato di base da usare come riferimento nel filtro.",
+      "feature_sql": [
+        "subquery",
+        "correlated_subquery"
+      ],
+      "tipo_schema": "single_entity",
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor",
+        "jargon",
+        "polysemy",
+        "ambiguity"
+      ],
+      "composizioni": [
+        "subquery",
+        "correlated_subquery"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "esempi_sql": [
+        "SELECT name, salary\nFROM employees e\nWHERE salary > (\n    SELECT AVG(salary)\n    FROM employees\n    WHERE department = e.department\n);",
+        "SELECT product_name, price\nFROM products\nWHERE price > (SELECT AVG(price) FROM products);"
+      ],
+      "query_type_ids": [
+        11,
+        12,
+        2
+      ],
+      "schema_type_ids": [
+        19
+      ]
+    },
+    {
+      "id": "Q11_Q12_S19_S27",
+      "descrizione": "Disjoint Subset Comparison: Estrarre due sottoinsiemi disgiunti tramite subquery annidate (una delle quali correlata) e confrontarli tramite un predicato scalare.",
+      "vincoli": "Zero-Data: il modello deve inventare un dominio complesso con una chiave esterna implicita.",
+      "feature_sql": [
+        "subquery",
+        "correlated_subquery",
+        "scalar_agg"
+      ],
+      "tipo_schema": "one_to_many",
+      "twist_ammessi": [
+        "rename",
+        "synonym",
+        "ambiguity"
+      ],
+      "composizioni": [
+        "nested_subquery",
+        "correlated_subquery",
+        "scalar_comparison"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "esempi_sql": [
+        "SELECT r.region_name\nFROM regions r\nWHERE (SELECT SUM(o.amount) FROM orders o WHERE o.region_id = r.id) >\n      (SELECT AVG(quarterly_target) FROM sales_targets WHERE year = 2026);"
+      ],
+      "query_type_ids": [
+        11,
+        12
+      ],
+      "schema_type_ids": [
+        19,
+        27
+      ]
+    },
+    {
+      "id": "Q14_Q44_S28_S26",
+      "descrizione": "Schema Fragmentation & Stitching: Unire legacy e moderno con UNION ALL, risolvendo type mismatch e abbreviazioni (Zero-Data: generare due schemi discordanti e allinearli).",
+      "vincoli": "Zero-Data: generare due schemi discordanti e allinearli.",
+      "feature_sql": [
+        "set_op"
+      ],
+      "tipo_schema": "one_to_one",
+      "twist_ammessi": [
+        "rename",
+        "synonym",
+        "jargon"
+      ],
+      "composizioni": [
+        "set_op"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "query_type_ids": [
+        14,
+        44
+      ],
+      "schema_type_ids": [
+        28,
+        26
+      ]
+    },
+    {
+      "id": "Q15_Q04_S19_S30",
+      "descrizione": "Archetipo Composizionale: CTE Pipeline & Parallel Stitching: Scomporre un problema analitico multi-step in diverse CTE non ricorsive definite in parallelo o in sequenza, che vengono poi incrociate tramite JOIN o aggregate.",
+      "vincoli": "Zero-Data: il modello deve inventare uno schema ampio e articolato con molte tabelle di distrazione, delle quali solo alcune rilevanti, e costruire insiemi derivati intermedi tramite WITH per poi combinarli.",
+      "feature_sql": [
+        "cte",
+        "multi_join",
+        "group_agg",
+        "top_n"
+      ],
+      "tipo_schema": "one_to_many",
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "distractor"
+      ],
+      "composizioni": [
+        "Multiple CTEs + JOIN",
+        "sequential CTEs"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "esempi_sql": [
+        "WITH regional_sales AS (\n  SELECT r.region_id, SUM(o.amount) AS total\n  FROM orders o\n  JOIN regions r ON o.region_id = r.id\n  GROUP BY r.region_id\n),\ntop_regions AS (\n  SELECT region_id, total\n  FROM regional_sales\n  ORDER BY total DESC\n  LIMIT 3\n)\nSELECT c.category_name, SUM(o.amount) AS category_revenue\nFROM orders o\nJOIN top_regions tr ON o.region_id = tr.region_id\nJOIN categories c ON o.category_id = c.id\nGROUP BY c.category_name;"
+      ],
+      "query_type_ids": [
+        15,
+        4
+      ],
+      "schema_type_ids": [
+        19,
+        30
+      ]
+    },
+    {
+      "id": "Q15_Q12_S19_S27",
+      "descrizione": "Nested-CTE: Intrecciare mutualmente CTE e subquery nella direzione PostgreSQL-valida: una CTE il cui corpo contiene a sua volta una subquery annidata (IN, scalare, EXISTS).",
+      "vincoli": "Zero-Data: il modello deve inventare un dominio complesso con una chiave esterna implicita, e calcolare un insieme intermedio tramite CTE filtrando con una subquery annidata su un'altra relazione.",
+      "feature_sql": [
+        "cte",
+        "subquery"
+      ],
+      "tipo_schema": "one_to_many",
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor"
+      ],
+      "composizioni": [
+        "Nested-CTE"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "esempi_sql": [
+        "WITH high_value_customers AS (\n  SELECT c.id, c.name, c.district_id\n  FROM customers c\n  WHERE c.id IN (SELECT o.customer_id FROM orders o WHERE o.amount > 1000)\n)\nSELECT d.name AS district, COUNT(hvc.id) AS vip_count\nFROM high_value_customers hvc\nJOIN districts d ON hvc.district_id = d.id\nGROUP BY d.name;"
+      ],
+      "query_type_ids": [
+        15,
+        12
+      ],
+      "schema_type_ids": [
+        19,
+        27
+      ]
+    },
+    {
+      "id": "Q16_Q41_S7_S27",
+      "descrizione": "Archetipo Composizionale: Graph Navigation Implicita: Navigare gerarchie con link impliciti usando WITH RECURSIVE (Zero-Data: la chiave esterna non viene menzionata esplicitamente, va inferita).",
+      "vincoli": "Zero-Data: la chiave esterna non viene menzionata esplicitamente, va inferita.",
+      "feature_sql": [
+        "recursive_cte"
+      ],
+      "tipo_schema": "self_referencing",
+      "twist_ammessi": [
+        "ambiguity"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "query_type_ids": [
+        16,
+        41
+      ],
+      "schema_type_ids": [
+        7,
+        27
+      ]
+    },
+    {
+      "id": "Q16_S07",
+      "descrizione": "Albero Self-Ref. Query ricorsiva su schema self-referencing.",
+      "vincoli": "Self-referencing schema, recursive query",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "cte",
+        "recursive_cte"
+      ],
+      "query_type": "Recursive query",
+      "schema_type": "Self-referencing",
+      "logical_pattern": "Albero Self-Ref.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        16
+      ],
+      "schema_type_ids": [
+        7
+      ]
+    },
+    {
+      "id": "Q16_S25",
+      "descrizione": "Categoria con schema auto-referenziante N:N e query ricorsiva.",
+      "vincoli": "Usare WITH RECURSIVE per attraversare strutture gerarchiche o a grafo.",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "cte",
+        "recursive_cte"
+      ],
+      "twist_ammessi": [
+        "rephrase"
+      ],
+      "query_type": "Recursive query",
+      "schema_type": "Self-referencing N:N",
+      "logical_pattern": "Grafo N:N.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        16
+      ],
+      "schema_type_ids": [
+        25
+      ]
+    },
+    {
+      "id": "Q17_Q04_S19_S27",
+      "descrizione": "Archetipo Composizionale: Windowed Analytics over Joined Relations: Applicare una funzione finestra analitica (`RANK()`, `ROW_NUMBER()`, `SUM() OVER`) sul risultato di un `JOIN` tra più tabelle, tipicamente filtrato da predicati congiuntivi nella `WHERE`. È il template analitico di base dei carichi di lavoro enterprise (classificato esplicitamente da BEAVER come \"Window + JOIN + WHERE\"): il ranking o l'aggregazione a finestra avvengono *all'interno di gruppi che attraversano relazioni joinate*, non su una singola tabella. (Zero-Data: il modello deve inventare due entità correlate con una chiave esterna non nominata esplicitamente, immerse in un dominio complesso, e poi classificare i record sul risultato del join.)",
+      "vincoli": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "feature_sql": [
+        "window",
+        "join",
+        "conjunctive"
+      ],
+      "tipo_schema": "one_to_many",
+      "twist_ammessi": [
+        "ambiguity",
+        "jargon"
+      ],
+      "composizioni": [
+        "window",
+        "join",
+        "conjunctive"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "esempi_sql": [
+        "SELECT d.department_name,\n       e.full_name,\n       e.salary,\n       RANK() OVER (PARTITION BY d.department_name ORDER BY e.salary DESC) AS salary_rank\nFROM employees e\nJOIN departments d ON e.dept_id = d.id\nWHERE e.employment_status = 'active'\n  AND d.annual_budget > 100000;"
+      ],
+      "query_type_ids": [
+        17,
+        4
+      ],
+      "schema_type_ids": [
+        19,
+        27
+      ]
+    },
+    {
+      "id": "Q17_Q34_Q37_S16",
+      "descrizione": "Archetipo Composizionale: Gaps and Islands (Streaks & Contiguità): Trovare periodi continui. Algoritmo date - ROW_NUMBER() (Zero-Data: il modello deve inventare l'algoritmo SQL su uno schema temporale allucinato).",
+      "vincoli": "Zero-Data: il modello deve inventare l'algoritmo SQL su uno schema temporale allucinato.",
+      "feature_sql": [
+        "window"
+      ],
+      "tipo_schema": "single_entity",
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor",
+        "jargon",
+        "polysemy",
+        "ambiguity"
+      ],
+      "composizioni": [
+        "Q17",
+        "Q34",
+        "Q37",
+        "S16"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "query_type_ids": [
+        17,
+        34,
+        37
+      ],
+      "schema_type_ids": [
+        16
+      ]
+    },
+    {
+      "id": "Q17_Q34_S16_S17",
+      "descrizione": "Archetipo Composizionale: Time-Series State Machines: Analizzare cambiamenti di stato sequenziali. Richiede LAG/LEAD su dati temporali partizionati, gestendo soft deletes (Zero-Data: inventare valid_from).",
+      "vincoli": "Zero-Data (soft deletes): inventare valid_from",
+      "feature_sql": [
+        "window"
+      ],
+      "tipo_schema": "single_entity",
+      "twist_ammessi": [
+        "distractor"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "query_type_ids": [
+        17,
+        34
+      ],
+      "schema_type_ids": [
+        16,
+        17
+      ]
+    },
+    {
+      "id": "Q17_Q37_Q05_S22",
+      "descrizione": "Archetipo Composizionale: Statistical Window Analytics (NTILE / STDDEV / CORR / VARIANCE): Applicare aggregati statistici (deviazione standard, varianza, correlazione, funzioni di quartile/percentile) in un contesto a finestra o di partizionamento, spesso combinati con GROUP BY per altre metriche.",
+      "vincoli": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "feature_sql": [
+        "window"
+      ],
+      "tipo_schema": "single_entity",
+      "twist_ammessi": [
+        "jargon",
+        "synonym",
+        "ambiguity"
+      ],
+      "composizioni": [
+        "NTILE",
+        "STDDEV",
+        "CORR",
+        "VARIANCE"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "esempi_sql": [
+        "SELECT region,\n       product_line,\n       NTILE(4) OVER (PARTITION BY region ORDER BY STDDEV(sales) DESC) AS volatility_quartile,\n       CORR(price, units) OVER (PARTITION BY region) AS price_units_corr,\n       AVG(sales) AS avg_sales\nFROM monthly_sales\nGROUP BY region, product_line;"
+      ],
+      "query_type_ids": [
+        17,
+        37,
+        5
+      ],
+      "schema_type_ids": [
+        22
+      ]
+    },
+    {
+      "id": "Q17_S07",
+      "descrizione": "Query: window function con OVER. Schema: auto-referenziamento.",
+      "vincoli": "Applicare una funzione analitica su una partizione di righe con OVER. Schema: Tabella con FK verso se stessa (es. organigramma).",
+      "tipo_schema": "self_referencing",
+      "feature_sql": [
+        "window"
+      ],
+      "query_type": "Window function",
+      "schema_type": "Self-referencing",
+      "logical_pattern": "Ranking Gerarchico.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        17
+      ],
+      "schema_type_ids": [
+        7
+      ]
+    },
+    {
+      "id": "Q17_S16",
+      "descrizione": "Category for window functions involving temporal lead/lag operations.",
+      "vincoli": "Applicare una funzione analitica su una partizione di righe con OVER. Schema: modellazione temporale (valid_from, valid_to).",
+      "tipo_schema": "temporal_modeling",
+      "feature_sql": [
+        "window"
+      ],
+      "composizioni": [
+        "LEAD",
+        "LAG"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor"
+      ],
+      "query_type": "Window function",
+      "schema_type": "Temporal modeling",
+      "logical_pattern": "Delta Temporale LEAD/LAG.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        17
+      ],
+      "schema_type_ids": [
+        16
+      ]
+    },
+    {
+      "id": "Q24_S02",
+      "descrizione": "Left outer join on a 1:N relationship, baseline join pattern.",
+      "vincoli": "Includere tutte le righe della tabella sinistra con LEFT JOIN, riempiendo con NULL. Schema: relazione uno-a-molti: tabella padre + figlia con FK.",
+      "tipo_schema": "one_to_many",
+      "feature_sql": [
+        "join",
+        "left_outer_join"
+      ],
+      "query_type": "Left outer join",
+      "schema_type": "1:N relationship",
+      "logical_pattern": "Baseline Join.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        24
+      ],
+      "schema_type_ids": [
+        2
+      ]
+    },
+    {
+      "id": "Q24_S04",
+      "descrizione": "Estensione Entità 1:1.",
+      "vincoli": "Includere tutte le righe della tabella sinistra con LEFT JOIN. Schema: Due tabelle collegate da FK con vincolo UNIQUE.",
+      "tipo_schema": "one_to_one",
+      "feature_sql": [
+        "join",
+        "left_outer_join"
+      ],
+      "composizioni": [
+        "left_outer_join",
+        "one_to_one"
+      ],
+      "query_type": "Left outer join",
+      "schema_type": "1:1 relationship",
+      "logical_pattern": "Estensione Entità 1:1.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        24
+      ],
+      "schema_type_ids": [
+        4
+      ]
+    },
+    {
+      "id": "Q24_S05",
+      "descrizione": "Query che effettua una left outer join tra un'entità forte e la sua entità debole, preservando tutti i record dell'entità forte anche in assenza di corrispondenze nell'entità debole. Pattern tipico per modellare relazioni opzionali tra entità forte e debole.",
+      "vincoli": "La query deve coinvolgere una left outer join tra un'entità debole e la sua entità proprietaria.",
+      "tipo_schema": "weak_entity",
+      "feature_sql": [
+        "join",
+        "left_outer_join"
+      ],
+      "composizioni": [
+        "join"
+      ],
+      "twist_ammessi": [
+        "rephrase"
+      ],
+      "query_type": "Left outer join",
+      "schema_type": "Weak entity",
+      "logical_pattern": "Weak Entity Join.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        24
+      ],
+      "schema_type_ids": [
+        5
+      ]
+    },
+    {
+      "id": "Q24_S08",
+      "descrizione": "Left outer join su relazione ISA (ereditarietà).",
+      "vincoli": "Nessun vincolo specifico.",
+      "tipo_schema": "one_to_one",
+      "feature_sql": [
+        "join",
+        "left_outer_join"
+      ],
+      "composizioni": [
+        "ISA",
+        "Ereditarietà"
+      ],
+      "query_type": "Left outer join",
+      "schema_type": "ISA relationship",
+      "logical_pattern": "ISA / Ereditarietà.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        24
+      ],
+      "schema_type_ids": [
+        8
+      ]
+    },
+    {
+      "id": "Q24_S10",
+      "descrizione": "Left outer join with implicit cardinality",
+      "vincoli": "Includere tutte le righe della tabella sinistra con LEFT JOIN.",
+      "tipo_schema": "one_to_many",
+      "feature_sql": [
+        "join",
+        "left_outer_join"
+      ],
+      "query_type": "Left outer join",
+      "schema_type": "Implicit cardinality",
+      "logical_pattern": "Cardinalità Implicita.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        24
+      ],
+      "schema_type_ids": [
+        10
+      ]
+    },
+    {
+      "id": "Q24_S23",
+      "descrizione": "Left outer join su schema polimorfico.",
+      "vincoli": "Includere tutte le righe della tabella sinistra con LEFT JOIN, riempiendo con NULL.",
+      "tipo_schema": "associative_entity",
+      "feature_sql": [
+        "join",
+        "left_outer_join"
+      ],
+      "twist_ammessi": [
+        "polysemy"
+      ],
+      "query_type": "Left outer join",
+      "schema_type": "Polymorphic relationship",
+      "logical_pattern": "Polimorfismo.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        24
+      ],
+      "schema_type_ids": [
+        23
+      ]
+    },
+    {
+      "id": "Q24_S27",
+      "descrizione": "Query: LEFT OUTER JOIN. Schema: FK implicite.",
+      "vincoli": "Includere tutte le righe della tabella sinistra con LEFT JOIN. Schema: Relazioni senza REFERENCES esplicito.",
+      "tipo_schema": "implicit_fk",
+      "feature_sql": [
+        "join",
+        "left_outer_join"
+      ],
+      "query_type": "Left outer join",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Join Semantico.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        24
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q24_S30",
+      "descrizione": "Left outer join on a large-scale distraction schema with path routing pattern.",
+      "vincoli": "Includere tutte le righe della tabella sinistra con LEFT JOIN. Schema: Schema ampio con molte tabelle irrilevanti.",
+      "tipo_schema": "large_scale_distraction",
+      "feature_sql": [
+        "join",
+        "left_outer_join"
+      ],
+      "composizioni": [
+        "Path Routing"
+      ],
+      "twist_ammessi": [
+        "distractor"
+      ],
+      "query_type": "Left outer join",
+      "schema_type": "Large-scale Distraction",
+      "logical_pattern": "Path Routing (Distrazione).",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        24
+      ],
+      "schema_type_ids": [
+        30
+      ]
+    },
+    {
+      "id": "Q25_S02",
+      "descrizione": "Query: natural join o USING. Schema: relazione uno-a-molti.",
+      "vincoli": "Unire tabelle usando NATURAL JOIN o USING su colonne con nome comune. Schema: Una tabella padre + tabella figlia con FK.",
+      "tipo_schema": "one_to_many",
+      "feature_sql": [
+        "natural_join"
+      ],
+      "query_type": "Natural join / USING",
+      "schema_type": "1:N relationship",
+      "logical_pattern": "Baseline Join.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        25
+      ],
+      "schema_type_ids": [
+        2
+      ]
+    },
+    {
+      "id": "Q25_S04",
+      "descrizione": "Query: natural join o USING. Schema: relazione uno-a-uno.",
+      "vincoli": "Unire tabelle usando NATURAL JOIN o USING su colonne con nome comune. Schema: Due tabelle collegate da FK con vincolo UNIQUE.",
+      "tipo_schema": "one_to_one",
+      "feature_sql": [
+        "natural_join"
+      ],
+      "query_type": "Natural join / USING",
+      "schema_type": "1:1 relationship",
+      "logical_pattern": "Estensione Entità 1:1.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        25
+      ],
+      "schema_type_ids": [
+        4
+      ]
+    },
+    {
+      "id": "Q25_S05",
+      "descrizione": "Pattern di giunzione naturale su entità debole, che utilizza la clausola NATURAL JOIN o USING per combinare tabelle con chiave primaria composta.",
+      "vincoli": "La narrativa deve incapsulare il pattern logico di weak entity join senza alterare lo scheletro della query SQL primaria, giustificando la complessità dello schema.",
+      "tipo_schema": "weak_entity",
+      "feature_sql": [
+        "natural_join"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym",
+        "distractor",
+        "jargon",
+        "polysemy",
+        "ambiguity"
+      ],
+      "query_type": "Natural join / USING",
+      "schema_type": "Weak entity",
+      "logical_pattern": "Weak Entity Join.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        25
+      ],
+      "schema_type_ids": [
+        5
+      ]
+    },
+    {
+      "id": "Q25_S08",
+      "descrizione": "Query: natural join o USING. Schema: S8.",
+      "vincoli": "Unire tabelle usando NATURAL JOIN o USING su colonne con nome comune.",
+      "tipo_schema": "one_to_one",
+      "feature_sql": [
+        "natural_join"
+      ],
+      "query_type": "Natural join / USING",
+      "schema_type": "ISA relationship",
+      "logical_pattern": "ISA / Ereditarietà.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        25
+      ],
+      "schema_type_ids": [
+        8
+      ]
+    },
+    {
+      "id": "Q25_S10",
+      "descrizione": "Natural join with implicit cardinality.",
+      "vincoli": "Cardinalità Implicita",
+      "tipo_schema": "one_to_many",
+      "feature_sql": [
+        "natural_join"
+      ],
+      "query_type": "Natural join / USING",
+      "schema_type": "Implicit cardinality",
+      "logical_pattern": "Cardinalità Implicita.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        25
+      ],
+      "schema_type_ids": [
+        10
+      ]
+    },
+    {
+      "id": "Q25_S23",
+      "descrizione": "Natural join query on a polymorphic relationship schema.",
+      "vincoli": "Unire tabelle usando NATURAL JOIN o USING su colonne con nome comune.",
+      "tipo_schema": "associative_entity",
+      "feature_sql": [
+        "natural_join"
+      ],
+      "composizioni": [
+        "polymorphic_relationship"
+      ],
+      "query_type": "Natural join / USING",
+      "schema_type": "Polymorphic relationship",
+      "logical_pattern": "Polimorfismo.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        25
+      ],
+      "schema_type_ids": [
+        23
+      ]
+    },
+    {
+      "id": "Q25_S27",
+      "descrizione": "Categoria per natural join con schema di chiave esterna implicita, join semantico.",
+      "vincoli": "Nessun vincolo specifico oltre alla generazione di una narrativa che incapsuli il pattern logico.",
+      "tipo_schema": "implicit_fk",
+      "feature_sql": [
+        "natural_join"
+      ],
+      "twist_ammessi": [
+        "rename",
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Natural join / USING",
+      "schema_type": "Implicit FK",
+      "logical_pattern": "Join Semantico.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        25
+      ],
+      "schema_type_ids": [
+        27
+      ]
+    },
+    {
+      "id": "Q25_S30",
+      "descrizione": "Natural join with large-scale distraction schema using path routing pattern.",
+      "vincoli": "Unire tabelle usando NATURAL JOIN o USING su colonne con nome comune. Schema: Schema ampio con molte tabelle irrilevanti.",
+      "tipo_schema": "large_scale_distraction",
+      "feature_sql": [
+        "natural_join"
+      ],
+      "twist_ammessi": [
+        "distractor"
+      ],
+      "query_type": "Natural join / USING",
+      "schema_type": "Large-scale Distraction",
+      "logical_pattern": "Path Routing (Distrazione).",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        25
+      ],
+      "schema_type_ids": [
+        30
+      ]
+    },
+    {
+      "id": "Q26_Q12_S8_S5",
+      "descrizione": "Archetipo Composizionale: Logica delle Eccezioni Multi-Hop: Negazione complessa navigando relazioni di ereditarietà e dipendenza debole (Zero-Data: l'architettura ereditarietà inventata deve sposarsi col NOT EXISTS).",
+      "vincoli": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "feature_sql": [
+        "subquery",
+        "correlated_subquery",
+        "exists",
+        "anti_join"
+      ],
+      "tipo_schema": "self_referencing",
+      "composizioni": [
+        "Q26",
+        "Q12",
+        "S8",
+        "S5"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "query_type_ids": [
+        26,
+        12
+      ],
+      "schema_type_ids": [
+        8,
+        5
+      ]
+    },
+    {
+      "id": "Q28_S16",
+      "descrizione": "Range type query with temporal modeling, focusing on overlapping calculations.",
+      "vincoli": "Eseguire query Q28 su schema S16.",
+      "tipo_schema": "temporal_modeling",
+      "twist_ammessi": [
+        "rephrase",
+        "synonym"
+      ],
+      "query_type": "Range type query",
+      "schema_type": "Temporal modeling",
+      "logical_pattern": "Temporal. Calcoli di overlapping.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        28
+      ],
+      "schema_type_ids": [
+        16
+      ]
+    },
+    {
+      "id": "Q28_S21",
+      "descrizione": "Query Q28. Schema S21.",
+      "vincoli": "Eseguire query Q28 su schema S21.",
+      "tipo_schema": "range_type",
+      "query_type": "Range type query",
+      "schema_type": "Range type inference",
+      "logical_pattern": "Range nativo PG.",
+      "instructions": "Generare una narrativa che incapsuli questo esatto pattern logico, giustificando la complessità dello schema senza trasformare lo scheletro della query SQL primaria.",
+      "query_type_ids": [
+        28
+      ],
+      "schema_type_ids": [
+        21
+      ]
+    },
+    {
+      "id": "Q37_Q5_Q45_S14",
+      "descrizione": "Implicit Domain Mathematics: Calcolo di KPI non esplicitati deducendo la formula aziendale (Zero-Data: inventare colonne finanziarie e scriverne la formula aggregata).",
+      "vincoli": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "feature_sql": [
+        "scalar_agg",
+        "group_agg",
+        "filtered_agg",
+        "having",
+        "window"
+      ],
+      "tipo_schema": "one_to_many",
+      "twist_ammessi": [
+        "jargon",
+        "synonym"
+      ],
+      "composizioni": [
+        "scalar_agg",
+        "group_agg"
+      ],
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "query_type_ids": [
+        37,
+        5,
+        45
+      ],
+      "schema_type_ids": [
+        14
+      ]
+    },
+    {
+      "id": "Q8_Q5_S19_S30",
+      "descrizione": "EAV Pivoting (Anti-Pattern Enterprise): Gestione EAV tramite PIVOT o Self-Join (Zero-Data: il modello inventa prima lo schema EAV a righe, poi scrive la query SQL per rimetterlo a colonne).",
+      "vincoli": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "feature_sql": [
+        "self_join"
+      ],
+      "tipo_schema": "self_referencing",
+      "instructions": "Generare un database e una storia di business realistica che costringa l'LLM a comporre tutte queste feature contemporaneamente per risolvere la richiesta dell'utente nel contesto 'Zero-Data'.",
+      "query_type_ids": [
+        8,
+        5
+      ],
+      "schema_type_ids": [
+        19,
+        30
+      ]
+    }
+  ]
+}

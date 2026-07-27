@@ -4,7 +4,7 @@
 """
 
 from bench.domain.models.base import AbstractDTO
-from bench.domain.models.category import RawCategoryDTO, CategoryDraftDTO, CategoryDTO
+from bench.domain.models.category import CategoryDTO
 from bench.domain.models.spec import TwistRuleDTO, SpecDTO
 from bench.domain.models.sql import (
     SchemaDDLDTO,
@@ -32,8 +32,6 @@ from bench.domain.models.state import TaskStateDTO
 
 __all__ = [
     "AbstractDTO",
-    "RawCategoryDTO",
-    "CategoryDraftDTO",
     "CategoryDTO",
     "TwistRuleDTO",
     "SpecDTO",
