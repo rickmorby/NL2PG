@@ -1,0 +1,83 @@
+"""Modulo servizio di dominio per la verifica della copertura narrativa delle entita' SQL.
+
+:author: Riccardo Morabito
+"""
+
+from dataclasses import dataclass
+from sqlglot import find_tables, parse_one, exp
+from sqlglot.errors import ParseError
+from bench.domain.models.nlp import StoryDTO, QuestionDTO
+from bench.domain.models.sql import GoldQueryDTO
+from bench.domain.models.spec import SpecDTO, TwistRuleDTO
+
+_MAPPING_TWISTS = frozenset({"rename", "synonym", "jargon", "rephrase", "polysemy"})
+
+
+@dataclass
+class CoverageResult:
+    """Esito della verifica di copertura narrativa delle entita' SQL."""
+
+    is_valid: bool = True
+    error: str = ""
+
+
+class CoverageValidator:
+    """Servizio di dominio per la verifica che la narrazione copra le entita' della gold query."""
+
+    def validate(
+        self,
+        story: StoryDTO,
+        question: QuestionDTO,
+        query: GoldQueryDTO,
+        spec: SpecDTO,
+    ) -> CoverageResult:
+        """Verifica che story+question copra tabelle e valori letterali della gold query."""
+        try:
+            tables, literals = self._anchors(query, spec)
+        except ParseError as e:
+            return CoverageResult(is_valid=False, error=f"AST fallito su query gold: {e}")
+        text = (story.story + " " + question.question).lower()
+        for ident in tables:
+            if ident.lower() not in text:
+                return CoverageResult(
+                    is_valid=False,
+                    error=(
+                        f"Manca la tabella '{ident}' nel testo. "
+                        f"DEVI inserire esplicitamente la parola '{ident}' nella prosa."
+                    ),
+                )
+        for lit in literals:
+            if lit.lower() not in text:
+                return CoverageResult(
+                    is_valid=False,
+                    error=(
+                        f"Manca il valore '{lit}' nel testo. "
+                        f"Inserisci il valore '{lit}' nella narrazione."
+                    ),
+                )
+        return CoverageResult()
+
+    @staticmethod
+    def _anchors(query: GoldQueryDTO, spec: SpecDTO) -> tuple[list[str], list[str]]:
+        """Estrae nomi tabella e valori letterali dalla gold query, mappando i twist."""
+        tree = parse_one(query.query, read="postgres")
+        tables = set()
+        for t in find_tables(tree):
+            mapped = _map_table_name(t.name.lower(), spec.twist_rules)
+            tables.add(mapped)
+        literals = set()
+        for node_type in (exp.Where, exp.Having, exp.Join):
+            for node in tree.find_all(node_type):
+                for lit in node.find_all(exp.Literal):
+                    if lit.is_string:
+                        literals.add(lit.this)
+        return sorted(tables), sorted(literals)
+
+
+def _map_table_name(name: str, twist_rules: list[TwistRuleDTO]) -> str:
+    """Applica il mapping inverso dei twist per ricondurre un nome tabella alla forma originale."""
+    for rule in twist_rules:
+        if rule.twist_type in _MAPPING_TWISTS and rule.target_value and rule.obsolete_value:
+            if rule.target_value.lower() in name or name in rule.target_value.lower():
+                return rule.obsolete_value.lower()
+    return name
