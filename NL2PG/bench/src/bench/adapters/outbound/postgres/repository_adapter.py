@@ -3,7 +3,6 @@
 :author: Riccardo Morabito
 """
 
-from logging import getLogger
 from uuid import uuid4
 from psycopg import errors as pg_errors
 from sqlalchemy import select
@@ -14,8 +13,6 @@ from bench.domain.exceptions import DatabaseClientError
 from bench.domain.models.llm import FailoverEventDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
-
-_log = getLogger("bench.adapters.postgres")
 
 
 class MetaRepositoryAdapter(MetaRepositoryPort):

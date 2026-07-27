@@ -15,7 +15,7 @@
       "level": "DEBUG"
     },
     "console": {
-      "class": "bench.logger.handlers.TqdmHandler",
+      "class": "bench.adapters.outbound.logging.handlers.TqdmHandler",
       "formatter": "bench",
       "level": "ERROR"
     }

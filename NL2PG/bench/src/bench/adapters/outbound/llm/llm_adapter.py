@@ -3,15 +3,12 @@
 :author: Riccardo Morabito
 """
 
-from logging import getLogger
 from typing import Any
 from litellm import Router
 from pydantic import BaseModel
 from bench.domain.exceptions import LLMClientError
 from bench.domain.models.llm import CallOptionsDTO, CallResultDTO
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
-
-_log = getLogger("bench.adapters.llm")
 
 
 class LLMClientAdapter(LLMGeneratorPort):

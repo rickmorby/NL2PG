@@ -23,4 +23,4 @@ class DataValidator:
             self._sandbox.execute_inserts(schema, inserts.inserts)
             return ValidationResult()
         except Exception as e:
-            return ValidationResult(is_valid=False, error=str(e))
+            return ValidationResult(is_valid=False, error=f"Inserimento dati fallito: {e}")

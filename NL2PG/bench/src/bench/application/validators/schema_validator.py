@@ -31,4 +31,4 @@ class SchemaValidator:
             self._sandbox.execute_ddl(schema, ddl.ddl)
             return ValidationResult()
         except Exception as e:
-            return ValidationResult(is_valid=False, error=str(e))
+            return ValidationResult(is_valid=False, error=f"Esecuzione DDL fallita: {e}")
