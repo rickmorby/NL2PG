@@ -60,7 +60,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             )
             return CallResultDTO(output=output, model_used=response.model)
         except Exception as e:
-            raise LLMClientError(f"Catena {role} esaurita: {e}", kind="chain_exhausted") from e
+            raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 
     @staticmethod
     def _build_model_list(config: dict[str, Any]) -> list[dict[str, Any]]:
