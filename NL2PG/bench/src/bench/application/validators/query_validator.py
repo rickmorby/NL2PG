@@ -5,8 +5,6 @@
 
 from dataclasses import dataclass
 from json import dumps
-from decimal import Decimal
-from typing import Any
 from sqlglot import find_tables, parse_one, exp
 from sqlglot.errors import ParseError
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
@@ -126,24 +124,14 @@ class QueryValidator:
     def _build_gold(
         query: GoldQueryDTO, cols: list[str], rows: list[tuple]
     ) -> GoldResultDTO:
-        """Costruisce un GoldResultDTO normalizzando i valori delle righe."""
-        normalized = [tuple(_norm(v) for v in row) for row in rows]
-        rows_json = [dumps(list(r), ensure_ascii=False, default=str) for r in normalized]
+        """Costruisce un GoldResultDTO serializzando le righe in JSON."""
+        rows_json = [dumps(list(r), ensure_ascii=False, default=str) for r in rows]
         return GoldResultDTO(
             columns=cols, rows=rows_json, order_sensitive=query.order_sensitive
         )
 
 
-def _norm(v: Any) -> Any:
-    """Normalizza un valore per il confronto (arrotonda float, strip stringhe)."""
-    if v is None:
-        return None
-    if isinstance(v, bool):
-        return v
-    if isinstance(v, (int, float, Decimal)):
-        return round(float(v), 2)
-    if isinstance(v, (list, tuple)):
-        return [_norm(x) for x in v]
-    if isinstance(v, dict):
-        return {str(k): _norm(val) for k, val in sorted(v.items())}
-    return str(v).strip()
+
+
+
+
