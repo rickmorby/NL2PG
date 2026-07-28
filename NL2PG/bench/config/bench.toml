@@ -1,0 +1,18 @@
+[thresholds]
+critic_high = 3.5
+
+[retry]
+max_per_node = 3
+
+[hardening]
+max_rounds = 3
+
+[calibration]
+runs        = 3
+temperature = 0.9
+
+[judge]
+max_regens = 2
+
+[critic]
+weights = { narrative = 1.0, distractors = 1.0, plot_twists = 1.0, jargon = 1.0, sql_composition = 1.5 }
