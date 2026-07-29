@@ -3,12 +3,12 @@
 :author: Riccardo Morabito
 """
 
+from bench.application.agents.base import AbstractAgent
 from bench.domain.models.category import CategoryDTO
 from bench.domain.models.spec import SpecDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.services.domain_pool import DOMAIN_POOL
 from bench.domain.services.spec_validation import validate_spec
-from bench.application.agents.base import AbstractAgent
 
 
 class SpecAgent(AbstractAgent):
@@ -35,7 +35,9 @@ class SpecAgent(AbstractAgent):
         return SpecDTO
 
     def validate(self, output: SpecDTO, state: TaskStateDTO) -> tuple[bool, str, dict]:
-        """Valida twist e feature SQL contro il vocabolario della categoria ."""
+        """Valida n_tables, twist e feature SQL contro il vocabolario della categoria."""
+        if not (1 <= output.n_tables <= 5):
+            return False, f"Numero di tabelle n_tables ({output.n_tables}) fuori dai vincoli [1, 5].", {}
         cat = self._config.load_categories().get(state.category, CategoryDTO())
         ok, err = validate_spec(output, cat)
         return (ok, err, {})

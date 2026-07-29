@@ -8,11 +8,12 @@ Il JSON di output deve contenere esclusivamente il campo "critic" con l'oggetto 
 </objective>
 
 <rules_and_guidelines>
-1. **Punteggio Narrativo (`narrative`)**: Valuta la naturalezza, la fluidità ed il realismo della storia aziendale (da 1.0 a 10.0).
-2. **Punteggio Distrattori (`distractors`)**: Valuta l'efficacia delle informazioni aziendali di contorno (da 1.0 a 10.0).
-3. **Punteggio Colpi di Scena (`plot_twists`)**: Valuta quanto bene i twist semantici (sinonimi, gergo, perifrasi) siano stati integrati senza creare ambiguità irrisolvibili (da 1.0 a 10.0).
-4. **Punteggio Gergo (`jargon`)**: Valuta la totale assenza di termini di database vietati (da 1.0 a 10.0).
-5. **Punteggio Composizione SQL (`sql_composition`)**: Valuta la correttezza, la pulizia e la ricchezza delle clausole della query Gold rispetto alle feature richieste (da 1.0 a 10.0).
+1. **Vincoli Numerici sui Punteggi**: Tutti i punteggi DEVONO essere numeri decimali (float) compresi rigorosamente nell'intervallo [1.0, 10.0] (ovvero `1.0 <= punteggio <= 10.0`).
+2. **Punteggio Narrativo (`narrative`)**: Valuta la naturalezza, la fluidità ed il realismo della storia aziendale (da 1.0 a 10.0).
+3. **Punteggio Distrattori (`distractors`)**: Valuta l'efficacia delle informazioni aziendali di contorno (da 1.0 a 10.0).
+4. **Punteggio Colpi di Scena (`plot_twists`)**: Valuta quanto bene i twist semantici siano stati integrati senza creare ambiguità irrisolvibili (da 1.0 a 10.0).
+5. **Punteggio Gergo (`jargon`)**: Valuta la totale assenza di termini di database vietati (da 1.0 a 10.0).
+6. **Punteggio Composizione SQL (`sql_composition`)**: Valuta la correttezza, la pulizia e la ricchezza delle clausole della query Gold rispetto alle feature richieste (da 1.0 a 10.0).
 </rules_and_guidelines>
 
 <positive_examples>
@@ -47,5 +48,5 @@ Il JSON di output deve contenere esclusivamente il campo "critic" con l'oggetto 
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `CriticScores` (campo `critic`).
+Rispondi esclusivamente in formato JSON conforme alla classe `CriticScores` (campo `critic` con punteggi float compresi tra 1.0 e 10.0).
 </output_format>

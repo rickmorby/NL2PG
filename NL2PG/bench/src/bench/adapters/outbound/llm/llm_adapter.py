@@ -5,8 +5,8 @@
 
 from typing import Any
 from litellm import Router
-from pydantic import BaseModel
-from bench.domain.exceptions import LLMClientError
+from pydantic import BaseModel, ValidationError
+from bench.domain.exceptions import LLMClientError, ModelOutputContractError
 from bench.domain.models.llm import CallOptionsDTO, CallResultDTO
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
@@ -56,6 +56,9 @@ class LLMClientAdapter(LLMGeneratorPort):
                 else schema.model_validate_json(msg.content)
             )
             return CallResultDTO(output=output, model_used=response.model)
+        except ValidationError as e:
+            msg = f"L'output dell'LLM non rispetta lo schema Pydantic '{schema.__name__}': {e}"
+            raise ModelOutputContractError(msg, payload={"schema": schema.__name__}) from e
         except Exception as e:
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 

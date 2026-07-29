@@ -3,9 +3,9 @@
 :author: Riccardo Morabito
 """
 
-from bench.domain.models.state import TaskStateDTO
-from bench.domain.models.nlp import CriticScoresDTO
 from bench.application.agents.base import AbstractAgent
+from bench.domain.models.nlp import CriticScoresDTO
+from bench.domain.models.state import TaskStateDTO
 
 
 class CriticAgent(AbstractAgent):
@@ -32,6 +32,14 @@ class CriticAgent(AbstractAgent):
     def output_schema(self) -> type:
         """Restituisce CriticScoresDTO come schema per lo structured output."""
         return CriticScoresDTO
+
+    def validate(self, output: CriticScoresDTO, _state: TaskStateDTO) -> tuple[bool, str, dict]:
+        """Valida che tutti i punteggi numerici rientrino nell'intervallo [1.0, 10.0]."""
+        for field in ("narrative", "distractors", "plot_twists", "jargon", "sql_composition"):
+            score = getattr(output, field, 0.0)
+            if not (1.0 <= score <= 10.0):
+                return False, f"Punteggio '{field}' valio ({score}). Deve essere compreso tra 1.0 e 10.0.", {}
+        return True, "", {}
 
     def build_updates(self, output: CriticScoresDTO, _state: TaskStateDTO) -> dict:
         """Aggiorna lo stato con critic."""

@@ -7,6 +7,7 @@ from bench.domain.exceptions.base import BenchException
 from bench.domain.exceptions.clients_exc import (
     DatabaseClientError,
     LLMClientError,
+    ModelOutputContractError,
     ProviderConfigError,
 )
 from bench.domain.exceptions.config_exc import ConfigurationMissingFieldError
@@ -21,6 +22,7 @@ __all__ = [
     "ConfigurationMissingFieldError",
     "DatabaseClientError",
     "LLMClientError",
+    "ModelOutputContractError",
     "ProviderConfigError",
     "LoggingConfigError",
     "SymlinkError",

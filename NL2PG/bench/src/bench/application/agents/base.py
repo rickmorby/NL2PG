@@ -5,7 +5,9 @@
 
 from abc import ABC, abstractmethod
 from typing import Any
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
+
+from bench.domain.exceptions import ModelOutputContractError, handle_exception
 from bench.domain.models.llm import CallOptionsDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
@@ -46,19 +48,34 @@ class AbstractAgent(ABC):
     def run(self, state: TaskStateDTO, chain_role: str = "default") -> dict:
         """Esegue prompt->LLM->validazione con retry loop; restituisce aggiornamenti stato."""
         err = ""
+        last_model = ""
         for i in range(1, self._max_retries(state) + 1):
             prompt = self._prompts.load(self.prompt_name(), **self.build_kwargs(state))
             opts = CallOptionsDTO(error_feedback=err if err else None)
-            result = self._llm.call_model(chain_role, prompt, self.output_schema(), opts)
-            output = result.output
-            ok, err, extra = self.validate(output, state)
-            if ok:
-                updates = self.build_updates(output, state)
-                updates.update(extra)
-                updates["last_model"] = result.model_used
-                updates["last_error"] = ""
-                return updates
-        return {"verdict": "scrapped", "last_error": err, "last_model": result.model_used}
+            try:
+                result = self._llm.call_model(chain_role, prompt, self.output_schema(), opts)
+                last_model = result.model_used
+                output = result.output
+                ok, val_err, extra = self.validate(output, state)
+                if ok:
+                    updates = self.build_updates(output, state)
+                    updates.update(extra)
+                    updates["last_model"] = result.model_used
+                    updates["last_error"] = ""
+                    return updates
+                err = f"Violazione dei vincoli di contratto dell'agente '{self.prompt_name()}': {val_err}"
+                contract_exc = ModelOutputContractError(err, payload={"agent": self.prompt_name(), "attempt": i})
+                handle_exception(contract_exc)
+            except (ModelOutputContractError, ValidationError) as e:
+                err = f"Errore di formato o contratto output dell'agente '{self.prompt_name()}': {e}"
+                contract_exc = ModelOutputContractError(err, payload={"agent": self.prompt_name(), "attempt": i})
+                handle_exception(contract_exc)
+            except Exception as e:
+                err = f"Errore generico durante l'invocazione dell'agente '{self.prompt_name()}': {e}"
+                contract_exc = ModelOutputContractError(err, payload={"agent": self.prompt_name(), "attempt": i})
+                handle_exception(contract_exc)
+
+        return {"verdict": "scrapped", "last_error": err, "last_model": last_model}
 
     def _max_retries(self, state: TaskStateDTO) -> int:
         """Restituisce il numero massimo di tentativi configurato."""

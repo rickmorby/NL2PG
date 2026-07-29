@@ -8,7 +8,10 @@ from logging import getLogger
 from sys import exit as sys_exit, modules
 from rich.console import Console
 
-from bench.domain.exceptions.clients_exc import ProviderConfigError
+from bench.domain.exceptions.clients_exc import (
+    ModelOutputContractError,
+    ProviderConfigError,
+)
 from bench.domain.exceptions.config_exc import ConfigurationMissingFieldError
 from bench.domain.exceptions.logging_exc import LoggingConfigError, SymlinkError
 
@@ -34,6 +37,13 @@ def _handle_symlink_error(exc: SymlinkError) -> None:
 @handle_exception.register(ConfigurationMissingFieldError)
 def _handle_config_missing_field_error(exc: ConfigurationMissingFieldError) -> None:
     """Handler per campi o file di configurazione mancanti con valore di fallback."""
+    _log.warning("%s", exc.message)
+    _console.print(f"[bold yellow][WARNING][/bold yellow] {exc.message}")
+
+
+@handle_exception.register(ModelOutputContractError)
+def _handle_model_output_contract_error(exc: ModelOutputContractError) -> None:
+    """Handler per errori di contratto o validazione dell'output generato dall'LLM."""
     _log.warning("%s", exc.message)
     _console.print(f"[bold yellow][WARNING][/bold yellow] {exc.message}")
 

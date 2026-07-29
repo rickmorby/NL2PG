@@ -16,3 +16,7 @@ class LLMClientError(BenchException):
 
 class ProviderConfigError(BenchException):
     """Sollevata se il file di configurazione dei provider è assente o non valido."""
+
+
+class ModelOutputContractError(BenchException):
+    """Sollevata quando l'output dell'LLM viola lo schema Pydantic o i vincoli del contratto di dominio."""

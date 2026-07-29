@@ -179,7 +179,7 @@ class Orchestrator:
         """Instrada dopo judge: accept, regen (retry story) o reject."""
         if state.verdict == "scrapped":
             return "reject"
-        if state.judge_verdict == "difficile":
+        if state.judge_verdict == "hard":
             return "accept"
         bench_cfg = self._config.load_bench()
         max_regens = bench_cfg.get("judge", {}).get("max_regens", 2)
