@@ -5,10 +5,11 @@
 
 from datetime import datetime, timezone
 from json import load
-from logging import WARNING, getLogger
+from logging import WARNING, NullHandler, getLogger
 from logging.config import dictConfig
 from os import getpid
 from pathlib import Path
+
 from bench.domain.exceptions import LoggingConfigError, SymlinkError
 from bench.domain.ports.outbound.logger_port import LoggerPort
 
@@ -33,7 +34,7 @@ class LoggingAdapter(LoggerPort):
         return self._log_dir
 
     def configure(self) -> None:
-        """Applica la configurazione del logging dal file JSON."""
+        """Applica la configurazione del logging dal file JSON ed integra le dipendenze esterne."""
         self._log_dir.mkdir(parents=True, exist_ok=True)
         log_path = self._new_log_path()
         self._ensure_latest_symlink(log_path)
@@ -50,19 +51,37 @@ class LoggingAdapter(LoggerPort):
         cfg["handlers"]["file"]["filename"] = str(log_path)
         cfg["handlers"]["file"]["level"] = self._level
         dictConfig(cfg)
-        self._quiet_network_loggers()
+        self._configure_dependency_loggers()
 
-    def _quiet_network_loggers(self) -> None:
-        """Silenzia i logger delle librerie esterne di rete a WARNING."""
+    def _configure_dependency_loggers(self) -> None:
+        """Integrazione e instradamento dei logger delle dipendenze nel file di log unico."""
+        try:
+            from litellm import drop_params, set_verbose, suppress_debug_info  # type: ignore
+
+            suppress_debug_info = True
+            set_verbose = False
+            drop_params = True
+        except ImportError:
+            pass
+
+        for pkg in ("httpcore", "asyncio", "urllib3", "filelock"):
+            getLogger(pkg).setLevel(WARNING)
+
         for pkg in (
+            "LiteLLM",
+            "litellm",
             "httpx",
-            "httpcore",
             "openai",
             "openai._base_client",
             "langchain",
             "langgraph",
+            "sqlalchemy",
+            "psycopg",
         ):
-            getLogger(pkg).setLevel(WARNING)
+            logger_obj = getLogger(pkg)
+            logger_obj.handlers.clear()
+            logger_obj.addHandler(NullHandler())
+            logger_obj.propagate = True
 
     def _new_log_path(self) -> Path:
         """Genera il percorso del file di log contenente timestamp, run_id e PID."""
