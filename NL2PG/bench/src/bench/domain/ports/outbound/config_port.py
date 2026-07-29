@@ -9,7 +9,7 @@ from bench.domain.models.category import CategoryDTO
 
 
 class ConfigPort(ABC):
-    """Interfaccia per caricare configurazioni da filesystem o ambiente."""
+    """Interfaccia per caricare configurazioni da filesystem."""
 
     @abstractmethod
     def load_providers(self) -> dict:
@@ -25,7 +25,7 @@ class ConfigPort(ABC):
 
     @abstractmethod
     def dsn(self, key: str) -> str:
-        """Restituisce il DSN per la connessione, da env o fallback su bench.toml."""
+        """Restituisce il DSN per la connessione da bench.toml o fallback di default se assente."""
 
     @abstractmethod
     def config_hash(self, cfg: dict) -> str:

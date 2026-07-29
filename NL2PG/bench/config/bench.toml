@@ -1,3 +1,7 @@
+[run]
+db_dsn   = "postgresql://bench:bench@127.0.0.1:5432/bench_sandbox"
+meta_dsn = "postgresql://bench:bench@127.0.0.1:5432/bench_meta"
+
 [thresholds]
 critic_high = 3.5
 

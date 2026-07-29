@@ -9,15 +9,16 @@ from bench.domain.exceptions.clients_exc import (
     LLMClientError,
     ProviderConfigError,
 )
+from bench.domain.exceptions.config_exc import ConfigurationMissingFieldError
 from bench.domain.exceptions.handler import (
     handle_exception,
     install_global_handler,
 )
 from bench.domain.exceptions.logging_exc import LoggingConfigError, SymlinkError
 
-
 __all__ = [
     "BenchException",
+    "ConfigurationMissingFieldError",
     "DatabaseClientError",
     "LLMClientError",
     "ProviderConfigError",

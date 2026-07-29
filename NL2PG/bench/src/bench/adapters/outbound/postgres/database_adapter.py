@@ -11,7 +11,11 @@ from psycopg_pool import ConnectionPool
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
-from bench.domain.exceptions import DatabaseClientError
+from bench.domain.exceptions import (
+    ConfigurationMissingFieldError,
+    DatabaseClientError,
+    handle_exception,
+)
 from bench.domain.ports.outbound.database_port import DatabasePort
 
 _log = getLogger("bench.adapters.postgres")
@@ -32,8 +36,34 @@ class PostgresClientAdapter(DatabasePort):
     ):
         """Inizializza l'adattatore creando i pool ed il sessionmaker dei metadati."""
         self._config = config or {}
-        self._sandbox_dsn = sandbox_dsn or self._config.get("sandbox_dsn", "")
-        self._meta_dsn = meta_dsn or self._config.get("meta_dsn", "")
+        default_sandbox = "postgresql://bench:bench@127.0.0.1:5432/bench_sandbox"
+        default_meta = "postgresql://bench:bench@127.0.0.1:5432/bench_meta"
+
+        configured_sandbox = (
+            sandbox_dsn
+            or self._config.get("sandbox_dsn", "")
+            or self._config.get("db_dsn", "")
+        )
+        if not configured_sandbox:
+            msg = (
+                "La DSN per il database sandbox non è stata fornita nella configurazione. "
+                f"Viene utilizzato il valore di fallback di default '{default_sandbox}', ma andrebbe configurata per correttezza."
+            )
+            exc = ConfigurationMissingFieldError(msg, payload={"default": default_sandbox})
+            handle_exception(exc)
+            configured_sandbox = default_sandbox
+        self._sandbox_dsn = configured_sandbox
+
+        configured_meta = meta_dsn or self._config.get("meta_dsn", "")
+        if not configured_meta:
+            msg = (
+                "La DSN per il database meta non è stata fornita nella configurazione. "
+                f"Viene utilizzato il valore di fallback di default '{default_meta}', ma andrebbe configurata per correttezza."
+            )
+            exc = ConfigurationMissingFieldError(msg, payload={"default": default_meta})
+            handle_exception(exc)
+            configured_meta = default_meta
+        self._meta_dsn = configured_meta
         self._statement_timeout_ms = statement_timeout_ms
         self._lock_timeout_ms = lock_timeout_ms
 

@@ -3,8 +3,8 @@
 :author: Riccardo Morabito
 """
 
-import json
 from datetime import datetime, timezone
+from json import dumps
 from pathlib import Path
 
 from bench.domain.models.state import TaskStateDTO
@@ -34,7 +34,7 @@ class BenchmarkSerializer:
         """Scrive il documento JSON su file."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(
-            json.dumps(document, indent=2, ensure_ascii=False, default=str),
+            dumps(document, indent=2, ensure_ascii=False, default=str),
             encoding="utf-8",
         )
 
