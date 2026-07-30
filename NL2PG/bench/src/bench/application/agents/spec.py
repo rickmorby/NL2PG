@@ -37,7 +37,8 @@ class SpecAgent(AbstractAgent):
     def validate(self, output: SpecDTO, state: TaskStateDTO) -> tuple[bool, str, dict]:
         """Valida n_tables, twist e feature SQL contro il vocabolario della categoria."""
         if not (1 <= output.n_tables <= 5):
-            return False, f"Numero di tabelle n_tables ({output.n_tables}) fuori dai vincoli [1, 5].", {}
+            msg = f"Numero di tabelle n_tables ({output.n_tables}) fuori dai vincoli [1, 5]."
+            return False, msg, {}
         cat = self._config.load_categories().get(state.category, CategoryDTO())
         ok, err = validate_spec(output, cat)
         return (ok, err, {})

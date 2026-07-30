@@ -32,7 +32,8 @@ class JudgeAgent(AbstractAgent):
         """Valida che il verdetto appartenga al set di valori esatti ammessi dal contratto."""
         allowed = {"hard", "ambigua", "incompleta"}
         if output.verdict not in allowed:
-            return False, f"Verdetto '{output.verdict}' non ammesso. Deve essere uno tra: {sorted(allowed)}", {}
+            msg = f"Verdetto '{output.verdict}' non ammesso. Deve essere tra: {sorted(allowed)}"
+            return False, msg, {}
         return True, "", {}
 
     def build_updates(self, output: JudgeDTO, state: TaskStateDTO) -> dict:

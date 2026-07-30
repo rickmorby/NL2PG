@@ -38,7 +38,8 @@ class CriticAgent(AbstractAgent):
         for field in ("narrative", "distractors", "plot_twists", "jargon", "sql_composition"):
             score = getattr(output, field, 0.0)
             if not (1.0 <= score <= 10.0):
-                return False, f"Punteggio '{field}' valio ({score}). Deve essere compreso tra 1.0 e 10.0.", {}
+                msg = f"Punteggio '{field}' ({score}) fuori dai vincoli [1.0, 10.0]."
+                return False, msg, {}
         return True, "", {}
 
     def build_updates(self, output: CriticScoresDTO, _state: TaskStateDTO) -> dict:

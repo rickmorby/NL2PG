@@ -19,4 +19,4 @@ class ProviderConfigError(BenchException):
 
 
 class ModelOutputContractError(BenchException):
-    """Sollevata quando l'output dell'LLM viola lo schema Pydantic o i vincoli del contratto di dominio."""
+    """Sollevata se l'output dell'LLM viola lo schema o i vincoli di dominio."""

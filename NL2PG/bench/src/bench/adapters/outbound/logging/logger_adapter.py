@@ -56,11 +56,11 @@ class LoggingAdapter(LoggerPort):
     def _configure_dependency_loggers(self) -> None:
         """Integrazione e instradamento dei logger delle dipendenze nel file di log unico."""
         try:
-            from litellm import drop_params, set_verbose, suppress_debug_info  # type: ignore
+            from litellm import verbose_logger  # type: ignore
 
-            suppress_debug_info = True
-            set_verbose = False
-            drop_params = True
+            verbose_logger.handlers.clear()
+            verbose_logger.addHandler(NullHandler())
+            verbose_logger.propagate = True
         except ImportError:
             pass
 

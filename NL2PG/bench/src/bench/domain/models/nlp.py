@@ -38,10 +38,10 @@ class JudgeDTO(AbstractDTO):
     @field_validator("verdict")
     @classmethod
     def validate_verdict(cls, v: str) -> str:
-        """Verifica che il verdetto sia tra i tre valori esatti di contratto."""
+        """Verifica che il verdetto sia tra i tre valori esatti del contratto."""
         allowed = {"hard", "ambigua", "incompleta"}
         if v not in allowed:
-            msg = f"Verdetto '{v}' non valido. Deve essere uno tra i valori esatti del contratto: {sorted(allowed)}"
+            msg = f"Verdetto '{v}' non valido. Valori esatti ammessi: {sorted(allowed)}"
             raise ValueError(msg)
         return v
 

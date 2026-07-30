@@ -68,10 +68,11 @@ class LLMClientAdapter(LLMGeneratorPort):
                 output = schema.model_validate_json(cleaned_json)
             except ValidationError as ve:
                 msg_err = (
-                    f"L'output generato dal modello '{response.model}' non rispetta lo schema Pydantic '{schema.__name__}': {ve}. "
-                    f"Assicurarsi di rispondere ESCLUSIVAMENTE con un oggetto JSON valido senza blocchi markdown ```json."
+                    f"L'output del modello '{response.model}' non rispetta lo schema "
+                    f"'{schema.__name__}': {ve}. Rispondere ESCLUSIVAMENTE con JSON valido."
                 )
-                raise ModelOutputContractError(msg_err, payload={"schema": schema.__name__, "raw": cleaned_json}) from ve
+                payload = {"schema": schema.__name__, "raw": cleaned_json}
+                raise ModelOutputContractError(msg_err, payload=payload) from ve
 
             return CallResultDTO(output=output, model_used=response.model)
         except ModelOutputContractError:

@@ -6,11 +6,13 @@
 from contextlib import contextmanager
 from logging import getLogger
 from typing import Any, Generator
+
 from psycopg import Connection, errors as pg_errors, rows, sql
 from psycopg_pool import ConnectionPool
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
+
 from bench.domain.exceptions import (
     ConfigurationMissingFieldError,
     DatabaseClientError,
@@ -47,7 +49,7 @@ class PostgresClientAdapter(DatabasePort):
         if not configured_sandbox:
             msg = (
                 "La DSN per il database sandbox non è stata fornita nella configurazione. "
-                f"Viene utilizzato il valore di fallback di default '{default_sandbox}', ma andrebbe configurata per correttezza."
+                f"Viene utilizzato il valore di fallback '{default_sandbox}'."
             )
             exc = ConfigurationMissingFieldError(msg, payload={"default": default_sandbox})
             handle_exception(exc)
@@ -58,7 +60,7 @@ class PostgresClientAdapter(DatabasePort):
         if not configured_meta:
             msg = (
                 "La DSN per il database meta non è stata fornita nella configurazione. "
-                f"Viene utilizzato il valore di fallback di default '{default_meta}', ma andrebbe configurata per correttezza."
+                f"Viene utilizzato il valore di fallback '{default_meta}'."
             )
             exc = ConfigurationMissingFieldError(msg, payload={"default": default_meta})
             handle_exception(exc)

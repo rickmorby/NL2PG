@@ -45,7 +45,8 @@ class ConfigAdapter(ConfigPort):
                 f"File di configurazione bench.toml non trovato in '{self._dir}'. "
                 "Il file andrebbe configurato per definire i parametri del benchmark."
             )
-            exc = ConfigurationMissingFieldError(msg, payload={"path": str(path), "file": "bench.toml"})
+            payload = {"path": str(path), "file": "bench.toml"}
+            exc = ConfigurationMissingFieldError(msg, payload=payload)
             handle_exception(exc)
             return {}
         with open(path, "rb") as f:
@@ -59,14 +60,15 @@ class ConfigAdapter(ConfigPort):
                 f"File di configurazione categories.json non trovato in '{self._dir}'. "
                 "Il file andrebbe configurato per caricare le categorie del benchmark."
             )
-            exc = ConfigurationMissingFieldError(msg, payload={"path": str(path), "file": "categories.json"})
+            payload = {"path": str(path), "file": "categories.json"}
+            exc = ConfigurationMissingFieldError(msg, payload=payload)
             handle_exception(exc)
             return {}
         data = loads(path.read_text(encoding="utf-8"))
         return {c["id"]: CategoryDTO(**c) for c in data["categories"]}
 
     def dsn(self, key: str) -> str:
-        """Restituisce il DSN da bench.toml o solleva un'eccezione di configurazione con valore di default.
+        """Restituisce il DSN da bench.toml o solleva un'eccezione di configurazione con fallback.
 
         :param key: Chiave del DSN richiesta ('db_dsn', 'sandbox_dsn' o 'meta_dsn').
         :return: Stringa di connessione DSN PostgreSQL.
@@ -88,8 +90,8 @@ class ConfigAdapter(ConfigPort):
 
         default_val = default_map.get(key, "")
         msg = (
-            f"Il campo '{key}' non è stato trovato nel file di configurazione bench.toml sotto [run]. "
-            f"Viene utilizzato il valore di fallback di default '{default_val}', ma andrebbe configurato per correttezza."
+            f"Il campo '{key}' non è stato trovato nel file bench.toml sotto [run]. "
+            f"Viene utilizzato il valore di fallback '{default_val}'."
         )
         exc = ConfigurationMissingFieldError(
             msg,

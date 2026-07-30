@@ -49,8 +49,9 @@ class AbstractAgent(ABC):
         """Esegue prompt->LLM->validazione con retry loop; restituisce aggiornamenti stato."""
         err = ""
         last_model = ""
+        name = self.prompt_name()
         for i in range(1, self._max_retries(state) + 1):
-            prompt = self._prompts.load(self.prompt_name(), **self.build_kwargs(state))
+            prompt = self._prompts.load(name, **self.build_kwargs(state))
             opts = CallOptionsDTO(error_feedback=err if err else None)
             try:
                 result = self._llm.call_model(chain_role, prompt, self.output_schema(), opts)
@@ -63,17 +64,17 @@ class AbstractAgent(ABC):
                     updates["last_model"] = result.model_used
                     updates["last_error"] = ""
                     return updates
-                err = f"Violazione dei vincoli di contratto dell'agente '{self.prompt_name()}': {val_err}"
-                contract_exc = ModelOutputContractError(err, payload={"agent": self.prompt_name(), "attempt": i})
-                handle_exception(contract_exc)
+                err = f"Violazione vincoli contratto '{name}': {val_err}"
+                exc = ModelOutputContractError(err, payload={"agent": name, "attempt": i})
+                handle_exception(exc)
             except (ModelOutputContractError, ValidationError) as e:
-                err = f"Errore di formato o contratto output dell'agente '{self.prompt_name()}': {e}"
-                contract_exc = ModelOutputContractError(err, payload={"agent": self.prompt_name(), "attempt": i})
-                handle_exception(contract_exc)
+                err = f"Errore contratto output '{name}': {e}"
+                exc = ModelOutputContractError(err, payload={"agent": name, "attempt": i})
+                handle_exception(exc)
             except Exception as e:
-                err = f"Errore generico durante l'invocazione dell'agente '{self.prompt_name()}': {e}"
-                contract_exc = ModelOutputContractError(err, payload={"agent": self.prompt_name(), "attempt": i})
-                handle_exception(contract_exc)
+                err = f"Errore invocazione agente '{name}': {e}"
+                exc = ModelOutputContractError(err, payload={"agent": name, "attempt": i})
+                handle_exception(exc)
 
         return {"verdict": "scrapped", "last_error": err, "last_model": last_model}
 
