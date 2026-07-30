@@ -13,7 +13,37 @@ Il JSON di output deve contenere i campi: "name", "description", "sql_features",
 3. **Tipo di Schema**: Mappa la tipologia di schema relazionale descritta.
 4. **Twist Ammessi**: Seleziona i tipi di mutazione o twist ammissibili.
 5. **Vincoli**: Trascrivi i vincoli operativi specifici della categoria.
+6. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
+
+<positive_examples>
+<example>
+{
+  "name": "Single Table Aggregations",
+  "description": "Aggregazioni su singola tabella.",
+  "sql_features": ["group_agg"],
+  "schema_type": "single_table",
+  "compositions": [],
+  "allowed_twists": ["rename"],
+  "constraints": []
+}
+</example>
+</positive_examples>
+
+<negative_examples>
+<example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{
+  "name": "Single Table Aggregations", ...
+}
+```
+</example_to_avoid>
+</negative_examples>
+
+<forbidden_actions>
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+</forbidden_actions>
 
 <input_context>
 <markdown_content>{content}</markdown_content>
@@ -22,9 +52,9 @@ Il JSON di output deve contenere i campi: "name", "description", "sql_features",
 <chain_of_thought_protocol>
 1. Analizza il testo Markdown della categoria.
 2. Estrai ed allinea le feature SQL, la tipologia di schema ed i vincoli.
-3. Compila la bozza in formato JSON conforme alla classe `CategoryDraft`.
+3. Compila la bozza dell'oggetto JSON puro conforme alla classe `CategoryDraft`.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `CategoryDraft`.
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `CategoryDraft`.
 </output_format>

@@ -14,6 +14,7 @@ Il JSON di output deve contenere esclusivamente il campo "inserts".
 4. **Popolamento Adeguato**: Inserisci tra 3 e 6 righe realistiche e significative per ciascuna tabella.
 5. **Formattazione SQL Valida**: Formatta le date nel formato `'YYYY-MM-DD'` e i decimali in cifre piane. Ogni istruzione `INSERT` deve essere valida per PostgreSQL e terminare con un punto e virgola `;`.
 6. **Garantire Risultati Non Vuoti**: Assicurati che i dati inseriti soddisfino le combinazioni di filtri e join aziendali in modo che l'esecuzione delle query restituisca sempre righe valide ($>0$ righe).
+7. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
@@ -26,14 +27,25 @@ Il JSON di output deve contenere esclusivamente il campo "inserts".
 
 <negative_examples>
 <example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{
+  "inserts": "INSERT INTO clienti (...) VALUES (...);"
+}
+```
+</example_to_avoid>
+<example_to_avoid>
 VIOLAZIONE INTEGRITÀ REFERENZIALE (ERRATO):
-INSERT INTO ordini (id, cliente_id, ...) VALUES (101, 999, ...); // SBAGLIATO! cliente_id 999 non esiste in clienti!
+{
+  "inserts": "INSERT INTO ordini (id, cliente_id, ...) VALUES (101, 999, ...);" // cliente_id 999 non esiste in clienti!
+}
 </example_to_avoid>
 </negative_examples>
 
 <forbidden_actions>
-- DIVIETO 1: NON inserire identificatori di schema (es. `task_xxx.`) prima dei nomi delle tabelle nelle istruzioni `INSERT INTO`.
-- DIVIETO 2: NON inserire valori di chiavi esterne inesistenti nella tabella padre.
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON inserire identificatori di schema (es. `task_xxx.`) prima dei nomi delle tabelle nelle istruzioni `INSERT INTO`.
+- DIVIETO 3: NON inserire valori di chiavi esterne inesistenti nella tabella padre.
 </forbidden_actions>
 
 <input_context>
@@ -49,5 +61,5 @@ INSERT INTO ordini (id, cliente_id, ...) VALUES (101, 999, ...); // SBAGLIATO! c
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `DataInserts` (campo `inserts`).
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `DataInserts` (campo `inserts`).
 </output_format>

@@ -20,6 +20,7 @@ Il JSON di output deve contenere esclusivamente il campo "story".
    - Descrivi i campi mediante perifrasi aziendali naturali (es. "l'anno in cui l'allievo ha avviato il percorso", "la valutazione conseguita nell'esame").
 5. **Iniezione Distrattori e Narrazione Naturale**:
    - Aggiungi processi aziendali e dettagli gestionali per rendere la storia ricca, fluida e verosimile.
+6. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
@@ -32,14 +33,25 @@ Il JSON di output deve contenere esclusivamente il campo "story".
 
 <negative_examples>
 <example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{
+  "story": "Presso la Segreteria Didattica dell'ateneo..."
+}
+```
+</example_to_avoid>
+<example_to_avoid>
 USO DI GERGO DB O TRONCAMENTO NOMI TABELLA (ERRATO):
-"L'archivio fornitori memorizza le righe della tabella..." // SBAGLIATO! Ha usato le parole 'tabella' e 'righe', ed ha abbreviato 'anagrafica_fornitori' in 'fornitori'!
+{
+  "story": "L'archivio fornitori memorizza le righe della tabella..." // SBAGLIATO! Ha usato le parole 'tabella' e 'righe', ed ha abbreviato 'anagrafica_fornitori' in 'fornitori'!
+}
 </example_to_avoid>
 </negative_examples>
 
 <forbidden_actions>
-- DIVIETO 1: NON usare MAI parole come *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*. SE SCRIVI LA PAROLA 'tabella', IL TASK È INVALIDATO!
-- DIVIETO 2: NON abbreviare o modificare il nome letterale di una tabella del DDL o del relativo `obsolete_value`.
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON usare MAI parole come *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*. SE SCRIVI LA PAROLA 'tabella', IL TASK È INVALIDATO!
+- DIVIETO 3: NON abbreviare o modificare il nome letterale di una tabella del DDL o del relativo `obsolete_value`.
 </forbidden_actions>
 
 <input_context>
@@ -56,9 +68,9 @@ USO DI GERGO DB O TRONCAMENTO NOMI TABELLA (ERRATO):
 2. Identifica tutti i valori letterali presenti nei filtri e nelle condizioni della query Gold.
 3. Progetta il racconto aziendale inserendo in modo naturale il nome esatto delle tabelle (o sinonimi dei twist) ed i valori letterali senza abbreviazioni.
 4. Rileggi ed elimina qualsiasi parola del gergo informatico/database.
-5. Genera il JSON valido conforme alla classe `Story`.
+5. Genera l'oggetto JSON puro valido conforme alla classe `Story`.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `Story` (campo `story`).
+Rispondi esclusivamente in formato JSON puro a level radice (senza blocchi ```json) conforme alla classe `Story` (campo `story`).
 </output_format>

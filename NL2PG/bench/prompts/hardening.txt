@@ -12,7 +12,32 @@ Il JSON di output deve contenere esclusivamente il campo "story".
 2. **Mantenimento Coverage Tabella**: Ogni nome esatto di tabella del DDL (o relativo `obsolete_value`) DEVE rimanere presente nella storia senza essere abbreviato.
 3. **Mantenimento Letterali**: Tutti i valori letterali della query Gold DEVONO rimanere presenti nel testo.
 4. **DIVIETO GERGO DB**: Elimina qualsiasi residuo di terminologia informatica (*tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*).
+5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
+
+<positive_examples>
+<example>
+{
+  "story": "Presso la gestione didattica, l'archivio denominato studenti memorizza..."
+}
+</example>
+</positive_examples>
+
+<negative_examples>
+<example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{
+  "story": "Presso la gestione didattica..."
+}
+```
+</example_to_avoid>
+</negative_examples>
+
+<forbidden_actions>
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON usare termini del gergo informatico/database.
+</forbidden_actions>
 
 <input_context>
 <spec>{spec}</spec>
@@ -26,9 +51,9 @@ Il JSON di output deve contenere esclusivamente il campo "story".
 1. Analizza i punteggi ed i feedback forniti dal Critic Agent.
 2. Riscrivi la storia per rendere il testo più naturale e fluido, arricchendo i dettagli gestionali di contorno.
 3. Verifica che i nomi delle tabelle ed i letterali siano ancora presenti nel testo finale.
-4. Genera il JSON valido conforme alla classe `Story`.
+4. Genera l'oggetto JSON puro valido conforme alla classe `Story`.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `Story` (campo `story`).
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `Story` (campo `story`).
 </output_format>

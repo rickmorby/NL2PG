@@ -1,25 +1,87 @@
 {
   "chains": {
-    "default":     ["openrouter/model-1", "nous/model-2"],
-    "critic":      ["openrouter/model-1", "nous/model-2"],
-    "calibration": ["openrouter/model-1", "nous/model-2"]
+    "default": [
+      "openrouter/nemotron-12b",
+      "openrouter/gemma-26b",
+      "openrouter/gemma-31b",
+      "kilo/ling-flash",
+      "nous/laguna-s"
+    ],
+    "critic": [
+      "openrouter/nemotron-12b",
+      "openrouter/gemma-26b",
+      "openrouter/gemma-31b",
+      "kilo/ling-flash",
+      "nous/laguna-s"
+    ],
+    "judge": [
+      "openrouter/nemotron-12b",
+      "openrouter/gemma-26b",
+      "openrouter/gemma-31b",
+      "kilo/ling-flash",
+      "nous/laguna-s"
+    ],
+    "calibration": [
+      "openrouter/nemotron-12b",
+      "openrouter/gemma-26b",
+      "openrouter/gemma-31b",
+      "kilo/ling-flash",
+      "nous/laguna-s"
+    ]
   },
   "models": {
-    "openrouter/model-1": {
+    "openrouter/nemotron-12b": {
       "provider": "openai",
-      "model": "your-model-name",
+      "model": "nvidia/nemotron-nano-12b-v2-vl:free",
       "temperature": 0.7,
-      "max_tokens": 8192,
-      "request_timeout": 120,
+      "max_tokens": 4096,
+      "request_timeout": 60,
+      "rpm": 30,
+      "structured_output": true,
       "base_url": "https://openrouter.ai/api/v1",
       "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
     },
-    "nous/model-2": {
+    "openrouter/gemma-26b": {
       "provider": "openai",
-      "model": "your-model-name-free",
+      "model": "google/gemma-4-26b-a4b-it:free",
       "temperature": 0.7,
-      "max_tokens": 8192,
-      "request_timeout": 120,
+      "max_tokens": 4096,
+      "request_timeout": 60,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/gemma-31b": {
+      "provider": "openai",
+      "model": "google/gemma-4-31b-it:free",
+      "temperature": 0.7,
+      "max_tokens": 4096,
+      "request_timeout": 60,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "kilo/ling-flash": {
+      "provider": "openai",
+      "model": "inclusionai/ling-3.0-flash:free",
+      "temperature": 0.7,
+      "max_tokens": 4096,
+      "request_timeout": 60,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://api.kilo.ai/api/gateway",
+      "api_key": "YOUR_KILO_API_KEY_HERE"
+    },
+    "nous/laguna-s": {
+      "provider": "openai",
+      "model": "poolside/laguna-s-2.1:free",
+      "temperature": 0.7,
+      "max_tokens": 4096,
+      "request_timeout": 60,
+      "rpm": 30,
+      "structured_output": true,
       "base_url": "https://inference-api.nousresearch.com/v1",
       "api_key": "YOUR_NOUS_API_KEY_HERE"
     }

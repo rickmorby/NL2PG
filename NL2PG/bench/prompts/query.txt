@@ -27,6 +27,7 @@ Il JSON di output deve contenere esclusivamente i campi "query", "intent", "orde
    - Se `"order_sensitive": true`, la presenza dell'`ORDER BY` nella query principale è **OBBLIGATORIA**.
    - Se l'ordine delle righe è irrilevante per la correttezza della risposta, imposta `"order_sensitive": false`.
 4. **Sintassi PostgreSQL Corretta**: Scrivi SQL pulito per PostgreSQL dove l'istruzione termina con un punto e virgola `;`.
+5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
@@ -41,6 +42,16 @@ Il JSON di output deve contenere esclusivamente i campi "query", "intent", "orde
 
 <negative_examples>
 <example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{
+  "query": "SELECT nome FROM clienti;",
+  "intent": "Elenco clienti.",
+  "order_sensitive": false
+}
+```
+</example_to_avoid>
+<example_to_avoid>
 NON impostare order_sensitive: true senza ORDER BY nella SELECT principale (ERRATO):
 {
   "query": "SELECT nome FROM clienti;",
@@ -50,8 +61,9 @@ NON impostare order_sensitive: true senza ORDER BY nella SELECT principale (ERRA
 </negative_examples>
 
 <forbidden_actions>
-- DIVIETO 1: NON qualificare le tabelle con prefissi di schema.
-- DIVIETO 2: NON impostare `order_sensitive: true` senza la clausola `ORDER BY` nella query principale.
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON qualificare le tabelle con prefissi di schema.
+- DIVIETO 3: NON impostare `order_sensitive: true` senza la clausola `ORDER BY` nella query principale.
 </forbidden_actions>
 
 <input_context>
@@ -65,9 +77,9 @@ NON impostare order_sensitive: true senza ORDER BY nella SELECT principale (ERRA
 2. Progetta la query PostgreSQL integrando tutte le clausole necessarie.
 3. Determina se l'ordinamento è rilevante: se sì, imposta `order_sensitive: true` ed aggiungi la clausola `ORDER BY` alla radice della SELECT.
 4. Redigi l'intenzione in linguaggio naturale (`intent`).
-5. Genera il JSON valido conforme alla classe `GoldQuery`.
+5. Genera l'oggetto JSON puro valido conforme alla classe `GoldQuery`.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `GoldQuery` (campi `query`, `intent`, `order_sensitive`).
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `GoldQuery` (campi `query`, `intent`, `order_sensitive`).
 </output_format>

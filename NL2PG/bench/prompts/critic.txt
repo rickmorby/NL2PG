@@ -14,6 +14,7 @@ Il JSON di output deve contenere esclusivamente il campo "critic" con l'oggetto 
 4. **Punteggio Colpi di Scena (`plot_twists`)**: Valuta quanto bene i twist semantici siano stati integrati senza creare ambiguità irrisolvibili (da 1.0 a 10.0).
 5. **Punteggio Gergo (`jargon`)**: Valuta la totale assenza di termini di database vietati (da 1.0 a 10.0).
 6. **Punteggio Composizione SQL (`sql_composition`)**: Valuta la correttezza, la pulizia e la ricchezza delle clausole della query Gold rispetto alle feature richieste (da 1.0 a 10.0).
+7. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
@@ -30,6 +31,28 @@ Il JSON di output deve contenere esclusivamente il campo "critic" con l'oggetto 
 </example>
 </positive_examples>
 
+<negative_examples>
+<example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{
+  "critic": { "narrative": 9.0, "distractors": 8.5, "plot_twists": 9.0, "jargon": 10.0, "sql_composition": 9.5 }
+}
+```
+</example_to_avoid>
+<example_to_avoid>
+NON USARE PUNTEGGI FUORI DALL'INTERVALLO [1.0, 10.0] (ERRATO):
+{
+  "critic": { "narrative": 15.0, ... }
+}
+</example_to_avoid>
+</negative_examples>
+
+<forbidden_actions>
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON usare punteggi minori di 1.0 o maggiori di 10.0.
+</forbidden_actions>
+
 <input_context>
 <spec>{spec}</spec>
 <schema_ddl>{schema_ddl}</schema_ddl>
@@ -41,12 +64,11 @@ Il JSON di output deve contenere esclusivamente il campo "critic" con l'oggetto 
 
 <chain_of_thought_protocol>
 1. Analizza ogni componente del task (Spec, DDL, Dati, Gold Query, Storia, Domanda).
-2. Verifica l'assenza di parole del gergo DB nel testo della storia.
-3. Valuta la presenza dei nomi di tabella/sinonimi e dei letterali.
-4. Assegna un punteggio da 1.0 a 10.0 per ciascuna delle 5 dimensioni.
-5. Genera il JSON valido conforme alla classe `CriticScores`.
+2. Valuta la qualità di ciascuna dimensione aziendale.
+3. Assegna un punteggio da 1.0 a 10.0 per ciascuna delle 5 dimensioni.
+4. Genera l'oggetto JSON puro valido conforme alla classe `CriticScores`.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `CriticScores` (campo `critic` con punteggi float compresi tra 1.0 e 10.0).
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `CriticScores` (campo `critic`).
 </output_format>

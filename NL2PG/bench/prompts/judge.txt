@@ -13,7 +13,32 @@ Il JSON di output deve contenere esclusivamente il campo "verdict" con uno dei s
    - **`ambigua`**: Il testo della storia o della domanda lascia spazio a molteplici interpretazioni SQL tra loro incompatibili.
    - **`incompleta`**: Mancano elementi informativi essenziali per la risoluzione deterministica della query.
 2. **DIVIETO DI VALORI NON STANDARD**: È TASSATIVAMENTE VIETATO restituire stringhe non previste come "successed", "passed", "easy", "medium", "valid", "ok" o "difficile". Usa ESCLUSIVAMENTE una delle tre stringhe minuscole: "hard", "ambigua", "incompleta".
+3. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
+
+<positive_examples>
+<example>
+{"verdict": "hard"}
+</example>
+</positive_examples>
+
+<negative_examples>
+<example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{"verdict": "hard"}
+```
+</example_to_avoid>
+<example_to_avoid>
+NON USARE VALORI NON INCLUSI NEL CONTRATTO (ERRATO):
+{"verdict": "successed"}
+</example_to_avoid>
+</negative_examples>
+
+<forbidden_actions>
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON usare mai stringhe non ammesse per il campo `verdict`.
+</forbidden_actions>
 
 <input_context>
 <spec>{spec}</spec>
@@ -29,9 +54,9 @@ Il JSON di output deve contenere esclusivamente il campo "verdict" con uno dei s
 1. Esamina l'intero materiale del task ed i risultati di calibrazione.
 2. Valida la chiarezza ed la completezza informativa.
 3. Assegna il verdetto finale scegliendo rigorosamente tra: "hard", "ambigua" o "incompleta".
-4. Genera il JSON valido conforme alla classe `Judge`.
+4. Genera l'oggetto JSON puro valido conforme alla classe `Judge`.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `Judge` (campo `verdict` contenente una tra "hard", "ambigua", "incompleta").
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `Judge` (campo `verdict`).
 </output_format>

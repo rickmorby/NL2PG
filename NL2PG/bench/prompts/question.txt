@@ -12,6 +12,7 @@ Il JSON di output deve contenere esclusivamente il campo "question".
 2. **Naturalezza Espressiva**: Esprimi la richiesta nel tono naturale di un manager o utente aziendale.
 3. **DIVIETO DI SCHEMA LEAKAGE**: NON citare alla lettera i nomi tecnici delle colonne SQL (es. scrivi "data di immatricolazione", NON "la colonna data_immatricolazione").
 4. **DIVIETO DI GERGO DB**: NON usare parole come *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*.
+5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
@@ -24,14 +25,25 @@ Il JSON di output deve contenere esclusivamente il campo "question".
 
 <negative_examples>
 <example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{
+  "question": "Quali sono i 3 studenti con la media voti più alta..."
+}
+```
+</example_to_avoid>
+<example_to_avoid>
 CITAZIONE SINTATTICA DI CLAUSOLE SQL O COLONNE (ERRATO):
-"Fai una SELECT con GROUP BY su student_id ed ORDER BY voto DESC LIMIT 3" // SBAGLIATO! Ha citato le clausole SQL ed i nomi delle colonne!
+{
+  "question": "Fai una SELECT con GROUP BY su student_id ed ORDER BY voto DESC LIMIT 3" // SBAGLIATO! Ha citato le clausole SQL ed i nomi delle colonne!
+}
 </example_to_avoid>
 </negative_examples>
 
 <forbidden_actions>
-- DIVIETO 1: NON usare parole del gergo informatico o di database.
-- DIVIETO 2: NON citare i nomi fisici delle colonne del database.
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON usare parole del gergo informatico o di database.
+- DIVIETO 3: NON citare i nomi fisici delle colonne del database.
 </forbidden_actions>
 
 <input_context>
@@ -45,9 +57,9 @@ CITAZIONE SINTATTICA DI CLAUSOLE SQL O COLONNE (ERRATO):
 2. Formula la domanda in italiano corrente in modo chiaro, naturale e completo.
 3. Assicurati che ogni vincolo o filtro della query sia traducibile in modo deterministico dal testo della domanda.
 4. Verifica l'assenza di gergo informatico o nomi fisici delle colonne.
-5. Genera il JSON valido conforme alla classe `Question`.
+5. Genera l'oggetto JSON puro valido conforme alla classe `Question`.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `Question` (campo `question`).
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `Question` (campo `question`).
 </output_format>

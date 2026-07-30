@@ -12,7 +12,32 @@ Il JSON di output deve contenere esclusivamente il campo "query".
 2. **Schema Linking**: Mappa le entità aziendali ed i sinonimi verso i nomi reali delle tabelle e delle colonne dello schema DDL.
 3. **DIVIETO DI QUALIFICAZIONE SCHEMA**: Scrivi la query PostgreSQL usando nomi di tabella semplici (`FROM clienti`, MAI `FROM task_xxx.clienti`).
 4. **Sintassi PostgreSQL**: Genera SQL valido che termina con punto e virgola `;`.
+5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
+
+<positive_examples>
+<example>
+{
+  "query": "SELECT * FROM clienti WHERE eta > 25;"
+}
+</example>
+</positive_examples>
+
+<negative_examples>
+<example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{
+  "query": "SELECT * FROM clienti;"
+}
+```
+</example_to_avoid>
+</negative_examples>
+
+<forbidden_actions>
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON qualificare le tabelle con prefissi di schema.
+</forbidden_actions>
 
 <input_context>
 <schema_ddl>{schema_ddl}</schema_ddl>
@@ -24,9 +49,9 @@ Il JSON di output deve contenere esclusivamente il campo "query".
 1. Analizza la domanda e lo schema DDL.
 2. Mappa i concetti espressi nel testo alle tabelle ed ai campi dello schema DDL.
 3. Costruisci la query PostgreSQL integrando le clausole necessarie (`SELECT`, `JOIN`, `WHERE`, `GROUP BY`, `ORDER BY`, `LIMIT`).
-4. Genera il JSON valido con il campo `query`.
+4. Genera l'oggetto JSON puro valido conforme alla classe `SolverOutput`.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON con il campo `query`.
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `SolverOutput` (campo `query`).
 </output_format>

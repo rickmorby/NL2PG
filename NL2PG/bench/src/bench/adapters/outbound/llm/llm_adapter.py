@@ -6,6 +6,7 @@
 from typing import Any
 from litellm import Router
 from pydantic import BaseModel, ValidationError
+
 from bench.domain.exceptions import LLMClientError, ModelOutputContractError
 from bench.domain.models.llm import CallOptionsDTO, CallResultDTO
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
@@ -35,7 +36,7 @@ class LLMClientAdapter(LLMGeneratorPort):
         schema: type[BaseModel] | type,
         options: CallOptionsDTO | None = None,
     ) -> CallResultDTO:
-        """Chiama la catena LLM con failover automatico gestito da liteLLM Router."""
+        """Chiama la catena LLM guidata dai prompt con failover automatico via liteLLM Router."""
         opts = options or CallOptionsDTO()
         messages = [{"role": "user", "content": prompt}]
 
@@ -44,21 +45,37 @@ class LLMClientAdapter(LLMGeneratorPort):
             messages.append({"role": "user", "content": msg})
 
         try:
-            response = self._router.completion(
-                model=role,
-                messages=messages,
-                response_format=schema,
-            )
+            kwargs: dict[str, Any] = {"model": role, "messages": messages}
+            if opts.temperature_override is not None:
+                kwargs["temperature"] = opts.temperature_override
+
+            response = self._router.completion(**kwargs)
             msg = response.choices[0].message
-            output = (
-                msg.parsed
-                if (hasattr(msg, "parsed") and msg.parsed is not None)
-                else schema.model_validate_json(msg.content)
-            )
+            content = (msg.content or "").strip()
+
+            if content.startswith("```"):
+                first_nl = content.find("\n")
+                if first_nl != -1 and content[:first_nl].strip().lower().startswith("```"):
+                    content = content[first_nl + 1:]
+                else:
+                    content = content[3:]
+            if content.endswith("```"):
+                content = content[:-3]
+
+            cleaned_json = content.strip()
+
+            try:
+                output = schema.model_validate_json(cleaned_json)
+            except ValidationError as ve:
+                msg_err = (
+                    f"L'output generato dal modello '{response.model}' non rispetta lo schema Pydantic '{schema.__name__}': {ve}. "
+                    f"Assicurarsi di rispondere ESCLUSIVAMENTE con un oggetto JSON valido senza blocchi markdown ```json."
+                )
+                raise ModelOutputContractError(msg_err, payload={"schema": schema.__name__, "raw": cleaned_json}) from ve
+
             return CallResultDTO(output=output, model_used=response.model)
-        except ValidationError as e:
-            msg = f"L'output dell'LLM non rispetta lo schema Pydantic '{schema.__name__}': {e}"
-            raise ModelOutputContractError(msg, payload={"schema": schema.__name__}) from e
+        except ModelOutputContractError:
+            raise
         except Exception as e:
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 

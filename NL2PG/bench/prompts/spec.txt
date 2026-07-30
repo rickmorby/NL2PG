@@ -10,7 +10,7 @@ Il JSON di output deve contenere esclusivamente le chiavi: "domain", "n_tables",
 
 <rules_and_guidelines>
 1. **Selezione Dominio**: Scegli il dominio aziendale più idoneo da `<available_domains>`.
-2. **Dimensionamento Schema**: Imposta `n_tables` (da 1 a 5) in perfetta aderenza con `<schema_type>`.
+2. **Dimensionamento Schema**: Imposta `n_tables` come numero intero compreso rigorosamente tra 1 e 5 (`1 <= n_tables <= 5`), in aderenza con `<schema_type>`.
 3. **Selezione Feature SQL**: Scegli un sottoinsieme di `sql_features` appartenenti ESCLUSIVAMENTE a `<allowed_sql_features>`. NON aggiungere mai feature non presenti nella lista fornita.
 4. **Selezione Twist**: Scegli un sottoinsieme di `twist` appartenenti ESCLUSIVAMENTE a `<allowed_twists>`.
 5. **Generazione Regole Twist (`twist_rules`)**: Per OGNI elemento scelto in `twist`, DEVI creare esattamente un oggetto `TwistRule` contenente:
@@ -19,7 +19,7 @@ Il JSON di output deve contenere esclusivamente le chiavi: "domain", "n_tables",
    - `obsolete_value`: la perifrasi o sinonimo usato nella prosa aziendale (es. "anagrafica_iscritti", "valore_complessivo").
    - `description`: spiegazione dettagliata dell'effetto del twist.
 6. **Sincronizzazione Obbligatoria**: Se `twist` contiene N elementi, `twist_rules` DEVE contenere esattamente N oggetti TwistRule.
-7. **Risolvibilità Garantita**: I sinonimi e le perifrasi usate nei twist devono essere trasparenti e riconducibili al dominio aziendale. Evita indovinelli o associazioni illogiche.
+7. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
@@ -45,11 +45,16 @@ Il JSON di output deve contenere esclusivamente le chiavi: "domain", "n_tables",
 
 <negative_examples>
 <example_to_avoid>
-NON CREARE STRUTTURE ANNIDATE O DESINCRONIZZATE (ERRATO):
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{ "domain": "ecommerce", "n_tables": 3, ... }
+```
+</example_to_avoid>
+<example_to_avoid>
+NON USARE VALORI O STRUTTURE FUORI CONTRATTO (ERRATO):
 {
   "domain": "università",
-  "schema": { "tables": [...] }, // SBAGLIATO! Il JSON deve essere piatto e non avere la chiave 'schema'.
-  "sql_features": ["invalid_feature"], // SBAGLIATO! Feature non presente in allowed_sql_features.
+  "n_tables": 12, // SBAGLIATO! n_tables deve essere compreso tra 1 e 5.
   "twist": ["rename"],
   "twist_rules": [] // SBAGLIATO! twist ha 1 elemento ma twist_rules è vuoto!
 }
@@ -57,8 +62,9 @@ NON CREARE STRUTTURE ANNIDATE O DESINCRONIZZATE (ERRATO):
 </negative_examples>
 
 <forbidden_actions>
-- DIVIETO 1: NON inserire `sql_features` o `twist` non espressamente inclusi in `<allowed_sql_features>` e `<allowed_twists>`.
-- DIVIETO 2: NON lasciare desincronizzati `twist` e `twist_rules`. Se `twist` ha N elementi, `twist_rules` DEVE contenere esattamente N oggetti.
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON inserire `sql_features` o `twist` non inclusi negli elenchi consentiti.
+- DIVIETO 3: NON impiegare `n_tables` minori di 1 o maggiori di 5.
 </forbidden_actions>
 
 <input_context>
@@ -73,12 +79,12 @@ NON CREARE STRUTTURE ANNIDATE O DESINCRONIZZATE (ERRATO):
 <chain_of_thought_protocol>
 1. Analizza la categoria, la descrizione e i vincoli in ingresso.
 2. Scegli il dominio aziendale idoneo tra quelli forniti.
-3. Determina il numero di tabelle e la gerarchia in base a `<schema_type>`.
+3. Determina il numero di tabelle (1-5) e la gerarchia in base a `<schema_type>`.
 4. Seleziona le feature SQL richieste e le tipologie di twist da applicare.
-5. Per ogni twist selezionato, compila la corrispondente `TwistRule` specificando `twist_type`, `target_value`, `obsolete_value` e `description`.
-6. Valida la coerenza dell'output in formato JSON piatto conforme alla classe `Spec`.
+5. Per ogni twist selezionato, compila la corrispondente `TwistRule`.
+6. Genera l'oggetto JSON puro valido conforme alla classe `Spec`.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `Spec`.
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `Spec`.
 </output_format>

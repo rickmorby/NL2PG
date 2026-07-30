@@ -17,6 +17,7 @@ Il JSON di output deve contenere esclusivamente il campo "ddl" con lo script SQL
 4. **Tipi di Dato PostgreSQL Appropriati**: Usa tipi di dato nativi coerenti (`INT`, `BIGINT`, `TEXT`, `DATE`, `TIMESTAMP`, `BOOLEAN`, `NUMERIC(p,s)`).
 5. **Vincoli CHECK Realistici**: Aggiungi vincoli `CHECK` plausibili per il dominio (es. `CHECK (prezzo >= 0)`, `CHECK (voto BETWEEN 18 AND 30)`).
 6. **Sintassi SQL Valida**: Ogni istruzione SQL deve essere sintatticamente valida per PostgreSQL e terminare con un punto e virgola `;`.
+7. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
@@ -29,14 +30,25 @@ Il JSON di output deve contenere esclusivamente il campo "ddl" con lo script SQL
 
 <negative_examples>
 <example_to_avoid>
+NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
+```json
+{
+  "ddl": "CREATE TABLE clienti (...);"
+}
+```
+</example_to_avoid>
+<example_to_avoid>
 NON QUALIFICARE MAI LO SCHEMA (ERRATO):
-CREATE TABLE task_abc123.clienti (...); // SBAGLIATO! NON USARE task_abc123.
+{
+  "ddl": "CREATE TABLE task_abc123.clienti (...);"
+}
 </example_to_avoid>
 </negative_examples>
 
 <forbidden_actions>
-- DIVIETO 1: NON inserire identificatori o prefissi di schema (es. `task_xxx.`) prima dei nomi delle tabelle.
-- DIVIETO 2: NON tralasciare le chiavi primarie o le chiavi esterne per le relazioni.
+- DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
+- DIVIETO 2: NON inserire identificatori o prefissi di schema (es. `task_xxx.`) prima dei nomi delle tabelle.
+- DIVIETO 3: NON tralasciare le chiavi primarie o le chiavi esterne per le relazioni.
 </forbidden_actions>
 
 <input_context>
@@ -52,5 +64,5 @@ CREATE TABLE task_abc123.clienti (...); // SBAGLIATO! NON USARE task_abc123.
 </chain_of_thought_protocol>
 
 <output_format>
-Rispondi esclusivamente in formato JSON conforme alla classe `SchemaDDL` (campo `ddl`).
+Rispondi esclusivamente in formato JSON puro a livello radice (senza blocchi ```json) conforme alla classe `SchemaDDL` (campo `ddl`).
 </output_format>
