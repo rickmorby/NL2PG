@@ -16,9 +16,15 @@ class LLMClientAdapter(LLMGeneratorPort):
     """Adattatore per l'invocazione di modelli LLM con failover automatico via liteLLM Router."""
 
     def __init__(self, config: dict[str, Any] | None = None):
-        """Inizializza l'adattatore con la configurazione dei provider."""
+        """Inizializza l'adattatore con la configurazione dei provider e la strategia di routing."""
         self._config = config or {}
-        self._router = Router(model_list=self._build_model_list(self._config))
+        strategy = self._config.get("routing_strategy", "latency-based-routing")
+        self._router = Router(
+            model_list=self._build_model_list(self._config),
+            routing_strategy=strategy,
+            num_retries=self._config.get("num_retries", 3),
+            cooldown_time=self._config.get("cooldown_time", 60),
+        )
 
     def get_config(self) -> dict[str, Any]:
         """Restituisce il dizionario di configurazione dell'adattatore."""
