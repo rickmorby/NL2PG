@@ -1,65 +1,31 @@
 {
   "chains": {
     "default": [
-      "openrouter/nemotron-12b",
-      "openrouter/gemma-26b",
-      "openrouter/gemma-31b",
       "kilo/ling-flash",
-      "nous/laguna-s"
+      "nous/laguna-s",
+      "nous/step-flash",
+      "openrouter/nemotron-120b"
     ],
     "critic": [
-      "openrouter/nemotron-12b",
-      "openrouter/gemma-26b",
-      "openrouter/gemma-31b",
       "kilo/ling-flash",
-      "nous/laguna-s"
+      "nous/laguna-s",
+      "nous/step-flash",
+      "openrouter/nemotron-120b"
     ],
     "judge": [
-      "openrouter/nemotron-12b",
-      "openrouter/gemma-26b",
-      "openrouter/gemma-31b",
       "kilo/ling-flash",
-      "nous/laguna-s"
+      "nous/laguna-s",
+      "nous/step-flash",
+      "openrouter/nemotron-120b"
     ],
     "calibration": [
-      "openrouter/nemotron-12b",
-      "openrouter/gemma-26b",
-      "openrouter/gemma-31b",
       "kilo/ling-flash",
-      "nous/laguna-s"
+      "nous/laguna-s",
+      "nous/step-flash",
+      "openrouter/nemotron-120b"
     ]
   },
   "models": {
-    "openrouter/nemotron-12b": {
-      "provider": "openai",
-      "model": "nvidia/nemotron-nano-12b-v2-vl:free",
-      "temperature": 0.7,
-      "request_timeout": 60,
-      "rpm": 30,
-      "structured_output": true,
-      "base_url": "https://openrouter.ai/api/v1",
-      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
-    },
-    "openrouter/gemma-26b": {
-      "provider": "openai",
-      "model": "google/gemma-4-26b-a4b-it:free",
-      "temperature": 0.7,
-      "request_timeout": 60,
-      "rpm": 30,
-      "structured_output": true,
-      "base_url": "https://openrouter.ai/api/v1",
-      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
-    },
-    "openrouter/gemma-31b": {
-      "provider": "openai",
-      "model": "google/gemma-4-31b-it:free",
-      "temperature": 0.7,
-      "request_timeout": 60,
-      "rpm": 30,
-      "structured_output": true,
-      "base_url": "https://openrouter.ai/api/v1",
-      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
-    },
     "kilo/ling-flash": {
       "provider": "openai",
       "model": "inclusionai/ling-3.0-flash:free",
@@ -79,6 +45,26 @@
       "structured_output": true,
       "base_url": "https://inference-api.nousresearch.com/v1",
       "api_key": "YOUR_NOUS_API_KEY_HERE"
+    },
+    "nous/step-flash": {
+      "provider": "openai",
+      "model": "stepfun/step-3.7-flash:free",
+      "temperature": 0.7,
+      "request_timeout": 60,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://inference-api.nousresearch.com/v1",
+      "api_key": "YOUR_NOUS_API_KEY_HERE"
+    },
+    "openrouter/nemotron-120b": {
+      "provider": "openai",
+      "model": "nvidia/nemotron-3-super-120b-a12b:free",
+      "temperature": 0.7,
+      "request_timeout": 60,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
     }
   }
 }
