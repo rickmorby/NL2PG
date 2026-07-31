@@ -1,3 +1,7 @@
+CREATE DATABASE bench_meta OWNER bench;
+
+\c bench_meta
+
 CREATE SCHEMA IF NOT EXISTS bench_meta;
 
 CREATE TABLE IF NOT EXISTS bench_meta.runs (

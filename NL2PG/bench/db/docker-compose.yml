@@ -1,6 +1,6 @@
 services:
   pg:
-    image: docker.io/library/postgres:16
+    image: docker.io/library/postgres:17-alpine
     environment:
       POSTGRES_USER: bench
       POSTGRES_PASSWORD: bench
