@@ -93,7 +93,7 @@ class QueryValidator:
         return QueryValidationResult(is_valid=True, gold_result=gold)
 
     @staticmethod
-    def has_explicit_schema(query: str) -> bool:
+    def _has_explicit_schema(query: str) -> bool:
         """Verifica se la query contiene riferimenti espliciti a schemi (es. schema.tabella)."""
         try:
             tree = parse_one(query, read="postgres")
@@ -102,7 +102,7 @@ class QueryValidator:
             return False
 
     @staticmethod
-    def tables_used(query: str) -> list[str]:
+    def _tables_used(query: str) -> list[str]:
         """Estrae i nomi delle tabelle referenziate nella query."""
         try:
             return sorted({t.name for t in find_tables(parse_one(query, read="postgres"))})
