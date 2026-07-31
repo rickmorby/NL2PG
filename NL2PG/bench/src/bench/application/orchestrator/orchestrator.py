@@ -102,16 +102,18 @@ class Orchestrator:
         g.add_edge("reject", END)
         return g
 
-    def _make_agent_node(self, name: str) -> Callable[[TaskStateDTO, dict], dict]:
+    def _make_agent_node(self, name: str) -> Callable[..., dict]:
         """Crea una funzione nodo che invoca l'agente corrispondente."""
         agent = self._agents.get(name)
         if agent is None:
-            def missing(_state: TaskStateDTO, _config: dict) -> dict:
-                return {"verdict": "scrapped",
-                        "last_error": f"Agente '{name}' non registrato."}
+            def missing(_state: TaskStateDTO, _config: dict | None = None) -> dict:
+                return {
+                    "verdict": "scrapped",
+                    "last_error": f"Agente '{name}' non registrato.",
+                }
             return missing
 
-        def node_fn(state: TaskStateDTO, _config: dict) -> dict:
+        def node_fn(state: TaskStateDTO, _config: dict | None = None) -> dict:
             return agent.run(state)
 
         return node_fn
