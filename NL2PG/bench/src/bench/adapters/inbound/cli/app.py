@@ -4,8 +4,8 @@
 """
 
 from json import dumps, loads
+from os import _exit as os_exit
 from pathlib import Path
-from sys import exit as sys_exit
 from typing import Annotated
 
 from typer import Option, Typer, colors, secho
@@ -36,6 +36,8 @@ from bench.application.serializer import BenchmarkSerializer
 from bench.application.services import TaskRunner
 from bench.domain.exceptions import handle_exception, install_global_handler
 from bench.domain.models.nlp import JudgeDTO
+from bench.domain.ports.outbound.database_port import DatabasePort
+from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 app = Typer(
     name="bench",
@@ -92,6 +94,25 @@ def _init_components(
     return config_adapter, pg_client, llm_adapter, runner
 
 
+def _shutdown_and_exit(
+    pg_client: DatabasePort | None = None,
+    llm_adapter: LLMGeneratorPort | None = None,
+    exit_code: int = 0,
+) -> None:
+    """Rilascia ordinatamente le risorse degli adattatori e rilascia subito il processo."""
+    if pg_client:
+        try:
+            pg_client.close()
+        except Exception:
+            pass
+    if llm_adapter:
+        try:
+            llm_adapter.close()
+        except Exception:
+            pass
+    os_exit(exit_code)
+
+
 @app.command("generate")
 def generate_command(
     count: Annotated[int, Option("--count", "-c", help="Numero di task da generare.")] = 10,
@@ -99,8 +120,11 @@ def generate_command(
     batch_size: Annotated[int, Option("--batch-size", "-b", help="Worker concorrenti.")] = 1,
 ) -> None:
     """Esegue la generazione batch dei task del benchmark in formato JSON unico."""
+    pg_client: DatabasePort | None = None
+    llm_adapter: LLMGeneratorPort | None = None
+    exit_code = 0
     try:
-        _, _, _, runner = _init_components()
+        _, pg_client, llm_adapter, runner = _init_components()
 
         secho("[BENCHMARK] Avvio Generazione Batch Task", fg=colors.CYAN, bold=True)
         secho(f"  Task richiesti: {count}", fg=colors.WHITE)
@@ -128,15 +152,20 @@ def generate_command(
             msg = f"\n[WARNING] Generazione interrotta: generati {acc_c}/{req_c} task."
             secho(msg, fg=colors.YELLOW, bold=True)
     except Exception as e:
+        exit_code = 1
         handle_exception(e)
-        sys_exit(1)
+    finally:
+        _shutdown_and_exit(pg_client, llm_adapter, exit_code)
 
 
 @app.command("check-providers")
 def check_providers_command() -> None:
     """Esegue una verifica di connettività e risposta sui provider LLM configurati."""
+    pg_client: DatabasePort | None = None
+    llm_adapter: LLMGeneratorPort | None = None
+    exit_code = 0
     try:
-        _, _, llm_adapter, _ = _init_components()
+        _, pg_client, llm_adapter, _ = _init_components()
         secho("[INFO] Verifica connettivita' provider LLM in corso...", fg=colors.CYAN)
 
         res = llm_adapter.call_model(
@@ -147,16 +176,21 @@ def check_providers_command() -> None:
         msg = f"[OK] Connessione LLM riuscita tramite il modello: {res.model_used}"
         secho(msg, fg=colors.GREEN, bold=True)
     except Exception as e:
+        exit_code = 1
         secho(f"[ERRORE] Verifica provider LLM fallita: {e}", fg=colors.RED, bold=True)
         handle_exception(e)
-        sys_exit(1)
+    finally:
+        _shutdown_and_exit(pg_client, llm_adapter, exit_code)
 
 
 @app.command("check")
 def check_command() -> None:
     """Verifica l'integrità dei file di configurazione e calcola gli hash di esecuzione."""
+    pg_client: DatabasePort | None = None
+    llm_adapter: LLMGeneratorPort | None = None
+    exit_code = 0
     try:
-        config_adapter, _, _, _ = _init_components()
+        config_adapter, pg_client, llm_adapter, _ = _init_components()
         bench_cfg = config_adapter.load_bench()
         providers_cfg = config_adapter.load_providers()
         categories = config_adapter.load_categories()
@@ -174,15 +208,20 @@ def check_command() -> None:
 
         secho("[OK] Controllo configurazioni completato con successo.", fg=colors.GREEN, bold=True)
     except Exception as e:
+        exit_code = 1
         handle_exception(e)
-        sys_exit(1)
+    finally:
+        _shutdown_and_exit(pg_client, llm_adapter, exit_code)
 
 
 @app.command("promote")
 def promote_command() -> None:
     """Promuove i task accettati da output/ verso la cartella esempi examples/<categoria>/."""
+    pg_client: DatabasePort | None = None
+    llm_adapter: LLMGeneratorPort | None = None
+    exit_code = 0
     try:
-        config_adapter, _, _, _ = _init_components()
+        config_adapter, pg_client, llm_adapter, _ = _init_components()
         base_dir = config_adapter.get_config_dir().parent
         out_dir = base_dir / "output"
         examples_dir = base_dir / "examples"
@@ -213,15 +252,20 @@ def promote_command() -> None:
         msg = f"[OK] Promozione completata: {promoted_count} campioni promossi in 'examples/'."
         secho(msg, fg=colors.GREEN, bold=True)
     except Exception as e:
+        exit_code = 1
         handle_exception(e)
-        sys_exit(1)
+    finally:
+        _shutdown_and_exit(pg_client, llm_adapter, exit_code)
 
 
 @app.command("cleanup")
 def cleanup_command() -> None:
     """Pulisce gli schemi temporanei orfani (task_*) nel database sandbox PostgreSQL."""
+    pg_client: DatabasePort | None = None
+    llm_adapter: LLMGeneratorPort | None = None
+    exit_code = 0
     try:
-        _, pg_client, _, _ = _init_components()
+        _, pg_client, llm_adapter, _ = _init_components()
         secho("[INFO] Avvio pulizia schemi temporanei sandbox PostgreSQL...", fg=colors.CYAN)
 
         removed_schemas = []
@@ -238,5 +282,7 @@ def cleanup_command() -> None:
         msg = f"[OK] Pulizia completata con successo: {len(removed_schemas)} schemi rimossi."
         secho(msg, fg=colors.GREEN, bold=True)
     except Exception as e:
+        exit_code = 1
         handle_exception(e)
-        sys_exit(1)
+    finally:
+        _shutdown_and_exit(pg_client, llm_adapter, exit_code)

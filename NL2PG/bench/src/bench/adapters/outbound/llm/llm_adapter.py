@@ -87,6 +87,11 @@ class LLMClientAdapter(LLMGeneratorPort):
         except Exception as e:
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 
+    def close(self) -> None:
+        """Rilascia le risorse di rete ed i pool dei client LLM."""
+        if hasattr(self, "_router"):
+            self._router = None
+
     @staticmethod
     def _build_model_list(config: dict[str, Any]) -> list[dict[str, Any]]:
         """Costruisce la model_list per liteLLM Router dalla configurazione providers.json."""

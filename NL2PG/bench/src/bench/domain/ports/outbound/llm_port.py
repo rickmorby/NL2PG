@@ -25,3 +25,8 @@ class LLMGeneratorPort(ABC):
     ) -> CallResultDTO:
         """Chiama la catena LLM con failover automatico tra modelli."""
         pass
+
+    @abstractmethod
+    def close(self) -> None:
+        """Chiude le risorse di rete ed i pool dei client LLM."""
+        pass
