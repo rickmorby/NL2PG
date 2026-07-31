@@ -133,7 +133,7 @@ class TaskRunner:
                     failed_count += 1
                     consecutive_failures += 1
                     if consecutive_failures >= max_fails:
-                        _log.error("Circuit breaker: %d fallimenti.", consecutive_failures)
+                        _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
                         break
 
                 pbar.set_postfix(
@@ -234,7 +234,7 @@ class TaskRunner:
                         )
 
                 if consecutive_failures >= max_fails:
-                    _log.error("Circuit breaker: %d fallimenti.", consecutive_failures)
+                    _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
                     for pending in futures:
                         pending.cancel()
 

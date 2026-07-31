@@ -120,7 +120,13 @@ def generate_command(
         secho(f"  Task Falliti: {summary.failed_count}", fg=colors.WHITE)
         secho(f"  Durata: {summary.duration_seconds}s", fg=colors.WHITE)
 
-        secho("\n[OK] Generazione completata con successo.", fg=colors.GREEN, bold=True)
+        if summary.accepted_count >= summary.requested_count:
+            secho("\n[OK] Generazione completata con successo.", fg=colors.GREEN, bold=True)
+        else:
+            acc_c = summary.accepted_count
+            req_c = summary.requested_count
+            msg = f"\n[WARNING] Generazione interrotta: generati {acc_c}/{req_c} task."
+            secho(msg, fg=colors.YELLOW, bold=True)
     except Exception as e:
         handle_exception(e)
         sys_exit(1)

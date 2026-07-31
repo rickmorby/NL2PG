@@ -70,6 +70,8 @@ class LoggingAdapter(LoggerPort):
         for pkg in (
             "LiteLLM",
             "litellm",
+            "LiteLLM Router",
+            "LiteLLM Proxy",
             "httpx",
             "openai",
             "openai._base_client",

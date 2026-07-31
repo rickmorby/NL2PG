@@ -24,6 +24,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             routing_strategy=strategy,
             num_retries=self._config.get("num_retries", 3),
             cooldown_time=self._config.get("cooldown_time", 60),
+            set_verbose=False,
         )
 
     def get_config(self) -> dict[str, Any]:
