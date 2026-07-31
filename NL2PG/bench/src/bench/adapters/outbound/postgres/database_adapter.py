@@ -204,9 +204,8 @@ class PostgresClientAdapter(DatabasePort):
         query: str,
         params: tuple[Any, ...] | dict[str, Any] | None = None,
     ) -> tuple[list[str], list[tuple[Any, ...]]]:
-        """Esegue una query SELECT parametrizzata read-only."""
+        """Esegue una query SELECT parametrizzata."""
         try:
-            conn.read_only = True
             with conn.cursor() as cur:
                 cur.execute(f"SET statement_timeout = '{self._statement_timeout_ms}ms'")
                 cur.execute(query, params)
@@ -225,7 +224,6 @@ class PostgresClientAdapter(DatabasePort):
     ) -> list[dict[str, Any]]:
         """Esegue una query SELECT e restituisce i risultati sotto forma di dizionari."""
         try:
-            conn.read_only = True
             with conn.cursor(row_factory=rows.dict_row) as cur:
                 cur.execute(f"SET statement_timeout = '{self._statement_timeout_ms}ms'")
                 cur.execute(query, params)
