@@ -25,6 +25,9 @@ dev = [
     "ruff>=0.16.0",
 ]
 
+[project.scripts]
+bench = "bench.adapters.inbound.cli.app:app"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
