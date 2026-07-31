@@ -104,19 +104,22 @@ class LLMClientAdapter(LLMGeneratorPort):
                 mc = models.get(mid)
                 if not mc:
                     continue
+                params = {
+                    "model": f"{mc['provider']}/{mc['model']}",
+                    "api_key": mc["api_key"],
+                    "temperature": mc["temperature"],
+                    "timeout": mc.get("request_timeout", 120),
+                    "rpm": 100,
+                }
+                if "max_tokens" in mc:
+                    params["max_tokens"] = mc["max_tokens"]
+                if "base_url" in mc:
+                    params["api_base"] = mc["base_url"]
+
                 entry = {
                     "model_name": role,
-                    "litellm_params": {
-                        "model": f"{mc['provider']}/{mc['model']}",
-                        "api_key": mc["api_key"],
-                        "max_tokens": mc["max_tokens"],
-                        "temperature": mc["temperature"],
-                        "timeout": mc.get("request_timeout", 120),
-                        "rpm": 100,
-                    },
+                    "litellm_params": params,
                 }
-                if "base_url" in mc:
-                    entry["litellm_params"]["api_base"] = mc["base_url"]
                 model_list.append(entry)
 
         return model_list
