@@ -3,6 +3,13 @@
 :author: Riccardo Morabito
 """
 
+from json import loads as json_loads
+from re import (
+    DOTALL as re_DOTALL,
+    IGNORECASE as re_IGNORECASE,
+    search as re_search,
+    sub as re_sub,
+)
 from typing import Any
 from litellm import Router
 from pydantic import BaseModel, ValidationError
@@ -58,18 +65,18 @@ class LLMClientAdapter(LLMGeneratorPort):
 
             response = self._router.completion(**kwargs)
             msg = response.choices[0].message
-            content = (msg.content or "").strip()
+            content = getattr(msg, "content", None) or ""
 
-            if content.startswith("```"):
-                first_nl = content.find("\n")
-                if first_nl != -1 and content[:first_nl].strip().lower().startswith("```"):
-                    content = content[first_nl + 1:]
-                else:
-                    content = content[3:]
-            if content.endswith("```"):
-                content = content[:-3]
+            cleaned_json = _extract_json_payload(content)
 
-            cleaned_json = content.strip()
+            if not cleaned_json:
+                msg_err = (
+                    f"L'output del modello '{response.model}' è vuoto. "
+                    "Il modello potrebbe aver esaurito i token nel ragionamento CoT. "
+                    "Rispondere ESCLUSIVAMENTE con JSON valido."
+                )
+                payload = {"schema": schema.__name__, "raw": ""}
+                raise ModelOutputContractError(msg_err, payload=payload)
 
             try:
                 output = schema.model_validate_json(cleaned_json)
@@ -123,3 +130,90 @@ class LLMClientAdapter(LLMGeneratorPort):
                 model_list.append(entry)
 
         return model_list
+
+
+def _extract_json_payload(text: str) -> str:
+    """Estrae l'oggetto o array JSON finale da un testo LLM scartando CoT e tag di ragionamento."""
+    if not text:
+        return ""
+
+    raw = text.strip()
+
+    try:
+        json_loads(raw)
+        return raw
+    except Exception:
+        pass
+
+    tags = "think|thinking|thought|reasoning|reflection|rationale|chain_of_thought"
+
+    cleaned = re_sub(
+        r"<(" + tags + r")\b[^>]*>.*?</\1>",
+        "",
+        raw,
+        flags=re_DOTALL | re_IGNORECASE,
+    )
+    cleaned = re_sub(
+        r"\[(" + tags + r")\].*?\[/\1\]",
+        "",
+        cleaned,
+        flags=re_DOTALL | re_IGNORECASE,
+    )
+
+    cleaned = re_sub(r"<(" + tags + r")\b[^>]*>", "", cleaned, flags=re_IGNORECASE)
+    cleaned = re_sub(r"\[(" + tags + r")\]", "", cleaned, flags=re_IGNORECASE)
+    cleaned = cleaned.strip()
+
+    if "```" in cleaned:
+        m = re_search(r"```(?:json)?\s*(.*?)\s*```", cleaned, flags=re_DOTALL | re_IGNORECASE)
+        if m:
+            cleaned = m.group(1).strip()
+        else:
+            cleaned = re_sub(r"^```[a-zA-Z]*\n?", "", cleaned)
+            cleaned = re_sub(r"\n?```$", "", cleaned).strip()
+
+    extracted = _find_balanced_json(cleaned)
+    if extracted:
+        return extracted
+
+    return cleaned
+
+
+def _find_balanced_json(candidate: str) -> str | None:
+    """Individua il confine esatto del JSON bilanciando parentesi graffe/quadre e stringhe."""
+    start_indices = [i for i, ch in enumerate(candidate) if ch in ("{", "[")]
+    valid_matches: list[str] = []
+    for start in start_indices:
+        stack: list[str] = []
+        in_string = False
+        escape = False
+        for i in range(start, len(candidate)):
+            ch = candidate[i]
+            if in_string:
+                if escape:
+                    escape = False
+                elif ch == "\\":
+                    escape = True
+                elif ch == '"':
+                    in_string = False
+            else:
+                if ch == '"':
+                    in_string = True
+                elif ch in ("{", "["):
+                    stack.append(ch)
+                elif ch in ("}", "]"):
+                    if not stack:
+                        break
+                    opening = stack.pop()
+                    if (opening == "{" and ch != "}") or (opening == "[" and ch != "]"):
+                        break
+                    if not stack:
+                        substr = candidate[start : i + 1]
+                        try:
+                            json_loads(substr)
+                            valid_matches.append(substr)
+                        except Exception:
+                            pass
+    return valid_matches[-1] if valid_matches else None
+
+
