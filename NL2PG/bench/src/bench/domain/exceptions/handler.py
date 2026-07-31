@@ -11,6 +11,7 @@ from rich.console import Console
 from bench.domain.exceptions.clients_exc import (
     ModelOutputContractError,
     ProviderConfigError,
+    SpecDuplicatedError,
 )
 from bench.domain.exceptions.config_exc import ConfigurationMissingFieldError
 from bench.domain.exceptions.logging_exc import LoggingConfigError, SymlinkError
@@ -44,6 +45,13 @@ def _handle_config_missing_field_error(exc: ConfigurationMissingFieldError) -> N
 @handle_exception.register(ModelOutputContractError)
 def _handle_model_output_contract_error(exc: ModelOutputContractError) -> None:
     """Handler per errori di contratto o validazione dell'output generato dall'LLM."""
+    _log.warning("%s", exc.message)
+    _console.print(f"[bold yellow][WARNING][/bold yellow] {exc.message}")
+
+
+@handle_exception.register(SpecDuplicatedError)
+def _handle_spec_duplicated_error(exc: SpecDuplicatedError) -> None:
+    """Handler per tentativi di generazione di specifica duplicata."""
     _log.warning("%s", exc.message)
     _console.print(f"[bold yellow][WARNING][/bold yellow] {exc.message}")
 

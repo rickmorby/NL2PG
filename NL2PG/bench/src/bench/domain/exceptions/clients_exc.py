@@ -20,3 +20,8 @@ class ProviderConfigError(BenchException):
 
 class ModelOutputContractError(BenchException):
     """Sollevata se l'output dell'LLM viola lo schema o i vincoli di dominio."""
+
+
+class SpecDuplicatedError(BenchException):
+    """Sollevata se la specifica generata dall'LLM risulta già presente su database."""
+

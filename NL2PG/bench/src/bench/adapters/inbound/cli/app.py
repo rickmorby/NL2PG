@@ -67,7 +67,9 @@ def _init_components(
     prompt_adapter = PromptAdapter(base_dir / "prompts")
 
     agents = {
-        "spec": SpecAgent(llm_adapter, prompt_adapter, config_adapter),
+        "spec": SpecAgent(
+            llm_adapter, prompt_adapter, config_adapter, meta_repo
+        ),
         "schema": SchemaAgent(
             llm_adapter, prompt_adapter, config_adapter, sandbox_adapter
         ),

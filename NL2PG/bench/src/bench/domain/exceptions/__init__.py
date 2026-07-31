@@ -9,6 +9,7 @@ from bench.domain.exceptions.clients_exc import (
     LLMClientError,
     ModelOutputContractError,
     ProviderConfigError,
+    SpecDuplicatedError,
 )
 from bench.domain.exceptions.config_exc import ConfigurationMissingFieldError
 from bench.domain.exceptions.handler import (
@@ -24,6 +25,7 @@ __all__ = [
     "LLMClientError",
     "ModelOutputContractError",
     "ProviderConfigError",
+    "SpecDuplicatedError",
     "LoggingConfigError",
     "SymlinkError",
     "handle_exception",
