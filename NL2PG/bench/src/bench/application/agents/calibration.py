@@ -3,24 +3,33 @@
 :author: Riccardo Morabito
 """
 
-from json import dumps
 from collections import Counter
+from json import dumps
+
 from psycopg.errors import Error as PgError
 from sqlglot.errors import ParseError
-from bench.domain.models.state import TaskStateDTO
-from bench.domain.models.sql import SolverOutputDTO, GoldResultDTO
-from bench.domain.models.nlp import CalibrationResultDTO
-from bench.domain.models.llm import CallOptionsDTO
-from bench.domain.exceptions import LLMClientError
-from bench.domain.ports.outbound.sandbox_port import SandboxPort
-from bench.application.agents.base import AbstractAgent
 
+from bench.application.agents.base import AbstractAgent
+from bench.domain.models.llm import CallOptionsDTO
+from bench.domain.models.nlp import CalibrationResultDTO
+from bench.domain.models.sql import GoldResultDTO, SolverOutputDTO
+from bench.domain.models.state import TaskStateDTO
+from bench.domain.ports.outbound.config_port import ConfigPort
+from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
+from bench.domain.ports.outbound.prompt_port import PromptPort
+from bench.domain.ports.outbound.sandbox_port import SandboxPort
 
 
 class CalibrationAgent(AbstractAgent):
     """Esegue N run del solver LLM su storia+domanda e calcola il pass_rate."""
 
-    def __init__(self, llm, prompts, config, sandbox: SandboxPort) -> None:
+    def __init__(
+        self,
+        llm: LLMGeneratorPort,
+        prompts: PromptPort,
+        config: ConfigPort,
+        sandbox: SandboxPort,
+    ) -> None:
         """Inietta le porte e la sandbox per eseguire le query candidati."""
         super().__init__(llm, prompts, config)
         self._sandbox = sandbox
@@ -40,7 +49,7 @@ class CalibrationAgent(AbstractAgent):
         """Restituisce SolverOutputDTO come schema per lo structured output."""
         return SolverOutputDTO
 
-    def build_updates(self, _output, _state):
+    def build_updates(self, _output: object, _state: TaskStateDTO) -> dict:
         """Non usato: CalibrationAgent override run() completamente."""
         return {}
 
@@ -56,19 +65,26 @@ class CalibrationAgent(AbstractAgent):
             try:
                 prompt = self._prompts.load(self.prompt_name(), **self.build_kwargs(state))
                 opts = CallOptionsDTO(temperature_override=temp)
-                result = self._llm.call_model(chain_role, prompt, self.output_schema(), opts)
+                result = self._llm.call_model(
+                    chain_role, prompt, self.output_schema(), opts
+                )
                 last_model = result.model_used
-                if self._matches_gold(state.sandbox_schema, result.output.query, state.gold_result):
+                if self._matches_gold(
+                    state.sandbox_schema, result.output.query, state.gold_result
+                ):
                     passes += 1
                     if first_pass is None:
                         first_pass = i
                         break
-            except (LLMClientError, PgError, ParseError):
+            except (PgError, ParseError):
                 pass
         rate = passes / max_runs
         cal = CalibrationResultDTO(
-            pass_rate=rate, passes=passes, runs=max_runs,
-            first_pass_attempt=first_pass, model=last_model,
+            pass_rate=rate,
+            passes=passes,
+            runs=max_runs,
+            first_pass_attempt=first_pass,
+            model=last_model,
         )
         return {"calibration": cal}
 
@@ -78,9 +94,10 @@ class CalibrationAgent(AbstractAgent):
             return False
         try:
             _, rows = self._sandbox.run_query(schema, candidate)
-        except (LLMClientError, PgError, ParseError):
+        except (PgError, ParseError):
             return False
         got = [dumps(list(r), ensure_ascii=False, default=str) for r in rows]
         if gold.order_sensitive:
             return got == gold.rows
         return Counter(got) == Counter(gold.rows)
+
