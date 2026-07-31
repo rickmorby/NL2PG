@@ -1,4 +1,4 @@
-"""Modulo DTO per il documento finale del benchmark in YAML.
+"""Modulo DTO per i documenti ed i riepiloghi del benchmark.
 
 :author: Riccardo Morabito
 """
@@ -42,7 +42,7 @@ class EvaluationDocumentDTO(AbstractDTO):
 
 
 class BenchmarkTaskDocumentDTO(AbstractDTO):
-    """Documento completo del task per l'esportazione in YAML."""
+    """Documento completo del task per l'esportazione."""
 
     id: str = ""
     version: int = 1
@@ -54,3 +54,16 @@ class BenchmarkTaskDocumentDTO(AbstractDTO):
     question: str = ""
     gold: GoldDocumentDTO = Field(default_factory=GoldDocumentDTO)
     evaluation: EvaluationDocumentDTO = Field(default_factory=EvaluationDocumentDTO)
+
+
+class BatchSummaryDTO(AbstractDTO):
+    """DTO per il riepilogo finale dell'esecuzione batch di una run."""
+
+    run_id: str = ""
+    output_dir: str = ""
+    requested_count: int = 0
+    accepted_count: int = 0
+    rejected_count: int = 0
+    scrapped_count: int = 0
+    failed_count: int = 0
+    duration_seconds: float = 0.0

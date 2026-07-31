@@ -20,7 +20,7 @@ class BenchmarkSerializer:
         """Costruisce il documento JSON della run con tutti i task accettati."""
         accepted = [
             t for t in tasks
-            if t.verdict == "accept" and t.story and t.question and t.gold_result
+            if t.verdict in ("accepted", "accept") and t.story and t.question and t.gold_result
         ]
         return {
             "version": 1,
@@ -31,12 +31,14 @@ class BenchmarkSerializer:
         }
 
     def write(self, document: dict, output_path: Path) -> None:
-        """Scrive il documento JSON su file."""
+        """Scrive atomicamente il documento JSON su file temporaneo e lo rimpiazza."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(
+        tmp_path = output_path.with_suffix(".tmp")
+        tmp_path.write_text(
             dumps(document, indent=2, ensure_ascii=False, default=str),
             encoding="utf-8",
         )
+        tmp_path.replace(output_path)
 
     def _build_entry(self, state: TaskStateDTO, weights: dict) -> dict:
         """Converte un TaskStateDTO in un dict per l'output JSON."""

@@ -5,6 +5,7 @@
 
 from contextlib import contextmanager
 from logging import getLogger
+from threading import Lock
 from typing import Any, Generator
 
 from psycopg import Connection, errors as pg_errors, rows, sql
@@ -68,6 +69,7 @@ class PostgresClientAdapter(DatabasePort):
         self._meta_dsn = configured_meta
         self._statement_timeout_ms = statement_timeout_ms
         self._lock_timeout_ms = lock_timeout_ms
+        self._engine_lock = Lock()
 
         options_str = f"-c lock_timeout={self._lock_timeout_ms}ms"
 
@@ -106,14 +108,16 @@ class PostgresClientAdapter(DatabasePort):
         return self._meta_dsn
 
     def get_meta_engine(self) -> Engine:
-        """Restituisce l'Engine SQLAlchemy collegato al database dei metadati."""
+        """Restituisce l'Engine SQLAlchemy dei metadati con thread locking a doppi controlli."""
         if not self._meta_engine:
-            if not self._meta_dsn:
-                msg = "DSN del database meta non configurato per l'Engine."
-                raise DatabaseClientError(msg)
-            url = make_url(self._meta_dsn).set(drivername="postgresql+psycopg")
-            self._meta_engine = create_engine(url)
-            self._meta_sessionmaker = sessionmaker(bind=self._meta_engine)
+            with self._engine_lock:
+                if not self._meta_engine:
+                    if not self._meta_dsn:
+                        msg = "DSN del database meta non configurato per l'Engine."
+                        raise DatabaseClientError(msg)
+                    url = make_url(self._meta_dsn).set(drivername="postgresql+psycopg")
+                    self._meta_engine = create_engine(url)
+                    self._meta_sessionmaker = sessionmaker(bind=self._meta_engine)
         return self._meta_engine
 
     @contextmanager
