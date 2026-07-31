@@ -4,8 +4,7 @@
 """
 
 from json import dumps
-from bench.adapters.outbound.postgres.entities import FailoverEntity, TaskEntity
-from bench.domain.models.llm import FailoverEventDTO
+from bench.adapters.outbound.postgres.entities import TaskEntity
 from bench.domain.models.state import TaskStateDTO
 
 
@@ -54,17 +53,3 @@ class TaskStateMapper:
             spec=dumps(spec.model_dump(), ensure_ascii=False) if spec else None,
         )
 
-
-class FailoverMapper:
-    """Mapper per la conversione di FailoverEventDTO in FailoverEntity."""
-
-    @staticmethod
-    def dto_to_entity(task_id: str, event: FailoverEventDTO) -> FailoverEntity:
-        """Converte un FailoverEventDTO in una FailoverEntity per il tracciamento."""
-        return FailoverEntity(
-            task_id=task_id,
-            role=event.role,
-            from_model=event.from_model,
-            to_model=event.to_model,
-            reason=event.reason,
-        )

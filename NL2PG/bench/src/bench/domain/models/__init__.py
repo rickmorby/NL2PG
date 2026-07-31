@@ -13,7 +13,7 @@ from bench.domain.models.document import (
     GoldDocumentDTO,
     GoldResultDocumentDTO,
 )
-from bench.domain.models.llm import CallOptionsDTO, CallResultDTO, FailoverEventDTO
+from bench.domain.models.llm import CallOptionsDTO, CallResultDTO
 from bench.domain.models.nlp import (
     CalibrationResultDTO,
     CriticScoresDTO,
@@ -47,7 +47,6 @@ __all__ = [
     "CriticScoresDTO",
     "JudgeDTO",
     "CalibrationResultDTO",
-    "FailoverEventDTO",
     "CallResultDTO",
     "CallOptionsDTO",
     "DifficultyDocumentDTO",

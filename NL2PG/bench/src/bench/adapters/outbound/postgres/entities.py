@@ -71,23 +71,3 @@ class TaskEntity(BaseEntity):
         default=lambda: datetime.now(timezone.utc),
     )
 
-
-class FailoverEntity(BaseEntity):
-    """Entità ORM che modella la tabella bench_meta.failovers."""
-
-    __tablename__ = "failovers"
-    __table_args__ = (
-        Index("idx_failovers_task", "task_id"),
-        {"schema": "bench_meta"},
-    )
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    task_id: Mapped[str | None] = mapped_column(String, nullable=True)
-    role: Mapped[str] = mapped_column(String, nullable=False)
-    from_model: Mapped[str] = mapped_column(String, nullable=False)
-    to_model: Mapped[str] = mapped_column(String, nullable=False)
-    reason: Mapped[str] = mapped_column(String, nullable=False)
-    ts: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(timezone.utc),
-    )

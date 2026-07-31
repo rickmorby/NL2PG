@@ -41,17 +41,7 @@ CREATE TABLE IF NOT EXISTS bench_meta.tasks (
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS bench_meta.failovers (
-    id         BIGSERIAL PRIMARY KEY,
-    task_id    TEXT,
-    role       TEXT NOT NULL,
-    from_model TEXT NOT NULL,
-    to_model   TEXT NOT NULL,
-    reason     TEXT NOT NULL,
-    ts         TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
 CREATE INDEX IF NOT EXISTS idx_tasks_category  ON bench_meta.tasks(category);
 CREATE INDEX IF NOT EXISTS idx_tasks_run_id    ON bench_meta.tasks(run_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_spec_hash ON bench_meta.tasks(spec_hash);
-CREATE INDEX IF NOT EXISTS idx_failovers_task  ON bench_meta.failovers(task_id);
+

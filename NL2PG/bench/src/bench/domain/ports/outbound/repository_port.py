@@ -4,12 +4,11 @@
 """
 
 from abc import ABC, abstractmethod
-from bench.domain.models.llm import FailoverEventDTO
 from bench.domain.models.state import TaskStateDTO
 
 
 class MetaRepositoryPort(ABC):
-    """Porta outbound per le operazioni di persistenza, deduplicazione e failover su bench_meta."""
+    """Porta outbound per le operazioni di persistenza e deduplicazione su bench_meta."""
 
     @abstractmethod
     def new_run(self, config_hash: str, categories_hash: str) -> str:
@@ -27,11 +26,7 @@ class MetaRepositoryPort(ABC):
         pass
 
     @abstractmethod
-    def log_failover(self, task_id: str, event: FailoverEventDTO) -> None:
-        """Registra un evento di fallback tra modelli nella tabella bench_meta.failovers."""
-        pass
-
-    @abstractmethod
     def save_task(self, run_id: str, state: TaskStateDTO) -> None:
         """Esegue l'upsert dello stato di un task nella tabella bench_meta.tasks."""
         pass
+

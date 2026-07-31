@@ -8,9 +8,8 @@ from psycopg import errors as pg_errors
 from sqlalchemy import select
 from bench.adapters.outbound.postgres.database_adapter import PostgresClientAdapter
 from bench.adapters.outbound.postgres.entities import RunEntity, TaskEntity
-from bench.adapters.outbound.postgres.mappers import FailoverMapper, TaskStateMapper
+from bench.adapters.outbound.postgres.mappers import TaskStateMapper
 from bench.domain.exceptions import DatabaseClientError
-from bench.domain.models.llm import FailoverEventDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
 
@@ -72,16 +71,6 @@ class MetaRepositoryAdapter(MetaRepositoryPort):
                 return list(session.scalars(stmt).all())
         except (pg_errors.Error, Exception) as e:
             raise DatabaseClientError(f"Errore durante la lettura dei top-k task: {e}") from e
-
-    def log_failover(self, task_id: str, event: FailoverEventDTO) -> None:
-        """Registra un evento di fallback nella tabella bench_meta.failovers."""
-        failover_entity = FailoverMapper.dto_to_entity(task_id, event)
-        try:
-            with self._client.get_meta_session() as session:
-                session.add(failover_entity)
-                session.commit()
-        except (pg_errors.Error, Exception) as e:
-            raise DatabaseClientError(f"Errore durante il tracciamento del failover: {e}") from e
 
     def save_task(self, run_id: str, state: TaskStateDTO) -> None:
         """Esegue l'upsert dello stato di un task mediante SQLAlchemy ORM session.merge."""
