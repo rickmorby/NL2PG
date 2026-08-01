@@ -23,14 +23,21 @@ class LLMClientAdapter(LLMGeneratorPort):
     """Adattatore per l'invocazione di modelli LLM con failover automatico via liteLLM Router."""
 
     def __init__(self, config: dict[str, Any] | None = None):
-        """Inizializza l'adattatore con la configurazione dei provider e la strategia di routing."""
+        """Inizializza l'adattatore con la configurazione dei provider e i fallback."""
         self._config = config or {}
-        strategy = self._config.get("routing_strategy", "latency-based-routing")
+        strategy = self._config.get("routing_strategy", "simple-shuffle")
+        retry_cfg = self._config.get("retry", {})
+        num_retries = retry_cfg.get("num_retries", 0)
+        cooldown_time = retry_cfg.get("cooldown_time_seconds", 15)
+        allowed_fails = retry_cfg.get("allowed_fails", 1)
+
         self._router = Router(
             model_list=self._build_model_list(self._config),
+            fallbacks=self._build_fallbacks(self._config),
             routing_strategy=strategy,
-            num_retries=self._config.get("num_retries", 3),
-            cooldown_time=self._config.get("cooldown_time", 60),
+            num_retries=num_retries,
+            cooldown_time=cooldown_time,
+            allowed_fails=allowed_fails,
             set_verbose=False,
         )
 
@@ -101,16 +108,19 @@ class LLMClientAdapter(LLMGeneratorPort):
 
     @staticmethod
     def _build_model_list(config: dict[str, Any]) -> list[dict[str, Any]]:
-        """Costruisce la model_list per liteLLM Router dalla configurazione providers.json."""
+        """Costruisce la model_list per liteLLM Router con identificativi univoci."""
         model_list: list[dict[str, Any]] = []
         models = config.get("models", {})
         chains = config.get("chains", {})
+        registered_keys: set[tuple[str, str]] = set()
 
-        for role, model_ids in chains.items():
-            for mid in model_ids:
-                mc = models.get(mid)
-                if not mc:
-                    continue
+        for role, mid_list in chains.items():
+            if not mid_list:
+                continue
+
+            primary_mid = mid_list[0]
+            mc = models.get(primary_mid)
+            if mc and (role, primary_mid) not in registered_keys:
                 params = {
                     "model": f"{mc['provider']}/{mc['model']}",
                     "api_key": mc["api_key"],
@@ -123,13 +133,38 @@ class LLMClientAdapter(LLMGeneratorPort):
                 if "base_url" in mc:
                     params["api_base"] = mc["base_url"]
 
-                entry = {
-                    "model_name": role,
-                    "litellm_params": params,
-                }
-                model_list.append(entry)
+                model_list.append({"model_name": role, "litellm_params": params})
+                registered_keys.add((role, primary_mid))
+
+            for fb_mid in mid_list[1:]:
+                f_mc = models.get(fb_mid)
+                if f_mc and (fb_mid, fb_mid) not in registered_keys:
+                    f_params = {
+                        "model": f"{f_mc['provider']}/{f_mc['model']}",
+                        "api_key": f_mc["api_key"],
+                        "temperature": f_mc["temperature"],
+                        "timeout": f_mc.get("request_timeout", 120),
+                        "rpm": 100,
+                    }
+                    if "max_tokens" in f_mc:
+                        f_params["max_tokens"] = f_mc["max_tokens"]
+                    if "base_url" in f_mc:
+                        f_params["api_base"] = f_mc["base_url"]
+
+                    model_list.append({"model_name": fb_mid, "litellm_params": f_params})
+                    registered_keys.add((fb_mid, fb_mid))
 
         return model_list
+
+    @staticmethod
+    def _build_fallbacks(config: dict[str, Any]) -> list[dict[str, list[str]]]:
+        """Costruisce la lista di fallback deterministici tra provider per ciascun ruolo."""
+        fallbacks: list[dict[str, list[str]]] = []
+        chains = config.get("chains", {})
+        for role, mid_list in chains.items():
+            if len(mid_list) > 1:
+                fallbacks.append({role: mid_list[1:]})
+        return fallbacks
 
 
 def _extract_json_payload(text: str) -> str:
