@@ -3,11 +3,10 @@
 :author: Riccardo Morabito
 """
 
-from bench.domain.models.state import TaskStateDTO
-from bench.domain.models.nlp import StoryDTO
-from bench.domain.services.coverage_validator import CoverageValidator
-from bench.domain.services.weighted_mean import weighted_mean
 from bench.application.agents.base import AbstractAgent
+from bench.domain.models.nlp import StoryDTO
+from bench.domain.models.state import TaskStateDTO
+from bench.domain.services.coverage_validator import CoverageValidator
 
 
 class HardeningAgent(AbstractAgent):
@@ -23,17 +22,13 @@ class HardeningAgent(AbstractAgent):
         return "hardening"
 
     def build_kwargs(self, state: TaskStateDTO) -> dict:
-        """Costruisce i kwargs per il prompt con storia, domanda, feedback e errore."""
-        critic_feedback = ""
-        if state.critic:
-            weights = self._config.load_bench().get("critic", {}).get("weights", {})
-            media = weighted_mean(state.critic, weights)
-            critic_feedback = f"media={media}"
+        """Costruisce i kwargs per il prompt con spec, schema, query, storia e punteggi critic."""
         return {
+            "spec": state.spec.model_dump_json() if state.spec else "{}",
+            "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
+            "gold_query": state.gold_query.query if state.gold_query else "",
             "story": state.story.story if state.story else "",
-            "question": state.question.question if state.question else "",
-            "critic_feedback": critic_feedback,
-            "coverage_error": state.last_error or "",
+            "critic_scores": state.critic.model_dump_json() if state.critic else "{}",
         }
 
     def output_schema(self) -> type:

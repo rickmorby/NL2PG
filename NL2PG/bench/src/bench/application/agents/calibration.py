@@ -39,8 +39,9 @@ class CalibrationAgent(AbstractAgent):
         return "calibration_solver"
 
     def build_kwargs(self, state: TaskStateDTO) -> dict:
-        """Costruisce i kwargs per il prompt con story e question."""
+        """Costruisce i kwargs per il prompt con schema_ddl, story e question."""
         return {
+            "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
             "story": state.story.story if state.story else "",
             "question": state.question.question if state.question else "",
         }

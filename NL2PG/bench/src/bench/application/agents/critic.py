@@ -16,17 +16,14 @@ class CriticAgent(AbstractAgent):
         return "critic"
 
     def build_kwargs(self, state: TaskStateDTO) -> dict:
-        """Costruisce i kwargs per il prompt con story, question, gold_query e pesi."""
-        weights = self._config.load_bench().get("critic", {}).get("weights", {})
+        """Costruisce i kwargs per il prompt con spec, schema, dati, query, storia e domanda."""
         return {
+            "spec": state.spec.model_dump_json() if state.spec else "{}",
+            "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
+            "data_inserts": state.data_inserts.inserts if state.data_inserts else "",
+            "gold_query": state.gold_query.query if state.gold_query else "",
             "story": state.story.story if state.story else "",
             "question": state.question.question if state.question else "",
-            "gold_query": state.gold_query.query if state.gold_query else "",
-            "w_narrative": weights.get("narrative", 1.0),
-            "w_distractors": weights.get("distractors", 1.0),
-            "w_plot_twists": weights.get("plot_twists", 1.0),
-            "w_jargon": weights.get("jargon", 1.0),
-            "w_sql_composition": weights.get("sql_composition", 1.0),
         }
 
     def output_schema(self) -> type:

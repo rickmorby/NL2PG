@@ -3,11 +3,12 @@
 :author: Riccardo Morabito
 """
 
-from bench.domain.models.state import TaskStateDTO
-from bench.domain.models.sql import SchemaDDLDTO
-from bench.domain.ports.outbound.sandbox_port import SandboxPort
-from bench.application.validators.schema_validator import SchemaValidator
 from bench.application.agents.base import AbstractAgent
+from bench.application.validators.schema_validator import SchemaValidator
+from bench.domain.models.category import CategoryDTO
+from bench.domain.models.sql import SchemaDDLDTO
+from bench.domain.models.state import TaskStateDTO
+from bench.domain.ports.outbound.sandbox_port import SandboxPort
 
 
 class SchemaAgent(AbstractAgent):
@@ -25,7 +26,7 @@ class SchemaAgent(AbstractAgent):
     def build_kwargs(self, state: TaskStateDTO) -> dict:
         """Costruisce i kwargs per il prompt con descrizione categoria, spec e few-shot."""
         few_shot = self._prompts.few_shot(state.category)
-        cat = self._config.load_categories().get(state.category, {})
+        cat = self._config.load_categories().get(state.category, CategoryDTO())
         return {
             "cat_descrizione": cat.descrizione,
             "spec": state.spec.model_dump_json() if state.spec else "{}",

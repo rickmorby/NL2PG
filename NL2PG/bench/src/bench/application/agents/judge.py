@@ -16,12 +16,18 @@ class JudgeAgent(AbstractAgent):
         return "judge"
 
     def build_kwargs(self, state: TaskStateDTO) -> dict:
-        """Costruisce i kwargs per il prompt con story, question, schema e gold_query."""
+        """Costruisce i kwargs per il prompt del JudgeAgent."""
+        calib_str = (
+            state.calibration.model_dump_json() if state.calibration else "{}"
+        )
         return {
-            "story": state.story.story if state.story else "",
-            "question": state.question.question if state.question else "",
+            "spec": state.spec.model_dump_json() if state.spec else "{}",
             "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
             "gold_query": state.gold_query.query if state.gold_query else "",
+            "story": state.story.story if state.story else "",
+            "question": state.question.question if state.question else "",
+            "critic_scores": state.critic.model_dump_json() if state.critic else "{}",
+            "calibration_result": calib_str,
         }
 
     def output_schema(self) -> type:

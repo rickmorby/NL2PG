@@ -16,11 +16,11 @@ class QuestionAgent(AbstractAgent):
         return "question"
 
     def build_kwargs(self, state: TaskStateDTO) -> dict:
-        """Costruisce i kwargs per il prompt con story, intent e schema."""
+        """Costruisce i kwargs per il prompt con story, intent_query e gold_query."""
         return {
             "story": state.story.story if state.story else "",
             "intent_query": state.gold_query.intent if state.gold_query else "",
-            "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
+            "gold_query": state.gold_query.query if state.gold_query else "",
         }
 
     def output_schema(self) -> type:
