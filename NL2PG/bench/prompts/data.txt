@@ -46,6 +46,7 @@ VIOLAZIONE INTEGRITÀ REFERENZIALE (ERRATO):
 - DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
 - DIVIETO 2: NON inserire identificatori di schema (es. `task_xxx.`) prima dei nomi delle tabelle nelle istruzioni `INSERT INTO`.
 - DIVIETO 3: NON inserire valori di chiavi esterne inesistenti nella tabella padre.
+- DIVIETO 4: NON usare mai l'escape backslash (\') per gli apici nelle stringhe PostgreSQL (raddoppia l'apice singolo '' se necessario, es. 'all''ufficio').
 </forbidden_actions>
 
 <input_context>

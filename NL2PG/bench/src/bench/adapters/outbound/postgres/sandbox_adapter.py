@@ -13,6 +13,7 @@ from sqlglot import parse as parse_sql, exp
 from bench.adapters.outbound.postgres.database_adapter import PostgresClientAdapter
 from bench.domain.exceptions import DatabaseClientError
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.domain.services.sql_repair import PostgresSQLRepair
 
 _log = getLogger("bench.adapters.postgres")
 
@@ -24,6 +25,7 @@ class PostgresSandboxAdapter(SandboxPort):
         """Inizializza l'adattatore memorizzando l'istanza del client PostgreSQL."""
         self._client = client
         self._schema_regex = re_compile(r"^task_[a-z0-9]{12}$")
+        self._repair = PostgresSQLRepair()
 
     def get_client(self) -> PostgresClientAdapter:
         """Restituisce il client di trasporto PostgreSQL."""
@@ -111,8 +113,9 @@ class PostgresSandboxAdapter(SandboxPort):
         allowed_types: tuple[type, ...],
     ) -> list[str]:
         """Analizza l'AST del testo SQL con sqlglot filtrando le istruzioni non ammesse."""
+        repaired_sql = self._repair.repair(sql_text)
         try:
-            parsed_expressions = parse_sql(sql_text, read="postgres")
+            parsed_expressions = parse_sql(repaired_sql, read="postgres")
         except Exception as e:
             raise DatabaseClientError(f"Errore durante il parsing del codice SQL: {e}") from e
 
