@@ -8,16 +8,24 @@ from bench.application.validators.schema_validator import SchemaValidator
 from bench.domain.models.category import CategoryDTO
 from bench.domain.models.sql import SchemaDDLDTO
 from bench.domain.models.state import TaskStateDTO
-from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.domain.ports.outbound.config_port import ConfigPort
+from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
+from bench.domain.ports.outbound.prompt_port import PromptPort
 
 
 class SchemaAgent(AbstractAgent):
     """Genera SchemaDDLDTO via LLM e lo valida eseguendolo nel sandbox PostgreSQL."""
 
-    def __init__(self, llm, prompts, config, sandbox: SandboxPort) -> None:
-        """Inietta le porte e il validatore schema (creato internamente)."""
+    def __init__(
+        self,
+        llm: LLMGeneratorPort,
+        prompts: PromptPort,
+        config: ConfigPort,
+        validator: SchemaValidator,
+    ) -> None:
+        """Inietta le porte outbound e il validatore schema."""
         super().__init__(llm, prompts, config)
-        self._validator = SchemaValidator(sandbox)
+        self._validator = validator
 
     def prompt_name(self) -> str:
         """Restituisce 'schema' come nome del template prompt."""

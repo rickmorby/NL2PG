@@ -51,10 +51,7 @@ class SpecAgent(AbstractAgent):
         return SpecDTO
 
     def validate(self, output: SpecDTO, state: TaskStateDTO) -> tuple[bool, str, dict]:
-        """Valida n_tables, vocabolario e verifica assenza di duplicati via spec_hash."""
-        if not (1 <= output.n_tables <= 5):
-            msg = f"Numero di tabelle n_tables ({output.n_tables}) fuori dai vincoli [1, 5]."
-            return False, msg, {}
+        """Valida vocabolario categoria e verifica assenza di duplicati via spec_hash."""
         cat = self._config.load_categories().get(state.category, CategoryDTO())
         ok, err = validate_spec(output, cat)
         if not ok:
@@ -79,4 +76,3 @@ class SpecAgent(AbstractAgent):
     def build_updates(self, output: SpecDTO, _state: TaskStateDTO) -> dict:
         """Aggiorna lo stato con spec."""
         return {"spec": output}
-

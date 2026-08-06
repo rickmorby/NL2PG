@@ -3,6 +3,8 @@
 :author: Riccardo Morabito
 """
 
+from typing import Any
+
 from bench.application.agents.base import AbstractAgent
 from bench.domain.models.nlp import StoryDTO
 from bench.domain.models.state import TaskStateDTO
@@ -37,10 +39,8 @@ class StoryAgent(AbstractAgent):
         """Restituisce StoryDTO come schema per lo structured output."""
         return StoryDTO
 
-    def validate(self, output: StoryDTO, _state: TaskStateDTO) -> tuple[bool, str, dict]:
-        """Valida che il testo della storia generata sia non vuoto."""
-        if not output.story or not output.story.strip():
-            return False, "La storia prodotta dall'LLM e' vuota.", {}
+    def validate(self, _output: Any, _state: TaskStateDTO) -> tuple[bool, str, dict]:
+        """La presenza di testo non vuoto e' validata nativamente dal DTO StoryDTO."""
         return True, "", {}
 
     def build_updates(self, output: StoryDTO, state: TaskStateDTO) -> dict:

@@ -4,7 +4,6 @@
 """
 
 from collections import Counter
-from json import dumps
 
 from psycopg.errors import Error as PgError
 from sqlglot.errors import ParseError
@@ -95,10 +94,10 @@ class CalibrationAgent(AbstractAgent):
             return False
         try:
             _, rows = self._sandbox.run_query(schema, candidate)
-        except (PgError, ParseError):
+        except Exception:
             return False
-        got = [dumps(list(r), ensure_ascii=False, default=str) for r in rows]
+        got = [list(r) for r in rows]
         if gold.order_sensitive:
             return got == gold.rows
-        return Counter(got) == Counter(gold.rows)
+        return Counter(tuple(r) for r in got) == Counter(tuple(r) for r in gold.rows)
 

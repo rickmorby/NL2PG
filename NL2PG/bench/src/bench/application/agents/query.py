@@ -3,25 +3,29 @@
 :author: Riccardo Morabito
 """
 
-from bench.domain.models.state import TaskStateDTO
-from bench.domain.models.sql import GoldQueryDTO
-from bench.domain.models.spec import SpecDTO
-from bench.domain.ports.outbound.database_port import DatabasePort
-from bench.domain.ports.outbound.sandbox_port import SandboxPort
-from bench.domain.services.feature_checker import FeatureChecker
-from bench.application.validators.query_validator import QueryValidator
-from bench.application.validators.mutation_tester import MutationTester
 from bench.application.agents.base import AbstractAgent
+from bench.application.validators.query_validator import QueryValidator
+from bench.domain.models.spec import SpecDTO
+from bench.domain.models.sql import GoldQueryDTO
+from bench.domain.models.state import TaskStateDTO
+from bench.domain.ports.outbound.config_port import ConfigPort
+from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
+from bench.domain.ports.outbound.prompt_port import PromptPort
 
 
 class QueryAgent(AbstractAgent):
     """Genera GoldQueryDTO via LLM e la valida eseguendola nel sandbox PostgreSQL."""
 
-    def __init__(self, llm, prompts, config, sandbox: SandboxPort,
-                 db: DatabasePort) -> None:
-        """Inietta le porte e il validatore query (creato internamente)."""
+    def __init__(
+        self,
+        llm: LLMGeneratorPort,
+        prompts: PromptPort,
+        config: ConfigPort,
+        validator: QueryValidator,
+    ) -> None:
+        """Inietta le porte outbound e il validatore query."""
         super().__init__(llm, prompts, config)
-        self._validator = QueryValidator(sandbox, FeatureChecker(), MutationTester(db))
+        self._validator = validator
 
     def prompt_name(self) -> str:
         """Restituisce 'query' come nome del template prompt."""

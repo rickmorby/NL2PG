@@ -37,8 +37,15 @@ from bench.application.agents import (
 )
 from bench.application.orchestrator import Orchestrator
 from bench.application.serializer import BenchmarkSerializer
+from bench.application.services.database_cleaner import DatabaseCleanupService
+from bench.application.services.system_checker import SystemCheckService
+from bench.application.services.task_promoter import TaskPromoterService
 from bench.application.services.task_runner import TaskRunner
+from bench.application.validators.mutation_tester import MutationTester
+from bench.application.validators.query_validator import QueryValidator
+from bench.application.validators.schema_validator import SchemaValidator
 from bench.domain.exceptions import install_global_handler
+from bench.domain.services.feature_checker import FeatureChecker
 
 
 class ApplicationBootstrap:
@@ -51,8 +58,8 @@ class ApplicationBootstrap:
 
     def __init__(self, config_dir: Path | None = None) -> None:
         """Inizializza logging, adattatori, agenti, orchestratore e serializzatore."""
-        base_dir = Path(__file__).resolve().parent.parent.parent.parent
-        cfg_dir = config_dir or (base_dir / "config")
+        self._base_dir = Path(__file__).resolve().parent.parent.parent.parent
+        cfg_dir = config_dir or (self._base_dir / "config")
 
         log_adapter = LoggingAdapter(level="DEBUG")
         log_adapter.configure()
@@ -65,9 +72,15 @@ class ApplicationBootstrap:
         )
         self._sandbox = PostgresSandboxAdapter(self._pg_client)
         self._meta_repo = MetaRepositoryAdapter(self._pg_client)
-        self._prompts = PromptAdapter(base_dir / "prompts")
+        self._prompts = PromptAdapter(self._base_dir / "prompts")
 
-        agents = self._build_agents()
+        schema_validator = SchemaValidator(self._sandbox)
+        mutation_tester = MutationTester(self._sandbox)
+        query_validator = QueryValidator(
+            self._sandbox, FeatureChecker(), mutation_tester
+        )
+
+        agents = self._build_agents(schema_validator, query_validator)
 
         self._orchestrator = Orchestrator(
             self._sandbox, self._config, self._meta_repo, agents,
@@ -76,7 +89,7 @@ class ApplicationBootstrap:
 
 
     def task_runner(self) -> TaskRunner:
-        """Restituisce un TaskRunner pronto all'uso per la generazione batch."""
+        """Restituisce un TaskRunner per la generazione batch dei task."""
         return TaskRunner(
             self._orchestrator,
             self._meta_repo,
@@ -84,21 +97,17 @@ class ApplicationBootstrap:
             self._config,
         )
 
+    def task_promoter(self) -> TaskPromoterService:
+        """Restituisce un TaskPromoterService per la promozione dei task accettati."""
+        return TaskPromoterService(self._serializer)
 
-    @property
-    def config(self) -> ConfigAdapter:
-        """Restituisce l'adattatore di configurazione."""
-        return self._config
+    def database_cleaner(self) -> DatabaseCleanupService:
+        """Restituisce un DatabaseCleanupService per la pulizia degli schemi orfani."""
+        return DatabaseCleanupService(self._sandbox)
 
-    @property
-    def llm(self) -> LLMClientAdapter:
-        """Restituisce l'adattatore LLM."""
-        return self._llm
-
-    @property
-    def pg_client(self) -> PostgresClientAdapter:
-        """Restituisce il client PostgreSQL."""
-        return self._pg_client
+    def system_checker(self) -> SystemCheckService:
+        """Restituisce un SystemCheckService per la diagnosi ed i controlli di salute."""
+        return SystemCheckService(self._config, self._llm)
 
 
     def close(self) -> None:
@@ -113,20 +122,21 @@ class ApplicationBootstrap:
             pass
 
 
-    def _build_agents(self) -> dict[str, object]:
+    def _build_agents(
+        self, schema_validator: SchemaValidator, query_validator: QueryValidator
+    ) -> dict[str, object]:
         """Assembla il dizionario degli agenti iniettando le dipendenze condivise."""
         llm = self._llm
         prompts = self._prompts
         cfg = self._config
         sandbox = self._sandbox
         meta = self._meta_repo
-        pg = self._pg_client
 
         return {
             "spec": SpecAgent(llm, prompts, cfg, meta),
-            "schema": SchemaAgent(llm, prompts, cfg, sandbox),
+            "schema": SchemaAgent(llm, prompts, cfg, schema_validator),
             "data": DataAgent(llm, prompts, cfg, sandbox),
-            "query": QueryAgent(llm, prompts, cfg, sandbox, pg),
+            "query": QueryAgent(llm, prompts, cfg, query_validator),
             "story": StoryAgent(llm, prompts, cfg),
             "question": QuestionAgent(llm, prompts, cfg),
             "critic": CriticAgent(llm, prompts, cfg),

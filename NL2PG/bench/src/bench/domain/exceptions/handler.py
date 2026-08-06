@@ -14,6 +14,7 @@ from bench.domain.exceptions.clients_exc import (
     SpecDuplicatedError,
 )
 from bench.domain.exceptions.config_exc import ConfigurationMissingFieldError
+from bench.domain.exceptions.domain_exc import DomainValidationError
 from bench.domain.exceptions.logging_exc import LoggingConfigError, SymlinkError
 
 _log = getLogger("bench.domain.exceptions")
@@ -33,6 +34,13 @@ def _handle_symlink_error(exc: SymlinkError) -> None:
     """Handler per SymlinkError: i log sono registrati sul file dedicato."""
     log_path = getattr(exc, "payload", None) or "file dedicato"
     _log.warning("Symlink bench.log non creato. I log sono comunque registrati su: %s", log_path)
+
+
+@handle_exception.register(DomainValidationError)
+def _handle_domain_validation_error(exc: DomainValidationError) -> None:
+    """Handler per violazioni delle regole d'invariante di dominio."""
+    _log.warning("%s", exc.message)
+    _console.print(f"[bold yellow][WARNING][/bold yellow] {exc.message}")
 
 
 @handle_exception.register(ConfigurationMissingFieldError)

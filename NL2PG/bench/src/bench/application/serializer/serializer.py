@@ -12,7 +12,7 @@ from bench.domain.services.weighted_mean import weighted_mean
 
 
 class BenchmarkSerializer:
-    """Serializza i task completati in un singolo file JSON per run."""
+    """Aggregato unico responsabile della serializzazione JSON per run e task promossi."""
 
     def build_document(
         self, tasks: list[TaskStateDTO], run_id: str, weights: dict | None = None,
@@ -36,6 +36,16 @@ class BenchmarkSerializer:
         tmp_path = output_path.with_suffix(".tmp")
         tmp_path.write_text(
             dumps(document, indent=2, ensure_ascii=False, default=str),
+            encoding="utf-8",
+        )
+        tmp_path.replace(output_path)
+
+    def write_single_task(self, task_dict: dict, output_path: Path) -> None:
+        """Scrive atomicamente un singolo task JSON nella cartella di destinazione."""
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path = output_path.with_suffix(".tmp")
+        tmp_path.write_text(
+            dumps(task_dict, indent=2, ensure_ascii=False, default=str),
             encoding="utf-8",
         )
         tmp_path.replace(output_path)

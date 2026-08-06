@@ -3,6 +3,8 @@
 :author: Riccardo Morabito
 """
 
+from typing import Any
+
 from bench.application.agents.base import AbstractAgent
 from bench.domain.models.nlp import QuestionDTO
 from bench.domain.models.state import TaskStateDTO
@@ -27,10 +29,8 @@ class QuestionAgent(AbstractAgent):
         """Restituisce QuestionDTO come schema per lo structured output."""
         return QuestionDTO
 
-    def validate(self, output: QuestionDTO, _state: TaskStateDTO) -> tuple[bool, str, dict]:
-        """Valida che il testo della domanda generata sia non vuoto."""
-        if not output.question or not output.question.strip():
-            return False, "La domanda prodotta dall'LLM e' vuota.", {}
+    def validate(self, _output: Any, _state: TaskStateDTO) -> tuple[bool, str, dict]:
+        """La presenza di testo non vuoto e' validata nativamente dal DTO QuestionDTO."""
         return True, "", {}
 
     def build_updates(self, output: QuestionDTO, state: TaskStateDTO) -> dict:

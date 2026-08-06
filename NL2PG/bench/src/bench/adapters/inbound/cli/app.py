@@ -3,15 +3,14 @@
 :author: Riccardo Morabito
 """
 
-from json import dumps, loads
 from os import _exit as os_exit
+from pathlib import Path
 from typing import Annotated
 
 from typer import Option, Typer, colors, secho
 
 from bench.application.bootstrap import ApplicationBootstrap
 from bench.domain.exceptions import handle_exception
-from bench.domain.models.nlp import JudgeDTO
 
 app = Typer(
     name="bench",
@@ -72,17 +71,18 @@ def check_providers_command() -> None:
     exit_code = 0
     try:
         secho("[INFO] Verifica connettivita' provider LLM in corso...", fg=colors.CYAN)
+        checker = bootstrap.system_checker()
+        res = checker.check_llm_providers()
 
-        res = bootstrap.llm.call_model(
-            role="default",
-            prompt='Rispondi esclusivamente con un oggetto JSON: {"verdict": "hard"}',
-            schema=JudgeDTO,
-        )
-        msg = f"[OK] Connessione LLM riuscita tramite il modello: {res.model_used}"
-        secho(msg, fg=colors.GREEN, bold=True)
+        if res.success:
+            msg = f"[OK] Connessione LLM riuscita tramite il modello: {res.model_used}"
+            secho(msg, fg=colors.GREEN, bold=True)
+        else:
+            secho(f"[ERRORE] Verifica provider LLM fallita: {res.error}", fg=colors.RED, bold=True)
+            exit_code = 1
     except Exception as e:
         exit_code = 1
-        secho(f"[ERRORE] Verifica provider LLM fallita: {e}", fg=colors.RED, bold=True)
+        secho(f"[ERRORE] Invocazione fallita: {e}", fg=colors.RED, bold=True)
         handle_exception(e)
     finally:
         bootstrap.close()
@@ -95,21 +95,15 @@ def check_command() -> None:
     bootstrap = ApplicationBootstrap()
     exit_code = 0
     try:
-        cfg = bootstrap.config
-        bench_cfg = cfg.load_bench()
-        providers_cfg = cfg.load_providers()
-        categories = cfg.load_categories()
-
-        cfg_hash = cfg.config_hash(bench_cfg)
-        cat_hash = cfg.config_hash({"categories": list(categories.keys())})
+        checker = bootstrap.system_checker()
+        res = checker.check_configurations()
 
         secho("[INFO] Stato Configurazioni Benchmark:", fg=colors.CYAN, bold=True)
         secho("  bench.toml: OK (Caricato)", fg=colors.WHITE)
-        models_count = len(providers_cfg.get("models", {}))
-        secho(f"  providers.json: OK ({models_count} modelli)", fg=colors.WHITE)
-        secho(f"  categories.json: OK ({len(categories)} categorie)", fg=colors.WHITE)
-        secho(f"  Config Hash: {cfg_hash}", fg=colors.WHITE)
-        secho(f"  Categories Hash: {cat_hash}", fg=colors.WHITE)
+        secho(f"  providers.json: OK ({res.models_count} modelli)", fg=colors.WHITE)
+        secho(f"  categories.json: OK ({res.categories_count} categorie)", fg=colors.WHITE)
+        secho(f"  Config Hash: {res.config_hash}", fg=colors.WHITE)
+        secho(f"  Categories Hash: {res.categories_hash}", fg=colors.WHITE)
 
         secho("[OK] Controllo configurazioni completato con successo.", fg=colors.GREEN, bold=True)
     except Exception as e:
@@ -126,35 +120,18 @@ def promote_command() -> None:
     bootstrap = ApplicationBootstrap()
     exit_code = 0
     try:
-        base_dir = bootstrap.config.get_config_dir().parent
+        base_dir = Path(__file__).resolve().parent.parent.parent.parent.parent
         out_dir = base_dir / "output"
         examples_dir = base_dir / "examples"
 
-        if not out_dir.exists():
-            secho("[INFO] Nessuna directory output/ trovata per la promozione.", fg=colors.YELLOW)
-            return
+        promoter = bootstrap.task_promoter()
+        promoted_count = promoter.promote_accepted_tasks(out_dir, examples_dir)
 
-        promoted_count = 0
-        for sample_file in sorted(out_dir.rglob("benchmark_samples.json")):
-            try:
-                doc = loads(sample_file.read_text(encoding="utf-8"))
-                for task in doc.get("tasks", []):
-                    cat = task.get("category", "unknown")
-                    cat_dir = examples_dir / cat
-                    cat_dir.mkdir(parents=True, exist_ok=True)
-
-                    task_file = cat_dir / f"{task['task_id']}.json"
-                    task_file.write_text(
-                        dumps(task, indent=2, ensure_ascii=False, default=str),
-                        encoding="utf-8",
-                    )
-                    promoted_count += 1
-            except Exception as e:
-                err_msg = f"[WARNING] Errore promozione file {sample_file.name}: {e}"
-                secho(err_msg, fg=colors.YELLOW)
-
-        msg = f"[OK] Promozione completata: {promoted_count} campioni promossi in 'examples/'."
-        secho(msg, fg=colors.GREEN, bold=True)
+        if promoted_count > 0:
+            msg = f"[OK] Promozione completata: {promoted_count} campioni promossi in 'examples/'."
+            secho(msg, fg=colors.GREEN, bold=True)
+        else:
+            secho("[INFO] Nessun nuovo campione trovato da promuovere.", fg=colors.YELLOW)
     except Exception as e:
         exit_code = 1
         handle_exception(e)
@@ -170,18 +147,8 @@ def cleanup_command() -> None:
     exit_code = 0
     try:
         secho("[INFO] Avvio pulizia schemi temporanei sandbox PostgreSQL...", fg=colors.CYAN)
-
-        pg = bootstrap.pg_client
-        removed_schemas = []
-        with pg.get_sandbox_connection(autocommit=True) as conn:
-            query = (
-                "SELECT schema_name FROM information_schema.schemata "
-                "WHERE schema_name LIKE 'task_%'"
-            )
-            _, rows = pg.execute_query(conn, query)
-            for (schema_name,) in rows:
-                pg.execute_identifier(conn, "DROP SCHEMA IF EXISTS {} CASCADE", schema_name)
-                removed_schemas.append(schema_name)
+        cleaner = bootstrap.database_cleaner()
+        removed_schemas = cleaner.cleanup_sandbox_schemas()
 
         msg = f"[OK] Pulizia completata con successo: {len(removed_schemas)} schemi rimossi."
         secho(msg, fg=colors.GREEN, bold=True)

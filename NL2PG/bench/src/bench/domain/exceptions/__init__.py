@@ -12,6 +12,7 @@ from bench.domain.exceptions.clients_exc import (
     SpecDuplicatedError,
 )
 from bench.domain.exceptions.config_exc import ConfigurationMissingFieldError
+from bench.domain.exceptions.domain_exc import DomainValidationError
 from bench.domain.exceptions.handler import (
     handle_exception,
     install_global_handler,
@@ -21,6 +22,7 @@ from bench.domain.exceptions.logging_exc import LoggingConfigError, SymlinkError
 __all__ = [
     "BenchException",
     "ConfigurationMissingFieldError",
+    "DomainValidationError",
     "DatabaseClientError",
     "LLMClientError",
     "ModelOutputContractError",

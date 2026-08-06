@@ -3,6 +3,8 @@
 :author: Riccardo Morabito
 """
 
+from typing import Any
+
 from bench.application.agents.base import AbstractAgent
 from bench.domain.models.nlp import JudgeDTO
 from bench.domain.models.state import TaskStateDTO
@@ -34,12 +36,8 @@ class JudgeAgent(AbstractAgent):
         """Restituisce JudgeDTO come schema per lo structured output."""
         return JudgeDTO
 
-    def validate(self, output: JudgeDTO, _state: TaskStateDTO) -> tuple[bool, str, dict]:
-        """Valida che il verdetto appartenga al set di valori esatti ammessi dal contratto."""
-        allowed = {"hard", "ambigua", "incompleta"}
-        if output.verdict not in allowed:
-            msg = f"Verdetto '{output.verdict}' non ammesso. Deve essere tra: {sorted(allowed)}"
-            return False, msg, {}
+    def validate(self, _output: Any, _state: TaskStateDTO) -> tuple[bool, str, dict]:
+        """I verdetti ammessi sono validati nativamente dal DTO JudgeDTO tramite field_validator."""
         return True, "", {}
 
     def build_updates(self, output: JudgeDTO, state: TaskStateDTO) -> dict:

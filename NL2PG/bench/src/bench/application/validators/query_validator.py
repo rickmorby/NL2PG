@@ -4,8 +4,7 @@
 """
 
 from dataclasses import dataclass
-from json import dumps
-from sqlglot import find_tables, parse_one, exp
+from sqlglot import exp, find_tables, parse_one
 from sqlglot.errors import ParseError
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
 from bench.domain.models.sql import GoldQueryDTO, GoldResultDTO
@@ -124,10 +123,10 @@ class QueryValidator:
     def _build_gold(
         query: GoldQueryDTO, cols: list[str], rows: list[tuple]
     ) -> GoldResultDTO:
-        """Costruisce un GoldResultDTO serializzando le righe in JSON."""
-        rows_json = [dumps(list(r), ensure_ascii=False, default=str) for r in rows]
+        """Costruisce un GoldResultDTO memorizzando le righe in formato nativo Python."""
+        raw_rows = [list(r) for r in rows]
         return GoldResultDTO(
-            columns=cols, rows=rows_json, order_sensitive=query.order_sensitive
+            columns=cols, rows=raw_rows, order_sensitive=query.order_sensitive
         )
 
 

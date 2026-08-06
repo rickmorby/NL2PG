@@ -37,6 +37,18 @@ class SandboxPort(ABC):
         pass
 
     @abstractmethod
+    def test_data_mutation(
+        self, schema: str, query: str, tables: list[str], attempts: int = 3
+    ) -> tuple[bool, str]:
+        """Verifica se una query SQL e' sensibile a mutazioni dei dati nel sandbox."""
+        pass
+
+    @abstractmethod
+    def cleanup_orphan_schemas(self) -> list[str]:
+        """Elimina tutti gli schemi temporanei orfani (task_*) nel database sandbox."""
+        pass
+
+    @abstractmethod
     @contextmanager
     def task_scope(self, schema: str | None = None) -> Generator[str, None, None]:
         """Context manager per l'allocazione e distruzione automatica dello schema."""

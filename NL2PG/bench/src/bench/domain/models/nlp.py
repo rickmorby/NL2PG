@@ -13,11 +13,31 @@ class StoryDTO(AbstractDTO):
 
     story: str = Field(default="", min_length=1)
 
+    @field_validator("story")
+    @classmethod
+    def validate_story_not_empty(cls, v: str) -> str:
+        """Garantisce che la storia generata non sia vuota o composta da soli spazi."""
+        cleaned = v.strip()
+        if not cleaned:
+            msg = "La storia generata non puo' essere vuota o contenere solo spazi."
+            raise ValueError(msg)
+        return cleaned
+
 
 class QuestionDTO(AbstractDTO):
     """Domanda finale in linguaggio naturale."""
 
     question: str = Field(default="", min_length=1)
+
+    @field_validator("question")
+    @classmethod
+    def validate_question_not_empty(cls, v: str) -> str:
+        """Garantisce che la domanda generata non sia vuota o composta da soli spazi."""
+        cleaned = v.strip()
+        if not cleaned:
+            msg = "La domanda generata non puo' essere vuota o contenere solo spazi."
+            raise ValueError(msg)
+        return cleaned
 
 
 class CriticScoresDTO(AbstractDTO):
