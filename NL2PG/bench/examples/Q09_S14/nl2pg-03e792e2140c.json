@@ -1,0 +1,58 @@
+{
+  "task_id": "nl2pg-03e792e2140c",
+  "category": "Q09_S14",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "rephrase",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rephrase",
+        "target_value": "ordini",
+        "obsolete_value": "richieste_acquisto",
+        "description": "La tabella ordini viene indicata con la perifrasi richieste_acquisto nel testo."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore_complessivo",
+        "description": "La colonna importo_totale viene sostituita con il sinonimo valore_complessivo nella specifica."
+      }
+    ],
+    "spec_hash": "7aefe9492233142e"
+  },
+  "story": "Presso l'area commerciale dell'azienda, l'archivio clienti custodisce le informazioni anagrafiche di ogni acquirente, registrando nome, cognome, codice fiscale e la data in cui ciascun soggetto ha effettuato la propria prima registrazione nel sistema. Accanto a questo, le richieste_acquisto costituiscono il registro storico delle operazioni commerciali: ciascuna voce collega l'acquirente al proprio profilo anagrafico e annota il valore_complessivo della transazione, la data di sottoscrizione e lo stato di avanzamento dell'operazione. A completamento dell'infrastruttura informativa, il catalogo prodotti dettaglia gli articoli contenuti in ogni richiesta, indicando la denominazione di ciascun elemento, la quantità ordinata e il prezzo unitario corrispondente. Nel corso di una revisione periodica, gli analisti hanno individuato i clienti il cui valore_complessivo complessivo ha superato la soglia di 100 euro, calcolando per ciascuno il numero di richieste_acquisto associate e sommando il totale delle spese sostenute; i risultati sono stati ordinati in modo decrescente in base all'importo speso. Il report così generato è stato inoltrato al reparto commerciale per supportare la valutazione delle prestazioni e orientare le strategie di fidelizzazione.",
+  "question": "Per ciascun cliente, indica nome, cognome, importo totale speso e numero di ordini effettuati, considerando solo coloro che hanno superato le 100 euro di spesa complessiva, ordinando i risultati dal valore più alto al più basso.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT CHECK (stato IN ('pending', 'confermato', 'evaso', 'cancellato'))\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    nome_prodotto TEXT NOT NULL,\n    quantita INT CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, data_registrazione) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it', '2023-05-10'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it', '2023-06-15'),\n(3, 'Giovanni', 'Verdi', 'VRTGNN90C03L234M', 'giovanni.verdi@email.it', '2023-07-20');\n\nINSERT INTO ordini (id, cliente_id, importo_totale, data_ordine, stato) VALUES\n(101, 1, 150.50, '2026-01-15', 'confermato'),\n(102, 2, 89.00, '2026-01-16', 'evaso'),\n(103, 3, 200.00, '2026-01-17', 'pending');\n\nINSERT INTO prodotti (id, ordine_id, nome_prodotto, quantita, prezzo_unitario) VALUES\n(1, 101, 'Laptop', 1, 150.50),\n(2, 101, 'Mouse', 2, 25.00),\n(3, 102, 'Tastiera', 1, 89.00),\n(4, 103, 'Monitor', 1, 150.00);",
+    "query": "SELECT c.nome, c.cognome, COUNT(o.id) AS numero_ordini, SUM(o.importo_totale) AS totale_speso FROM clienti c JOIN ordini o ON c.id = o.cliente_id GROUP BY c.nome, c.cognome HAVING SUM(o.importo_totale) > 100 ORDER BY totale_speso DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "numero_ordini",
+        "totale_speso"
+      ],
+      "rows": [
+        "[\"Giovanni\", \"Verdi\", 1, \"200.00\"]",
+        "[\"Mario\", \"Rossi\", 1, \"150.50\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

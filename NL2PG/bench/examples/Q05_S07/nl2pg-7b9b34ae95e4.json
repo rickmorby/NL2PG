@@ -1,0 +1,42 @@
+{
+  "task_id": "nl2pg-7b9b34ae95e4",
+  "category": "Q05_S07",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 1,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "fb274d82b5283867"
+  },
+  "story": "Nel cuore del centro logistico aziendale, l'archivio denominato consegne raccoglie ogni scheda relativa alle spedizioni gestite quotidianamente. Ogni scheda contiene il codice identificativo della spedizione, una descrizione del contenuto trasportato, la data prevista per la consegna, il peso in chilogrammi e l'importo totale associato all'operazione. Un ulteriore campo registra lo stato di avanzamento di ciascun invio, che può trovarsi in una tra quattro condizioni: pianificata, in_transito, consegnata o annullata. Durante un'analisi operativa volta a ottenere un quadro aggiornato dell'attività, gli analisti hanno organizzato le schede raggruppandole in base allo stato di avanzamento. Per ciascun gruppo hanno quindi calcolato il numero complessivo di consegne e la somma degli importi, considerando tutte e quattro le condizioni: spedizioni con stato pianificata, quelle con stato in_transito, le consegne con stato consegnata e gli invii con stato annullata. Nel corso dell'esame, hanno preso in esame anche casi particolari, come una spedizione dal peso di 25.50 e un importo di 150.00, permettendo così di delineare un quadro chiaro e dettagliato della situazione finanziaria e operativa dell'intero centro logistico.",
+  "question": "Per ciascuno stato di avanzamento delle spedizioni, qual è il numero totale di consegne e la somma degli importi associati?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE consegne (\n    id INT PRIMARY KEY,\n    codice_consegna TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    data_consegna DATE NOT NULL,\n    peso_kg NUMERIC(10,2) CHECK (peso_kg >= 0),\n    importo NUMERIC(10,2) CHECK (importo >= 0),\n    stato TEXT CHECK (stato IN ('pianificata', 'in_transito', 'consegnata', 'annullata')),\n    consegna_padre_id INT REFERENCES consegne(id)\n);",
+    "data_inserts": "INSERT INTO consegne (id, codice_consegna, descrizione, data_consegna, peso_kg, importo, stato, consegna_padre_id) VALUES\n(1, 'CON-001', 'Consegna materiale ufficio', '2026-03-10', 25.50, 150.00, 'consegnata', NULL),\n(2, 'CON-002', 'Spedizione componenti elettronici', '2026-03-12', 12.30, 89.50, 'pianificata', NULL),\n(3, 'CON-003', 'Sub-consegna componenti A', '2026-03-11', 5.00, 30.00, 'in_transito', 1),\n(4, 'CON-004', 'Sub-consegna componenti B', '2026-03-13', 3.20, 22.00, 'pianificata', 1),\n(5, 'CON-005', 'Sub-consegna accessori', '2026-03-14', 8.10, 45.00, 'annullata', 2);",
+    "query": "SELECT stato, COUNT(*) AS numero_consegne, SUM(importo) AS totale_importo FROM consegne GROUP BY stato;",
+    "result": {
+      "columns": [
+        "stato",
+        "numero_consegne",
+        "totale_importo"
+      ],
+      "rows": [
+        "[\"pianificata\", 2, \"111.50\"]",
+        "[\"in_transito\", 1, \"30.00\"]",
+        "[\"annullata\", 1, \"45.00\"]",
+        "[\"consegnata\", 1, \"150.00\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "task_id": "nl2pg-aa6e124b2796",
+  "category": "Q09_S26",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "4785bfc1f23f5900"
+  },
+  "story": "Nell'ambito della gestione amministrativa quotidiana, l'archivio principale denominato aziende conserva le anagrafiche complete di ciascuna società cliente, riportando il nome commerciale, la partita_iva e l'indirizzo della sede legale. Accanto a questo archivio, il registro contabile intitolato conti_contabili organizza le sezioni dedicate ai singoli conti economici, specificando per ciascuno il codice del conto, la descrizione dettagliata e la classificazione — che può essere attivo, passivo, patrimonio_netto, ricavo o costo. Ogni voce di conto è collegata alla società di appartenenza attraverso il legame con l'azienda di riferimento, mentre il terzo registro, denominato movimenti, registra puntualmente ogni singola operazione contabile con la data del movimento, una descrizione dell'operazione e gli importi in dare e in avere. Ciascun movimento è ricollegato al proprio conto di riferimento tramite il legame con il conto associato. Durante l'ultima revisione contabile, il team di auditor ha deciso di isolare le società il cui volume complessivo di movimenti superava la soglia di 1000, procedendo successivamente al conteggio delle voci come num_movimenti e alla somma degli importi complessivi come totale_movimenti. L'analisi ha preso in esame tre società in particolare: Tech Solutions S.r.l., con sede in Via Roma 1, Milano e partita_iva 01234567890; Nova S.p.A., con sede in Piazza Duomo 5, Torino e partita_iva 09876543210; e Green Energy S.r.l., con sede in Via Verdi 12, Bologna e partita_iva 11223344556. Per ciascuna di esse sono state aggregate le operazioni registrate tra il 2026-01-10 e il 2026-03-01, verificando che il totale degli importi movimentati — ottenuto sommando importo_dare e importo_avere — superasse effettivamente la soglia di 1000, e sono state quindi prodotte le relazioni sintetiche raggruppate per il nome delle società.",
+  "question": "Tra le aziende registrate, quali hanno un volume complessivo di movimenti contabili superiore a 1000, e per ciascuna di esse qual è il numero di movimenti e l'importo totale complessivo?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE aziende (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT\n);\n\nCREATE TABLE conti_contabili (\n    id SERIAL PRIMARY KEY,\n    azienda_id INT NOT NULL REFERENCES aziende(id),\n    codice_conto TEXT NOT NULL,\n    descrizione TEXT,\n    tipo_conto TEXT CHECK (tipo_conto IN ('attivo', 'passivo', 'patrimonio_netto', 'ricavo', 'costo'))\n);\n\nCREATE TABLE movimenti (\n    id SERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti_contabili(id),\n    data_movimento DATE NOT NULL,\n    descrizione TEXT,\n    importo_dare NUMERIC(12,2) CHECK (importo_dare >= 0),\n    importo_avere NUMERIC(12,2) CHECK (importo_avere >= 0)\n);",
+    "data_inserts": "INSERT INTO aziende (id, nome, partita_iva, indirizzo) VALUES\n(1, 'Tech Solutions S.r.l.', '01234567890', 'Via Roma 1, Milano'),\n(2, 'Nova S.p.A.', '09876543210', 'Piazza Duomo 5, Torino'),\n(3, 'Green Energy S.r.l.', '11223344556', 'Via Verdi 12, Bologna');\n\nINSERT INTO conti_contabili (id, azienda_id, codice_conto, descrizione, tipo_conto) VALUES\n(1, 1, '1010', 'Cassa', 'attivo'),\n(2, 1, '2010', 'Debiti verso fornitori', 'passivo'),\n(3, 2, '3010', 'Capitale sociale', 'patrimonio_netto'),\n(4, 2, '4010', 'Ricavi vendita', 'ricavo'),\n(5, 3, '5010', 'Costi energia', 'costo');\n\nINSERT INTO movimenti (id, conto_id, data_movimento, descrizione, importo_dare, importo_avere) VALUES\n(1, 1, '2026-01-10', 'Versamento cassa', 5000.00, 0.00),\n(2, 1, '2026-01-15', 'Uscita cassa', 0.00, 200.50),\n(3, 2, '2026-01-12', 'Fattura fornitore', 1500.00, 0.00),\n(4, 3, '2026-02-01', 'Aumento capitale', 0.00, 10000.00),\n(5, 4, '2026-02-15', 'Vendita prodotti', 0.00, 3500.00),\n(6, 5, '2026-03-01', 'Pagamento bolletta', 450.00, 0.00);",
+    "query": "SELECT a.nome, COUNT(m.id) AS num_movimenti, SUM(m.importo_dare + m.importo_avere) AS totale_movimenti FROM aziende a JOIN conti_contabili c ON a.id = c.azienda_id JOIN movimenti m ON c.id = m.conto_id GROUP BY a.nome HAVING SUM(m.importo_dare + m.importo_avere) > 1000;",
+    "result": {
+      "columns": [
+        "nome",
+        "num_movimenti",
+        "totale_movimenti"
+      ],
+      "rows": [
+        "[\"Nova S.p.A.\", 2, \"13500.00\"]",
+        "[\"Tech Solutions S.r.l.\", 3, \"6700.50\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

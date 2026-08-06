@@ -1,0 +1,62 @@
+{
+  "task_id": "nl2pg-7c1e86b57d63",
+  "category": "Q37_Q5_Q45_S14",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having",
+      "window",
+      "filtered_agg"
+    ],
+    "twist": [
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "fatturato",
+        "obsolete_value": "ricavi_netto",
+        "description": "La colonna fatturato viene denominata ricavi_netto nel linguaggio aziendale, costringendo l'LLM a riconoscere che ricavi_netto corrisponde alla colonna fatturato presente nello schema."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "transazioni",
+        "obsolete_value": "movimenti_contabili",
+        "description": "La tabella transazioni viene chiamata movimenti_contabili nella prosa di business, richiedendo all'LLM di mappare il sinonimo movimenti_contabili sulla tabella reale transazioni."
+      }
+    ],
+    "spec_hash": "92fe0b7391bbc6f1"
+  },
+  "story": "Per la revisione annuale del portafoglio clienti, il dipartimento di amministrazione ha avviato un'analisi approfondita degli archivi gestionali al fine di ricostruire il quadro economico complessivo. Il primo archivio consultato è quello dedicato ai clienti, che funge da anagrafica primaria: ogni voce contiene l'identificativo univoco e la denominazione completa del partner commerciale. A ciascun soggetto presente in questo primo archivio risultano associate una o più posizioni economiche, accuratamente catalogate in un secondo archivio denominato conti, il quale specifica la natura della posizione — che sia attiva, passiva, patrimoniale, di ricavo o di costo — e riporta il saldo attualmente disponibile. Per ricostruire il flusso economico e tracciare le dinamiche operative, gli analisti si sono avvalsi di un terzo archivio, noto internamente come movimenti_contabili, nel quale ogni singola operazione viene documentata con la relativa data di esecuzione e l'importo del fatturato, ovvero il ricavi_netto effettivamente incassato. Nell'ambito del controllo di verifica, gli analisti hanno proceduto a raggruppare le operazioni per singolo cliente, calcolando per ciascuno il totale dei ricavi_netto, il numero complessivo di movimenti_contabili e il sotto-conteggio di quelli con ricavi_netto superiori a 1000. A seguire, hanno applicato un filtro selettivo per includere nella lista finale solo i clienti la cui somma di ricavi_netto supera la soglia di 1000, assegnando a ciascuno una posizione in classifica basata sul totale dei ricavi_netto in ordine decrescente.",
+  "question": "Per la revisione annuale del portafoglio clienti, qual è la classifica dei clienti il cui fatturato totale supera 1000, ordinata per fatturato decrescente, con indicazione del numero complessivo di transazioni, di quelle con importo superiore a 1000 e della posizione in classifica?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE conti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    descrizione TEXT,\n    tipo_conto TEXT CHECK (tipo_conto IN ('attivo', 'passivo', 'patrimonio', 'ricavo', 'costo')),\n    saldo_corrente NUMERIC(15,2) CHECK (saldo_corrente >= 0)\n);\n\nCREATE TABLE transazioni (\n    id SERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    fatturato NUMERIC(15,2) CHECK (fatturato >= 0),\n    descrizione TEXT,\n    data_transazione DATE NOT NULL,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z'),\n(3, 'Giovanni Verdi', 'VRDGNN78C15F205X'),\n(4, 'Anna Neri', 'NRNNA90D58L123E');\n\nINSERT INTO conti (id, cliente_id, descrizione, tipo_conto, saldo_corrente) VALUES\n(1, 1, 'Conto Corrente', 'attivo', 15000.00),\n(2, 1, 'Conto Risparmio', 'patrimonio', 45000.50),\n(3, 2, 'Conto Corrente', 'attivo', 8200.00),\n(4, 3, 'Credito Clienti', 'ricavo', 3200.75),\n(5, 4, 'Debiti Fornitori', 'costo', 5600.00),\n(6, 2, 'Patrimonio Immobiliare', 'patrimonio', 120000.00);\n\nINSERT INTO transazioni (id, conto_id, fatturato, descrizione, data_transazione) VALUES\n(1, 1, 1200.00, 'Pagamento fattura', '2026-01-10'),\n(2, 1, 500.00, 'Acquisto materiale ufficio', '2026-01-12'),\n(3, 2, 5000.00, 'Versamento interessi', '2026-01-15'),\n(4, 3, 3500.00, 'Incasso cliente ABC', '2026-01-18'),\n(5, 4, 1500.00, 'Pagamento servizio', '2026-01-20'),\n(6, 5, 800.00, 'Pagamento fornitore', '2026-01-22');",
+    "query": "SELECT c.nome, COUNT(*) AS totale_transazioni, SUM(t.fatturato) AS totale_fatturato, COUNT(*) FILTER (WHERE t.fatturato > 1000) AS transazioni_grandi, RANK() OVER (ORDER BY SUM(t.fatturato) DESC) AS posizione FROM clienti c JOIN conti co ON c.id = co.cliente_id JOIN transazioni t ON co.id = t.conto_id GROUP BY c.nome HAVING SUM(t.fatturato) > 1000 ORDER BY totale_fatturato DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "totale_transazioni",
+        "totale_fatturato",
+        "transazioni_grandi",
+        "posizione"
+      ],
+      "rows": [
+        "[\"Mario Rossi\", 3, \"6700.00\", 2, 1]",
+        "[\"Laura Bianchi\", 1, \"3500.00\", 1, 2]",
+        "[\"Giovanni Verdi\", 1, \"1500.00\", 1, 3]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

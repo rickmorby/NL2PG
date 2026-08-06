@@ -1,0 +1,57 @@
+{
+  "task_id": "nl2pg-b3f894a30e09",
+  "category": "Q09_S28",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "vnd",
+        "obsolete_value": "tbl_vend",
+        "description": "La tabella vendite, normalmente indicata con l'acronimo vnd nello schema abbreviato, viene denominata tbl_vend nella documentazione aziendale, richiedendo al solver di decodificare il nome alternativo per identificare correttamente la tabella."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "fatturato",
+        "obsolete_value": "ricavo_operativo",
+        "description": "La colonna fatturato viene referenziata nel linguaggio aziendale come ricavo_operativo, introducendo una terminologia di settore che il solver deve mappare sul nome reale della colonna per costruire la query corretta."
+      }
+    ],
+    "spec_hash": "e3af7f4c3da6f53d"
+  },
+  "story": "All'interno della struttura direzionale dedicata al commercio, l'archivio denominato clienti conserva le schede anagrafiche di ciascuna controparte attiva, annotando il nome dell'interlocutore, la città di residenza e la data di avvio del rapporto commerciale. Accanto a questo, il registro intitolato tbl_vend custodisce l'evidenza dettagliata di ogni transazione conclusa, registrando il riferimento al cliente coinvolto, il momento esatto in cui l'operazione è stata finalizzata e l'importo del ricavo_operativo incassato a seguito della vendita. Per ciascun movimento di vendita, la sezione righe_vendita documenta i prodotti specifici acquistati, indicando la descrizione dell'articolo, la quantità prelevata a magazzino e il prezzo unitario concordato tra le parti. Durante un'analisi di verifica operativa condotta dai responsabili, i dati sono stati filtrati per isolare le aree geografiche il cui ricavo_operativo aggregato superasse la soglia di 100. L'elaborazione ha raggruppato le informazioni per località, calcolando il numero complessivo di operazioni registrate e la somma totale degli incassi, disponendo poi i risultati in ordine decrescente di importo per guidare le scelte strategiche della direzione commerciale.",
+  "question": "Per ciascuna città, quali sono il numero totale di vendite effettuate e il ricavo operativo complessivo, considerando solo le aree geografiche il cui ricavo aggregato supera 100, elencate in ordine decrescente di incasso?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    citta TEXT,\n    data_registrazione DATE DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE tbl_vend (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_vendita DATE NOT NULL,\n    ricavo_operativo NUMERIC(12,2) CHECK (ricavo_operativo >= 0)\n);\n\nCREATE TABLE righe_vendita (\n    id INT PRIMARY KEY,\n    vendita_id INT NOT NULL REFERENCES tbl_vend(id),\n    descrizione_prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, citta, data_registrazione) VALUES\n(1, 'Mario Rossi', 'Milano', '2024-03-15'),\n(2, 'Laura Bianchi', 'Roma', '2024-06-20'),\n(3, 'Giuseppe Verdi', 'Napoli', '2025-01-10'),\n(4, 'Anna Neri', 'Torino', '2025-02-28');\n\nINSERT INTO tbl_vend (id, cliente_id, data_vendita, ricavo_operativo) VALUES\n(101, 1, '2026-01-15', 150.50),\n(102, 2, '2026-02-20', 89.00),\n(103, 3, '2026-03-10', 200.00),\n(104, 1, '2026-04-05', 75.25);\n\nINSERT INTO righe_vendita (id, vendita_id, descrizione_prodotto, quantita, prezzo_unitario) VALUES\n(1001, 101, 'Laptop Dell', 2, 750.00),\n(1002, 101, 'Mouse Logitech', 5, 25.50),\n(1003, 102, 'Monitor Samsung', 1, 299.00),\n(1004, 103, 'Tastiera Meccanica', 3, 120.00),\n(1005, 104, 'Cavo USB', 10, 8.50);",
+    "query": "SELECT c.citta, COUNT(*) AS num_vendite, SUM(tv.ricavo_operativo) AS ricavo_totale FROM clienti c JOIN tbl_vend tv ON c.id = tv.cliente_id GROUP BY c.citta HAVING SUM(tv.ricavo_operativo) > 100 ORDER BY ricavo_totale DESC;",
+    "result": {
+      "columns": [
+        "citta",
+        "num_vendite",
+        "ricavo_totale"
+      ],
+      "rows": [
+        "[\"Milano\", 2, \"225.75\"]",
+        "[\"Napoli\", 1, \"200.00\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

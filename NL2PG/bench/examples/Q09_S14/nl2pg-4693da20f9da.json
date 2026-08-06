@@ -1,0 +1,58 @@
+{
+  "task_id": "nl2pg-4693da20f9da",
+  "category": "Q09_S14",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "rephrase",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rephrase",
+        "target_value": "vendite",
+        "obsolete_value": "elenco_transazioni",
+        "description": "La tabella vendite viene indicata con la perifrasi elenco_transazioni nel testo del benchmark, richiedendo al risolutore di mappare il termine proseggiato all'entità reale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo_totale",
+        "obsolete_value": "fatturato",
+        "description": "La colonna importo_totale viene denominata fatturato nella prosa del benchmark, richiedendo al risolutore di riconoscere il sinonimo e utilizzare la colonna corretta nelle query GROUP BY e HAVING."
+      }
+    ],
+    "spec_hash": "01e4c72edf2b3518"
+  },
+  "story": "Presso l'Ufficio Commerciale dell'azienda, l'archivio denominato clienti raccoglie le schede anagrafiche di ciascun partner commerciale, riportando per ogni soggetto il nome, il cognome, il codice fiscale e i recapiti di contatto. Parallelamente, il registro intitolato prodotti custodisce l'intero catalogo degli articoli in commercio, indicando per ogni voce la categoria di appartenenza e il relativo prezzo unitario. Tutti i movimenti di vendita vengono annotati nel registro denominato elenco_transazioni, dove si riportano la quantità di articoli ceduti e il fatturato conseguito dalla singola transazione. Durante un'analisi operativa volta a individuare le categorie di prodotto con fatturato_totale superiore a 100, gli analisti hanno incrociato le schede dell'archivio clienti con il registro prodotti e il registro elenco_transazioni. Gli operatori hanno quindi calcolato il numero_vendite per ciascuna categoria e sommato l'importo_totale, filtrando i risultati per includere solo le categorie con un fatturato aggregato maggiore di 100, disponendo infine l'esito in ordine DESC in base all'ammontare complessivo incassato.",
+  "question": "Per le categorie di prodotto il cui fatturato complessivo supera 100, qual è il numero di vendite effettuate e il fatturato totale raggruppato per categoria, ordinati dal fatturato più alto al più basso?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome_prodotto TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    categoria TEXT\n);\n\nCREATE TABLE vendite (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    importo_totale NUMERIC(10,2) NOT NULL CHECK (importo_totale >= 0),\n    data_vendita DATE NOT NULL DEFAULT CURRENT_DATE\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, telefono) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it', '3331234567'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it', '3339876543'),\n(3, 'Giovanni', 'Verdi', 'VRDGNN88C15L219Z', 'giovanni.verdi@email.it', '3401112233'),\n(4, 'Anna', 'Neri', 'NRINNA90D20M502X', 'anna.neri@email.it', '3394445566');\n\nINSERT INTO prodotti (id, nome_prodotto, descrizione, prezzo_unitario, categoria) VALUES\n(1, 'Laptop Dell Inspiron', 'Laptop 15 pollici con 16GB RAM', 899.99, 'Elettronica'),\n(2, 'Smartphone Samsung Galaxy', 'Smartphone 128GB bianco', 599.50, 'Elettronica'),\n(3, 'Libreria in Legno', 'Libreria artigianale in legno massello', 245.00, 'Arredamento'),\n(4, 'Set di cancelleria', 'Set completo di penne, quaderni e matite', 35.75, 'Cancelleria');\n\nINSERT INTO vendite (id, cliente_id, prodotto_id, quantita, importo_totale, data_vendita) VALUES\n(1, 1, 1, 1, 899.99, '2026-01-10'),\n(2, 1, 2, 2, 1199.00, '2026-01-12'),\n(3, 2, 3, 1, 245.00, '2026-01-14'),\n(4, 3, 4, 3, 107.25, '2026-01-15'),\n(5, 4, 1, 1, 899.99, '2026-01-18');",
+    "query": "SELECT p.categoria, COUNT(v.id) AS numero_vendite, SUM(v.importo_totale) AS fatturato_totale FROM prodotti p JOIN vendite v ON p.id = v.prodotto_id GROUP BY p.categoria HAVING SUM(v.importo_totale) > 100 ORDER BY fatturato_totale DESC;",
+    "result": {
+      "columns": [
+        "categoria",
+        "numero_vendite",
+        "fatturato_totale"
+      ],
+      "rows": [
+        "[\"Elettronica\", 3, \"2998.98\"]",
+        "[\"Arredamento\", 1, \"245.00\"]",
+        "[\"Cancelleria\", 1, \"107.25\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

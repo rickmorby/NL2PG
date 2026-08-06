@@ -1,0 +1,43 @@
+{
+  "task_id": "nl2pg-949937540e76",
+  "category": "Q09_S26",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "2e19262f13b6dbb5"
+  },
+  "story": "Presso l'Ufficio Relazioni con la Clientela, l'archivio denominato clienti custodisce le schede anagrafiche di ogni acquirente, riportando il nome, il cognome, l'indirizzo di posta elettronica e il numero di telefono. Parallelamente, il registro chiamato prodotti descrive l'intero catalogo commerciale, indicando per ciascun articolo il nome, la descrizione, il prezzo unitario e la quantità disponibile a magazzino. Ogni volta che un cliente effettua un acquisto, la sezione ordini registra l'operazione, annotando l'identificativo del cliente, la data e l'ora dell'acquisto, lo stato di avanzamento e l'importo totale della transazione. All'interno di ciascun ordine, l'archivio righe_ordine dettaglia le singole voci di acquisto, specificando il prodotto selezionato, la quantità acquistata e il prezzo unitario applicato. Durante un'analisi operativa condotta a inizio anno, gli operatori hanno esaminato le transazioni raggruppandole per nome e cognome del cliente, contando quanti ordini ciascun acquirente abbia effettuato e sommando gli importi complessivi, considerando solo i gruppi con una somma superiore a 100. Il controllo ha evidenziato che Mario Rossi ha registrato un ordine del 15 gennaio 2026 per un importo di 1029,98, Laura Bianchi ha concluso un ordine il 16 gennaio 2026 per 349,50, e Giovanni Verdi ha completato un ordine il 17 gennaio 2026 per un totale di 159,99. Anna Neri, pur risultando presente nell'archivio clienti, non ha effettuato ordini con importo superiore a tale soglia. L'intero processo di verifica ha permesso di ricostruire fedelmente il percorso di ciascun acquirente attraverso le sezioni ordini e righe_ordine, garantendo una visione completa delle transazioni gestite nel periodo.",
+  "question": "Per ciascun cliente, indica nome e cognome, quanti ordini ha effettuato e quale importo totale ha speso, considerando solo i clienti la cui spesa complessiva supera 100.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    quantita_disponibile INT NOT NULL DEFAULT 0 CHECK (quantita_disponibile >= 0)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato TEXT NOT NULL DEFAULT 'completato',\n    importo_totale NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, email, telefono, data_registrazione) VALUES\n(1, 'Mario', 'Rossi', 'mario.rossi@email.it', '3331234567', '2025-06-10'),\n(2, 'Laura', 'Bianchi', 'laura.bianchi@email.it', '3339876543', '2025-07-15'),\n(3, 'Giovanni', 'Verdi', 'giovanni.verdi@email.it', '3471112222', '2025-08-20'),\n(4, 'Anna', 'Neri', 'anna.neri@email.it', '3283334444', '2025-09-01');\n\nINSERT INTO prodotti (id, nome, descrizione, prezzo_unitario, quantita_disponibile) VALUES\n(1, 'Laptop Dell Inspiron 15', 'Laptop 15.6 pollici, 16GB RAM, 512GB SSD', 999.99, 50),\n(2, 'Mouse Logitech MX Master 3', 'Mouse wireless ergonomico con scroll magnetico', 29.99, 200),\n(3, 'Monitor Samsung 27', 'Monitor LED 27 pollici Full HD IPS', 349.50, 30),\n(4, 'Tastiera Meccanica RGB', 'Tastiera meccanica Cherry MX Blue retroilluminata', 129.00, 75);\n\nINSERT INTO ordini (id, cliente_id, data_ordine, stato, importo_totale) VALUES\n(1, 1, '2026-01-15 10:30:00', 'completato', 1029.98),\n(2, 2, '2026-01-16 14:15:00', 'completato', 349.50),\n(3, 3, '2026-01-17 09:00:00', 'completato', 159.99);\n\nINSERT INTO righe_ordine (id, ordine_id, prodotto_id, quantita, prezzo_unitario) VALUES\n(1, 1, 1, 1, 999.99),\n(2, 1, 2, 1, 29.99),\n(3, 2, 3, 1, 349.50),\n(4, 3, 4, 1, 129.00),\n(5, 3, 2, 1, 29.99);",
+    "query": "SELECT c.nome, c.cognome, COUNT(o.id) AS num_ordini, SUM(o.importo_totale) AS totale_speso FROM clienti c JOIN ordini o ON c.id = o.cliente_id GROUP BY c.nome, c.cognome HAVING SUM(o.importo_totale) > 100;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "num_ordini",
+        "totale_speso"
+      ],
+      "rows": [
+        "[\"Giovanni\", \"Verdi\", 1, \"159.99\"]",
+        "[\"Laura\", \"Bianchi\", 1, \"349.50\"]",
+        "[\"Mario\", \"Rossi\", 1, \"1029.98\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

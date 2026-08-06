@@ -1,0 +1,63 @@
+{
+  "task_id": "nl2pg-6ec2869d9e59",
+  "category": "Q17_Q37_Q05_S22",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "jargon",
+      "ambiguity"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "transazioni",
+        "obsolete_value": "movimenti_contabili",
+        "description": "La tabella transazioni viene denominata con il gergo contabile 'movimenti_contabili', obbligando l'LLM a riconoscere che si riferisce alla stessa entità."
+      },
+      {
+        "twist_type": "ambiguity",
+        "target_value": "importo",
+        "obsolete_value": "valore",
+        "description": "La colonna 'importo' viene sostituita con il termine ambiguo 'valore', che nella prosa aziendale potrebbe riferirsi indistintamente a importo lordo, importo netto o importo totale, richiedendo all'LLM di disambiguare nel contesto della query."
+      }
+    ],
+    "spec_hash": "da1e67525ca34789"
+  },
+  "story": "Presso l'Ufficio Amministrativo, l'archivio denominato movimenti_contabili custodisce le schede di ogni operazione economica registrata nell'arco dell'anno. Ciascuna scheda riporta la data in cui l'evento si è verificato, una descrizione dell'operazione, e il valore associato. Ogni voce è inoltre classificata secondo la tipologia del movimento, che può essere Dare o Avere, e identificata dal conto interessato, tra cui Clienti, Banca, Fornitori e Affitti. Durante un recente controllo operativo volto a classificare tutte le operazioni in ordine di valore decrescente e ad assegnare una posizione relativa a ciascuna di esse mediante una funzione di analisi della finestra temporale, gli operatori hanno esaminato attentamente i dati contenuti nell'archivio movimenti_contabili. Hanno osservato che il giorno 2026-01-05 sono state registrate delle operazioni con un valore di 1500.00, mentre il giorno 2026-01-10 si sono verificati movimenti di 450.75 e, successivamente, il giorno 2026-01-15 un affitto di 1200.00. L'analisi ha permesso di ordinare l'intero archivio per valore decrescente, garantendo una visione chiara delle priorità finanziarie.",
+  "question": "Fornisci la classifica completa di tutti i movimenti contabili ordinati per valore decrescente, assegnando una posizione progressiva a ciascuna voce.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE movimenti_contabili (\n    id BIGINT PRIMARY KEY,\n    data_movimento DATE NOT NULL,\n    descrizione TEXT,\n    valore NUMERIC(15,2) CHECK (valore >= 0),\n    tipo_movimento TEXT CHECK (tipo_movimento IN ('Dare', 'Avere')),\n    conto TEXT NOT NULL\n);",
+    "data_inserts": "INSERT INTO movimenti_contabili (id, data_movimento, descrizione, valore, tipo_movimento, conto) VALUES\n(1, '2026-01-05', 'Vendita merce al cliente Alpha', 1500.00, 'Dare', 'Clienti'),\n(2, '2026-01-05', 'Incasso dalla vendita al cliente Alpha', 1500.00, 'Avere', 'Banca'),\n(3, '2026-01-10', 'Acquisto materiali dal fornitore Beta', 450.75, 'Avere', 'Fornitori'),\n(4, '2026-01-10', 'Bonifico pagamento fornitore Beta', 450.75, 'Dare', 'Banca'),\n(5, '2026-01-15', 'Pagamento affitto ufficio gennaio', 1200.00, 'Avere', 'Affitti');\n",
+    "query": "SELECT id, data_movimento, descrizione, valore, tipo_movimento, conto, ROW_NUMBER() OVER (ORDER BY valore DESC) AS posizione FROM movimenti_contabili ORDER BY valore DESC;",
+    "result": {
+      "columns": [
+        "id",
+        "data_movimento",
+        "descrizione",
+        "valore",
+        "tipo_movimento",
+        "conto",
+        "posizione"
+      ],
+      "rows": [
+        "[1, \"2026-01-05\", \"Vendita merce al cliente Alpha\", \"1500.00\", \"Dare\", \"Clienti\", 1]",
+        "[2, \"2026-01-05\", \"Incasso dalla vendita al cliente Alpha\", \"1500.00\", \"Avere\", \"Banca\", 2]",
+        "[5, \"2026-01-15\", \"Pagamento affitto ufficio gennaio\", \"1200.00\", \"Avere\", \"Affitti\", 3]",
+        "[3, \"2026-01-10\", \"Acquisto materiali dal fornitore Beta\", \"450.75\", \"Avere\", \"Fornitori\", 4]",
+        "[4, \"2026-01-10\", \"Bonifico pagamento fornitore Beta\", \"450.75\", \"Dare\", \"Banca\", 5]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

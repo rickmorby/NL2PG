@@ -1,0 +1,41 @@
+{
+  "task_id": "nl2pg-d7891ea01742",
+  "category": "Q03_S14",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "top_n"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "df4c0a4a03ac03b5"
+  },
+  "story": "Presso l'Ufficio Relazioni con la Clientela di una rinomata azienda del settore vendite, tre archivi fondamentali collaborano per tracciare l'intera attività commerciale. Il primo, chiamato clienti, custodisce le schede anagrafiche di ciascun acquirente, riportando nome, cognome, codice fiscale e la data in cui il soggetto ha avviato la propria iscrizione. Il secondo, denominato ordini, raccoglie le informazioni relative a ogni singolo acquisto effettuato, annotando la data dell'ordine, l'importo complessivo e lo stato della pratica, che può trovarsi in una tra le condizioni: pending, completato o annullato. Infine, il terzo archivio, intitolato dettagli_ordine, contiene le voci singole di ciascun ordine, specificando il prodotto acquistato, la quantità, il prezzo unitario e il sottototale parziale. Durante la consueta verifica semestrale condotta nel corso del 2026, gli analisti hanno esaminato gli ordini il cui stato risultava essere completato, con l'obiettivo di individuare i tre clienti che avevano generato il maggior importo totale, incrociando le informazioni presenti nell'archivio clienti con quelle degli ordini. Tra le schede consultate, Mario Rossi, registrato in data 2024-03-10, presentava un ordine datato 2026-01-15 per un importo di 150,50, comprendente un Cavo USB-C e un Hub USB. Laura Bianchi, iscritta il 2024-06-15, aveva un ordine del 2026-01-16 per 89,00 relativo a un paio di Cuffie Bluetooth, ma il suo stato era ancora pending e quindi non è stato incluso nel calcolo dell'importo totale. Giovanni Verdi, la cui iscrizione risale al 2025-01-20, risultava il cliente con l'importo più elevato, avendo effettuato il 2026-02-01 un ordine del valore di 250,00 comprendente un Monitor 27 pollici e un Supporto Monitor. Sara Neri, registrata il 2025-04-05, aveva un ordine del 2026-03-10 per 55,75 contenente un Mouse Wireless, ma tale ordine presentava stato annullato ed è stato pertanto escluso dall'analisi. Un dettaglio che ha destato sorpresa è emerso quando si è scoperto che il sistema aveva erroneamente classificato un altro acquisto di Giovanni Verdi come annullato in una fase preliminare, poi corretto in completato durante il controllo qualità. La classifica finale ha confermato Giovanni Verdi al primo posto con 250,00 e Mario Rossi al secondo con 150,50, mentre il terzo posto non ha trovato altri candidati idonei, poiché nessun altro cliente con ordini in stato completato presentava un importo totale sufficiente a completare la graduatoria dei primi tre.",
+  "question": "Quali sono i primi 3 clienti che hanno speso di più tra tutti gli ordini con stato completato?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT NOW(),\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0),\n    stato TEXT CHECK (stato IN ('pending', 'completato', 'annullato'))\n);\n\nCREATE TABLE dettagli_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto TEXT NOT NULL,\n    quantita INT CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0),\n    subtotale NUMERIC(10,2) CHECK (subtotale >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, data_registrazione) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it', '2024-03-10'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it', '2024-06-15'),\n(3, 'Giovanni', 'Verdi', 'VRTGNV92C15L219P', 'giovanni.verdi@email.it', '2025-01-20'),\n(4, 'Sara', 'Neri', 'NRISRA78D03M502Q', 'sara.neri@email.it', '2025-04-05');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, importo_totale, stato) VALUES\n(1, 1, '2026-01-15 10:30:00', 150.50, 'completato'),\n(2, 2, '2026-01-16 14:00:00', 89.00, 'pending'),\n(3, 3, '2026-02-01 09:15:00', 250.00, 'completato'),\n(4, 1, '2026-03-10 16:45:00', 55.75, 'annullato');\n\nINSERT INTO dettagli_ordine (id, ordine_id, prodotto, quantita, prezzo_unitario, subtotale) VALUES\n(1, 1, 'Cavo USB-C', 1, 45.50, 45.50),\n(2, 1, 'Hub USB', 1, 105.00, 105.00),\n(3, 2, 'Cuffie Bluetooth', 1, 89.00, 89.00),\n(4, 3, 'Monitor 27 pollici', 1, 150.00, 150.00),\n(5, 3, 'Supporto Monitor', 1, 100.00, 100.00),\n(6, 4, 'Mouse Wireless', 1, 55.75, 55.75);",
+    "query": "SELECT c.nome, c.cognome, SUM(o.importo_totale) AS totale_speso FROM clienti c JOIN ordini o ON c.id = o.cliente_id GROUP BY c.nome, c.cognome ORDER BY totale_speso DESC LIMIT 3;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "totale_speso"
+      ],
+      "rows": [
+        "[\"Giovanni\", \"Verdi\", \"250.00\"]",
+        "[\"Mario\", \"Rossi\", \"206.25\"]",
+        "[\"Laura\", \"Bianchi\", \"89.00\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "task_id": "nl2pg-e30c214dd85d",
+  "category": "Q05_S07",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 1,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "d87b2c619afc1acb"
+  },
+  "story": "Presso l'Ufficio Categorizzazione Prodotti dell'azienda, l'archivio denominato categorie_vendite custodisce le schede di ciascuna famiglia merceologica. Ogni scheda è identificata da un numero univoco, un nome descrittivo, un codice di classificazione e un riferimento alla categoria di appartenenza, oltre a un indicatore di livello gerarchico e un indicatore di stato. Durante un'analisi organizzativa, i responsabili hanno preso in esame le voci con livello 0, ossia le categorie di primo livello, e hanno quantificato quante sotto-categorie ciascuna di esse contenesse al proprio interno. L'elemento con identificativo 1, denominato Elettronica e con livello 0, risultava attivo e presentava come valore di riferimento gerarchico il valore NULL, in quanto radice dell'intera struttura ad albero. Al suo interno figuravano due sotto-categorie: Informatica, con identificativo 2 e codice INFO, e Smartphone, con identificativo 3 e codice SMART, entrambe con livello 1 e riferimento alla categoria superiore pari a 1. A sua volta, la voce Informatica, identificata con identificativo 2 e livello 1, ospitava una sotto-categoria ulteriormente annidata, Notebooks, con identificativo 4, codice NB e livello 2, il cui riferimento alla categoria superiore era uguale a 2. L'elemento con identificativo 5, Abbigliamento, pure con livello 0 e valore attivo pari a TRUE, non presentava alcuna sotto-categoria associata. Al termine dell'analisi, i dati sono stati ordinati per numero decrescente di sotto-categorie, evidenziando che la categoria con identificativo 1 risultava la più ricca di ramificazioni, seguita da quella con identificativo 2, mentre le schede con identificativo 3, 4 e 5 non presentavano sotto-categorie proprie o erano prive di discendenti diretti nell'archivio categorie_vendite.",
+  "question": "Per ogni categoria principale, quante sotto-categorie dirette contiene, elencate in ordine decrescente rispetto al numero di sotto-categorie?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE categorie_vendite (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    categoria_padre_id INT REFERENCES categorie_vendite(id),\n    livello INT CHECK (livello >= 0),\n    attivo BOOLEAN DEFAULT TRUE\n);",
+    "data_inserts": "INSERT INTO categorie_vendite (id, nome, codice, descrizione, categoria_padre_id, livello, attivo) VALUES\n(1, 'Elettronica', 'ELEC', 'Prodotti elettronici e tecnologici', NULL, 0, TRUE),\n(5, 'Abbigliamento', 'ABB', 'Indumenti e accessori moda', NULL, 0, TRUE);\n\nINSERT INTO categorie_vendite (id, nome, codice, descrizione, categoria_padre_id, livello, attivo) VALUES\n(2, 'Informatica', 'INFO', 'Computer e periferiche', 1, 1, TRUE),\n(3, 'Smartphone', 'SMART', 'Telefonia mobile e accessori', 1, 1, TRUE),\n(4, 'Notebooks', 'NB', 'Computer portatili e tablet', 2, 2, TRUE);",
+    "query": "SELECT c.nome AS categoria_padre, COUNT(cv.id) AS num_sotto_categorie FROM categorie_vendite cv JOIN categorie_vendite c ON cv.categoria_padre_id = c.id GROUP BY c.nome ORDER BY num_sotto_categorie DESC;",
+    "result": {
+      "columns": [
+        "categoria_padre",
+        "num_sotto_categorie"
+      ],
+      "rows": [
+        "[\"Elettronica\", 2]",
+        "[\"Informatica\", 1]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

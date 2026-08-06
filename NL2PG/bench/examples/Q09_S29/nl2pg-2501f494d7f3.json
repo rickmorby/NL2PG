@@ -1,0 +1,49 @@
+{
+  "task_id": "nl2pg-2501f494d7f3",
+  "category": "Q09_S29",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "rename"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "vendite",
+        "obsolete_value": "registri_transazioni",
+        "description": "La tabella vendite viene denominata registri_transazioni nella prosa aziendale, rendendo necessaria la mappatura semantica per identificare correttamente la tabella di origine dei dati di vendita."
+      }
+    ],
+    "spec_hash": "3129d8b65c2b06e3"
+  },
+  "story": "All'interno del sistema informativo aziendale dedicato alla gestione delle vendite, l'archivio anagrafico denominato clienti conserva i dati identificativi di ogni partner commerciale: ciascun associato è riconoscibile tramite il proprio nome univoco e il codice fiscale, garantendo un collegamento affidabile con le operazioni effettuate. Accanto a questo, il catalogo denominato prodotti documenta l'intera offerta commerciale dell'azienda, associando a ciascun articolo una descrizione e un prezzo unitario che ne determina il valore economico. Le transazioni commerciali trovano invece collocazione nell'archivio denominato registri_transazioni, dove ogni voce riporta la quantità di articoli acquistati, la data di completamento dell'operazione e l'importo totale corrispondente alla somma delle singole voci di spesa. Per individuare i partner commerciali più ricorrenti, i responsabili hanno proceduto a correlare le schede anagrafiche dei clienti con le registrazioni contenute nei registri_transazioni, utilizzando la corrispondenza tra l'identificativo del cliente e il riferimento al cliente presente in ciascuna registrazione, ossia c.id = rt.cliente_id. Successivamente, hanno aggregato i dati raggruppandoli per nome, calcolando per ciascun soggetto il numero di transazioni — ottenuto tramite COUNT(rt.id) — e la somma degli importi complessivi — ottenuta tramite SUM(rt.importo_totale) — denominando rispettivamente queste metriche numero_transazioni e totale_speso. È stato quindi applicato un filtro per selezionare esclusivamente i soggetti con più di 1 transazione, e i risultati sono stati ordinati per totale_speso in ordine decrescente, consentendo di identificare rapidamente i clienti più fedeli e di orientare di conseguenza le strategie di fidelizzazione.",
+  "question": "Quali sono i clienti che hanno effettuato più di una transazione, elencati in ordine decrescente in base all'importo totale speso?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome_prodotto TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE registri_transazioni (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT CHECK (quantita > 0),\n    data_transazione DATE NOT NULL,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, email, telefono) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it', '3331234567'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it', '3339876543'),\n(3, 'Giovanni Verdi', 'VRGBNN88C15L219P', 'giovanni.verdi@email.it', '3471112233'),\n(4, 'Sara Neri', 'NRISRA92D08M502Q', 'sara.neri@email.it', '3385556677');\n\nINSERT INTO prodotti (id, nome_prodotto, descrizione, prezzo_unitario) VALUES\n(1, 'Laptop Pro', 'Laptop professionale 15 pollici', 1299.99),\n(2, 'Mouse Wireless', 'Mouse ottico wireless', 29.99),\n(3, 'Monitor 27', 'Schermo LED 27 pollici 4K', 449.50),\n(4, 'Tastiera Meccanica', 'Tastiera meccanica RGB', 159.00);\n\nINSERT INTO registri_transazioni (id, cliente_id, prodotto_id, quantita, data_transazione, importo_totale) VALUES\n(1, 1, 1, 1, '2026-01-10', 1299.99),\n(2, 2, 2, 2, '2026-01-12', 59.98),\n(3, 3, 3, 1, '2026-01-15', 449.50),\n(4, 1, 4, 1, '2026-02-01', 159.00),\n(5, 4, 1, 1, '2026-02-05', 1299.99);",
+    "query": "SELECT c.nome, COUNT(rt.id) AS numero_transazioni, SUM(rt.importo_totale) AS totale_speso FROM clienti c JOIN registri_transazioni rt ON c.id = rt.cliente_id GROUP BY c.nome HAVING COUNT(rt.id) > 1 ORDER BY totale_speso DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "numero_transazioni",
+        "totale_speso"
+      ],
+      "rows": [
+        "[\"Mario Rossi\", 2, \"1458.99\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

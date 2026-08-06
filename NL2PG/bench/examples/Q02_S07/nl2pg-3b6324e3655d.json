@@ -1,0 +1,39 @@
+{
+  "task_id": "nl2pg-3b6324e3655d",
+  "category": "Q02_S07",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 1,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "fea729c55e3d6251"
+  },
+  "story": "Nel cuore del centro logistico aziendale, l'archivio denominato consegne conserva ogni scheda relativa alle spedizioni gestite dall'organizzazione. Ciascuna scheda riporta il codice identificativo della spedizione, il luogo di partenza e quello di destinazione, oltre alla data prevista per la consegna. Gli operatori consultano regolarmente anche il peso espresso in chilogrammi, il costo sostenuto per l'intero trasporto e la distanza in chilometri percorsa dal veicolo. Per monitorare lo stato di avanzamento di ogni movimento, viene registrato anche l'attuale fase del processo, che può trovarsi in una delle seguenti condizioni: pianificata, in corso, completata o annullata. Quando una spedizione dipende da un'altra, viene stabilito un collegamento con la consegna principale a cui fa riferimento. Durante una verifica operativa, il responsabile ha esaminato l'intero parco delle consegne: ha contato il numero totale di consegne, ha sommato il costo complessivo di tutte le spedizioni e ha determinato la distanza media percorsa, ottenendo così un quadro completo delle performance logistiche. Tra le schede esaminate, quella relativa al codice CON-001, datata 2025-03-10, ha evidenziato un peso di 12.50, un costo di 150.00 e una distanza di 580.00, con stato completata.",
+  "question": "Qual è il numero totale di consegne registrate, il costo complessivo di tutte le spedizioni e la distanza media percorsa?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE consegne (\n    id SERIAL PRIMARY KEY,\n    codice_consegna TEXT NOT NULL UNIQUE,\n    indirizzo_partenza TEXT NOT NULL,\n    indirizzo_destinazione TEXT NOT NULL,\n    data_consegna DATE NOT NULL,\n    peso_kg NUMERIC(10,2) CHECK (peso_kg >= 0),\n    costo NUMERIC(10,2) CHECK (costo >= 0),\n    distanza_km NUMERIC(10,2) CHECK (distanza_km >= 0),\n    stato TEXT NOT NULL CHECK (stato IN ('pianificata', 'in_corso', 'completata', 'annullata')),\n    consegna_padre_id INT REFERENCES consegne(id)\n);",
+    "data_inserts": "INSERT INTO consegne (id, codice_consegna, indirizzo_partenza, indirizzo_destinazione, data_consegna, peso_kg, costo, distanza_km, stato, consegna_padre_id) VALUES\n(1, 'CON-001', 'Via Roma 1, Milano', 'Via Torino 5, Roma', '2025-03-10', 12.50, 150.00, 580.00, 'completata', NULL),\n(2, 'CON-002', 'Via Milano 10, Torino', 'Via Napoli 20, Napoli', '2025-03-12', 5.00, 80.00, 700.00, 'in_corso', NULL),\n(3, 'CON-003', 'Via Roma 1, Milano', 'Via Firenze 3, Firenze', '2025-03-15', 8.00, 120.00, 450.00, 'pianificata', 1),\n(4, 'CON-004', 'Via Napoli 20, Napoli', 'Via Bari 1, Bari', '2025-03-18', 20.00, 200.00, 600.00, 'completata', 2),\n(5, 'CON-005', 'Via Firenze 3, Firenze', 'Via Venezia 7, Venezia', '2025-03-20', 3.50, 60.00, 350.00, 'annullata', 3);",
+    "query": "SELECT COUNT(*) AS totale_consegne, SUM(costo) AS costo_totale, AVG(distanza_km) AS distanza_media FROM consegne;",
+    "result": {
+      "columns": [
+        "totale_consegne",
+        "costo_totale",
+        "distanza_media"
+      ],
+      "rows": [
+        "[5, \"610.00\", \"536.0000000000000000\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

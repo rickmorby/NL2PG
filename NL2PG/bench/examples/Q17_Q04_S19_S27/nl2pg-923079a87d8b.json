@@ -1,0 +1,60 @@
+{
+  "task_id": "nl2pg-923079a87d8b",
+  "category": "Q17_Q04_S19_S27",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "window",
+      "join",
+      "conjunctive"
+    ],
+    "twist": [
+      "ambiguity",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "ambiguity",
+        "target_value": "quantità",
+        "obsolete_value": "totale_righe",
+        "description": "La colonna quantità viene riferita con il termine ambiguo 'totale_righe', che potrebbe essere interpretato sia come numero di unità vendute sia come importo complessivo della riga."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "vendite",
+        "obsolete_value": "registrazioni_transazionali",
+        "description": "La tabella vendite viene denominata 'registrazioni_transazionali' nel linguaggio aziendale interno, rendendo non immediato il riconoscimento della sua natura di fatto."
+      }
+    ],
+    "spec_hash": "d9175af1686c4cf5"
+  },
+  "story": "Presso l'Ufficio Amministrativo, l'archivio dei clienti raccoglie le schede di ciascun soggetto acquirente, annotandone nome, cognome e codice fiscale. Accanto a questo, il catalogo dei prodotti descrive le merci disponibili sul mercato, indicandone la descrizione dettagliata e il prezzo unitario. Le operazioni commerciali vengono archiviate nel sistema delle registrazioni_transazionali, ossia l'insieme di dati chiamato vendite, dove ogni voce collega un cliente a un prodotto, riporta la quantità totale_righe relativa alle unità cedute, la data dell'operazione e l'importo_riga corrispondente. Nel corso del controllo annuale, gli analisti hanno esaminato tutte le operazioni a partire dal giorno 2026-01-01, considerando esclusivamente gli eventi successivi a quella soglia temporale. Incrociando le informazioni dell'archivio clienti con le voci registrate nelle vendite, hanno sommato gli importo_riga per ciascun acquirente, assegnato un piazzamento in graduatoria e individuato i primi tre clienti per importo complessivo di vendita.",
+  "question": "Quali sono i primi 3 clienti per importo totale delle vendite nel 2026, con la loro posizione in graduatoria?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE vendite (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantità INT NOT NULL CHECK (quantità > 0),\n    data_vendita DATE NOT NULL,\n    importo_riga NUMERIC(10,2) CHECK (importo_riga >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it'),\n(3, 'Giovanni', 'Verdi', 'VDRGNN90C15L219X', 'giovanni.verdi@email.it'),\n(4, 'Anna', 'Neri', 'NRINNA92D08M502Y', 'anna.neri@email.it');\n\nINSERT INTO prodotti (id, nome, descrizione, prezzo_unitario) VALUES\n(1, 'Laptop', 'Computer portatile 15 pollici', 899.99),\n(2, 'Mouse Wireless', 'Mouse ottico senza fili', 29.90),\n(3, 'Monitor 27', 'Schermo LED 27 pollici 4K', 349.50),\n(4, 'Tastiera Meccanica', 'Tastiera RGB con switch blu', 120.00);\n\nINSERT INTO vendite (id, cliente_id, prodotto_id, quantità, data_vendita, importo_riga) VALUES\n(1, 1, 1, 1, '2026-01-15', 899.99),\n(2, 2, 2, 3, '2026-01-16', 89.70),\n(3, 1, 3, 2, '2026-01-17', 699.00),\n(4, 3, 4, 1, '2026-01-18', 120.00),\n(5, 4, 1, 1, '2026-01-19', 899.99),\n(6, 2, 3, 1, '2026-01-20', 349.50);",
+    "query": "SELECT c.nome, c.cognome, SUM(v.importo_riga) AS totale_vendite, RANK() OVER (ORDER BY SUM(v.importo_riga) DESC) AS posizione FROM clienti c JOIN vendite v ON c.id = v.cliente_id AND v.data_vendita >= '2026-01-01' GROUP BY c.nome, c.cognome HAVING SUM(v.importo_riga) > 0 ORDER BY totale_vendite DESC LIMIT 3;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "totale_vendite",
+        "posizione"
+      ],
+      "rows": [
+        "[\"Mario\", \"Rossi\", \"1598.99\", 1]",
+        "[\"Anna\", \"Neri\", \"899.99\", 2]",
+        "[\"Laura\", \"Bianchi\", \"439.20\", 3]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

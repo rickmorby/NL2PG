@@ -1,0 +1,40 @@
+{
+  "task_id": "nl2pg-48171f28b37a",
+  "category": "Q06_S14",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "20abc903ca3a6071"
+  },
+  "story": "All'interno del sistema logistico aziendale, l'archivio mittenti custodisce le informazioni anagrafiche di ogni soggetto che avvia una spedizione, annotando per ciascuno il nome completo, l'indirizzo di residenza, la città di origine e il codice di avviamento postale. A valle di questo archivio, il registro spedizioni traccia ogni singolo invio effettuato, registrando la data di partenza, la destinazione finale e lo stato di avanzamento della consegna, che può collocarsi tra le condizioni in_transito, consegnato, in_attesa oppure danneggiato. Completando il quadro informativo, il registro colli dettaglia ogni singolo pacco associato a una spedizione, indicandone il peso in chilogrammi, una breve descrizione del contenuto e lo stato di integrità fisica, che può risultare integro, danneggiato o smarrito. Durante una sessione di revisione operativa, gli analisti hanno isolato i mittenti i cui colli presentano condizioni danneggiate e le cui spedizioni non hanno ancora raggiunto la condizione consegnato, trovandosi pertanto ancora in_transito oppure in_attesa. Per ciascun mittente, le informazioni sono state raggruppate per nome e città, calcolando il numero complessivo di colli problematici e il peso totale ad essi associato, con l'obiettivo di ordinare i risultati in modo decrescente e dare priorità alle segnalazioni più significative.",
+  "question": "Considerando solo i mittenti per cui è registrata una città, elenca quelli i cui colli risultano danneggiati e le cui spedizioni non sono ancora state consegnate, raggruppati per nome e città, indicando per ciascuno il numero totale di problematiche riscontrate e il peso complessivo dei colli coinvolti, ordinando i risultati in ordine decrescente per numero di problematiche.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE mittenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT,\n    citta TEXT,\n    cap TEXT,\n    telefono TEXT\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    mittente_id INT NOT NULL REFERENCES mittenti(id),\n    data_spedizione DATE NOT NULL,\n    destinazione TEXT NOT NULL,\n    stato TEXT CHECK (stato IN ('in_transito', 'consegnato', 'in_attesa', 'danneggiato'))\n);\n\nCREATE TABLE colli (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    peso_kg NUMERIC(8,2) CHECK (peso_kg > 0),\n    descrizione TEXT,\n    stato TEXT CHECK (stato IN ('integro', 'danneggiato', 'smarrito'))\n);",
+    "data_inserts": "INSERT INTO mittenti (id, nome, indirizzo, citta, cap, telefono) VALUES\n(1, 'Mario Rossi', 'Via Roma 1', 'Roma', '00100', '3331234567'),\n(2, 'Laura Bianchi', 'Via Milano 5', 'Milano', '20100', '3339876543'),\n(3, 'Giuseppe Verdi', 'Via Napoli 10', 'Napoli', '80100', '3334567890'),\n(4, 'Anna Neri', 'Via Firenze 3', 'Firenze', '50100', '3330987654');\n\nINSERT INTO spedizioni (id, mittente_id, data_spedizione, destinazione, stato) VALUES\n(101, 1, '2026-01-15', 'Torino', 'consegnato'),\n(102, 2, '2026-01-16', 'Bologna', 'in_transito'),\n(103, 1, '2026-01-17', 'Milano', 'in_attesa'),\n(104, 3, '2026-01-18', 'Roma', 'danneggiato'),\n(105, 4, '2026-01-19', 'Genova', 'consegnato');\n\nINSERT INTO colli (id, spedizione_id, peso_kg, descrizione, stato) VALUES\n(1001, 101, 12.50, 'Documenti urgenti', 'integro'),\n(1002, 102, 5.00, 'Pacco regalo', 'integro'),\n(1003, 103, 25.00, 'Arredamento', 'danneggiato'),\n(1004, 104, 3.50, 'Libri', 'smarrito'),\n(1005, 105, 8.00, 'Componenti elettronici', 'integro');",
+    "query": "SELECT m.nome, m.citta, COUNT(*) AS num_problemi, SUM(c.peso_kg) AS peso_totale FROM mittenti m JOIN spedizioni s ON m.id = s.mittente_id JOIN colli c ON s.id = c.spedizione_id WHERE c.stato = 'danneggiato' AND s.stato != 'consegnato' AND m.citta IS NOT NULL GROUP BY m.nome, m.citta HAVING COUNT(*) > 0 ORDER BY num_problemi DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "citta",
+        "num_problemi",
+        "peso_totale"
+      ],
+      "rows": [
+        "[\"Mario Rossi\", \"Roma\", 1, \"25.00\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

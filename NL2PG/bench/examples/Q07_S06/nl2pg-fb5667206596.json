@@ -1,0 +1,48 @@
+{
+  "task_id": "nl2pg-fb5667206596",
+  "category": "Q07_S06",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "many_to_many",
+    "sql_features": [
+      "join",
+      "multi_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "cc6798bdafea6498"
+  },
+  "story": "La Direzione Operativa gestisce l'intera attività logistica dell'azienda attraverso tre archivi collegati tra loro. Il primo, chiamato clienti, conserva le informazioni anagrafiche di ogni impresa committente: il nome completo dell'azienda, la citta in cui ha sede e i recapiti telefonici per il contatto. Il secondo, denominato veicoli, descrive l'intera flotta aziendale riportando per ciascun mezzo la targa univoca, la tipologia del veicolo e la capacità massima espressa in chilogrammi. Il terzo, noto come trasporti, costituisce il cuore operativo dell'archivio: ogni scheda documenta un singolo movimento di merce, indicando la data di partenza, la data di arrivo prevista qualora la consegna sia stata completata, il peso in chilogrammi della spedizione e il suo stato—che può essere pianificato, in_corso, completato o annullato. Per ricostruire il profilo completo di ciascun movimento, gli operatori riuniscono le informazioni dei tre archivi: a ogni spedizione registrata in trasporti viene associato il committente tramite il collegamento al cliente, consentendo di arricchire la scheda con il nome e la località di residenza dell'impresa. Parallelamente, ciascun trasporto viene collegato al mezzo utilizzato attraverso il riferimento al veicolo, permettendo di estrarre la targa e la tipologia del mezzo assegnato. Una volta riunite tutte le informazioni, la procedura ordina l'intero elenco in base alla data di partenza, dalla più recente alla più antica. Inoltre, per garantire una visione d'insieme immediata, il sistema riporta su ogni voce dell'elenco il conteggio complessivo dei trasporti presenti nell'archivio, indicato come totale_trasporti. Durante la verifica operativa, il responsabile della logistica ha supervisionato l'estrazione di questi dati, accertandosi che i trasferimenti pianificati per il trasporto di merci pesanti fossero correttamente associati ai veicoli idonei e ai clienti corretti. Ha inoltre richiesto di verificare le condizioni di annullamento o completamento di ciascun ordine di trasporto, annotando le osservazioni sul registro centrale.",
+  "question": "Visualizza l'elenco di tutti i trasporti con le informazioni del cliente committente e i dettagli del veicolo assegnato, ordinato dalla data di partenza più recente alla più antica, con il conteggio complessivo dei trasporti riportato su ciascuna voce.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE veicoli (\n    id INT PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    tipo_veicolo TEXT NOT NULL,\n    capacita_kg NUMERIC(10,2) CHECK (capacita_kg > 0)\n);\n\nCREATE TABLE trasporti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    veicolo_id INT NOT NULL REFERENCES veicoli(id),\n    data_partenza DATE NOT NULL,\n    data_arrivo DATE,\n    peso_kg NUMERIC(10,2) CHECK (peso_kg >= 0),\n    stato TEXT CHECK (stato IN ('pianificato', 'in_corso', 'completato', 'annullato'))\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, citta, telefono) VALUES\n(1, 'Mario Rossi', 'Milano', '3331234567'),\n(2, 'Laura Bianchi', 'Roma', '3479876543'),\n(3, 'Giuseppe Verdi', 'Napoli', '3294567890'),\n(4, 'Anna Neri', 'Torino', '3387654321');\n\nINSERT INTO veicoli (id, targa, tipo_veicolo, capacita_kg) VALUES\n(1, 'AB123CD', 'Camion', 15000.00),\n(2, 'EF456GH', 'Furgone', 3000.00),\n(3, 'IJ789KL', 'Camion', 20000.00),\n(4, 'LM012MN', 'Autocisterna', 12000.00);\n\nINSERT INTO trasporti (id, cliente_id, veicolo_id, data_partenza, data_arrivo, peso_kg, stato) VALUES\n(1, 1, 1, '2026-01-15', '2026-01-17', 12000.00, 'completato'),\n(2, 2, 2, '2026-02-01', NULL, 2500.00, 'pianificato'),\n(3, 3, 3, '2026-02-10', '2026-02-12', 18000.00, 'in_corso'),\n(4, 1, 4, '2026-03-05', '2026-03-07', 10000.00, 'completato'),\n(5, 4, 2, '2026-03-15', NULL, 2800.00, 'pianificato');",
+    "query": "SELECT c.nome, c.citta, v.targa, v.tipo_veicolo, t.peso_kg, t.stato, COUNT(*) OVER () AS totale_trasporti FROM clienti c JOIN trasporti t ON c.id = t.cliente_id JOIN veicoli v ON t.veicolo_id = v.id ORDER BY t.data_partenza DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "citta",
+        "targa",
+        "tipo_veicolo",
+        "peso_kg",
+        "stato",
+        "totale_trasporti"
+      ],
+      "rows": [
+        "[\"Anna Neri\", \"Torino\", \"EF456GH\", \"Furgone\", \"2800.00\", \"pianificato\", 5]",
+        "[\"Mario Rossi\", \"Milano\", \"LM012MN\", \"Autocisterna\", \"10000.00\", \"completato\", 5]",
+        "[\"Giuseppe Verdi\", \"Napoli\", \"IJ789KL\", \"Camion\", \"18000.00\", \"in_corso\", 5]",
+        "[\"Laura Bianchi\", \"Roma\", \"EF456GH\", \"Furgone\", \"2500.00\", \"pianificato\", 5]",
+        "[\"Mario Rossi\", \"Milano\", \"AB123CD\", \"Camion\", \"12000.00\", \"completato\", 5]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

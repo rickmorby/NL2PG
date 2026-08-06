@@ -1,0 +1,57 @@
+{
+  "task_id": "nl2pg-12ccefafb6d3",
+  "category": "Q05_S20",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [
+      "rename",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "prodotti",
+        "obsolete_value": "catalogo_prodotti",
+        "description": "La tabella prodotti viene denominata catalogo_prodotti nella prosa aziendale, richiedendo la mappatura inversa per identificare correttamente la tabella nel database."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "totale_vendite",
+        "obsolete_value": "importo_generato",
+        "description": "La colonna totale_vendite viene chiamata importo_generato nella descrizione del compito, obbligando l'utente a riconoscere la corrispondenza semantica tra i due termini."
+      }
+    ],
+    "spec_hash": "0269acd376c93b8f"
+  },
+  "story": "L'Ufficio Commerciale dell'azienda gestisce un sistema informativo articolato in più sezioni dedicate al monitoraggio delle attività di vendita. La prima sezione, denominata clienti, raccoglie le schede anagrafiche complete di ogni acquirente: nome, cognome, codice fiscale, indirizzo di posta elettronica e recapito telefonico. Accanto a questo archivio, esiste una seconda area dedicata ai prodotti — nell'ambito aziendale nota anche come catalogo_prodotti — che elenca ciascun articolo trattato dall'azienda insieme alla descrizione e al prezzo unitario. Le operazioni di vendita vengono registrate nel registro vendite, dove ogni voce riporta il riferimento al cliente tramite cliente_id, il prodotto acquistato tramite prodotto_id, la quantità comprata, il totale_vendite (chiamato internamente importo_generato nella documentazione operativa) e la data di completamento della transazione. Durante l'analisi mensile delle performance commerciali, gli operatori hanno incrociato le informazioni del registro vendite con i dati degli archivi clienti e catalogo_prodotti. L'obiettivo era calcolare, per ciascun cliente, il numero di transazioni effettuate — indicato come numero_transazioni — e la somma complessiva del totale_vendite. In particolare, il periodo iniziale del 2026 ha mostrato operazioni significative: l'acquisto di un Laptop HP ProBook da parte di Mario Rossi il 15 gennaio 2026, la compra di due Monitor Samsung 27 da parte di Laura Bianchi il 16 gennaio 2026, l'acquisto di tre Mouse Logitech MX da parte di Mario Rossi il 17 gennaio 2026 e l'acquisto di una Tastiera Meccanica da parte di Giovanni Verdi il 18 gennaio 2026. Gli operatori hanno raggruppato tutte le voci per ciascun acquirente, calcolando il numero di transazioni e l'importo totale per cliente; i risultati sono stati quindi inseriti in un report mensile destinato alla revisione del direttore commerciale. Parallelamente, il team di logistica ha aggiornato le scorte di magazzino per i prodotti non coinvolti nelle transazioni analizzate, garantendo la disponibilità dei articoli in arrivo.",
+  "question": "Per ciascun cliente, qual è il numero di transazioni effettuate e l'importo totale delle vendite?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome_prodotto TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE vendite (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT CHECK (quantita > 0),\n    totale_vendite NUMERIC(10,2) CHECK (totale_vendite >= 0),\n    data_vendita DATE NOT NULL\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, telefono) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it', '3331234567'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it', '3479876543'),\n(3, 'Giovanni', 'Verdi', 'VRGBNI78C15L219X', 'giovanni.verdi@email.it', '3294567890'),\n(4, 'Anna', 'Neri', 'NRANNI90D22M567Y', 'anna.neri@email.it', '3667890123');\n\nINSERT INTO prodotti (id, nome_prodotto, descrizione, prezzo_unitario) VALUES\n(1, 'Laptop HP ProBook', 'Laptop professionale 15 pollici', 899.99),\n(2, 'Mouse Logitech MX', 'Mouse wireless ergonomico', 49.90),\n(3, 'Monitor Samsung 27', 'Monitor LED 27 pollici 4K', 349.50),\n(4, 'Tastiera Meccanica', 'Tastiera meccanica RGB', 129.00);\n\nINSERT INTO vendite (id, cliente_id, prodotto_id, quantita, totale_vendite, data_vendita) VALUES\n(1, 1, 1, 1, 899.99, '2026-01-15'),\n(2, 2, 3, 2, 699.00, '2026-01-16'),\n(3, 1, 2, 3, 149.70, '2026-01-17'),\n(4, 3, 4, 1, 129.00, '2026-01-18');",
+    "query": "SELECT cliente_id, COUNT(*) AS numero_transazioni, SUM(totale_vendite) AS totale_vendite FROM vendite GROUP BY cliente_id;",
+    "result": {
+      "columns": [
+        "cliente_id",
+        "numero_transazioni",
+        "totale_vendite"
+      ],
+      "rows": [
+        "[3, 1, \"129.00\"]",
+        "[2, 1, \"699.00\"]",
+        "[1, 2, \"1049.69\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

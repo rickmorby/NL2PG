@@ -1,0 +1,55 @@
+{
+  "task_id": "nl2pg-e6e11780d2ce",
+  "category": "Q24_S23",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "many_to_many",
+    "sql_features": [
+      "join",
+      "left_outer_join"
+    ],
+    "twist": [
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "polysemy",
+        "target_value": "movimenti",
+        "obsolete_value": "registrazioni",
+        "description": "La tabella movimenti viene indicata come registrazioni nel testo. Il termine registrazioni è polisemico: in ambito logistico indica i movimenti fisici di merce tra sedi, mentre in ambito contabile si riferisce a transazioni finanziarie, generando ambiguità nell'interpretazione della query."
+      }
+    ],
+    "spec_hash": "fc0def41fe12a333"
+  },
+  "story": "Il Reparto Logistico dell'azienda gestisce un archivio dedicato alle schede operative di ciascuna location, denominato sedi, nel quale vengono annotate la denominazione, l'indirizzo, la città e il codice di avviamento postale di ogni struttura. Accanto a questo, esiste una raccolta chiamata merci che cataloga le descrizioni delle tipologie di materiale trattate, indicandone la categoria di appartenenza e il peso in chilogrammi. Le operazioni quotidiane di spostamento delle merci tra le diverse sedi vengono documentate in un dossier noto anche con il termine registrazioni, poiché il nome tecnico di questo archivio è movimenti: ogni voce riporta il riferimento alla sede interessata, la merce oggetto, la quantita movimentata, la data e l'ora dell'operazione, oltre al tipo_movimento — che può essere ingresso, uscita o trasferimento — e alle note illustrative. Durante un'analisi consolidata, i responsabili hanno incrociato le schede delle sedi con i movimenti per ricostruire il quadro completo dei flussi, associando a ciascuna annotazione il nome della sede di riferimento e la descrizione dettagliata della merce coinvolta. In particolare, le operazioni del mese di gennaio 2026 hanno evidenziato flussi significativi: il giorno 10 un ingresso di Acciaio Inox presso la Sede Centrale di Milano, l'11 un'uscita di Componenti Elettronici dalla Sede Nord di Torino destinata a un cliente, e il 12 un trasferimento di Legno Massello dalla Sede Centrale verso il magazzino interno. Ulteriori accertamenti hanno poi registrato il 13 un ingresso di Prodotti Chimici alla Sede Sud di Napoli, il 14 un'uscita di Acciaio Inox dalla Sede Nord per ordine interno, e infine il 15 un nuovo arrivo di Componenti Elettronici presso la Sede Est di Venezia. Attraverso questa ricostruzione, anche le schede di merce prive di corrispondenza diretta sono state mantenute nel panorama analitico, garantendo una visione completa di ogni voce archiviata.",
+  "question": "Visualizza l'elenco di tutti i movimenti con il nome della sede associata, la descrizione della merce, la quantità e il tipo di movimento, mantenendo anche le voci prive di una corrispondenza nel catalogo delle merci.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE sedi (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT,\n    citta TEXT,\n    cap TEXT\n);\n\nCREATE TABLE merci (\n    id INT PRIMARY KEY,\n    descrizione TEXT NOT NULL,\n    categoria TEXT,\n    peso_kg NUMERIC(10,3) CHECK (peso_kg >= 0)\n);\n\nCREATE TABLE movimenti (\n    id INT PRIMARY KEY,\n    sede_id INT NOT NULL REFERENCES sedi(id),\n    merci_id INT NOT NULL REFERENCES merci(id),\n    quantita NUMERIC(10,3) CHECK (quantita >= 0),\n    data_movimento TIMESTAMP NOT NULL,\n    tipo_movimento TEXT CHECK (tipo_movimento IN ('ingresso', 'uscita', 'trasferimento')),\n    note TEXT\n);",
+    "data_inserts": "INSERT INTO sedi (id, nome, indirizzo, citta, cap) VALUES\n(1, 'Sede Centrale', 'Via Roma 1', 'Milano', '20100'),\n(2, 'Sede Nord', 'Via Torino 45', 'Torino', '10100'),\n(3, 'Sede Sud', 'Via Napoli 10', 'Napoli', '80100'),\n(4, 'Sede Est', 'Via Venezia 22', 'Venezia', '30100');\n\nINSERT INTO merci (id, descrizione, categoria, peso_kg) VALUES\n(1, 'Acciaio Inox', 'Metalli', 150.500),\n(2, 'Componenti Elettronici', 'Elettronica', 25.000),\n(3, 'Legno Massello', 'Materiali da Costruzione', 500.000),\n(4, 'Prodotti Chimici', 'Chimica', 75.250);\n\nINSERT INTO movimenti (id, sede_id, merci_id, quantita, data_movimento, tipo_movimento, note) VALUES\n(1, 1, 1, 100.000, '2026-01-10 08:30:00', 'ingresso', 'Ricezione materiale'),\n(2, 2, 2, 50.000, '2026-01-11 14:00:00', 'uscita', 'Spedizione cliente'),\n(3, 1, 3, 200.000, '2026-01-12 09:15:00', 'trasferimento', 'Trasferimento a magazzino'),\n(4, 3, 4, 30.000, '2026-01-13 11:00:00', 'ingresso', 'Consegna fornitore'),\n(5, 2, 1, 75.500, '2026-01-14 16:45:00', 'uscita', 'Ordine interno'),\n(6, 4, 2, 120.000, '2026-01-15 10:00:00', 'ingresso', 'Nuovo arrivo merci');",
+    "query": "SELECT s.nome AS sede, m.descrizione AS merce, mov.quantita, mov.tipo_movimento FROM movimenti mov JOIN sedi s ON mov.sede_id = s.id LEFT JOIN merci m ON mov.merci_id = m.id;",
+    "result": {
+      "columns": [
+        "sede",
+        "merce",
+        "quantita",
+        "tipo_movimento"
+      ],
+      "rows": [
+        "[\"Sede Centrale\", \"Acciaio Inox\", \"100.000\", \"ingresso\"]",
+        "[\"Sede Nord\", \"Componenti Elettronici\", \"50.000\", \"uscita\"]",
+        "[\"Sede Centrale\", \"Legno Massello\", \"200.000\", \"trasferimento\"]",
+        "[\"Sede Sud\", \"Prodotti Chimici\", \"30.000\", \"ingresso\"]",
+        "[\"Sede Nord\", \"Acciaio Inox\", \"75.500\", \"uscita\"]",
+        "[\"Sede Est\", \"Componenti Elettronici\", \"120.000\", \"ingresso\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

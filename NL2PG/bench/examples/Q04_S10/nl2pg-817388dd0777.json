@@ -1,0 +1,53 @@
+{
+  "task_id": "nl2pg-817388dd0777",
+  "category": "Q04_S10",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [
+      "ambiguity"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "ambiguity",
+        "target_value": "stato",
+        "obsolete_value": "condizione",
+        "description": "Il termine 'condizione' nella prosa aziendale è ambiguo: può riferirsi allo stato del magazzino (tabella magazzini) oppure allo stato della spedizione (tabella spedizioni), entrambe presenti come colonne nelle rispettive tabelle collegate tramite chiave primaria ed esterna."
+      }
+    ],
+    "spec_hash": "b2f754d15d42bce4"
+  },
+  "story": "Nell'ambito della gestione logistica aziendale, l'archivio denominato magazzini conserva le schede delle strutture di stoccaggio dislocate sul territorio nazionale. Ogni scheda riporta la denominazione dell'impianto, il suo indirizzo fisico e la condizione operativa, la quale può assumere i valori attivo, inattivo o in_manutenzione. Ad esempio, l'elemento Magazzino Centrale, con indirizzo Via Roma 1, presenta una condizione pari ad attivo; il Magazzino Nord, situato in Via Milano 10, risulta inattivo; e il Magazzino Sud, in Via Napoli 5, è classificato come in_manutenzione. Parallelamente, il registro intitolato spedizioni annota i movimenti delle merci in transito tra le varie sedi operative. Ciascuna voce in questo registro riporta la descrizione del trasporto, la condizione logistica—che può essere pianificata, in_transito, consegnata o annullata—e la data di avvio della spedizione. Durante l'analisi operativa del 2026, gli uffici hanno incrociato le schede dei magazzini con i registri delle spedizioni per ricostruire il flusso completo delle operazioni. Hanno riscontrato che la spedizione nazionale standard, originata dal Magazzino Centrale, presenta una condizione di pianificata e una data di avvio del 2026-01-15; la spedizione urgente internazionale, sempre dal Magazzino Centrale, è in_transito con data 2026-01-16; la spedizione regionale dal Magazzino Nord è stata consegnata il 2026-01-10; la spedizione prioritaria dal Magazzino Sud è stata annullata il 2026-01-12; infine, la spedizione ordinaria dal Magazzino Est, situato in Via Venezia 20, risulta pianificata per il 2026-01-20. È proprio l'uso del termine condizione a generare una sottile ambiguità nel racconto: esso può riferirsi allo stato operativo di un magazzino (attivo, inattivo o in_manutenzione) oppure allo stato logistico di una spedizione (pianificata, in_transito, consegnata o annullata), rendendo necessaria un'attenta lettura per distinguere a quale contesto ci si riferisce in ciascun passaggio.",
+  "question": "Elenca tutti i magazzini con le spedizioni ad essi associate, mostrando per ciascuna combinazione il nome del magazzino, la descrizione della spedizione, lo stato logistico e la data di avvio.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE magazzini (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT,\n    stato TEXT NOT NULL CHECK (stato IN ('attivo', 'inattivo', 'in_manutenzione'))\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    descrizione TEXT,\n    stato TEXT NOT NULL CHECK (stato IN ('pianificata', 'in_transito', 'consegnata', 'annullata')),\n    data_spedizione DATE\n);",
+    "data_inserts": "INSERT INTO magazzini (id, nome, indirizzo, stato) VALUES\n(1, 'Magazzino Centrale', 'Via Roma 1', 'attivo'),\n(2, 'Magazzino Nord', 'Via Milano 10', 'inattivo'),\n(3, 'Magazzino Sud', 'Via Napoli 5', 'in_manutenzione'),\n(4, 'Magazzino Est', 'Via Venezia 20', 'attivo');\n\nINSERT INTO spedizioni (id, magazzino_id, descrizione, stato, data_spedizione) VALUES\n(101, 1, 'Spedizione nazionale standard', 'pianificata', '2026-01-15'),\n(102, 1, 'Spedizione urgente internazionale', 'in_transito', '2026-01-16'),\n(103, 2, 'Spedizione regionale', 'consegnata', '2026-01-10'),\n(104, 3, 'Spedizione prioritaria', 'annullata', '2026-01-12'),\n(105, 4, 'Spedizione ordinaria', 'pianificata', '2026-01-20');",
+    "query": "SELECT m.nome AS nome_magazzino, s.descrizione, s.stato AS stato_spedizione, s.data_spedizione FROM magazzini m JOIN spedizioni s ON m.id = s.magazzino_id;",
+    "result": {
+      "columns": [
+        "nome_magazzino",
+        "descrizione",
+        "stato_spedizione",
+        "data_spedizione"
+      ],
+      "rows": [
+        "[\"Magazzino Centrale\", \"Spedizione nazionale standard\", \"pianificata\", \"2026-01-15\"]",
+        "[\"Magazzino Centrale\", \"Spedizione urgente internazionale\", \"in_transito\", \"2026-01-16\"]",
+        "[\"Magazzino Nord\", \"Spedizione regionale\", \"consegnata\", \"2026-01-10\"]",
+        "[\"Magazzino Sud\", \"Spedizione prioritaria\", \"annullata\", \"2026-01-12\"]",
+        "[\"Magazzino Est\", \"Spedizione ordinaria\", \"pianificata\", \"2026-01-20\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

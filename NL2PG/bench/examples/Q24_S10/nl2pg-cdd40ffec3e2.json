@@ -1,0 +1,43 @@
+{
+  "task_id": "nl2pg-cdd40ffec3e2",
+  "category": "Q24_S10",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "left_outer_join",
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "69cf2e746d81ee93"
+  },
+  "story": "Presso l'Ufficio Gestione Clienti dell'azienda, l'archivio denominato clienti custodisce le schede anagrafiche di ciascun acquirente, riportando nome, cognome e codice fiscale. Parallelamente, il registro intitolato ordini conserva le schede di ogni acquisto effettuato, annotando la data dell'ordine, lo stato di avanzamento — che può essere confermato, evaso, annullato o in_lavorazione — e l'importo complessivo. Ad ogni ordine possono essere associate multiple voci nel registro righe_ordine, dove sono descritti il prodotto, la quantità e il prezzo unitario di ciascun articolo, con il totale calcolato automaticamente come prodotto tra quantità e prezzo unitario. Durante la revisione semestrale delle vendite, gli operatori hanno proceduto all'incrocio delle schede dell'archivio clienti con il registro ordini e le singole voci di righe_ordine, ricostruendo il quadro completo degli acquisti e delle spese sostenute. In particolare, hanno preso in esame gli ordini datati 2026-01-15, 2026-01-16, 2026-02-01 e 2026-02-10, relativi rispettivamente a Mario Rossi, Laura Bianchi, Giovanni Verdi e Sara Neri. Per ciascun cliente, hanno sommato gli importi presenti nelle voci di righe_ordine, considerando la quantità moltiplicata per il prezzo unitario di ciascun articolo, ottenendo valori come 150.50 per l'ordine di Mario Rossi, 89.00 per quello di Laura Bianchi, 230.00 per Giovanni Verdi e 45.75 per Sara Neri. Successivamente, hanno proceduto alla classifica dei clienti in base al numero complessivo di voci di righe_ordine associate e alla spesa totale sostenuta, disponendo i risultati per importo decrescente e, a parità di spesa, per nome e cognome in ordine alfabetico crescente, limitando l'elenco ai primi 10 posizionamenti. Il risultato di questa analisi ha permesso al Responsabile Commerciale di identificare rapidamente i clienti con il maggiore volume di acquisti e il numero più elevato di voci di righe_ordine, facilitando l'indirizzo delle strategie di fidelizzazione e il monitoraggio periodico degli ordini.",
+  "question": "Quali sono i primi 10 clienti, con il numero di voci di riga ordine e la spesa totale, classificati per spesa decrescente e per nome e cognome in ordine alfabetico crescente?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('confermato', 'evaso', 'annullato', 'in_lavorazione')),\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    descrizione TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    prezzo_totale NUMERIC(10,2) GENERATED ALWAYS AS (quantita * prezzo_unitario) STORED\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, data_registrazione) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it', '2025-06-10'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it', '2025-07-15'),\n(3, 'Giovanni', 'Verdi', 'VRTGNV90C15L219P', 'giovanni.verdi@email.it', '2025-08-20'),\n(4, 'Sara', 'Neri', 'NERSRA88D03M502Q', 'sara.neri@email.it', '2025-09-05');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, stato, importo_totale) VALUES\n(101, 1, '2026-01-15', 'confermato', 150.50),\n(102, 2, '2026-01-16', 'evaso', 89.00),\n(103, 1, '2026-02-01', 'in_lavorazione', 230.00),\n(104, 3, '2026-02-10', 'annullato', 45.75);\n\nINSERT INTO righe_ordine (id, ordine_id, descrizione, quantita, prezzo_unitario) VALUES\n(1, 101, 'Laptop Dell Inspiron 15', 1, 150.50),\n(2, 102, 'Mouse Logitech MX Master', 2, 44.50),\n(3, 103, 'Monitor Samsung 27', 1, 120.00),\n(4, 104, 'Libro Introduzione a Python', 1, 45.75);",
+    "query": "SELECT c.nome, c.cognome, COUNT(r.id) AS num_righe, COALESCE(SUM(r.prezzo_totale), 0) AS spesa_totale FROM clienti c JOIN ordini o ON c.id = o.cliente_id LEFT JOIN righe_ordine r ON o.id = r.ordine_id GROUP BY c.nome, c.cognome ORDER BY spesa_totale DESC, c.nome ASC LIMIT 10;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "num_righe",
+        "spesa_totale"
+      ],
+      "rows": [
+        "[\"Mario\", \"Rossi\", 2, \"270.50\"]",
+        "[\"Laura\", \"Bianchi\", 1, \"89.00\"]",
+        "[\"Giovanni\", \"Verdi\", 1, \"45.75\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "task_id": "nl2pg-e15fd3e8a801",
+  "category": "Q02_S01",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "370286a65d3882ef"
+  },
+  "story": "Presso l'Ufficio Anagrafe Sanitaria dell'azienda ospedaliera, l'archivio denominato pazienti custodisce le schede di ciascun individuo assistito. In ogni scheda sono annotati il nome e il cognome del paziente, il codice fiscale, la data di nascita e il sesso dichiarato. Accanto a queste informazioni personali, vengono registrati anche il numero di visite effettuate, il peso medio corporeo in chilogrammi e l'altezza espressa in centimetri. Durante la consueta riunione mensile di verifica amministrativa, il responsabile dell'archivio ha incaricato gli operatori di esaminare l'intero insieme delle schede contenute nell'archivio pazienti per ricavare due indici fondamentali: il numero complessivo di pazienti registrati e il peso medio corporeo dell'intera popolazione assistita. Gli operatori hanno pertanto proceduto a sfogliare le schede una per una, contando ciascun elemento presente nel registro e sommando i valori riportati nella sezione relativa al peso medio in chilogrammi. Tra i pazienti esaminati figuravano Mario Rossi, nato il primo gennaio del mille novecentottanta, con dodici visite effettuate e un peso medio di settantotto virgola cinquanta chilogrammi; Laura Bianchi, nata il quindici febbraio del mille novecentottantacinque, con cinque visite e un peso medio di sessantadue virgola trenta chilogrammi; Marco Verdi, nato il venti marzo del mille novecentonovanta, con otto visite e un peso medio di ottantacinque chilogrammi; Giulia Neri, nata il dieci aprile del mille novecentonovantacinque, con tre visite e un peso medio di cinquantacinque virgola ottanta chilogrammi; e infine Alessio Romano, nato il cinque maggio del mille novecentottantotto, con dieci visite e un peso medio di settantadue virgola quaranta chilogrammi. Al termine dell'analisi, gli operatori hanno comunicato al responsabile il totale delle schede individuate e la media aritmetica dei pesi corporei, consentendo all'azienda di aggiornare i report gestionali e di pianificare le risorse sanitarie per il periodo successivo.",
+  "question": "Qual è il numero complessivo di pazienti registrati nell'archivio e qual è il peso medio corporeo dell'intera popolazione assistita?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    sesso TEXT CHECK (sesso IN ('M', 'F', 'Altro')),\n    numero_visite INT CHECK (numero_visite >= 0),\n    media_peso_kg NUMERIC(5,2) CHECK (media_peso_kg > 0),\n    altezza_cm NUMERIC(5,2) CHECK (altezza_cm > 0),\n    email TEXT,\n    telefono TEXT,\n    indirizzo TEXT,\n    creato_il TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);",
+    "data_inserts": "INSERT INTO pazienti (nome, cognome, codice_fiscale, data_nascita, sesso, numero_visite, media_peso_kg, altezza_cm, email, telefono, indirizzo) VALUES\n('Mario', 'Rossi', 'RSSMRA80A01H501U', '1980-01-01', 'M', 12, 78.50, 178.00, 'mario.rossi@email.it', '3331234567', 'Via Roma 10, Milano'),\n('Laura', 'Bianchi', 'BNCLRA85B42F205Z', '1985-02-15', 'F', 5, 62.30, 165.50, 'laura.bianchi@email.it', '3339876543', 'Via Milano 25, Roma'),\n('Marco', 'Verdi', 'VRDMRC90C15L234X', '1990-03-20', 'M', 8, 85.00, 180.00, 'marco.verdi@email.it', '3335678901', 'Via Verdi 3, Napoli'),\n('Giulia', 'Neri', 'NRIGLA95D22M345Y', '1995-04-10', 'F', 3, 55.80, 162.00, 'giulia.neri@email.it', '3332345678', 'Via Neri 18, Torino'),\n('Alessio', 'Romano', 'RMLLSN88E05P456Z', '1988-05-05', 'M', 10, 72.40, 175.50, 'alessio.romano@email.it', '3338765432', 'Via Romano 7, Firenze');",
+    "query": "SELECT COUNT(*) AS totale_pazienti, AVG(media_peso_kg) AS peso_medio FROM pazienti;",
+    "result": {
+      "columns": [
+        "totale_pazienti",
+        "peso_medio"
+      ],
+      "rows": [
+        "[5, \"70.8000000000000000\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

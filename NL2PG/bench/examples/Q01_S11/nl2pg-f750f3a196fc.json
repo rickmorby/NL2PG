@@ -1,0 +1,42 @@
+{
+  "task_id": "nl2pg-f750f3a196fc",
+  "category": "Q01_S11",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "971e745c3f78cfba"
+  },
+  "story": "Nel cuore pulsante della divisione commerciale dell'azienda, il team delle Relazioni con la Clientela custodisce un archivio dedicato ai clienti, dove ogni scheda anagrafica riporta il nome, il cognome e i dati di contatto di ciascun acquirente. Accanto a questo archivio, esiste un secondo registro — quello degli ordini — che raccoglie tutte le transazioni effettuate, annotando per ciascuna la data di sottoscrizione e lo stato di avanzamento, che può variare tra pending, confermato, spedito, concluso o annullato. Completando il quadro, una terza sezione, chiamata righe_ordine, scompone ogni ordine nei singoli prodotti acquistati, indicandone la descrizione, la quantità e il prezzo unitario. Durante l'ultima riunione di revisione, il responsabile commerciale ha chiesto al team di produrre un quadro chiaro delle relazioni tra gli acquirenti e i loro acquisti. L'obiettivo era capire, per ciascun cliente, quanti ordini aveva complessivamente effettuato e quale fosse l'importo totale da lui speso, includendo anche chi non aveva ancora completato alcun ordine. Per raggiungere questo scopo, il team ha messo in relazione le schede dell'archivio clienti con le voci presenti nel registro degli ordini, aggregando i dati e calcolando per ogni acquirente il numero di ordini e la somma dei relativi importi. I risultati sono stati poi disposti in ordine decrescente in base all'importo totale speso, così da consentire alla direzione di identificare rapidamente i clienti più attivi. Nel corso dell'analisi, è emerso che alcuni ordini risultavano ancora in attesa di conferma, altri erano stati regolarmente evasi o annullati, e che il sistema aveva correttamente incluso anche i clienti privi di ordinazioni, garantendo una visione completa e priva di omissioni.",
+  "question": "Per ciascun cliente, quali sono il nome, il cognome, il numero di ordini effettuati e l'importo totale speso, inclusi anche quelli che non hanno ancora effettuato alcun ordine, elencati in ordine decrescente in base all'importo totale speso?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT CHECK (stato IN ('pending', 'confermato', 'spedito', 'concluso', 'annullato')),\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    descrizione_produtto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0),\n    subtotale NUMERIC(10,2) CHECK (subtotale >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, telefono, data_registrazione) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it', '3331234567', '2025-03-10'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it', '3339876543', '2025-04-22'),\n(3, 'Giovanni', 'Verdi', 'VRGBNI78C15L219M', 'giovanni.verdi@email.it', '3471112222', '2025-05-01'),\n(4, 'Anna', 'Neri', 'NRINNA90D08M502N', 'anna.neri@email.it', '3384445555', '2025-06-15'),\n(5, 'Marco', 'Gialli', 'GLLMRC82E22H703P', 'marco.gialli@email.it', '3206667777', '2025-07-20');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, stato, importo_totale) VALUES\n(101, 1, '2026-01-15', 'confermato', 150.50),\n(102, 2, '2026-01-16', 'spedito', 89.00),\n(103, 3, '2026-01-17', 'pending', 230.75),\n(104, 1, '2026-01-18', 'concluso', 45.00),\n(105, 4, '2026-01-19', 'annullato', 0.00);\n\nINSERT INTO righe_ordine (id, ordine_id, descrizione_produtto, quantita, prezzo_unitario, subtotale) VALUES\n(1001, 101, 'Laptop Dell Inspiron 15', 1, 120.00, 120.00),\n(1002, 101, 'Mouse Logitech MX', 2, 15.25, 30.50),\n(1003, 102, 'Tastiera Meccanica RGB', 1, 89.00, 89.00),\n(1004, 103, 'Monitor Samsung 27 pollici', 1, 200.00, 200.00),\n(1005, 103, 'Hub USB-C 7-in-1', 1, 30.75, 30.75),\n(1006, 104, 'Cavo USB-C 2m', 3, 15.00, 45.00);",
+    "query": "SELECT c.nome, c.cognome, COUNT(o.id) AS num_ordini, COALESCE(SUM(o.importo_totale), 0) AS totale_speso FROM clienti c LEFT JOIN ordini o ON c.id = o.cliente_id GROUP BY c.nome, c.cognome ORDER BY totale_speso DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "num_ordini",
+        "totale_speso"
+      ],
+      "rows": [
+        "[\"Giovanni\", \"Verdi\", 1, \"230.75\"]",
+        "[\"Mario\", \"Rossi\", 2, \"195.50\"]",
+        "[\"Laura\", \"Bianchi\", 1, \"89.00\"]",
+        "[\"Marco\", \"Gialli\", 0, \"0\"]",
+        "[\"Anna\", \"Neri\", 1, \"0.00\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

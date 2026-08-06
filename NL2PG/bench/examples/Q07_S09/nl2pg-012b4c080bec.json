@@ -1,0 +1,70 @@
+{
+  "task_id": "nl2pg-012b4c080bec",
+  "category": "Q07_S09",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "associative_entity",
+    "sql_features": [
+      "join",
+      "multi_join"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_acquirenti",
+        "description": "La tabella clienti viene rinominata in anagrafica_acquirenti nella prosa aziendale, obbligando l'agente a riconoscere il mapping tra il nome originale e la perifrasi utilizzata."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "prodotti",
+        "obsolete_value": "articoli_in_catalogo",
+        "description": "La tabella prodotti viene indicata con il sinonimo articoli_in_catalogo nel testo della query, richiedendo la risoluzione del sinonimo per identificare correttamente l'entità target."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "ordini",
+        "obsolete_value": "movimentazione_transazionale",
+        "description": "La tabella ordini viene riferita con il termine gergale aziendale movimentazione_transazionale, richiedendo la decodifica del jargon per collegare correttamente la tabella associativa alle entità principali."
+      }
+    ],
+    "spec_hash": "25ffafddd524ce5b"
+  },
+  "story": "Presso la gestione commerciale aziendale, l'archivio anagrafico denominato anagrafica_acquirenti custodisce le schede complete di ogni cliente, ciascuno identificato in modo univoco dal proprio codice fiscale, con riportati nome, cognome, recapiti telefonici, indirizzo e indirizzo di posta elettronica. Contemporaneamente, il catalogo interno denominato articoli_in_catalogo conserva la descrizione dettagliata, il prezzo unitario e la classificazione merceologica di ciascun prodotto offerto dall'azienda. La movimentazione_transazionale costituisce il diario operativo centrale in cui vengono annotate sistematicamente tutte le transazioni di acquisto, associando a ciascuna voce l'identificativo dell'acquirente tratto dall'anagrafica_acquirenti, il prodotto selezionato negli articoli_in_catalogo, la quantita ordinata, la data_ordine con il momento temporale dell'operazione e lo stato di avanzamento della richiesta. Durante l'ultima verifica operativa, gli analisti hanno ricostruito l'elenco completo delle transazioni incrociando le schede presenti nell'anagrafica_acquirenti con le voci archiviate negli articoli_in_catalogo, utilizzando la movimentazione_transazionale come collegamento centrale tra i due archivi. Tra le operazioni esaminate figurano l'acquisto del 15 gennaio 2026 relativo a Mario Rossi, con stato evaso, l'elaborazione del 16 gennaio 2026 della sigla Bianchi Laura, ancora in stato pending, e l'ordine del 17 gennaio 2026 dello stesso Rossi relativo a un singolo articolo. Si segnala inoltre la richiesta del 18 gennaio 2026 dell'acquirente Verdi Giuseppe, risultante annullato, e infine la transazione del 19 gennaio 2026 della sigla Neri Anna, anch'essa in attesa di evasione. I prodotti coinvolti includono il Laptop Dell XPS, il Mouse Logitech, la Tastiera Meccanica e il Monitor Samsung 27, ciascuno riconducibile alla propria scheda negli articoli_in_catalogo attraverso il nome_prodotto corrispondente. L'intera ricostruzione è stata ordinata per data_ordine in ordine decrescente, garantendo una visione aggiornata dello stato della movimentazione_transazionale per ciascun acquirente presente nell'anagrafica_acquirenti.",
+  "question": "Mostra l'elenco completo di tutti gli ordini effettuati, includendo per ciascuno il nome e cognome del cliente, il nome del prodotto acquistato, la quantità ordinata, la data dell'ordine e lo stato di avanzamento, disposti dall'ordine più recente al più vecchio.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT,\n    telefono TEXT,\n    indirizzo TEXT\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome_prodotto TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    categoria TEXT\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato TEXT CHECK (stato IN ('pending', 'evaso', 'annullato'))\n);",
+    "data_inserts": "INSERT INTO clienti (id, codice_fiscale, nome, cognome, email, telefono, indirizzo) VALUES\n(1, 'RSSMRA80A01H501U', 'Mario', 'Rossi', 'mario.rossi@email.com', '3331234567', 'Via Roma 1, Milano'),\n(2, 'BNCLRA85B42F205Z', 'Laura', 'Bianchi', 'laura.bianchi@email.com', '3339876543', 'Via Milano 10, Roma'),\n(3, 'VRNCLS92C15L219M', 'Giuseppe', 'Verdi', 'g.verdi@email.com', '3471112222', 'Piazza Navona 5, Roma'),\n(4, 'CRNMMR78D20M502T', 'Anna', 'Neri', 'anna.neri@email.com', '3294445555', 'Corso Vittorio 20, Torino');\n\nINSERT INTO prodotti (id, nome_prodotto, descrizione, prezzo_unitario, categoria) VALUES\n(1, 'Laptop Dell XPS', 'Laptop 15 pollici, 16GB RAM, 512GB SSD', 1299.99, 'Elettronica'),\n(2, 'Mouse Logitech', 'Mouse wireless ergonomic', 29.99, 'Elettronica'),\n(3, 'Tastiera Meccanica', 'Tastiera RGB meccanica Cherry MX', 89.50, 'Elettronica'),\n(4, 'Monitor Samsung 27', 'Monitor LED 27 pollici 4K', 349.00, 'Elettronica');\n\nINSERT INTO ordini (id, cliente_id, prodotto_id, quantita, data_ordine, stato) VALUES\n(1, 1, 1, 1, '2026-01-15 10:30:00', 'evaso'),\n(2, 2, 2, 3, '2026-01-16 14:00:00', 'pending'),\n(3, 1, 3, 1, '2026-01-17 09:15:00', 'evaso'),\n(4, 3, 4, 2, '2026-01-18 16:45:00', 'annullato'),\n(5, 4, 1, 1, '2026-01-19 11:00:00', 'pending');",
+    "query": "SELECT c.nome, c.cognome, p.nome_prodotto, o.quantita, o.data_ordine, o.stato FROM clienti c JOIN ordini o ON c.id = o.cliente_id JOIN prodotti p ON o.prodotto_id = p.id ORDER BY o.data_ordine DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "nome_prodotto",
+        "quantita",
+        "data_ordine",
+        "stato"
+      ],
+      "rows": [
+        "[\"Anna\", \"Neri\", \"Laptop Dell XPS\", 1, \"2026-01-19 11:00:00\", \"pending\"]",
+        "[\"Giuseppe\", \"Verdi\", \"Monitor Samsung 27\", 2, \"2026-01-18 16:45:00\", \"annullato\"]",
+        "[\"Mario\", \"Rossi\", \"Tastiera Meccanica\", 1, \"2026-01-17 09:15:00\", \"evaso\"]",
+        "[\"Laura\", \"Bianchi\", \"Mouse Logitech\", 3, \"2026-01-16 14:00:00\", \"pending\"]",
+        "[\"Mario\", \"Rossi\", \"Laptop Dell XPS\", 1, \"2026-01-15 10:30:00\", \"evaso\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

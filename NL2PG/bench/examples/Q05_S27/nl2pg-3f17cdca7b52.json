@@ -1,0 +1,60 @@
+{
+  "task_id": "nl2pg-3f17cdca7b52",
+  "category": "Q05_S27",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "rep_vendite",
+        "obsolete_value": "anagrafica_venditori",
+        "description": "La tabella rep_vendite viene indicata nel testo del problema come anagrafica_venditori, rendendo meno evidente il suo ruolo di tabella referenziata e il collegamento implicito con la tabella vendite."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo",
+        "obsolete_value": "valore_transaction",
+        "description": "La colonna importo nella tabella vendite viene chiamata valore_transaction nella descrizione del problema, creando ambiguità semantica e costringendo il modello a mappare correttamente il sinonimo alla colonna reale."
+      }
+    ],
+    "spec_hash": "b8910864dcb51bee"
+  },
+  "story": "Presso l'Ufficio Commerciale dell'azienda, il dossier del personale incaricato delle vendite — noto internamente come anagrafica_venditori — conserva le informazioni anagrafiche di ciascun rappresentante, includendo nome, cognome e data di inizio attività. Questo archivio, tecnicamente denominato rep_vendite nei sistemi aziendali, funge da base di riferimento per l'identità di ogni agente commerciale. Accanto a questo, il registro delle vendite — denominato vendite nell'architettura informativa — annota ogni singola transazione commerciale completata, registrando per ciascuna l'importo corrispondente al valore_transaction incassato, la data di chiusura dell'operazione e il prodotto oggetto della vendita.\n\nIn vista della revisione semestrale delle performance, i responsabili hanno deciso di ricostruire il quadro completo dell'attività commerciale relativa al periodo compreso tra il 10 gennaio 2026 e il 20 gennaio 2026. Durante questa fase, sono state prese in esame diverse operazioni significative: una vendita di Laptop HP per un valore_transaction di 2500.00 euro, un Monitor Dell a 1800.50 euro, una Workstation Lenovo a 3200.75 euro, un Televisore Samsung a 950.00 euro, un Server Dell a 4200.00 euro e infine un Tablet Apple a 1500.00 euro.\n\nPer ottenere una visione chiara dei contributi individuali, gli analisti hanno incrociato le schede presenti nell'archivio anagrafica_venditori con le transazioni registrate nel registro vendite, associando ciascuna operazione al rappresentante che l'ha condotta a termine. Successivamente, hanno raggruppato i dati per ciascun agente, calcolando il numero totale di vendite effettuate e la somma complessiva dell'importo. I risultati sono stati infine disposti in ordine decrescente in base all'ammontare totale, consentendo alla direzione commerciale di individuare con precisione i migliori performer del periodo e di orientare di conseguenza le decisioni strategiche.",
+  "question": "Classifica i rappresentanti di vendita in base al totale delle vendite effettuate, dal più alto al più basso, indicando per ciascuno il numero di vendite concluse e l'importo complessivo delle stesse.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE rep_vendite (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_assunzione DATE,\n    commissione_percentuale NUMERIC(5,2) CHECK (commissione_percentuale BETWEEN 0 AND 100)\n);\n\nCREATE TABLE vendite (\n    id INT PRIMARY KEY,\n    rep_vendite_id INT NOT NULL REFERENCES rep_vendite(id),\n    importo NUMERIC(10,2) CHECK (importo >= 0),\n    data_vendita DATE NOT NULL,\n    prodotto TEXT\n);",
+    "data_inserts": "INSERT INTO rep_vendite (id, nome, cognome, data_assunzione, commissione_percentuale) VALUES\n(1, 'Marco', 'Rossi', '2018-03-15', 5.50),\n(2, 'Giulia', 'Verdi', '2019-07-22', 7.25),\n(3, 'Luca', 'Bianchi', '2020-01-10', 4.00),\n(4, 'Sara', 'Neri', '2021-05-01', 6.80),\n(5, 'Paolo', 'Colombo', '2017-11-20', 8.10);\n\nINSERT INTO vendite (id, rep_vendite_id, importo, data_vendita, prodotto) VALUES\n(101, 1, 2500.00, '2026-01-10', 'Laptop HP'),\n(102, 2, 1800.50, '2026-01-12', 'Monitor Dell'),\n(103, 1, 3200.75, '2026-01-14', 'Workstation Lenovo'),\n(104, 3, 950.00, '2026-01-15', 'Televisore Samsung'),\n(105, 4, 4200.00, '2026-01-18', 'Server Dell'),\n(106, 5, 1500.00, '2026-01-20', 'Tablet Apple');",
+    "query": "SELECT r.nome, r.cognome, COUNT(v.id) AS numero_vendite, SUM(v.importo) AS totale_vendite FROM rep_vendite r JOIN vendite v ON r.id = v.rep_vendite_id GROUP BY r.nome, r.cognome ORDER BY totale_vendite DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "numero_vendite",
+        "totale_vendite"
+      ],
+      "rows": [
+        "[\"Marco\", \"Rossi\", 2, \"5700.75\"]",
+        "[\"Sara\", \"Neri\", 1, \"4200.00\"]",
+        "[\"Giulia\", \"Verdi\", 1, \"1800.50\"]",
+        "[\"Paolo\", \"Colombo\", 1, \"1500.00\"]",
+        "[\"Luca\", \"Bianchi\", 1, \"950.00\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

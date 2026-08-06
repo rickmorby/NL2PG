@@ -1,0 +1,42 @@
+{
+  "task_id": "nl2pg-a7f72512f70d",
+  "category": "Q05_S14",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "48883d833f12d4c0"
+  },
+  "story": "Nell'ambito della gestione commerciale aziendale, l'archivio anagrafico denominato clienti conserva le schede identificative di tutti gli affiliati attivi. Ogni scheda riporta il nome, il cognome e il codice fiscale della persona fisica, insieme alla data di inizio della collaborazione commerciale. Tra i soggetti registrati figurano Mario Rossi, identificato con il numero 1, il cui rapporto è stato avviato il 2025-03-10; Laura Bianchi, con il numero 2 e data di avvio 2025-04-15; Giovanni Verdi, con il numero 3 e data 2025-05-20; Anna Neri, con il numero 4 e data 2025-06-01; e Marco Esposito, con il numero 5 e data 2025-07-12. Accanto a questo archivio, il registro dedicato agli ordini traccia le richieste di acquisto formulate dai clienti nel corso del tempo. Ciascuna voce di questo registro è collegata alla scheda anagrafica del committente attraverso il riferimento all'identificativo univoco del cliente stesso. Gli ordini presenti nel sistema comprendono il numero 101, datato 2026-01-15, associato al cliente 1 e con stato confermato; il numero 102, datato 2026-01-16, riferito al cliente 2 e con stato spedito; il numero 103, datato 2026-01-17, collegato al cliente 3 e con stato pending; il numero 104, datato 2026-01-18, riferito al cliente 1 e con stato consegnato; e infine il numero 105, datato 2026-01-19, associato al cliente 4 e con stato annullato. All'interno della struttura denominata righe_ordine vengono annotati i dettagli di ciascuna richiesta di acquisto. Questa struttura collega le singole voci all'ordine di riferimento mediante il riferimento all'identificativo dell'ordine stesso. Per l'ordine 101, l'elemento descrive un Laptop Dell XPS con quantità pari a 1 e un valore unitario di 1299.99. Per l'ordine 102, la voce indica un Mouse Logitech MX con quantità 2 e prezzo unitario 49.99. Per l'ordine 103, il dettaglio riporta un Monitor Samsung 27 con quantità 1 e prezzo unitario 349.50. Per l'ordine 104, la voce indica una Tastiera meccanica con quantità 1 e prezzo unitario 129.00. Per l'ordine 105, l'elemento descrive delle Cuffie Sony WH-1000XM5 con quantità 1 e valore unitario di 299.99. Durante un'analisi operativa mirata a determinare il totale speso da ciascun cliente, raggruppando i risultati per nome e cognome, gli operatori hanno proceduto alla somma del prodotto tra la quantità e il prezzo unitario di tutte le voci associate a ciascun soggetto. Pertanto, Mario Rossi, il cui nome compare nell'archivio clienti con il numero 1, ha un totale speso che deriva dalla somma dei contributi relativi all'ordine 101 e all'ordine 104, mentre gli altri clienti — Laura Bianchi, Giovanni Verdi, Anna Neri e Marco Esposito — hanno ciascuno un unico ordine corrispondente, con importi calcolati nello stesso modo raggruppando per nome e cognome.",
+  "question": "Qual è l'importo totale speso da ciascun cliente, raggruppando i risultati per nome e cognome, sommando il prodotto tra la quantità e il prezzo unitario di tutti gli elementi degli ordini associati?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('pending', 'confermato', 'spedito', 'consegnato', 'annullato'))\n);\n\nCREATE TABLE righe_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    descrizione TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, data_registrazione) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it', '2025-03-10'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it', '2025-04-15'),\n(3, 'Giovanni', 'Verdi', 'VRDIGIO72C15L219M', 'giovanni.verdi@email.it', '2025-05-20'),\n(4, 'Anna', 'Neri', 'NERIANN90D22H501N', 'anna.neri@email.it', '2025-06-01'),\n(5, 'Marco', 'Esposito', 'ESPMAR88E03H501T', 'marco.esposito@email.it', '2025-07-12');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, stato) VALUES\n(101, 1, '2026-01-15', 'confermato'),\n(102, 2, '2026-01-16', 'spedito'),\n(103, 3, '2026-01-17', 'pending'),\n(104, 1, '2026-01-18', 'consegnato'),\n(105, 4, '2026-01-19', 'annullato');\n\nINSERT INTO righe_ordine (id, ordine_id, descrizione, quantita, prezzo_unitario) VALUES\n(1, 101, 'Laptop Dell XPS', 1, 1299.99),\n(2, 102, 'Mouse Logitech MX', 2, 49.99),\n(3, 103, 'Monitor Samsung 27', 1, 349.50),\n(4, 104, 'Tastiera meccanica', 1, 129.00),\n(5, 105, 'Cuffie Sony WH-1000XM5', 1, 299.99);",
+    "query": "SELECT c.nome, c.cognome, SUM(r.quantita * r.prezzo_unitario) AS totale_speso FROM clienti c JOIN ordini o ON c.id = o.cliente_id JOIN righe_ordine r ON o.id = r.ordine_id GROUP BY c.nome, c.cognome;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "totale_speso"
+      ],
+      "rows": [
+        "[\"Giovanni\", \"Verdi\", \"349.50\"]",
+        "[\"Laura\", \"Bianchi\", \"99.98\"]",
+        "[\"Mario\", \"Rossi\", \"1428.99\"]",
+        "[\"Anna\", \"Neri\", \"299.99\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

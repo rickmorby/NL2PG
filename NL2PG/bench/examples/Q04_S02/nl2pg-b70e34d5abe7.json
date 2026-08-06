@@ -1,0 +1,46 @@
+{
+  "task_id": "nl2pg-b70e34d5abe7",
+  "category": "Q04_S02",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "c55f14bac3f200a7"
+  },
+  "story": "L'Ufficio Relazioni con la Clientela dell'azienda gestisce due fondamentali strumenti operativi per il monitoraggio delle attività commerciali. Il primo è l'archivio denominato clienti, dove vengono conservate le schede anagrafiche di ciascun soggetto registrato: in ogni scheda sono annotati il nome, il cognome, il codice fiscale, l'indirizzo elettronico e il numero di telefono del cliente, insieme alla data in cui ha completato la registrazione. Il secondo è il registro intitolato ordini, che raccoglie tutte le transazioni commerciali effettuate nel corso del tempo, indicando per ciascuna il riferimento al cliente interessato, la data dell'ordine, l'importo totale e lo stato della pratica. Durante una revisione periodica delle operazioni commerciali, gli operatori hanno proceduto a mettere in relazione le schede dell'archivio clienti con le voci del registro ordini, associando ciascun ordine al profilo del cliente a cui appartiene. Per farlo, hanno incrociato i dati verificando che l'identificativo del cliente presente in ciascuna transazione corrispondesse a quello riportato nell'apposita anagrafica, ricostruendo così un quadro completo delle attività commerciali. Tra le operazioni analizzate figurano l'ordine 101 del 2026-01-15, relativo al cliente con identificativo 1, per un importo di 150.50 e stato completato; l'ordine 102 del 2026-01-16, intestato al cliente 2, per 89.00 e stato pending; l'ordine 103 del 2026-02-01, sempre del cliente 1, per 200.00 e stato annullato; l'ordine 104 del 2026-02-10, riferito al cliente 3, per 45.75 e stato completato; l'ordine 105 del 2026-03-05, associato al cliente 4, per 320.00 e stato completato; infine l'ordine 106 del 2026-03-12, riconducibile al cliente 2, per 67.30 e stato pending. Gli operatori hanno così verificato la consistenza delle informazioni, assicurandosi che ogni transazione fosse correttamente riconducibile al soggetto interessato e che le condizioni contrattuali fossero state rispettate in ciascun caso.",
+  "question": "Elenca tutti i clienti insieme ai dettagli dei loro ordini, includendo nome, cognome, identificativo dell'ordine, importo totale e stato della pratica.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0),\n    stato TEXT NOT NULL CHECK (stato IN ('pending', 'completato', 'annullato'))\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, telefono, data_registrazione) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.com', '3331234567', '2024-03-10'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.com', '3479876543', '2024-06-22'),\n(3, 'Giuseppe', 'Verdi', 'VRDGSG78C15L219P', 'giuseppe.verdi@email.com', '3294567890', '2025-01-05'),\n(4, 'Anna', 'Neri', 'NNRANA92D08M502R', 'anna.neri@email.com', '3661112233', '2025-09-14');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, importo_totale, stato) VALUES\n(101, 1, '2026-01-15', 150.50, 'completato'),\n(102, 2, '2026-01-16', 89.00, 'pending'),\n(103, 1, '2026-02-01', 200.00, 'annullato'),\n(104, 3, '2026-02-10', 45.75, 'completato'),\n(105, 4, '2026-03-05', 320.00, 'completato'),\n(106, 2, '2026-03-12', 67.30, 'pending');",
+    "query": "SELECT c.nome, c.cognome, o.id AS ordine_id, o.importo_totale, o.stato FROM clienti c JOIN ordini o ON c.id = o.cliente_id;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "ordine_id",
+        "importo_totale",
+        "stato"
+      ],
+      "rows": [
+        "[\"Mario\", \"Rossi\", 101, \"150.50\", \"completato\"]",
+        "[\"Laura\", \"Bianchi\", 102, \"89.00\", \"pending\"]",
+        "[\"Mario\", \"Rossi\", 103, \"200.00\", \"annullato\"]",
+        "[\"Giuseppe\", \"Verdi\", 104, \"45.75\", \"completato\"]",
+        "[\"Anna\", \"Neri\", 105, \"320.00\", \"completato\"]",
+        "[\"Laura\", \"Bianchi\", 106, \"67.30\", \"pending\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

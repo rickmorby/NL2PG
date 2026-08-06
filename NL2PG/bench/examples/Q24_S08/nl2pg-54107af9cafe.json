@@ -1,0 +1,45 @@
+{
+  "task_id": "nl2pg-54107af9cafe",
+  "category": "Q24_S08",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "join",
+      "left_outer_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "a81bd487627220a5"
+  },
+  "story": "Presso l'Ufficio Anagrafe Sanitaria, l'archivio denominato pazienti raccoglie le schede dei cittadini assistiti, riportando per ciascun elemento il nome, il cognome e il codice fiscale. Parallelamente, il registro intitolato cartelle_cliniche conserva le schede cliniche, annotando la diagnosi e il dato corrispondente a data_ultima_visita. Durante l'analisi annuale degli archivi, gli operatori hanno estratto un elenco completo di tutti i pazienti, accorpando le informazioni diagnostiche presenti nel registro cartelle_cliniche attraverso un confronto basato sull'identificativo univoco di ciascun paziente. Nel corso di questa operazione, è emerso che Mario Rossi presenta una diagnosi di Ipertensione con data dell'ultima visita il 2026-01-10 e allergia alla Penicillina. Laura Bianchi risulta affetta da Diabete di tipo 2, con data dell'ultima visita il 2026-02-20 e nessuna allergia. Giovanni Verdi soffre di Asma, data dell'ultima visita il 2026-03-05, allergia al Pollen. Sara Neri ha una diagnosi di Migraine cronica, data dell'ultima visita il 2026-01-25, allergia all'Aspirina. Luca Blu ha Gastroenterite, data dell'ultima visita il 2026-04-12, nessuna allergia. Particolare attenzione è stata posta nel garantire che il confronto tra gli archivi comprendesse anche i pazienti privi di cartella clinica, assicurando così una visione completa del percorso sanitario.",
+  "question": "Elenco di tutti i pazienti assistiti con il nome, il cognome, la diagnosi e la data dell'ultima visita, comprendendo anche chi non ha ancora una cartella clinica compilata.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    genere TEXT CHECK (genere IN ('M', 'F', 'O'))\n);\n\nCREATE TABLE cartelle_cliniche (\n    id SERIAL PRIMARY KEY,\n    paziente_id INT NOT NULL UNIQUE REFERENCES pazienti(id),\n    diagnosi TEXT,\n    data_ultima_visita DATE,\n    allergie TEXT,\n    note_mediche TEXT\n);",
+    "data_inserts": "INSERT INTO pazienti (id, nome, cognome, codice_fiscale, data_nascita, genere) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', '1980-01-01', 'M'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', '1985-02-15', 'F'),\n(3, 'Giovanni', 'Verdi', 'VRDGNV92C10L219X', '1992-03-10', 'M'),\n(4, 'Sara', 'Neri', 'NRISRA90D25M501N', '1990-04-25', 'F'),\n(5, 'Luca', 'Blu', 'BLULCA88E03A123B', '1988-05-03', 'M');\n\nINSERT INTO cartelle_cliniche (id, paziente_id, diagnosi, data_ultima_visita, allergie, note_mediche) VALUES\n(1, 1, 'Ipertensione', '2026-01-10', 'Penicillina', 'Monitorare pressione mensilmente'),\n(2, 2, 'Diabete di tipo 2', '2026-02-20', 'Nessuna', 'Dieta ipocalorica prescritta'),\n(3, 3, 'Asma', '2026-03-05', 'Pollen', 'Inhalatore necessario'),\n(4, 4, 'Migraine cronica', '2026-01-25', 'Aspirina', 'Evitare FANS'),\n(5, 5, 'Gastroenterite', '2026-04-12', 'Nessuna', 'Terapia idratante');",
+    "query": "SELECT p.nome, p.cognome, c.diagnosi, c.data_ultima_visita FROM pazienti p LEFT JOIN cartelle_cliniche c ON p.id = c.paziente_id;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "diagnosi",
+        "data_ultima_visita"
+      ],
+      "rows": [
+        "[\"Mario\", \"Rossi\", \"Ipertensione\", \"2026-01-10\"]",
+        "[\"Laura\", \"Bianchi\", \"Diabete di tipo 2\", \"2026-02-20\"]",
+        "[\"Giovanni\", \"Verdi\", \"Asma\", \"2026-03-05\"]",
+        "[\"Sara\", \"Neri\", \"Migraine cronica\", \"2026-01-25\"]",
+        "[\"Luca\", \"Blu\", \"Gastroenterite\", \"2026-04-12\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

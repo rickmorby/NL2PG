@@ -1,0 +1,45 @@
+{
+  "task_id": "nl2pg-d2174b29ad81",
+  "category": "Q25_S08",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "fa8a830951529196"
+  },
+  "story": "Nel cuore del Reparto Logistica aziendale, l'archivio chiamato spedizioni conserva ogni scheda relativa alle operazioni di trasporto gestite dall'azienda, annotando con cura il numero_tracking assegnato a ciascuna spedizione, lo stato di avanzamento — che può essere pianificato, in transito, consegnato o annullato —, la data di partenza, la data di arrivo prevista e il peso_totale del carico trasportato. Parallelamente, il registro denominato documenti_trasporto raccoglie le informazioni fondamentali dei documenti che accompagnano ogni spedizione, riportando il tipo_documento, il numero_documento, la data di emissione e un indicatore booleano che segnala se la pratica sia stata consegnata oppure no. Poiché ogni spedizione corrisponde esattamente a un unico documento di trasporto e viceversa, i due archivi sono legati da una relazione diretta e univoca. Durante una consueta operazione di verifica, gli operatori hanno proceduto all'accoppiamento delle schede tra l'archivio spedizioni e il registro documenti_trasporto, unendo ogni spedizione con il proprio documento di trasporto corrispondente, e hanno organizzato il risultato in ordine crescente secondo l'identificativo della spedizione. In questo modo, è stato possibile ottenere un elenco completo di tutte le spedizioni con i rispettivi documenti di trasporto, verificando per ciascuna voce se il documento fosse stato regolarmente consegnato.",
+  "question": "Mostra l'elenco completo di tutte le spedizioni con i documenti di trasporto associati, indicando per ciascuna il numero di tracking, lo stato, il peso totale, il tipo e il numero del documento, e se il documento è stato consegnato, ordinando i risultati per identificativo della spedizione.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    numero_tracking TEXT NOT NULL UNIQUE,\n    stato TEXT NOT NULL CHECK (stato IN ('pianificato', 'in_transito', 'consegnato', 'annullato')),\n    data_partenza DATE,\n    data_arrivo_prevista DATE,\n    peso_totale NUMERIC(10,2) CHECK (peso_totale >= 0)\n);\n\nCREATE TABLE documenti_trasporto (\n    id INT PRIMARY KEY REFERENCES spedizioni(id),\n    tipo_documento TEXT NOT NULL,\n    numero_documento TEXT NOT NULL,\n    data_emissione DATE NOT NULL,\n    consegnato BOOLEAN DEFAULT FALSE\n);",
+    "data_inserts": "INSERT INTO spedizioni (id, numero_tracking, stato, data_partenza, data_arrivo_prevista, peso_totale) VALUES\n(1, 'SPED20260001', 'consegnato', '2026-01-10', '2026-01-15', 125.50),\n(2, 'SPED20260002', 'in_transito', '2026-02-01', '2026-02-10', 340.00),\n(3, 'SPED20260003', 'pianificato', '2026-03-05', '2026-03-12', 89.75),\n(4, 'SPED20260004', 'annullato', '2026-01-20', '2026-01-25', 0.00);\n\nINSERT INTO documenti_trasporto (id, tipo_documento, numero_documento, data_emissione, consegnato) VALUES\n(1, 'DDT', 'DDT-00001', '2026-01-10', TRUE),\n(2, 'Fattura', 'FAT-00002', '2026-02-01', FALSE),\n(3, 'Bolla', 'BLL-00003', '2026-03-05', FALSE),\n(4, 'DDT', 'DDT-00004', '2026-01-20', TRUE);",
+    "query": "SELECT s.numero_tracking, s.stato, s.peso_totale, d.tipo_documento, d.numero_documento, d.consegnato FROM spedizioni s NATURAL JOIN documenti_trasporto d ORDER BY s.id;",
+    "result": {
+      "columns": [
+        "numero_tracking",
+        "stato",
+        "peso_totale",
+        "tipo_documento",
+        "numero_documento",
+        "consegnato"
+      ],
+      "rows": [
+        "[\"SPED20260001\", \"consegnato\", \"125.50\", \"DDT\", \"DDT-00001\", true]",
+        "[\"SPED20260002\", \"in_transito\", \"340.00\", \"Fattura\", \"FAT-00002\", false]",
+        "[\"SPED20260003\", \"pianificato\", \"89.75\", \"Bolla\", \"BLL-00003\", false]",
+        "[\"SPED20260004\", \"annullato\", \"0.00\", \"DDT\", \"DDT-00004\", true]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "task_id": "nl2pg-f27ed1d1a617",
+  "category": "Q05_S01",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "single",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "a2348b7d7d11612b"
+  },
+  "story": "Presso l'Ufficio Gestione Sanitaria dell'azienda ospedaliera, l'archivio denominato visite_mediche custodisce le schede relative a ciascuna prestazione erogata ai pazienti. Ogni scheda riporta il codice fiscale del paziente, il suo nome e cognome, la data in cui è stata effettuata la visita, il reparto di competenza, il medico curante, la diagnosi formulata e l'importo_visita associato alla prestazione. Nel corso di una consueta verifica contabile, gli operatori hanno proceduto alla classificazione delle prestazioni per reparto, determinando quante visite siano state effettuate e quale sia stato l'importo totale sostenuto per ciascun reparto. Il primo reparto analizzato è stato Cardiologia, dove il Dott. Verdi ha visitato il paziente Mario Rossi il 10 giugno 2025 per una diagnosi di ipertensione arteriosa, con un importo_visita di 150 euro. Successivamente, gli operatori hanno esaminato il reparto Dermatologia, in cui il Dott. Neri ha visitato la paziente Laura Bianchi il 22 maggio 2025 per una dermatite atopica, con un importo_visita di 80 euro. Nel reparto Ortopedia, il Dott. Bianchi ha curato il paziente Giovanni Ferrari il 1° giugno 2025 per una luxazione alla spalla destra, con un importo_visita di 200 euro. Il reparto Pediatria ha registrato la visita della piccola Anna Esposito il 15 aprile 2025, assistita dal Dott. Romano per una bronchite acuta, con un importo_visita di 120 euro. Infine, il reparto Medicina Generale ha visto il Dott. Verdi visitare il paziente Roberto Marino il 12 giugno 2025, senza una diagnosi specifica registrata, con un importo_visita di 50 euro. Al termine dell'analisi, l'ufficio ha redatto un riepilogo sintetico che raggruppa tutte le prestazioni per reparto, indicando per ciascuno il numero complessivo di visite effettuate e la somma degli importo_visita corrispondenti.",
+  "question": "Per ciascun reparto, quante visite sono state effettuate in totale e qual è l'importo complessivo sostenuto?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE visite_mediche (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale_paziente TEXT NOT NULL,\n    nome_paziente TEXT NOT NULL,\n    cognome_paziente TEXT NOT NULL,\n    data_visita DATE NOT NULL,\n    reparto TEXT NOT NULL,\n    medico TEXT NOT NULL,\n    diagnosi TEXT,\n    importo_visita NUMERIC(10,2) CHECK (importo_visita >= 0),\n    CHECK (data_visita <= CURRENT_DATE)\n);",
+    "data_inserts": "INSERT INTO visite_mediche (id, codice_fiscale_paziente, nome_paziente, cognome_paziente, data_visita, reparto, medico, diagnosi, importo_visita) VALUES\n(1, 'RSSMRA80A01H501U', 'Mario', 'Rossi', '2025-06-10', 'Cardiologia', 'Dott. Verdi', 'Ipertensione arteriosa', 150.00),\n(2, 'BNCLRA85B42F205Z', 'Laura', 'Bianchi', '2025-05-22', 'Dermatologia', 'Dott. Neri', 'Dermatite atopica', 80.00),\n(3, 'FRMGNN78C15L219P', 'Giovanni', 'Ferrari', '2025-06-01', 'Ortopedia', 'Dott. Bianchi', 'Luxazione spalla destra', 200.00),\n(4, 'ESPNNA92D30M501Q', 'Anna', 'Esposito', '2025-04-15', 'Pediatria', 'Dott. Romano', 'Bronchite acuta', 120.00),\n(5, 'MRNRRT75E08H501R', 'Roberto', 'Marino', '2025-06-12', 'Medicina Generale', 'Dott. Verdi', NULL, 50.00);\n",
+    "query": "SELECT reparto, COUNT(*) AS numero_visite, SUM(importo_visita) AS importo_totale FROM visite_mediche GROUP BY reparto;",
+    "result": {
+      "columns": [
+        "reparto",
+        "numero_visite",
+        "importo_totale"
+      ],
+      "rows": [
+        "[\"Medicina Generale\", 1, \"50.00\"]",
+        "[\"Ortopedia\", 1, \"200.00\"]",
+        "[\"Dermatologia\", 1, \"80.00\"]",
+        "[\"Pediatria\", 1, \"120.00\"]",
+        "[\"Cardiologia\", 1, \"150.00\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

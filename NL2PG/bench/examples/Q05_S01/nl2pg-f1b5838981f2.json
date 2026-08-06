@@ -1,0 +1,42 @@
+{
+  "task_id": "nl2pg-f1b5838981f2",
+  "category": "Q05_S01",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "single",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "8c4d6d696d596cf7"
+  },
+  "story": "La segreteria amministrativa dell'azienda gestisce un archivio chiamato registrazioni_contabili, nel quale vengono annotate quotidianamente tutte le operazioni finanziarie dell'ufficio. Il primo movimento, datato 2026-01-10, riguardava il pagamento per la fornitura di materiale di cartoleria: un'uscita di 1250,00 euro registrata sul conto intitolato Fornitori - Cartoleria Rossi, classificata come tipo di movimento Avere. Due giorni dopo, il 2026-01-12, arrivava un incasso significativo dalla fattura del cliente ABC, con un credito di 3500,00 euro accreditato sul conto Crediti verso clienti, segnato come Dare. Il 2026-01-15, in concomitanza con la scadenza del canone mensile, il pagamento dell'affitto dell'ufficio comportava un'uscita di 1800,00 euro sul conto Affitti e locazioni, nuovamente registrato come Avere. Il 2026-01-18, un versamento proveniente dal cliente XYZ aumentava la liquidità disponibile di 2750,50 euro sul conto Banca - Conto Corrente, annotato come Dare. Infine, il 2026-01-22, l'acquisto di materiale per l'ufficio richiedeva un pagamento di 430,75 euro sul conto Acquisti merci, anch'esso classificato come Avere. A fine mese, il responsabile amministrativo ha elaborato un riepilogo in cui ha raggruppato le voci per ciascun conto contabile e ha calcolato l'importo totale per ogni singola voce, ottenendo una visione chiara del saldo complessivo per ogni conto, in modo da produrre il totale_importo corrispondente a quanto richiesto dalla sintesi contabile.",
+  "question": "Qual è l'importo totale delle registrazioni finanziarie raggruppate per ciascun conto contabile?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE registrazioni_contabili (\n    id SERIAL PRIMARY KEY,\n    data_movimento DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    conto TEXT NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo >= 0),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('Dare', 'Avere')),\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);",
+    "data_inserts": "INSERT INTO registrazioni_contabili (id, data_movimento, descrizione, conto, importo, tipo_movimento) VALUES\n(1, '2026-01-10', 'Pagamento fornitore cartoleria', 'Fornitori - Cartoleria Rossi', 1250.00, 'Avere'),\n(2, '2026-01-12', 'Incasso fattura cliente ABC', 'Crediti verso clienti', 3500.00, 'Dare'),\n(3, '2026-01-15', 'Pagamento affitto ufficio gennaio', 'Affitti e locazioni', 1800.00, 'Avere'),\n(4, '2026-01-18', 'Versamento incasso cliente XYZ', 'Banca - Conto Corrente', 2750.50, 'Dare'),\n(5, '2026-01-22', 'Acquisto materiale ufficio', 'Acquisti merci', 430.75, 'Avere');",
+    "query": "SELECT conto, SUM(importo) AS totale_importo FROM registrazioni_contabili GROUP BY conto;",
+    "result": {
+      "columns": [
+        "conto",
+        "totale_importo"
+      ],
+      "rows": [
+        "[\"Affitti e locazioni\", \"1800.00\"]",
+        "[\"Fornitori - Cartoleria Rossi\", \"1250.00\"]",
+        "[\"Acquisti merci\", \"430.75\"]",
+        "[\"Banca - Conto Corrente\", \"2750.50\"]",
+        "[\"Crediti verso clienti\", \"3500.00\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

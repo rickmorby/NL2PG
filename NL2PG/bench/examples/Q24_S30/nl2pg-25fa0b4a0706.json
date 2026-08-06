@@ -1,0 +1,59 @@
+{
+  "task_id": "nl2pg-25fa0b4a0706",
+  "category": "Q24_S30",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join",
+      "left_outer_join"
+    ],
+    "twist": [
+      "distractor"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "distractor",
+        "target_value": "clienti",
+        "obsolete_value": "partner_commerciali",
+        "description": "La tabella clienti viene indicata come partner_commerciali nella descrizione del problema, creando un elemento di distrazione che potrebbe indurre a unire tabelle irrilevanti o a cercare relazioni inesistenti con la tabella ordini."
+      }
+    ],
+    "spec_hash": "ad52ac6357354035"
+  },
+  "story": "Presso la Direzione Operativa dell'azienda, l'archivio anagrafico denominato clienti custodisce le schede complete dei soggetti affiliati, ciascuna corredata da nome completo, codice fiscale e recapiti di contatto. Parallelamente, per finalità di audit e conformità normativa, esiste un deposito storico chiamato partner_commerciali, che conserva informazioni obsolete sugli stessi soggetti, sebbene non sia più impiegato nelle operazioni correnti. Il sistema di gestione degli acquisti, attraverso il registro ordini, traccia ogni acquisto effettuato annotando la data di emissione — tra cui il 2026-01-15, il 2026-01-16, il 2026-02-01, il 2026-02-10 e il 2026-03-01 — e lo stato di avanzamento, che può essere in_elaborazione, spedito, consegnato o annullato. Per ciascun ordine, il registro righe_ordine elenca nel dettaglio i prodotti acquistati, facendo riferimento all'elenco prodotti dove sono indicati nome, descrizione e prezzo unitario — come 999.99, 349.50 o 129.00 — con un totale che può ammontare a importi quali 1029.98, 158.99 o 999.99. Contemporaneamente, il dossier destinazioni gestisce gli indirizzi di consegna, associando ogni destinazione al soggetto tramite l'identificativo anagrafico, e registra località come Milano, Roma, Napoli e Torino, con codici cap quali 20100, 00100, 80100 e 10100, indirizzi come Via Milano 1, Via Roma 20, Via Napoli 15 e Corso Torino 8, oltre alla nazione Italia. Durante una verifica operativa volta a elencare i soggetti con i dettagli dei loro acquisti e le relative destinazioni di spedizione, compresi quelli privi di un indirizzo di consegna registrato, gli analisti hanno incrociato le informazioni provenienti dagli archivi clienti, ordini, prodotti, righe_ordine e destinazioni, verificando anche i dati storici contenuti in partner_commerciali per completezza investigativa.",
+  "question": "Elenca tutti i clienti insieme ai dettagli dei loro ordini — come identificativo dell'ordine, data di emissione, stato di avanzamento e importo complessivo — e le relative destinazioni di spedizione comprensive di indirizzo, città e codice cap, includendo anche i clienti che non hanno un indirizzo di consegna registrato.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    indirizzo TEXT\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT CHECK (stato IN ('in_elaborazione', 'spedito', 'consegnato', 'annullato')),\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0),\n    unita_misura TEXT NOT NULL\n);\n\nCREATE TABLE righe_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE destinazioni (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT,\n    nazione TEXT NOT NULL DEFAULT 'Italia'\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, email, telefono, indirizzo) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.com', '3331234567', 'Via Roma 1, Milano'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.com', '3339876543', 'Via Verdi 10, Roma'),\n(3, 'Giovanni Neri', 'NRIGIO78C15L219X', 'giovanni.neri@email.com', '3471112233', 'Corso Italia 5, Napoli'),\n(4, 'Anna Verdi', 'VRDANN90D22M502T', 'anna.verdi@email.com', '3284445566', 'Piazza Libertà 3, Torino');\n\nINSERT INTO prodotti (id, nome, descrizione, prezzo_unitario, unita_misura) VALUES\n(1, 'Laptop', 'Computer portatile 15 pollici SSD', 999.99, 'unità'),\n(2, 'Mouse wireless', 'Mouse ottico wireless ergonomic', 29.99, 'pezzo'),\n(3, 'Monitor 27 pollici', 'Schermo LED Full HD 27 pollici', 349.50, 'unità'),\n(4, 'Tastiera meccanica', 'Tastiera RGB meccanica con switch blu', 129.00, 'pezzo');\n\nINSERT INTO destinazioni (id, cliente_id, indirizzo, citta, cap, nazione) VALUES\n(1, 1, 'Via Milano 1', 'Milano', '20100', 'Italia'),\n(2, 2, 'Via Roma 20', 'Roma', '00100', 'Italia'),\n(3, 3, 'Via Napoli 15', 'Napoli', '80100', 'Italia'),\n(4, 4, 'Corso Torino 8', 'Torino', '10100', 'Italia');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, stato, importo_totale) VALUES\n(101, 1, '2026-01-15', 'spedito', 1029.98),\n(102, 2, '2026-01-16', 'consegnato', 349.50),\n(103, 1, '2026-02-01', 'in_elaborazione', 158.99),\n(104, 3, '2026-02-10', 'annullato', 129.00),\n(105, 4, '2026-03-01', 'spedito', 999.99);\n\nINSERT INTO righe_ordine (id, ordine_id, prodotto_id, quantita, prezzo_unitario) VALUES\n(1, 101, 1, 1, 999.99),\n(2, 101, 2, 1, 29.99),\n(3, 102, 3, 1, 349.50),\n(4, 103, 2, 1, 29.99),\n(5, 103, 4, 1, 129.00),\n(6, 104, 4, 1, 129.00),\n(7, 105, 1, 1, 999.99);",
+    "query": "SELECT c.nome, c.codice_fiscale, o.id AS ordine_id, o.data_ordine, o.stato, o.importo_totale, d.indirizzo AS indirizzo_spedizione, d.citta, d.cap FROM clienti c JOIN ordini o ON c.id = o.cliente_id LEFT JOIN destinazioni d ON c.id = d.cliente_id;",
+    "result": {
+      "columns": [
+        "nome",
+        "codice_fiscale",
+        "ordine_id",
+        "data_ordine",
+        "stato",
+        "importo_totale",
+        "indirizzo_spedizione",
+        "citta",
+        "cap"
+      ],
+      "rows": [
+        "[\"Mario Rossi\", \"RSSMRA80A01H501U\", 101, \"2026-01-15\", \"spedito\", \"1029.98\", \"Via Milano 1\", \"Milano\", \"20100\"]",
+        "[\"Laura Bianchi\", \"BNCLRA85B42F205Z\", 102, \"2026-01-16\", \"consegnato\", \"349.50\", \"Via Roma 20\", \"Roma\", \"00100\"]",
+        "[\"Mario Rossi\", \"RSSMRA80A01H501U\", 103, \"2026-02-01\", \"in_elaborazione\", \"158.99\", \"Via Milano 1\", \"Milano\", \"20100\"]",
+        "[\"Giovanni Neri\", \"NRIGIO78C15L219X\", 104, \"2026-02-10\", \"annullato\", \"129.00\", \"Via Napoli 15\", \"Napoli\", \"80100\"]",
+        "[\"Anna Verdi\", \"VRDANN90D22M502T\", 105, \"2026-03-01\", \"spedito\", \"999.99\", \"Corso Torino 8\", \"Torino\", \"10100\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

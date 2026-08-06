@@ -1,0 +1,54 @@
+{
+  "task_id": "nl2pg-cc611dda8568",
+  "category": "Q17_Q34_S16_S17",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "distractor"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "distractor",
+        "target_value": "stato_ordine",
+        "obsolete_value": "priorità_consegna",
+        "description": "Nel testo della richiesta viene usato il termine 'priorità_consegna' per riferirsi alla colonna reale 'stato_ordine', creando una distrazione semantica che suggerisce un campo inesistente relativo alla priorità anziché allo stato effettivo della spedizione."
+      }
+    ],
+    "spec_hash": "fab422f11ca8d55a"
+  },
+  "story": "Nel contesto operativo del Dipartimento Logistico, l'archivio principale noto come ordini conserva le schede di ciascuna transazione commerciale in corso. Ogni scheda riporta il codice_ordine assegnato, lo stato_ordine che descrive l'avanzamento della spedizione — talvolta indicato informalmente con il termine priorità_consegna — la data di emissione e l'importo_totale della transazione. Accanto a questo archivio, il registro dedicato denominato righe_ordine raccoglie le voci dettagliate associate a ogni singola scheda, registrando la descrizione dell'articolo, la quantità ordinata e il costo unitario dello stesso. Nel corso dell'analisi operativa condotta il giorno 2026-01-10, gli operatori hanno esaminato la scheda identificata dal codice_ordine ORD-2026-001, rilevando un importo_totale di 250.00 e annotando le voci Cavo USB-C e Hub USB multiporta. Il giorno successivo, il 2026-01-12, la scheda con codice_ordine ORD-2026-002 presentava un importo_totale di 135.75 con la voce Mouse wireless Logitech. Il giorno 2026-01-14, la scheda con codice_ordine ORD-2026-003 risultava avere un importo_totale di 89.90 e la descrizione Tastiera meccanica. Il giorno 2026-01-15, la scheda con codice_ordine ORD-2026-004 registrava un importo_totale di 420.00, comprendente le voci Monitor 27 pollici Samsung e Cavo HDMI 2m. Infine, il giorno 2026-01-16, la scheda con codice_ordine ORD-2026-005 risultava annullata con un importo_totale di 0.00. Al termine dell'analisi, gli analisti hanno proceduto a ordinare tutte le schede per importo_totale in ordine decrescente, assegnando a ciascuna una posizione in graduatoria — corrispondente al numero progressivo assegnato tramite una finestra di classificazione — e contando il numero_righe di voci associate presenti nel registro righe_ordine, completando così la classifica finale degli ordini.",
+  "question": "Visualizza la classifica completa degli ordini ordinata per importo totale decrescente, indicando per ciascun ordine il codice, lo stato, l'importo complessivo, il numero di righe associate e la posizione in graduatoria.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    codice_ordine TEXT NOT NULL UNIQUE,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('creato', 'in_lavorazione', 'spedito', 'consegnato', 'annullato')),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    descrizione TEXT NOT NULL,\n    quantità INT NOT NULL CHECK (quantità > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);",
+    "data_inserts": "INSERT INTO ordini (id, codice_ordine, stato_ordine, data_ordine, importo_totale) VALUES\n(1, 'ORD-2026-001', 'creato', '2026-01-10', 250.00),\n(2, 'ORD-2026-002', 'in_lavorazione', '2026-01-12', 135.75),\n(3, 'ORD-2026-003', 'spedito', '2026-01-14', 89.90),\n(4, 'ORD-2026-004', 'consegnato', '2026-01-15', 420.00),\n(5, 'ORD-2026-005', 'annullato', '2026-01-16', 0.00);\n\nINSERT INTO righe_ordine (id, ordine_id, descrizione, quantità, prezzo_unitario) VALUES\n(1, 1, 'Cavo USB-C', 3, 15.50),\n(2, 1, 'Hub USB multiporta', 1, 45.00),\n(3, 2, 'Mouse wireless Logitech', 2, 35.00),\n(4, 3, 'Tastiera meccanica', 1, 89.90),\n(5, 4, 'Monitor 27 pollici Samsung', 2, 210.00),\n(6, 4, 'Cavo HDMI 2m', 3, 12.00);",
+    "query": "SELECT o.codice_ordine, o.stato_ordine, o.importo_totale, COUNT(r.id) AS numero_righe, ROW_NUMBER() OVER (ORDER BY o.importo_totale DESC) AS posizione FROM ordini o LEFT JOIN righe_ordine r ON o.id = r.ordine_id GROUP BY o.codice_ordine, o.stato_ordine, o.importo_totale ORDER BY o.importo_totale DESC;",
+    "result": {
+      "columns": [
+        "codice_ordine",
+        "stato_ordine",
+        "importo_totale",
+        "numero_righe",
+        "posizione"
+      ],
+      "rows": [
+        "[\"ORD-2026-004\", \"consegnato\", \"420.00\", 2, 1]",
+        "[\"ORD-2026-001\", \"creato\", \"250.00\", 2, 2]",
+        "[\"ORD-2026-002\", \"in_lavorazione\", \"135.75\", 1, 3]",
+        "[\"ORD-2026-003\", \"spedito\", \"89.90\", 1, 4]",
+        "[\"ORD-2026-005\", \"annullato\", \"0.00\", 0, 5]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

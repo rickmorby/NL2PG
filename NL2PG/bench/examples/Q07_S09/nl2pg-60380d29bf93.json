@@ -1,0 +1,63 @@
+{
+  "task_id": "nl2pg-60380d29bf93",
+  "category": "Q07_S09",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "many_to_many",
+    "sql_features": [
+      "join",
+      "multi_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "transazioni",
+        "description": "La tabella associativa ordini, che funge da ponte tra clienti e prodotti, viene denominata transazioni nel linguaggio aziendale, rendendo necessario riconoscere il sinonimo per collegare correttamente le entità."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "prodotti",
+        "obsolete_value": "referenze_mercoli",
+        "description": "La tabella prodotti viene chiamata referenze_mercoli usando la terminologia gergale del reparto acquisti, richiedendo al risolutore di mappare il termine gergale sull'entità reale nel database."
+      }
+    ],
+    "spec_hash": "65dc0fef7fb434be"
+  },
+  "story": "All'interno dell'Ufficio Commerciale dell'azienda, l'archivio anagrafico noto come clienti conserva le schede complete di ciascun acquirente, registrando nome, cognome, codice fiscale, indirizzo di posta elettronica e numero di telefono di contatto. Parallelamente, il catalogo merci denominato referenze_mercoli – che nel linguaggio informale del reparto acquisti viene spesso chiamato con il termine prodotti – raccoglie le schede dettagliate di ogni bene disponibile sul mercato, includendo la denominazione, una descrizione approfondita e il prezzo unitario di listino. A completare il quadro, il registro delle operazioni commerciali identificato come transazioni, nella documentazione storica dell'azienda talvolta indicato con il termine obsoleto ordini, svolge la funzione di collegamento tra gli acquirenti e i beni offerti, annotando per ciascuna operazione la quantità acquistata e la data di esecuzione. Nel corso della chiusura dell'esercizio 2026, gli analisti hanno ricostruito l'intero panorama delle vendite ricollegando sistematicamente ogni movimento all'archivio clienti, al catalogo referenze_mercoli e al registro transazioni, ricavando per ciascuna operazione l'importo totale come prodotto tra la quantità e il prezzo unitario, e ordinando i risultati in base a questo importo in ordine decrescente. Tra le operazioni esaminate figurano quelle del 2026-01-10, relative a un acquisto singolo; quelle del 2026-01-12, con una quantità pari a 2; quelle del 2026-01-14, con quantità 3; quelle del 2026-01-16; e infine quelle del 2026-01-18. I prezzi unitari consultati nel catalogo referenze_mercoli includono valori come 899.99, 349.50, 99.00 e 69.99, corrispondenti a diversi beni presenti nell'offerta aziendale. L'intera operazione ha permesso di ricostruire il quadro completo delle vendite, incrociando le informazioni provenienti dall'archivio clienti, dal catalogo referenze_mercoli e dal registro transazioni, restituendo per ciascun acquirente il nome, il cognome, la denominazione del prodotto acquistato, la quantità, la data dell'operazione e l'importo totale calcolato.",
+  "question": "Mostra l'elenco completo di tutte le operazioni commerciali includendo il nome e il cognome del cliente, il nome del prodotto acquistato, la quantità, la data dell'operazione e l'importo totale calcolato, ordinando i risultati dal valore più alto al più basso.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE referenze_mercoli (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE transazioni (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    referenze_mercoli_id INT NOT NULL REFERENCES referenze_mercoli(id),\n    quantita INT NOT NULL CHECK (quantita >= 1),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, telefono) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.it', '3331234567'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.it', '3479876543'),\n(3, 'Giuseppe', 'Verdi', 'VRTGSP82C15L219M', 'giuseppe.verdi@email.it', '3387654321'),\n(4, 'Anna', 'Neri', 'NRNNA88D23L502E', 'anna.neri@email.it', '3201112222'),\n(5, 'Paolo', 'Esposito', 'ESPPLO77E10M501X', 'paolo.esposito@email.it', '3390001111');\n\nINSERT INTO referenze_mercoli (id, nome, descrizione, prezzo_unitario) VALUES\n(1, 'Laptop Dell', 'Laptop professionale Dell Inspiron 15', 899.99),\n(2, 'Monitor Samsung', 'Monitor Samsung 27 pollici 4K', 349.50),\n(3, 'Tastiera Logitech', 'Tastiera wireless Logitech MX Keys', 99.00),\n(4, 'Mouse Razer', 'Mouse gaming Razer DeathAdder V3', 69.99);\n\nINSERT INTO transazioni (id, cliente_id, referenze_mercoli_id, quantita, data_transazione) VALUES\n(1, 1, 1, 1, '2026-01-10 09:30:00'),\n(2, 2, 2, 2, '2026-01-12 14:15:00'),\n(3, 3, 3, 3, '2026-01-14 11:00:00'),\n(4, 1, 4, 1, '2026-01-16 16:45:00'),\n(5, 5, 1, 2, '2026-01-18 10:00:00');",
+    "query": "SELECT c.nome, c.cognome, rm.nome AS prodotto, t.quantita, t.data_transazione, (t.quantita * rm.prezzo_unitario) AS importo_totale FROM clienti c JOIN transazioni t ON c.id = t.cliente_id JOIN referenze_mercoli rm ON t.referenze_mercoli_id = rm.id ORDER BY importo_totale DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "prodotto",
+        "quantita",
+        "data_transazione",
+        "importo_totale"
+      ],
+      "rows": [
+        "[\"Paolo\", \"Esposito\", \"Laptop Dell\", 2, \"2026-01-18 10:00:00\", \"1799.98\"]",
+        "[\"Mario\", \"Rossi\", \"Laptop Dell\", 1, \"2026-01-10 09:30:00\", \"899.99\"]",
+        "[\"Laura\", \"Bianchi\", \"Monitor Samsung\", 2, \"2026-01-12 14:15:00\", \"699.00\"]",
+        "[\"Giuseppe\", \"Verdi\", \"Tastiera Logitech\", 3, \"2026-01-14 11:00:00\", \"297.00\"]",
+        "[\"Mario\", \"Rossi\", \"Mouse Razer\", 1, \"2026-01-16 16:45:00\", \"69.99\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

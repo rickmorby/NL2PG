@@ -1,0 +1,41 @@
+{
+  "task_id": "nl2pg-f63f93beccc1",
+  "category": "Q09_S17",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "d4609dfdec7b0a1b"
+  },
+  "story": "Presso la Direzione Commerciale, l'archivio denominato clienti conserva le schede dei partner commerciali, riportando per ciascun soggetto il nome, il cognome e il codice fiscale. Parallelamente, il registro intitolato ordini annota le transazioni effettuate, indicando la data dell'operazione, l'importo totale e lo stato della pratica. Durante l'analisi di fine periodo, gli operatori hanno esaminato le schede incrociate tra i due archivi per individuare i soggetti con più di un ordine. In particolare, consultando l'archivio clienti e il registro ordini, hanno isolato le pratiche con data '2026-01-15' e stato 'confermato', accanto a quelle con data '2026-02-10' e stato 'pending'. Nello stesso periodo, sono state registrate altre transazioni, come l'operazione del '2026-01-16' per '89.00' con stato 'spedito', quella del '2026-02-01' per '234.99' con stato 'consegnato', e infine l'aggiornamento del '2026-03-05' per '310.75' con stato 'annullato'. Calcolando la spesa complessiva per ciascun partner, hanno sommato i valori '150.50' e '45.00', ottenendo il totale per il soggetto in esame, ordinando i risultati per importo decrescente.",
+  "question": "Tra tutti i clienti, quali sono quelli che hanno effettuato più di un ordine? Per ciascuno di essi, indica il nome, il cognome, il numero totale di ordini effettuati e la somma complessiva spesa, ordinando i risultati per importo totale decrescente.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0),\n    stato TEXT CHECK (stato IN ('pending', 'confermato', 'spedito', 'consegnato', 'annullato'))\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, email, data_registrazione) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.com', '2025-03-10'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.com', '2025-06-22'),\n(3, 'Giovanni', 'Verdi', 'VRDGNV72C15L219M', 'giovanni.verdi@email.com', '2025-01-05'),\n(4, 'Anna', 'Neri', 'NRNNA90D08M501X', 'anna.neri@email.com', '2025-09-14'),\n(5, 'Paolo', 'Colombo', 'CLMPPA88E22Z201A', 'paolo.colombo@email.com', '2025-11-30');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, importo_totale, stato) VALUES\n(101, 1, '2026-01-15', 150.50, 'confermato'),\n(102, 2, '2026-01-16', 89.00, 'spedito'),\n(103, 3, '2026-02-01', 234.99, 'consegnato'),\n(104, 1, '2026-02-10', 45.00, 'pending'),\n(105, 5, '2026-03-05', 310.75, 'annullato');",
+    "query": "SELECT c.nome, c.cognome, COUNT(o.id) AS numero_ordini, SUM(o.importo_totale) AS totale_speso FROM clienti c JOIN ordini o ON c.id = o.cliente_id GROUP BY c.nome, c.cognome HAVING COUNT(o.id) > 1 ORDER BY totale_speso DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "numero_ordini",
+        "totale_speso"
+      ],
+      "rows": [
+        "[\"Mario\", \"Rossi\", 2, \"195.50\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

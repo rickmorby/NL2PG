@@ -1,0 +1,43 @@
+{
+  "task_id": "nl2pg-e0c3f81fb650",
+  "category": "Q04_S04",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "5e2e608175aefda9"
+  },
+  "story": "Nel cuore del Reparto Logistica, l'archivio dedicato alle citta conserva le schede anagrafiche di ogni centro abitato, registrando il nome della località, il codice di avviamento postale e la regione di appartenenza. Accanto a esso, il registro magazzino raccoglie le informazioni operative relative ai depositi, collegando ciascuna struttura alla città in cui sorge e annotando la denominazione dell'impianto, la superficie in metri quadrati e lo stato di attività. Durante una verifica operativa finalizzata ad elencare tutte le strutture di stoccaggio con le rispettive città di ubicazione, includendo la superficie e lo stato di attività, gli operatori hanno estratto i dati incrociati tra i due archivi. Ad esempio, hanno rilevato che il Magazzino Centro Roma si trova nella località di Roma, nel Lazio, con CAP 00118 e una superficie di 1500.00 metri quadrati, risultando attivo. Analogamente, il Magazzino Nord Milano, situato a Milano in Lombardia con CAP 20121, presenta una superficie di 2300.50 metri quadrati ed è attivo. Il Magazzino Napoli Centro, ubicato a Napoli in Campania con CAP 80100, ha una superficie di 890.75 metri quadrati ed è attivo. Infine, il Magazzino Torino, a Torino in Piemonte con CAP 10100, ha una superficie di 1200.00 metri quadrati ma risulta non attivo.",
+  "question": "Elenca tutti i magazzini con la città in cui si trovano, indicando la superficie disponibile e se sono attivi o meno.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE citta (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cap TEXT NOT NULL UNIQUE,\n    regione TEXT NOT NULL\n);\n\nCREATE TABLE magazzino (\n    id SERIAL PRIMARY KEY,\n    citta_id INT NOT NULL UNIQUE REFERENCES citta(id),\n    nome TEXT NOT NULL,\n    superficie_mq NUMERIC(10,2) CHECK (superficie_mq > 0),\n    attivo BOOLEAN DEFAULT TRUE\n);",
+    "data_inserts": "INSERT INTO citta (id, nome, cap, regione) VALUES\n(1, 'Roma', '00118', 'Lazio'),\n(2, 'Milano', '20121', 'Lombardia'),\n(3, 'Napoli', '80100', 'Campania'),\n(4, 'Torino', '10100', 'Piemonte');\n\nINSERT INTO magazzino (id, citta_id, nome, superficie_mq, attivo) VALUES\n(1, 1, 'Magazzino Centro Roma', 1500.00, true),\n(2, 2, 'Magazzino Nord Milano', 2300.50, true),\n(3, 3, 'Magazzino Napoli Centro', 890.75, true),\n(4, 4, 'Magazzino Torino', 1200.00, false);",
+    "query": "SELECT c.nome AS citta, m.nome AS magazzino, m.superficie_mq, m.attivo FROM citta c JOIN magazzino m ON c.id = m.citta_id;",
+    "result": {
+      "columns": [
+        "citta",
+        "magazzino",
+        "superficie_mq",
+        "attivo"
+      ],
+      "rows": [
+        "[\"Roma\", \"Magazzino Centro Roma\", \"1500.00\", true]",
+        "[\"Milano\", \"Magazzino Nord Milano\", \"2300.50\", true]",
+        "[\"Napoli\", \"Magazzino Napoli Centro\", \"890.75\", true]",
+        "[\"Torino\", \"Magazzino Torino\", \"1200.00\", false]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "task_id": "nl2pg-47be94007070",
+  "category": "Q03_S17",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "top_n"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti",
+        "obsolete_value": "registri_movimento",
+        "description": "La tabella movimenti viene denominata registri_movimento nella documentazione aziendale, creando una discordanza tra il nome tecnico e il nome usato nelle query in linguaggio naturale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "quantita",
+        "obsolete_value": "qta_ordine",
+        "description": "La colonna quantita viene chiamata qta_ordine nel linguaggio aziendale, richiedendo al risolutore di mappare il sinonimo alla colonna reale nello schema."
+      }
+    ],
+    "spec_hash": "53373cc23d402829"
+  },
+  "story": "Presso l'Ufficio Amministrativo dell'azienda, l'archivio denominato clienti conserva le schede anagrafiche di ciascun interlocutore commerciale, riportando il nome completo e il codice fiscale. Parallelamente, il registro intitolato ordini raccoglie le schede di ogni acquisto effettuato, indicando la data dell'ordine e l'importo complessivo della transazione. A completamento del ciclo operativo, il dossier chiamato registri_movimento annota ogni movimento legato a un ordine, specificando la qta_ordine di articoli coinvolti e la tipologia dell'operazione. Durante la revisione semestrale, i responsabili hanno incrociato le schede del registro clienti con quelle del registro ordini, filtrando gli ordini datati '2026-01-15', '2026-01-16', '2026-02-01' e '2026-02-10'. Dall'analisi è emerso che Mario Rossi, con un totale_speso di 150.50 nell'ordine del 2026-01-15 e di 230.75 nell'ordine del 2026-02-01, si è posizionato al primo posto della classifica. Al secondo posto si è collocata Laura Bianchi, la cui spesa totale ammonta a 89.00 nell'ordine del 2026-01-16. Giuseppe Verdi, pur avendo un ordine del 2026-02-10 per 45.00, si è collocato al di fuori della top 2. Nei registri_movimento, la qta_ordine di 5 unità in ingresso e 3 in uscita per l'ordine 101 di Mario Rossi, e la qta_ordine di 10 unità in ingresso per l'ordine 102 di Laura Bianchi, hanno confermato la consistenza dei dati gestionali.",
+  "question": "Quali sono i primi 2 clienti per importo totale speso, in ordine decrescente, con la loro posizione in classifica?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE movimenti (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    tipo_movimento TEXT NOT NULL,\n    data_movimento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z'),\n(3, 'Giuseppe Verdi', 'VRDGPS82C15L219M');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, importo_totale) VALUES\n(101, 1, '2026-01-15', 150.50),\n(102, 2, '2026-01-16', 89.00),\n(103, 1, '2026-02-01', 230.75),\n(104, 3, '2026-02-10', 45.00);\n\nINSERT INTO movimenti (id, ordine_id, quantita, tipo_movimento, data_movimento) VALUES\n(1, 101, 5, 'ingresso', '2026-01-15 10:30:00'),\n(2, 101, 3, 'uscita', '2026-01-16 14:00:00'),\n(3, 102, 10, 'ingresso', '2026-01-16 09:15:00'),\n(4, 103, 2, 'uscita', '2026-02-01 11:45:00');",
+    "query": "SELECT c.nome, SUM(o.importo_totale) AS totale_speso FROM clienti c JOIN ordini o ON c.id = o.cliente_id GROUP BY c.nome ORDER BY totale_speso DESC LIMIT 2;",
+    "result": {
+      "columns": [
+        "nome",
+        "totale_speso"
+      ],
+      "rows": [
+        "[\"Mario Rossi\", \"381.25\"]",
+        "[\"Laura Bianchi\", \"89.00\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

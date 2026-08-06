@@ -1,0 +1,42 @@
+{
+  "task_id": "nl2pg-aa58225fcf31",
+  "category": "Q06_S01",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "14a275eedf67fd5c"
+  },
+  "story": "All'interno del Dipartimento Logistico dell'azienda, l'archivio denominato consegne conserva le schede dettagliate di ogni spedizione gestita nel corso dell'anno 2026. Ogni scheda archiviata riporta il codice_spedizione, il nome completo del mittente e del destinatario, gli indirizzi di partenza e di arrivo, il peso_kg dichiarato, lo stato di avanzamento della consegna, le date di partenza programmata, di consegna prevista e di consegna effettiva, il costo_trasporto sostenuto e il livello di priorita assegnato al trasporto. Nell'ambito di un'analisi operativa finalizzata a individuare le spedizioni portate a termine con successo e di particolare rilevanza strategica, gli operatori hanno esaminato le schede presenti nell'archivio consegne applicando tre criteri di filtraggio: hanno selezionato esclusivamente le consegne il cui stato fosse 'consegnato', il cui livello di priorita fosse 'alta' o 'urgente', e il cui costo_trasporto superasse la soglia minima di 20.00 euro. Successivamente, i risultati ottenuti sono stati disposti in ordine decrescente rispetto al costo_trasporto, dal valore più elevato al più contenuto. Tra le spedizioni che hanno soddisfatto tutti i criteri di selezione, ad esempio, figura quella con codice SPED004, gestita da GLS Spedizioni per conto di Anna Neri, con un costo di 120.00 euro e priorita 'urgente', nonché quella con codice SPED005, affidata a SDA Express per Marco Bianchi, con un costo di 55.80 euro e priorita 'alta'. L'archivio consegne ha pertanto permesso di ricostruire in modo chiaro, ordinato e immediatamente fruibile il quadro complessivo delle operazioni di trasporto più costose e prioritarie concluse positivamente.",
+  "question": "Quali sono le consegne già completate con priorità alta o urgente e un costo di trasporto superiore a 20 euro, elencate dal costo più alto al più basso?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE consegne (\n    id BIGINT PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    mittente TEXT NOT NULL,\n    destinatario TEXT NOT NULL,\n    indirizzo_partenza TEXT NOT NULL,\n    indirizzo_arrivo TEXT NOT NULL,\n    peso_kg NUMERIC(10,3) CHECK (peso_kg > 0),\n    stato TEXT NOT NULL CHECK (stato IN ('in_transito', 'consegnato', 'in_attesa', 'annullato')),\n    data_partenza DATE NOT NULL,\n    data_consegna_prevista DATE,\n    data_consegna_effettiva DATE,\n    costo_trasporto NUMERIC(10,2) CHECK (costo_trasporto >= 0),\n    priorita TEXT CHECK (priorita IN ('bassa', 'media', 'alta', 'urgente')),\n    attiva BOOLEAN DEFAULT TRUE\n);",
+    "data_inserts": "INSERT INTO consegne (id, codice_spedizione, mittente, destinatario, indirizzo_partenza, indirizzo_arrivo, peso_kg, stato, data_partenza, data_consegna_prevista, data_consegna_effettiva, costo_trasporto, priorita, attiva) VALUES\n(1, 'SPED001', 'DHL Logistics', 'Mario Rossi', 'Via Torino 10, Milano', 'Via Roma 5, Roma', 12.500, 'consegnato', '2026-01-10', '2026-01-12', '2026-01-11', 45.00, 'alta', FALSE),\n(2, 'SPED002', 'Bartolini S.p.A.', 'Laura Bianchi', 'Via Nazionale 100, Napoli', 'Corso Garibaldi 20, Torino', 5.200, 'in_transito', '2026-02-01', '2026-02-05', NULL, 32.50, 'media', TRUE),\n(3, 'SPED003', 'Poste Italiane', 'Giuseppe Verdi', 'Piazza della Posta 1, Bologna', 'Via Milano 15, Firenze', 0.800, 'in_attesa', '2026-02-10', '2026-02-13', NULL, 5.00, 'bassa', TRUE),\n(4, 'SPED004', 'GLS Spedizioni', 'Anna Neri', 'Viale della Libertà 50, Palermo', 'Piazza Duomo 1, Milano', 25.000, 'annullato', '2026-01-20', '2026-01-25', NULL, 120.00, 'urgente', FALSE),\n(5, 'SPED005', 'SDA Express', 'Marco Bianchi', 'Stazione Centrale 3, Genova', 'Via Garibaldi 10, Venezia', 8.750, 'consegnato', '2026-02-15', '2026-02-18', '2026-02-17', 55.80, 'alta', FALSE);",
+    "query": "SELECT codice_spedizione, mittente, destinatario, peso_kg, costo_trasporto FROM consegne WHERE stato = 'consegnato' AND priorita IN ('alta', 'urgente') AND costo_trasporto > 20.00 ORDER BY costo_trasporto DESC;",
+    "result": {
+      "columns": [
+        "codice_spedizione",
+        "mittente",
+        "destinatario",
+        "peso_kg",
+        "costo_trasporto"
+      ],
+      "rows": [
+        "[\"SPED005\", \"SDA Express\", \"Marco Bianchi\", \"8.750\", \"55.80\"]",
+        "[\"SPED001\", \"DHL Logistics\", \"Mario Rossi\", \"12.500\", \"45.00\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

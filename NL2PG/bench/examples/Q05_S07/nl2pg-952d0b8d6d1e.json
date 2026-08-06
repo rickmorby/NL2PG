@@ -1,0 +1,41 @@
+{
+  "task_id": "nl2pg-952d0b8d6d1e",
+  "category": "Q05_S07",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 2,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "b9852165e178bac5"
+  },
+  "story": "All'interno della Direzione Sanitaria di un'azienda ospedaliera, l'archivio denominato reparti custodisce i dati essenziali di ogni area clinica, registrandone la denominazione ufficiale e la sede fisica in cui opera. Parallelamente, l'archivio chiamato medici raccoglie le schede professionali di ciascun medico in servizio, annotando nome, cognome, data di assunzione, retribuzione annua, reparto di assegnazione e, quando presente, il riferimento al medico superiore di fiducia. In occasione di un'analisi gestionale finalizzata a comprendere la distribuzione del personale e i costi associati, gli operatori hanno esaminato quattro aree cliniche: la Cardiologia con sede a Milano, la Neurologia con sede a Roma, l'Ortopedia con sede a Milano e la Pediatria con sede a Firenze. Per ciascun reparto, hanno determinato quanti medici vi erano stati assegnati e hanno calcolato la media delle rispettive retribuzioni. Nel dettaglio, nel reparto di Cardiologia, il medico Marco Verdi, identificato con il numero 1, assunto il 10 marzo 2015 con una retribuzione di 75000 euro, riveste il ruolo di primario e non dispone di un superiore di riferimento. La dottoressa Giulia Bianchi, identificata con il numero 2, assunta il 22 luglio 2018 con uno stipendio di 82000 euro, opera sotto la supervisione del primario il cui identificativo è 1. Il dottor Paolo Conti, identificato con il numero 5, entrato in servizio il 12 settembre 2021 con una retribuzione di 65000 euro, appartiene anch'egli alla Cardiologia e riporta al medico superiore identificato con il numero 2. Nella Neurologia, il medico Luca Neri, identificato con il numero 3, assunto il 15 gennaio 2019 con uno stipendio di 68000 euro, rappresenta l'unico elemento del reparto e non dispone di un medico superiore. Nell'Ortopedia, la dottoressa Sara Rossi, identificata con il numero 4, assunta il 3 maggio 2020 con una retribuzione di 71000 euro, opera sotto la supervisione del primario della Cardiologia il cui identificativo è 1. L'esame comparativo ha consentito di ricostruire il quadro completo della dotazione organica e dei costi del personale per ogni area clinica, evidenziando che la Cardiologia conta tre medici con una retribuzione media di 74000 euro, mentre gli altri reparti presentano ciascuno un singolo elemento.",
+  "question": "Per ciascun reparto dell'azienda ospedaliera, quanti medici sono stati assegnati e qual è la media dei loro stipendi?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE reparti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE medici (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_assunzione DATE NOT NULL,\n    stipendio NUMERIC(10,2) CHECK (stipendio >= 0),\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    medico_superiore_id INT REFERENCES medici(id),\n    CHECK (medico_superiore_id != id)\n);",
+    "data_inserts": "INSERT INTO reparti (id, nome, sede) VALUES\n(1, 'Cardiologia', 'Milano'),\n(2, 'Neurologia', 'Roma'),\n(3, 'Ortopedia', 'Milano'),\n(4, 'Pediatria', 'Firenze');\n\nINSERT INTO medici (id, nome, cognome, data_assunzione, stipendio, reparto_id, medico_superiore_id) VALUES\n(1, 'Marco', 'Verdi', '2015-03-10', 75000.00, 1, NULL),\n(2, 'Giulia', 'Bianchi', '2018-07-22', 82000.00, 1, 1),\n(3, 'Luca', 'Neri', '2019-01-15', 68000.00, 2, NULL),\n(4, 'Sara', 'Rossi', '2020-05-03', 71000.00, 3, 1),\n(5, 'Paolo', 'Conti', '2021-09-12', 65000.00, 1, 2);",
+    "query": "SELECT r.nome AS nome_reparto, COUNT(m.id) AS numero_medici, AVG(m.stipendio) AS stipendio_medio FROM reparti r JOIN medici m ON r.id = m.reparto_id GROUP BY r.nome;",
+    "result": {
+      "columns": [
+        "nome_reparto",
+        "numero_medici",
+        "stipendio_medio"
+      ],
+      "rows": [
+        "[\"Ortopedia\", 1, \"71000.000000000000\"]",
+        "[\"Neurologia\", 1, \"68000.000000000000\"]",
+        "[\"Cardiologia\", 3, \"74000.000000000000\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

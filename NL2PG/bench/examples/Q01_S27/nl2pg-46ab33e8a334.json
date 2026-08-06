@@ -1,0 +1,47 @@
+{
+  "task_id": "nl2pg-46ab33e8a334",
+  "category": "Q01_S27",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [],
+    "twist": [
+      "rename"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "richieste_acquisto",
+        "description": "La tabella ordini viene denominata richieste_acquisto nel linguaggio aziendale, rendendo meno immediato il riconoscimento dell'entità durante la stesura della query."
+      }
+    ],
+    "spec_hash": "5ee79bce66b34522"
+  },
+  "story": "All'interno dell'Ufficio Acquisti aziendale, l'archivio chiamato richieste_acquisto conserva ogni pratica relativa ai processi di approvvigionamento. Ciascuna voce archiviata è identificata dal numero_richiesta, univoco per ogni documento, e riporta la data di presentazione, il fornitore designato, l'importo_totale previsto per l'operazione e lo stato di avanzamento della pratica. Durante un ciclo di revisione mensile, i responsabili hanno estratto dal documentario soltanto le voci il cui stato risultava essere 'approvata'. L'elenco ottenuto è stato poi ordinato per importo_totale in ordine decrescente, in modo da esporre per prime le operazioni dal maggiore peso economico. Tra le richieste approvate, spicca quella riconducibile a TechSupply S.r.l., con un importo_totale di 2500,00 euro e data di presentazione 2026-01-10, seguita dalle altre schede contrassegnate come 'approvata' e disposte secondo lo stesso criterio. Parallelamente, l'archivio manteneva anche le pratiche in stato 'bozza', 'rifiutata' ed 'evasa', ma il perimetro del report si limitava esclusivamente agli elementi approvati, ordinati dal valore più alto al più basso.",
+  "question": "Mostra l'elenco delle richieste di acquisto approvate, ordinato per importo totale dal più alto al più basso.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE richieste_acquisto (\n    id INT PRIMARY KEY,\n    numero_richiesta TEXT NOT NULL UNIQUE,\n    data_richiesta DATE NOT NULL,\n    fornitore TEXT NOT NULL,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0),\n    stato TEXT NOT NULL CHECK (stato IN ('bozza', 'approvata', 'rifiutata', 'evasa')),\n    note TEXT\n);",
+    "data_inserts": "INSERT INTO richieste_acquisto (id, numero_richiesta, data_richiesta, fornitore, importo_totale, stato, note) VALUES\n(1, 'RQ-2026-001', '2026-01-10', 'TechSupply S.r.l.', 2500.00, 'approvata', 'Urgente per progetto Q1'),\n(2, 'RQ-2026-002', '2026-01-12', 'OfficeMax', 350.75, 'bozza', NULL),\n(3, 'RQ-2026-003', '2026-01-15', 'Global Parts', 12000.00, 'evasa', 'Consegna completata'),\n(4, 'RQ-2026-004', '2026-01-18', 'EcoMaterials', 890.50, 'rifiutata', 'Budget superato');",
+    "query": "SELECT numero_richiesta, fornitore, importo_totale, stato FROM richieste_acquisto WHERE stato = 'approvata' ORDER BY importo_totale DESC;",
+    "result": {
+      "columns": [
+        "numero_richiesta",
+        "fornitore",
+        "importo_totale",
+        "stato"
+      ],
+      "rows": [
+        "[\"RQ-2026-001\", \"TechSupply S.r.l.\", \"2500.00\", \"approvata\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "task_id": "nl2pg-54ff54320aa0",
+  "category": "Q25_S04",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "4aef543837d4a4be"
+  },
+  "story": "Presso il Centro Logistico aziendale, l'archivio principale denominato spedizioni custodisce ogni scheda relativa alle operazioni di trasporto effettuate dall'azienda. Per ciascuna spedizione sono annotati con precisione il numero di spedizione, il nome del mittente, il destinatario, la data di partenza e lo stato della consegna. Parallelamente, il registro tracking conserva in tempo reale la posizione attuale di ogni spedizione, la temperatura monitorata durante il trasporto e la data dell'ultimo aggiornamento. Durante un controllo operativo volto a individuare tutte le spedizioni il cui stato risulta essere 'consegnata', gli operatori hanno incrociato le schede presenti nell'archivio spedizioni con le annotazioni corrispondenti contenute nel registro tracking, associando per ciascuna spedizione la sua posizione attuale e la temperatura registrata. I risultati ottenuti sono stati quindi ordinati in base alla data di partenza, dalla più recente alla più antica, al fine di privilegiare le consegne recenti.",
+  "question": "Quali sono tutte le spedizioni consegnate con il numero di spedizione, il mittente, il destinatario, la data di partenza, lo stato, la posizione attuale e la temperatura monitorata, ordinate per data di partenza dalla più recente alla più antica?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    numero_spedizione TEXT NOT NULL UNIQUE,\n    mittente TEXT NOT NULL,\n    destinatario TEXT NOT NULL,\n    data_partenza DATE NOT NULL,\n    stato TEXT CHECK (stato IN ('pianificata', 'in_transito', 'consegnata', 'annullata'))\n);\n\nCREATE TABLE tracking (\n    id INT PRIMARY KEY REFERENCES spedizioni(id),\n    posizione_attuale TEXT NOT NULL,\n    data_ultimo_aggiornamento TIMESTAMP NOT NULL,\n    temperatura_monitorata NUMERIC(5,2) CHECK (temperatura_monitorata >= -20 AND temperatura_monitorata <= 50)\n);",
+    "data_inserts": "INSERT INTO spedizioni (id, numero_spedizione, mittente, destinatario, data_partenza, stato) VALUES\n(1, 'SP-2026-0001', 'Mario Rossi', 'Laura Bianchi', '2026-01-10', 'consegnata'),\n(2, 'SP-2026-0002', 'Giuseppe Verdi', 'Anna Neri', '2026-02-15', 'in_transito'),\n(3, 'SP-2026-0003', 'Azienda Alpha', 'Beta SRL', '2026-03-01', 'pianificata'),\n(4, 'SP-2026-0004', 'Carlo Bianchi', 'Diana Verdi', '2026-01-20', 'annullata');\n\nINSERT INTO tracking (id, posizione_attuale, data_ultimo_aggiornamento, temperatura_monitorata) VALUES\n(1, 'Milano Centro', '2026-01-12 14:30:00', 5.50),\n(2, 'Bologna Autostrada', '2026-02-16 09:15:00', -2.30),\n(3, 'Roma Magazzino', '2026-03-02 11:00:00', 18.75),\n(4, 'Torino Deposito', '2026-01-21 16:45:00', 10.00);",
+    "query": "SELECT s.numero_spedizione, s.mittente, s.destinatario, s.data_partenza, s.stato, t.posizione_attuale, t.temperatura_monitorata FROM spedizioni s NATURAL JOIN tracking t WHERE s.stato = 'consegnata' ORDER BY s.data_partenza DESC;",
+    "result": {
+      "columns": [
+        "numero_spedizione",
+        "mittente",
+        "destinatario",
+        "data_partenza",
+        "stato",
+        "posizione_attuale",
+        "temperatura_monitorata"
+      ],
+      "rows": [
+        "[\"SP-2026-0001\", \"Mario Rossi\", \"Laura Bianchi\", \"2026-01-10\", \"consegnata\", \"Milano Centro\", \"5.50\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

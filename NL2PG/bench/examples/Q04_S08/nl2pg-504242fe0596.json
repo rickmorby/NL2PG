@@ -1,0 +1,43 @@
+{
+  "task_id": "nl2pg-504242fe0596",
+  "category": "Q04_S08",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "967d5521c451fdf0"
+  },
+  "story": "All'interno della struttura ospedaliera, l'Ufficio Anagrafe Sanitaria custodisce un archivio dedicato chiamato pazienti, nel quale sono conservate le schede anagrafiche di ogni assistito, complete di nome completo, cognome, codice fiscale e data di nascita. Parallelamente, esiste un secondo registro denominato cartella_clinica, nel quale vengono raccolte le informazioni cliniche associate a ciascun assistito, riportando la diagnosi formulata dal medico curante, la data dell'ultima visita effettuata e l'elenco delle eventuali allergie conosciute. Durante una sessione ordinaria di verifica, gli operatori sanitari hanno proceduto a incrociare le schede anagrafiche presenti nell'archivio pazienti con le corrispondenti cartelle cliniche contenute nel registro cartella_clinica, confrontando nome, cognome, diagnosi e data_ultima_visita, così da ricostruire un quadro clinico completo e aggiornato di ciascun assistito.",
+  "question": "Mostra i dati anagrafici dei pazienti insieme alla diagnosi e alla data dell'ultima visita per ciascun assistito.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE pazienti (\n    id BIGINT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    sesso TEXT CHECK (sesso IN ('M', 'F'))\n);\n\nCREATE TABLE cartella_clinica (\n    id BIGINT PRIMARY KEY,\n    paziente_id BIGINT NOT NULL UNIQUE REFERENCES pazienti(id),\n    diagnosi TEXT,\n    data_ultima_visita DATE CHECK (data_ultima_visita <= CURRENT_DATE),\n    allergie TEXT\n);",
+    "data_inserts": "INSERT INTO pazienti (id, nome, cognome, codice_fiscale, data_nascita, sesso) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', '1980-01-15', 'M'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', '1985-06-22', 'F'),\n(3, 'Giovanni', 'Verdi', 'VRGBNN75C15L219P', '1975-03-10', 'M'),\n(4, 'Anna', 'Neri', 'NRANNI90D08M501Q', '1990-09-03', 'F');\n\nINSERT INTO cartella_clinica (id, paziente_id, diagnosi, data_ultima_visita, allergie) VALUES\n(1, 1, 'Ipertensione arteriosa', '2025-03-10', 'Penicillina'),\n(2, 2, 'Asma bronchiale', '2025-01-22', 'Aspirina'),\n(3, 3, 'Diabete di tipo 2', '2024-11-05', 'Solfamide'),\n(4, 4, 'Artrosi al ginocchio', '2025-05-18', NULL);",
+    "query": "SELECT p.nome, p.cognome, c.diagnosi, c.data_ultima_visita FROM pazienti p JOIN cartella_clinica c ON p.id = c.paziente_id;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "diagnosi",
+        "data_ultima_visita"
+      ],
+      "rows": [
+        "[\"Mario\", \"Rossi\", \"Ipertensione arteriosa\", \"2025-03-10\"]",
+        "[\"Laura\", \"Bianchi\", \"Asma bronchiale\", \"2025-01-22\"]",
+        "[\"Giovanni\", \"Verdi\", \"Diabete di tipo 2\", \"2024-11-05\"]",
+        "[\"Anna\", \"Neri\", \"Artrosi al ginocchio\", \"2025-05-18\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

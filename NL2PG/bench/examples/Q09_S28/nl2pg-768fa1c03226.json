@@ -1,0 +1,56 @@
+{
+  "task_id": "nl2pg-768fa1c03226",
+  "category": "Q09_S28",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "cli",
+        "obsolete_value": "anagrafica_clienti",
+        "description": "La tabella clienti è denominata 'cli' nello schema abbreviato, ma nella documentazione aziendale viene chiamata 'anagrafica_clienti', richiedendo la decodifica del nome per identificare correttamente la tabella nelle query."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "tot_ord",
+        "obsolete_value": "impatto_ordini",
+        "description": "La colonna 'tot_ord' (totale ordini per cliente) è riferita nel linguaggio aziendale con il termine gergale 'impatto_ordini', richiedendo al risolutore di interpretare correttamente il significato semantico per mapparlo sulla colonna reale."
+      }
+    ],
+    "spec_hash": "3de1b088791c04c0"
+  },
+  "story": "Nell'ambito della gestione commerciale aziendale, l'archivio denominato anagrafica_clienti custodisce le schede anagrafiche di ogni partner commerciale. Ciascuna scheda riporta il nome dell'intestatario, il codice fiscale e l'impatto_ordini, ovvero il totale degli ordini che il cliente ha accumulato nel tempo. Affiancato a questo archivio, il registro ordini raccoglie i dettagli di ogni acquisto effettuato, registrando con precisione la data di ciascun ordine e l'importo complessivo della transazione. Il primo ordine è stato annotato il 2026-01-15 con un importo complessivo di 150.50, il secondo ordine, datato 2026-01-16, presenta un importo di 89.00, il terzo ordine, datato 2026-02-01, ammonta a 230.75, il quarto ordine, datato 2026-02-10, registra un valore di 45.00, mentre il quinto ordine, datato 2026-02-15, riporta un importo complessivo di 112.30. Per ogni singolo ordine, la sezione dedicata alle righe_ordine fornisce un dettaglio granulare dei prodotti acquistati, delle quantità richieste e del prezzo unitario di ciascun articolo, garantendo una visione completa di ogni transazione. Durante un'analisi periodica volta a individuare i collaboratori più significativi, i responsabili hanno consultato i dati aggregati per identificare i clienti la cui spesa complessiva supera la soglia di 100, disponendoli in ordine decrescente di importo e selezionando i primi 3 classificati. In questa graduatoria, il cliente Mario Rossi emerge al primo posto con una spesa totale di 381.25, seguito da Anna Neri con un totale di 112.30. L'intero processo di raccolta, aggregazione e classificazione viene documentato negli archivi gestionali per assicurare trasparenza, tracciabilità e piena coerenza nelle operazioni commerciali dell'azienda.",
+  "question": "Quali sono i primi 3 clienti per spesa complessiva, con un importo totale degli ordini superiore a 100, elencati dal più alto al più basso?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE cli (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    tot_ord INT DEFAULT 0 CHECK (tot_ord >= 0)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cli_id INT NOT NULL REFERENCES cli(id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);",
+    "data_inserts": "INSERT INTO cli (id, nome, codice_fiscale, tot_ord) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', 2),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', 1),\n(3, 'Giovanni Verdi', 'VRTGNN72C15L219P', 3),\n(4, 'Anna Neri', 'NRINNA90D22F345X', 1);\n\nINSERT INTO ordini (id, cli_id, data_ordine, importo_totale) VALUES\n(1, 1, '2026-01-15', 150.50),\n(2, 2, '2026-01-16', 89.00),\n(3, 1, '2026-02-01', 230.75),\n(4, 3, '2026-02-10', 45.00),\n(5, 4, '2026-02-15', 112.30);\n\nINSERT INTO righe_ordine (id, ordine_id, prodotto, quantita, prezzo_unitario) VALUES\n(1, 1, 'Laptop Dell', 1, 150.50),\n(2, 2, 'Mouse Logitech', 2, 44.50),\n(3, 3, 'Monitor Samsung', 1, 230.75),\n(4, 3, 'Cavo USB-C', 3, 15.00),\n(5, 4, 'Tastiera Mecanica', 1, 45.00),\n(6, 5, 'Webcam HD', 1, 112.30);",
+    "query": "SELECT c.nome, SUM(o.importo_totale) AS totale_speso FROM cli c JOIN ordini o ON c.id = o.cli_id GROUP BY c.nome HAVING SUM(o.importo_totale) > 100 ORDER BY totale_speso DESC LIMIT 3;",
+    "result": {
+      "columns": [
+        "nome",
+        "totale_speso"
+      ],
+      "rows": [
+        "[\"Mario Rossi\", \"381.25\"]",
+        "[\"Anna Neri\", \"112.30\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

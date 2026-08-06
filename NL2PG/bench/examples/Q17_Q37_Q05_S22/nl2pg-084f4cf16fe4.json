@@ -1,0 +1,59 @@
+{
+  "task_id": "nl2pg-084f4cf16fe4",
+  "category": "Q17_Q37_Q05_S22",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "vendite",
+        "obsolete_value": "movimentazione_commesse",
+        "description": "La tabella vendite viene indicata con il termine gergale aziendale 'movimentazione_commesse', rendendo meno immediato il riconoscimento dell'entità per chi deve scrivere la query."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "prodotti",
+        "obsolete_value": "articoli_offerti",
+        "description": "La tabella prodotti viene chiamata con il sinonimo 'articoli_offerti', obbligando l'analista a mappare il termine della richiesta con il nome reale della tabella nel database."
+      }
+    ],
+    "spec_hash": "a0eb2beaf2115ab1"
+  },
+  "story": "Nel cuore della gestione commerciale aziendale, l'archivio noto come movimentazione_commesse custodisce ogni documento relativo alle operazioni concluse con i clienti. Ciascuna scheda al suo interno riporta il codice fiscale del cliente, la data di registrazione dell'operazione, l'importo complessivo della commessa e il suo stato di avanzamento, con le possibili classificazioni 'completato', 'annullato' oppure 'in_corso'. Accanto a questo sistema, il catalogo dei beni disponibili prende il nome di articoli_offerti, dove ciascuna voce è identificata dal nome commerciale, da una descrizione dettagliata e dal prezzo unitario di listino. Completando il quadro informativo, l'insieme righe_vendita funge da ponte tra le commesse e i prodotti ad esse associati, annotando per ogni voce la quantità venduta e il prezzo unitario praticato. Durante la revisione semestrale dei ricavi, il team di analisi ha isolato dal movimento movimentazione_commesse soltanto le schede il cui stato fosse 'completato', escludendo quelle contrassegnate come 'annullato' o 'in_corso'. Incrociando poi i dati con il catalogo articoli_offerti e con le informazioni contenute in righe_vendita, gli operatori hanno calcolato il ricavo totale attribuito a ciascun prodotto, sommando i valori di quantità moltiplicati per il prezzo unitario corrispondente. È stata quindi applicata la funzione RANK per assegnare una posizione in graduatoria, consentendo di identificare i cinque prodotti con il ricavo complessivo più elevato tra tutte le commesse portate a termine con successo.",
+  "question": "Tra le vendite completate, quali sono i primi 5 prodotti con il ricavo totale più alto, indicando anche la posizione in graduatoria assegnata a ciascuno?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE vendite (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale_cliente TEXT NOT NULL,\n    data_vendita DATE NOT NULL DEFAULT CURRENT_DATE,\n    importo_totale NUMERIC(12,2) CHECK (importo_totale >= 0),\n    stato TEXT CHECK (stato IN ('completato', 'annullato', 'in_corso'))\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE righe_vendita (\n    id SERIAL PRIMARY KEY,\n    vendita_id INT NOT NULL REFERENCES vendite(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);",
+    "data_inserts": "INSERT INTO prodotti (id, nome, descrizione, prezzo_unitario) VALUES\n(1, 'Laptop Dell XPS', 'Laptop 15 pollici, 16GB RAM, 512GB SSD', 1299.99),\n(2, 'Mouse Logitech', 'Mouse wireless ergonomico', 29.99),\n(3, 'Monitor Samsung 27', 'Monitor LED 27 pollici 4K', 349.50),\n(4, 'Tastiera Meccanica', 'Tastiera meccanica RGB', 89.99),\n(5, 'Cavo USB-C', 'Cavo dati USB-C 2 metri', 12.50);\n\nINSERT INTO vendite (id, codice_fiscale_cliente, data_vendita, importo_totale, stato) VALUES\n(1, 'RSSMRA80A01H501U', '2026-01-15', 1329.98, 'completato'),\n(2, 'BNCLRA85B42F205Z', '2026-01-18', 349.50, 'completato'),\n(3, 'RSSMRA80A01H501U', '2026-01-20', 102.49, 'in_corso'),\n(4, 'BNCLRA85B42F205Z', '2026-02-01', 89.99, 'annullato'),\n(5, 'RSSMRA80A01H501U', '2026-02-05', 12.50, 'completato');\n\nINSERT INTO righe_vendita (id, vendita_id, prodotto_id, quantita, prezzo_unitario) VALUES\n(1, 1, 1, 1, 1299.99),\n(2, 1, 2, 1, 29.99),\n(3, 2, 3, 1, 349.50),\n(4, 3, 4, 1, 89.99),\n(5, 3, 5, 1, 12.50),\n(6, 4, 4, 1, 89.99),\n(7, 5, 5, 1, 12.50);",
+    "query": "SELECT p.nome, SUM(rv.quantita) AS quantita_totale, SUM(rv.quantita * rv.prezzo_unitario) AS ricavo_totale, RANK() OVER (ORDER BY SUM(rv.quantita * rv.prezzo_unitario) DESC) AS posizione FROM prodotti p JOIN righe_vendita rv ON p.id = rv.prodotto_id JOIN vendite v ON rv.vendita_id = v.id WHERE v.stato = 'completato' GROUP BY p.nome HAVING SUM(rv.quantita * rv.prezzo_unitario) > 0 ORDER BY ricavo_totale DESC LIMIT 5;",
+    "result": {
+      "columns": [
+        "nome",
+        "quantita_totale",
+        "ricavo_totale",
+        "posizione"
+      ],
+      "rows": [
+        "[\"Laptop Dell XPS\", 1, \"1299.99\", 1]",
+        "[\"Monitor Samsung 27\", 1, \"349.50\", 2]",
+        "[\"Mouse Logitech\", 1, \"29.99\", 3]",
+        "[\"Cavo USB-C\", 1, \"12.50\", 4]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

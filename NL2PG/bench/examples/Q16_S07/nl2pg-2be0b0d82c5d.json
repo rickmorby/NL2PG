@@ -1,0 +1,47 @@
+{
+  "task_id": "nl2pg-2be0b0d82c5d",
+  "category": "Q16_S07",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "università",
+    "n_tables": 2,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "cte",
+      "recursive_cte"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "dc230fda731b7eb8"
+  },
+  "story": "Presso la Direzione Accademica dell'ateneo, l'archivio corsi conserva le schede di ciascuna attività formativa offerta. Per ogni insegnamento sono annotati il codice del corso, la denominazione ufficiale, il numero di crediti formativi e, laddove previsto, l'identificativo del corso propedeutico. Parallelamente, il registro docenti raccoglie le informazioni anagrafiche del corpo docente, indicando per ciascun membro il nome, il cognome e l'indirizzo istituzionale di posta elettronica, oltre all'identificativo dell'insegnamento a cui è assegnato. Nell'ambito della revisione della gerarchia formativa, gli operatori hanno proceduto alla ricostruzione dell'intera catena di prerequisiti, attraversando i diversi livelli di profondità dei percorsi accademici. È emerso che la scheda relativa ad Analisi Matematica II riporta come propedeutico il corso Analisi Matematica I, mentre Strutture Dati richiede come prerequisito Programmazione. Fisica Generale I e Programmazione risultano privi di propedeuticità, configurandosi come le radici della gerarchia formativa. Per quanto riguarda l'assegnazione dei docenti, il registro docenti indica che Mario Rossi è responsabile di Analisi Matematica I, Laura Bianchi di Analisi Matematica II, e Giuseppe Verdi di Programmazione. Anna Neri, invece, non risulta assegnata a nessun corso in questo archivio, mentre gli altri docenti sono regolarmente contattabili ai rispettivi indirizzi istituzionali. L'intero processo di visualizzazione ha permesso di ricostruire l'ordine di profondità delle catene di prerequisiti, garantendo una chiara visione d'insieme dei percorsi accademici e delle rispettive attribuzioni didattiche.",
+  "question": "Mostra la gerarchia completa dei corsi con i livelli di profondità della catena di prerequisiti e i docenti assegnati a ciascuno, ordinata per livello di profondità e poi per codice del corso.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE corsi (\n    id INT PRIMARY KEY,\n    codice_corso TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    crediti INT NOT NULL CHECK (crediti > 0),\n    corso_prerequisito_id INT REFERENCES corsi(id)\n);\n\nCREATE TABLE docenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    corsi_id INT REFERENCES corsi(id)\n);",
+    "data_inserts": "INSERT INTO corsi (id, codice_corso, nome, crediti, corso_prerequisito_id) VALUES\n(1, 'MAT101', 'Analisi Matematica I', 9, NULL),\n(2, 'FIS101', 'Fisica Generale I', 9, NULL),\n(3, 'MAT201', 'Analisi Matematica II', 9, 1),\n(4, 'CS101', 'Programmazione', 6, NULL),\n(5, 'CS201', 'Strutture Dati', 6, 4);\n\nINSERT INTO docenti (id, nome, cognome, email, corsi_id) VALUES\n(1, 'Mario', 'Rossi', 'mario.rossi@university.it', 1),\n(2, 'Laura', 'Bianchi', 'laura.bianchi@university.it', 3),\n(3, 'Giuseppe', 'Verdi', 'giuseppe.verdi@university.it', 4),\n(4, 'Anna', 'Neri', 'anna.neri@university.it', NULL);",
+    "query": "WITH RECURSIVE catena_prerequisiti AS (SELECT id, codice_corso, nome, crediti, corso_prerequisito_id, id AS corso_radice_id, 1 AS profondita FROM corsi WHERE corso_prerequisito_id IS NULL UNION ALL SELECT c.id, c.codice_corso, c.nome, c.crediti, c.corso_prerequisito_id, cp.corso_radice_id, cp.profondita + 1 FROM corsi c JOIN catena_prerequisiti cp ON c.corso_prerequisito_id = cp.id), riepilogo_docenti AS (SELECT d.id, d.nome, d.cognome, d.email, c.id AS corso_id FROM docenti d INNER JOIN corsi c ON d.corsi_id = c.id) SELECT cp.codice_corso, cp.nome AS nome_corso, cp.crediti, cp.profondita, rd.nome AS nome_docente, rd.cognome AS cognome_docente FROM catena_prerequisiti cp LEFT JOIN riepilogo_docenti rd ON cp.id = rd.corso_id ORDER BY cp.profondita, cp.codice_corso;",
+    "result": {
+      "columns": [
+        "codice_corso",
+        "nome_corso",
+        "crediti",
+        "profondita",
+        "nome_docente",
+        "cognome_docente"
+      ],
+      "rows": [
+        "[\"CS101\", \"Programmazione\", 6, 1, \"Giuseppe\", \"Verdi\"]",
+        "[\"FIS101\", \"Fisica Generale I\", 9, 1, null, null]",
+        "[\"MAT101\", \"Analisi Matematica I\", 9, 1, \"Mario\", \"Rossi\"]",
+        "[\"CS201\", \"Strutture Dati\", 6, 2, null, null]",
+        "[\"MAT201\", \"Analisi Matematica II\", 9, 2, \"Laura\", \"Bianchi\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

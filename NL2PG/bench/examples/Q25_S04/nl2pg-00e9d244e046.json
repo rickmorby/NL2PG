@@ -1,0 +1,46 @@
+{
+  "task_id": "nl2pg-00e9d244e046",
+  "category": "Q25_S04",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "95ef3f09520821db"
+  },
+  "story": "Presso l'Ufficio Amministrativo, l'archivio denominato fatture raccoglie le schede relative alle operazioni di vendita. Ogni scheda riporta il codice identificativo, il numero_fattura, la data_fattura, l'importo_totale e una descrizione del servizio erogato. Parallelamente, il registro intitolato pagamenti custodisce le voci relative agli incassi, annotando la data_pagamento, l'importo_pagato e il metodo_pagamento. Durante una verifica di routine volta a ricostruire il flusso economico completo, gli operatori hanno incrociato le informazioni presenti nell'archivio fatture con quelle contenute nel registro pagamenti, associando ogni fattura al proprio pagamento tramite il codice identificativo comune, e hanno successivamente ordinato l'intero elenco in base alla data_fattura.",
+  "question": "Mostra l'elenco di tutte le fatture insieme ai dettagli dei pagamenti corrispondenti, ordinati per data di emissione della fattura.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE fatture (\n    id INT PRIMARY KEY,\n    numero_fattura TEXT NOT NULL UNIQUE,\n    data_fattura DATE NOT NULL,\n    importo_totale NUMERIC(12,2) CHECK (importo_totale >= 0),\n    descrizione TEXT\n);\n\nCREATE TABLE pagamenti (\n    id INT PRIMARY KEY REFERENCES fatture(id),\n    data_pagamento DATE NOT NULL,\n    importo_pagato NUMERIC(12,2) CHECK (importo_pagato >= 0),\n    metodo_pagamento TEXT\n);",
+    "data_inserts": "INSERT INTO fatture (id, numero_fattura, data_fattura, importo_totale, descrizione) VALUES\n(1, 'FAT/2025/0001', '2025-01-15', 1250.00, 'Fattura per consulenza IT'),\n(2, 'FAT/2025/0002', '2025-02-20', 340.75, 'Fattura per materiale d''ufficio'),\n(3, 'FAT/2025/0003', '2025-03-10', 890.00, 'Fattura per servizi di manutenzione'),\n(4, 'FAT/2025/0004', '2025-04-05', 2100.50, 'Fattura per licenze software'),\n(5, 'FAT/2025/0005', '2025-05-18', 575.30, 'Fattura per trasporto merci');\n\nINSERT INTO pagamenti (id, data_pagamento, importo_pagato, metodo_pagamento) VALUES\n(1, '2025-01-20', 1250.00, 'Bonifico bancario'),\n(2, '2025-02-25', 340.75, 'Carta di credito'),\n(3, '2025-03-15', 890.00, 'Bonifico bancario'),\n(4, '2025-04-10', 2100.50, 'PayPal'),\n(5, '2025-05-22', 575.30, 'Contanti');",
+    "query": "SELECT fatture.numero_fattura, fatture.data_fattura, fatture.importo_totale, pagamenti.data_pagamento, pagamenti.importo_pagato, pagamenti.metodo_pagamento FROM fatture NATURAL JOIN pagamenti ORDER BY fatture.data_fattura;",
+    "result": {
+      "columns": [
+        "numero_fattura",
+        "data_fattura",
+        "importo_totale",
+        "data_pagamento",
+        "importo_pagato",
+        "metodo_pagamento"
+      ],
+      "rows": [
+        "[\"FAT/2025/0001\", \"2025-01-15\", \"1250.00\", \"2025-01-20\", \"1250.00\", \"Bonifico bancario\"]",
+        "[\"FAT/2025/0002\", \"2025-02-20\", \"340.75\", \"2025-02-25\", \"340.75\", \"Carta di credito\"]",
+        "[\"FAT/2025/0003\", \"2025-03-10\", \"890.00\", \"2025-03-15\", \"890.00\", \"Bonifico bancario\"]",
+        "[\"FAT/2025/0004\", \"2025-04-05\", \"2100.50\", \"2025-04-10\", \"2100.50\", \"PayPal\"]",
+        "[\"FAT/2025/0005\", \"2025-05-18\", \"575.30\", \"2025-05-22\", \"575.30\", \"Contanti\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "task_id": "nl2pg-516aed2d416b",
+  "category": "Q09_S07",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 2,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "fe36deefc1ab9402"
+  },
+  "story": "In occasione della revisione trimestrale del catalogo merceologico, i responsabili del reparto vendite hanno avviato un'analisi approfondita dei dati contenuti nell'archivio denominato categorie, il quale raccoglie tutte le famiglie di prodotti commercializzati dall'azienda. Ogni voce è identificata da un codice univoco e da un nome esclusivo, e ciascuna famiglia può essere collegata a una famiglia di livello superiore, generando così una struttura gerarchica che riflette le relazioni gerarchiche tra le diverse famiglie merceologiche. Parallelamente, il registro chiamato prodotti conserva le schede complete di tutti gli articoli disponibili per la vendita, indicando per ciascuno il nome commerciale, il prezzo di listino, la quantità presente in magazzino e il riferimento alla categoria di appartenenza. L'obiettivo dell'analisi era individuare le categorie che comprendono più di un prodotto, calcolando per ciascuna di esse il numero totale di articoli presenti e il prezzo medio di vendita. I risultati ottenuti sono stati quindi ordinati in modo decrescente in base al numero di prodotti per categoria, consentendo ai responsabili di identificare rapidamente le famiglie merceologiche più ampie e di ottimizzare di conseguenza le strategie di approvvigionamento e le iniziative promozionali.",
+  "question": "Tra le categorie del catalogo, quali sono quelle che contengono più di un prodotto? Mostra il nome di ciascuna categoria, il numero totale di prodotti associati e il prezzo medio di vendita, ordinando i risultati dal numero di prodotti più alto al più basso.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    categoria_padre_id INT REFERENCES categorie(id)\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    prezzo NUMERIC(10,2) CHECK (prezzo >= 0),\n    quantita_disponibile INT CHECK (quantita_disponibile >= 0)\n);",
+    "data_inserts": "INSERT INTO categorie (id, nome, categoria_padre_id) VALUES\n(1, 'Elettronica', NULL),\n(2, 'Informatica', 1),\n(3, 'Abbigliamento', NULL),\n(4, 'Smartphone', 2),\n(5, 'Accessori', 3);\n\nINSERT INTO prodotti (id, nome, categoria_id, prezzo, quantita_disponibile) VALUES\n(1, 'Laptop Dell XPS', 2, 1299.99, 15),\n(2, 'iPhone 15 Pro', 4, 1199.00, 8),\n(3, 'T-Shirt Cotton', 3, 19.99, 100),\n(4, 'Cavo USB-C', 5, 12.50, 200),\n(5, 'Monitor Samsung 27', 2, 349.00, 10);",
+    "query": "SELECT c.nome AS categoria, COUNT(p.id) AS num_prodotti, AVG(p.prezzo) AS prezzo_medio FROM categorie c JOIN prodotti p ON c.id = p.categoria_id GROUP BY c.nome HAVING COUNT(p.id) > 1 ORDER BY num_prodotti DESC;",
+    "result": {
+      "columns": [
+        "categoria",
+        "num_prodotti",
+        "prezzo_medio"
+      ],
+      "rows": [
+        "[\"Informatica\", 2, \"824.4950000000000000\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

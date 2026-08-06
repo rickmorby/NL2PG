@@ -1,0 +1,49 @@
+{
+  "task_id": "nl2pg-43aadf80d7e7",
+  "category": "Q25_S30",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [
+      "distractor"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "distractor",
+        "target_value": "stazioni",
+        "obsolete_value": "hub_di_smistamento",
+        "description": "La tabella stazioni viene referenziata nella prosa come hub_di_smistamento, un'entità distrattiva irrilevante per la query principale che richiede il tracciamento dei pacchi tramite join naturale tra pacchi, corrieri e indirizzi."
+      }
+    ],
+    "spec_hash": "15de741ce1039a6e"
+  },
+  "story": "Presso il Centro Logistico dell'azienda, l'archivio dedicato ai corrieri raccoglie le schede complete di ciascun vettore attivo, annotando la denominazione ufficiale, il recapito telefonico e la città di residenza. Parallelamente, il registro degli indirizzi conserva la via e il civico di destinazione, la località e il codice di avviamento postale, fungendo da riferimento geografico indispensabile per ogni spedizione in partenza. L'archivio centrale chiamato pacchi rappresenta il cuore operativo della struttura: collega ogni spedizione al vettore attraverso il rimando al corriere e alla destinazione tramite il riferimento all'indirizzo, annotando il peso dichiarato, la descrizione del contenuto, il codice di avviamento postale e la città di destinazione. Per ogni elemento in transito, il registro degli stati_pacco aggiorna la condizione attuale e la data dell'ultimo aggiornamento, garantendo tracciabilità continua lungo l'intero percorso, mentre la scheda dei tipi_pacco classifica la categoria di spedizione e registra il peso complessivo lordo. Durante la verifica mensile, gli operatori hanno consultato anche l'entità distrattiva hub_di_smistamento, che gestisce i flussi secondari e i trasferimenti tra sedi periferiche, senza tuttavia influenzare l'analisi principale. Hanno raggruppato le spedizioni per vettore, filtrando solo quelli con un numero di pacchi superiore a 1, calcolando il totale delle unità e la media dei pesi, e hanno ordinato i risultati per quantità decrescente.",
+  "question": "Per ogni corriere che ha gestito più di una spedizione, qual è il numero totale di pacchi e il peso medio dei pacchi, ordinati per quantità decrescente?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE corrieri (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    telefono TEXT,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE indirizzi (\n    id SERIAL PRIMARY KEY,\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL\n);\n\nCREATE TABLE pacchi (\n    id SERIAL PRIMARY KEY,\n    corriere_id INT NOT NULL REFERENCES corrieri(id),\n    indirizzo_id INT NOT NULL REFERENCES indirizzi(id),\n    peso NUMERIC(8,2) CHECK (peso > 0),\n    descrizione TEXT,\n    cap TEXT NOT NULL,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE stati_pacco (\n    id SERIAL PRIMARY KEY,\n    pacchetto_id INT NOT NULL REFERENCES pacchi(id),\n    stato TEXT NOT NULL,\n    data_aggiornamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE tipi_pacco (\n    id SERIAL PRIMARY KEY,\n    pacchetto_id INT NOT NULL REFERENCES pacchi(id),\n    tipo TEXT NOT NULL,\n    peso_lordo NUMERIC(8,2) CHECK (peso_lordo >= 0)\n);",
+    "data_inserts": "INSERT INTO corrieri (id, nome, telefono, citta) VALUES\n(1, 'BRT Spedizioni', '+39 02 1234567', 'Milano'),\n(2, 'Bartolini', '+39 055 9876543', 'Firenze'),\n(3, 'GLS Italia', '+39 06 5551234', 'Roma'),\n(4, 'SDA Express', '+39 041 3334445', 'Venezia');\n\nINSERT INTO indirizzi (id, via, citta, cap) VALUES\n(1, 'Via Roma 1', 'Milano', '20100'),\n(2, 'Via della Scala 45', 'Firenze', '50100'),\n(3, 'Piazza Navona 12', 'Roma', '00186'),\n(4, 'Calle della Mandola 3', 'Venezia', '30100'),\n(5, 'Via Torino 78', 'Napoli', '80100'),\n(6, 'Corso Buenos Aires 100', 'Milano', '20100');\n\nINSERT INTO pacchi (id, corriere_id, indirizzo_id, peso, descrizione, cap, citta) VALUES\n(1, 1, 1, 2.50, 'Documenti urgenti', '20100', 'Milano'),\n(2, 2, 2, 5.75, 'Pacco regalo', '50100', 'Firenze'),\n(3, 3, 3, 1.20, 'Libri', '00186', 'Roma'),\n(4, 1, 4, 10.00, 'Elettronica', '30100', 'Venezia'),\n(5, 4, 5, 3.30, 'Abbigliamento', '80100', 'Napoli'),\n(6, 2, 6, 0.80, 'Pacco leggero', '20100', 'Milano');\n\nINSERT INTO stati_pacco (id, pacchetto_id, stato, data_aggiornamento) VALUES\n(1, 1, 'In transito', '2026-01-10 08:30:00'),\n(2, 1, 'Consegnato', '2026-01-11 14:00:00'),\n(3, 2, 'In transito', '2026-01-12 09:15:00'),\n(4, 3, 'In transito', '2026-01-13 11:00:00'),\n(5, 3, 'Consegnato', '2026-01-14 16:45:00'),\n(6, 4, 'In transito', '2026-01-15 10:30:00');\n\nINSERT INTO tipi_pacco (id, pacchetto_id, tipo, peso_lordo) VALUES\n(1, 1, 'Standard', 2.50),\n(2, 2, 'Express', 5.75),\n(3, 3, 'Standard', 1.20),\n(4, 4, 'Premium', 10.00),\n(5, 5, 'Standard', 3.30),\n(6, 6, 'Economy', 0.80);",
+    "query": "WITH pacchi_arricchiti AS (SELECT p.id, p.descrizione, p.peso, c.nome AS corriere, i.via FROM pacchi p NATURAL JOIN indirizzi i JOIN corrieri c ON p.corriere_id = c.id) SELECT corriere, COUNT(*) AS num_pacchi, ROUND(AVG(peso), 2) AS peso_medio FROM pacchi_arricchiti GROUP BY corriere HAVING COUNT(*) > 1 ORDER BY num_pacchi DESC;",
+    "result": {
+      "columns": [
+        "corriere",
+        "num_pacchi",
+        "peso_medio"
+      ],
+      "rows": [
+        "[\"BRT Spedizioni\", 2, \"6.25\"]",
+        "[\"Bartolini\", 2, \"3.28\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

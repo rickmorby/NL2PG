@@ -1,0 +1,45 @@
+{
+  "task_id": "nl2pg-ee19c5b95072",
+  "category": "Q04_S02",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "2eb3a8377ed54265"
+  },
+  "story": "Nel contesto della gestione logistica aziendale, l'archivio clienti conserva le informazioni anagrafiche complete di ciascun partner commerciale, annotando nome e codice fiscale come dati identificativi fondamentali. Parallelamente, il registro ordini archivia l'intera cronologia delle transazioni commerciali, registrando con precisione la data di ogni ordine, l'importo totale e lo stato di avanzamento della spedizione. Durante un'analisi operativa finalizzata a individuare le priorità di magazzino, gli operatori hanno ricostruito le relazioni tra i clienti e gli ordini, esaminando ogni transazione nel suo contesto completo. Hanno analizzato l'ordine 101 di Mario Rossi, effettuato in data 2026-01-15, con un importo totale di 150.50 e stato delivered. Successivamente, hanno esaminato l'ordine 102 di Laura Bianchi, datato 2026-01-16, con importo 89.00 e stato shipped. Hanno poi preso in esame l'ordine 103 di Mario Rossi, datato 2026-02-01, importo 230.75, stato pending. Hanno verificato anche l'ordine 104 di Giuseppe Verdi, datato 2026-02-10, importo 45.00, stato cancelled. Infine, hanno processato l'ordine 105 di Anna Neri, datato 2026-03-05, importo 312.99, stato delivered. L'intero elenco è stato ordinato per importo totale decrescente, partendo dal valore 312.99 fino al più modesto 45.00, per garantire una rapida identificazione delle priorità di magazzino.",
+  "question": "Visualizza l'elenco completo di tutti i clienti insieme ai loro ordini, mostrando il nome del cliente, l'identificativo dell'ordine, la data dell'ordine, l'importo totale e lo stato di avanzamento, ordinando i risultati dal valore totale più alto al più basso per individuare rapidamente gli ordini di maggior valore.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0),\n    stato TEXT CHECK (stato IN ('pending', 'shipped', 'delivered', 'cancelled'))\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, email, telefono) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.com', '3331234567'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.com', '3339876543'),\n(3, 'Giuseppe Verdi', 'VRDGSP72C15L219P', 'g.verdi@email.com', '3471112233'),\n(4, 'Anna Neri', 'NRINNA90D22M502X', 'anna.neri@email.com', '3205556677');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, importo_totale, stato) VALUES\n(101, 1, '2026-01-15', 150.50, 'delivered'),\n(102, 2, '2026-01-16', 89.00, 'shipped'),\n(103, 1, '2026-02-01', 230.75, 'pending'),\n(104, 3, '2026-02-10', 45.00, 'cancelled'),\n(105, 4, '2026-03-05', 312.99, 'delivered');",
+    "query": "SELECT c.nome, o.id AS ordine_id, o.data_ordine, o.importo_totale, o.stato FROM clienti c JOIN ordini o ON c.id = o.cliente_id ORDER BY o.importo_totale DESC;",
+    "result": {
+      "columns": [
+        "nome",
+        "ordine_id",
+        "data_ordine",
+        "importo_totale",
+        "stato"
+      ],
+      "rows": [
+        "[\"Anna Neri\", 105, \"2026-03-05\", \"312.99\", \"delivered\"]",
+        "[\"Mario Rossi\", 103, \"2026-02-01\", \"230.75\", \"pending\"]",
+        "[\"Mario Rossi\", 101, \"2026-01-15\", \"150.50\", \"delivered\"]",
+        "[\"Laura Bianchi\", 102, \"2026-01-16\", \"89.00\", \"shipped\"]",
+        "[\"Giuseppe Verdi\", 104, \"2026-02-10\", \"45.00\", \"cancelled\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

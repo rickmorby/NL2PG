@@ -1,0 +1,57 @@
+{
+  "task_id": "nl2pg-4255bcc49b13",
+  "category": "Q06_S28",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fatture",
+        "obsolete_value": "documenti_fiscali",
+        "description": "La tabella fatture viene denominata documenti_fiscali nel linguaggio aziendale, richiedendo al modello di decodificare il sinonimo per identificare correttamente la tabella."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore_monetario_netto",
+        "description": "La colonna importo_totale è riferita con il gergo contabile valore_monetario_netto, obbligando il modello a mappare il termine tecnico al nome reale della colonna."
+      }
+    ],
+    "spec_hash": "b2277f6053ac0032"
+  },
+  "story": "Nel contesto della Direzione Amministrativa, l'archivio denominato clienti custodisce le schede di ciascun partner commerciale, annotando per ogni soggetto la ragione sociale, il codice fiscale e l'indirizzo di contatto. Accanto a questo, il registro intitolato documenti_fiscali raccoglie i dati relativi a tutti gli addebiti emessi, associando a ogni voce il valore_monetario_netto, la data di emissione e lo stato di avanzamento della pratica. Nell'ambito di un'analisi periodica volta a individuare i clienti con debiti regolarizzati, gli analisti hanno esaminato le schede clienti filtrando esclusivamente gli elementi presenti nel registro documenti_fiscali caratterizzati dallo stato 'pagata' e dal valore_monetario_netto superiore a 50. Procedendo poi alla somma degli importi per ciascun soggetto e ordinando i risultati in modo decrescente, la squadra ha determinato la graduatoria finale. In questa classifica, Giuseppe Verdi si è posizionato al primo posto con un totale di 230,75, mentre Mario Rossi si è collocato al secondo posto con 150,50, entrambi correttamente ricavati dalla consultazione delle sezioni dettagliate contenute nel registro documenti_fiscali e delle relative voci di spesa archiviate nel registro righe_fattura.",
+  "question": "Quali sono i primi 5 clienti con il totale più alto di fatture pagate da oltre 50 euro, indicando per ciascuno il numero di fatture, l'importo complessivo e la posizione in graduatoria?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE fatture (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    importo_totale NUMERIC(12,2) CHECK (importo_totale >= 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato TEXT CHECK (stato IN ('emessa', 'pagata', 'annullata')),\n    CHECK (data_scadenza >= data_emissione)\n);\n\nCREATE TABLE righe_fattura (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL REFERENCES fatture(id),\n    descrizione TEXT NOT NULL,\n    quantita NUMERIC(10,2) CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0),\n    importo_riga NUMERIC(12,2) CHECK (importo_riga >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, email, data_registrazione) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.com', '2025-03-10'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.com', '2025-06-15'),\n(3, 'Giuseppe Verdi', 'VRDGLS72C25L219M', 'g.verdi@email.com', '2025-01-20'),\n(4, 'Anna Neri', 'NNRANA90D15M502R', 'anna.neri@email.com', '2025-09-01');\n\nINSERT INTO fatture (id, cliente_id, importo_totale, data_emissione, data_scadenza, stato) VALUES\n(101, 1, 150.50, '2026-01-15', '2026-02-15', 'pagata'),\n(102, 2, 89.00, '2026-01-16', '2026-02-16', 'emessa'),\n(103, 3, 230.75, '2026-02-01', '2026-03-01', 'pagata'),\n(104, 1, 45.00, '2026-03-10', '2026-04-10', 'annullata');\n\nINSERT INTO righe_fattura (id, fattura_id, descrizione, quantita, prezzo_unitario, importo_riga) VALUES\n(1, 101, 'Consulenza software', 5.00, 30.10, 150.50),\n(2, 101, 'Licenza software annuale', 1.00, 0.00, 0.00),\n(3, 102, 'Assistenza tecnica', 2.00, 44.50, 89.00),\n(4, 103, 'Formazione aziendale', 3.00, 50.25, 150.75),\n(5, 104, 'Abbonamento annuale', 1.00, 45.00, 45.00);",
+    "query": "WITH fatture_pagate AS (SELECT cliente_id, importo_totale FROM fatture WHERE stato = 'pagata' AND importo_totale > 50) SELECT c.nome, COUNT(fp.importo_totale) AS numero_fatture, SUM(fp.importo_totale) AS totale_fatture, RANK() OVER (ORDER BY SUM(fp.importo_totale) DESC) AS posizione FROM clienti c JOIN fatture_pagate fp ON c.id = fp.cliente_id GROUP BY c.nome HAVING COUNT(fp.importo_totale) >= 1 ORDER BY totale_fatture DESC LIMIT 5;",
+    "result": {
+      "columns": [
+        "nome",
+        "numero_fatture",
+        "totale_fatture",
+        "posizione"
+      ],
+      "rows": [
+        "[\"Giuseppe Verdi\", 1, \"230.75\", 1]",
+        "[\"Mario Rossi\", 1, \"150.50\", 2]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

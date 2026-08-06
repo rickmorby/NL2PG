@@ -1,0 +1,42 @@
+{
+  "task_id": "nl2pg-70a34dddca81",
+  "category": "Q01_S07",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "self_referencing",
+    "sql_features": [],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "edd55f8a992bda92"
+  },
+  "story": "All'interno della struttura ospedaliera, l'archivio denominato personale_medico custodisce le schede anagrafiche di ciascun membro del team sanitario, registrando nome, cognome, codice fiscale, ruolo professionale e data di inizio attività. Ogni scheda contiene anche il riferimento al proprio diretto superiore, creando una gerarchia organizzativa interna ben definita. Durante un'ispezione periodica, il responsabile delle risorse umane ha richiesto l'elenco completo di tutti gli operatori, desiderando identificare per ciascuno il nome del proprio diretto soprintendente, qualora presente. L'analisi ha coinvolto i seguenti membri del personale: Maria Verdi, con ruolo di medico e codice fiscale VRDMRA70A01L234Z, che ricopre una posizione di vertice senza un superiore diretto; Giovanni Neri, infermiere con codice fiscale NRIGNN85B02H501M, il cui superiore diretto è Maria Verdi; Laura Bianchi, specialista con codice fiscale BNCLRA85B42F205Z, anch'ella subordinata a Maria Verdi; Paolo Rossi, tecnico con codice fiscale RSSPLA78C03H502N, la cui guida è Giovanni Neri; e infine Sara Esposito, operatore amministrativo con codice fiscale ESPSRA90D05H503P, che riporta comunque a Maria Verdi. Le assunzioni sono avvenute rispettivamente il 2010-03-15 per Maria, il 2015-07-20 per Giovanni, il 2018-01-10 per Laura, il 2019-06-01 per Paolo e il 2020-11-25 per Sara. Questo organigramma interno permette una chiara distribuzione delle responsabilità all'interno della struttura sanitaria, garantendo trasparenza nei rapporti gerarchici e facilitando la gestione quotidiana del personale.",
+  "question": "Visualizzare l'elenco di tutto il personale medico indicando per ciascuno il nome del proprio diretto superiore gerarchico",
+  "gold": {
+    "schema_ddl": "CREATE TABLE personale_medico (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    ruolo TEXT NOT NULL CHECK (ruolo IN ('medico', 'infermiere', 'specialista', 'tecnico', 'amministrativo')),\n    superiore_id INT REFERENCES personale_medico(id),\n    data_assunzione DATE NOT NULL CHECK (data_assunzione <= CURRENT_DATE)\n);",
+    "data_inserts": "INSERT INTO personale_medico (id, nome, cognome, codice_fiscale, ruolo, superiore_id, data_assunzione) VALUES\n(1, 'Maria', 'Verdi', 'VRDMRA70A01L234Z', 'medico', NULL, '2010-03-15'),\n(2, 'Giovanni', 'Neri', 'NRIGNN85B02H501M', 'infermiere', 1, '2015-07-20'),\n(3, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', 'specialista', 1, '2018-01-10'),\n(4, 'Paolo', 'Rossi', 'RSSPLA78C03H502N', 'tecnico', 2, '2019-06-01'),\n(5, 'Sara', 'Esposito', 'ESPSRA90D05H503P', 'amministrativo', 1, '2020-11-25');",
+    "query": "SELECT pm.nome, pm.cognome, pm.ruolo, pm_superiore.nome AS superiore FROM personale_medico pm LEFT JOIN personale_medico pm_superiore ON pm.superiore_id = pm_superiore.id;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "ruolo",
+        "superiore"
+      ],
+      "rows": [
+        "[\"Maria\", \"Verdi\", \"medico\", null]",
+        "[\"Giovanni\", \"Neri\", \"infermiere\", \"Maria\"]",
+        "[\"Laura\", \"Bianchi\", \"specialista\", \"Maria\"]",
+        "[\"Paolo\", \"Rossi\", \"tecnico\", \"Giovanni\"]",
+        "[\"Sara\", \"Esposito\", \"amministrativo\", \"Maria\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

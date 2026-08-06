@@ -1,0 +1,43 @@
+{
+  "task_id": "nl2pg-7ae2a931aa30",
+  "category": "Q05_S29",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "flat",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "6a8c15ccdb7720ba"
+  },
+  "story": "Presso l'Ufficio Amministrativo dell'azienda, l'archivio denominato clienti conserva le schede anagrafiche di ciascun acquirente, riportando nome, cognome e città di residenza. Parallelamente, il registro intitolato prodotti archivia le schede di ciascun articolo disponibile in catalogo, indicandone la descrizione, il prezzo unitario e la categoria di appartenenza. Il registro ordini, infine, raccoglie le voci relative a ogni acquisto effettuato, collegando ciascuna transazione all'acquirente e al prodotto corrispondente. Durante la chiusura del bilancio del primo trimestre del 2026, gli operatori hanno esaminato il registro ordini per ricostruire il quadro complessivo delle vendite. Hanno preso in considerazione l'ordine numero 101, registrato il 2026-01-15, relativo a Mario Rossi, cliente residente a Roma, che ha acquistato un Laptop HP della categoria Elettronica al prezzo unitario di 899.99. Hanno poi analizzato l'ordine 102, datato 2026-01-16, relativo a Laura Bianchi di Milano, che ha acquistato 2 unità del Mouse Logitech, un accessorio dal prezzo unitario di 29.90. L'ordine 103, datato 2026-02-01, ha visto Giovanni Verdi di Napoli acquistare un Monitor Samsung della categoria Elettronica al prezzo di 349.50. Successivamente, l'ordine 104, registrato il 2026-02-10, ha riguardato Mario Rossi che ha acquistato 3 unità della Tastiera Meccanica, un accessorio dal costo unitario di 79.99. Infine, l'ordine 105, datato 2026-03-05, ha registrato l'acquisto di Sara Neri, residente a Torino, che ha acquistato 1 Mouse Logitech al prezzo di 29.90. A seguito di questa analisi, gli operatori hanno raggruppato le voci per nome e cognome di ciascun cliente presente nell'archivio clienti, calcolando la spesa_totale sostenuta e il numero_ordini complessivo per ogni acquirente.",
+  "question": "Qual è la spesa totale sostenuta e quanti ordini ha effettuato ciascun cliente, raggruppando i risultati per nome e cognome?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    citta TEXT,\n    data_registrazione DATE DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0),\n    categoria TEXT\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT CHECK (quantita > 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, cognome, email, citta, data_registrazione) VALUES\n(1, 'Mario', 'Rossi', 'mario.rossi@email.com', 'Roma', '2024-03-10'),\n(2, 'Laura', 'Bianchi', 'laura.bianchi@email.com', 'Milano', '2024-05-22'),\n(3, 'Giovanni', 'Verdi', 'giovanni.verdi@email.com', 'Napoli', '2025-01-14'),\n(4, 'Sara', 'Neri', 'sara.neri@email.com', 'Torino', '2025-06-30');\n\nINSERT INTO prodotti (id, nome, descrizione, prezzo_unitario, categoria) VALUES\n(1, 'Laptop HP', 'Laptop 15 pollici 16GB RAM', 899.99, 'Elettronica'),\n(2, 'Mouse Logitech', 'Mouse wireless ergonomico', 29.90, 'Accessori'),\n(3, 'Monitor Samsung', 'Monitor 27 pollici 4K', 349.50, 'Elettronica'),\n(4, 'Tastiera Meccanica', 'Tastiera meccanica RGB', 79.99, 'Accessori');\n\nINSERT INTO ordini (id, cliente_id, prodotto_id, quantita, data_ordine, prezzo_unitario) VALUES\n(101, 1, 1, 1, '2026-01-15', 899.99),\n(102, 2, 2, 2, '2026-01-16', 29.90),\n(103, 3, 3, 1, '2026-02-01', 349.50),\n(104, 1, 4, 3, '2026-02-10', 79.99),\n(105, 4, 2, 1, '2026-03-05', 29.90);",
+    "query": "SELECT c.nome, c.cognome, SUM(o.quantita * o.prezzo_unitario) AS spesa_totale, COUNT(o.id) AS numero_ordini FROM clienti c JOIN ordini o ON c.id = o.cliente_id GROUP BY c.nome, c.cognome;",
+    "result": {
+      "columns": [
+        "nome",
+        "cognome",
+        "spesa_totale",
+        "numero_ordini"
+      ],
+      "rows": [
+        "[\"Giovanni\", \"Verdi\", \"349.50\", 1]",
+        "[\"Laura\", \"Bianchi\", \"59.80\", 1]",
+        "[\"Mario\", \"Rossi\", \"1139.96\", 2]",
+        "[\"Sara\", \"Neri\", \"29.90\", 1]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

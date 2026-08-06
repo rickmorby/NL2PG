@@ -1,0 +1,43 @@
+{
+  "task_id": "nl2pg-cf9c8f54f657",
+  "category": "Q01_S20",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "cb686eb12662f763"
+  },
+  "story": "Presso il centro logistico 'LogiTrack', gli operatori gestiscono quotidianamente le operazioni di invio pacchi attraverso procedure manuali e archivi cartacei. L'archivio principale, denominato spedizioni, raccoglie le schede di ogni pacco in transito. In ciascuna scheda sono riportati il codice_spedizione, il nome del mittente, il nome del destinatario, l'indirizzo di partenza e l'indirizzo di arrivo. Ogni scheda include anche il peso in chilogrammi, la priorita, lo stato attuale della consegna e la data e ora in cui la spedizione è stata creata, registrata come data_creazione. Durante la verifica operativa mattutina, il responsabile della logistica estrae dall'archivio le schede in cui l'indicatore attiva è impostato su TRUE, per isolare esclusivamente le spedizioni ancora in corso. Per organizzare il flusso di lavoro, gli operatori ordinano questi elementi secondo il valore della voce data_creazione, partendo dalla più recente. Successivamente, il team di verifica confronta il valore della voce data_consegna_prevista con la data odierna fornita da CURRENT_DATE e, qualora la spedizione risulti in stato in_transito, determina se la consegna è in ritardo o in tempo: se la data_consegna_prevista è antecedente a CURRENT_DATE e lo stato è in_transito, la spedizione viene segnalata come 'In ritardo'; in caso contrario, viene contrassegnata come 'In tempo'. Infine, gli operatori aggiornano il registro fisico con queste indicazioni e archiviano le conferme di consegna nel cassetto dei documenti validati.",
+  "question": "Qual è lo stato delle spedizioni ancora attive, elencate dalla più recente alla meno recente, con indicazione per ciascuna se la consegna risulta in ritardo o in tempo rispetto alla data prevista?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE spedizioni (\n    id BIGINT PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    mittente TEXT NOT NULL,\n    destinatario TEXT NOT NULL,\n    indirizzo_partenza TEXT NOT NULL,\n    indirizzo_arrivo TEXT NOT NULL,\n    peso_kg NUMERIC(8,3) CHECK (peso_kg > 0),\n    stato TEXT NOT NULL CHECK (stato IN ('in_transito', 'consegnato', 'in_attesa', 'annullato')),\n    priorita TEXT CHECK (priorita IN ('bassa', 'normale', 'alta', 'urgente')),\n    data_creazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    data_consegna_prevista DATE,\n    data_consegna_effettiva DATE,\n    attiva BOOLEAN DEFAULT TRUE\n);",
+    "data_inserts": "INSERT INTO spedizioni (id, codice_spedizione, mittente, destinatario, indirizzo_partenza, indirizzo_arrivo, peso_kg, stato, priorita, data_creazione, data_consegna_prevista, data_consegna_effettiva, attiva) VALUES\n(1, 'SPED-2026-0001', 'Milano Logistica SRL', 'Mario Rossi', 'Via Milano 10, 20100 Milano MI', 'Via Roma 5, 00100 Roma RM', 12.500, 'consegnato', 'alta', '2026-01-10 08:30:00', '2026-01-15', '2026-01-14', FALSE),\n(2, 'SPED-2026-0002', 'Torino Express', 'Laura Bianchi', 'Corso Francia 100, 10100 Torino TO', 'Piazza del Popolo 1, 00100 Roma RM', 5.200, 'in_transito', 'normale', '2026-01-12 14:00:00', '2026-01-18', NULL, TRUE),\n(3, 'SPED-2026-0003', 'Napoli Shipping', 'Giuseppe Verdi', 'Via Napoli 20, 80100 Napoli NA', 'Via Milano 50, 20100 Milano MI', 0.800, 'in_attesa', 'bassa', '2026-01-14 09:15:00', '2026-01-20', NULL, TRUE),\n(4, 'SPED-2026-0004', 'Firenze Cargo', 'Anna Neri', 'Lungarno 15, 50100 Firenze FI', 'Via Verdi 30, 50100 Firenze FI', 25.000, 'annullato', 'urgente', '2026-01-15 11:00:00', '2026-01-16', NULL, FALSE),\n(5, 'SPED-2026-0005', 'Roma Express SRL', 'Marco Bianchi', 'Via Tiburtina 100, 00100 Roma RM', 'Corso Buenos Aires 5, 20100 Milano MI', 8.350, 'consegnato', 'normale', '2026-01-16 16:45:00', '2026-01-22', '2026-01-21', FALSE);",
+    "query": "SELECT codice_spedizione, mittente, destinatario, stato, priorita, data_creazione, data_consegna_prevista, CASE WHEN data_consegna_prevista < CURRENT_DATE AND stato = 'in_transito' THEN 'In ritardo' ELSE 'In tempo' END AS stato_consegna FROM spedizioni WHERE attiva = TRUE ORDER BY data_creazione DESC;",
+    "result": {
+      "columns": [
+        "codice_spedizione",
+        "mittente",
+        "destinatario",
+        "stato",
+        "priorita",
+        "data_creazione",
+        "data_consegna_prevista",
+        "stato_consegna"
+      ],
+      "rows": [
+        "[\"SPED-2026-0003\", \"Napoli Shipping\", \"Giuseppe Verdi\", \"in_attesa\", \"bassa\", \"2026-01-14 09:15:00\", \"2026-01-20\", \"In tempo\"]",
+        "[\"SPED-2026-0002\", \"Torino Express\", \"Laura Bianchi\", \"in_transito\", \"normale\", \"2026-01-12 14:00:00\", \"2026-01-18\", \"In ritardo\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

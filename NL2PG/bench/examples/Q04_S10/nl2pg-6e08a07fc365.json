@@ -1,0 +1,54 @@
+{
+  "task_id": "nl2pg-6e08a07fc365",
+  "category": "Q04_S10",
+  "difficulty": {
+    "label": "easy",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.3333333333333333,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [
+      "ambiguity"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "ambiguity",
+        "target_value": "quantità",
+        "obsolete_value": "numero",
+        "description": "La colonna 'quantità' nella tabella prodotti viene chiamata 'numero' nel linguaggio aziendale, creando ambiguità poiché 'numero' può riferirsi sia alla quantità di articoli venduti sia a un identificativo numerico, rendendo ambiguo il significato nella query SQL che deve unire le tabelle vendite e prodotti tramite chiave primaria ed esterna."
+      }
+    ],
+    "spec_hash": "d5064e5fcc1fa36c"
+  },
+  "story": "Presso l'Ufficio Commerciale dell'azienda, l'archivio denominato prodotti conserva le schede di ciascun articolo disponibile presso i punti vendita. In ogni scheda dell'archivio prodotti sono annotati il nome dell'articolo, il numero di unità disponibili a magazzino e il prezzo_unitario di vendita. Parallelamente, il registro delle vendite registra ogni transazione effettuata con i clienti, indicando per ciascuna il riferimento al prodotto venduto, la quantita di articoli ceduti e la data_vendita. La quantita venduta viene confrontata con il numero di unità giacenti nell'archivio prodotti, poiché nel linguaggio gestito dall'azienda il termine numero rappresenta appunto la quantità disponibile, generando talvolta ambiguità nella lettura dei dati tra i due registri. Durante una verifica contabile periodica, i responsabili hanno esaminato l'intero archivio vendite per ricostruire l'elenco completo delle operazioni. Per ciascuna vendita, hanno ricostruito la corrispondenza con la scheda del prodotto nell'archivio prodotti, in modo da associare il nome dell'articolo alla transazione e calcolare l'importo totale. Ad esempio, la prima operazione registrata in data 2026-01-10 ha visto la vendita del prodotto 'Laptop Dell XPS', il cui numero a magazzino era pari a 50, in quantita di 2 unità, per un importo totale di 2599.98. Il giorno 2026-01-12 il 'Mouse Logitech', con un numero di 200 pezzi disponibili, è stato venduto in quantita di 5, per un totale di 149.95. La transazione del 2026-01-15 ha riguardato il 'Monitor Samsung 27\"', per il quale il numero in archivio era 75, venduto in quantita di 1 unità al prezzo_unitario di 349.50. Il 2026-01-18 sono state cedute 3 unità di 'Tastiera Meccanica', il cui numero disponibile era 120, per un importo complessivo di 267.00. Il 2026-01-20 ha registrato la cessione di 4 'Cuffie Bluetooth', con un numero di 150 pezzi in magazzino, per un totale di 239.60. Infine, il 2026-02-01 un ulteriore acquisto di 1 'Laptop Dell XPS' ha generato un importo di 1299.99. Al termine della verifica, i responsabili hanno confermato che in ogni caso il numero di unità indicato nelle vendite risultava coerente con il numero disponibile nell'archivio prodotti, assicurando la corretta tenuta dei registri gestionali.",
+  "question": "Elenca tutte le vendite effettuate indicando per ciascuna il nome del prodotto, la quantità venduta, la data della transazione e l'importo totale calcolato.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    numero INT NOT NULL CHECK (numero >= 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE vendite (\n    id INT PRIMARY KEY,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    data_vendita DATE NOT NULL\n);",
+    "data_inserts": "INSERT INTO prodotti (id, nome, numero, prezzo_unitario) VALUES\n(1, 'Laptop Dell XPS', 50, 1299.99),\n(2, 'Mouse Logitech', 200, 29.99),\n(3, 'Monitor Samsung 27\"', 75, 349.50),\n(4, 'Tastiera Meccanica', 120, 89.00),\n(5, 'Cuffie Bluetooth', 150, 59.90);\n\nINSERT INTO vendite (id, prodotto_id, quantita, data_vendita) VALUES\n(1, 1, 2, '2026-01-10'),\n(2, 2, 5, '2026-01-12'),\n(3, 3, 1, '2026-01-15'),\n(4, 4, 3, '2026-01-18'),\n(5, 5, 4, '2026-01-20'),\n(6, 1, 1, '2026-02-01');",
+    "query": "SELECT p.nome, v.quantita, v.data_vendita, p.prezzo_unitario * v.quantita AS importo FROM prodotti p JOIN vendite v ON p.id = v.prodotto_id;",
+    "result": {
+      "columns": [
+        "nome",
+        "quantita",
+        "data_vendita",
+        "importo"
+      ],
+      "rows": [
+        "[\"Laptop Dell XPS\", 2, \"2026-01-10\", \"2599.98\"]",
+        "[\"Mouse Logitech\", 5, \"2026-01-12\", \"149.95\"]",
+        "[\"Monitor Samsung 27\\\"\", 1, \"2026-01-15\", \"349.50\"]",
+        "[\"Tastiera Meccanica\", 3, \"2026-01-18\", \"267.00\"]",
+        "[\"Cuffie Bluetooth\", 4, \"2026-01-20\", \"239.60\"]",
+        "[\"Laptop Dell XPS\", 1, \"2026-02-01\", \"1299.99\"]"
+      ],
+      "order_sensitive": false
+    }
+  }
+}

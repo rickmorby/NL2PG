@@ -1,0 +1,44 @@
+{
+  "task_id": "nl2pg-86a023220237",
+  "category": "Q06_S27",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "1ee4ad30a14872f0"
+  },
+  "story": "Nel contesto della revisione annuale della logistica distributiva, il responsabile degli archivi ha esaminato l'elenco denominato magazzini, dove sono conservate le schede di ciascuna struttura operativa con relative ubicazioni e limiti di stoccaggio. Tra queste, il Magazzino Centrale con sede a Milano, il Magazzino Nord con sede a Torino, il Magazzino Sud con sede a Napoli e il Magazzino Ovest con sede a Genova risultavano censiti con le rispettive capacità massime. Accanto a tale elenco, la raccolta intitolata camion raccoglieva le schede di ciascun mezzo pesante assegnato, indicando per ogni veicolo la targa e la capacità di carico. Ad esempio, il veicolo con targa AB123CD era assegnato al Magazzino Centrale, mentre il mezzo con targa EF456GH operava dal medesimo hub milanese; il camion con targa IJ789KL era stato destinato al Magazzino Nord di Torino e quello con targa MN012OP al Magazzino Sud di Napoli. Completando il quadro informativo, la scheda delle consegne annotava ogni spedizione con destinazione, peso trasportato, data di partenza e stato di avanzamento. Le possibili condizioni riportate in questo archivio erano pianificata, in_corso, completata e annullata. In particolare, la consegna numero 1, affidata al veicolo AB123CD con destinazione Via Roma 1, Milano per un peso di 500.00 kg e data 2026-01-10, risultava completata; la consegna numero 2, sempre con il mezzo AB123CD diretto a Via Milano 45, Torino con 300.00 kg e data 2026-01-12, era in_corso; la consegna numero 3, assegnata al camion IJ789KL con destinazione Piazza Garibaldi 8, Napoli per 750.00 kg in data 2026-01-15, era ancora pianificata; la consegna numero 4, affidata al camion IJ789KL verso Corso Francia 120, Torino con 200.00 kg e data 2026-01-18, risultava completata; la consegna numero 5, gestita dal mezzo MN012OP con destinazione Via Garibaldi 5, Genova per 400.00 kg in data 2026-01-20, era stata annullata; infine, la consegna numero 6, assegnata al camion MN012OP verso Via Partenope 3, Napoli con 600.00 kg e data 2026-01-22, era completata. Durante l'analisi delle performance, gli operatori hanno isolato dalla scheda delle consegne tutte le voci con stato completata, escludendo le strutture ubicate a Genova e considerando solo le spedizioni con peso positivo, e hanno sommato i pesi trasportati per ciascun magazzino. La graduatoria risultante, che assegnava una posizione in base al peso_totale complessivo, ha collocato al primo posto il Magazzino Sud con un totale di 600.00 kg, al secondo il Magazzino Centrale con 500.00 kg e al terzo il Magazzino Nord con 200.00 kg, determinando così la classifica dei primi tre magazzini per volume di consegne portate a termine, con un conteggio del numero di camion e del numero di consegne associati a ciascun sito.",
+  "question": "Quali sono i primi 3 magazzini, escluso quello con sede a Genova, classificati in base al peso complessivo delle consegne portate a termine, e qual è la posizione di ciascuno in questa graduatoria?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE magazzini (\n    id SERIAL PRIMARY KEY,\n    nome_magazzino TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capacita_massima_kg NUMERIC(10,2) CHECK (capacita_massima_kg > 0)\n);\n\nCREATE TABLE camion (\n    id SERIAL PRIMARY KEY,\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    targa TEXT NOT NULL UNIQUE,\n    capacita_kg NUMERIC(10,2) CHECK (capacita_kg > 0)\n);\n\nCREATE TABLE consegne (\n    id SERIAL PRIMARY KEY,\n    camion_id INT NOT NULL REFERENCES camion(id),\n    indirizzo_destinazione TEXT NOT NULL,\n    peso_kg NUMERIC(10,2) CHECK (peso_kg > 0),\n    data_consegna DATE NOT NULL,\n    stato TEXT CHECK (stato IN ('pianificata', 'in_corso', 'completata', 'annullata')),\n    UNIQUE (camion_id, data_consegna)\n);",
+    "data_inserts": "INSERT INTO magazzini (id, nome_magazzino, citta, capacita_massima_kg) VALUES\n(1, 'Magazzino Centrale', 'Milano', 50000.00),\n(2, 'Magazzino Nord', 'Torino', 35000.00),\n(3, 'Magazzino Sud', 'Napoli', 42000.00),\n(4, 'Magazzino Ovest', 'Genova', 28000.00);\n\nINSERT INTO camion (id, magazzino_id, targa, capacita_kg) VALUES\n(1, 1, 'AB123CD', 10000.00),\n(2, 1, 'EF456GH', 8500.00),\n(3, 2, 'IJ789KL', 12000.00),\n(4, 3, 'MN012OP', 9500.00);\n\nINSERT INTO consegne (id, camion_id, indirizzo_destinazione, peso_kg, data_consegna, stato) VALUES\n(1, 1, 'Via Roma 1, Milano', 500.00, '2026-01-10', 'completata'),\n(2, 1, 'Via Milano 45, Torino', 300.00, '2026-01-12', 'in_corso'),\n(3, 2, 'Piazza Garibaldi 8, Napoli', 750.00, '2026-01-15', 'pianificata'),\n(4, 3, 'Corso Francia 120, Torino', 200.00, '2026-01-18', 'completata'),\n(5, 3, 'Via Garibaldi 5, Genova', 400.00, '2026-01-20', 'annullata'),\n(6, 4, 'Via Partenope 3, Napoli', 600.00, '2026-01-22', 'completata');",
+    "query": "SELECT m.nome_magazzino, m.citta, COUNT(c.id) AS num_camion, COUNT(con.id) AS num_consegne, SUM(con.peso_kg) AS peso_totale, RANK() OVER (ORDER BY SUM(con.peso_kg) DESC) AS posizione FROM magazzini m JOIN camion c ON m.id = c.magazzino_id JOIN consegne con ON c.id = con.camion_id WHERE con.stato = 'completata' AND con.peso_kg > 0 AND m.citta <> 'Genova' GROUP BY m.nome_magazzino, m.citta HAVING COUNT(con.id) > 0 ORDER BY peso_totale DESC LIMIT 3;",
+    "result": {
+      "columns": [
+        "nome_magazzino",
+        "citta",
+        "num_camion",
+        "num_consegne",
+        "peso_totale",
+        "posizione"
+      ],
+      "rows": [
+        "[\"Magazzino Sud\", \"Napoli\", 1, 1, \"600.00\", 1]",
+        "[\"Magazzino Centrale\", \"Milano\", 1, 1, \"500.00\", 2]",
+        "[\"Magazzino Nord\", \"Torino\", 1, 1, \"200.00\", 3]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

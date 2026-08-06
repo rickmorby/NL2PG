@@ -1,0 +1,46 @@
+{
+  "task_id": "nl2pg-b00f86148939",
+  "category": "Q08_S02",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash:free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "self_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "e85fdd87e8a387b0"
+  },
+  "story": "All'interno del Centro Logistico aziendale, l'archivio denominato citta conserva le schede di tutte le città servite, ciascuna identificata da un codice univoco e dalla relativa denominazione. Accanto a questo, il registro intitolato spedizioni documenta ogni movimento merceologico, indicando il riferimento alla città di partenza (citta_origine) e quello alla città di arrivo (citta_destinazione), oltre al peso in chilogrammi (peso_kg), la data_spedizione e lo stato della spedizione. Durante un'analisi operativa di routine, gli specialisti hanno ricostruito l'elenco completo delle spedizioni, risolvendo i codici numerici delle città di origine e di destinazione attraverso il medesimo archivio citta, al fine di ottenere le denominazioni leggibili. Il risultato ha messo in luce la spedizione numero 1, partita da Milano con destinazione Roma, del peso di 12.50 chilogrammi, datata 2026-01-10 e con stato consegnata; la spedizione numero 2, con origine Roma e destinazione Napoli, peso di 8.75 chilogrammi, data 2026-01-12, ancora in_transito; la spedizione numero 3, Torino-Firenze, 25.00 chilogrammi, 2026-01-14, consegnata; la spedizione numero 4, Napoli-Milano, 5.30 chilogrammi, 2026-01-15, annullata; la spedizione numero 5, Firenze-Torino, 15.00 chilogrammi, 2026-01-18, consegnata; e infine la spedizione numero 6, Milano-Napoli, 20.00 chilogrammi, 2026-01-20, in_transito. L'elenco è stato ordinato per data_spedizione in ordine decrescente, consentendo agli operatori di avere immediatamente sotto controllo le movimentazioni più recenti.",
+  "question": "Mostrami l'elenco completo di tutte le spedizioni indicando le città di partenza e di arrivo, ordinate per data di spedizione dalla più recente alla più vecchia.",
+  "gold": {
+    "schema_ddl": "CREATE TABLE citta (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    provincia_id INT REFERENCES citta(id)\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    citta_origine_id INT NOT NULL REFERENCES citta(id),\n    citta_destinazione_id INT NOT NULL REFERENCES citta(id),\n    peso_kg NUMERIC(10,2) CHECK (peso_kg >= 0),\n    data_spedizione DATE NOT NULL,\n    stato TEXT CHECK (stato IN ('in_transito', 'consegnata', 'annullata'))\n);",
+    "data_inserts": "INSERT INTO citta (id, nome, provincia_id) VALUES\n(1, 'Milano', NULL),\n(2, 'Roma', NULL),\n(3, 'Napoli', NULL),\n(4, 'Torino', NULL),\n(5, 'Firenze', NULL);\n\nINSERT INTO spedizioni (id, citta_origine_id, citta_destinazione_id, peso_kg, data_spedizione, stato) VALUES\n(1, 1, 2, 12.50, '2026-01-10', 'consegnata'),\n(2, 2, 3, 8.75, '2026-01-12', 'in_transito'),\n(3, 4, 5, 25.00, '2026-01-14', 'consegnata'),\n(4, 3, 1, 5.30, '2026-01-15', 'annullata'),\n(5, 5, 4, 15.00, '2026-01-18', 'consegnata'),\n(6, 1, 3, 20.00, '2026-01-20', 'in_transito');",
+    "query": "SELECT c1.nome AS citta_origine, c2.nome AS citta_destinazione, s.peso_kg, s.data_spedizione, s.stato FROM spedizioni s JOIN citta c1 ON s.citta_origine_id = c1.id JOIN citta c2 ON s.citta_destinazione_id = c2.id ORDER BY s.data_spedizione DESC;",
+    "result": {
+      "columns": [
+        "citta_origine",
+        "citta_destinazione",
+        "peso_kg",
+        "data_spedizione",
+        "stato"
+      ],
+      "rows": [
+        "[\"Milano\", \"Napoli\", \"20.00\", \"2026-01-20\", \"in_transito\"]",
+        "[\"Firenze\", \"Torino\", \"15.00\", \"2026-01-18\", \"consegnata\"]",
+        "[\"Napoli\", \"Milano\", \"5.30\", \"2026-01-15\", \"annullata\"]",
+        "[\"Torino\", \"Firenze\", \"25.00\", \"2026-01-14\", \"consegnata\"]",
+        "[\"Roma\", \"Napoli\", \"8.75\", \"2026-01-12\", \"in_transito\"]",
+        "[\"Milano\", \"Roma\", \"12.50\", \"2026-01-10\", \"consegnata\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

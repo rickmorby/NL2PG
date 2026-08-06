@@ -1,0 +1,39 @@
+{
+  "task_id": "nl2pg-d681db0fd9ec",
+  "category": "Q05_S14",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "1f940048c0f0920b"
+  },
+  "story": "All'interno dell'Ufficio Amministrativo della società, il documento denominato aziende conserva le schede anagrafiche delle imprese registrate, ognuna corredata dalla ragione_sociale, dal numero di partita IVA e dalla data di iscrizione. In particolare, le schede relative alle società TechNova S.r.l., AlfaBeta S.p.A. e Gamma Solutions S.r.l. sono state archiviate rispettivamente il 2020-03-15, il 2019-07-22 e il 2021-11-01. Parallelamente, il fascicolo intitolato registrazioni_contabili raccoglie ogni movimento contabile con la data di registrazione, una descrizione e l'importo_totale ad esso associato. Ad esempio, il giorno 2026-01-10 è stata annotata la vendita di software per un importo di 5000.00, mentre il 2026-01-12 è stato registrato l'acquisto di materiali per 1200.50, e il 2026-01-14 i servizi di consulenza per 3500.00. Ciascuna registrazione contabile si articola poi in voci di dettaglio conservate nel documento righe_registrazione, dove per ogni movimento si indica il conto interessato, la descrizione, l'importo e la tipologia, che può essere dare o avere. Nel corso di una verifica contabile finalizzata a calcolare il totale delle registrazioni per ogni società — corrispondente al totale_registrazioni — e a classificare le aziende in ordine decrescente di importo complessivo, gli operatori hanno proceduto all'incrocio tra le schede aziendali e i movimenti contabili. Il totale complessivo per TechNova S.r.l. è risultato di 6200.50, mentre per AlfaBeta S.p.A. ammonta a 3500.00 e per Gamma Solutions S.r.l. non sono presenti registrazioni nel periodo analizzato. La classifica finale ha pertanto posizionato TechNova S.r.l. al primo posto, seguita da AlfaBeta S.p.A., in base all'importo totale dei movimenti contabili registrati.",
+  "question": "Per ogni azienda, qual è l'importo complessivo dei movimenti contabili ad essa associati, elencate in ordine decrescente di totale?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE aziende (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    data_iscrizione DATE NOT NULL\n);\n\nCREATE TABLE registrazioni_contabili (\n    id SERIAL PRIMARY KEY,\n    azienda_id INT NOT NULL REFERENCES aziende(id),\n    data_registrazione DATE NOT NULL,\n    descrizione TEXT,\n    importo_totale NUMERIC(12,2) CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE righe_registrazione (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni_contabili(id),\n    conto TEXT NOT NULL,\n    descrizione TEXT,\n    importo NUMERIC(12,2) CHECK (importo >= 0),\n    tipo TEXT CHECK (tipo IN ('dare', 'avere'))\n);",
+    "data_inserts": "INSERT INTO aziende (id, ragione_sociale, partita_iva, data_iscrizione) VALUES\n(1, 'TechNova S.r.l.', '01234567890', '2020-03-15'),\n(2, 'AlfaBeta S.p.A.', '09876543210', '2019-07-22'),\n(3, 'Gamma Solutions S.r.l.', '11223344556', '2021-11-01');\n\nINSERT INTO registrazioni_contabili (id, azienda_id, data_registrazione, descrizione, importo_totale) VALUES\n(1, 1, '2026-01-10', 'Vendita software', 5000.00),\n(2, 1, '2026-01-12', 'Acquisto materiali', 1200.50),\n(3, 2, '2026-01-14', 'Servizi di consulenza', 3500.00);\n\nINSERT INTO righe_registrazione (id, registrazione_id, conto, descrizione, importo, tipo) VALUES\n(1, 1, 'Clienti', 'Incasso vendita software', 5000.00, 'dare'),\n(2, 1, 'Ricavi', 'Ricavo vendita software', 5000.00, 'avere'),\n(3, 2, 'Materiali', 'Acquisto materiali ufficio', 1200.50, 'dare'),\n(4, 2, 'Banca', 'Pagamento materiali', 1200.50, 'avere'),\n(5, 3, 'Clienti', 'Incasso consulenza', 3500.00, 'dare'),\n(6, 3, 'Ricavi', 'Ricavo consulenza', 3500.00, 'avere');",
+    "query": "SELECT a.ragione_sociale, SUM(r.importo_totale) AS totale_registrazioni FROM aziende a JOIN registrazioni_contabili r ON a.id = r.azienda_id GROUP BY a.ragione_sociale ORDER BY totale_registrazioni DESC;",
+    "result": {
+      "columns": [
+        "ragione_sociale",
+        "totale_registrazioni"
+      ],
+      "rows": [
+        "[\"TechNova S.r.l.\", \"6200.50\"]",
+        "[\"AlfaBeta S.p.A.\", \"3500.00\"]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}

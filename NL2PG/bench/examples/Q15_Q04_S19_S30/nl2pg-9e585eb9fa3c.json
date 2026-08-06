@@ -1,0 +1,59 @@
+{
+  "task_id": "nl2pg-9e585eb9fa3c",
+  "category": "Q15_Q04_S19_S30",
+  "difficulty": {
+    "label": "hard",
+    "critic_score": 1.0,
+    "calibration_pass_rate": 0.0,
+    "calibration_model": "inclusionai/ling-3.0-flash-free"
+  },
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "cte",
+      "multi_join",
+      "group_agg"
+    ],
+    "twist": [
+      "rename",
+      "distractor"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "richieste_acquisto",
+        "description": "La tabella ordini viene denominata richieste_acquisto nella prosa aziendale, richiedendo al modello di riconoscere il sinonimo e mapparla correttamente nella query."
+      },
+      {
+        "twist_type": "distractor",
+        "target_value": "clienti",
+        "obsolete_value": "profilo_acquirenti",
+        "description": "La tabella clienti viene presentata come profilo_acquirenti e descritta come essenziale per l'analisi, ma i suoi dati non sono necessari per risolvere il problema, fungendo da tabella di distrazione."
+      }
+    ],
+    "spec_hash": "427e0a073a464351"
+  },
+  "story": "Nell'ambito della Direzione Logistica e Commerciale, l'ecosistema informativo aziendale si articola in diversi archivi dedicati alla gestione delle operazioni quotidiane. Il primo, denominato profilo_acquirenti, raccoglie le schede anagrafiche complete di ciascun cliente, registrando nome completo, recapiti di contatto e città di residenza. Affiancandolo, il registro chiamato richieste_acquisto — corrispondente all'archivio ordini del sistema gestionale — archivia ogni ordine effettuato, associando ciascuna richiesta al cliente tramite un riferimento interno, annotando la data di sottoscrizione e tracciando lo stato di avanzamento, che può essere in_corso, evaso o annullato. Il catalogo prodotti funge da inventario centrale dell'azienda, contenendo per ogni articolo il nome descrittivo, una breve descrizione, il prezzo unitario e la relativa categoria merceologica. Completando il quadro informativo, l'archivio righe_ordine dettaglia le singole linee di ciascuna richiesta, indicando il prodotto acquistato, la quantità e il prezzo unitario applicato al momento dell'evasione.\n\nIn occasione della revisione semestrale delle performance commerciali, gli analisti hanno estratto dal registro richieste_acquisto tutte le voci con stato 'evaso', relative al periodo compreso tra le date '2026-01-15', '2026-01-16', '2026-01-17' e '2026-01-18'. Successivamente, hanno incrociato queste informazioni con il catalogo prodotti attraverso l'archivio righe_ordine, aggregando per ciascun acquirente la spesa totale sommando il prodotto tra quantità e prezzo unitario di ogni elemento acquistato. I dati del profilo_acquirenti, pur essendo consultati per attribuire l'identità e la città ai risultati, hanno rappresentato un elemento accessorio rispetto al calcolo effettivo della spesa, fungendo da voce fuorviante all'interno del percorso analitico. Alla fine, la classifica dei primi tre acquirenti per spesa complessiva su richieste_acquisto con stato 'evaso' ha evidenziato i risultati più significativi del periodo analizzato.",
+  "question": "Quali sono i primi 3 clienti per spesa totale su ordini evasi, con il numero di ordini evasi e il numero di prodotti unici acquistati?",
+  "gold": {
+    "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    citta TEXT\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    stato TEXT CHECK (stato IN ('in_corso', 'evaso', 'annullato'))\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0),\n    categoria TEXT\n);\n\nCREATE TABLE righe_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);",
+    "data_inserts": "INSERT INTO clienti (id, nome, email, telefono, citta) VALUES\n(1, 'Mario Rossi', 'mario.rossi@email.it', '3331234567', 'Roma'),\n(2, 'Laura Bianchi', 'laura.bianchi@email.it', '3339876543', 'Milano'),\n(3, 'Giovanni Verdi', 'giovanni.verdi@email.it', '3381112233', 'Napoli'),\n(4, 'Sara Neri', 'sara.neri@email.it', '3394445566', 'Firenze');\n\nINSERT INTO prodotti (id, nome, descrizione, prezzo_unitario, categoria) VALUES\n(1, 'Laptop HP', 'Notebook HP EliteBook 15', 899.99, 'Elettronica'),\n(2, 'Mouse Logitech', 'Mouse wireless Logitech MX Master', 29.99, 'Accessori'),\n(3, 'Monitor Samsung', 'Monitor Samsung 27 pollici 4K', 249.50, 'Elettronica'),\n(4, 'Tastiera Meccanica', 'Tastiera meccanica RGB Cherry MX', 75.00, 'Accessori');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, stato) VALUES\n(101, 1, '2026-01-15', 'evaso'),\n(102, 2, '2026-01-16', 'in_corso'),\n(103, 3, '2026-01-17', 'annullato'),\n(104, 1, '2026-01-18', 'evaso');\n\nINSERT INTO righe_ordine (id, ordine_id, prodotto_id, quantita, prezzo_unitario) VALUES\n(1, 101, 1, 1, 899.99),\n(2, 101, 2, 2, 29.99),\n(3, 102, 3, 1, 249.50),\n(4, 103, 4, 3, 75.00),\n(5, 104, 1, 1, 899.99),\n(6, 104, 2, 1, 29.99);",
+    "query": "WITH spesa_clienti AS (SELECT c.id, c.nome, c.citta, COUNT(DISTINCT o.id) AS num_ordini_evasi, SUM(r.quantita * r.prezzo_unitario) AS spesa_totale, COUNT(DISTINCT r.prodotto_id) AS prodotti_unici FROM clienti c JOIN ordini o ON c.id = o.cliente_id JOIN righe_ordine r ON o.id = r.ordine_id JOIN prodotti p ON r.prodotto_id = p.id WHERE o.stato = 'evaso' GROUP BY c.id, c.nome, c.citta HAVING SUM(r.quantita * r.prezzo_unitario) > 0) SELECT nome, citta, num_ordini_evasi, spesa_totale, prodotti_unici FROM spesa_clienti ORDER BY spesa_totale DESC LIMIT 3;",
+    "result": {
+      "columns": [
+        "nome",
+        "citta",
+        "num_ordini_evasi",
+        "spesa_totale",
+        "prodotti_unici"
+      ],
+      "rows": [
+        "[\"Mario Rossi\", \"Roma\", 2, \"1889.95\", 2]"
+      ],
+      "order_sensitive": true
+    }
+  }
+}
