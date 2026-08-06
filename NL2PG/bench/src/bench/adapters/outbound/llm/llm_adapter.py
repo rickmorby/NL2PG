@@ -3,6 +3,7 @@
 :author: Riccardo Morabito
 """
 
+from logging import getLogger
 from re import (
     DOTALL as re_DOTALL,
     IGNORECASE as re_IGNORECASE,
@@ -10,6 +11,7 @@ from re import (
 )
 from typing import Any
 
+import litellm
 from json_repair import repair_json
 from litellm import Router
 from pydantic import BaseModel, ValidationError
@@ -17,6 +19,10 @@ from pydantic import BaseModel, ValidationError
 from bench.domain.exceptions import LLMClientError, ModelOutputContractError
 from bench.domain.models.llm import CallOptionsDTO, CallResultDTO
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
+
+_log = getLogger("bench.adapters.llm")
+
+litellm.suppress_debug_info = True
 
 
 class LLMClientAdapter(LLMGeneratorPort):
@@ -99,6 +105,7 @@ class LLMClientAdapter(LLMGeneratorPort):
         except ModelOutputContractError:
             raise
         except Exception as e:
+            _log.info("Failover catena LLM per ruolo '%s': %s", role, e)
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 
     def close(self) -> None:
@@ -180,6 +187,3 @@ def _extract_json_payload(text: str) -> str:
 
     repaired: str = repair_json(cleaned.strip())
     return repaired
-
-
-

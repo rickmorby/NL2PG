@@ -121,17 +121,14 @@ def _check_correlated(tree: exp.Expression) -> bool:
     selects = list(tree.find_all(exp.Select))
     if len(selects) < 2:
         return False
+    root_select = selects[0]
+    root_tables = {t.alias_or_name.lower() for t in root_select.find_all(exp.Table)}
     for sq in selects[1:]:
-        outer_selects = list(sq.find_ancestors(exp.Select))
-        outer_tables = {
-            t.alias_or_name.lower() for s in outer_selects for t in _direct_tables(s)
-        }
-        sq_tables = {t.alias_or_name.lower() for t in _direct_tables(sq)}
+        sq_tables = {t.alias_or_name.lower() for t in sq.find_all(exp.Table)}
+        outer_tables = root_tables - sq_tables
         for col in sq.find_all(exp.Column):
-            if col.table:
-                tbl = col.table.lower()
-                if tbl in outer_tables and tbl not in sq_tables:
-                    return True
+            if col.table and col.table.lower() in outer_tables:
+                return True
     return False
 
 

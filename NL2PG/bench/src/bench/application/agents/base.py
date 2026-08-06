@@ -4,22 +4,30 @@
 """
 
 from abc import ABC, abstractmethod
+from logging import getLogger
 from typing import Any
+
 from pydantic import BaseModel, ValidationError
 
-from bench.domain.exceptions import ModelOutputContractError, handle_exception
+from bench.domain.exceptions import ModelOutputContractError
 from bench.domain.models.llm import CallOptionsDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 
+_log = getLogger("bench.application.agents")
+
 
 class AbstractAgent(ABC):
     """Base astratta per agent che generano componenti del task via LLM con retry loop."""
 
-    def __init__(self, llm: LLMGeneratorPort, prompts: PromptPort,
-                 config: ConfigPort) -> None:
+    def __init__(
+        self,
+        llm: LLMGeneratorPort,
+        prompts: PromptPort,
+        config: ConfigPort,
+    ) -> None:
         """Inietta le porte outbound per LLM, prompt e configurazione."""
         self._llm = llm
         self._prompts = prompts
@@ -50,7 +58,9 @@ class AbstractAgent(ABC):
         err = ""
         last_model = ""
         name = self.prompt_name()
-        for i in range(1, self._max_retries(state) + 1):
+        max_attempts = self._max_retries(state)
+
+        for i in range(1, max_attempts + 1):
             prompt = self._prompts.load(name, **self.build_kwargs(state))
             opts = CallOptionsDTO(error_feedback=err if err else None)
             try:
@@ -65,17 +75,24 @@ class AbstractAgent(ABC):
                     updates["last_error"] = ""
                     return updates
                 err = f"Violazione vincoli contratto '{name}': {val_err}"
-                exc = ModelOutputContractError(err, payload={"agent": name, "attempt": i})
-                handle_exception(exc)
+                _log.info(
+                    "Nodo '%s' (tentativo %d/%d) fallito: %s",
+                    name, i, max_attempts, val_err,
+                )
             except (ModelOutputContractError, ValidationError) as e:
                 err = f"Errore contratto output '{name}': {e}"
-                exc = ModelOutputContractError(err, payload={"agent": name, "attempt": i})
-                handle_exception(exc)
+                _log.info(
+                    "Nodo '%s' (tentativo %d/%d) errore contratto: %s",
+                    name, i, max_attempts, e,
+                )
             except Exception as e:
                 err = f"Errore invocazione agente '{name}': {e}"
-                exc = ModelOutputContractError(err, payload={"agent": name, "attempt": i})
-                handle_exception(exc)
+                _log.info(
+                    "Nodo '%s' (tentativo %d/%d) eccezione: %s",
+                    name, i, max_attempts, e,
+                )
 
+        _log.warning("Nodo '%s' esaurito dopo %d tentativi. Task scartato.", name, max_attempts)
         return {"verdict": "scrapped", "last_error": err, "last_model": last_model}
 
     def _max_retries(self, state: TaskStateDTO) -> int:
