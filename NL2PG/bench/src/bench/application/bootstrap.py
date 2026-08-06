@@ -87,6 +87,11 @@ class ApplicationBootstrap:
         )
         self._serializer = BenchmarkSerializer()
 
+    @property
+    def base_dir(self) -> Path:
+        """Restituisce il percorso della directory radice del progetto bench."""
+        return self._base_dir
+
 
     def task_runner(self) -> TaskRunner:
         """Restituisce un TaskRunner per la generazione batch dei task."""

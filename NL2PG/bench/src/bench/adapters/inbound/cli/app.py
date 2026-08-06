@@ -4,7 +4,6 @@
 """
 
 from os import _exit as os_exit
-from pathlib import Path
 from typing import Annotated
 
 from typer import Option, Typer, colors, secho
@@ -120,7 +119,7 @@ def promote_command() -> None:
     bootstrap = ApplicationBootstrap()
     exit_code = 0
     try:
-        base_dir = Path(__file__).resolve().parent.parent.parent.parent.parent
+        base_dir = bootstrap.base_dir
         out_dir = base_dir / "output"
         examples_dir = base_dir / "examples"
 

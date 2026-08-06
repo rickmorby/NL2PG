@@ -1,4 +1,4 @@
-"""Servizio applicativo per la gestione dell'esecuzione batch dei task del benchmark.
+"""Servizio applicativo per l'esecuzione batch dei task con output JSON piatto.
 
 :author: Riccardo Morabito
 """
@@ -23,7 +23,7 @@ _log = getLogger("bench.application.task_runner")
 
 
 class TaskRunner:
-    """Servizio applicativo che coordina la generazione batch di task."""
+    """Servizio applicativo che coordina la generazione batch ed il salvataggio JSON."""
 
     def __init__(
         self,
@@ -62,15 +62,15 @@ class TaskRunner:
 
         run_id = self._meta_repo.new_run(cfg_hash, cat_hash)
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        run_output_dir = self._base_output_dir / f"run_{timestamp}_{run_id}"
-        run_output_dir.mkdir(parents=True, exist_ok=True)
+        self._base_output_dir.mkdir(parents=True, exist_ok=True)
+        run_output_file = self._base_output_dir / f"run_{timestamp}_{run_id}.json"
 
-        _log.info("Nuova run avviata: run_id=%s, output_dir=%s", run_id, run_output_dir.name)
+        _log.info("Nuova run avviata: run_id=%s, output_file=%s", run_id, run_output_file.name)
 
         if batch_size > 1:
             summary = self._run_parallel(
                 run_id=run_id,
-                output_dir=run_output_dir,
+                output_file=run_output_file,
                 count=count,
                 category=category,
                 batch_size=batch_size,
@@ -79,7 +79,7 @@ class TaskRunner:
         else:
             summary = self._run_sequential(
                 run_id=run_id,
-                output_dir=run_output_dir,
+                output_file=run_output_file,
                 count=count,
                 category=category,
                 bench_cfg=bench_cfg,
@@ -92,7 +92,7 @@ class TaskRunner:
     def _run_sequential(
         self,
         run_id: str,
-        output_dir: Path,
+        output_file: Path,
         count: int,
         category: str,
         bench_cfg: dict,
@@ -122,7 +122,7 @@ class TaskRunner:
 
                         weights = bench_cfg.get("critic", {}).get("weights", {})
                         doc = self._serializer.build_document(accepted_tasks, run_id, weights)
-                        self._serializer.write(doc, output_dir / "benchmark_samples.json")
+                        self._serializer.write(doc, output_file)
                 elif result_state.verdict == "rejected":
                     rejected_count += 1
                     consecutive_failures = 0
@@ -144,7 +144,7 @@ class TaskRunner:
 
         return BatchSummaryDTO(
             run_id=run_id,
-            output_dir=str(output_dir),
+            output_dir=str(output_file.parent),
             requested_count=count,
             accepted_count=len(accepted_tasks),
             rejected_count=rejected_count,
@@ -156,7 +156,7 @@ class TaskRunner:
     def _run_parallel(
         self,
         run_id: str,
-        output_dir: Path,
+        output_file: Path,
         count: int,
         category: str,
         batch_size: int,
@@ -200,9 +200,7 @@ class TaskRunner:
                                     doc = self._serializer.build_document(
                                         accepted_tasks, run_id, weights
                                     )
-                                    self._serializer.write(
-                                        doc, output_dir / "benchmark_samples.json"
-                                    )
+                                    self._serializer.write(doc, output_file)
                             elif result_state.verdict == "rejected":
                                 rejected_count += 1
                                 consecutive_failures = 0
@@ -240,7 +238,7 @@ class TaskRunner:
 
         return BatchSummaryDTO(
             run_id=run_id,
-            output_dir=str(output_dir),
+            output_dir=str(output_file.parent),
             requested_count=count,
             accepted_count=len(accepted_tasks),
             rejected_count=rejected_count,

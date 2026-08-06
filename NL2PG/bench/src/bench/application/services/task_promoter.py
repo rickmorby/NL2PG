@@ -20,13 +20,18 @@ class TaskPromoterService:
         self._serializer = serializer
 
     def promote_accepted_tasks(self, output_dir: Path, examples_dir: Path) -> int:
-        """Legge i file benchmark_samples.json da output_dir e li promuove in examples/<cat>/."""
+        """Legge i file JSON di run da output_dir e li promuove in examples/<cat>/."""
         if not output_dir.exists():
             _log.info("Directory output '%s' non esistente.", output_dir)
             return 0
 
+        json_files = sorted(
+            list(output_dir.glob("run_*.json"))
+            + list(output_dir.rglob("benchmark_samples.json"))
+        )
+
         promoted_count = 0
-        for sample_file in sorted(output_dir.rglob("benchmark_samples.json")):
+        for sample_file in json_files:
             try:
                 doc = loads(sample_file.read_text(encoding="utf-8"))
                 for task in doc.get("tasks", []):
