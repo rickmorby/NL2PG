@@ -5,114 +5,19 @@
 
 from json import dumps, loads
 from os import _exit as os_exit
-from pathlib import Path
 from typing import Annotated
 
 from typer import Option, Typer, colors, secho
 
-from bench.adapters.outbound.config import ConfigAdapter
-from bench.adapters.outbound.llm import LLMClientAdapter
-from bench.adapters.outbound.logging import LoggingAdapter
-from bench.adapters.outbound.postgres import (
-    MetaRepositoryAdapter,
-    PostgresClientAdapter,
-    PostgresSandboxAdapter,
-)
-from bench.adapters.outbound.prompts import PromptAdapter
-from bench.application.agents import (
-    CalibrationAgent,
-    CriticAgent,
-    DataAgent,
-    HardeningAgent,
-    JudgeAgent,
-    QueryAgent,
-    QuestionAgent,
-    SchemaAgent,
-    SpecAgent,
-    StoryAgent,
-)
-from bench.application.orchestrator import Orchestrator
-from bench.application.serializer import BenchmarkSerializer
-from bench.application.services import TaskRunner
-from bench.domain.exceptions import handle_exception, install_global_handler
+from bench.application.bootstrap import ApplicationBootstrap
+from bench.domain.exceptions import handle_exception
 from bench.domain.models.nlp import JudgeDTO
-from bench.domain.ports.outbound.database_port import DatabasePort
-from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 app = Typer(
     name="bench",
     help="Bench - Generatore di dataset sintetici SQL e Natural Language.",
     add_completion=False,
 )
-
-
-def _init_components(
-    config_dir: Path | None = None,
-) -> tuple[ConfigAdapter, PostgresClientAdapter, LLMClientAdapter, TaskRunner]:
-    """Inizializza il logging, gestore eccezioni e tutte le dipendenze della pipeline."""
-    base_dir = Path(__file__).resolve().parent.parent.parent.parent.parent.parent
-    cfg_dir = config_dir or (base_dir / "config")
-
-    log_adapter = LoggingAdapter(level="DEBUG")
-    log_adapter.configure()
-    install_global_handler()
-
-    config_adapter = ConfigAdapter(cfg_dir)
-    providers_cfg = config_adapter.load_providers()
-    llm_adapter = LLMClientAdapter(providers_cfg)
-
-    pg_client = PostgresClientAdapter(config=config_adapter.load_bench().get("run", {}))
-    sandbox_adapter = PostgresSandboxAdapter(pg_client)
-    meta_repo = MetaRepositoryAdapter(pg_client)
-    prompt_adapter = PromptAdapter(base_dir / "prompts")
-
-    agents = {
-        "spec": SpecAgent(
-            llm_adapter, prompt_adapter, config_adapter, meta_repo
-        ),
-        "schema": SchemaAgent(
-            llm_adapter, prompt_adapter, config_adapter, sandbox_adapter
-        ),
-        "data": DataAgent(
-            llm_adapter, prompt_adapter, config_adapter, sandbox_adapter
-        ),
-        "query": QueryAgent(
-            llm_adapter, prompt_adapter, config_adapter, sandbox_adapter, pg_client
-        ),
-        "story": StoryAgent(llm_adapter, prompt_adapter, config_adapter),
-        "question": QuestionAgent(llm_adapter, prompt_adapter, config_adapter),
-        "critic": CriticAgent(llm_adapter, prompt_adapter, config_adapter),
-        "hardening": HardeningAgent(llm_adapter, prompt_adapter, config_adapter),
-        "calibration": CalibrationAgent(
-            llm_adapter, prompt_adapter, config_adapter, sandbox_adapter
-        ),
-        "judge": JudgeAgent(llm_adapter, prompt_adapter, config_adapter),
-    }
-
-    orchestrator = Orchestrator(sandbox_adapter, config_adapter, meta_repo, agents)
-    serializer = BenchmarkSerializer()
-    runner = TaskRunner(orchestrator, meta_repo, serializer, config_adapter)
-
-    return config_adapter, pg_client, llm_adapter, runner
-
-
-def _shutdown_and_exit(
-    pg_client: DatabasePort | None = None,
-    llm_adapter: LLMGeneratorPort | None = None,
-    exit_code: int = 0,
-) -> None:
-    """Rilascia ordinatamente le risorse degli adattatori e rilascia subito il processo."""
-    if pg_client:
-        try:
-            pg_client.close()
-        except Exception:
-            pass
-    if llm_adapter:
-        try:
-            llm_adapter.close()
-        except Exception:
-            pass
-    os_exit(exit_code)
 
 
 @app.command("generate")
@@ -122,11 +27,10 @@ def generate_command(
     batch_size: Annotated[int, Option("--batch-size", "-b", help="Worker concorrenti.")] = 1,
 ) -> None:
     """Esegue la generazione batch dei task del benchmark in formato JSON unico."""
-    pg_client: DatabasePort | None = None
-    llm_adapter: LLMGeneratorPort | None = None
+    bootstrap = ApplicationBootstrap()
     exit_code = 0
     try:
-        _, pg_client, llm_adapter, runner = _init_components()
+        runner = bootstrap.task_runner()
 
         secho("[BENCHMARK] Avvio Generazione Batch Task", fg=colors.CYAN, bold=True)
         secho(f"  Task richiesti: {count}", fg=colors.WHITE)
@@ -157,20 +61,19 @@ def generate_command(
         exit_code = 1
         handle_exception(e)
     finally:
-        _shutdown_and_exit(pg_client, llm_adapter, exit_code)
+        bootstrap.close()
+        os_exit(exit_code)
 
 
 @app.command("check-providers")
 def check_providers_command() -> None:
     """Esegue una verifica di connettività e risposta sui provider LLM configurati."""
-    pg_client: DatabasePort | None = None
-    llm_adapter: LLMGeneratorPort | None = None
+    bootstrap = ApplicationBootstrap()
     exit_code = 0
     try:
-        _, pg_client, llm_adapter, _ = _init_components()
         secho("[INFO] Verifica connettivita' provider LLM in corso...", fg=colors.CYAN)
 
-        res = llm_adapter.call_model(
+        res = bootstrap.llm.call_model(
             role="default",
             prompt='Rispondi esclusivamente con un oggetto JSON: {"verdict": "hard"}',
             schema=JudgeDTO,
@@ -182,23 +85,23 @@ def check_providers_command() -> None:
         secho(f"[ERRORE] Verifica provider LLM fallita: {e}", fg=colors.RED, bold=True)
         handle_exception(e)
     finally:
-        _shutdown_and_exit(pg_client, llm_adapter, exit_code)
+        bootstrap.close()
+        os_exit(exit_code)
 
 
 @app.command("check")
 def check_command() -> None:
     """Verifica l'integrità dei file di configurazione e calcola gli hash di esecuzione."""
-    pg_client: DatabasePort | None = None
-    llm_adapter: LLMGeneratorPort | None = None
+    bootstrap = ApplicationBootstrap()
     exit_code = 0
     try:
-        config_adapter, pg_client, llm_adapter, _ = _init_components()
-        bench_cfg = config_adapter.load_bench()
-        providers_cfg = config_adapter.load_providers()
-        categories = config_adapter.load_categories()
+        cfg = bootstrap.config
+        bench_cfg = cfg.load_bench()
+        providers_cfg = cfg.load_providers()
+        categories = cfg.load_categories()
 
-        cfg_hash = config_adapter.config_hash(bench_cfg)
-        cat_hash = config_adapter.config_hash({"categories": list(categories.keys())})
+        cfg_hash = cfg.config_hash(bench_cfg)
+        cat_hash = cfg.config_hash({"categories": list(categories.keys())})
 
         secho("[INFO] Stato Configurazioni Benchmark:", fg=colors.CYAN, bold=True)
         secho("  bench.toml: OK (Caricato)", fg=colors.WHITE)
@@ -213,18 +116,17 @@ def check_command() -> None:
         exit_code = 1
         handle_exception(e)
     finally:
-        _shutdown_and_exit(pg_client, llm_adapter, exit_code)
+        bootstrap.close()
+        os_exit(exit_code)
 
 
 @app.command("promote")
 def promote_command() -> None:
     """Promuove i task accettati da output/ verso la cartella esempi examples/<categoria>/."""
-    pg_client: DatabasePort | None = None
-    llm_adapter: LLMGeneratorPort | None = None
+    bootstrap = ApplicationBootstrap()
     exit_code = 0
     try:
-        config_adapter, pg_client, llm_adapter, _ = _init_components()
-        base_dir = config_adapter.get_config_dir().parent
+        base_dir = bootstrap.config.get_config_dir().parent
         out_dir = base_dir / "output"
         examples_dir = base_dir / "examples"
 
@@ -257,28 +159,28 @@ def promote_command() -> None:
         exit_code = 1
         handle_exception(e)
     finally:
-        _shutdown_and_exit(pg_client, llm_adapter, exit_code)
+        bootstrap.close()
+        os_exit(exit_code)
 
 
 @app.command("cleanup")
 def cleanup_command() -> None:
     """Pulisce gli schemi temporanei orfani (task_*) nel database sandbox PostgreSQL."""
-    pg_client: DatabasePort | None = None
-    llm_adapter: LLMGeneratorPort | None = None
+    bootstrap = ApplicationBootstrap()
     exit_code = 0
     try:
-        _, pg_client, llm_adapter, _ = _init_components()
         secho("[INFO] Avvio pulizia schemi temporanei sandbox PostgreSQL...", fg=colors.CYAN)
 
+        pg = bootstrap.pg_client
         removed_schemas = []
-        with pg_client.get_sandbox_connection(autocommit=True) as conn:
+        with pg.get_sandbox_connection(autocommit=True) as conn:
             query = (
                 "SELECT schema_name FROM information_schema.schemata "
                 "WHERE schema_name LIKE 'task_%'"
             )
-            _, rows = pg_client.execute_query(conn, query)
+            _, rows = pg.execute_query(conn, query)
             for (schema_name,) in rows:
-                pg_client.execute_identifier(conn, "DROP SCHEMA IF EXISTS {} CASCADE", schema_name)
+                pg.execute_identifier(conn, "DROP SCHEMA IF EXISTS {} CASCADE", schema_name)
                 removed_schemas.append(schema_name)
 
         msg = f"[OK] Pulizia completata con successo: {len(removed_schemas)} schemi rimossi."
@@ -287,4 +189,5 @@ def cleanup_command() -> None:
         exit_code = 1
         handle_exception(e)
     finally:
-        _shutdown_and_exit(pg_client, llm_adapter, exit_code)
+        bootstrap.close()
+        os_exit(exit_code)
