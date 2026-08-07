@@ -17,6 +17,7 @@ from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.domain.services.sql_repair import PostgresSQLRepair
 
 
 class CalibrationAgent(AbstractAgent):
@@ -29,9 +30,10 @@ class CalibrationAgent(AbstractAgent):
         config: ConfigPort,
         sandbox: SandboxPort,
     ) -> None:
-        """Inietta le porte e la sandbox per eseguire le query candidati."""
+        """Inietta le porte, la sandbox e il servizio di riparazione SQL per i tentativi."""
         super().__init__(llm, prompts, config)
         self._sandbox = sandbox
+        self._repair = PostgresSQLRepair()
 
     def prompt_name(self) -> str:
         """Restituisce 'calibration_solver' come nome del template prompt."""
@@ -89,13 +91,21 @@ class CalibrationAgent(AbstractAgent):
         return {"calibration": cal}
 
     def _matches_gold(self, schema: str, candidate: str, gold: GoldResultDTO | None) -> bool:
-        """Esegue la query candidata e confronta i risultati col gold."""
+        """Esegue la query candidata (applicando sql_repair) e confronta con il gold."""
         if not gold:
             return False
         try:
             _, rows = self._sandbox.run_query(schema, candidate)
         except Exception:
-            return False
+            repaired_sql = self._repair.repair(candidate)
+            if repaired_sql != candidate:
+                try:
+                    _, rows = self._sandbox.run_query(schema, repaired_sql)
+                except Exception:
+                    return False
+            else:
+                return False
+
         got = [list(r) for r in rows]
         if gold.order_sensitive:
             return got == gold.rows

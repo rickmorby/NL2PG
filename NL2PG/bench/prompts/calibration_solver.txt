@@ -10,9 +10,14 @@ Il JSON di output deve contenere esclusivamente il campo "query".
 <rules_and_guidelines>
 1. **Analisi del Contesto**: Leggi lo schema DDL, la storia aziendale e la domanda in linguaggio naturale.
 2. **Schema Linking**: Mappa le entità aziendali ed i sinonimi verso i nomi reali delle tabelle e delle colonne dello schema DDL.
-3. **DIVIETO DI QUALIFICAZIONE SCHEMA**: Scrivi la query PostgreSQL usando nomi di tabella semplici (`FROM clienti`, MAI `FROM task_xxx.clienti`).
-4. **Sintassi PostgreSQL**: Genera SQL valido che termina con punto e virgola `;`.
-5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
+3. **Best Practice PostgreSQL**:
+   - Nelle `self_join` assegna SEMPRE alias di tabella distinti (es. `FROM dipendenti d JOIN dipendenti m ON d.manager_id = m.id`).
+   - Per interrogazioni su strutture gerarchiche usa clausole `WITH RECURSIVE`.
+   - Nelle aggregazioni filtrate impiega sintassi PostgreSQL nativa come `FILTER (WHERE ...)` o `CASE WHEN`.
+   - Esegui i cast espliciti di tipo (es. `::numeric`, `::date`) laddove richiesto da operatori matematici o di data.
+4. **DIVIETO DI QUALIFICAZIONE SCHEMA**: Scrivi la query PostgreSQL usando nomi di tabella semplici (`FROM clienti`, MAI `FROM task_xxx.clienti`).
+5. **Sintassi PostgreSQL**: Genera SQL valido che termina con punto e virgola `;`.
+6. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
