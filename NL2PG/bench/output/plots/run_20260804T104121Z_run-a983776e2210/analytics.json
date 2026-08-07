@@ -1,0 +1,45 @@
+{
+  "run_id": "run-a983776e2210",
+  "generated_at": "2026-08-07T08:46:19Z",
+  "total_tasks": 116,
+  "difficulty_distribution": {
+    "easy": 66,
+    "hard": 43,
+    "medium": 7
+  },
+  "domain_distribution": {
+    "vendite": 45,
+    "logistica": 44,
+    "sanità": 8,
+    "contabilità": 16,
+    "università": 1,
+    "erp": 2
+  },
+  "sql_feature_counts": {
+    "group_agg": 37,
+    "having": 16,
+    "window": 11,
+    "left_outer_join": 6,
+    "join": 25,
+    "conjunctive": 11,
+    "multi_join": 7,
+    "natural_join": 8,
+    "self_join": 1,
+    "scalar_agg": 5,
+    "cte": 3,
+    "recursive_cte": 3,
+    "top_n": 6,
+    "filtered_agg": 1
+  },
+  "twist_type_counts": {
+    "distractor": 5,
+    "rename": 27,
+    "ambiguity": 11,
+    "jargon": 14,
+    "rephrase": 8,
+    "synonym": 20,
+    "polysemy": 2
+  },
+  "avg_critic_scores": {},
+  "avg_pass_rate": 0.2098
+}
