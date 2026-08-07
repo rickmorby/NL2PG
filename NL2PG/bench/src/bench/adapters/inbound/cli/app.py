@@ -3,7 +3,7 @@
 :author: Riccardo Morabito
 """
 
-from os import _exit as os_exit
+from sys import exit as sys_exit
 from typing import Annotated
 
 from typer import Option, Typer, colors, secho
@@ -60,7 +60,7 @@ def generate_command(
         handle_exception(e)
     finally:
         bootstrap.close()
-        os_exit(exit_code)
+        sys_exit(exit_code)
 
 
 @app.command("check-providers")
@@ -85,7 +85,7 @@ def check_providers_command() -> None:
         handle_exception(e)
     finally:
         bootstrap.close()
-        os_exit(exit_code)
+        sys_exit(exit_code)
 
 
 @app.command("check")
@@ -110,7 +110,7 @@ def check_command() -> None:
         handle_exception(e)
     finally:
         bootstrap.close()
-        os_exit(exit_code)
+        sys_exit(exit_code)
 
 
 @app.command("promote")
@@ -136,7 +136,7 @@ def promote_command() -> None:
         handle_exception(e)
     finally:
         bootstrap.close()
-        os_exit(exit_code)
+        sys_exit(exit_code)
 
 
 @app.command("cleanup")
@@ -156,7 +156,7 @@ def cleanup_command() -> None:
         handle_exception(e)
     finally:
         bootstrap.close()
-        os_exit(exit_code)
+        sys_exit(exit_code)
 
 
 @app.command("stats")
@@ -187,4 +187,4 @@ def stats_command(
         handle_exception(e)
     finally:
         bootstrap.close()
-        os_exit(exit_code)
+        sys_exit(exit_code)
