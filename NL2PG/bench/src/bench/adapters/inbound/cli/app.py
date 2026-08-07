@@ -157,3 +157,34 @@ def cleanup_command() -> None:
     finally:
         bootstrap.close()
         os_exit(exit_code)
+
+
+@app.command("stats")
+def stats_command(
+    run: Annotated[str, Option("--run", "-r", help="ID o nome opzionale della run.")] = "",
+) -> None:
+    """Genera le metriche analytics.json ed i 12 grafici scientifici PNG per la run."""
+    bootstrap = ApplicationBootstrap()
+    exit_code = 0
+    try:
+        secho("[INFO] Avvio generazione analytics e grafici scientifici...", fg=colors.CYAN)
+        analytics_svc = bootstrap.analytics()
+        out_dir = bootstrap.base_dir / "output"
+        target = out_dir / "benchmarks" / run if run else out_dir
+        res = analytics_svc.generate_analytics(target)
+
+        if res.total_tasks > 0:
+            msg = (
+                f"[OK] Analytics e 12 grafici generati con successo per {res.total_tasks} task "
+                f"(Run ID: {res.run_id})."
+            )
+            secho(msg, fg=colors.GREEN, bold=True)
+        else:
+            msg_warn = "[WARNING] Nessun task analizzabile trovato nel percorso specificato."
+            secho(msg_warn, fg=colors.YELLOW)
+    except Exception as e:
+        exit_code = 1
+        handle_exception(e)
+    finally:
+        bootstrap.close()
+        os_exit(exit_code)

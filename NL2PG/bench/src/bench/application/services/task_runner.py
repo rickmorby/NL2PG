@@ -1,4 +1,4 @@
-"""Servizio applicativo per l'esecuzione batch dei task con output JSON piatto.
+"""Servizio applicativo per l'esecuzione batch dei task con output JSON e generazione analytics.
 
 :author: Riccardo Morabito
 """
@@ -31,13 +31,15 @@ class TaskRunner:
         meta_repo: MetaRepositoryPort,
         serializer: BenchmarkSerializer,
         config: ConfigPort,
+        analytics: object | None = None,
         base_output_dir: Path | None = None,
     ) -> None:
-        """Inietta l'orchestratore, il repository, il serializzatore e la configurazione."""
+        """Inietta l'orchestratore, il repository, il serializzatore ed analytics."""
         self._orchestrator = orchestrator
         self._meta_repo = meta_repo
         self._serializer = serializer
         self._config = config
+        self._analytics = analytics
         self._lock = Lock()
         base_dir = Path(__file__).resolve().parent.parent.parent.parent.parent
         self._base_output_dir = base_output_dir or (base_dir / "output")
@@ -62,15 +64,16 @@ class TaskRunner:
 
         run_id = self._meta_repo.new_run(cfg_hash, cat_hash)
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        self._base_output_dir.mkdir(parents=True, exist_ok=True)
-        run_output_file = self._base_output_dir / f"run_{timestamp}_{run_id}.json"
+        benchmarks_dir = self._base_output_dir / "benchmarks"
+        benchmarks_dir.mkdir(parents=True, exist_ok=True)
+        run_file = benchmarks_dir / f"run_{timestamp}_{run_id}.json"
 
-        _log.info("Nuova run avviata: run_id=%s, output_file=%s", run_id, run_output_file.name)
+        _log.info("Nuova run avviata: run_id=%s, run_file=%s", run_id, run_file.name)
 
         if batch_size > 1:
             summary = self._run_parallel(
                 run_id=run_id,
-                output_file=run_output_file,
+                output_file=run_file,
                 count=count,
                 category=category,
                 batch_size=batch_size,
@@ -79,7 +82,7 @@ class TaskRunner:
         else:
             summary = self._run_sequential(
                 run_id=run_id,
-                output_file=run_output_file,
+                output_file=run_file,
                 count=count,
                 category=category,
                 bench_cfg=bench_cfg,
@@ -87,6 +90,13 @@ class TaskRunner:
 
         duration = round(time() - start_time, 2)
         summary.duration_seconds = duration
+
+        if self._analytics and hasattr(self._analytics, "generate_analytics"):
+            try:
+                self._analytics.generate_analytics(run_file)
+            except Exception as e:
+                _log.warning("Generazione analytics per la run '%s' fallita: %s", run_id, e)
+
         return summary
 
     def _run_sequential(

@@ -37,6 +37,7 @@ from bench.application.agents import (
 )
 from bench.application.orchestrator import Orchestrator
 from bench.application.serializer import BenchmarkSerializer
+from bench.application.services.analytics import BenchmarkAnalyticsService
 from bench.application.services.database_cleaner import DatabaseCleanupService
 from bench.application.services.system_checker import SystemCheckService
 from bench.application.services.task_promoter import TaskPromoterService
@@ -86,6 +87,7 @@ class ApplicationBootstrap:
             self._sandbox, self._config, self._meta_repo, agents,
         )
         self._serializer = BenchmarkSerializer()
+        self._analytics = BenchmarkAnalyticsService(self._serializer)
 
     @property
     def base_dir(self) -> Path:
@@ -100,6 +102,7 @@ class ApplicationBootstrap:
             self._meta_repo,
             self._serializer,
             self._config,
+            analytics=self._analytics,
         )
 
     def task_promoter(self) -> TaskPromoterService:
@@ -113,6 +116,10 @@ class ApplicationBootstrap:
     def system_checker(self) -> SystemCheckService:
         """Restituisce un SystemCheckService per la diagnosi ed i controlli di salute."""
         return SystemCheckService(self._config, self._llm)
+
+    def analytics(self) -> BenchmarkAnalyticsService:
+        """Restituisce un BenchmarkAnalyticsService per la visualizzazione ed analisi."""
+        return self._analytics
 
 
     def close(self) -> None:

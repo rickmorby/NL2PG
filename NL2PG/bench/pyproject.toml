@@ -19,6 +19,7 @@ dependencies = [
     "ormguard>=0.2.0",
     "litellm>=1.63.0",
     "json-repair>=0.61.7",
+    "matplotlib>=3.11.1",
 ]
 
 [dependency-groups]
