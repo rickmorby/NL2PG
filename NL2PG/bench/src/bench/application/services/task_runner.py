@@ -42,6 +42,7 @@ class TaskRunner:
         self._config = config
         self._analytics = analytics
         self._lock = Lock()
+        self._attempt_counter = 0
         base_dir = Path(__file__).resolve().parent.parent.parent.parent.parent
         self._base_output_dir = base_output_dir or (base_dir / "output")
 
@@ -120,7 +121,10 @@ class TaskRunner:
         with tqdm(total=count, desc="Generazione Task (Sequenziale)", smoothing=0.1) as pbar:
             while len(accepted_tasks) < count:
                 cat_id = category if category else choice(categories)
-                initial_state = TaskStateDTO(category=cat_id)
+                with self._lock:
+                    target_domain = DOMAIN_POOL[self._attempt_counter % len(DOMAIN_POOL)]
+                    self._attempt_counter += 1
+                initial_state = TaskStateDTO(category=cat_id, target_domain=target_domain)
 
                 result_state = self._orchestrator.run_task(initial_state, run_id)
                 self._meta_repo.save_task(run_id, result_state)
