@@ -75,13 +75,13 @@ class Orchestrator:
         g.add_node("accept", self._accept_node)
         g.add_node("reject", self._reject_node)
         g.set_entry_point("spec")
-        g.add_conditional_edges("spec", self._after_spec,
+        g.add_conditional_edges("spec", self._after_generation_step,
                                 {"ok": "schema", "scrapped": "reject"})
-        g.add_conditional_edges("schema", self._after_v1,
+        g.add_conditional_edges("schema", self._after_generation_step,
                                 {"ok": "data", "scrapped": "reject"})
-        g.add_conditional_edges("data", self._after_v2,
+        g.add_conditional_edges("data", self._after_generation_step,
                                 {"ok": "query", "scrapped": "reject"})
-        g.add_conditional_edges("query", self._after_v3,
+        g.add_conditional_edges("query", self._after_generation_step,
                                 {"ok": "story", "scrapped": "reject"})
         g.add_edge("story", "question")
         g.add_edge("question", "coverage")
@@ -118,20 +118,8 @@ class Orchestrator:
 
         return node_fn
 
-    def _after_spec(self, state: TaskStateDTO) -> str:
-        """Instrada dopo spec: ok se generato, scrapped se fallito."""
-        return "scrapped" if state.verdict == "scrapped" else "ok"
-
-    def _after_v1(self, state: TaskStateDTO) -> str:
-        """Instrada dopo schema: ok se generato, scrapped se fallito."""
-        return "scrapped" if state.verdict == "scrapped" else "ok"
-
-    def _after_v2(self, state: TaskStateDTO) -> str:
-        """Instrada dopo data: ok se generato, scrapped se fallito."""
-        return "scrapped" if state.verdict == "scrapped" else "ok"
-
-    def _after_v3(self, state: TaskStateDTO) -> str:
-        """Instrada dopo query: ok se generato, scrapped se fallito."""
+    def _after_generation_step(self, state: TaskStateDTO) -> str:
+        """Instrada dopo uno step di generazione: ok se generato, scrapped se fallito."""
         return "scrapped" if state.verdict == "scrapped" else "ok"
 
     def _after_coverage(self, state: TaskStateDTO) -> str:
