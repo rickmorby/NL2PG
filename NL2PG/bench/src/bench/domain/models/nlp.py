@@ -3,7 +3,9 @@
 :author: Riccardo Morabito
 """
 
-from pydantic import Field, field_validator
+from typing import Any
+
+from pydantic import Field, field_validator, model_validator
 
 from bench.domain.models.base import AbstractDTO
 
@@ -43,11 +45,19 @@ class QuestionDTO(AbstractDTO):
 class CriticScoresDTO(AbstractDTO):
     """Punteggi di qualità assegnati dal Critic."""
 
-    narrative: float = Field(default=1.0, ge=1.0, le=10.0)
-    distractors: float = Field(default=1.0, ge=1.0, le=10.0)
-    plot_twists: float = Field(default=1.0, ge=1.0, le=10.0)
-    jargon: float = Field(default=1.0, ge=1.0, le=10.0)
-    sql_composition: float = Field(default=1.0, ge=1.0, le=10.0)
+    narrative: float = Field(ge=1.0, le=10.0)
+    distractors: float = Field(ge=1.0, le=10.0)
+    plot_twists: float = Field(ge=1.0, le=10.0)
+    jargon: float = Field(ge=1.0, le=10.0)
+    sql_composition: float = Field(ge=1.0, le=10.0)
+
+    @model_validator(mode="before")
+    @classmethod
+    def unwrap_critic(cls, data: Any) -> Any:
+        """Estrae l'oggetto annidato 'critic' se l'LLM ha risposto con wrapper."""
+        if isinstance(data, dict) and "critic" in data and isinstance(data["critic"], dict):
+            return data["critic"]
+        return data
 
 
 class JudgeDTO(AbstractDTO):
