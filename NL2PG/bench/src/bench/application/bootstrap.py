@@ -122,6 +122,19 @@ class ApplicationBootstrap:
         return self._analytics
 
 
+    def __enter__(self) -> "ApplicationBootstrap":
+        """Consente l'utilizzo di ApplicationBootstrap come context manager."""
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: object | None,
+    ) -> None:
+        """Garantisce il rilascio controllato delle risorse allo scadere del contesto."""
+        self.close()
+
     def close(self) -> None:
         """Rilascia ordinatamente pool DB e client LLM."""
         try:
