@@ -9,7 +9,7 @@ Il JSON di output deve contenere esclusivamente le chiavi: "domain", "n_tables",
 </objective>
 
 <rules_and_guidelines>
-1. **Selezione Dominio**: Scegli il dominio aziendale più idoneo da `<available_domains>`.
+1. **Selezione Dominio**: Se `<target_domain>` è specificato e non vuoto, DEVI impostare il campo "domain" esattamente a quel valore. Altrimenti sceglilo da `<available_domains>`.
 2. **Dimensionamento Schema**: Imposta `n_tables` come numero intero compreso rigorosamente tra 1 e 5 (`1 <= n_tables <= 5`), in aderenza con `<schema_type>`.
 3. **Selezione Feature SQL**: Scegli un sottoinsieme di `sql_features` appartenenti ESCLUSIVAMENTE a `<allowed_sql_features>`. NON aggiungere mai feature non presenti nella lista fornita.
 4. **Selezione Twist**: Scegli un sottoinsieme di `twist` appartenenti ESCLUSIVAMENTE a `<allowed_twists>`.
@@ -74,6 +74,7 @@ NON USARE VALORI O STRUTTURE FUORI CONTRATTO (ERRATO):
 <category_constraints>{cat_vincoli}</category_constraints>
 <category_description>{cat_descrizione}</category_description>
 <available_domains>{domains}</available_domains>
+<target_domain>{target_domain}</target_domain>
 </input_context>
 
 <chain_of_thought_protocol>

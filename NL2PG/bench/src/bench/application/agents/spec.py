@@ -44,6 +44,7 @@ class SpecAgent(AbstractAgent):
             "cat_twist": cat.twist_ammessi,
             "cat_vincoli": cat.vincoli,
             "domains": DOMAIN_POOL,
+            "target_domain": state.target_domain,
         }
 
     def output_schema(self) -> type:
@@ -51,9 +52,9 @@ class SpecAgent(AbstractAgent):
         return SpecDTO
 
     def validate(self, output: SpecDTO, state: TaskStateDTO) -> tuple[bool, str, dict]:
-        """Valida vocabolario categoria e verifica assenza di duplicati via spec_hash."""
+        """Valida vocabolario categoria, target_domain e assenza di duplicati via spec_hash."""
         cat = self._config.load_categories().get(state.category, CategoryDTO())
-        ok, err = validate_spec(output, cat)
+        ok, err = validate_spec(output, cat, target_domain=state.target_domain)
         if not ok:
             return False, err, {}
 

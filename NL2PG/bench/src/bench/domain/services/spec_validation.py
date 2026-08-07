@@ -26,8 +26,15 @@ def compute_spec_hash(category: str, spec: SpecDTO) -> str:
     return sha256(payload.encode("utf-8")).hexdigest()[:16]
 
 
-def validate_spec(spec: SpecDTO, category: CategoryDTO) -> tuple[bool, str]:
-    """Verifica che twist, twist_rules e feature_sql della Spec siano coerenti con la categoria."""
+def validate_spec(
+    spec: SpecDTO, category: CategoryDTO, target_domain: str = ""
+) -> tuple[bool, str]:
+    """Verifica che dominio, twist, twist_rules e feature_sql della Spec siano coerenti."""
+    if target_domain and spec.domain != target_domain:
+        return (
+            False,
+            f"dominio '{spec.domain}' non corrisponde al target_domain richiesto '{target_domain}'",
+        )
     invalid_twists = set(spec.twist) - set(category.twist_ammessi)
     if invalid_twists:
         return False, f"twist fuori vocabolario: {sorted(invalid_twists)}"

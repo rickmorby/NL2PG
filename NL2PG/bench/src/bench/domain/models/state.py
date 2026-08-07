@@ -20,6 +20,7 @@ class TaskStateDTO(AbstractDTO):
     task_id: str = ""
     run_id: str = ""
     category: str = ""
+    target_domain: str = ""
     sandbox_schema: str = ""
     spec: SpecDTO | None = None
     schema_ddl: SchemaDDLDTO | None = None

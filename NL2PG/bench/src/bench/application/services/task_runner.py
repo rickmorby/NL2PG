@@ -18,6 +18,7 @@ from bench.application.serializer.serializer import BenchmarkSerializer
 from bench.domain.models import BatchSummaryDTO, TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
+from bench.domain.services.domain_pool import DOMAIN_POOL
 
 _log = getLogger("bench.application.task_runner")
 
@@ -229,7 +230,14 @@ class TaskRunner:
                             len(accepted_tasks) + len(futures)
                         ) < count:
                             next_cat = category if category else choice(categories)
-                            next_state = TaskStateDTO(category=next_cat)
+                            with self._lock:
+                                target_domain = DOMAIN_POOL[
+                                    self._attempt_counter % len(DOMAIN_POOL)
+                                ]
+                                self._attempt_counter += 1
+                            next_state = TaskStateDTO(
+                                category=next_cat, target_domain=target_domain
+                            )
                             new_fut = executor.submit(
                                 self._orchestrator.run_task, next_state, run_id
                             )
