@@ -12,8 +12,10 @@ from bench.domain.ports.outbound.logger_port import LoggerPort
 from bench.domain.ports.outbound.plotter_port import PlotterPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
+from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
 
 __all__ = [
+    "BenchmarkSerializerPort",
     "ConfigPort",
     "DatabasePort",
     "DatabaseSchemaValidatorPort",

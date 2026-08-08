@@ -37,7 +37,7 @@ from bench.application.agents import (
     StoryAgent,
 )
 from bench.application.orchestrator import Orchestrator
-from bench.application.serializer import BenchmarkSerializer
+from bench.adapters.outbound.serializer import JsonBenchmarkSerializerAdapter
 from bench.application.services.analytics import BenchmarkAnalyticsService
 from bench.application.services.database_cleaner import DatabaseCleanupService
 from bench.application.services.system_checker import SystemCheckService
@@ -87,7 +87,7 @@ class ApplicationBootstrap:
         self._orchestrator = Orchestrator(
             self._sandbox, self._config, self._meta_repo, agents,
         )
-        self._serializer = BenchmarkSerializer()
+        self._serializer = JsonBenchmarkSerializerAdapter()
         self._plotter = SeabornPlotterAdapter()
         self._analytics = BenchmarkAnalyticsService(self._serializer, self._plotter)
 
