@@ -61,16 +61,19 @@ class FeatureChecker:
         ),
     }
 
-    def check(self, query: str, required: list[str]) -> FeatureCheckResult:
+    def check(self, query: str | exp.Expression, required: list[str]) -> FeatureCheckResult:
         """Verifica che la query SQL contenga tutte le feature richieste."""
-        try:
-            tree = parse_one(query, read="postgres")
-        except ParseError:
-            return FeatureCheckResult(is_valid=False, missing=required)
+        if isinstance(query, exp.Expression):
+            tree = query
+        else:
+            try:
+                tree = parse_one(query, read="postgres")
+            except ParseError:
+                return FeatureCheckResult(is_valid=False, missing=required)
         missing = [feat for feat in required if not self._CHECKS.get(feat, lambda _: True)(tree)]
         return FeatureCheckResult(is_valid=len(missing) == 0, missing=missing)
 
-    def uses_features(self, query: str, required: list[str]) -> bool:
+    def uses_features(self, query: str | exp.Expression, required: list[str]) -> bool:
         """Restituisce True se la query contiene tutte le feature richieste."""
         return self.check(query, required).is_valid
 

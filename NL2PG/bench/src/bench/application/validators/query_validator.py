@@ -40,7 +40,14 @@ class QueryValidator:
         self, query: GoldQueryDTO, spec: SpecDTO, schema: str
     ) -> QueryValidationResult:
         """Esegue la query, verifica feature e mutazioni, e restituisce il risultato gold."""
-        if self._has_explicit_schema(query.query):
+        try:
+            tree = parse_one(query.query, read="postgres")
+        except ParseError as pe:
+            return QueryValidationResult(
+                is_valid=False, error=f"Errore di sintassi SQL nella Gold Query: {pe}"
+            )
+
+        if self._has_explicit_schema(tree):
             return QueryValidationResult(
                 is_valid=False,
                 error=(
@@ -62,7 +69,7 @@ class QueryValidator:
                     "Inserisci dati o modifica la query in modo da restituire risultati validi."
                 ),
             )
-        if query.order_sensitive and not self._order_by_root_only(query):
+        if query.order_sensitive and not self._order_by_root_only(tree, query.order_sensitive):
             return QueryValidationResult(
                 is_valid=False,
                 error=(
@@ -70,7 +77,7 @@ class QueryValidator:
                     "nella query principale della SELECT."
                 ),
             )
-        feat_result = self._feature_checker.check(query.query, spec.sql_features)
+        feat_result = self._feature_checker.check(tree, spec.sql_features)
         if not feat_result.is_valid:
             return QueryValidationResult(
                 is_valid=False,
@@ -79,7 +86,7 @@ class QueryValidator:
                     f"{', '.join(feat_result.missing)}."
                 ),
             )
-        tables = self._tables_used(query.query)
+        tables = self._tables_used(tree)
         if not tables:
             return QueryValidationResult(
                 is_valid=False,
@@ -92,32 +99,21 @@ class QueryValidator:
         return QueryValidationResult(is_valid=True, gold_result=gold)
 
     @staticmethod
-    def _has_explicit_schema(query: str) -> bool:
+    def _has_explicit_schema(tree: exp.Expression) -> bool:
         """Verifica se la query contiene riferimenti espliciti a schemi (es. schema.tabella)."""
-        try:
-            tree = parse_one(query, read="postgres")
-            return any(t.db or t.catalog for t in tree.find_all(exp.Table))
-        except ParseError:
-            return False
+        return any(t.db or t.catalog for t in tree.find_all(exp.Table))
 
     @staticmethod
-    def _tables_used(query: str) -> list[str]:
+    def _tables_used(tree: exp.Expression) -> list[str]:
         """Estrae i nomi delle tabelle referenziate nella query."""
-        try:
-            return sorted({t.name for t in find_tables(parse_one(query, read="postgres"))})
-        except ParseError:
-            return []
+        return sorted({t.name for t in find_tables(tree)})
 
     @staticmethod
-    def _order_by_root_only(query: GoldQueryDTO) -> bool:
+    def _order_by_root_only(tree: exp.Expression, order_sensitive: bool) -> bool:
         """Verifica che le query order_sensitive abbiano ORDER BY a livello radice."""
-        if not query.order_sensitive:
+        if not order_sensitive:
             return True
-        try:
-            tree = parse_one(query.query, read="postgres")
-            return tree.args.get("order") is not None
-        except ParseError:
-            return False
+        return tree.args.get("order") is not None
 
     @staticmethod
     def _build_gold(
