@@ -17,6 +17,7 @@ from pathlib import Path
 from bench.adapters.outbound.config import ConfigAdapter
 from bench.adapters.outbound.llm import LLMClientAdapter
 from bench.adapters.outbound.logging import LoggingAdapter
+from bench.adapters.outbound.plotter.seaborn_adapter import SeabornPlotterAdapter
 from bench.adapters.outbound.postgres import (
     MetaRepositoryAdapter,
     PostgresClientAdapter,
@@ -87,7 +88,8 @@ class ApplicationBootstrap:
             self._sandbox, self._config, self._meta_repo, agents,
         )
         self._serializer = BenchmarkSerializer()
-        self._analytics = BenchmarkAnalyticsService(self._serializer)
+        self._plotter = SeabornPlotterAdapter()
+        self._analytics = BenchmarkAnalyticsService(self._serializer, self._plotter)
 
     @property
     def base_dir(self) -> Path:
