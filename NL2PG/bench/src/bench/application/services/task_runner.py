@@ -101,6 +101,14 @@ class TaskRunner:
 
         return summary
 
+    def _create_initial_state(self, category: str, categories: list[str]) -> TaskStateDTO:
+        """Crea uno stato iniziale per un task assegnando il dominio in Round-Robin."""
+        cat_id = category if category else choice(categories)
+        with self._lock:
+            target_domain = DOMAIN_POOL[self._attempt_counter % len(DOMAIN_POOL)]
+            self._attempt_counter += 1
+        return TaskStateDTO(category=cat_id, target_domain=target_domain)
+
     def _run_sequential(
         self,
         run_id: str,
@@ -120,11 +128,7 @@ class TaskRunner:
 
         with tqdm(total=count, desc="Generazione Task (Sequenziale)", smoothing=0.1) as pbar:
             while len(accepted_tasks) < count:
-                cat_id = category if category else choice(categories)
-                with self._lock:
-                    target_domain = DOMAIN_POOL[self._attempt_counter % len(DOMAIN_POOL)]
-                    self._attempt_counter += 1
-                initial_state = TaskStateDTO(category=cat_id, target_domain=target_domain)
+                initial_state = self._create_initial_state(category, categories)
 
                 result_state = self._orchestrator.run_task(initial_state, run_id)
                 self._meta_repo.save_task(run_id, result_state)
@@ -192,10 +196,9 @@ class TaskRunner:
                 futures = {}
 
                 while len(futures) < batch_size and (len(accepted_tasks) + len(futures)) < count:
-                    cat_id = category if category else choice(categories)
-                    init_state = TaskStateDTO(category=cat_id)
+                    init_state = self._create_initial_state(category, categories)
                     fut = executor.submit(self._orchestrator.run_task, init_state, run_id)
-                    futures[fut] = cat_id
+                    futures[fut] = init_state.category
 
                 while futures and consecutive_failures < max_fails:
                     done, _ = wait(futures.keys(), return_when=FIRST_COMPLETED)
@@ -233,19 +236,11 @@ class TaskRunner:
                         while len(futures) < batch_size and (
                             len(accepted_tasks) + len(futures)
                         ) < count:
-                            next_cat = category if category else choice(categories)
-                            with self._lock:
-                                target_domain = DOMAIN_POOL[
-                                    self._attempt_counter % len(DOMAIN_POOL)
-                                ]
-                                self._attempt_counter += 1
-                            next_state = TaskStateDTO(
-                                category=next_cat, target_domain=target_domain
-                            )
+                            next_state = self._create_initial_state(category, categories)
                             new_fut = executor.submit(
                                 self._orchestrator.run_task, next_state, run_id
                             )
-                            futures[new_fut] = next_cat
+                            futures[new_fut] = next_state.category
 
                         pbar.set_postfix(
                             acc=len(accepted_tasks),
