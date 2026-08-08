@@ -3,11 +3,12 @@
 :author: Riccardo Morabito
 """
 
-from json import loads
 from logging import getLogger
 from pathlib import Path
 
-from bench.application.serializer.serializer import BenchmarkSerializer
+from orjson import loads as orjson_loads
+
+from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
 
 _log = getLogger("bench.application.task_promoter")
 
@@ -15,7 +16,7 @@ _log = getLogger("bench.application.task_promoter")
 class TaskPromoterService:
     """Servizio applicativo che coordina la promozione dei task accettati."""
 
-    def __init__(self, serializer: BenchmarkSerializer) -> None:
+    def __init__(self, serializer: BenchmarkSerializerPort) -> None:
         """Inietta l'aggregato unico di serializzazione."""
         self._serializer = serializer
 
@@ -33,7 +34,7 @@ class TaskPromoterService:
         promoted_count = 0
         for sample_file in json_files:
             try:
-                doc = loads(sample_file.read_text(encoding="utf-8"))
+                doc = orjson_loads(sample_file.read_bytes())
                 for task in doc.get("tasks", []):
                     cat = task.get("category", "unknown")
                     cat_dir = examples_dir / cat
