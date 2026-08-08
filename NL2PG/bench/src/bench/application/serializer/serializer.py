@@ -42,13 +42,7 @@ class BenchmarkSerializer:
 
     def write_single_task(self, task_dict: dict, output_path: Path) -> None:
         """Scrive atomicamente un singolo task JSON nella cartella di destinazione."""
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        tmp_path = output_path.with_suffix(".tmp")
-        tmp_path.write_text(
-            dumps(task_dict, indent=2, ensure_ascii=False, default=str),
-            encoding="utf-8",
-        )
-        tmp_path.replace(output_path)
+        self.write(task_dict, output_path)
 
     def _build_entry(self, state: TaskStateDTO, weights: dict) -> dict:
         """Converte un TaskStateDTO in un dict per l'output JSON."""
