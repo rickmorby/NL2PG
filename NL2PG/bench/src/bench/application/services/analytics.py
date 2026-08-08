@@ -242,6 +242,7 @@ class BenchmarkAnalyticsService:
             self._add_label(ax, b, label_text, label_offset)
 
         fig.savefig(output_path, bbox_inches="tight")
+        fig.clf()
 
 
     def _plot_01_sql_syntax_distribution(self, tasks: list[dict], output_path: Path) -> None:
@@ -361,6 +362,7 @@ class BenchmarkAnalyticsService:
         title = "05. Matrice Co-occorrenza Feature SQL"
         ax.set_title(title, fontsize=13, fontweight="bold", pad=15, color="#2c3e50")
         fig.savefig(output_path, bbox_inches="tight")
+        fig.clf()
 
     def _plot_06_nl_linguistic_complexity(self, tasks: list[dict], output_path: Path) -> None:
         """06: Scatter Plot tra la lunghezza del testo in parole e le tabelle."""
@@ -377,6 +379,7 @@ class BenchmarkAnalyticsService:
             n_tables, word_counts, color="#e67e22", alpha=0.7, edgecolors="none", s=50, zorder=3
         )
         fig.savefig(output_path, bbox_inches="tight")
+        fig.clf()
 
     def _plot_07_twist_type_frequency(self, tasks: list[dict], output_path: Path) -> None:
         """07: Bar Chart della frequenza dei tipi di Twist semantici."""
@@ -474,6 +477,7 @@ class BenchmarkAnalyticsService:
         for x, y in zip(xs, ys, strict=False):
             ax.text(x, y + 0.008, f"{y:.3f}", ha="center", va="bottom", fontsize=10)
         fig.savefig(output_path, bbox_inches="tight")
+        fig.clf()
 
     def _plot_11_twist_vs_difficulty_heatmap(
         self, tasks: list[dict], output_path: Path
@@ -507,6 +511,7 @@ class BenchmarkAnalyticsService:
         title = "11. Correlazione Tipo Twist vs Difficoltà Task"
         ax.set_title(title, fontsize=13, fontweight="bold", pad=15, color="#2c3e50")
         fig.savefig(output_path, bbox_inches="tight")
+        fig.clf()
 
     def _plot_12_schema_size_vs_passrate_boxplot(
         self, tasks: list[dict], output_path: Path
@@ -562,6 +567,7 @@ class BenchmarkAnalyticsService:
         for b in bars:
             self._add_label(ax, b, f"{b.get_height():.3f}", 0.01)
         fig.savefig(output_path, bbox_inches="tight")
+        fig.clf()
 
     def _plot_14_critic_vs_passrate_correlation(
         self, tasks: list[dict], output_path: Path
@@ -589,6 +595,7 @@ class BenchmarkAnalyticsService:
             )
             txt.set_path_effects([stroke])
         fig.savefig(output_path, bbox_inches="tight")
+        fig.clf()
 
     def _plot_15_critic_5dimensions_radar(
         self, tasks: list[dict], output_path: Path
