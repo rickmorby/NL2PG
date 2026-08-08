@@ -4,8 +4,9 @@
 """
 
 from datetime import datetime, timezone
-from json import dumps
 from pathlib import Path
+
+from orjson import OPT_INDENT_2, dumps as orjson_dumps
 
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.services.weighted_mean import weighted_mean
@@ -34,10 +35,7 @@ class BenchmarkSerializer:
         """Scrive atomicamente il documento JSON su file temporaneo e lo rimpiazza."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
         tmp_path = output_path.with_suffix(".tmp")
-        tmp_path.write_text(
-            dumps(document, indent=2, ensure_ascii=False, default=str),
-            encoding="utf-8",
-        )
+        tmp_path.write_bytes(orjson_dumps(document, option=OPT_INDENT_2))
         tmp_path.replace(output_path)
 
     def write_single_task(self, task_dict: dict, output_path: Path) -> None:

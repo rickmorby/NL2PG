@@ -4,9 +4,10 @@
 """
 
 from hashlib import sha256
-from json import dumps, loads
 from pathlib import Path
 from tomllib import load as toml_load
+
+from orjson import OPT_SORT_KEYS, dumps as orjson_dumps, loads as orjson_loads
 
 from bench.domain.exceptions import (
     ConfigurationMissingFieldError,
@@ -39,7 +40,7 @@ class ConfigAdapter(ConfigPort):
             exc = ProviderConfigError(msg, payload={"path": str(path)})
             handle_exception(exc)
             return {}
-        return loads(path.read_text(encoding="utf-8"))
+        return orjson_loads(path.read_bytes())
 
     def load_bench(self) -> dict:
         """Restituisce il contenuto di bench.toml come dict, o dict vuoto se assente."""
@@ -68,7 +69,7 @@ class ConfigAdapter(ConfigPort):
             exc = ConfigurationMissingFieldError(msg, payload=payload)
             handle_exception(exc)
             return {}
-        data = loads(path.read_text(encoding="utf-8"))
+        data = orjson_loads(path.read_bytes())
         return {c["id"]: CategoryDTO(**c) for c in data["categories"]}
 
     def dsn(self, key: str) -> str:
@@ -106,5 +107,5 @@ class ConfigAdapter(ConfigPort):
 
     def config_hash(self, cfg: dict) -> str:
         """Calcola l'hash SHA256 di un dict di configurazione."""
-        payload = dumps(cfg, sort_keys=True, ensure_ascii=False, default=str)
-        return sha256(payload.encode("utf-8")).hexdigest()[:16]
+        payload = orjson_dumps(cfg, option=OPT_SORT_KEYS)
+        return sha256(payload).hexdigest()[:16]

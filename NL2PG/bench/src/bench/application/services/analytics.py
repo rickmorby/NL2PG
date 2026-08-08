@@ -5,7 +5,7 @@
 
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
-from json import loads
+from orjson import loads as orjson_loads
 from logging import getLogger
 from pathlib import Path
 from threading import Lock
@@ -115,7 +115,7 @@ class BenchmarkAnalyticsService:
         if not json_file.is_file():
             return [], "", output_dir / "plots" / "run_unknown"
 
-        doc = loads(json_file.read_text(encoding="utf-8"))
+        doc = orjson_loads(json_file.read_bytes())
         tasks = doc.get("tasks", [])
         run_id = doc.get("run_id", "unknown")
         is_samples = json_file.name == "benchmark_samples.json"

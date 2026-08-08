@@ -4,7 +4,8 @@
 """
 
 from hashlib import sha256
-from json import dumps
+
+from orjson import OPT_SORT_KEYS, dumps as orjson_dumps
 
 from bench.domain.models.category import CategoryDTO
 from bench.domain.models.spec import SpecDTO
@@ -12,18 +13,17 @@ from bench.domain.models.spec import SpecDTO
 
 def compute_spec_hash(category: str, spec: SpecDTO) -> str:
     """Calcola l'hash SHA-256 deterministico per una SpecDTO e la sua categoria."""
-    payload = dumps(
+    payload = orjson_dumps(
         {
             "cat": category,
             "domain": spec.domain,
             "sql_features": sorted(spec.sql_features),
             "twist": sorted(spec.twist),
-            "rules": sorted([r.model_dump_json() for r in spec.twist_rules]),
+            "rules": sorted([r.model_dump() for r in spec.twist_rules]),
         },
-        sort_keys=True,
-        ensure_ascii=False,
+        option=OPT_SORT_KEYS,
     )
-    return sha256(payload.encode("utf-8")).hexdigest()[:16]
+    return sha256(payload).hexdigest()[:16]
 
 
 def validate_spec(
