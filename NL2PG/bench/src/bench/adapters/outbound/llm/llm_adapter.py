@@ -5,11 +5,6 @@
 
 from asyncio import get_event_loop
 from logging import getLogger
-from re import (
-    DOTALL,
-    IGNORECASE,
-    compile as re_compile,
-)
 from sys import modules
 from typing import Any
 
@@ -28,12 +23,6 @@ from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 _log = getLogger("bench.adapters.llm")
 
 modules["litellm"].suppress_debug_info = True
-
-_TAGS_PATTERN = "think|thinking|thought|reasoning|reflection|rationale|chain_of_thought"
-_RE_COT_BLOCK = re_compile(r"<(" + _TAGS_PATTERN + r")\b[^>]*>.*?</\1>", flags=DOTALL | IGNORECASE)
-_RE_COT_BRACKETS = re_compile(r"\[(" + _TAGS_PATTERN + r")\].*?\[/\1\]", flags=DOTALL | IGNORECASE)
-_RE_COT_OPEN = re_compile(r"<(" + _TAGS_PATTERN + r")\b[^>]*>", flags=IGNORECASE)
-_RE_COT_BRACKETS_OPEN = re_compile(r"\[(" + _TAGS_PATTERN + r")\]", flags=IGNORECASE)
 
 
 class LLMClientAdapter(LLMGeneratorPort):
@@ -194,13 +183,4 @@ class LLMClientAdapter(LLMGeneratorPort):
 
 def _extract_json_payload(text: str) -> str:
     """Estrae l'oggetto JSON finale da un testo LLM scartando CoT e riparando la sintassi."""
-    if not text:
-        return ""
-
-    cleaned = _RE_COT_BLOCK.sub("", text)
-    cleaned = _RE_COT_BRACKETS.sub("", cleaned)
-    cleaned = _RE_COT_OPEN.sub("", cleaned)
-    cleaned = _RE_COT_BRACKETS_OPEN.sub("", cleaned)
-
-    repaired: str = repair_json(cleaned.strip())
-    return repaired
+    return repair_json(text.strip(), ensure_ascii=False) if text else ""
