@@ -6,9 +6,9 @@
 from asyncio import get_event_loop
 from logging import getLogger
 from re import (
-    DOTALL as re_DOTALL,
-    IGNORECASE as re_IGNORECASE,
-    sub as re_sub,
+    DOTALL,
+    IGNORECASE,
+    compile as re_compile,
 )
 from sys import modules
 from typing import Any
@@ -28,6 +28,12 @@ from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 _log = getLogger("bench.adapters.llm")
 
 modules["litellm"].suppress_debug_info = True
+
+_TAGS_PATTERN = "think|thinking|thought|reasoning|reflection|rationale|chain_of_thought"
+_RE_COT_BLOCK = re_compile(r"<(" + _TAGS_PATTERN + r")\b[^>]*>.*?</\1>", flags=DOTALL | IGNORECASE)
+_RE_COT_BRACKETS = re_compile(r"\[(" + _TAGS_PATTERN + r")\].*?\[/\1\]", flags=DOTALL | IGNORECASE)
+_RE_COT_OPEN = re_compile(r"<(" + _TAGS_PATTERN + r")\b[^>]*>", flags=IGNORECASE)
+_RE_COT_BRACKETS_OPEN = re_compile(r"\[(" + _TAGS_PATTERN + r")\]", flags=IGNORECASE)
 
 
 class LLMClientAdapter(LLMGeneratorPort):
@@ -137,8 +143,8 @@ class LLMClientAdapter(LLMGeneratorPort):
         except Exception as e:
             _log.debug("Rilascio risorse LiteLLM completato: %s", e)
 
-    @staticmethod
-    def _build_model_list(config: dict[str, Any]) -> list[dict[str, Any]]:
+    @classmethod
+    def _build_model_list(cls, config: dict[str, Any]) -> list[dict[str, Any]]:
         """Costruisce la model_list per liteLLM Router con identificativi univoci."""
         model_list: list[dict[str, Any]] = []
         models = config.get("models", {})
@@ -149,43 +155,31 @@ class LLMClientAdapter(LLMGeneratorPort):
             if not mid_list:
                 continue
 
-            primary_mid = mid_list[0]
-            mc = models.get(primary_mid)
-            if mc and (role, primary_mid) not in registered_keys:
-                params = {
-                    "model": f"{mc['provider']}/{mc['model']}",
-                    "api_key": mc["api_key"],
-                    "temperature": mc["temperature"],
-                    "timeout": mc.get("request_timeout", 120),
-                    "rpm": 100,
-                }
-                if "max_tokens" in mc:
-                    params["max_tokens"] = mc["max_tokens"]
-                if "base_url" in mc:
-                    params["api_base"] = mc["base_url"]
-
-                model_list.append({"model_name": role, "litellm_params": params})
-                registered_keys.add((role, primary_mid))
-
-            for fb_mid in mid_list[1:]:
-                f_mc = models.get(fb_mid)
-                if f_mc and (fb_mid, fb_mid) not in registered_keys:
-                    f_params = {
-                        "model": f"{f_mc['provider']}/{f_mc['model']}",
-                        "api_key": f_mc["api_key"],
-                        "temperature": f_mc["temperature"],
-                        "timeout": f_mc.get("request_timeout", 120),
-                        "rpm": 100,
-                    }
-                    if "max_tokens" in f_mc:
-                        f_params["max_tokens"] = f_mc["max_tokens"]
-                    if "base_url" in f_mc:
-                        f_params["api_base"] = f_mc["base_url"]
-
-                    model_list.append({"model_name": fb_mid, "litellm_params": f_params})
-                    registered_keys.add((fb_mid, fb_mid))
+            for idx, mid in enumerate(mid_list):
+                mc = models.get(mid)
+                model_key = role if idx == 0 else mid
+                if mc and (model_key, mid) not in registered_keys:
+                    params = cls._make_litellm_params(mc)
+                    model_list.append({"model_name": model_key, "litellm_params": params})
+                    registered_keys.add((model_key, mid))
 
         return model_list
+
+    @staticmethod
+    def _make_litellm_params(mc: dict[str, Any]) -> dict[str, Any]:
+        """Costruisce il dizionario dei parametri litellm_params per una configurazione modello."""
+        params: dict[str, Any] = {
+            "model": f"{mc['provider']}/{mc['model']}",
+            "api_key": mc["api_key"],
+            "temperature": mc["temperature"],
+            "timeout": mc.get("request_timeout", 120),
+            "rpm": 100,
+        }
+        if "max_tokens" in mc:
+            params["max_tokens"] = mc["max_tokens"]
+        if "base_url" in mc:
+            params["api_base"] = mc["base_url"]
+        return params
 
     @staticmethod
     def _build_fallbacks(config: dict[str, Any]) -> list[dict[str, list[str]]]:
@@ -203,11 +197,10 @@ def _extract_json_payload(text: str) -> str:
     if not text:
         return ""
 
-    tags = "think|thinking|thought|reasoning|reflection|rationale|chain_of_thought"
-    cleaned = re_sub(r"<(" + tags + r")\b[^>]*>.*?</\1>", "", text, flags=re_DOTALL | re_IGNORECASE)
-    cleaned = re_sub(r"\[(" + tags + r")\].*?\[/\1\]", "", cleaned, flags=re_DOTALL | re_IGNORECASE)
-    cleaned = re_sub(r"<(" + tags + r")\b[^>]*>", "", cleaned, flags=re_IGNORECASE)
-    cleaned = re_sub(r"\[(" + tags + r")\]", "", cleaned, flags=re_IGNORECASE)
+    cleaned = _RE_COT_BLOCK.sub("", text)
+    cleaned = _RE_COT_BRACKETS.sub("", cleaned)
+    cleaned = _RE_COT_OPEN.sub("", cleaned)
+    cleaned = _RE_COT_BRACKETS_OPEN.sub("", cleaned)
 
     repaired: str = repair_json(cleaned.strip())
     return repaired
