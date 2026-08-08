@@ -11,10 +11,11 @@ from pathlib import Path
 from threading import Lock
 from typing import Any
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.patheffects as path_effects
+from matplotlib import use as matplotlib_use
 from matplotlib.figure import Figure
+from matplotlib.patheffects import withStroke
+
+matplotlib_use("Agg")
 from sqlglot import parse_one
 
 from bench.application.serializer.serializer import BenchmarkSerializer
@@ -588,7 +589,7 @@ class BenchmarkAnalyticsService:
         title = "14. Correlazione Critic Score vs Pass Rate (Bubble Plot)"
         self._style_ax(ax, title, "Critic Score", "Calibration Pass Rate")
         ax.scatter(xs, ys, s=sizes, color="#34495e", alpha=0.6, edgecolors="#1a252f", linewidth=1.5)
-        stroke = path_effects.withStroke(linewidth=3, foreground="white")
+        stroke = withStroke(linewidth=3, foreground="white")
         for x, y, c in zip(xs, ys, counts, strict=False):
             txt = ax.text(
                 x, y, f"{c} task", ha="center", va="center", color="#1a252f", fontweight="bold"
