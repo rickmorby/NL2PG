@@ -10,7 +10,7 @@ from logging.config import dictConfig
 from os import getpid
 from pathlib import Path
 
-from litellm import verbose_logger  # type: ignore
+from litellm import verbose_logger
 
 from bench.domain.exceptions import LoggingConfigError, SymlinkError
 from bench.domain.ports.outbound.logger_port import LoggerPort
