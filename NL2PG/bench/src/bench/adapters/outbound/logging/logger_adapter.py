@@ -10,6 +10,8 @@ from logging.config import dictConfig
 from os import getpid
 from pathlib import Path
 
+from litellm import verbose_logger  # type: ignore
+
 from bench.domain.exceptions import LoggingConfigError, SymlinkError
 from bench.domain.ports.outbound.logger_port import LoggerPort
 
@@ -55,14 +57,9 @@ class LoggingAdapter(LoggerPort):
 
     def _configure_dependency_loggers(self) -> None:
         """Integrazione e instradamento dei logger delle dipendenze nel file di log unico."""
-        try:
-            from litellm import verbose_logger  # type: ignore
-
-            verbose_logger.handlers.clear()
-            verbose_logger.addHandler(NullHandler())
-            verbose_logger.propagate = True
-        except ImportError:
-            pass
+        verbose_logger.handlers.clear()
+        verbose_logger.addHandler(NullHandler())
+        verbose_logger.propagate = True
 
         for pkg in ("httpcore", "asyncio", "urllib3", "filelock"):
             getLogger(pkg).setLevel(WARNING)
