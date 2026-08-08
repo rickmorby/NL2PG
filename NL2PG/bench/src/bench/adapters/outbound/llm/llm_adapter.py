@@ -3,17 +3,22 @@
 :author: Riccardo Morabito
 """
 
+from asyncio import get_event_loop
 from logging import getLogger
 from re import (
     DOTALL as re_DOTALL,
     IGNORECASE as re_IGNORECASE,
     sub as re_sub,
 )
+from sys import modules
 from typing import Any
 
-import litellm
 from json_repair import repair_json
-from litellm import Router
+from litellm import (
+    Router,
+    close_litellm_async_clients,
+    in_memory_llm_clients_cache,
+)
 from pydantic import BaseModel, ValidationError
 
 from bench.domain.exceptions import LLMClientError, ModelOutputContractError
@@ -22,7 +27,7 @@ from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 _log = getLogger("bench.adapters.llm")
 
-litellm.suppress_debug_info = True
+modules["litellm"].suppress_debug_info = True
 
 
 class LLMClientAdapter(LLMGeneratorPort):
@@ -118,19 +123,17 @@ class LLMClientAdapter(LLMGeneratorPort):
             self._router = None
 
         try:
-            if hasattr(litellm, "close_litellm_async_clients") and callable(
-                litellm.close_litellm_async_clients
-            ):
-                import asyncio
-
+            if callable(close_litellm_async_clients):
                 try:
-                    loop = asyncio.get_event_loop()
+                    loop = get_event_loop()
                     if loop.is_running():
-                        loop.create_task(litellm.close_litellm_async_clients())
+                        loop.create_task(close_litellm_async_clients())
                     else:
-                        loop.run_until_complete(litellm.close_litellm_async_clients())
+                        loop.run_until_complete(close_litellm_async_clients())
                 except Exception:
                     pass
+            if isinstance(in_memory_llm_clients_cache, dict):
+                in_memory_llm_clients_cache.clear()
         except Exception as e:
             _log.debug("Rilascio risorse LiteLLM completato: %s", e)
 
