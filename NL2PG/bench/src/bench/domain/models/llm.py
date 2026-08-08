@@ -21,3 +21,9 @@ class CallOptionsDTO(AbstractDTO):
     temperature_override: float | None = None
     error_feedback: str | None = None
 
+
+class HealthCheckDTO(AbstractDTO):
+    """DTO diagnostico leggero per i test di connettività dei provider LLM."""
+
+    status: str = "ok"
+

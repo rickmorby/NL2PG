@@ -6,7 +6,7 @@
 from dataclasses import dataclass
 from logging import getLogger
 
-from bench.domain.models.nlp import JudgeDTO
+from bench.domain.models.llm import HealthCheckDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
@@ -63,8 +63,8 @@ class SystemCheckService:
         try:
             res = self._llm.call_model(
                 role="default",
-                prompt='Rispondi esclusivamente con un oggetto JSON: {"verdict": "hard"}',
-                schema=JudgeDTO,
+                prompt='Rispondi esclusivamente con un oggetto JSON: {"status": "ok"}',
+                schema=HealthCheckDTO,
             )
             return ProviderCheckResult(success=True, model_used=self._extract_model_used(res))
         except Exception as e:
