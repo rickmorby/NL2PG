@@ -66,12 +66,12 @@ class SystemCheckService:
                 prompt='Rispondi esclusivamente con un oggetto JSON: {"verdict": "hard"}',
                 schema=JudgeDTO,
             )
-            return ProviderCheckResult(success=True, model_used=result_model(res))
+            return ProviderCheckResult(success=True, model_used=self._extract_model_used(res))
         except Exception as e:
             _log.error("Verifica provider LLM fallita: %s", e)
             return ProviderCheckResult(success=False, error=str(e))
 
-
-def result_model(res: object) -> str:
-    """Estrae in modo sicuro il modello utilizzato dal risultato dell'invocazione."""
-    return getattr(res, "model_used", "")
+    @staticmethod
+    def _extract_model_used(res: object) -> str:
+        """Estrae in modo sicuro il modello utilizzato dal risultato dell'invocazione."""
+        return getattr(res, "model_used", "")
