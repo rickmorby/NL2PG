@@ -9,7 +9,7 @@ from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
-from bench.domain.exceptions import ModelOutputContractError
+from bench.domain.exceptions import LLMClientError, ModelOutputContractError
 from bench.domain.models.llm import CallOptionsDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
@@ -85,6 +85,10 @@ class AbstractAgent(ABC):
                     "Nodo '%s' (tentativo %d/%d) errore contratto: %s",
                     name, i, max_attempts, e,
                 )
+            except LLMClientError as e:
+                err = f"Errore infrastruttura LLM per nodo '{name}': {e}"
+                _log.warning("Nodo '%s' interrotto per errore client LLM: %s", name, e)
+                break
             except Exception as e:
                 err = f"Errore invocazione agente '{name}': {e}"
                 _log.info(
