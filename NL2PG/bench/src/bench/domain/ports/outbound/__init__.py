@@ -9,6 +9,7 @@ from bench.domain.ports.outbound.sandbox_port import SandboxPort
 from bench.domain.ports.outbound.schema_validator_port import DatabaseSchemaValidatorPort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.logger_port import LoggerPort
+from bench.domain.ports.outbound.plotter_port import PlotterPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
 
@@ -19,6 +20,7 @@ __all__ = [
     "SandboxPort",
     "LLMGeneratorPort",
     "LoggerPort",
+    "PlotterPort",
     "PromptPort",
     "MetaRepositoryPort",
 ]
