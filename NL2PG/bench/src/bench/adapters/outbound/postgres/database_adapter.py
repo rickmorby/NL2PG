@@ -42,31 +42,13 @@ class PostgresClientAdapter(DatabasePort):
         default_sandbox = "postgresql://bench:bench@127.0.0.1:5432/bench_sandbox"
         default_meta = "postgresql://bench:bench@127.0.0.1:5432/bench_meta"
 
-        configured_sandbox = (
-            sandbox_dsn
-            or self._config.get("sandbox_dsn", "")
-            or self._config.get("db_dsn", "")
+        self._sandbox_dsn = self._resolve_dsn(
+            sandbox_dsn, ("sandbox_dsn", "db_dsn"), default_sandbox, "sandbox"
         )
-        if not configured_sandbox:
-            msg = (
-                "La DSN per il database sandbox non è stata fornita nella configurazione. "
-                f"Viene utilizzato il valore di fallback '{default_sandbox}'."
-            )
-            exc = ConfigurationMissingFieldError(msg, payload={"default": default_sandbox})
-            handle_exception(exc)
-            configured_sandbox = default_sandbox
-        self._sandbox_dsn = configured_sandbox
-
-        configured_meta = meta_dsn or self._config.get("meta_dsn", "")
-        if not configured_meta:
-            msg = (
-                "La DSN per il database meta non è stata fornita nella configurazione. "
-                f"Viene utilizzato il valore di fallback '{default_meta}'."
-            )
-            exc = ConfigurationMissingFieldError(msg, payload={"default": default_meta})
-            handle_exception(exc)
-            configured_meta = default_meta
-        self._meta_dsn = configured_meta
+        self._meta_dsn = self._resolve_dsn(
+            meta_dsn, ("meta_dsn",), default_meta, "meta"
+        )
+        self._statement_timeout_ms = statement_timeout_ms
         self._statement_timeout_ms = statement_timeout_ms
         self._lock_timeout_ms = lock_timeout_ms
         self._engine_lock = Lock()
@@ -98,6 +80,26 @@ class PostgresClientAdapter(DatabasePort):
 
         self._meta_engine: Engine | None = None
         self._meta_sessionmaker: sessionmaker[Session] | None = None
+
+    def _resolve_dsn(
+        self, provided: str, keys: tuple[str, ...], default_dsn: str, db_type: str
+    ) -> str:
+        """Risolve la stringa DSN dalla configurazione o applica il valore predefinito."""
+        resolved = provided
+        if not resolved:
+            for k in keys:
+                resolved = self._config.get(k, "")
+                if resolved:
+                    break
+        if not resolved:
+            msg = (
+                f"La DSN per il database {db_type} non è stata fornita nella configurazione. "
+                f"Viene utilizzato il valore di fallback '{default_dsn}'."
+            )
+            exc = ConfigurationMissingFieldError(msg, payload={"default": default_dsn})
+            handle_exception(exc)
+            resolved = default_dsn
+        return resolved
 
     def get_sandbox_dsn(self) -> str:
         """Restituisce il DSN del database sandbox."""
