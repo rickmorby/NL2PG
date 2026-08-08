@@ -34,6 +34,8 @@ class MetaRepositoryAdapter(MetaRepositoryPort):
                 session.add(run_entity)
                 session.commit()
             return run_id
+        except DatabaseClientError:
+            raise
         except (pg_errors.Error, Exception) as e:
             msg = f"Errore durante la registrazione della nuova run: {e}"
             raise DatabaseClientError(msg) from e
@@ -53,6 +55,8 @@ class MetaRepositoryAdapter(MetaRepositoryPort):
                 )
                 result = session.scalars(stmt).first()
                 return result is not None
+        except DatabaseClientError:
+            raise
         except (pg_errors.Error, Exception) as e:
             msg = f"Errore durante la verifica della deduplicazione: {e}"
             raise DatabaseClientError(msg) from e
@@ -69,6 +73,8 @@ class MetaRepositoryAdapter(MetaRepositoryPort):
                     .limit(k)
                 )
                 return list(session.scalars(stmt).all())
+        except DatabaseClientError:
+            raise
         except (pg_errors.Error, Exception) as e:
             raise DatabaseClientError(f"Errore durante la lettura dei top-k task: {e}") from e
 
@@ -79,6 +85,8 @@ class MetaRepositoryAdapter(MetaRepositoryPort):
             with self._client.get_meta_session() as session:
                 session.merge(task_entity)
                 session.commit()
+        except DatabaseClientError:
+            raise
         except (pg_errors.Error, Exception) as e:
             msg = f"Errore durante il salvataggio del task {state.task_id}: {e}"
             raise DatabaseClientError(msg) from e
