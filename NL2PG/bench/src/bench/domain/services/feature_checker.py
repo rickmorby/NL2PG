@@ -36,9 +36,7 @@ class FeatureChecker:
         "correlated_subquery": lambda t: _check_correlated(t),
         "exists": lambda t: bool(t.find(exp.Exists)),
         "anti_join": lambda t: _check_anti_join(t),
-        "set_op": lambda t: bool(t.find(exp.Union))
-        or bool(t.find(exp.Intersect))
-        or bool(t.find(exp.Except)),
+        "set_op": lambda t: bool(t.find(exp.Union, exp.Intersect, exp.Except)),
         "cte": lambda t: bool(t.find(exp.CTE)),
         "recursive_cte": lambda t: bool(t.find(exp.With)) and _is_recursive(t),
         "window": lambda t: bool(t.find(exp.Window)),
