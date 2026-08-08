@@ -109,9 +109,30 @@ class LLMClientAdapter(LLMGeneratorPort):
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 
     def close(self) -> None:
-        """Rilascia le risorse di rete ed i pool dei client LLM."""
-        if hasattr(self, "_router"):
+        """Rilascia le risorse di rete, i pool ed i meccanismi di cache dei client LLM."""
+        if hasattr(self, "_router") and self._router is not None:
+            try:
+                self._router.reset()
+            except Exception:
+                pass
             self._router = None
+
+        try:
+            if hasattr(litellm, "close_litellm_async_clients") and callable(
+                litellm.close_litellm_async_clients
+            ):
+                import asyncio
+
+                try:
+                    loop = asyncio.get_event_loop()
+                    if loop.is_running():
+                        loop.create_task(litellm.close_litellm_async_clients())
+                    else:
+                        loop.run_until_complete(litellm.close_litellm_async_clients())
+                except Exception:
+                    pass
+        except Exception as e:
+            _log.debug("Rilascio risorse LiteLLM completato: %s", e)
 
     @staticmethod
     def _build_model_list(config: dict[str, Any]) -> list[dict[str, Any]]:
