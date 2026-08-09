@@ -51,6 +51,27 @@ class SeabornPlotterAdapter(PlotterPort):
             fn = f"{method.__name__[6:]}.png"
             method(tasks, output_dir / fn)
 
+    def _render_barplot(
+        self,
+        output_path: Path,
+        title: str,
+        xlabel: str,
+        ylabel: str,
+        xs: list[Any],
+        ys: list[Any],
+        palette: str | list[str],
+        rotation: int = 0,
+        figsize: tuple[float, float] = (8.0, 5.0),
+        ylim: tuple[float, float] | None = None,
+    ) -> None:
+        """Template helper per la generazione e salvataggio automatizzato di barplot Seaborn."""
+        fig = Figure(figsize=figsize)
+        ax = fig.add_subplot(111)
+        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette=palette)
+        if ylim:
+            ax.set_ylim(*ylim)
+        self._save_fig(fig, ax, title, xlabel, ylabel, output_path, rotation=rotation)
+
     def _save_fig(
         self,
         fig: Figure,
@@ -79,17 +100,16 @@ class SeabornPlotterAdapter(PlotterPort):
                 counts[f] += 1
         items = counts.most_common(8)
         xs, ys = [i[0] for i in items] or ["join"], [i[1] for i in items] or [0]
-        fig = Figure(figsize=(9, 5.5))
-        ax = fig.add_subplot(111)
-        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette="mako")
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "01. Distribuzione Feature SQL",
             "Feature SQL",
             "Frequenza Task",
-            output_path,
+            xs,
+            ys,
+            palette="mako",
             rotation=35,
+            figsize=(9, 5.5),
         )
 
     def _plot_02_ast_complexity_depth(self, tasks: list[dict], output_path: Path) -> None:
@@ -99,16 +119,14 @@ class SeabornPlotterAdapter(PlotterPort):
         ]
         c = Counter(depths)
         xs, ys = [f"Profondità {k}" for k in sorted(c.keys())], [c[k] for k in sorted(c.keys())]
-        fig = Figure(figsize=(8, 5))
-        ax = fig.add_subplot(111)
-        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette="viridis")
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "02. Profondità AST Query Gold",
             "Profondità AST",
             "Frequenza Task",
-            output_path,
+            xs,
+            ys,
+            palette="viridis",
         )
 
     def _plot_03_schema_domain_diversity(self, tasks: list[dict], output_path: Path) -> None:
@@ -116,33 +134,30 @@ class SeabornPlotterAdapter(PlotterPort):
         c = Counter(t.get("spec", {}).get("domain", "unknown") for t in tasks if t.get("spec"))
         items = c.most_common(8)
         xs, ys = [i[0] for i in items] or ["vendite"], [i[1] for i in items] or [0]
-        fig = Figure(figsize=(9, 5.5))
-        ax = fig.add_subplot(111)
-        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette="crest")
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "03. Diversità Domini Aziendali Benchmark",
             "Dominio",
             "Numero Task",
-            output_path,
+            xs,
+            ys,
+            palette="crest",
             rotation=35,
+            figsize=(9, 5.5),
         )
 
     def _plot_04_schema_complexity_heatmap(self, tasks: list[dict], output_path: Path) -> None:
         """04: Barplot Seaborn della complessità dello schema."""
         c = Counter(t.get("spec", {}).get("n_tables", 1) for t in tasks if t.get("spec"))
         xs, ys = [f"{k} tabelle" for k in sorted(c.keys())], [c[k] for k in sorted(c.keys())]
-        fig = Figure(figsize=(8, 5))
-        ax = fig.add_subplot(111)
-        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette="flare")
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "04. Complessità Schema (N° Tabelle)",
             "N° Tabelle",
             "Conteggio Task",
-            output_path,
+            xs,
+            ys,
+            palette="flare",
         )
 
     def _plot_05_sql_feature_cooccurrence(self, tasks: list[dict], output_path: Path) -> None:
@@ -203,16 +218,14 @@ class SeabornPlotterAdapter(PlotterPort):
             [i[0] for i in items] if items else ["baseline"],
             [i[1] for i in items] if items else [len(tasks)],
         )
-        fig = Figure(figsize=(8, 5))
-        ax = fig.add_subplot(111)
-        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette="rocket")
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "07. Frequenza Disturbi Semantici (Twist)",
             "Tipo di Twist",
             "Conteggio",
-            output_path,
+            xs,
+            ys,
+            palette="rocket",
             rotation=35,
         )
 
@@ -228,17 +241,16 @@ class SeabornPlotterAdapter(PlotterPort):
         ]
         top = Counter(obs).most_common(6)
         xs, ys = [i[0] for i in top] or ["nessun_gergo"], [i[1] for i in top] or [0]
-        fig = Figure(figsize=(9.5, 5.5))
-        ax = fig.add_subplot(111)
-        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette="magma")
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "08. Frequenza Gergo e Sinonimi nei Twist",
             "Termine Gergo",
             "Occorrenze",
-            output_path,
+            xs,
+            ys,
+            palette="magma",
             rotation=35,
+            figsize=(9.5, 5.5),
         )
 
     def _plot_09_sql_feature_passrate_impact(
@@ -253,18 +265,17 @@ class SeabornPlotterAdapter(PlotterPort):
         sorted_feats = sorted(prs.items(), key=lambda x: sum(x[1]) / len(x[1]))
         xs = [x[0] for x in sorted_feats][:8] or ["join"]
         ys = [round(sum(x[1]) / len(x[1]), 3) for x in sorted_feats][:8] or [0.0]
-        fig = Figure(figsize=(9.5, 5.5))
-        ax = fig.add_subplot(111)
-        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette="Spectral")
-        ax.set_ylim(0, 0.5)
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "09. Impatto Feature SQL su Risolvibilità Solver",
             "Feature SQL Obbligatoria",
             "Pass Rate Medio Solver",
-            output_path,
+            xs,
+            ys,
+            palette="Spectral",
             rotation=35,
+            ylim=(0, 0.5),
+            figsize=(9.5, 5.5),
         )
 
     def _plot_10_twist_count_degradation_curve(
@@ -335,16 +346,14 @@ class SeabornPlotterAdapter(PlotterPort):
             prs[nt].append(float(pr))
         xs = [f"{x} tab" for x in sorted(prs.keys())] or ["1 tab"]
         ys = [round(sum(prs[k]) / len(prs[k]), 3) for k in sorted(prs.keys())]
-        fig = Figure(figsize=(8, 5))
-        ax = fig.add_subplot(111)
-        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette="mako")
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "12. Risolvibilità (Pass Rate) vs Dimensione Schema",
             "Numero di Tabelle nello Schema",
             "Pass Rate Medio Solver",
-            output_path,
+            xs,
+            ys,
+            palette="mako",
         )
 
     def _plot_13_solver_passrate_by_difficulty(
@@ -359,24 +368,15 @@ class SeabornPlotterAdapter(PlotterPort):
         difficulties = ["easy", "medium", "hard"]
         xs = [d.capitalize() for d in difficulties]
         ys = [round(sum(prs[d]) / len(prs[d]), 3) if prs[d] else 0.0 for d in difficulties]
-        fig = Figure(figsize=(8, 5))
-        ax = fig.add_subplot(111)
-        barplot(
-            x=xs,
-            y=ys,
-            hue=xs,
-            legend=False,
-            ax=ax,
-            palette=["#2ecc71", "#f39c12", "#e74c3c"],
-        )
-        ax.set_ylim(0, 0.5)
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "13. Risolvibilità (Pass Rate Medio) per Classe di Difficoltà",
             "Classe di Difficoltà Calibrata",
             "Pass Rate Medio Solver (0.0 - 1.0)",
-            output_path,
+            xs,
+            ys,
+            palette=["#2ecc71", "#f39c12", "#e74c3c"],
+            ylim=(0, 0.5),
         )
 
     def _plot_14_critic_vs_passrate_correlation(
@@ -417,18 +417,16 @@ class SeabornPlotterAdapter(PlotterPort):
         """15: Barplot Seaborn delle 5 dimensioni qualitative del Critic."""
         dims = ["narrative", "distractors", "plot_twists", "jargon", "sql_composition"]
         vals = [8.5, 7.8, 8.2, 9.0, 8.7]
-        fig = Figure(figsize=(8, 5))
-        ax = fig.add_subplot(111)
-        barplot(x=dims, y=vals, hue=dims, legend=False, ax=ax, palette="crest")
-        ax.set_ylim(0, 10)
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "15. Punteggi Medi Critic su 5 Dimensioni Qualitative",
             "Dimensione Qualitativa",
             "Punteggio Medio (1-10)",
-            output_path,
+            dims,
+            vals,
+            palette="crest",
             rotation=35,
+            ylim=(0, 10),
         )
 
     def _plot_16_query_result_cardinality_distribution(
@@ -440,15 +438,14 @@ class SeabornPlotterAdapter(PlotterPort):
         )
         xs = [f"{k} righe" for k in sorted(counts.keys())] or ["1 riga"]
         ys = [counts[k] for k in sorted(counts.keys())] or [1]
-        fig = Figure(figsize=(8.5, 5))
-        ax = fig.add_subplot(111)
-        barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette="viridis")
-        self._save_fig(
-            fig,
-            ax,
+        self._render_barplot(
+            output_path,
             "16. Cardinalità Risultato Gold (N° Righe)",
             "Numero di Righe DB",
             "Frequenza Task",
-            output_path,
+            xs,
+            ys,
+            palette="viridis",
             rotation=25,
+            figsize=(8.5, 5),
         )
