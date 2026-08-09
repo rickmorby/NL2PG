@@ -229,7 +229,7 @@ class TaskRunner:
                                 failed_count += 1
                                 consecutive_failures += 1
                         except Exception as e:
-                            _log.error("Errore task parallelo per categoria '%s': %s", cat_id, e)
+                            _log.debug("Errore task parallelo per categoria '%s': %s", cat_id, e)
                             failed_count += 1
                             consecutive_failures += 1
 
