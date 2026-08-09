@@ -60,23 +60,22 @@ class PostgresSandboxAdapter(SandboxPort):
 
     def execute_ddl(self, schema: str, ddl: str) -> None:
         """Valida l'AST del DDL tramite sqlglot ed esegue la creazione tabelle nello schema."""
-        self._validate_schema_name(schema)
-        statements = self._validate_and_split_sql(
-            ddl,
-            allowed_types=(exp.Create, exp.Alter, exp.Comment, exp.Drop),
+        self._execute_statements(
+            schema, ddl, allowed_types=(exp.Create, exp.Alter, exp.Comment, exp.Drop)
         )
-        with self._client.get_sandbox_connection(schema) as conn:
-            with conn.transaction():
-                for stmt in statements:
-                    self._client.execute_prepared(conn, stmt)
 
     def execute_inserts(self, schema: str, inserts: str) -> None:
         """Valida l'AST degli INSERT tramite sqlglot ed inserisce i dati nello schema."""
-        self._validate_schema_name(schema)
-        statements = self._validate_and_split_sql(
-            inserts,
-            allowed_types=(exp.Insert, exp.Tuple),
+        self._execute_statements(
+            schema, inserts, allowed_types=(exp.Insert, exp.Tuple)
         )
+
+    def _execute_statements(
+        self, schema: str, sql_text: str, allowed_types: tuple[type, ...]
+    ) -> None:
+        """Esegue atomicamente un blocco di istruzioni SQL ammesse in transazione isolata."""
+        self._validate_schema_name(schema)
+        statements = self._validate_and_split_sql(sql_text, allowed_types=allowed_types)
         with self._client.get_sandbox_connection(schema) as conn:
             with conn.transaction():
                 for stmt in statements:
