@@ -177,6 +177,9 @@ class LLMClientAdapter(LLMGeneratorPort):
         for role, mid_list in chains.items():
             if len(mid_list) > 1:
                 fallbacks.append({role: mid_list[1:]})
+                for idx, mid in enumerate(mid_list):
+                    if idx < len(mid_list) - 1:
+                        fallbacks.append({mid: mid_list[idx + 1 :]})
         return fallbacks
 
 
