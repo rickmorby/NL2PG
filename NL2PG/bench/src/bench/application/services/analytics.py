@@ -49,11 +49,9 @@ class BenchmarkAnalyticsService:
     def _resolve_paths(self, target_path: Path) -> tuple[list[dict[str, Any]], str, Path]:
         """Carica il file JSON di run e determina la directory output/plots/run_<name>/."""
         p = target_path.resolve()
-        output_dir = p if p.name == "output" else p
-        while output_dir.name != "output" and output_dir != output_dir.parent:
-            output_dir = output_dir.parent
-        if output_dir.name != "output":
-            output_dir = target_path.resolve().parent
+        output_dir = next(
+            (parent for parent in (p, *p.parents) if parent.name == "output"), p.parent
+        )
 
         json_file = target_path
         if target_path.is_dir():
