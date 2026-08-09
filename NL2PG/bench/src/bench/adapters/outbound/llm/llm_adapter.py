@@ -105,7 +105,6 @@ class LLMClientAdapter(LLMGeneratorPort):
         except ModelOutputContractError:
             raise
         except Exception as e:
-            _log.info("Failover catena LLM per ruolo '%s': %s", role, e)
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 
     def close(self) -> None:
