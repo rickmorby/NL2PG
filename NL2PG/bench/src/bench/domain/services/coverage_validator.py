@@ -28,12 +28,13 @@ class CoverageValidator:
         self,
         story: StoryDTO,
         question: QuestionDTO,
-        query: GoldQueryDTO,
+        query: GoldQueryDTO | exp.Expression,
         spec: SpecDTO,
+        tree: exp.Expression | None = None,
     ) -> CoverageResult:
         """Verifica che story+question copra tabelle e valori letterali della gold query."""
         try:
-            tables, literals = self._anchors(query, spec)
+            tables, literals = self._anchors(query, spec, tree=tree)
         except ParseError as e:
             return CoverageResult(is_valid=False, error=f"AST fallito su query gold: {e}")
         text = (story.story + " " + question.question).lower()
@@ -58,9 +59,15 @@ class CoverageValidator:
         return CoverageResult()
 
     @staticmethod
-    def _anchors(query: GoldQueryDTO, spec: SpecDTO) -> tuple[list[str], list[str]]:
+    def _anchors(
+        query: GoldQueryDTO | exp.Expression,
+        spec: SpecDTO,
+        tree: exp.Expression | None = None,
+    ) -> tuple[list[str], list[str]]:
         """Estrae nomi tabella e valori letterali dalla gold query, mappando i twist."""
-        tree = parse_one(query.query, read="postgres")
+        if tree is None:
+            sql_text = query.query if isinstance(query, GoldQueryDTO) else str(query)
+            tree = parse_one(sql_text, read="postgres")
         tables = set()
         for t in find_tables(tree):
             mapped = _map_table_name(t.name.lower(), spec.twist_rules)
