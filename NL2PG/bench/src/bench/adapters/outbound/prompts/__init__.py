@@ -23,10 +23,12 @@ class PromptAdapter(PromptPort):
         return template
 
     def few_shot(self, category_id: str) -> str:
-        """Carica fino a 3 esempi YAML da examples/{category_id}/ separati da ---."""
+        """Carica fino a 3 esempi JSON/YAML da examples/{category_id}/ separati da ---."""
         examples_dir = self._dir.parent / "examples" / category_id
         if not examples_dir.exists():
             return ""
-        files = sorted(examples_dir.glob("*.yaml"))[:3]
+        files = sorted(
+            list(examples_dir.glob("*.json")) + list(examples_dir.glob("*.yaml"))
+        )[:3]
         parts = [f.read_text(encoding="utf-8") for f in files]
         return "\n---\n".join(parts)
