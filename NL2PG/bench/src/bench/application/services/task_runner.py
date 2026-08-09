@@ -14,10 +14,10 @@ from time import time
 from tqdm import tqdm
 
 from bench.application.orchestrator.orchestrator import Orchestrator
-from bench.application.serializer.serializer import BenchmarkSerializer
 from bench.domain.models import BatchSummaryDTO, TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
+from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
 from bench.domain.services.domain_pool import DOMAIN_POOL
 
 _log = getLogger("bench.application.task_runner")
@@ -30,7 +30,7 @@ class TaskRunner:
         self,
         orchestrator: Orchestrator,
         meta_repo: MetaRepositoryPort,
-        serializer: BenchmarkSerializer,
+        serializer: BenchmarkSerializerPort,
         config: ConfigPort,
         analytics: object | None = None,
         base_output_dir: Path | None = None,
@@ -65,7 +65,7 @@ class TaskRunner:
         cat_hash = self._config.config_hash({"categories": list(categories.keys())})
 
         run_id = self._meta_repo.new_run(cfg_hash, cat_hash)
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         benchmarks_dir = self._base_output_dir / "benchmarks"
         benchmarks_dir.mkdir(parents=True, exist_ok=True)
         run_file = benchmarks_dir / f"run_{timestamp}_{run_id}.json"
@@ -109,6 +109,35 @@ class TaskRunner:
             self._attempt_counter += 1
         return TaskStateDTO(category=cat_id, target_domain=target_domain)
 
+    def _process_verdict(
+        self,
+        result_state: TaskStateDTO,
+        accepted_tasks: list[TaskStateDTO],
+        counts: dict[str, int],
+        output_file: Path,
+        bench_cfg: dict,
+        pbar: tqdm,
+    ) -> int:
+        """Elabora l'esito di un task aggiornando i contatori, la barra ed il file di output."""
+        verdict = result_state.verdict
+        if verdict in ("accepted", "accept"):
+            with self._lock:
+                accepted_tasks.append(result_state)
+                pbar.update(1)
+                weights = bench_cfg.get("critic", {}).get("weights", {})
+                doc = self._serializer.build_document(accepted_tasks, result_state.run_id, weights)
+                self._serializer.write(doc, output_file)
+            return 0
+        elif verdict == "rejected":
+            counts["rejected"] += 1
+            return 0
+        elif verdict == "scrapped":
+            counts["scrapped"] += 1
+            return 0
+        else:
+            counts["failed"] += 1
+            return 1
+
     def _run_sequential(
         self,
         run_id: str,
@@ -121,43 +150,29 @@ class TaskRunner:
         categories = list(self._config.load_categories().keys())
         max_fails = bench_cfg.get("cli", {}).get("max_consecutive_failures", 5)
         accepted_tasks: list[TaskStateDTO] = []
-        rejected_count = 0
-        scrapped_count = 0
-        failed_count = 0
+        counts = {"rejected": 0, "scrapped": 0, "failed": 0}
         consecutive_failures = 0
 
         with tqdm(total=count, desc="Generazione Task (Sequenziale)", smoothing=0.1) as pbar:
             while len(accepted_tasks) < count:
                 initial_state = self._create_initial_state(category, categories)
-
                 result_state = self._orchestrator.run_task(initial_state, run_id)
                 self._meta_repo.save_task(run_id, result_state)
 
-                if result_state.verdict in ("accepted", "accept"):
-                    with self._lock:
-                        accepted_tasks.append(result_state)
-                        consecutive_failures = 0
-                        pbar.update(1)
-
-                        weights = bench_cfg.get("critic", {}).get("weights", {})
-                        doc = self._serializer.build_document(accepted_tasks, run_id, weights)
-                        self._serializer.write(doc, output_file)
-                elif result_state.verdict == "rejected":
-                    rejected_count += 1
-                    consecutive_failures = 0
-                elif result_state.verdict == "scrapped":
-                    scrapped_count += 1
-                    consecutive_failures = 0
-                else:
-                    failed_count += 1
-                    consecutive_failures += 1
+                fail_delta = self._process_verdict(
+                    result_state, accepted_tasks, counts, output_file, bench_cfg, pbar
+                )
+                if fail_delta > 0:
+                    consecutive_failures += fail_delta
                     if consecutive_failures >= max_fails:
                         _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
                         break
+                else:
+                    consecutive_failures = 0
 
                 pbar.set_postfix(
                     acc=len(accepted_tasks),
-                    rej=rejected_count,
+                    rej=counts["rejected"],
                     verdict=result_state.verdict,
                 )
 
@@ -166,9 +181,9 @@ class TaskRunner:
             output_dir=str(output_file.parent),
             requested_count=count,
             accepted_count=len(accepted_tasks),
-            rejected_count=rejected_count,
-            scrapped_count=scrapped_count,
-            failed_count=failed_count,
+            rejected_count=counts["rejected"],
+            scrapped_count=counts["scrapped"],
+            failed_count=counts["failed"],
             duration_seconds=0.0,
         )
 
@@ -185,9 +200,7 @@ class TaskRunner:
         categories = list(self._config.load_categories().keys())
         max_fails = bench_cfg.get("cli", {}).get("max_consecutive_failures", 5)
         accepted_tasks: list[TaskStateDTO] = []
-        rejected_count = 0
-        scrapped_count = 0
-        failed_count = 0
+        counts = {"rejected": 0, "scrapped": 0, "failed": 0}
         consecutive_failures = 0
 
         desc = f"Generazione Task (Parallel {batch_size})"
@@ -207,30 +220,16 @@ class TaskRunner:
                         try:
                             result_state = fut.result()
                             self._meta_repo.save_task(run_id, result_state)
-
-                            if result_state.verdict in ("accepted", "accept"):
-                                with self._lock:
-                                    accepted_tasks.append(result_state)
-                                    consecutive_failures = 0
-                                    pbar.update(1)
-
-                                    weights = bench_cfg.get("critic", {}).get("weights", {})
-                                    doc = self._serializer.build_document(
-                                        accepted_tasks, run_id, weights
-                                    )
-                                    self._serializer.write(doc, output_file)
-                            elif result_state.verdict == "rejected":
-                                rejected_count += 1
-                                consecutive_failures = 0
-                            elif result_state.verdict == "scrapped":
-                                scrapped_count += 1
-                                consecutive_failures = 0
+                            fail_delta = self._process_verdict(
+                                result_state, accepted_tasks, counts, output_file, bench_cfg, pbar
+                            )
+                            if fail_delta > 0:
+                                consecutive_failures += fail_delta
                             else:
-                                failed_count += 1
-                                consecutive_failures += 1
+                                consecutive_failures = 0
                         except Exception as e:
                             _log.debug("Errore task parallelo per categoria '%s': %s", cat_id, e)
-                            failed_count += 1
+                            counts["failed"] += 1
                             consecutive_failures += 1
 
                         while len(futures) < batch_size and (
@@ -258,8 +257,8 @@ class TaskRunner:
             output_dir=str(output_file.parent),
             requested_count=count,
             accepted_count=len(accepted_tasks),
-            rejected_count=rejected_count,
-            scrapped_count=scrapped_count,
-            failed_count=failed_count,
+            rejected_count=counts["rejected"],
+            scrapped_count=counts["scrapped"],
+            failed_count=counts["failed"],
             duration_seconds=0.0,
         )
