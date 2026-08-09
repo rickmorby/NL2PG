@@ -118,18 +118,7 @@ class PostgresDataMutator:
 
     def _mutate_random_cell(self, conn: Connection, cur: Any, table: str, query: str) -> bool:
         """Modifica un valore casuale in una riga della tabella."""
-        excluded = self._excluded_cols(cur, table)
-        cur.execute(
-            "SELECT column_name, data_type, character_maximum_length "
-            "FROM information_schema.columns "
-            "WHERE table_name = %s AND table_schema = current_schema()",
-            (table,),
-        )
-        cols_info = cur.fetchall()
-        used = self._get_used_columns(query, table)
-        candidates = [c for c in cols_info if c[0] not in excluded and c[1] in _MUTATABLE_TYPES]
-        if used:
-            candidates = [c for c in candidates if c[0] in used]
+        candidates = self._get_mutatable_candidates(cur, table, query)
         if not candidates:
             return False
         shuffle(candidates)
@@ -192,20 +181,25 @@ class PostgresDataMutator:
 
     def _has_mutatable_cols(self, cur: Any, table: str, used: set[str]) -> bool:
         """Verifica se la tabella ha colonne mutabili (non PK/FK/UNIQUE, tipo supportato)."""
+        return bool(self._get_mutatable_candidates(cur, table, ""))
+
+    def _get_mutatable_candidates(
+        self, cur: Any, table: str, query: str = ""
+    ) -> list[tuple[str, str, int | None]]:
+        """Estrae le colonne mutabili valide da information_schema.columns."""
         excluded = self._excluded_cols(cur, table)
         cur.execute(
-            "SELECT column_name, data_type FROM information_schema.columns "
+            "SELECT column_name, data_type, character_maximum_length "
+            "FROM information_schema.columns "
             "WHERE table_name = %s AND table_schema = current_schema()",
             (table,),
         )
-        candidates = [
-            (r[0], r[1])
-            for r in cur.fetchall()
-            if r[0] not in excluded and r[1] in _MUTATABLE_TYPES
-        ]
+        cols_info = cur.fetchall()
+        used = self._get_used_columns(query, table) if query else set()
+        candidates = [c for c in cols_info if c[0] not in excluded and c[1] in _MUTATABLE_TYPES]
         if used:
-            candidates = [(n, d) for n, d in candidates if n in used]
-        return bool(candidates)
+            candidates = [c for c in candidates if c[0] in used]
+        return candidates
 
     def _gen_mutation(self, old_val: Any, col_type: str, max_len: int | None) -> Any:
         """Genera un valore mutato per un dato tipo di colonna."""
