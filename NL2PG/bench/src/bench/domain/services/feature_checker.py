@@ -104,17 +104,10 @@ def _direct_tables(select_node: exp.Select) -> list:
 
 def _check_anti_join(tree: exp.Expression) -> bool:
     """Verifica se la query contiene anti-join (NOT EXISTS, NOT IN)."""
-    for j in tree.find_all(exp.Join):
-        kind = j.args.get("kind", "")
-        if kind and "ANTI" in str(kind).upper():
-            return True
-    for node in tree.find_all(exp.Not):
-        if isinstance(node.this, (exp.Exists, exp.In)):
-            return True
-    for node in tree.find_all(exp.In):
-        if node.args.get("is_negated"):
-            return True
-    return False
+    has_anti = any("ANTI" in str(j.args.get("kind", "")).upper() for j in tree.find_all(exp.Join))
+    has_not = any(isinstance(n.this, (exp.Exists, exp.In)) for n in tree.find_all(exp.Not))
+    has_negated = any(bool(n.args.get("is_negated")) for n in tree.find_all(exp.In))
+    return has_anti or has_not or has_negated
 
 
 def _check_correlated(tree: exp.Expression) -> bool:
@@ -122,14 +115,12 @@ def _check_correlated(tree: exp.Expression) -> bool:
     selects = list(tree.find_all(exp.Select))
     if len(selects) < 2:
         return False
-    root_select = selects[0]
-    root_tables = {t.alias_or_name.lower() for t in root_select.find_all(exp.Table)}
+    root_tables = {t.alias_or_name.lower() for t in selects[0].find_all(exp.Table)}
     for sq in selects[1:]:
         sq_tables = {t.alias_or_name.lower() for t in sq.find_all(exp.Table)}
         outer_tables = root_tables - sq_tables
-        for col in sq.find_all(exp.Column):
-            if col.table and col.table.lower() in outer_tables:
-                return True
+        if any(c.table and c.table.lower() in outer_tables for c in sq.find_all(exp.Column)):
+            return True
     return False
 
 
