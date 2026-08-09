@@ -112,11 +112,14 @@ class PostgresSandboxAdapter(SandboxPort):
                 "WHERE schema_name LIKE 'task_%'"
             )
             _, rows = self._client.execute_query(conn, query)
-            for (schema_name,) in rows:
-                self._client.execute_identifier(
-                    conn, "DROP SCHEMA IF EXISTS {} CASCADE", schema_name
-                )
-                removed_schemas.append(schema_name)
+            target_schemas = [r[0] for r in rows if self._schema_regex.match(r[0])]
+            if not target_schemas:
+                return []
+            identifiers = sql.SQL(", ").join(sql.Identifier(s) for s in target_schemas)
+            drop_stmt = sql.SQL("DROP SCHEMA IF EXISTS {} CASCADE").format(identifiers)
+            with conn.cursor() as cur:
+                cur.execute(drop_stmt)
+            removed_schemas.extend(target_schemas)
         return removed_schemas
 
     def test_data_mutation(
