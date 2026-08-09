@@ -5,7 +5,7 @@
 
 from hashlib import sha256
 from pathlib import Path
-from tomllib import load as toml_load
+from tomllib import loads as toml_loads
 
 from orjson import OPT_SORT_KEYS, dumps as orjson_dumps, loads as orjson_loads
 
@@ -54,8 +54,7 @@ class ConfigAdapter(ConfigPort):
             exc = ConfigurationMissingFieldError(msg, payload=payload)
             handle_exception(exc)
             return {}
-        with open(path, "rb") as f:
-            return toml_load(f)
+        return toml_loads(path.read_text(encoding="utf-8"))
 
     def load_categories(self) -> dict[str, CategoryDTO]:
         """Restituisce un dict {id: CategoryDTO} dal file categories.json."""
