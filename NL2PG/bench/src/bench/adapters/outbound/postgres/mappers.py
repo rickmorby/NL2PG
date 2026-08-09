@@ -3,7 +3,8 @@
 :author: Riccardo Morabito
 """
 
-from json import dumps
+from orjson import dumps as orjson_dumps
+
 from bench.adapters.outbound.postgres.entities import TaskEntity
 from bench.domain.models.state import TaskStateDTO
 
@@ -47,9 +48,8 @@ class TaskStateMapper:
             schema_ddl=schema.ddl if schema else None,
             data_inserts=data.inserts if data else None,
             gold_query=gold_q.query if gold_q else None,
-            gold_result=dumps(gold_r.model_dump(), ensure_ascii=False) if gold_r else None,
+            gold_result=orjson_dumps(gold_r.model_dump()).decode("utf-8") if gold_r else None,
             story=story.story if story else None,
             question=question.question if question else None,
-            spec=dumps(spec.model_dump(), ensure_ascii=False) if spec else None,
+            spec=orjson_dumps(spec.model_dump()).decode("utf-8") if spec else None,
         )
-
