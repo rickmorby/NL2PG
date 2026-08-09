@@ -68,7 +68,6 @@ class SystemCheckService:
             )
             return ProviderCheckResult(success=True, model_used=self._extract_model_used(res))
         except Exception as e:
-            _log.error("Verifica provider LLM fallita: %s", e)
             return ProviderCheckResult(success=False, error=str(e))
 
     @staticmethod
