@@ -3,7 +3,7 @@
 :author: Riccardo Morabito
 """
 
-from asyncio import get_event_loop
+from asyncio import all_tasks, gather, get_event_loop
 from logging import getLogger
 from sys import modules
 from typing import Any
@@ -23,6 +23,7 @@ from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 _log = getLogger("bench.adapters.llm")
 
 modules["litellm"].suppress_debug_info = True
+modules["litellm"].turn_off_message_logging = True
 
 
 class LLMClientAdapter(LLMGeneratorPort):
@@ -120,10 +121,16 @@ class LLMClientAdapter(LLMGeneratorPort):
             if callable(close_litellm_async_clients):
                 try:
                     loop = get_event_loop()
-                    if loop.is_running():
-                        loop.create_task(close_litellm_async_clients())
-                    else:
-                        loop.run_until_complete(close_litellm_async_clients())
+                    if not loop.is_closed():
+                        pending = [t for t in all_tasks(loop) if not t.done()]
+                        for task in pending:
+                            task.cancel()
+                        if not loop.is_running() and pending:
+                            loop.run_until_complete(gather(*pending, return_exceptions=True))
+                        if loop.is_running():
+                            loop.create_task(close_litellm_async_clients())
+                        else:
+                            loop.run_until_complete(close_litellm_async_clients())
                 except Exception:
                     pass
             if isinstance(in_memory_llm_clients_cache, dict):
