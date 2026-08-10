@@ -36,6 +36,7 @@ class ModelHealthDTO(AbstractDTO):
 
     model_id: str
     target_model: str = ""
+    roles: list[str] = Field(default_factory=list)
     is_available_on_server: bool = False
     is_healthy: bool = False
     error_message: str = ""
