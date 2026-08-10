@@ -1,41 +1,27 @@
 {
   "chains": {
     "default": [
-      "kilo/ling-flash",
       "nous/laguna-s",
       "nous/step-flash",
       "openrouter/nemotron-120b"
     ],
     "critic": [
-      "kilo/ling-flash",
       "nous/laguna-s",
       "nous/step-flash",
       "openrouter/nemotron-120b"
     ],
     "judge": [
-      "kilo/ling-flash",
       "nous/laguna-s",
       "nous/step-flash",
       "openrouter/nemotron-120b"
     ],
     "calibration": [
-      "kilo/ling-flash",
       "nous/laguna-s",
       "nous/step-flash",
       "openrouter/nemotron-120b"
     ]
   },
   "models": {
-    "kilo/ling-flash": {
-      "provider": "openai",
-      "model": "inclusionai/ling-3.0-flash:free",
-      "temperature": 0.7,
-      "request_timeout": 60,
-      "rpm": 30,
-      "structured_output": true,
-      "base_url": "https://api.kilo.ai/api/gateway",
-      "api_key": "YOUR_KILO_API_KEY_HERE"
-    },
     "nous/laguna-s": {
       "provider": "openai",
       "model": "poolside/laguna-s-2.1:free",
