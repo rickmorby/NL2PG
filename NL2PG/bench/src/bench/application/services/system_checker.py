@@ -6,7 +6,7 @@
 from dataclasses import dataclass
 from logging import getLogger
 
-from bench.domain.models.llm import HealthCheckDTO
+from bench.domain.models.llm import SystemHealthReportDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
@@ -22,15 +22,6 @@ class ConfigCheckResult:
     categories_count: int = 0
     config_hash: str = ""
     categories_hash: str = ""
-
-
-@dataclass
-class ProviderCheckResult:
-    """Esito della verifica di connettivita' del provider LLM."""
-
-    success: bool = True
-    model_used: str = ""
-    error: str = ""
 
 
 class SystemCheckService:
@@ -58,19 +49,6 @@ class SystemCheckService:
             categories_hash=cat_hash,
         )
 
-    def check_llm_providers(self) -> ProviderCheckResult:
-        """Invia un prompt di test alla catena LLM per verificare la connettivita'."""
-        try:
-            res = self._llm.call_model(
-                role="default",
-                prompt='Rispondi esclusivamente con un oggetto JSON: {"status": "ok"}',
-                schema=HealthCheckDTO,
-            )
-            return ProviderCheckResult(success=True, model_used=self._extract_model_used(res))
-        except Exception as e:
-            return ProviderCheckResult(success=False, error=str(e))
-
-    @staticmethod
-    def _extract_model_used(res: object) -> str:
-        """Estrae in modo sicuro il modello utilizzato dal risultato dell'invocazione."""
-        return getattr(res, "model_used", "")
+    def check_llm_providers(self) -> SystemHealthReportDTO:
+        """Esegue la diagnosi multilivello di tutti i provider e modelli configurati."""
+        return self._llm.check_all_providers()
