@@ -49,6 +49,6 @@ class SystemCheckService:
             categories_hash=cat_hash,
         )
 
-    def check_llm_providers(self) -> SystemHealthReportDTO:
+    def check_llm_providers(self, check_models: bool = True) -> SystemHealthReportDTO:
         """Esegue la diagnosi multilivello di tutti i provider e modelli configurati."""
-        return self._llm.check_all_providers()
+        return self._llm.check_all_providers(check_models=check_models)
