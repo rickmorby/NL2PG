@@ -115,59 +115,101 @@ class LLMClientAdapter(LLMGeneratorPort):
         except Exception as e:
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 
-    def check_all_providers(self) -> SystemHealthReportDTO:
-        """Esegue la diagnosi multilivello di tutti i provider ed i relativi modelli."""
+    def check_all_providers(self, check_models: bool = True) -> SystemHealthReportDTO:
+        """Esegue la diagnosi multilivello dei provider e dei modelli fisici univoci."""
         models = self._config.get("models", {})
-        providers_grouped: dict[tuple[str, str, str], list[tuple[str, dict[str, Any]]]] = {}
+        chains = self._config.get("chains", {})
+
+        mid_roles: dict[str, list[str]] = {}
+        for role, m_list in chains.items():
+            for m_id in m_list:
+                if m_id not in mid_roles:
+                    mid_roles[m_id] = []
+                mid_roles[m_id].append(role)
+
+        providers_grouped: dict[
+            tuple[str, str, str], dict[str, dict[str, Any]]
+        ] = {}
 
         for m_id, m_info in models.items():
             p_name = m_info.get("provider", "openai")
             base_url = m_info.get("base_url", "https://api.openai.com/v1")
             api_key = m_info.get("api_key", "")
-            group_key = (p_name, base_url, api_key)
-            if group_key not in providers_grouped:
-                providers_grouped[group_key] = []
-            providers_grouped[group_key].append((m_id, m_info))
+            target_model = m_info.get("model", "")
+            roles = mid_roles.get(m_id, [])
+
+            p_key = (p_name, base_url, api_key)
+            if p_key not in providers_grouped:
+                providers_grouped[p_key] = {}
+
+            if target_model not in providers_grouped[p_key]:
+                providers_grouped[p_key][target_model] = {
+                    "model_ids": [],
+                    "roles": set(),
+                    "info": m_info,
+                }
+            providers_grouped[p_key][target_model]["model_ids"].append(m_id)
+            providers_grouped[p_key][target_model]["roles"].update(roles)
 
         provider_reports: list[ProviderHealthDTO] = []
-        total_models_count = len(models)
+        total_physical_models = 0
         healthy_models_count = 0
         reachable_providers_count = 0
 
         with Client(timeout=10.0) as client:
-            for (p_name, base_url, api_key), model_list in providers_grouped.items():
+            for (p_name, base_url, api_key), target_models in providers_grouped.items():
                 p_report, server_models = self._check_provider_endpoint(
                     client, p_name, base_url, api_key
                 )
+                total_physical_models += len(target_models)
+
                 if p_report.is_reachable:
                     reachable_providers_count += 1
                     model_reports = []
-                    for m_id, m_info in model_list:
-                        m_report = self._check_model_health(
-                            client, m_id, m_info, base_url, api_key, server_models
-                        )
-                        if m_report.is_healthy:
-                            healthy_models_count += 1
+                    for t_model, data in target_models.items():
+                        sorted_roles = sorted(list(data["roles"]))
+                        if check_models:
+                            m_report = self._check_model_health(
+                                client,
+                                data["model_ids"][0],
+                                t_model,
+                                sorted_roles,
+                                base_url,
+                                api_key,
+                                server_models,
+                            )
+                            if m_report.is_healthy:
+                                healthy_models_count += 1
+                        else:
+                            m_report = ModelHealthDTO(
+                                model_id=data["model_ids"][0],
+                                target_model=t_model,
+                                roles=sorted_roles,
+                                is_available_on_server=True,
+                                is_healthy=True,
+                                error_message="",
+                            )
                         model_reports.append(m_report)
                     p_report.models = model_reports
                 else:
                     p_report.models = [
                         ModelHealthDTO(
-                            model_id=m_id,
-                            target_model=m_info.get("model", ""),
+                            model_id=data["model_ids"][0],
+                            target_model=t_model,
+                            roles=sorted(list(data["roles"])),
                             is_available_on_server=False,
                             is_healthy=False,
                             error_message="Provider non raggiungibile o autenticazione fallita.",
                         )
-                        for m_id, m_info in model_list
+                        for t_model, data in target_models.items()
                     ]
                 provider_reports.append(p_report)
 
         return SystemHealthReportDTO(
             total_providers=len(providers_grouped),
             reachable_providers=reachable_providers_count,
-            total_models=total_models_count,
-            healthy_models=healthy_models_count,
+            total_models=total_physical_models,
+            healthy_models=healthy_models_count if check_models else total_physical_models,
             providers=provider_reports,
         )
 
@@ -221,13 +263,13 @@ class LLMClientAdapter(LLMGeneratorPort):
         self,
         client: Client,
         model_id: str,
-        m_info: dict[str, Any],
+        target_model: str,
+        roles: list[str],
         base_url: str,
         api_key: str,
         server_models: set[str],
     ) -> ModelHealthDTO:
         """Invia un ping di completamento per verificare la reale fruibilità del modello."""
-        target_model = m_info.get("model", "")
         is_available = bool(
             not server_models
             or target_model in server_models
@@ -249,6 +291,7 @@ class LLMClientAdapter(LLMGeneratorPort):
                 return ModelHealthDTO(
                     model_id=model_id,
                     target_model=target_model,
+                    roles=roles,
                     is_available_on_server=is_available,
                     is_healthy=True,
                     error_message="",
@@ -256,6 +299,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             return ModelHealthDTO(
                 model_id=model_id,
                 target_model=target_model,
+                roles=roles,
                 is_available_on_server=is_available,
                 is_healthy=False,
                 error_message=f"HTTP {resp.status_code}: {resp.text[:120]}",
@@ -264,6 +308,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             return ModelHealthDTO(
                 model_id=model_id,
                 target_model=target_model,
+                roles=roles,
                 is_available_on_server=is_available,
                 is_healthy=False,
                 error_message=f"Errore ping completamento: {e}",

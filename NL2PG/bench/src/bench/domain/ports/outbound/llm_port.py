@@ -28,7 +28,7 @@ class LLMGeneratorPort(ABC):
         """Chiama la catena LLM con failover automatico tra modelli."""
 
     @abstractmethod
-    def check_all_providers(self) -> SystemHealthReportDTO:
+    def check_all_providers(self, check_models: bool = True) -> SystemHealthReportDTO:
         """Esegue la diagnosi multilivello di tutti i provider e modelli LLM configurati."""
 
     @abstractmethod
