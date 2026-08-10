@@ -4,13 +4,13 @@
 """
 
 from datetime import datetime, timezone
-from json import load
 from logging import WARNING, NullHandler, getLogger
 from logging.config import dictConfig
 from os import getpid
 from pathlib import Path
 
 from litellm import verbose_logger
+from orjson import loads as orjson_loads
 
 from bench.domain.exceptions import LoggingConfigError, SymlinkError
 from bench.domain.ports.outbound.logger_port import LoggerPort
@@ -47,8 +47,7 @@ class LoggingAdapter(LoggerPort):
                 f"File di configurazione del logging assente: {cfg_path}. "
                 "Assicurarsi che sia presente."
             )
-        with open(cfg_path, encoding="utf-8") as f:
-            cfg = load(f)
+        cfg = orjson_loads(cfg_path.read_bytes())
 
         cfg["handlers"]["file"]["filename"] = str(log_path)
         cfg["handlers"]["file"]["level"] = self._level
