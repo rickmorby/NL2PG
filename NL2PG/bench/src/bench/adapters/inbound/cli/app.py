@@ -158,10 +158,7 @@ def check_command(
         handle_exception(e)
 
 
-@app.command("check-providers")
-def check_providers_command(ctx: Context) -> None:
-    """Alias di 'bench check --models' per la verifica di provider e modelli LLM."""
-    check_command(ctx, models_check=True)
+
 
 
 @app.command("promote")
