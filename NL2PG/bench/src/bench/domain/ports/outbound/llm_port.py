@@ -1,11 +1,13 @@
-"""Porta astratta outbound per l'invocazione dei modelli LLM.
+"""Porta astratta outbound per l'invocazione ed i test di diagnosi dei modelli LLM.
 
 :author: Riccardo Morabito
 """
 
 from abc import ABC, abstractmethod
+
 from pydantic import BaseModel
-from bench.domain.models.llm import CallOptionsDTO, CallResultDTO
+
+from bench.domain.models.llm import CallOptionsDTO, CallResultDTO, SystemHealthReportDTO
 
 
 class LLMGeneratorPort(ABC):
@@ -24,9 +26,11 @@ class LLMGeneratorPort(ABC):
         options: CallOptionsDTO | None = None,
     ) -> CallResultDTO:
         """Chiama la catena LLM con failover automatico tra modelli."""
-        pass
+
+    @abstractmethod
+    def check_all_providers(self) -> SystemHealthReportDTO:
+        """Esegue la diagnosi multilivello di tutti i provider e modelli LLM configurati."""
 
     @abstractmethod
     def close(self) -> None:
         """Chiude le risorse di rete ed i pool dei client LLM."""
-        pass
