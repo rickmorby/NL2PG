@@ -5,6 +5,8 @@
 
 from typing import Annotated
 
+from rich.console import Console
+from rich.tree import Tree
 from typer import Context, Option, Typer, colors, secho
 
 from bench.application.bootstrap import ApplicationBootstrap
@@ -112,34 +114,35 @@ def check_command(
             secho(msg_start, fg=colors.CYAN, bold=True)
             report = checker.check_llm_providers(check_models=do_models)
 
+            console = Console()
             for p in report.providers:
                 if p.is_reachable:
-                    p_msg = (
-                        f"[OK] Provider {p.provider_name} ({p.base_url}): "
-                        f"RAGGIUNGIBILE [{len(p.models)} modelli]"
+                    p_title = (
+                        f"[bold green][OK] Provider {p.provider_name} ({p.base_url}): "
+                        f"RAGGIUNGIBILE [{len(p.models)} modelli][/bold green]"
                     )
-                    secho(p_msg, fg=colors.GREEN, bold=True)
                 else:
-                    p_msg = (
-                        f"[ERRORE] Provider {p.provider_name} ({p.base_url}): "
-                        f"NON RAGGIUNGIBILE -> {p.error_message}"
+                    p_title = (
+                        f"[bold red][ERRORE] Provider {p.provider_name} ({p.base_url}): "
+                        f"NON RAGGIUNGIBILE -> {p.error_message}[/bold red]"
                     )
-                    secho(p_msg, fg=colors.RED, bold=True)
 
+                tree = Tree(p_title)
                 if do_models:
-                    total_m = len(p.models)
-                    for idx, m in enumerate(p.models):
-                        connector = "  └── " if idx == total_m - 1 else "  ├── "
-                        roles_str = f"[Ruoli: {', '.join(m.roles)}]" if m.roles else ""
-                        status_str = f"{connector}{m.target_model} {roles_str} -> "
+                    for m in p.models:
+                        roles_str = f"[dim][Ruoli: {', '.join(m.roles)}][/dim]" if m.roles else ""
                         if m.is_healthy:
-                            secho(f"{status_str}DISPONIBILE [OK]", fg=colors.GREEN)
-                        else:
-                            secho(
-                                f"{status_str}NON DISPONIBILE ({m.error_message})",
-                                fg=colors.RED,
+                            tree.add(
+                                f"[green]{m.target_model} {roles_str} -> DISPONIBILE [OK][/green]"
                             )
-                secho("")
+                        else:
+                            msg_err_str = (
+                                f"[red]{m.target_model} {roles_str} -> "
+                                f"NON DISPONIBILE ({m.error_message})[/red]"
+                            )
+                            tree.add(msg_err_str)
+                console.print(tree)
+                console.print("")
 
             msg_summary = (
                 f"[RIEPILOGO DIAGNOSI] Provider raggiungibili: "
@@ -156,9 +159,6 @@ def check_command(
     except Exception as e:
         secho(f"[ERRORE] Diagnosi fallita: {e}", fg=colors.RED, bold=True)
         handle_exception(e)
-
-
-
 
 
 @app.command("promote")
