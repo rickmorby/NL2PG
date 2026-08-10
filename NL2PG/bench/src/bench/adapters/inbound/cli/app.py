@@ -74,73 +74,94 @@ def generate_command(
         handle_exception(e)
 
 
-@app.command("check-providers")
-def check_providers_command(ctx: Context) -> None:
-    """Diagnosi di connettività e risposte su tutti i provider ed i modelli."""
+@app.command("check")
+def check_command(
+    ctx: Context,
+    providers_only: Annotated[
+        bool, Option("--providers", "-p", help="Verifica la connettività dei provider.")
+    ] = False,
+    models_check: Annotated[
+        bool, Option("--models", "-m", help="Verifica provider e modelli fisici.")
+    ] = False,
+    config_only: Annotated[
+        bool, Option("--config", "-cfg", help="Verifica l'integrità delle configurazioni.")
+    ] = False,
+    all_check: Annotated[
+        bool, Option("--all", "-a", help="Diagnosi completa 360° (Config + Provider + Modelli).")
+    ] = False,
+) -> None:
+    """Diagnosi unificata di configurazioni, connettività provider e modelli LLM."""
     bootstrap: ApplicationBootstrap = ctx.obj
     try:
-        msg_start = "[INFO] Avvio diagnosi connettività multilivello provider ed LLM...\n"
-        secho(msg_start, fg=colors.CYAN, bold=True)
         checker = bootstrap.system_checker()
-        report = checker.check_llm_providers()
+        do_config = config_only or all_check or (not providers_only and not models_check)
+        do_providers = providers_only or models_check or all_check
+        do_models = models_check or all_check
 
-        for p in report.providers:
-            if p.is_reachable:
-                msg_p = f"[OK] Provider {p.provider_name} ({p.base_url}): RAGGIUNGIBILE"
-                secho(msg_p, fg=colors.GREEN, bold=True)
-            else:
-                msg_p = (
-                    f"[ERRORE] Provider {p.provider_name} ({p.base_url}): "
-                    f"NON RAGGIUNGIBILE -> {p.error_message}"
-                )
-                secho(msg_p, fg=colors.RED, bold=True)
+        if do_config:
+            res = checker.check_configurations()
+            secho("[INFO] Stato Configurazioni Benchmark:", fg=colors.CYAN, bold=True)
+            secho("  bench.toml: OK (Caricato)", fg=colors.WHITE)
+            secho(f"  providers.json: OK ({res.models_count} modelli)", fg=colors.WHITE)
+            secho(f"  categories.json: OK ({res.categories_count} categorie)", fg=colors.WHITE)
+            secho(f"  Config Hash: {res.config_hash}", fg=colors.WHITE)
+            secho(f"  Categories Hash: {res.categories_hash}\n", fg=colors.WHITE)
 
-            for m in p.models:
-                status_str = f"  - {m.model_id} ({m.target_model}): "
-                if m.is_healthy:
-                    secho(f"{status_str}DISPONIBILE [OK]", fg=colors.GREEN)
+        if do_providers:
+            msg_start = "[INFO] Avvio diagnosi connettività provider ed LLM...\n"
+            secho(msg_start, fg=colors.CYAN, bold=True)
+            report = checker.check_llm_providers(check_models=do_models)
+
+            for p in report.providers:
+                if p.is_reachable:
+                    p_msg = (
+                        f"[OK] Provider {p.provider_name} ({p.base_url}): "
+                        f"RAGGIUNGIBILE [{len(p.models)} modelli]"
+                    )
+                    secho(p_msg, fg=colors.GREEN, bold=True)
                 else:
-                    secho(f"{status_str}NON DISPONIBILE -> {m.error_message}", fg=colors.RED)
-            secho("")
+                    p_msg = (
+                        f"[ERRORE] Provider {p.provider_name} ({p.base_url}): "
+                        f"NON RAGGIUNGIBILE -> {p.error_message}"
+                    )
+                    secho(p_msg, fg=colors.RED, bold=True)
 
-        msg_summary = (
-            f"[RIEPILOGO DIAGNOSI] Provider raggiungibili: "
-            f"{report.reachable_providers}/{report.total_providers} | "
-            f"Modelli operativi: {report.healthy_models}/{report.total_models}"
-        )
-        secho(msg_summary, fg=colors.CYAN, bold=True)
+                if do_models:
+                    total_m = len(p.models)
+                    for idx, m in enumerate(p.models):
+                        connector = "  └── " if idx == total_m - 1 else "  ├── "
+                        roles_str = f"[Ruoli: {', '.join(m.roles)}]" if m.roles else ""
+                        status_str = f"{connector}{m.target_model} {roles_str} -> "
+                        if m.is_healthy:
+                            secho(f"{status_str}DISPONIBILE [OK]", fg=colors.GREEN)
+                        else:
+                            secho(
+                                f"{status_str}NON DISPONIBILE ({m.error_message})",
+                                fg=colors.RED,
+                            )
+                secho("")
+
+            msg_summary = (
+                f"[RIEPILOGO DIAGNOSI] Provider raggiungibili: "
+                f"{report.reachable_providers}/{report.total_providers}"
+            )
+            if do_models:
+                msg_summary += (
+                    f" | Modelli fisici operativi: "
+                    f"{report.healthy_models}/{report.total_models}"
+                )
+            secho(msg_summary, fg=colors.CYAN, bold=True)
     except KeyboardInterrupt:
         secho(_INTERRUPT_MSG, fg=colors.YELLOW, bold=True)
     except Exception as e:
-        secho(f"[ERRORE] Diagnosi provider fallita: {e}", fg=colors.RED, bold=True)
+        secho(f"[ERRORE] Diagnosi fallita: {e}", fg=colors.RED, bold=True)
         handle_exception(e)
 
 
-@app.command("check")
-def check_command(ctx: Context) -> None:
-    """Verifica l'integrità dei file di configurazione e calcola gli hash di esecuzione."""
-    bootstrap: ApplicationBootstrap = ctx.obj
-    try:
-        checker = bootstrap.system_checker()
-        res = checker.check_configurations()
-
-        secho("[INFO] Stato Configurazioni Benchmark:", fg=colors.CYAN, bold=True)
-        secho("  bench.toml: OK (Caricato)", fg=colors.WHITE)
-        secho(f"  providers.json: OK ({res.models_count} modelli)", fg=colors.WHITE)
-        secho(f"  categories.json: OK ({res.categories_count} categorie)", fg=colors.WHITE)
-        secho(f"  Config Hash: {res.config_hash}", fg=colors.WHITE)
-        secho(f"  Categories Hash: {res.categories_hash}", fg=colors.WHITE)
-
-        msg_ok = "[OK] Controllo configurazioni completato con successo."
-        secho(msg_ok, fg=colors.GREEN, bold=True)
-    except KeyboardInterrupt:
-        secho(
-            _INTERRUPT_MSG,
-            fg=colors.YELLOW,
-            bold=True,
-        )
-    except Exception as e:
-        handle_exception(e)
+@app.command("check-providers")
+def check_providers_command(ctx: Context) -> None:
+    """Alias di 'bench check --models' per la verifica di provider e modelli LLM."""
+    check_command(ctx, models_check=True)
 
 
 @app.command("promote")
