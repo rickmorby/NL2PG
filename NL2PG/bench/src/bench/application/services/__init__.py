@@ -7,7 +7,6 @@ from bench.application.services.analytics import BenchmarkAnalyticsService
 from bench.application.services.database_cleaner import DatabaseCleanupService
 from bench.application.services.system_checker import (
     ConfigCheckResult,
-    ProviderCheckResult,
     SystemCheckService,
 )
 from bench.application.services.task_promoter import TaskPromoterService
@@ -18,7 +17,6 @@ __all__: list[str] = [
     "BenchmarkAnalyticsService",
     "ConfigCheckResult",
     "DatabaseCleanupService",
-    "ProviderCheckResult",
     "SystemCheckService",
     "TaskPromoterService",
     "TaskRunner",

@@ -16,6 +16,8 @@ app = Typer(
     add_completion=False,
 )
 
+_INTERRUPT_MSG = "\n[WARNING] Interruzione da tastiera (Ctrl+C). Chiusura in corso..."
+
 
 @app.callback()
 def main_callback(ctx: Context) -> None:
@@ -64,7 +66,7 @@ def generate_command(
             secho(msg, fg=colors.YELLOW, bold=True)
     except KeyboardInterrupt:
         secho(
-            "\n[WARNING] Interruzione da tastiera (Ctrl+C). Chiusura in corso...",
+            _INTERRUPT_MSG,
             fg=colors.YELLOW,
             bold=True,
         )
@@ -74,27 +76,43 @@ def generate_command(
 
 @app.command("check-providers")
 def check_providers_command(ctx: Context) -> None:
-    """Esegue una verifica di connettività e risposta sui provider LLM configurati."""
+    """Diagnosi di connettività e risposte su tutti i provider ed i modelli."""
     bootstrap: ApplicationBootstrap = ctx.obj
     try:
-        secho("[INFO] Verifica connettivita' provider LLM in corso...", fg=colors.CYAN)
+        msg_start = "[INFO] Avvio diagnosi connettività multilivello provider ed LLM...\n"
+        secho(msg_start, fg=colors.CYAN, bold=True)
         checker = bootstrap.system_checker()
-        res = checker.check_llm_providers()
+        report = checker.check_llm_providers()
 
-        if res.success:
-            msg = f"[OK] Connessione LLM riuscita tramite il modello: {res.model_used}"
-            secho(msg, fg=colors.GREEN, bold=True)
-        else:
-            msg_err = f"[ERRORE] Verifica provider LLM fallita: {res.error}"
-            secho(msg_err, fg=colors.RED, bold=True)
-    except KeyboardInterrupt:
-        secho(
-            "\n[WARNING] Interruzione da tastiera (Ctrl+C). Chiusura in corso...",
-            fg=colors.YELLOW,
-            bold=True,
+        for p in report.providers:
+            if p.is_reachable:
+                msg_p = f"[OK] Provider {p.provider_name} ({p.base_url}): RAGGIUNGIBILE"
+                secho(msg_p, fg=colors.GREEN, bold=True)
+            else:
+                msg_p = (
+                    f"[ERRORE] Provider {p.provider_name} ({p.base_url}): "
+                    f"NON RAGGIUNGIBILE -> {p.error_message}"
+                )
+                secho(msg_p, fg=colors.RED, bold=True)
+
+            for m in p.models:
+                status_str = f"  - {m.model_id} ({m.target_model}): "
+                if m.is_healthy:
+                    secho(f"{status_str}DISPONIBILE [OK]", fg=colors.GREEN)
+                else:
+                    secho(f"{status_str}NON DISPONIBILE -> {m.error_message}", fg=colors.RED)
+            secho("")
+
+        msg_summary = (
+            f"[RIEPILOGO DIAGNOSI] Provider raggiungibili: "
+            f"{report.reachable_providers}/{report.total_providers} | "
+            f"Modelli operativi: {report.healthy_models}/{report.total_models}"
         )
+        secho(msg_summary, fg=colors.CYAN, bold=True)
+    except KeyboardInterrupt:
+        secho(_INTERRUPT_MSG, fg=colors.YELLOW, bold=True)
     except Exception as e:
-        secho(f"[ERRORE] Invocazione fallita: {e}", fg=colors.RED, bold=True)
+        secho(f"[ERRORE] Diagnosi provider fallita: {e}", fg=colors.RED, bold=True)
         handle_exception(e)
 
 
@@ -117,7 +135,7 @@ def check_command(ctx: Context) -> None:
         secho(msg_ok, fg=colors.GREEN, bold=True)
     except KeyboardInterrupt:
         secho(
-            "\n[WARNING] Interruzione da tastiera (Ctrl+C). Chiusura in corso...",
+            _INTERRUPT_MSG,
             fg=colors.YELLOW,
             bold=True,
         )
@@ -144,7 +162,7 @@ def promote_command(ctx: Context) -> None:
             secho("[INFO] Nessun nuovo campione trovato da promuovere.", fg=colors.YELLOW)
     except KeyboardInterrupt:
         secho(
-            "\n[WARNING] Interruzione da tastiera (Ctrl+C). Chiusura in corso...",
+            _INTERRUPT_MSG,
             fg=colors.YELLOW,
             bold=True,
         )
@@ -165,7 +183,7 @@ def cleanup_command(ctx: Context) -> None:
         secho(msg, fg=colors.GREEN, bold=True)
     except KeyboardInterrupt:
         secho(
-            "\n[WARNING] Interruzione da tastiera (Ctrl+C). Chiusura in corso...",
+            _INTERRUPT_MSG,
             fg=colors.YELLOW,
             bold=True,
         )
@@ -198,7 +216,7 @@ def stats_command(
             secho(msg_warn, fg=colors.YELLOW)
     except KeyboardInterrupt:
         secho(
-            "\n[WARNING] Interruzione da tastiera (Ctrl+C). Chiusura in corso...",
+            _INTERRUPT_MSG,
             fg=colors.YELLOW,
             bold=True,
         )
