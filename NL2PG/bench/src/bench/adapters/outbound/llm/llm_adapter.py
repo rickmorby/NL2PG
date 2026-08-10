@@ -8,6 +8,7 @@ from logging import getLogger
 from sys import modules
 from typing import Any
 
+from httpx import Client
 from json_repair import repair_json
 from litellm import (
     Router,
@@ -17,7 +18,13 @@ from litellm import (
 from pydantic import BaseModel, ValidationError
 
 from bench.domain.exceptions import LLMClientError, ModelOutputContractError
-from bench.domain.models.llm import CallOptionsDTO, CallResultDTO
+from bench.domain.models.llm import (
+    CallOptionsDTO,
+    CallResultDTO,
+    ModelHealthDTO,
+    ProviderHealthDTO,
+    SystemHealthReportDTO,
+)
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 _log = getLogger("bench.adapters.llm")
@@ -107,6 +114,160 @@ class LLMClientAdapter(LLMGeneratorPort):
             raise
         except Exception as e:
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
+
+    def check_all_providers(self) -> SystemHealthReportDTO:
+        """Esegue la diagnosi multilivello di tutti i provider ed i relativi modelli."""
+        models = self._config.get("models", {})
+        providers_grouped: dict[tuple[str, str, str], list[tuple[str, dict[str, Any]]]] = {}
+
+        for m_id, m_info in models.items():
+            p_name = m_info.get("provider", "openai")
+            base_url = m_info.get("base_url", "https://api.openai.com/v1")
+            api_key = m_info.get("api_key", "")
+            group_key = (p_name, base_url, api_key)
+            if group_key not in providers_grouped:
+                providers_grouped[group_key] = []
+            providers_grouped[group_key].append((m_id, m_info))
+
+        provider_reports: list[ProviderHealthDTO] = []
+        total_models_count = len(models)
+        healthy_models_count = 0
+        reachable_providers_count = 0
+
+        with Client(timeout=10.0) as client:
+            for (p_name, base_url, api_key), model_list in providers_grouped.items():
+                p_report, server_models = self._check_provider_endpoint(
+                    client, p_name, base_url, api_key
+                )
+                if p_report.is_reachable:
+                    reachable_providers_count += 1
+                    model_reports = []
+                    for m_id, m_info in model_list:
+                        m_report = self._check_model_health(
+                            client, m_id, m_info, base_url, api_key, server_models
+                        )
+                        if m_report.is_healthy:
+                            healthy_models_count += 1
+                        model_reports.append(m_report)
+                    p_report.models = model_reports
+                else:
+                    p_report.models = [
+                        ModelHealthDTO(
+                            model_id=m_id,
+                            target_model=m_info.get("model", ""),
+                            is_available_on_server=False,
+                            is_healthy=False,
+                            error_message="Provider non raggiungibile o autenticazione fallita.",
+                        )
+                        for m_id, m_info in model_list
+                    ]
+                provider_reports.append(p_report)
+
+        return SystemHealthReportDTO(
+            total_providers=len(providers_grouped),
+            reachable_providers=reachable_providers_count,
+            total_models=total_models_count,
+            healthy_models=healthy_models_count,
+            providers=provider_reports,
+        )
+
+    def _check_provider_endpoint(
+        self, client: Client, provider_name: str, base_url: str, api_key: str
+    ) -> tuple[ProviderHealthDTO, set[str]]:
+        """Invia una richiesta GET /v1/models per verificare se il provider e' raggiungibile."""
+        clean_url = base_url.rstrip("/")
+        models_url = f"{clean_url}/models" if not clean_url.endswith("/models") else clean_url
+        headers = {"Authorization": f"Bearer {api_key}"}
+
+        try:
+            resp = client.get(models_url, headers=headers)
+            if resp.status_code == 200:
+                data = resp.json()
+                server_model_ids = {
+                    item.get("id")
+                    for item in data.get("data", [])
+                    if isinstance(item, dict) and item.get("id")
+                }
+                return (
+                    ProviderHealthDTO(
+                        provider_name=provider_name,
+                        base_url=base_url,
+                        is_reachable=True,
+                        error_message="",
+                    ),
+                    server_model_ids,
+                )
+            return (
+                ProviderHealthDTO(
+                    provider_name=provider_name,
+                    base_url=base_url,
+                    is_reachable=False,
+                    error_message=f"HTTP {resp.status_code}: {resp.text[:120]}",
+                ),
+                set(),
+            )
+        except Exception as e:
+            return (
+                ProviderHealthDTO(
+                    provider_name=provider_name,
+                    base_url=base_url,
+                    is_reachable=False,
+                    error_message=f"Errore di connessione: {e}",
+                ),
+                set(),
+            )
+
+    def _check_model_health(
+        self,
+        client: Client,
+        model_id: str,
+        m_info: dict[str, Any],
+        base_url: str,
+        api_key: str,
+        server_models: set[str],
+    ) -> ModelHealthDTO:
+        """Invia un ping di completamento per verificare la reale fruibilità del modello."""
+        target_model = m_info.get("model", "")
+        is_available = bool(
+            not server_models
+            or target_model in server_models
+            or any(target_model in m for m in server_models)
+        )
+
+        clean_url = base_url.rstrip("/")
+        comp_url = f"{clean_url}/chat/completions"
+        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        payload = {
+            "model": target_model,
+            "messages": [{"role": "user", "content": "ping"}],
+            "max_tokens": 5,
+        }
+
+        try:
+            resp = client.post(comp_url, headers=headers, json=payload)
+            if resp.status_code == 200:
+                return ModelHealthDTO(
+                    model_id=model_id,
+                    target_model=target_model,
+                    is_available_on_server=is_available,
+                    is_healthy=True,
+                    error_message="",
+                )
+            return ModelHealthDTO(
+                model_id=model_id,
+                target_model=target_model,
+                is_available_on_server=is_available,
+                is_healthy=False,
+                error_message=f"HTTP {resp.status_code}: {resp.text[:120]}",
+            )
+        except Exception as e:
+            return ModelHealthDTO(
+                model_id=model_id,
+                target_model=target_model,
+                is_available_on_server=is_available,
+                is_healthy=False,
+                error_message=f"Errore ping completamento: {e}",
+            )
 
     def close(self) -> None:
         """Rilascia le risorse di rete, i pool ed i meccanismi di cache dei client LLM."""
