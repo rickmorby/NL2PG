@@ -3,7 +3,7 @@
 :author: Riccardo Morabito
 """
 
-from asyncio import all_tasks, gather, get_event_loop
+from asyncio import get_event_loop
 from contextlib import suppress
 from logging import getLogger
 from sys import modules
@@ -30,8 +30,28 @@ from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 _log = getLogger("bench.adapters.llm")
 
-modules["litellm"].suppress_debug_info = True
-modules["litellm"].turn_off_message_logging = True
+litellm_mod = modules["litellm"]
+litellm_mod.suppress_debug_info = True
+litellm_mod.turn_off_message_logging = True
+litellm_mod.callbacks = []
+litellm_mod.success_callback = []
+litellm_mod.failure_callback = []
+litellm_mod.input_callback = []
+litellm_mod.service_callback = []
+litellm_mod.telemetry = False
+
+for _cb_attr in ("_async_success_callback", "_async_failure_callback", "_async_input_callback"):
+    if hasattr(litellm_mod, _cb_attr):
+        setattr(litellm_mod, _cb_attr, [])
+
+with suppress(Exception):
+    import litellm._service_logger as _sl
+
+    def _noop_service_hook(*_args: Any, **_kwargs: Any) -> None:
+        pass
+
+    _sl.ServiceLogging.service_success_hook = _noop_service_hook
+    _sl.ServiceLogging.async_service_success_hook = _noop_service_hook
 
 
 class LLMClientAdapter(LLMGeneratorPort):
@@ -134,18 +154,11 @@ class LLMClientAdapter(LLMGeneratorPort):
 
         with suppress(Exception):
             if callable(close_litellm_async_clients):
-                with suppress(Exception):
-                    loop = get_event_loop()
-                    if not loop.is_closed():
-                        pending = [t for t in all_tasks(loop) if not t.done()]
-                        for task in pending:
-                            task.cancel()
-                        if not loop.is_running() and pending:
-                            loop.run_until_complete(gather(*pending, return_exceptions=True))
-                        if loop.is_running():
-                            self._async_close_task = loop.create_task(close_litellm_async_clients())
-                        else:
-                            loop.run_until_complete(close_litellm_async_clients())
+                loop = get_event_loop()
+                if not loop.is_closed() and not loop.is_running():
+                    loop.run_until_complete(close_litellm_async_clients())
+
+        with suppress(Exception):
             if isinstance(in_memory_llm_clients_cache, dict):
                 in_memory_llm_clients_cache.clear()
 
