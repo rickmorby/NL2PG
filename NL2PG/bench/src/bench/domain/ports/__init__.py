@@ -5,7 +5,6 @@
 
 from bench.domain.ports.outbound import (
     DatabasePort,
-    DatabaseSchemaValidatorPort,
     LLMGeneratorPort,
     LoggerPort,
     MetaRepositoryPort,
@@ -14,9 +13,8 @@ from bench.domain.ports.outbound import (
 
 __all__ = [
     "DatabasePort",
-    "DatabaseSchemaValidatorPort",
-    "SandboxPort",
     "LLMGeneratorPort",
     "LoggerPort",
     "MetaRepositoryPort",
+    "SandboxPort",
 ]
