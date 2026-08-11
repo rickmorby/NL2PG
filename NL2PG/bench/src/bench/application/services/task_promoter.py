@@ -6,8 +6,6 @@
 from logging import getLogger
 from pathlib import Path
 
-from orjson import loads as orjson_loads
-
 from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
 
 _log = getLogger("bench.application.task_promoter")
@@ -34,7 +32,7 @@ class TaskPromoterService:
         promoted_count = 0
         for sample_file in json_files:
             try:
-                doc = orjson_loads(sample_file.read_bytes())
+                doc = self._serializer.read(sample_file)
                 for task in doc.get("tasks", []):
                     cat = task.get("category", "unknown")
                     cat_dir = examples_dir / cat

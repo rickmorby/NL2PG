@@ -6,7 +6,7 @@
 from datetime import datetime, timezone
 from pathlib import Path
 
-from orjson import OPT_INDENT_2, dumps as orjson_dumps
+from orjson import OPT_INDENT_2, dumps as orjson_dumps, loads as orjson_loads
 
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
@@ -31,6 +31,10 @@ class JsonBenchmarkSerializerAdapter(BenchmarkSerializerPort):
             "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "tasks": [self._build_entry(t, weights or {}) for t in accepted],
         }
+
+    def read(self, input_path: Path) -> dict:
+        """Legge e deserializza in byte UTF-8 un file JSON su filesystem."""
+        return orjson_loads(input_path.read_bytes())
 
     def write(self, document: dict, output_path: Path) -> None:
         """Scrive atomicamente il documento JSON su file temporaneo e lo rimpiazza."""

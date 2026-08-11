@@ -7,11 +7,9 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any
 
-from orjson import loads as orjson_loads
-
-from bench.application.serializer.serializer import BenchmarkSerializer
 from bench.domain.models.analytics import AnalyticsDTO
 from bench.domain.ports.outbound.plotter_port import PlotterPort
+from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
 from bench.domain.services.analytics_calculator import AnalyticsCalculator
 
 _log = getLogger("bench.application.analytics")
@@ -22,7 +20,7 @@ class BenchmarkAnalyticsService:
 
     def __init__(
         self,
-        serializer: BenchmarkSerializer,
+        serializer: BenchmarkSerializerPort,
         plotter: PlotterPort,
         calculator: AnalyticsCalculator | None = None,
     ) -> None:
@@ -72,7 +70,7 @@ class BenchmarkAnalyticsService:
         if not json_file.is_file():
             return [], "", output_dir / "plots" / "run_unknown"
 
-        doc = orjson_loads(json_file.read_bytes())
+        doc = self._serializer.read(json_file)
         tasks = doc.get("tasks", [])
         run_id = doc.get("run_id", "unknown")
         is_samples = json_file.name == "benchmark_samples.json"

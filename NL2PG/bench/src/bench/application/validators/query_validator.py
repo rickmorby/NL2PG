@@ -69,7 +69,7 @@ class QueryValidator:
                     "Inserisci dati o modifica la query in modo da restituire risultati validi."
                 ),
             )
-        if query.order_sensitive and not self._order_by_root_only(tree, query.order_sensitive):
+        if query.order_sensitive and not self._has_root_order_by(tree):
             return QueryValidationResult(
                 is_valid=False,
                 error=(
@@ -109,10 +109,8 @@ class QueryValidator:
         return sorted({t.name for t in find_tables(tree)})
 
     @staticmethod
-    def _order_by_root_only(tree: exp.Expression, order_sensitive: bool) -> bool:
-        """Verifica che le query order_sensitive abbiano ORDER BY a livello radice."""
-        if not order_sensitive:
-            return True
+    def _has_root_order_by(tree: exp.Expression) -> bool:
+        """Verifica che la query SQL contenga la clausola ORDER BY a livello radice."""
         return tree.args.get("order") is not None
 
     @staticmethod
