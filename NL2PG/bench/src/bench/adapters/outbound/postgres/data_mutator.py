@@ -171,15 +171,13 @@ class PostgresDataMutator:
                 if t.name.lower() == table_name.lower() and t.alias:
                     aliases.add(t.alias.lower())
             for c in tree.find_all(exp.Column):
-                if c.table and c.table.lower() in aliases:
-                    used.add(c.name.lower())
-                elif not c.table:
+                if (c.table and c.table.lower() in aliases) or not c.table:
                     used.add(c.name.lower())
             return used
         except Exception:
             return set()
 
-    def _has_mutatable_cols(self, cur: Any, table: str, used: set[str]) -> bool:
+    def _has_mutatable_cols(self, cur: Any, table: str, _used: set[str]) -> bool:
         """Verifica se la tabella ha colonne mutabili (non PK/FK/UNIQUE, tipo supportato)."""
         return bool(self._get_mutatable_candidates(cur, table, ""))
 

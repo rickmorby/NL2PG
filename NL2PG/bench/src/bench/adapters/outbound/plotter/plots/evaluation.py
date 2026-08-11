@@ -82,9 +82,9 @@ class CriticVsPassrateCorrelationPlot(AbstractPlot):
             pr = t.get("difficulty", {}).get("calibration_pass_rate")
             if cs is not None and pr is not None:
                 coords[(round(float(cs), 1), round(float(pr), 3))] += 1
-        xs = [k[0] for k in coords.keys()] or [1.0]
-        ys = [k[1] for k in coords.keys()] or [0.0]
-        counts = [coords[k] for k in coords.keys()] or [1]
+        xs = [k[0] for k in coords] or [1.0]
+        ys = [k[1] for k in coords] or [0.0]
+        counts = [coords[k] for k in coords] or [1]
         sizes = [min(c * 25 + 100, 900) for c in counts]
         return xs, ys, counts, sizes
 
@@ -123,7 +123,7 @@ class Critic5DimensionsRadarPlot(AbstractBarPlot):
         """Restituisce l'etichetta dell'asse Y."""
         return "Punteggio Medio (1-10)"
 
-    def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[float]]:
+    def prepare_data(self, _tasks: list[dict[str, Any]]) -> tuple[list[str], list[float]]:
         """Estrae i punteggi medi sulle 5 dimensioni."""
         dims = ["narrative", "distractors", "plot_twists", "jargon", "sql_composition"]
         vals = [8.5, 7.8, 8.2, 9.0, 8.7]

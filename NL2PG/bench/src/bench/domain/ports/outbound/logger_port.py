@@ -12,4 +12,3 @@ class LoggerPort(ABC):
     @abstractmethod
     def configure(self) -> None:
         """Applica la configurazione del logging."""
-        pass

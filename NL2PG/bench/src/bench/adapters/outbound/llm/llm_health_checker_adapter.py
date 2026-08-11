@@ -3,6 +3,7 @@
 :author: Riccardo Morabito
 """
 
+from http import HTTPStatus
 from typing import Any
 
 from httpx import Client
@@ -76,13 +77,12 @@ class LLMHealthCheckerAdapter:
                         sorted_roles = sorted(list(data["roles"]))
                         if check_models:
                             m_report = self._check_model_health(
-                                client,
-                                data["model_ids"][0],
-                                t_model,
-                                sorted_roles,
-                                base_url,
-                                api_key,
-                                server_models,
+                                client=client,
+                                model_id=data["model_ids"][0],
+                                target_model=t_model,
+                                roles=sorted_roles,
+                                endpoint=(base_url, api_key),
+                                server_models=server_models,
                             )
                             if m_report.is_healthy:
                                 healthy_models_count += 1
@@ -129,7 +129,7 @@ class LLMHealthCheckerAdapter:
 
         try:
             resp = client.get(models_url, headers=headers)
-            if resp.status_code == 200:
+            if resp.status_code == HTTPStatus.OK:
                 data = resp.json()
                 server_model_ids = {
                     item.get("id")
@@ -171,11 +171,11 @@ class LLMHealthCheckerAdapter:
         model_id: str,
         target_model: str,
         roles: list[str],
-        base_url: str,
-        api_key: str,
+        endpoint: tuple[str, str],
         server_models: set[str],
     ) -> ModelHealthDTO:
         """Invia un ping di completamento per verificare la reale fruibilità del modello."""
+        base_url, api_key = endpoint
         is_available = bool(
             not server_models
             or target_model in server_models
@@ -193,7 +193,7 @@ class LLMHealthCheckerAdapter:
 
         try:
             resp = client.post(comp_url, headers=headers, json=payload)
-            if resp.status_code == 200:
+            if resp.status_code == HTTPStatus.OK:
                 return ModelHealthDTO(
                     model_id=model_id,
                     target_model=target_model,

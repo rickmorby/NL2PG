@@ -10,9 +10,9 @@ from bench.adapters.outbound.postgres.repository_adapter import MetaRepositoryAd
 from bench.adapters.outbound.postgres.sandbox_adapter import PostgresSandboxAdapter
 
 __all__ = [
+    "MetaRepositoryAdapter",
     "PostgresClientAdapter",
     "PostgresSandboxAdapter",
-    "MetaRepositoryAdapter",
     "RunEntity",
     "TaskEntity",
     "TaskStateMapper",

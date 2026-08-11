@@ -11,10 +11,10 @@ from bench.adapters.outbound.prompts import PromptAdapter
 
 __all__ = [
     "ConfigAdapter",
+    "LLMClientAdapter",
     "LoggingAdapter",
-    "TqdmHandler",
     "PostgresClientAdapter",
     "PostgresSandboxAdapter",
-    "LLMClientAdapter",
     "PromptAdapter",
+    "TqdmHandler",
 ]

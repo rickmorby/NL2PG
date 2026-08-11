@@ -99,6 +99,6 @@ class AbstractAgent(ABC):
         _log.warning("Nodo '%s' esaurito dopo %d tentativi. Task scartato.", name, max_attempts)
         return {"verdict": "scrapped", "last_error": err, "last_model": last_model}
 
-    def _max_retries(self, state: TaskStateDTO) -> int:
+    def _max_retries(self, _state: TaskStateDTO) -> int:
         """Restituisce il numero massimo di tentativi configurato."""
         return self._config.load_bench().get("retry", {}).get("max_per_node", 5)

@@ -69,10 +69,9 @@ class PostgresSandboxAdapter(SandboxPort):
         """Esegue atomicamente un blocco di istruzioni SQL ammesse in transazione isolata."""
         self._validate_schema_name(schema)
         statements = self._validate_and_split_sql(sql_text, allowed_types=allowed_types)
-        with self._client.get_sandbox_connection(schema) as conn:
-            with conn.transaction():
-                for stmt in statements:
-                    self._client.execute_prepared(conn, stmt)
+        with self._client.get_sandbox_connection(schema) as conn, conn.transaction():
+            for stmt in statements:
+                self._client.execute_prepared(conn, stmt)
 
     def run_query(self, schema: str, query: str) -> tuple[list[str], list[tuple[Any, ...]]]:
         """Valida che la query sia una SELECT read-only ed esegue la lettura nello schema."""

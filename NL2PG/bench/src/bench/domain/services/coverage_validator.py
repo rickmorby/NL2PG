@@ -84,7 +84,11 @@ class CoverageValidator:
 def _map_table_name(name: str, twist_rules: list[TwistRuleDTO]) -> str:
     """Applica il mapping inverso dei twist per ricondurre un nome tabella alla forma originale."""
     for rule in twist_rules:
-        if rule.twist_type in _MAPPING_TWISTS and rule.target_value and rule.obsolete_value:
-            if rule.target_value.lower() in name or name in rule.target_value.lower():
-                return rule.obsolete_value.lower()
+        if (
+            rule.twist_type in _MAPPING_TWISTS
+            and rule.target_value
+            and rule.obsolete_value
+            and (rule.target_value.lower() in name or name in rule.target_value.lower())
+        ):
+            return rule.obsolete_value.lower()
     return name

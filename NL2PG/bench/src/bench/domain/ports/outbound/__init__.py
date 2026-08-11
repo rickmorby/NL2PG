@@ -19,8 +19,8 @@ __all__ = [
     "DatabasePort",
     "LLMGeneratorPort",
     "LoggerPort",
+    "MetaRepositoryPort",
     "PlotterPort",
     "PromptPort",
-    "MetaRepositoryPort",
     "SandboxPort",
 ]

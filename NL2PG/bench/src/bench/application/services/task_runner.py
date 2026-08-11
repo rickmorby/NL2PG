@@ -128,15 +128,14 @@ class TaskRunner:
                 doc = self._serializer.build_document(accepted_tasks, result_state.run_id, weights)
                 self._serializer.write(doc, output_file)
             return 0
-        elif verdict == "rejected":
+        if verdict == "rejected":
             counts["rejected"] += 1
             return 0
-        elif verdict == "scrapped":
+        if verdict == "scrapped":
             counts["scrapped"] += 1
             return 0
-        else:
-            counts["failed"] += 1
-            return 1
+        counts["failed"] += 1
+        return 1
 
     def _run_sequential(
         self,
@@ -204,53 +203,55 @@ class TaskRunner:
         consecutive_failures = 0
 
         desc = f"Generazione Task (Parallel {batch_size})"
-        with tqdm(total=count, desc=desc, smoothing=0.1) as pbar:
-            with ThreadPoolExecutor(max_workers=batch_size) as executor:
-                futures = {}
+        with (
+            tqdm(total=count, desc=desc, smoothing=0.1) as pbar,
+            ThreadPoolExecutor(max_workers=batch_size) as executor,
+        ):
+            futures = {}
 
-                while len(futures) < batch_size and (len(accepted_tasks) + len(futures)) < count:
-                    init_state = self._create_initial_state(category, categories)
-                    fut = executor.submit(self._orchestrator.run_task, init_state, run_id)
-                    futures[fut] = init_state.category
+            while len(futures) < batch_size and (len(accepted_tasks) + len(futures)) < count:
+                init_state = self._create_initial_state(category, categories)
+                fut = executor.submit(self._orchestrator.run_task, init_state, run_id)
+                futures[fut] = init_state.category
 
-                while futures and consecutive_failures < max_fails:
-                    done, _ = wait(futures.keys(), return_when=FIRST_COMPLETED)
-                    for fut in done:
-                        cat_id = futures.pop(fut)
-                        try:
-                            result_state = fut.result()
-                            self._meta_repo.save_task(run_id, result_state)
-                            fail_delta = self._process_verdict(
-                                result_state, accepted_tasks, counts, output_file, bench_cfg, pbar
-                            )
-                            if fail_delta > 0:
-                                consecutive_failures += fail_delta
-                            else:
-                                consecutive_failures = 0
-                        except Exception as e:
-                            _log.debug("Errore task parallelo per categoria '%s': %s", cat_id, e)
-                            counts["failed"] += 1
-                            consecutive_failures += 1
-
-                        while len(futures) < batch_size and (
-                            len(accepted_tasks) + len(futures)
-                        ) < count:
-                            next_state = self._create_initial_state(category, categories)
-                            new_fut = executor.submit(
-                                self._orchestrator.run_task, next_state, run_id
-                            )
-                            futures[new_fut] = next_state.category
-
-                        pbar.set_postfix(
-                            acc=len(accepted_tasks),
-                            active=len(futures),
-                            cat=cat_id,
+            while futures and consecutive_failures < max_fails:
+                done, _ = wait(futures.keys(), return_when=FIRST_COMPLETED)
+                for fut in done:
+                    cat_id = futures.pop(fut)
+                    try:
+                        result_state = fut.result()
+                        self._meta_repo.save_task(run_id, result_state)
+                        fail_delta = self._process_verdict(
+                            result_state, accepted_tasks, counts, output_file, bench_cfg, pbar
                         )
+                        if fail_delta > 0:
+                            consecutive_failures += fail_delta
+                        else:
+                            consecutive_failures = 0
+                    except Exception as e:
+                        _log.debug("Errore task parallelo per categoria '%s': %s", cat_id, e)
+                        counts["failed"] += 1
+                        consecutive_failures += 1
 
-                if consecutive_failures >= max_fails:
-                    _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
-                    for pending in futures:
-                        pending.cancel()
+                    while len(futures) < batch_size and (
+                        len(accepted_tasks) + len(futures)
+                    ) < count:
+                        next_state = self._create_initial_state(category, categories)
+                        new_fut = executor.submit(
+                            self._orchestrator.run_task, next_state, run_id
+                        )
+                        futures[new_fut] = next_state.category
+
+                    pbar.set_postfix(
+                        acc=len(accepted_tasks),
+                        active=len(futures),
+                        cat=cat_id,
+                    )
+
+            if consecutive_failures >= max_fails:
+                _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
+                for pending in futures:
+                    pending.cancel()
 
         return BatchSummaryDTO(
             run_id=run_id,

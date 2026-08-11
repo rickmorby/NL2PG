@@ -3,6 +3,7 @@
 :author: Riccardo Morabito
 """
 
+from typing import ClassVar
 from datetime import datetime, timezone
 from sqlalchemy import DateTime, Float, Index, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -11,14 +12,13 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 class BaseEntity(DeclarativeBase):
     """Classe base declarativa per le entità SQLAlchemy del benchmark."""
 
-    pass
 
 
 class RunEntity(BaseEntity):
     """Entità ORM che modella la tabella bench_meta.runs."""
 
     __tablename__ = "runs"
-    __table_args__ = {"schema": "bench_meta"}
+    __table_args__: ClassVar = {"schema": "bench_meta"}
 
     id: Mapped[str] = mapped_column(String, primary_key=True)
     config_hash: Mapped[str] = mapped_column(String, nullable=False)
@@ -33,7 +33,7 @@ class TaskEntity(BaseEntity):
     """Entità ORM che modella la tabella bench_meta.tasks."""
 
     __tablename__ = "tasks"
-    __table_args__ = (
+    __table_args__: ClassVar = (
         Index("idx_tasks_category", "category"),
         Index("idx_tasks_run_id", "run_id"),
         Index("idx_tasks_spec_hash", "spec_hash"),

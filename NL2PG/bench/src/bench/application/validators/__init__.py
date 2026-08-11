@@ -9,11 +9,11 @@ from bench.application.validators.mutation_tester import MutationTester, Mutatio
 from bench.application.validators.query_validator import QueryValidator, QueryValidationResult
 
 __all__: list[str] = [
+    "DataValidator",
+    "MutationResult",
+    "MutationTester",
+    "QueryValidationResult",
+    "QueryValidator",
     "SchemaValidator",
     "ValidationResult",
-    "DataValidator",
-    "MutationTester",
-    "MutationResult",
-    "QueryValidator",
-    "QueryValidationResult",
 ]

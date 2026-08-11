@@ -4,6 +4,7 @@
 """
 
 from dataclasses import dataclass, field
+from typing import ClassVar
 from sqlglot import parse_one, exp
 from sqlglot.errors import ParseError
 
@@ -16,12 +17,15 @@ class FeatureCheckResult:
     missing: list[str] = field(default_factory=list)
 
 
+_MIN_MULTI_COUNT = 2
+
+
 class FeatureChecker:
     """Servizio di dominio per la verifica delle feature sintattiche SQL richieste."""
 
-    _CHECKS = {
+    _CHECKS: ClassVar = {
         "join": lambda t: bool(t.find(exp.Join)),
-        "multi_join": lambda t: len(list(t.find_all(exp.Join))) >= 2,
+        "multi_join": lambda t: len(list(t.find_all(exp.Join))) >= _MIN_MULTI_COUNT,
         "self_join": lambda t: _check_self_join(t),
         "scalar_agg": lambda t: bool(t.find(exp.AggFunc)) and t.args.get("group") is None,
         "group_agg": lambda t: bool(t.find(exp.Group)),
@@ -32,7 +36,7 @@ class FeatureChecker:
             for f in t.find_all(exp.AggFunc)
         ),
         "having": lambda t: bool(t.find(exp.Having)),
-        "subquery": lambda t: len(list(t.find_all(exp.Select))) >= 2,
+        "subquery": lambda t: len(list(t.find_all(exp.Select))) >= _MIN_MULTI_COUNT,
         "correlated_subquery": lambda t: _check_correlated(t),
         "exists": lambda t: bool(t.find(exp.Exists)),
         "anti_join": lambda t: _check_anti_join(t),
@@ -113,7 +117,7 @@ def _check_anti_join(tree: exp.Expression) -> bool:
 def _check_correlated(tree: exp.Expression) -> bool:
     """Verifica se la query contiene subquery correlate."""
     selects = list(tree.find_all(exp.Select))
-    if len(selects) < 2:
+    if len(selects) < _MIN_MULTI_COUNT:
         return False
     root_tables = {t.alias_or_name.lower() for t in selects[0].find_all(exp.Table)}
     for sq in selects[1:]:

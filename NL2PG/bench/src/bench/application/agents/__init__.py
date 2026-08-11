@@ -17,14 +17,14 @@ from bench.application.agents.judge import JudgeAgent
 
 __all__ = [
     "AbstractAgent",
-    "SpecAgent",
-    "SchemaAgent",
-    "DataAgent",
-    "QueryAgent",
-    "StoryAgent",
-    "QuestionAgent",
-    "CriticAgent",
-    "HardeningAgent",
     "CalibrationAgent",
+    "CriticAgent",
+    "DataAgent",
+    "HardeningAgent",
     "JudgeAgent",
+    "QueryAgent",
+    "QuestionAgent",
+    "SchemaAgent",
+    "SpecAgent",
+    "StoryAgent",
 ]

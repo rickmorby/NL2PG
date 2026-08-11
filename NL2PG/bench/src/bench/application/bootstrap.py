@@ -12,6 +12,7 @@ TaskRunner e' protetto da threading.Lock per la scrittura parallela.
 :author: Riccardo Morabito
 """
 
+from contextlib import suppress
 from pathlib import Path
 
 from bench.adapters.outbound.config import ConfigAdapter
@@ -139,14 +140,10 @@ class ApplicationBootstrap:
 
     def close(self) -> None:
         """Rilascia ordinatamente pool DB e client LLM."""
-        try:
+        with suppress(Exception):
             self._pg_client.close()
-        except Exception:
-            pass
-        try:
+        with suppress(Exception):
             self._llm.close()
-        except Exception:
-            pass
 
 
     def _build_agents(

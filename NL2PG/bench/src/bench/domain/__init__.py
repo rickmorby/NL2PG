@@ -7,7 +7,7 @@ from bench.domain.exceptions import BenchException
 from bench.domain.models import AbstractDTO, TaskStateDTO
 
 __all__ = [
-    "BenchException",
     "AbstractDTO",
+    "BenchException",
     "TaskStateDTO",
 ]

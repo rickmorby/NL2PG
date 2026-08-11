@@ -79,9 +79,9 @@ def _handle_logging_config_error(exc: LoggingConfigError) -> None:
 
 
 def _global_excepthook(
-    exc_type: type[BaseException],
+    _exc_type: type[BaseException],
     exc_value: BaseException,
-    exc_tb: object,
+    _exc_tb: object,
 ) -> None:
     """Hook globale assegnato a sys.excepthook che delega il dispatch a handle_exception."""
     handle_exception(exc_value)

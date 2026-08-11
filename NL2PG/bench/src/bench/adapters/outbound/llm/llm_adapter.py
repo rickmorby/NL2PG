@@ -4,6 +4,7 @@
 """
 
 from asyncio import all_tasks, gather, get_event_loop
+from contextlib import suppress
 from logging import getLogger
 from sys import modules
 from typing import Any
@@ -127,15 +128,13 @@ class LLMClientAdapter(LLMGeneratorPort):
     def close(self) -> None:
         """Rilascia le risorse di rete, i pool ed i meccanismi di cache dei client LLM."""
         if self._router is not None:
-            try:
+            with suppress(Exception):
                 self._router.reset()
-            except Exception:
-                pass
             self._router = None
 
-        try:
+        with suppress(Exception):
             if callable(close_litellm_async_clients):
-                try:
+                with suppress(Exception):
                     loop = get_event_loop()
                     if not loop.is_closed():
                         pending = [t for t in all_tasks(loop) if not t.done()]
@@ -144,15 +143,11 @@ class LLMClientAdapter(LLMGeneratorPort):
                         if not loop.is_running() and pending:
                             loop.run_until_complete(gather(*pending, return_exceptions=True))
                         if loop.is_running():
-                            loop.create_task(close_litellm_async_clients())
+                            self._async_close_task = loop.create_task(close_litellm_async_clients())
                         else:
                             loop.run_until_complete(close_litellm_async_clients())
-                except Exception:
-                    pass
             if isinstance(in_memory_llm_clients_cache, dict):
                 in_memory_llm_clients_cache.clear()
-        except Exception as e:
-            _log.debug("Rilascio risorse LiteLLM completato: %s", e)
 
     @classmethod
     def _build_model_list(cls, config: dict[str, Any]) -> list[dict[str, Any]]:

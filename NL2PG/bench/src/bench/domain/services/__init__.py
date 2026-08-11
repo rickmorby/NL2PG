@@ -12,12 +12,12 @@ from bench.domain.services.spec_validation import validate_spec
 from bench.domain.services.weighted_mean import weighted_mean
 
 __all__: list[str] = [
-    "AnalyticsCalculator",
-    "CoverageValidator",
-    "CoverageResult",
     "DOMAIN_POOL",
-    "FeatureChecker",
+    "AnalyticsCalculator",
+    "CoverageResult",
+    "CoverageValidator",
     "FeatureCheckResult",
+    "FeatureChecker",
     "PostgresSQLRepair",
     "validate_spec",
     "weighted_mean",
