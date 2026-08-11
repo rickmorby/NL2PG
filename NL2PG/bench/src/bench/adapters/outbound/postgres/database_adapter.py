@@ -8,7 +8,7 @@ from logging import getLogger
 from threading import Lock
 from typing import Any, Generator
 
-from psycopg import Connection, errors as pg_errors, rows, sql
+from psycopg import Connection, errors as pg_errors, sql
 from psycopg_pool import ConnectionPool
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.engine import make_url
@@ -101,14 +101,6 @@ class PostgresClientAdapter(DatabasePort):
                 handle_exception(e)
             resolved = default_dsn
         return resolved
-
-    def get_sandbox_dsn(self) -> str:
-        """Restituisce il DSN del database sandbox."""
-        return self._sandbox_dsn
-
-    def get_meta_dsn(self) -> str:
-        """Restituisce il DSN del database dei metadati."""
-        return self._meta_dsn
 
     def get_meta_engine(self) -> Engine:
         """Restituisce l'Engine SQLAlchemy dei metadati con thread locking a doppi controlli."""
@@ -218,21 +210,6 @@ class PostgresClientAdapter(DatabasePort):
                 return cols, cur.fetchall()
         except pg_errors.Error as e:
             raise DatabaseClientError(f"Errore durante l'esecuzione della query SELECT: {e}") from e
-
-    def execute_query_dict(
-        self,
-        conn: Connection,
-        query: str,
-        params: tuple[Any, ...] | dict[str, Any] | None = None,
-    ) -> list[dict[str, Any]]:
-        """Esegue una query SELECT e restituisce i risultati sotto forma di dizionari."""
-        try:
-            with conn.cursor(row_factory=rows.dict_row) as cur:
-                cur.execute(f"SET statement_timeout = '{self._statement_timeout_ms}ms'")
-                cur.execute(query, params)
-                return cur.fetchall()
-        except pg_errors.Error as e:
-            raise DatabaseClientError(f"Errore durante l'esecuzione della query dict: {e}") from e
 
     def close(self) -> None:
         """Chiude i pool ed inattiva l'Engine SQLAlchemy del client."""

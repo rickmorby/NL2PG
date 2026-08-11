@@ -38,10 +38,6 @@ class PostgresSandboxAdapter(SandboxPort):
         self._schema_regex = re_compile(r"^task_[a-z0-9]{12}$")
         self._repair = PostgresSQLRepair()
 
-    def get_client(self) -> PostgresClientAdapter:
-        """Restituisce il client di trasporto PostgreSQL."""
-        return self._client
-
     def create_fresh_schema(self) -> str:
         """Crea uno schema temporaneo univoco ed isolato per un task del benchmark."""
         with self._client.get_sandbox_connection() as conn:

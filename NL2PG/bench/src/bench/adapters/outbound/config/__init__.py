@@ -24,10 +24,6 @@ class ConfigAdapter(ConfigPort):
         """Salva il percorso della directory di configurazione."""
         self._dir = config_dir
 
-    def get_config_dir(self) -> Path:
-        """Restituisce il percorso della directory di configurazione."""
-        return self._dir
-
     def load_providers(self) -> dict:
         """Restituisce il contenuto di providers.json come dict."""
         path = self._dir / "providers.json"

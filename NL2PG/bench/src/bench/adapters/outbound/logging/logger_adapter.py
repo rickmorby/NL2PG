@@ -27,14 +27,6 @@ class LoggingAdapter(LoggerPort):
         self._config_dir = base_dir / "config"
         self._log_dir = base_dir / "logs"
 
-    def get_config_dir(self) -> Path:
-        """Restituisce la directory contenente i file di configurazione."""
-        return self._config_dir
-
-    def get_log_dir(self) -> Path:
-        """Restituisce la directory dei file di log."""
-        return self._log_dir
-
     def configure(self) -> None:
         """Applica la configurazione del logging dal file JSON ed integra le dipendenze esterne."""
         self._log_dir.mkdir(parents=True, exist_ok=True)
