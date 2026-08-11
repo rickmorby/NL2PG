@@ -32,6 +32,7 @@ class TaskRunner:
         meta_repo: MetaRepositoryPort,
         serializer: BenchmarkSerializerPort,
         config: ConfigPort,
+        *,
         analytics: object | None = None,
         base_output_dir: Path | None = None,
     ) -> None:
@@ -74,11 +75,7 @@ class TaskRunner:
 
         if batch_size > 1:
             summary = self._run_parallel(
-                run_id=run_id,
-                output_file=run_file,
-                count=count,
-                category=category,
-                batch_size=batch_size,
+                run_info=(run_id, run_file, count, category, batch_size),
                 bench_cfg=bench_cfg,
             )
         else:
@@ -114,19 +111,17 @@ class TaskRunner:
         result_state: TaskStateDTO,
         accepted_tasks: list[TaskStateDTO],
         counts: dict[str, int],
-        output_file: Path,
+        run_file: Path,
         bench_cfg: dict,
-        pbar: tqdm,
     ) -> int:
         """Elabora l'esito di un task aggiornando i contatori, la barra ed il file di output."""
         verdict = result_state.verdict
         if verdict in ("accepted", "accept"):
             with self._lock:
                 accepted_tasks.append(result_state)
-                pbar.update(1)
                 weights = bench_cfg.get("critic", {}).get("weights", {})
                 doc = self._serializer.build_document(accepted_tasks, result_state.run_id, weights)
-                self._serializer.write(doc, output_file)
+                self._serializer.write(doc, run_file)
             return 0
         if verdict == "rejected":
             counts["rejected"] += 1
@@ -159,8 +154,10 @@ class TaskRunner:
                 self._meta_repo.save_task(run_id, result_state)
 
                 fail_delta = self._process_verdict(
-                    result_state, accepted_tasks, counts, output_file, bench_cfg, pbar
+                    result_state, accepted_tasks, counts, output_file, bench_cfg
                 )
+                if result_state.verdict in ("accepted", "accept"):
+                    pbar.update(1)
                 if fail_delta > 0:
                     consecutive_failures += fail_delta
                     if consecutive_failures >= max_fails:
@@ -188,14 +185,11 @@ class TaskRunner:
 
     def _run_parallel(
         self,
-        run_id: str,
-        output_file: Path,
-        count: int,
-        category: str,
-        batch_size: int,
+        run_info: tuple[str, Path, int, str, int],
         bench_cfg: dict,
     ) -> BatchSummaryDTO:
         """Esegue la generazione parallela in batch tramite ThreadPoolExecutor con Lock."""
+        run_id, output_file, count, category, batch_size = run_info
         categories = list(self._config.load_categories().keys())
         max_fails = bench_cfg.get("cli", {}).get("max_consecutive_failures", 5)
         accepted_tasks: list[TaskStateDTO] = []
@@ -222,8 +216,10 @@ class TaskRunner:
                         result_state = fut.result()
                         self._meta_repo.save_task(run_id, result_state)
                         fail_delta = self._process_verdict(
-                            result_state, accepted_tasks, counts, output_file, bench_cfg, pbar
+                            result_state, accepted_tasks, counts, output_file, bench_cfg
                         )
+                        if result_state.verdict in ("accepted", "accept"):
+                            pbar.update(1)
                         if fail_delta > 0:
                             consecutive_failures += fail_delta
                         else:

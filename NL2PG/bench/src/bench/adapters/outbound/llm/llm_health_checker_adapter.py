@@ -24,40 +24,7 @@ class LLMHealthCheckerAdapter:
 
     def check_all_providers(self, check_models: bool = True) -> SystemHealthReportDTO:
         """Esegue la diagnosi multilivello dei provider e dei modelli fisici univoci."""
-        models = self._config.get("models", {})
-        chains = self._config.get("chains", {})
-
-        mid_roles: dict[str, list[str]] = {}
-        for role, m_list in chains.items():
-            for m_id in m_list:
-                if m_id not in mid_roles:
-                    mid_roles[m_id] = []
-                mid_roles[m_id].append(role)
-
-        providers_grouped: dict[
-            tuple[str, str, str], dict[str, dict[str, Any]]
-        ] = {}
-
-        for m_id, m_info in models.items():
-            p_name = m_info.get("provider", "openai")
-            base_url = m_info.get("base_url", "https://api.openai.com/v1")
-            api_key = m_info.get("api_key", "")
-            target_model = m_info.get("model", "")
-            roles = mid_roles.get(m_id, [])
-
-            p_key = (p_name, base_url, api_key)
-            if p_key not in providers_grouped:
-                providers_grouped[p_key] = {}
-
-            if target_model not in providers_grouped[p_key]:
-                providers_grouped[p_key][target_model] = {
-                    "model_ids": [],
-                    "roles": set(),
-                    "info": m_info,
-                }
-            providers_grouped[p_key][target_model]["model_ids"].append(m_id)
-            providers_grouped[p_key][target_model]["roles"].update(roles)
-
+        providers_grouped = self._group_physical_models()
         provider_reports: list[ProviderHealthDTO] = []
         total_physical_models = 0
         healthy_models_count = 0
@@ -78,9 +45,7 @@ class LLMHealthCheckerAdapter:
                         if check_models:
                             m_report = self._check_model_health(
                                 client=client,
-                                model_id=data["model_ids"][0],
-                                target_model=t_model,
-                                roles=sorted_roles,
+                                model_info=(data["model_ids"][0], t_model, sorted_roles),
                                 endpoint=(base_url, api_key),
                                 server_models=server_models,
                             )
@@ -118,6 +83,42 @@ class LLMHealthCheckerAdapter:
             healthy_models=healthy_models_count if check_models else total_physical_models,
             providers=provider_reports,
         )
+
+    def _group_physical_models(self) -> dict[tuple[str, str, str], dict[str, dict[str, Any]]]:
+        """Raggruppa i modelli fisici e i loro ruoli per provider."""
+        models = self._config.get("models", {})
+        chains = self._config.get("chains", {})
+
+        mid_roles: dict[str, list[str]] = {}
+        for role, m_list in chains.items():
+            for m_id in m_list:
+                if m_id not in mid_roles:
+                    mid_roles[m_id] = []
+                mid_roles[m_id].append(role)
+
+        providers_grouped: dict[tuple[str, str, str], dict[str, dict[str, Any]]] = {}
+
+        for m_id, m_info in models.items():
+            p_name = m_info.get("provider", "openai")
+            base_url = m_info.get("base_url", "https://api.openai.com/v1")
+            api_key = m_info.get("api_key", "")
+            target_model = m_info.get("model", "")
+            roles = mid_roles.get(m_id, [])
+
+            p_key = (p_name, base_url, api_key)
+            if p_key not in providers_grouped:
+                providers_grouped[p_key] = {}
+
+            if target_model not in providers_grouped[p_key]:
+                providers_grouped[p_key][target_model] = {
+                    "model_ids": [],
+                    "roles": set(),
+                    "info": m_info,
+                }
+            providers_grouped[p_key][target_model]["model_ids"].append(m_id)
+            providers_grouped[p_key][target_model]["roles"].update(roles)
+
+        return providers_grouped
 
     def _check_provider_endpoint(
         self, client: Client, provider_name: str, base_url: str, api_key: str
@@ -168,13 +169,12 @@ class LLMHealthCheckerAdapter:
     def _check_model_health(
         self,
         client: Client,
-        model_id: str,
-        target_model: str,
-        roles: list[str],
+        model_info: tuple[str, str, list[str]],
         endpoint: tuple[str, str],
         server_models: set[str],
     ) -> ModelHealthDTO:
         """Invia un ping di completamento per verificare la reale fruibilità del modello."""
+        model_id, target_model, roles = model_info
         base_url, api_key = endpoint
         is_available = bool(
             not server_models

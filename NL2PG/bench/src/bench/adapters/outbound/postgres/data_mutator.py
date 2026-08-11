@@ -201,19 +201,17 @@ class PostgresDataMutator:
 
     def _gen_mutation(self, old_val: Any, col_type: str, max_len: int | None) -> Any:
         """Genera un valore mutato per un dato tipo di colonna."""
-        if "int" in col_type or "numeric" in col_type or "decimal" in col_type:
-            return (old_val or 0) + 1
-        if "real" in col_type or "double" in col_type:
-            return (old_val or 0) + 1.0
-        if "char" in col_type or "text" in col_type:
-            base = "m_" + (str(old_val) if old_val is not None else "")
-            if max_len and len(base) > max_len:
-                base = base[:max_len]
-            return base
-        if col_type == "boolean":
-            return not bool(old_val)
-        if "date" in col_type or "timestamp" in col_type:
-            if old_val is None:
-                return date.today()
-            return old_val + timedelta(days=1)
-        return None
+        match col_type:
+            case t if any(k in t for k in ("int", "numeric", "decimal")):
+                return (old_val or 0) + 1
+            case t if any(k in t for k in ("real", "double")):
+                return (old_val or 0) + 1.0
+            case t if any(k in t for k in ("char", "text")):
+                base = "m_" + (str(old_val) if old_val is not None else "")
+                return base[:max_len] if max_len and len(base) > max_len else base
+            case "boolean":
+                return not bool(old_val)
+            case t if any(k in t for k in ("date", "timestamp")):
+                return date.today() if old_val is None else old_val + timedelta(days=1)
+            case _:
+                return None

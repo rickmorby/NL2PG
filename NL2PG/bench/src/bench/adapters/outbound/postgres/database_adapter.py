@@ -32,13 +32,16 @@ class PostgresClientAdapter(DatabasePort):
         sandbox_dsn: str = "",
         meta_dsn: str = "",
         config: dict[str, Any] | None = None,
-        min_size: int = 1,
-        max_size: int = 10,
-        statement_timeout_ms: int = 5000,
-        lock_timeout_ms: int = 5000,
+        options: dict[str, Any] | None = None,
     ):
         """Inizializza l'adattatore creando i pool ed il sessionmaker dei metadati."""
         self._config = config or {}
+        opts = options or {}
+        min_size = opts.get("min_size", 1)
+        max_size = opts.get("max_size", 10)
+        statement_timeout_ms = opts.get("statement_timeout_ms", 5000)
+        lock_timeout_ms = opts.get("lock_timeout_ms", 5000)
+
         default_sandbox = "postgresql://bench:bench@127.0.0.1:5432/bench_sandbox"
         default_meta = "postgresql://bench:bench@127.0.0.1:5432/bench_meta"
 

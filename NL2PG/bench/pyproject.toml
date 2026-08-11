@@ -56,6 +56,8 @@ select = [
     "ARG",
     "PL",
     "RUF",
+    "A",
+    "C90",
 ]
 ignore = [
     "D203",  # 1 blank line required before class docstring
@@ -63,9 +65,7 @@ ignore = [
     "D213",  # Multi-line docstring summary should start at the second line
     "D401",  # First line of docstring should be in imperative mood
     "D105",  # Missing docstring in magic method
-    "PLR0913", # Too many arguments in function definition
+    "PLR0913", # Too many arguments in function definition (Composition Root DI)
     "PLR0917", # Too many positional arguments
-    "PLR0911", # Too many return statements
-    "PLR0912", # Too many branches
     "PLW0108", # Lambda unnecessarily wrapping function call
 ]

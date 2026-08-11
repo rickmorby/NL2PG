@@ -4,13 +4,15 @@
 """
 
 from dataclasses import dataclass
+
 from sqlglot import exp, find_tables, parse_one
 from sqlglot.errors import ParseError
-from bench.domain.ports.outbound.sandbox_port import SandboxPort
-from bench.domain.models.sql import GoldQueryDTO, GoldResultDTO
-from bench.domain.models.spec import SpecDTO
-from bench.domain.services.feature_checker import FeatureChecker
+
 from bench.application.validators.mutation_tester import MutationTester
+from bench.domain.models.spec import SpecDTO
+from bench.domain.models.sql import GoldQueryDTO, GoldResultDTO
+from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.domain.services.feature_checker import FeatureChecker
 
 
 @dataclass
@@ -40,61 +42,71 @@ class QueryValidator:
         self, query: GoldQueryDTO, spec: SpecDTO, schema: str
     ) -> QueryValidationResult:
         """Esegue la query, verifica feature e mutazioni, e restituisce il risultato gold."""
+        ast_err, tree = self._validate_ast_rules(query, spec)
+        if ast_err:
+            return QueryValidationResult(is_valid=False, error=ast_err)
+
+        return self._validate_execution(query, schema, tree)
+
+    def _validate_ast_rules(
+        self, query: GoldQueryDTO, spec: SpecDTO
+    ) -> tuple[str, exp.Expression | None]:
+        """Verifica la sintassi, l'assenza di schemi espliciti, ORDER BY e feature."""
         try:
             tree = parse_one(query.query, read="postgres")
         except ParseError as pe:
-            return QueryValidationResult(
-                is_valid=False, error=f"Errore di sintassi SQL nella Gold Query: {pe}"
-            )
+            return f"Errore di sintassi SQL nella Gold Query: {pe}", None
 
         if self._has_explicit_schema(tree):
-            return QueryValidationResult(
-                is_valid=False,
-                error=(
-                    "Qualificazione esplicita dello schema non ammessa "
-                    "(es. scrivi 'FROM tabella', non 'FROM schema.tabella')."
-                ),
+            msg = (
+                "Qualificazione esplicita dello schema non ammessa "
+                "(es. scrivi 'FROM tabella', non 'FROM schema.tabella')."
             )
+            return msg, None
+
+        if query.order_sensitive and not self._has_root_order_by(tree):
+            msg = (
+                "La query ha order_sensitive=true ma manca della clausola ORDER BY "
+                "nella query principale della SELECT."
+            )
+            return msg, None
+
+        feat_res = self._feature_checker.check(tree, spec.sql_features)
+        if not feat_res.is_valid:
+            msg = (
+                f"La query SQL non contiene le seguenti feature obbligatorie richieste: "
+                f"{', '.join(feat_res.missing)}."
+            )
+            return msg, None
+
+        return "", tree
+
+    def _validate_execution(
+        self, query: GoldQueryDTO, schema: str, tree: exp.Expression | None
+    ) -> QueryValidationResult:
+        """Esegue la query nel sandbox PostgreSQL e valida righe, tabelle e mutazioni."""
         try:
             cols, rows = self._sandbox.run_query(schema, query.query)
         except Exception as e:
-            return QueryValidationResult(
-                is_valid=False, error=f"Errore di esecuzione SQL in PostgreSQL: {e}"
-            )
+            msg = f"Errore di esecuzione SQL in PostgreSQL: {e}"
+            return QueryValidationResult(is_valid=False, error=msg)
+
         if not rows:
-            return QueryValidationResult(
-                is_valid=False,
-                error=(
-                    "La query ha restituito un risultato vuoto (0 righe). "
-                    "Inserisci dati o modifica la query in modo da restituire risultati validi."
-                ),
+            msg = (
+                "La query ha restituito un risultato vuoto (0 righe). "
+                "Inserisci dati o modifica la query in modo da restituire risultati validi."
             )
-        if query.order_sensitive and not self._has_root_order_by(tree):
-            return QueryValidationResult(
-                is_valid=False,
-                error=(
-                    "La query ha order_sensitive=true ma manca della clausola ORDER BY "
-                    "nella query principale della SELECT."
-                ),
-            )
-        feat_result = self._feature_checker.check(tree, spec.sql_features)
-        if not feat_result.is_valid:
-            return QueryValidationResult(
-                is_valid=False,
-                error=(
-                    f"La query SQL non contiene le seguenti feature obbligatorie richieste: "
-                    f"{', '.join(feat_result.missing)}."
-                ),
-            )
-        tables = self._tables_used(tree)
+            return QueryValidationResult(is_valid=False, error=msg)
+
+        tables = self._tables_used(tree) if tree else []
         if not tables:
-            return QueryValidationResult(
-                is_valid=False,
-                error="La query SQL non utilizza alcuna tabella del database.",
-            )
-        mut_result = self._mutation_tester.test(schema, query.query, tables)
-        if not mut_result.is_valid:
-            return QueryValidationResult(is_valid=False, error=mut_result.error)
+            msg = "La query SQL non utilizza alcuna tabella del database."
+            return QueryValidationResult(is_valid=False, error=msg)
+
+        mut_res = self._mutation_tester.test(schema, query.query, tables)
+        if not mut_res.is_valid:
+            return QueryValidationResult(is_valid=False, error=mut_res.error)
+
         gold = self._build_gold(query, cols, rows)
         return QueryValidationResult(is_valid=True, gold_result=gold)
 
@@ -122,9 +134,3 @@ class QueryValidator:
         return GoldResultDTO(
             columns=cols, rows=raw_rows, order_sensitive=query.order_sensitive
         )
-
-
-
-
-
-
