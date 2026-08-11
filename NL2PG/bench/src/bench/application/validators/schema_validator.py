@@ -3,32 +3,28 @@
 :author: Riccardo Morabito
 """
 
-from dataclasses import dataclass
-from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.application.validators.base import AbstractSandboxValidator
+from bench.domain.models.base import AbstractDTO
 from bench.domain.models.sql import SchemaDDLDTO
 
 
-@dataclass
-class ValidationResult:
-    """Esito della validazione di uno script DDL o INSERT."""
+class SchemaValidator(AbstractSandboxValidator):
+    """Validatore applicativo per l'esecuzione DDL su PostgreSQL Sandbox (GoF Template Method)."""
 
-    is_valid: bool = True
-    error: str = ""
+    def _extract_sql(self, dto: AbstractDTO) -> str:
+        """Estrae lo script DDL dal DTO."""
+        if isinstance(dto, SchemaDDLDTO):
+            return dto.ddl
+        return ""
 
+    def _execute_sql(self, schema: str, sql_text: str) -> None:
+        """Esegue il DDL nello schema sandbox."""
+        self._sandbox.execute_ddl(schema, sql_text)
 
-class SchemaValidator:
-    """Validatore applicativo che verifica l'eseguibilita' di uno script DDL su PostgreSQL."""
+    def _empty_error_msg(self) -> str:
+        """Restituisce il messaggio per DDL vuoto."""
+        return "DDL vuoto"
 
-    def __init__(self, sandbox: SandboxPort):
-        """Inizializza il validatore con la porta sandbox per l'esecuzione DDL."""
-        self._sandbox = sandbox
-
-    def validate(self, ddl: SchemaDDLDTO, schema: str) -> ValidationResult:
-        """Esegue il DDL nel sandbox e restituisce l'esito."""
-        if not ddl.ddl.strip():
-            return ValidationResult(is_valid=False, error="DDL vuoto")
-        try:
-            self._sandbox.execute_ddl(schema, ddl.ddl)
-            return ValidationResult()
-        except Exception as e:
-            return ValidationResult(is_valid=False, error=f"Esecuzione DDL fallita: {e}")
+    def _failure_error_prefix(self) -> str:
+        """Restituisce il prefisso di errore per fallimento DDL."""
+        return "Esecuzione DDL fallita"

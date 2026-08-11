@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from bench.domain.models.analytics import AnalyticsDTO
+from bench.domain.ports.inbound.analytics_port import AnalyticsServicePort
 from bench.domain.ports.outbound.plotter_port import PlotterPort
 from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
 from bench.domain.services.analytics_calculator import AnalyticsCalculator
@@ -15,7 +16,7 @@ from bench.domain.services.analytics_calculator import AnalyticsCalculator
 _log = getLogger("bench.application.analytics")
 
 
-class BenchmarkAnalyticsService:
+class BenchmarkAnalyticsService(AnalyticsServicePort):
     """Servizio applicativo facade che coordina dominio, serializzatore e porta grafica."""
 
     def __init__(

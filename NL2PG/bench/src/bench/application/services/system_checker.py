@@ -6,13 +6,14 @@
 from logging import getLogger
 
 from bench.domain.models.llm import ConfigCheckResultDTO, SystemHealthReportDTO
+from bench.domain.ports.inbound.system_checker_port import SystemCheckPort
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 _log = getLogger("bench.application.system_checker")
 
 
-class SystemCheckService:
+class SystemCheckService(SystemCheckPort):
     """Servizio applicativo per i controlli di diagnosi e configurazione."""
 
     def __init__(self, config: ConfigPort, llm: LLMGeneratorPort) -> None:

@@ -48,6 +48,13 @@ from bench.application.validators.mutation_tester import MutationTester
 from bench.application.validators.query_validator import QueryValidator
 from bench.application.validators.schema_validator import SchemaValidator
 from bench.domain.exceptions import install_global_handler
+from bench.domain.ports.inbound import (
+    AnalyticsServicePort,
+    DatabaseCleanerPort,
+    SystemCheckPort,
+    TaskPromoterPort,
+    TaskRunnerPort,
+)
 from bench.domain.services.feature_checker import FeatureChecker
 
 
@@ -98,8 +105,8 @@ class ApplicationBootstrap:
         return self._base_dir
 
 
-    def task_runner(self) -> TaskRunner:
-        """Restituisce un TaskRunner per la generazione batch dei task."""
+    def task_runner(self) -> TaskRunnerPort:
+        """Restituisce la porta astratta TaskRunnerPort per la generazione batch dei task."""
         return TaskRunner(
             self._orchestrator,
             self._meta_repo,
@@ -108,20 +115,20 @@ class ApplicationBootstrap:
             analytics=self._analytics,
         )
 
-    def task_promoter(self) -> TaskPromoterService:
-        """Restituisce un TaskPromoterService per la promozione dei task accettati."""
+    def task_promoter(self) -> TaskPromoterPort:
+        """Restituisce la porta astratta TaskPromoterPort per la promozione dei task accettati."""
         return TaskPromoterService(self._serializer)
 
-    def database_cleaner(self) -> DatabaseCleanupService:
-        """Restituisce un DatabaseCleanupService per la pulizia degli schemi orfani."""
+    def database_cleaner(self) -> DatabaseCleanerPort:
+        """Restituisce la porta astratta DatabaseCleanerPort per la pulizia degli schemi orfani."""
         return DatabaseCleanupService(self._sandbox)
 
-    def system_checker(self) -> SystemCheckService:
-        """Restituisce un SystemCheckService per la diagnosi ed i controlli di salute."""
+    def system_checker(self) -> SystemCheckPort:
+        """Restituisce la porta astratta SystemCheckPort per la diagnosi ed i controlli."""
         return SystemCheckService(self._config, self._llm)
 
-    def analytics(self) -> BenchmarkAnalyticsService:
-        """Restituisce un BenchmarkAnalyticsService per la visualizzazione ed analisi."""
+    def analytics(self) -> AnalyticsServicePort:
+        """Restituisce la porta astratta AnalyticsServicePort per la visualizzazione ed analisi."""
         return self._analytics
 
 

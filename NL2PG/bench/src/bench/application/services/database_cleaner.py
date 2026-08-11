@@ -5,12 +5,13 @@
 
 from logging import getLogger
 
+from bench.domain.ports.inbound.database_cleaner_port import DatabaseCleanerPort
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
 
 _log = getLogger("bench.application.database_cleaner")
 
 
-class DatabaseCleanupService:
+class DatabaseCleanupService(DatabaseCleanerPort):
     """Servizio applicativo che coordina la pulizia degli schemi orfani."""
 
     def __init__(self, sandbox: SandboxPort) -> None:

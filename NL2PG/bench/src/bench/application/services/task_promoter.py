@@ -6,12 +6,13 @@
 from logging import getLogger
 from pathlib import Path
 
+from bench.domain.ports.inbound.task_promoter_port import TaskPromoterPort
 from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
 
 _log = getLogger("bench.application.task_promoter")
 
 
-class TaskPromoterService:
+class TaskPromoterService(TaskPromoterPort):
     """Servizio applicativo che coordina la promozione dei task accettati."""
 
     def __init__(self, serializer: BenchmarkSerializerPort) -> None:

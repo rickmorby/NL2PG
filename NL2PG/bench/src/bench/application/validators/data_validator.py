@@ -3,24 +3,28 @@
 :author: Riccardo Morabito
 """
 
-from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.application.validators.base import AbstractSandboxValidator
+from bench.domain.models.base import AbstractDTO
 from bench.domain.models.sql import DataInsertsDTO
-from bench.application.validators.schema_validator import ValidationResult
 
 
-class DataValidator:
-    """Validatore applicativo che verifica l'eseguibilita' delle INSERT su PostgreSQL."""
+class DataValidator(AbstractSandboxValidator):
+    """Validatore applicativo per le INSERT su PostgreSQL Sandbox (GoF Template Method)."""
 
-    def __init__(self, sandbox: SandboxPort):
-        """Inizializza il validatore con la porta sandbox per l'esecuzione INSERT."""
-        self._sandbox = sandbox
+    def _extract_sql(self, dto: AbstractDTO) -> str:
+        """Estrae lo script INSERT dal DTO."""
+        if isinstance(dto, DataInsertsDTO):
+            return dto.inserts
+        return ""
 
-    def validate(self, inserts: DataInsertsDTO, schema: str) -> ValidationResult:
-        """Esegue le INSERT nel sandbox e restituisce l'esito."""
-        if not inserts.inserts.strip():
-            return ValidationResult(is_valid=False, error="INSERT vuoti")
-        try:
-            self._sandbox.execute_inserts(schema, inserts.inserts)
-            return ValidationResult()
-        except Exception as e:
-            return ValidationResult(is_valid=False, error=f"Inserimento dati fallito: {e}")
+    def _execute_sql(self, schema: str, sql_text: str) -> None:
+        """Esegue le INSERT nello schema sandbox."""
+        self._sandbox.execute_inserts(schema, sql_text)
+
+    def _empty_error_msg(self) -> str:
+        """Restituisce il messaggio per INSERT vuote."""
+        return "INSERT vuoti"
+
+    def _failure_error_prefix(self) -> str:
+        """Restituisce il prefisso di errore per fallimento INSERT."""
+        return "Inserimento dati fallito"
