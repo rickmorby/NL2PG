@@ -108,5 +108,5 @@ class CalibrationAgent(AbstractAgent):
 
         if gold.order_sensitive:
             return [list(r) for r in rows] == gold.rows
-        return Counter(rows) == Counter(tuple(r) for r in gold.rows)
+        return Counter(rows) == Counter(gold.rows)
 

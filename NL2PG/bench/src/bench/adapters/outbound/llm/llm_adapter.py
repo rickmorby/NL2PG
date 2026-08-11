@@ -126,7 +126,7 @@ class LLMClientAdapter(LLMGeneratorPort):
 
     def close(self) -> None:
         """Rilascia le risorse di rete, i pool ed i meccanismi di cache dei client LLM."""
-        if hasattr(self, "_router") and self._router is not None:
+        if self._router is not None:
             try:
                 self._router.reset()
             except Exception:

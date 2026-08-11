@@ -3,8 +3,6 @@
 :author: Riccardo Morabito
 """
 
-from typing import Any
-
 from bench.application.agents.base import AbstractAgent
 from bench.domain.models.nlp import CriticScoresDTO
 from bench.domain.models.state import TaskStateDTO
@@ -31,10 +29,6 @@ class CriticAgent(AbstractAgent):
     def output_schema(self) -> type:
         """Restituisce CriticScoresDTO come schema per lo structured output."""
         return CriticScoresDTO
-
-    def validate(self, _output: Any, _state: TaskStateDTO) -> tuple[bool, str, dict]:
-        """I vincoli sui punteggi [1.0, 10.0] sono validati nativamente dal DTO CriticScoresDTO."""
-        return True, "", {}
 
     def build_updates(self, output: CriticScoresDTO, _state: TaskStateDTO) -> dict:
         """Aggiorna lo stato con critic."""

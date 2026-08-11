@@ -93,7 +93,7 @@ class TaskRunner:
         duration = round(time() - start_time, 2)
         summary.duration_seconds = duration
 
-        if self._analytics and hasattr(self._analytics, "generate_analytics"):
+        if self._analytics:
             try:
                 self._analytics.generate_analytics(run_file)
             except Exception as e:

@@ -4,7 +4,6 @@
 """
 
 from bench.application.agents.base import AbstractAgent
-from bench.domain.exceptions import SpecDuplicatedError, handle_exception
 from bench.domain.models.category import CategoryDTO
 from bench.domain.models.spec import SpecDTO
 from bench.domain.models.state import TaskStateDTO
@@ -66,10 +65,6 @@ class SpecAgent(AbstractAgent):
                 f"Specifica duplicata per la categoria '{state.category}' (hash={spec_hash}). "
                 "Genera una specifica con un dominio, feature SQL o regole twist differenti."
             )
-            exc = SpecDuplicatedError(
-                msg, payload={"category": state.category, "spec_hash": spec_hash}
-            )
-            handle_exception(exc)
             return False, msg, {}
 
         return True, "", {}
