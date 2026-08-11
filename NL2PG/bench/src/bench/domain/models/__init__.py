@@ -7,7 +7,7 @@ from bench.domain.models.analytics import AnalyticsDTO
 from bench.domain.models.base import AbstractDTO
 from bench.domain.models.category import CategoryDTO
 from bench.domain.models.document import BatchSummaryDTO
-from bench.domain.models.llm import CallOptionsDTO, CallResultDTO
+from bench.domain.models.llm import CallOptionsDTO, CallResultDTO, ConfigCheckResultDTO
 from bench.domain.models.nlp import (
     CalibrationResultDTO,
     CriticScoresDTO,
@@ -44,5 +44,6 @@ __all__ = [
     "CalibrationResultDTO",
     "CallResultDTO",
     "CallOptionsDTO",
+    "ConfigCheckResultDTO",
     "TaskStateDTO",
 ]

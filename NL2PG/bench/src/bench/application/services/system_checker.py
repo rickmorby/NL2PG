@@ -1,27 +1,15 @@
-"""Servizio applicativo per i test di integrita' del sistema e health check dei provider LLM.
+"""Servizio applicativo per i test di integrità del sistema e health check dei provider LLM.
 
 :author: Riccardo Morabito
 """
 
-from dataclasses import dataclass
 from logging import getLogger
 
-from bench.domain.models.llm import SystemHealthReportDTO
+from bench.domain.models.llm import ConfigCheckResultDTO, SystemHealthReportDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 _log = getLogger("bench.application.system_checker")
-
-
-@dataclass
-class ConfigCheckResult:
-    """Esito del controllo di integrita' delle configurazioni."""
-
-    bench_loaded: bool = True
-    models_count: int = 0
-    categories_count: int = 0
-    config_hash: str = ""
-    categories_hash: str = ""
 
 
 class SystemCheckService:
@@ -32,8 +20,8 @@ class SystemCheckService:
         self._config = config
         self._llm = llm
 
-    def check_configurations(self) -> ConfigCheckResult:
-        """Carica le configurazioni e ne calcola gli hash di integrita'."""
+    def check_configurations(self) -> ConfigCheckResultDTO:
+        """Carica le configurazioni e ne calcola gli hash di integrità."""
         bench_cfg = self._config.load_bench()
         providers_cfg = self._config.load_providers()
         categories = self._config.load_categories()
@@ -41,7 +29,7 @@ class SystemCheckService:
         cfg_hash = self._config.config_hash(bench_cfg)
         cat_hash = self._config.config_hash({"categories": list(categories.keys())})
 
-        return ConfigCheckResult(
+        return ConfigCheckResultDTO(
             bench_loaded=bool(bench_cfg),
             models_count=len(providers_cfg.get("models", {})),
             categories_count=len(categories),

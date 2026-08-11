@@ -1,4 +1,4 @@
-"""Modulo DTO per le chiamate ed i controlli di diagnosi dei modelli LLM.
+"""Modulo DTO per le chiamate ed i controlli di diagnosi dei modelli LLM e configurazioni.
 
 :author: Riccardo Morabito
 """
@@ -25,10 +25,14 @@ class CallOptionsDTO(AbstractDTO):
     error_feedback: str | None = None
 
 
-class HealthCheckDTO(AbstractDTO):
-    """DTO diagnostico leggero per i test di connettività dei provider LLM."""
+class ConfigCheckResultDTO(AbstractDTO):
+    """Esito del controllo di integrità delle configurazioni del sistema."""
 
-    status: str = "ok"
+    bench_loaded: bool = True
+    models_count: int = 0
+    categories_count: int = 0
+    config_hash: str = ""
+    categories_hash: str = ""
 
 
 class ModelHealthDTO(AbstractDTO):
