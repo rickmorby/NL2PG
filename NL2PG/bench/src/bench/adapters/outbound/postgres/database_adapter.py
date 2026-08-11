@@ -14,11 +14,7 @@ from sqlalchemy import Engine, create_engine
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
 
-from bench.domain.exceptions import (
-    ConfigurationMissingFieldError,
-    DatabaseClientError,
-    handle_exception,
-)
+from bench.domain.exceptions import DatabaseClientError
 from bench.domain.ports.outbound.database_port import DatabasePort
 
 _log = getLogger("bench.adapters.postgres")
@@ -48,7 +44,6 @@ class PostgresClientAdapter(DatabasePort):
         self._meta_dsn = self._resolve_dsn(
             meta_dsn, ("meta_dsn",), default_meta, "meta"
         )
-        self._statement_timeout_ms = statement_timeout_ms
         self._statement_timeout_ms = statement_timeout_ms
         self._lock_timeout_ms = lock_timeout_ms
         self._engine_lock = Lock()
@@ -96,8 +91,7 @@ class PostgresClientAdapter(DatabasePort):
                 f"La DSN per il database {db_type} non è stata fornita nella configurazione. "
                 f"Viene utilizzato il valore di fallback '{default_dsn}'."
             )
-            exc = ConfigurationMissingFieldError(msg, payload={"default": default_dsn})
-            handle_exception(exc)
+            _log.warning(msg)
             resolved = default_dsn
         return resolved
 
