@@ -1,0 +1,19 @@
+{
+  "run_id": "run-cdae4089000c",
+  "generated_at": "2026-08-12T16:26:23Z",
+  "total_tasks": 1,
+  "difficulty_distribution": {
+    "hard": 1
+  },
+  "domain_distribution": {
+    "logistica": 1
+  },
+  "sql_feature_counts": {
+    "group_agg": 1,
+    "having": 1
+  },
+  "twist_type_counts": {},
+  "avg_critic_scores": {},
+  "avg_pass_rate": 0.0,
+  "plots_count": 0
+}
