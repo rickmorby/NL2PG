@@ -56,6 +56,7 @@
   "retry": {
     "num_retries": 0,
     "cooldown_time_seconds": 15,
-    "allowed_fails": 1
+    "allowed_fails": 1,
+    "stream_timeout": 60
   }
 }

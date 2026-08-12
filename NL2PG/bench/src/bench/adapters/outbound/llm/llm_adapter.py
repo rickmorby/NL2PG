@@ -14,6 +14,7 @@ from litellm import (
     Router,
     close_litellm_async_clients,
     in_memory_llm_clients_cache,
+    stream_chunk_builder,
 )
 from pydantic import BaseModel, ValidationError
 
@@ -70,6 +71,7 @@ class LLMClientAdapter(LLMGeneratorPort):
         num_retries = retry_cfg.get("num_retries", 0)
         cooldown_time = retry_cfg.get("cooldown_time_seconds", 15)
         allowed_fails = retry_cfg.get("allowed_fails", 1)
+        self._stream_timeout = retry_cfg.get("stream_timeout", 60)
 
         self._router = Router(
             model_list=self._build_model_list(self._config),
@@ -78,6 +80,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             num_retries=num_retries,
             cooldown_time=cooldown_time,
             allowed_fails=allowed_fails,
+            stream_timeout=self._stream_timeout,
             set_verbose=False,
         )
 
@@ -106,11 +109,24 @@ class LLMClientAdapter(LLMGeneratorPort):
             messages.append({"role": "user", "content": msg})
 
         try:
-            kwargs: dict[str, Any] = {"model": role, "messages": messages}
+            kwargs: dict[str, Any] = {
+                "model": role,
+                "messages": messages,
+                "stream": True,
+            }
             if opts.temperature_override is not None:
                 kwargs["temperature"] = opts.temperature_override
 
-            response = self._router.completion(**kwargs)
+            chunks = list(self._router.completion(**kwargs))
+            response = stream_chunk_builder(chunks, messages=messages)
+            if response is None:
+                msg_err = (
+                    "L'output del modello è vuoto. "
+                    "Il modello potrebbe aver esaurito i token nel ragionamento CoT. "
+                    "Rispondere ESCLUSIVAMENTE con JSON valido."
+                )
+                payload = {"schema": schema.__name__, "raw": ""}
+                raise ModelOutputContractError(msg_err, payload=payload)
             msg = response.choices[0].message
             content = getattr(msg, "content", None) or ""
 
