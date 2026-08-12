@@ -67,13 +67,9 @@ class CalibrationAgent(AbstractAgent):
             try:
                 prompt = self._prompts.load(self.prompt_name(), **self.build_kwargs(state))
                 opts = CallOptionsDTO(temperature_override=temp)
-                result = self._llm.call_model(
-                    chain_role, prompt, self.output_schema(), opts
-                )
+                result = self._llm.call_model(chain_role, prompt, self.output_schema(), opts)
                 last_model = result.model_used
-                if self._matches_gold(
-                    state.sandbox_schema, result.output.query, state.gold_result
-                ):
+                if self._matches_gold(state.sandbox_schema, result.output.query, state.gold_result):
                     passes += 1
                     if first_pass is None:
                         first_pass = i
@@ -106,7 +102,7 @@ class CalibrationAgent(AbstractAgent):
             else:
                 return False
 
+        rows = [list(row) for row in rows]
         if gold.order_sensitive:
-            return [list(r) for r in rows] == gold.rows
-        return Counter(rows) == Counter(gold.rows)
-
+            return rows == gold.rows
+        return Counter(map(tuple, rows)) == Counter(map(tuple, gold.rows))

@@ -155,9 +155,7 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
         """Estrae la cardinalità del risultato Gold."""
-        counts = Counter(
-            [len(t.get("gold", {}).get("result", {}).get("rows", [])) for t in tasks]
-        )
+        counts = Counter([len(t.get("gold", {}).get("result", {}).get("rows", [])) for t in tasks])
         xs = [f"{k} righe" for k in sorted(counts.keys())] or ["1 riga"]
         ys = [counts[k] for k in sorted(counts.keys())] or [1]
         return xs, ys

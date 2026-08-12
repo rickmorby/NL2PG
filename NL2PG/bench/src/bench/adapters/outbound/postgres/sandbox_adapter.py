@@ -59,9 +59,7 @@ class PostgresSandboxAdapter(SandboxPort):
 
     def execute_inserts(self, schema: str, inserts: str) -> None:
         """Valida l'AST degli INSERT tramite sqlglot ed inserisce i dati nello schema."""
-        self._execute_statements(
-            schema, inserts, allowed_types=(exp.Insert, exp.Tuple)
-        )
+        self._execute_statements(schema, inserts, allowed_types=(exp.Insert, exp.Tuple))
 
     def _execute_statements(
         self, schema: str, sql_text: str, allowed_types: tuple[type, ...]

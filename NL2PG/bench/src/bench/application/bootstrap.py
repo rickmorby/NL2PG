@@ -86,14 +86,15 @@ class ApplicationBootstrap:
 
         schema_validator = SchemaValidator(self._sandbox)
         mutation_tester = MutationTester(self._sandbox)
-        query_validator = QueryValidator(
-            self._sandbox, FeatureChecker(), mutation_tester
-        )
+        query_validator = QueryValidator(self._sandbox, FeatureChecker(), mutation_tester)
 
         agents = self._build_agents(schema_validator, query_validator)
 
         self._orchestrator = Orchestrator(
-            self._sandbox, self._config, self._meta_repo, agents,
+            self._sandbox,
+            self._config,
+            self._meta_repo,
+            agents,
         )
         self._serializer = JsonBenchmarkSerializerAdapter()
         self._plotter = SeabornPlotterAdapter()

@@ -24,4 +24,3 @@ class ModelOutputContractError(BenchException):
 
 class SpecDuplicatedError(BenchException):
     """Sollevata se la specifica generata dall'LLM risulta già presente su database."""
-

@@ -25,4 +25,3 @@ class MetaRepositoryPort(ABC):
     @abstractmethod
     def save_task(self, run_id: str, state: TaskStateDTO) -> None:
         """Esegue l'upsert dello stato di un task nella tabella bench_meta.tasks."""
-

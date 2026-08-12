@@ -11,13 +11,26 @@ from psycopg import Connection, sql
 from psycopg.errors import Error as PgError, ForeignKeyViolation
 from sqlglot import exp, parse_one
 
-_MUTATABLE_TYPES = frozenset({
-    "integer", "bigint", "smallint",
-    "numeric", "decimal", "real", "double precision",
-    "text", "character varying", "char", "character",
-    "boolean", "date", "timestamp without time zone",
-    "timestamp with time zone", "timestamp",
-})
+_MUTATABLE_TYPES = frozenset(
+    {
+        "integer",
+        "bigint",
+        "smallint",
+        "numeric",
+        "decimal",
+        "real",
+        "double precision",
+        "text",
+        "character varying",
+        "char",
+        "character",
+        "boolean",
+        "date",
+        "timestamp without time zone",
+        "timestamp with time zone",
+        "timestamp",
+    }
+)
 
 
 class PostgresDataMutator:
@@ -72,9 +85,7 @@ class PostgresDataMutator:
             conn.rollback()
             return None
 
-    def _try_mutations(
-        self, ctx: tuple, query: str, orig: list[tuple], attempts: int
-    ) -> bool:
+    def _try_mutations(self, ctx: tuple, query: str, orig: list[tuple], attempts: int) -> bool:
         """Tenta mutazioni casuali finche' una produce un risultato diverso."""
         conn, cur, tables, is_agg = ctx
         for _ in range(attempts):
@@ -124,9 +135,7 @@ class PostgresDataMutator:
         shuffle(candidates)
         return self._apply_mutation(conn, cur, table, candidates)
 
-    def _apply_mutation(
-        self, conn: Connection, cur: Any, table: str, candidates: list
-    ) -> bool:
+    def _apply_mutation(self, conn: Connection, cur: Any, table: str, candidates: list) -> bool:
         """Applica una mutazione a una colonna casuale di una riga."""
         for col_name, col_type, max_len in candidates:
             stmt = sql.SQL("SELECT ctid, {} FROM {} ORDER BY random() LIMIT 1").format(

@@ -23,9 +23,7 @@ class MutationTester:
         """Inietta la porta sandbox per l'esecuzione dei test di mutazione."""
         self._sandbox = sandbox
 
-    def test(
-        self, schema: str, query: str, tables: list[str], attempts: int = 3
-    ) -> MutationResult:
+    def test(self, schema: str, query: str, tables: list[str], attempts: int = 3) -> MutationResult:
         """Testa se la query e' sensibile a mutazioni dei dati nello schema sandbox."""
         ok, err = self._sandbox.test_data_mutation(schema, query, tables, attempts)
         return MutationResult(is_valid=ok, error=err)

@@ -77,13 +77,19 @@ class AbstractAgent(ABC):
                 err = f"Violazione vincoli contratto '{name}': {val_err}"
                 _log.info(
                     "Nodo '%s' (tentativo %d/%d) fallito: %s",
-                    name, i, max_attempts, val_err,
+                    name,
+                    i,
+                    max_attempts,
+                    val_err,
                 )
             except (ModelOutputContractError, ValidationError) as e:
                 err = f"Errore contratto output '{name}': {e}"
                 _log.info(
                     "Nodo '%s' (tentativo %d/%d) errore contratto: %s",
-                    name, i, max_attempts, e,
+                    name,
+                    i,
+                    max_attempts,
+                    e,
                 )
             except LLMClientError as e:
                 err = f"Errore infrastruttura LLM per nodo '{name}': {e}"
@@ -93,7 +99,10 @@ class AbstractAgent(ABC):
                 err = f"Errore invocazione agente '{name}': {e}"
                 _log.info(
                     "Nodo '%s' (tentativo %d/%d) eccezione: %s",
-                    name, i, max_attempts, e,
+                    name,
+                    i,
+                    max_attempts,
+                    e,
                 )
 
         _log.warning("Nodo '%s' esaurito dopo %d tentativi. Task scartato.", name, max_attempts)

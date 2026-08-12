@@ -40,7 +40,10 @@ class HardeningAgent(AbstractAgent):
         if not state.spec or not state.gold_query or not state.question:
             return False, "stato incompleto (mancano spec, gold_query o question)", {}
         result = self._coverage.validate(
-            output, state.question, state.gold_query, state.spec,
+            output,
+            state.question,
+            state.gold_query,
+            state.spec,
         )
         return (result.is_valid, result.error, {})
 
@@ -52,6 +55,9 @@ class HardeningAgent(AbstractAgent):
         """Esegue il retry loop solo se non ha superato max_rounds."""
         max_rounds = self._config.load_bench().get("hardening", {}).get("max_rounds", 3)
         if state.retry_hardening >= max_rounds:
-            return {"verdict": "scrapped", "last_error": "max hardening rounds",
-                    "retry_hardening": state.retry_hardening}
+            return {
+                "verdict": "scrapped",
+                "last_error": "max hardening rounds",
+                "retry_hardening": state.retry_hardening,
+            }
         return super().run(state, chain_role)

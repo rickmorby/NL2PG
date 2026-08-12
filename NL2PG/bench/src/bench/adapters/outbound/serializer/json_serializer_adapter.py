@@ -17,11 +17,15 @@ class JsonBenchmarkSerializerAdapter(BenchmarkSerializerPort):
     """Adattatore outbound per la serializzazione atomica su filesystem via orjson."""
 
     def build_document(
-        self, tasks: list[TaskStateDTO], run_id: str, weights: dict | None = None,
+        self,
+        tasks: list[TaskStateDTO],
+        run_id: str,
+        weights: dict | None = None,
     ) -> dict:
         """Costruisce il documento JSON della run con tutti i task accettati."""
         accepted = [
-            t for t in tasks
+            t
+            for t in tasks
             if t.verdict in ("accepted", "accept") and t.story and t.question and t.gold_result
         ]
         return {
@@ -71,7 +75,8 @@ class JsonBenchmarkSerializerAdapter(BenchmarkSerializerPort):
                     "columns": state.gold_result.columns if state.gold_result else [],
                     "rows": rows,
                     "order_sensitive": state.gold_result.order_sensitive
-                    if state.gold_result else False,
+                    if state.gold_result
+                    else False,
                 },
             },
         }

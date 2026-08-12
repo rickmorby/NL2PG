@@ -230,13 +230,11 @@ class TaskRunner(TaskRunnerPort):
                         counts["failed"] += 1
                         consecutive_failures += 1
 
-                    while len(futures) < batch_size and (
-                        len(accepted_tasks) + len(futures)
-                    ) < count:
+                    while (
+                        len(futures) < batch_size and (len(accepted_tasks) + len(futures)) < count
+                    ):
                         next_state = self._create_initial_state(category, categories)
-                        new_fut = executor.submit(
-                            self._orchestrator.run_task, next_state, run_id
-                        )
+                        new_fut = executor.submit(self._orchestrator.run_task, next_state, run_id)
                         futures[new_fut] = next_state.category
 
                     pbar.set_postfix(

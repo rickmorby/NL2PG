@@ -17,9 +17,7 @@ class JudgeAgent(AbstractAgent):
 
     def build_kwargs(self, state: TaskStateDTO) -> dict:
         """Costruisce i kwargs per il prompt del JudgeAgent."""
-        calib_str = (
-            state.calibration.model_dump_json() if state.calibration else "{}"
-        )
+        calib_str = state.calibration.model_dump_json() if state.calibration else "{}"
         return {
             "spec": state.spec.model_dump_json() if state.spec else "{}",
             "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",

@@ -14,7 +14,10 @@ class BenchmarkSerializerPort(ABC):
 
     @abstractmethod
     def build_document(
-        self, tasks: list[TaskStateDTO], run_id: str, weights: dict | None = None,
+        self,
+        tasks: list[TaskStateDTO],
+        run_id: str,
+        weights: dict | None = None,
     ) -> dict:
         """Costruisce il documento JSON della run con tutti i task accettati."""
 

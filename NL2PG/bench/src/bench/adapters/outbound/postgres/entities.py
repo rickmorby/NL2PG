@@ -13,7 +13,6 @@ class BaseEntity(DeclarativeBase):
     """Classe base declarativa per le entità SQLAlchemy del benchmark."""
 
 
-
 class RunEntity(BaseEntity):
     """Entità ORM che modella la tabella bench_meta.runs."""
 
@@ -70,4 +69,3 @@ class TaskEntity(BaseEntity):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
     )
-

@@ -22,9 +22,13 @@ _log = getLogger("bench.orchestrator")
 class Orchestrator:
     """Costruisce ed esegue il grafo LangGraph della pipeline di generazione."""
 
-    def __init__(self, sandbox: SandboxPort, config: ConfigPort,
-                 meta_repo: MetaRepositoryPort,
-                 agents: dict[str, AbstractAgent]) -> None:
+    def __init__(
+        self,
+        sandbox: SandboxPort,
+        config: ConfigPort,
+        meta_repo: MetaRepositoryPort,
+        agents: dict[str, AbstractAgent],
+    ) -> None:
         """Inietta le dipendenze di infrastruttura e costruisce il grafo."""
         self._sandbox = sandbox
         self._config = config
@@ -49,13 +53,16 @@ class Orchestrator:
                 return TaskStateDTO.model_validate(result)
             except Exception as e:
                 failed = self._recover_state(graph, config, state)
-                return failed.model_copy(update={
-                    "verdict": "failed",
-                    "last_error": f"{type(e).__name__}: {e}",
-                })
+                return failed.model_copy(
+                    update={
+                        "verdict": "failed",
+                        "last_error": f"{type(e).__name__}: {e}",
+                    }
+                )
 
-    def _recover_state(self, graph: Any, config: dict[str, Any],
-                       fallback: TaskStateDTO) -> TaskStateDTO:
+    def _recover_state(
+        self, graph: Any, config: dict[str, Any], fallback: TaskStateDTO
+    ) -> TaskStateDTO:
         """Recupera l'ultimo stato valido dal checkpoint o restituisce il fallback."""
         try:
             snap = graph.get_state(config)
@@ -68,36 +75,58 @@ class Orchestrator:
     def _build_graph(self) -> StateGraph:
         """Costruisce il grafo LangGraph con nodi agent, routing e nodi terminali."""
         g = StateGraph(TaskStateDTO)
-        for name in ("spec", "schema", "data", "query", "story",
-                      "question", "critic", "hardening", "calibration", "judge"):
+        for name in (
+            "spec",
+            "schema",
+            "data",
+            "query",
+            "story",
+            "question",
+            "critic",
+            "hardening",
+            "calibration",
+            "judge",
+        ):
             g.add_node(name, self._make_agent_node(name))
         g.add_node("coverage", self._coverage_node)
         g.add_node("accept", self._accept_node)
         g.add_node("reject", self._reject_node)
         g.set_entry_point("spec")
-        g.add_conditional_edges("spec", self._after_generation_step,
-                                {"ok": "schema", "scrapped": "reject"})
-        g.add_conditional_edges("schema", self._after_generation_step,
-                                {"ok": "data", "scrapped": "reject"})
-        g.add_conditional_edges("data", self._after_generation_step,
-                                {"ok": "query", "scrapped": "reject"})
-        g.add_conditional_edges("query", self._after_generation_step,
-                                {"ok": "story", "scrapped": "reject"})
+        g.add_conditional_edges(
+            "spec", self._after_generation_step, {"ok": "schema", "scrapped": "reject"}
+        )
+        g.add_conditional_edges(
+            "schema", self._after_generation_step, {"ok": "data", "scrapped": "reject"}
+        )
+        g.add_conditional_edges(
+            "data", self._after_generation_step, {"ok": "query", "scrapped": "reject"}
+        )
+        g.add_conditional_edges(
+            "query", self._after_generation_step, {"ok": "story", "scrapped": "reject"}
+        )
         g.add_edge("story", "question")
         g.add_edge("question", "coverage")
-        g.add_conditional_edges("coverage", self._after_coverage,
-                                {"ok": "critic", "fail": "story", "scrapped": "reject"})
-        g.add_conditional_edges("critic", self._route_critic,
-                                {"harden": "hardening", "calib": "calibration",
-                                 "scrapped": "reject"})
-        g.add_conditional_edges("hardening", self._after_harden,
-                                {"loop": "question", "scrapped": "reject"})
-        g.add_conditional_edges("calibration", self._route_calib,
-                                {"accept": "accept", "judge": "judge",
-                                 "harden": "hardening", "reject": "reject"})
-        g.add_conditional_edges("judge", self._route_judge,
-                                {"regen": "story", "accept": "accept",
-                                 "reject": "reject"})
+        g.add_conditional_edges(
+            "coverage",
+            self._after_coverage,
+            {"ok": "critic", "fail": "story", "scrapped": "reject"},
+        )
+        g.add_conditional_edges(
+            "critic",
+            self._route_critic,
+            {"harden": "hardening", "calib": "calibration", "scrapped": "reject"},
+        )
+        g.add_conditional_edges(
+            "hardening", self._after_harden, {"loop": "question", "scrapped": "reject"}
+        )
+        g.add_conditional_edges(
+            "calibration",
+            self._route_calib,
+            {"accept": "accept", "judge": "judge", "harden": "hardening", "reject": "reject"},
+        )
+        g.add_conditional_edges(
+            "judge", self._route_judge, {"regen": "story", "accept": "accept", "reject": "reject"}
+        )
         g.add_edge("accept", END)
         g.add_edge("reject", END)
         return g
@@ -106,11 +135,13 @@ class Orchestrator:
         """Crea una funzione nodo che invoca l'agente corrispondente."""
         agent = self._agents.get(name)
         if agent is None:
+
             def missing(_state: TaskStateDTO, _config: dict | None = None) -> dict:
                 return {
                     "verdict": "scrapped",
                     "last_error": f"Agente '{name}' non registrato.",
                 }
+
             return missing
 
         def node_fn(state: TaskStateDTO, _config: dict | None = None) -> dict:
@@ -184,7 +215,10 @@ class Orchestrator:
         if not state.gold_query or not state.spec:
             return {"last_error": "Query gold o specifica mancante per la verifica di copertura."}
         result = self._coverage.validate(
-            state.story, state.question, state.gold_query, state.spec,
+            state.story,
+            state.question,
+            state.gold_query,
+            state.spec,
         )
         if not result.is_valid:
             return {"last_error": result.error}

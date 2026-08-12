@@ -38,9 +38,7 @@ class QueryValidator:
         self._feature_checker = feature_checker
         self._mutation_tester = mutation_tester
 
-    def validate(
-        self, query: GoldQueryDTO, spec: SpecDTO, schema: str
-    ) -> QueryValidationResult:
+    def validate(self, query: GoldQueryDTO, spec: SpecDTO, schema: str) -> QueryValidationResult:
         """Esegue la query, verifica feature e mutazioni, e restituisce il risultato gold."""
         ast_err, tree = self._validate_ast_rules(query, spec)
         if ast_err:
@@ -126,11 +124,10 @@ class QueryValidator:
         return tree.args.get("order") is not None
 
     @staticmethod
-    def _build_gold(
-        query: GoldQueryDTO, cols: list[str], rows: list[tuple]
-    ) -> GoldResultDTO:
-        """Costruisce un GoldResultDTO memorizzando le righe in formato nativo Python."""
-        raw_rows = [list(r) for r in rows]
+    def _build_gold(query: GoldQueryDTO, cols: list[str], rows: list[tuple]) -> GoldResultDTO:
+        """Costruisce un GoldResultDTO convertendo le righe in liste di tipi nativi."""
         return GoldResultDTO(
-            columns=cols, rows=raw_rows, order_sensitive=query.order_sensitive
+            columns=cols,
+            rows=[list(row) for row in rows],
+            order_sensitive=query.order_sensitive,
         )
