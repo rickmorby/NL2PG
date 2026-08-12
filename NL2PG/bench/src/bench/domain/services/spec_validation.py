@@ -19,7 +19,10 @@ def compute_spec_hash(category: str, spec: SpecDTO) -> str:
             "domain": spec.domain,
             "sql_features": sorted(spec.sql_features),
             "twist": sorted(spec.twist),
-            "rules": sorted([r.model_dump() for r in spec.twist_rules]),
+            "rules": sorted(
+                (r.model_dump() for r in spec.twist_rules),
+                key=lambda r: orjson_dumps(r, option=OPT_SORT_KEYS),
+            ),
         },
         option=OPT_SORT_KEYS,
     )
