@@ -20,3 +20,4 @@ class AnalyticsDTO(AbstractDTO):
     twist_type_counts: dict[str, int] = Field(default_factory=dict)
     avg_critic_scores: dict[str, float] = Field(default_factory=dict)
     avg_pass_rate: float = 0.0
+    plots_count: int = 0

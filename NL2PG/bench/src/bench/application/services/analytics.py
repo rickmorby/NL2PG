@@ -41,8 +41,13 @@ class BenchmarkAnalyticsService(AnalyticsServicePort):
         analytics = self._calculator.compute_metrics(tasks, run_id)
         self._serializer.write_single_task(analytics.model_dump(), plots_dir / "analytics.json")
         self._plotter.render_plots(tasks, plots_dir)
+        analytics.plots_count = len(list(plots_dir.glob("*.png")))
 
-        _log.info("Analytics e 16 grafici scientifici generati in '%s'.", plots_dir)
+        _log.info(
+            "Analytics e %d grafici scientifici generati in '%s'.",
+            analytics.plots_count,
+            plots_dir,
+        )
         return analytics
 
     def _resolve_paths(self, target_path: Path) -> tuple[list[dict[str, Any]], str, Path]:

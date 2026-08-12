@@ -27,6 +27,7 @@ class TaskPromoterService(TaskPromoterPort):
 
         json_files = sorted(
             list(output_dir.glob("run_*.json"))
+            + list(output_dir.glob("benchmarks/run_*.json"))
             + list(output_dir.rglob("benchmark_samples.json"))
         )
 

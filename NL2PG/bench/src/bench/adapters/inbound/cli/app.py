@@ -185,8 +185,8 @@ def stats_command(
 
         if res.total_tasks > 0:
             msg = (
-                f"[OK] Analytics e 12 grafici generati con successo per {res.total_tasks} task "
-                f"(Run ID: {res.run_id})."
+                f"[OK] Analytics e {res.plots_count} grafici generati con successo per "
+                f"{res.total_tasks} task (Run ID: {res.run_id})."
             )
             secho(msg, fg=colors.GREEN, bold=True)
         else:
@@ -237,8 +237,5 @@ def _print_provider_tree(report: Any, *, do_models: bool) -> None:
         f"{report.reachable_providers}/{report.total_providers}"
     )
     if do_models:
-        msg_summary += (
-            f" | Modelli fisici operativi: "
-            f"{report.healthy_models}/{report.total_models}"
-        )
+        msg_summary += f" | Modelli fisici operativi: {report.healthy_models}/{report.total_models}"
     secho(msg_summary, fg=colors.CYAN, bold=True)
