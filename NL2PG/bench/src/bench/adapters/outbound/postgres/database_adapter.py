@@ -14,6 +14,7 @@ from sqlalchemy import Engine, create_engine
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session, sessionmaker
 
+from bench.adapters.outbound.postgres.loaders import register_json_safe_loaders
 from bench.domain.exceptions import (
     ConfigurationMissingFieldError,
     DatabaseClientError,
@@ -35,6 +36,7 @@ class PostgresClientAdapter(DatabasePort):
         options: dict[str, Any] | None = None,
     ):
         """Inizializza l'adattatore creando i pool ed il sessionmaker dei metadati."""
+        register_json_safe_loaders()
         self._config = config or {}
         opts = options or {}
         min_size = opts.get("min_size", 1)
@@ -48,9 +50,7 @@ class PostgresClientAdapter(DatabasePort):
         self._sandbox_dsn = self._resolve_dsn(
             sandbox_dsn, ("sandbox_dsn", "db_dsn"), default_sandbox, "sandbox"
         )
-        self._meta_dsn = self._resolve_dsn(
-            meta_dsn, ("meta_dsn",), default_meta, "meta"
-        )
+        self._meta_dsn = self._resolve_dsn(meta_dsn, ("meta_dsn",), default_meta, "meta")
         self._statement_timeout_ms = statement_timeout_ms
         self._lock_timeout_ms = lock_timeout_ms
         self._engine_lock = Lock()
