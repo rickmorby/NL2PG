@@ -44,9 +44,12 @@ class Orchestrator:
         state = initial.model_copy(update={"task_id": task_id, "run_id": run_id})
         with self._sandbox.task_scope() as schema:
             state = state.model_copy(update={"sandbox_schema": schema})
+            recursion_limit = (
+                self._config.load_bench().get("orchestrator", {}).get("recursion_limit", 150)
+            )
             config: dict[str, Any] = {
                 "configurable": {"thread_id": task_id},
-                "recursion_limit": 60,
+                "recursion_limit": recursion_limit,
             }
             graph = self._graph_builder.compile(checkpointer=MemorySaver())
             try:

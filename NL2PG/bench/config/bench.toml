@@ -8,6 +8,9 @@ critic_high = 6.0
 [retry]
 max_per_node = 3
 
+[orchestrator]
+recursion_limit = 150
+
 [hardening]
 max_rounds = 3
 
