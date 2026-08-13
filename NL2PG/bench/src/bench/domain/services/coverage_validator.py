@@ -5,6 +5,8 @@
 
 from dataclasses import dataclass
 
+from re import compile as re_compile
+
 from dateparser import parse as dateparser_parse
 from dateparser.search import search_dates
 from sqlglot import exp, find_tables, parse_one
@@ -15,6 +17,9 @@ from bench.domain.models.spec import SpecDTO, TwistRuleDTO
 from bench.domain.models.sql import GoldQueryDTO
 
 _MAPPING_TWISTS = frozenset({"rename", "synonym", "jargon", "rephrase", "polysemy"})
+_RE_IS_DATE_LIKE = re_compile(
+    r"^\d{4}[-/]\d{1,2}(?:[-/]\d{1,2})?$|^\d{1,2}[-/]\d{1,2}[-/]\d{4}$"
+)
 
 
 @dataclass
@@ -116,6 +121,9 @@ def _is_literal_covered(lit: str, text: str) -> bool:
     variants = _expand_name_variants(lit)
     if any(v in text for v in variants if v):
         return True
+
+    if not _RE_IS_DATE_LIKE.search(lit.strip()):
+        return False
 
     parsed_target = dateparser_parse(lit, settings={"PREFER_DAY_OF_MONTH": "first"})
     if parsed_target:

@@ -3,7 +3,7 @@
 :author: Riccardo Morabito
 """
 
-from re import DOTALL, IGNORECASE, compile as re_compile
+from re import DOTALL, IGNORECASE, Match, compile as re_compile
 
 _RE_MARKDOWN_BLOCK = re_compile(r"```(?:sql|postgres)?\s*(.*?)\s*```", flags=DOTALL | IGNORECASE)
 _RE_MARKDOWN_PREFIX = re_compile(r"^```[a-zA-Z]*\n?")
@@ -13,7 +13,9 @@ _RE_IDENTITY = re_compile(r"GENERATED\s+ALWAYS\s+AS\s+IDENTITY", flags=IGNORECAS
 _RE_TRAILING_COMMAS = re_compile(
     r",\s*(\)|FROM\b|WHERE\b|GROUP\s+BY\b|ORDER\s+BY\b|HAVING\b)", flags=IGNORECASE
 )
-_RE_HYPHENATED_IDENTIFIER = re_compile(r"\b([a-zA-Z][a-zA-Z0-9_]*)-([a-zA-Z][a-zA-Z0-9_]*)\b")
+_RE_HYPHENATED_IDENTIFIER = re_compile(
+    r"('(?:''|[^'])*')|\b([a-zA-Z][a-zA-Z0-9_]*)-([a-zA-Z][a-zA-Z0-9_]*)\b"
+)
 
 
 class PostgresSQLRepair:
@@ -57,7 +59,14 @@ class PostgresSQLRepair:
 
     def _fix_hyphenated_identifiers(self, sql: str) -> str:
         """Sostituisce i trattini negli identificatori SQL non virgolettati con underscore."""
-        return _RE_HYPHENATED_IDENTIFIER.sub(r"\1_\2", sql)
+        return _RE_HYPHENATED_IDENTIFIER.sub(self._replace_hyphenated_match, sql)
+
+    @staticmethod
+    def _replace_hyphenated_match(match: Match[str]) -> str:
+        """Sostituisce il trattino con underscore se il match e' un identificatore."""
+        if match.group(1):
+            return match.group(1)
+        return f"{match.group(2)}_{match.group(3)}"
 
     def _ensure_semicolon(self, sql: str) -> str:
         """Assicura che il comando o script SQL termini con punto e virgola ';'."""
