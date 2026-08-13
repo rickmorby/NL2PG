@@ -26,7 +26,7 @@ Il JSON di output deve contenere esclusivamente i campi "query", "intent", "orde
    - Se la richiesta implica un ordinamento rigido a livello primario (es. graduatoria, top-N, primi K), imposta `"order_sensitive": true` E inserisci la clausola `ORDER BY` nella query principale (SELECT alla radice).
    - Se `"order_sensitive": true`, la presenza dell'`ORDER BY` nella query principale è **OBBLIGATORIA**.
    - Se l'ordine delle righe è irrilevante per la correttezza della risposta, imposta `"order_sensitive": false`.
-4. **Sintassi PostgreSQL Corretta**: Scrivi SQL pulito per PostgreSQL dove l'istruzione termina con un punto e virgola `;`. DIVIETO DI TRATTINI NEGLI IDENTIFICATORI: Negli alias di tabelle o colonne usa SEMPRE l'underscore `_` (es. `totale_speso`, `catalogo_merci`). NON usare mai il trattino `-`.
+4. **Sintassi PostgreSQL Corretta**: Scrivi SQL pulito per PostgreSQL dove l'istruzione termina con un punto e virgola `;`. DIVIETO DI TRATTINI NEGLI IDENTIFICATORI: Negli alias di tabelle o colonne usa SEMPRE l'underscore `_` (es. `totale_speso`, `catalogo_merci`). NON usare mai il trattino `-`. **REGOLE GROUP BY**: Se la query usa funzioni di aggregazione (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`), OGNI colonna non aggregata presente nella SELECT DEVE comparire nella clausola `GROUP BY`; la stessa regola vale per le colonne non aggregate usate in `ORDER BY` o `HAVING` (vanno raggruppate o aggregate).
 5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
@@ -56,6 +56,14 @@ NON impostare order_sensitive: true senza ORDER BY nella SELECT principale (ERRA
 {
   "query": "SELECT nome FROM clienti;",
   "order_sensitive": true // SBAGLIATO! Manca la clausola ORDER BY nella query radice!
+}
+</example_to_avoid>
+<example_to_avoid>
+Colonna non aggregata assente dal GROUP BY (ERRATO):
+{
+  "query": "SELECT c.nome, c.citta, SUM(o.importo_totale) AS totale_speso FROM clienti c JOIN ordini o ON c.id = o.cliente_id GROUP BY c.nome;",
+  "intent": "Totale speso per cliente.",
+  "order_sensitive": false // SBAGLIATO! `c.citta` è nella SELECT ma manca dal GROUP BY: PostgreSQL risponde "column c.citta must appear in the GROUP BY clause or be used in an aggregate function". Il GROUP BY corretto è `GROUP BY c.nome, c.citta`.
 }
 </example_to_avoid>
 </negative_examples>

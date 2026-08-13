@@ -5,6 +5,8 @@
 
 from re import DOTALL, IGNORECASE, Match, compile as re_compile
 
+from sqlglot import exp, parse_one
+
 _RE_MARKDOWN_BLOCK = re_compile(r"```(?:sql|postgres)?\s*(.*?)\s*```", flags=DOTALL | IGNORECASE)
 _RE_MARKDOWN_PREFIX = re_compile(r"^```[a-zA-Z]*\n?")
 _RE_MARKDOWN_SUFFIX = re_compile(r"\n?```$")
@@ -15,6 +17,11 @@ _RE_TRAILING_COMMAS = re_compile(
 )
 _RE_HYPHENATED_IDENTIFIER = re_compile(
     r"('(?:''|[^'])*')|\b([a-zA-Z][a-zA-Z0-9_]*)-([a-zA-Z][a-zA-Z0-9_]*)\b"
+)
+_RE_GROUP_BY_ERROR = re_compile(
+    r'column[ ]+"([a-zA-Z_][a-zA-Z0-9_.]*)"[ ]+must[ ]+appear[ ]+in[ ]+the[ ]+'
+    r"GROUP[ ]+BY[ ]+clause",
+    flags=IGNORECASE,
 )
 
 
@@ -34,6 +41,49 @@ class PostgresSQLRepair:
         sql = self._fix_hyphenated_identifiers(sql)
         sql = self._ensure_semicolon(sql)
         return sql.strip()
+
+    def repair_group_by(self, sql_text: str, error_message: str) -> str:
+        """Corregge l'errore GROUP BY segnalato da PostgreSQL aggiungendo la colonna mancante.
+
+        Il messaggio di errore (es. 'column "c.citta" must appear in the GROUP BY clause')
+        indica esattamente quale riferimento aggiungere: la riparazione è deterministica e
+        preserva la semantica della query (raggruppa più finemente, non altera gli aggregati).
+        Nei casi ambigui (più clausole GROUP BY o parsing fallito) restituisce l'SQL invariato
+        lasciando il recupero al retry dell'agente.
+        """
+        if not sql_text or not error_message:
+            return sql_text or ""
+        match = _RE_GROUP_BY_ERROR.search(error_message)
+        if not match:
+            return sql_text
+        return self._add_group_by_column(sql_text, match.group(1))
+
+    def _add_group_by_column(self, sql: str, column: str) -> str:
+        """Aggiunge la colonna alla clausola GROUP BY unica della query."""
+        try:
+            tree = parse_one(sql, read="postgres")
+        except Exception:
+            return sql
+
+        groups = list(tree.find_all(exp.Group))
+        if len(groups) == 1:
+            group = groups[0]
+            if self._group_contains(group, column):
+                return sql
+            group.expressions.append(exp.to_column(column))
+            return tree.sql(dialect="postgres")
+
+        if not groups and isinstance(tree, exp.Select):
+            tree.set("group", exp.Group(expressions=[exp.to_column(column)]))
+            return tree.sql(dialect="postgres")
+
+        return sql
+
+    @staticmethod
+    def _group_contains(group: exp.Group, column: str) -> bool:
+        """Verifica se la colonna è già presente tra le chiavi di raggruppamento."""
+        norm = column.lower()
+        return any(e.sql(dialect="postgres").lower() == norm for e in group.expressions)
 
     def _strip_markdown_fences(self, sql: str) -> str:
         """Rimuove eventuali involucri di codice Markdown."""

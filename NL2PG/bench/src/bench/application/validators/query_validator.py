@@ -4,6 +4,7 @@
 """
 
 from dataclasses import dataclass
+from logging import getLogger
 
 from sqlglot import exp, find_tables, parse_one
 from sqlglot.errors import ParseError
@@ -13,6 +14,9 @@ from bench.domain.models.spec import SpecDTO
 from bench.domain.models.sql import GoldQueryDTO, GoldResultDTO
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
 from bench.domain.services.feature_checker import FeatureChecker
+from bench.domain.services.sql_repair import PostgresSQLRepair
+
+_log = getLogger("bench.application.validators")
 
 
 @dataclass
@@ -22,6 +26,7 @@ class QueryValidationResult:
     is_valid: bool = True
     error: str = ""
     gold_result: GoldResultDTO | None = None
+    repaired_query: GoldQueryDTO | None = None
 
 
 class QueryValidator:
@@ -37,6 +42,8 @@ class QueryValidator:
         self._sandbox = sandbox
         self._feature_checker = feature_checker
         self._mutation_tester = mutation_tester
+        self._repair = PostgresSQLRepair()
+        self._max_group_by_repairs = 3
 
     def validate(self, query: GoldQueryDTO, spec: SpecDTO, schema: str) -> QueryValidationResult:
         """Esegue la query, verifica feature e mutazioni, e restituisce il risultato gold."""
@@ -82,12 +89,40 @@ class QueryValidator:
     def _validate_execution(
         self, query: GoldQueryDTO, schema: str, tree: exp.Expression | None
     ) -> QueryValidationResult:
-        """Esegue la query nel sandbox PostgreSQL e valida righe, tabelle e mutazioni."""
-        try:
-            cols, rows = self._sandbox.run_query(schema, query.query)
-        except Exception as e:
-            msg = f"Errore di esecuzione SQL in PostgreSQL: {e}"
-            return QueryValidationResult(is_valid=False, error=msg)
+        """Esegue la query nel sandbox PostgreSQL riparando i GROUP BY mancanti.
+
+        Quando PostgreSQL segnala una colonna non aggregata assente dal GROUP BY, la
+        colonna viene aggiunta deterministicamente e la query rieseguita (fino a
+        `_max_group_by_repairs` volte). Se la riparazione non è possibile o introduce
+        un errore diverso, si interrompe restituendo il feedback originale al retry
+        dell'agente.
+        """
+        executed_query = query.query
+        repairs = 0
+        while True:
+            try:
+                cols, rows = self._sandbox.run_query(schema, executed_query)
+            except Exception as e:
+                msg = str(e)
+                if repairs >= self._max_group_by_repairs:
+                    return QueryValidationResult(
+                        is_valid=False, error=f"Errore di esecuzione SQL in PostgreSQL: {msg}"
+                    )
+                repaired = self._repair.repair_group_by(executed_query, msg)
+                if repaired == executed_query:
+                    return QueryValidationResult(
+                        is_valid=False, error=f"Errore di esecuzione SQL in PostgreSQL: {msg}"
+                    )
+                executed_query = repaired
+                repairs += 1
+                _log.info(
+                    "Riparazione deterministica GROUP BY (%d/%d): %s",
+                    repairs,
+                    self._max_group_by_repairs,
+                    msg[:100],
+                )
+                continue
+            break
 
         if not rows:
             msg = (
@@ -101,12 +136,19 @@ class QueryValidator:
             msg = "La query SQL non utilizza alcuna tabella del database."
             return QueryValidationResult(is_valid=False, error=msg)
 
-        mut_res = self._mutation_tester.test(schema, query.query, tables)
+        mut_res = self._mutation_tester.test(schema, executed_query, tables)
         if not mut_res.is_valid:
             return QueryValidationResult(is_valid=False, error=mut_res.error)
 
         gold = self._build_gold(query, cols, rows)
-        return QueryValidationResult(is_valid=True, gold_result=gold)
+        repaired_query = (
+            GoldQueryDTO(
+                query=executed_query, intent=query.intent, order_sensitive=query.order_sensitive
+            )
+            if executed_query != query.query
+            else None
+        )
+        return QueryValidationResult(is_valid=True, gold_result=gold, repaired_query=repaired_query)
 
     @staticmethod
     def _has_explicit_schema(tree: exp.Expression) -> bool:
