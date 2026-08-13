@@ -81,11 +81,10 @@ class FeatureChecker:
 
 
 def _check_self_join(tree: exp.Expression) -> bool:
-    """Verifica se la query contiene self-join."""
-    cte_names = {c.alias_or_name.lower() for c in tree.find_all(exp.CTE) if c.alias_or_name}
+    """Verifica se la query contiene self-join (sia su tabelle fisiche che su CTE)."""
     for select in tree.find_all(exp.Select):
         tables = _direct_tables(select)
-        names = [t.name.lower() for t in tables if t.name and t.name.lower() not in cte_names]
+        names = [t.name.lower() for t in tables if t.name]
         if len(names) != len(set(names)):
             return True
     return False
