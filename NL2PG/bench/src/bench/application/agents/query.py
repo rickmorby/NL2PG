@@ -49,10 +49,7 @@ class QueryAgent(AbstractAgent):
         result = self._validator.validate(output, spec, state.sandbox_schema)
         if not result.is_valid:
             return False, result.error, {}
-        extra: dict = {"gold_result": result.gold_result}
-        if result.repaired_query is not None:
-            extra["gold_query"] = result.repaired_query
-        return True, "", extra
+        return True, "", {"gold_result": result.gold_result}
 
     def build_updates(self, output: GoldQueryDTO, _state: TaskStateDTO) -> dict:
         """Aggiorna lo stato con gold_query."""
