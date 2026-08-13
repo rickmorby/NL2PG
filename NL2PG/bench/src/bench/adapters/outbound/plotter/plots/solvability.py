@@ -40,8 +40,8 @@ class SqlFeaturePassrateImpactPlot(AbstractBarPlot):
         """Calcola la media del pass rate per feature."""
         prs = defaultdict(list)
         for t in tasks:
-            pr = t.get("difficulty", {}).get("calibration_pass_rate", 0.0)
-            for f in t.get("spec", {}).get("sql_features", []):
+            pr = (t.get("difficulty") or {}).get("calibration_pass_rate", 0.0)
+            for f in (t.get("spec") or {}).get("sql_features", []):
                 prs[f].append(float(pr))
         sorted_feats = sorted(prs.items(), key=lambda x: sum(x[1]) / len(x[1]))
         return (
@@ -71,13 +71,15 @@ class TwistCountDegradationCurvePlot(AbstractPlot):
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[int], list[float]]:
         """Calcola il degrado pass rate in funzione del numero di twist."""
+        if not tasks:
+            return ([0], [0.0])
         prs = defaultdict(list)
         for t in tasks:
-            pr = t.get("difficulty", {}).get("calibration_pass_rate", 0.0)
-            n_tr = len(t.get("spec", {}).get("twist_rules", []))
+            pr = (t.get("difficulty") or {}).get("calibration_pass_rate", 0.0)
+            n_tr = len((t.get("spec") or {}).get("twist_rules", []))
             prs[n_tr].append(float(pr))
-        xs = sorted(prs.keys()) or [0, 1, 2, 3]
-        ys = [round(sum(prs[k]) / len(prs[k]), 3) for k in xs]
+        xs = sorted(prs.keys()) or [0]
+        ys = [round(sum(prs[k]) / len(prs[k]), 3) if prs[k] else 0.0 for k in xs]
         return xs, ys
 
     def draw(self, ax: Any, data: tuple[list[int], list[float]]) -> None:
@@ -125,8 +127,8 @@ class TwistVsDifficultyHeatmapPlot(AbstractHeatmapPlot):
         """Calcola la matrice bivariata delle frequenze."""
         counts = {tt: {d: 0 for d in self._difficulties} for tt in self._twist_types}
         for t in tasks:
-            diff = t.get("difficulty", {}).get("label", "easy")
-            for tr in t.get("spec", {}).get("twist_rules", []):
+            diff = (t.get("difficulty") or {}).get("label", "easy")
+            for tr in (t.get("spec") or {}).get("twist_rules", []):
                 ttype = tr.get("twist_type", "none")
                 if ttype in counts and diff in self._difficulties:
                     counts[ttype][diff] += 1
@@ -160,8 +162,8 @@ class SchemaSizeVsPassrateBoxplotPlot(AbstractBarPlot):
         """Calcola il pass rate in base alle dimensioni dello schema."""
         prs = defaultdict(list)
         for t in tasks:
-            pr = t.get("difficulty", {}).get("calibration_pass_rate", 0.0)
-            nt = t.get("spec", {}).get("n_tables", 1) if t.get("spec") else 1
+            pr = (t.get("difficulty") or {}).get("calibration_pass_rate", 0.0)
+            nt = (t.get("spec") or {}).get("n_tables", 1)
             prs[nt].append(float(pr))
         xs = [f"{x} tab" for x in sorted(prs.keys())] or ["1 tab"]
         ys = [round(sum(prs[k]) / len(prs[k]), 3) for k in sorted(prs.keys())]

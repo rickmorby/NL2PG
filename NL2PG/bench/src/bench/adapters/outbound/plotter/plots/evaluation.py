@@ -40,8 +40,8 @@ class SolverPassrateByDifficultyPlot(AbstractBarPlot):
         """Calcola il pass rate per classe di difficoltà."""
         prs = defaultdict(list)
         for t in tasks:
-            diff = t.get("difficulty", {}).get("label", "easy")
-            pr = t.get("difficulty", {}).get("calibration_pass_rate", 0.0)
+            diff = (t.get("difficulty") or {}).get("label", "easy")
+            pr = (t.get("difficulty") or {}).get("calibration_pass_rate", 0.0)
             prs[diff].append(float(pr))
         difficulties = ["easy", "medium", "hard"]
         xs = [d.capitalize() for d in difficulties]
@@ -78,8 +78,8 @@ class CriticVsPassrateCorrelationPlot(AbstractPlot):
         """Estrae le coordinate e le frequenze delle coppie punteggio/pass_rate."""
         coords = Counter()
         for t in tasks:
-            cs = t.get("difficulty", {}).get("critic_score")
-            pr = t.get("difficulty", {}).get("calibration_pass_rate")
+            cs = (t.get("difficulty") or {}).get("critic_score")
+            pr = (t.get("difficulty") or {}).get("calibration_pass_rate")
             if cs is not None and pr is not None:
                 coords[(round(float(cs), 1), round(float(pr), 3))] += 1
         xs = [k[0] for k in coords] or [1.0]
@@ -125,7 +125,8 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
         """Estrae la cardinalità del risultato Gold."""
-        counts = Counter([len(t.get("gold", {}).get("result", {}).get("rows", [])) for t in tasks])
+        rows = [((t.get("gold") or {}).get("result") or {}).get("rows", []) for t in tasks]
+        counts = Counter([len(r) for r in rows])
         xs = [f"{k} righe" for k in sorted(counts.keys())] or ["1 riga"]
         ys = [counts[k] for k in sorted(counts.keys())] or [1]
         return xs, ys

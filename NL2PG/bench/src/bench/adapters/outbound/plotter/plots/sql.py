@@ -38,7 +38,7 @@ class SqlSyntaxDistributionPlot(AbstractBarPlot):
         """Estrae le top 8 feature SQL."""
         counts: Counter = Counter()
         for t in tasks:
-            for f in t.get("spec", {}).get("sql_features", []):
+            for f in (t.get("spec") or {}).get("sql_features", []):
                 counts[f] += 1
         items = counts.most_common(8)
         return ([i[0] for i in items] or ["join"], [i[1] for i in items] or [0])
@@ -70,7 +70,7 @@ class AstComplexityDepthPlot(AbstractBarPlot):
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
         """Calcola la profondità AST per le query Gold."""
-        depths = [self._calc.parse_depth(t.get("gold", {}).get("query", "")) for t in tasks]
+        depths = [self._calc.parse_depth((t.get("gold") or {}).get("query", "")) for t in tasks]
         c = Counter(depths)
         return ([f"Profondità {k}" for k in sorted(c.keys())], [c[k] for k in sorted(c.keys())])
 
@@ -100,7 +100,7 @@ class SchemaDomainDiversityPlot(AbstractBarPlot):
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
         """Estrae il conteggio per dominio."""
-        c = Counter(t.get("spec", {}).get("domain", "unknown") for t in tasks if t.get("spec"))
+        c = Counter((t.get("spec") or {}).get("domain", "unknown") for t in tasks)
         items = c.most_common(8)
         return ([i[0] for i in items] or ["vendite"], [i[1] for i in items] or [0])
 
@@ -130,7 +130,7 @@ class SchemaComplexityHeatmapPlot(AbstractBarPlot):
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
         """Estrae la distribuzione del numero di tabelle."""
-        c = Counter(t.get("spec", {}).get("n_tables", 1) for t in tasks if t.get("spec"))
+        c = Counter((t.get("spec") or {}).get("n_tables", 1) for t in tasks)
         return ([f"{k} tabelle" for k in sorted(c.keys())], [c[k] for k in sorted(c.keys())])
 
 
@@ -172,7 +172,7 @@ class SqlFeatureCooccurrencePlot(AbstractHeatmapPlot):
         """Calcola la matrice di co-occorrenza."""
         matrix = [[0 for _ in self._top_feats] for _ in self._top_feats]
         for t in tasks:
-            feats = set(t.get("spec", {}).get("sql_features", []))
+            feats = set((t.get("spec") or {}).get("sql_features", []))
             for i, f1 in enumerate(self._top_feats):
                 for j, f2 in enumerate(self._top_feats):
                     if f1 in feats and f2 in feats:

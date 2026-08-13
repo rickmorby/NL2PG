@@ -33,8 +33,11 @@ class NlLinguisticComplexityPlot(AbstractPlot):
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[int], list[int]]:
         """Estrae conteggio parole e numero tabelle."""
-        words = [len((t.get("story", "") + " " + t.get("question", "")).split()) for t in tasks]
-        tables = [t.get("spec", {}).get("n_tables", 1) if t.get("spec") else 1 for t in tasks]
+        words = [
+            len(((t.get("story") or "") + " " + (t.get("question") or "")).split())
+            for t in tasks
+        ]
+        tables = [(t.get("spec") or {}).get("n_tables", 1) for t in tasks]
         return tables, words
 
     def draw(self, ax: Any, data: tuple[list[int], list[int]]) -> None:
@@ -70,7 +73,7 @@ class TwistTypeFrequencyPlot(AbstractBarPlot):
         """Estrae la frequenza dei twist semantici."""
         c: Counter = Counter()
         for t in tasks:
-            for tr in t.get("spec", {}).get("twist_rules", []):
+            for tr in (t.get("spec") or {}).get("twist_rules", []):
                 c[tr.get("twist_type", "unknown")] += 1
         items = c.most_common(6)
         return (
@@ -107,7 +110,7 @@ class VocabularyJargonDistributionPlot(AbstractBarPlot):
         obs = [
             tr.get("obsolete_value")
             for t in tasks
-            for tr in t.get("spec", {}).get("twist_rules", [])
+            for tr in (t.get("spec") or {}).get("twist_rules", [])
             if tr.get("obsolete_value")
         ]
         top = Counter(obs).most_common(6)
