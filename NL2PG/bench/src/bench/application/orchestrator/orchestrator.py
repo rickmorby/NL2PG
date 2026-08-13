@@ -221,6 +221,10 @@ class Orchestrator:
             state.spec,
         )
         if not result.is_valid:
+            bench_cfg = self._config.load_bench()
+            max_per_node = bench_cfg.get("retry", {}).get("max_per_node", 3)
+            if state.retry_story >= max_per_node:
+                return {"verdict": "scrapped", "last_error": result.error}
             return {"last_error": result.error}
         return {"last_error": ""}
 

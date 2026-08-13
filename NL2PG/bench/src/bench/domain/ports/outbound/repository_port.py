@@ -25,3 +25,7 @@ class MetaRepositoryPort(ABC):
     @abstractmethod
     def save_task(self, run_id: str, state: TaskStateDTO) -> None:
         """Esegue l'upsert dello stato di un task nella tabella bench_meta.tasks."""
+
+    @abstractmethod
+    def get_run_verdict_counts(self, run_id: str) -> dict[str, int]:
+        """Calcola i conteggi aggregati dei verdetti registrati per una determinata run dal DB."""

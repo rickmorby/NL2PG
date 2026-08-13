@@ -173,16 +173,7 @@ class TaskRunner(TaskRunnerPort):
                     verdict=result_state.verdict,
                 )
 
-        return BatchSummaryDTO(
-            run_id=run_id,
-            output_dir=str(output_file.parent),
-            requested_count=count,
-            accepted_count=len(accepted_tasks),
-            rejected_count=counts["rejected"],
-            scrapped_count=counts["scrapped"],
-            failed_count=counts["failed"],
-            duration_seconds=0.0,
-        )
+        return self._build_summary_from_db(run_id, output_file, count, accepted_tasks)
 
     def _run_parallel(
         self,
@@ -248,13 +239,24 @@ class TaskRunner(TaskRunnerPort):
                 for pending in futures:
                     pending.cancel()
 
+        return self._build_summary_from_db(run_id, output_file, count, accepted_tasks)
+
+    def _build_summary_from_db(
+        self,
+        run_id: str,
+        output_file: Path,
+        requested_count: int,
+        accepted_tasks: list[TaskStateDTO],
+    ) -> BatchSummaryDTO:
+        """Costruisce il riepilogo BatchSummaryDTO interrogando il DB come fonte unica di verità."""
+        db_counts = self._meta_repo.get_run_verdict_counts(run_id)
         return BatchSummaryDTO(
             run_id=run_id,
             output_dir=str(output_file.parent),
-            requested_count=count,
-            accepted_count=len(accepted_tasks),
-            rejected_count=counts["rejected"],
-            scrapped_count=counts["scrapped"],
-            failed_count=counts["failed"],
+            requested_count=requested_count,
+            accepted_count=db_counts.get("accepted", len(accepted_tasks)),
+            rejected_count=db_counts.get("rejected", 0),
+            scrapped_count=db_counts.get("scrapped", 0),
+            failed_count=db_counts.get("failed", 0),
             duration_seconds=0.0,
         )

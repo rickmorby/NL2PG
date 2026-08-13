@@ -5,7 +5,7 @@
 
 from uuid import uuid4
 from psycopg import errors as pg_errors
-from sqlalchemy import select
+from sqlalchemy import func, select
 from bench.adapters.outbound.postgres.database_adapter import PostgresClientAdapter
 from bench.adapters.outbound.postgres.entities import RunEntity, TaskEntity
 from bench.adapters.outbound.postgres.mappers import TaskStateMapper
@@ -89,4 +89,21 @@ class MetaRepositoryAdapter(MetaRepositoryPort):
             raise
         except (pg_errors.Error, Exception) as e:
             msg = f"Errore durante il salvataggio del task {state.task_id}: {e}"
+            raise DatabaseClientError(msg) from e
+
+    def get_run_verdict_counts(self, run_id: str) -> dict[str, int]:
+        """Calcola i conteggi aggregati dei verdetti registrati per una determinata run dal DB."""
+        try:
+            with self._client.get_meta_session() as session:
+                stmt = (
+                    select(TaskEntity.verdict, func.count(TaskEntity.task_id))
+                    .where(TaskEntity.run_id == run_id)
+                    .group_by(TaskEntity.verdict)
+                )
+                results = session.execute(stmt).all()
+                return {verdict: count for verdict, count in results}
+        except DatabaseClientError:
+            raise
+        except (pg_errors.Error, Exception) as e:
+            msg = f"Errore durante il recupero delle statistiche per la run '{run_id}': {e}"
             raise DatabaseClientError(msg) from e
