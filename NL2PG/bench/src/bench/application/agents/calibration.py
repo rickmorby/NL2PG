@@ -6,9 +6,11 @@
 from collections import Counter
 
 from psycopg.errors import Error as PgError
+from pydantic import ValidationError
 from sqlglot.errors import ParseError
 
 from bench.application.agents.base import AbstractAgent
+from bench.domain.exceptions import LLMClientError, ModelOutputContractError
 from bench.domain.models.llm import CallOptionsDTO
 from bench.domain.models.nlp import CalibrationResultDTO
 from bench.domain.models.sql import GoldResultDTO, SolverOutputDTO
@@ -74,7 +76,7 @@ class CalibrationAgent(AbstractAgent):
                     if first_pass is None:
                         first_pass = i
                         break
-            except (PgError, ParseError):
+            except (PgError, ParseError, ModelOutputContractError, LLMClientError, ValidationError):
                 pass
         rate = passes / max_runs
         cal = CalibrationResultDTO(

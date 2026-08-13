@@ -9,6 +9,7 @@ from uuid import uuid4
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
 from bench.application.agents.base import AbstractAgent
+from bench.domain.exceptions.handler import handle_exception
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
@@ -52,6 +53,7 @@ class Orchestrator:
                 result = graph.invoke(state, config=config)
                 return TaskStateDTO.model_validate(result)
             except Exception as e:
+                handle_exception(e)
                 failed = self._recover_state(graph, config, state)
                 return failed.model_copy(
                     update={
