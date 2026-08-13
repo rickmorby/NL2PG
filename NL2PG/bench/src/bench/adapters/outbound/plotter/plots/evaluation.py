@@ -100,38 +100,8 @@ class CriticVsPassrateCorrelationPlot(AbstractPlot):
             txt.set_path_effects([stroke])
 
 
-class Critic5DimensionsRadarPlot(AbstractBarPlot):
-    """15: Barplot delle 5 dimensioni qualitative del Critic."""
-
-    def __init__(self) -> None:
-        """Inizializza la rotazione ed i limiti Y."""
-        super().__init__(rotation=35, ylim=(0, 10))
-
-    def filename(self) -> str:
-        """Restituisce il nome del file PNG."""
-        return "15_critic_5dimensions_radar.png"
-
-    def title(self) -> str:
-        """Restituisce il titolo del grafico."""
-        return "15. Punteggi Medi Critic su 5 Dimensioni Qualitative"
-
-    def xlabel(self) -> str:
-        """Restituisce l'etichetta dell'asse X."""
-        return "Dimensione Qualitativa"
-
-    def ylabel(self) -> str:
-        """Restituisce l'etichetta dell'asse Y."""
-        return "Punteggio Medio (1-10)"
-
-    def prepare_data(self, _tasks: list[dict[str, Any]]) -> tuple[list[str], list[float]]:
-        """Estrae i punteggi medi sulle 5 dimensioni."""
-        dims = ["narrative", "distractors", "plot_twists", "jargon", "sql_composition"]
-        vals = [8.5, 7.8, 8.2, 9.0, 8.7]
-        return dims, vals
-
-
 class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
-    """16: Barplot della cardinalità del risultato Gold."""
+    """15: Barplot della cardinalità del risultato Gold."""
 
     def __init__(self) -> None:
         """Inizializza la rotazione e la dimensione del grafico."""
@@ -139,11 +109,11 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
-        return "16_query_result_cardinality_distribution.png"
+        return "15_query_result_cardinality_distribution.png"
 
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
-        return "16. Cardinalità Risultato Gold (N° Righe)"
+        return "15. Cardinalità Risultato Gold (N° Righe)"
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""

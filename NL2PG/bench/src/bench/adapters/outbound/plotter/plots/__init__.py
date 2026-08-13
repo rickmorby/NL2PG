@@ -1,11 +1,10 @@
-"""Modulo package contenente i 16 grafici scientifici polimorfici raggruppati per categoria.
+"""Modulo package contenente i 15 grafici scientifici polimorfici raggruppati per categoria.
 
 :author: Riccardo Morabito
 """
 
 from bench.adapters.outbound.plotter.base import AbstractPlot
 from bench.adapters.outbound.plotter.plots.evaluation import (
-    Critic5DimensionsRadarPlot,
     CriticVsPassrateCorrelationPlot,
     QueryResultCardinalityDistributionPlot,
     SolverPassrateByDifficultyPlot,
@@ -32,7 +31,7 @@ from bench.domain.services.analytics_calculator import AnalyticsCalculator
 
 
 def get_default_plots(calculator: AnalyticsCalculator) -> list[AbstractPlot]:
-    """Restituisce la lista ordinata dei 16 grafici scientifici polimorfici del benchmark."""
+    """Restituisce la lista ordinata dei 15 grafici scientifici polimorfici del benchmark."""
     return [
         SqlSyntaxDistributionPlot(),
         AstComplexityDepthPlot(calculator),
@@ -48,14 +47,12 @@ def get_default_plots(calculator: AnalyticsCalculator) -> list[AbstractPlot]:
         SchemaSizeVsPassrateBoxplotPlot(),
         SolverPassrateByDifficultyPlot(),
         CriticVsPassrateCorrelationPlot(),
-        Critic5DimensionsRadarPlot(),
         QueryResultCardinalityDistributionPlot(),
     ]
 
 
 __all__ = [
     "AstComplexityDepthPlot",
-    "Critic5DimensionsRadarPlot",
     "CriticVsPassrateCorrelationPlot",
     "NlLinguisticComplexityPlot",
     "QueryResultCardinalityDistributionPlot",
