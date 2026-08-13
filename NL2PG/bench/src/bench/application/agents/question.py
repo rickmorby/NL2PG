@@ -30,6 +30,3 @@ class QuestionAgent(AbstractAgent):
     def build_updates(self, output: QuestionDTO, state: TaskStateDTO) -> dict:
         """Aggiorna lo stato con question e incrementa retry_question."""
         return {"question": output, "retry_question": state.retry_question + 1}
-
-    def _max_retries(self, _state: TaskStateDTO) -> int:
-        return 1
