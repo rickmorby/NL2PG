@@ -27,9 +27,13 @@ class AbstractBarPlot(AbstractPlot):
         self.ylim = ylim
 
     def draw(self, ax: Any, data: tuple[list[Any], list[Any]]) -> None:
-        """Disegna un barplot Seaborn sull'asse fornito."""
+        """Disegna un barplot Seaborn annotando ogni barra con il valore numerico."""
         xs, ys = data
         barplot(x=xs, y=ys, hue=xs, legend=False, ax=ax, palette=self.palette)
+        has_floats = any(isinstance(v, float) for v in ys)
+        fmt = "%.2f" if has_floats else "%g"
+        for c in ax.containers:
+            ax.bar_label(c, padding=3, fmt=fmt, fontsize=9)
 
     def format_axes(self, ax: Any) -> None:
         """Applica il titolo, le etichette degli assi e la rotazione dei tick X."""
