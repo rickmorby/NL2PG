@@ -1,0 +1,56 @@
+{
+  "run_id": "run-d8ae654cd8dd",
+  "generated_at": "2026-08-13T19:27:54Z",
+  "total_tasks": 116,
+  "difficulty_distribution": {
+    "easy": 40,
+    "hard": 68,
+    "medium": 8
+  },
+  "domain_distribution": {
+    "sanità": 9,
+    "contabilità": 11,
+    "università": 8,
+    "risorse_umane": 10,
+    "assicurazioni": 11,
+    "immobiliare": 11,
+    "ecommerce": 9,
+    "telecomunicazioni": 12,
+    "logistica": 8,
+    "erp": 9,
+    "finanza": 10,
+    "vendite": 8
+  },
+  "sql_feature_counts": {
+    "group_agg": 19,
+    "having": 10,
+    "join": 20,
+    "top_n": 11,
+    "subquery": 8,
+    "set_op": 1,
+    "left_outer_join": 9,
+    "multi_join": 3,
+    "conjunctive": 4,
+    "window": 10,
+    "self_join": 5,
+    "correlated_subquery": 5,
+    "exists": 2,
+    "anti_join": 2,
+    "scalar_agg": 8,
+    "natural_join": 9,
+    "recursive_cte": 4,
+    "cte": 4
+  },
+  "twist_type_counts": {
+    "rename": 42,
+    "synonym": 36,
+    "ambiguity": 8,
+    "rephrase": 25,
+    "distractor": 16,
+    "jargon": 13,
+    "polysemy": 4
+  },
+  "avg_critic_scores": {},
+  "avg_pass_rate": 0.1379,
+  "plots_count": 15
+}
