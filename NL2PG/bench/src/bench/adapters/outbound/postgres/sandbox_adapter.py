@@ -76,7 +76,7 @@ class PostgresSandboxAdapter(SandboxPort):
         self._validate_schema_name(schema)
         statements = self._validate_and_split_sql(
             query,
-            allowed_types=(exp.Select, exp.Union),
+            allowed_types=(exp.Select, exp.Union, exp.Intersect, exp.Except),
         )
         if not statements:
             return [], []
