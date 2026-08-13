@@ -208,7 +208,6 @@ class LLMClientAdapter(LLMGeneratorPort):
             "api_key": mc["api_key"],
             "temperature": mc["temperature"],
             "timeout": mc.get("request_timeout", 120),
-            "rpm": 100,
         }
         if "max_tokens" in mc:
             params["max_tokens"] = mc["max_tokens"]
