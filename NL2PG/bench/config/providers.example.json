@@ -2,7 +2,6 @@
   "chains": {
     "default": [
       "groq/gpt-oss",
-      "groq/llama70b",
       "gemini/flash-lite",
       "nous/laguna-s",
       "openrouter/laguna-s",
@@ -12,7 +11,6 @@
     ],
     "critic": [
       "groq/gpt-oss/critic",
-      "groq/llama70b/critic",
       "gemini/flash-lite/critic",
       "nous/laguna-s/critic",
       "openrouter/laguna-s/critic",
@@ -22,7 +20,6 @@
     ],
     "judge": [
       "groq/gpt-oss/judge",
-      "groq/llama70b/judge",
       "gemini/flash-lite/judge",
       "nous/laguna-s/judge",
       "openrouter/laguna-s/judge",
@@ -32,7 +29,6 @@
     ],
     "calibration": [
       "groq/gpt-oss/calibration",
-      "groq/llama70b/calibration",
       "gemini/flash-lite/calibration",
       "nous/laguna-s/calibration",
       "openrouter/laguna-s/calibration",
@@ -252,42 +248,6 @@
     "groq/gpt-oss/calibration": {
       "provider": "openai",
       "model": "openai/gpt-oss-120b",
-      "temperature": 0.3,
-      "request_timeout": 30,
-      "structured_output": true,
-      "base_url": "https://api.groq.com/openai/v1",
-      "api_key": "YOUR_GROQ_API_KEY_HERE"
-    },
-    "groq/llama70b": {
-      "provider": "openai",
-      "model": "llama-3.3-70b-versatile",
-      "temperature": 0.7,
-      "request_timeout": 30,
-      "structured_output": true,
-      "base_url": "https://api.groq.com/openai/v1",
-      "api_key": "YOUR_GROQ_API_KEY_HERE"
-    },
-    "groq/llama70b/critic": {
-      "provider": "openai",
-      "model": "llama-3.3-70b-versatile",
-      "temperature": 0.7,
-      "request_timeout": 30,
-      "structured_output": true,
-      "base_url": "https://api.groq.com/openai/v1",
-      "api_key": "YOUR_GROQ_API_KEY_HERE"
-    },
-    "groq/llama70b/judge": {
-      "provider": "openai",
-      "model": "llama-3.3-70b-versatile",
-      "temperature": 0.7,
-      "request_timeout": 30,
-      "structured_output": true,
-      "base_url": "https://api.groq.com/openai/v1",
-      "api_key": "YOUR_GROQ_API_KEY_HERE"
-    },
-    "groq/llama70b/calibration": {
-      "provider": "openai",
-      "model": "llama-3.3-70b-versatile",
       "temperature": 0.3,
       "request_timeout": 30,
       "structured_output": true,

@@ -2,6 +2,9 @@
 
 :author: Riccardo Morabito
 """
+import os
+
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
 from typing import Annotated, Any
 
