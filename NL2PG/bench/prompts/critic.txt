@@ -8,13 +8,46 @@ Il JSON di output deve contenere direttamente i campi "narrative", "distractors"
 </objective>
 
 <rules_and_guidelines>
-1. **Vincoli Numerici sui Punteggi**: Tutti i punteggi DEVONO essere numeri decimali (float) compresi rigorosamente nell'intervallo [1.0, 10.0] (ovvero `1.0 <= punteggio <= 10.0`).
-2. **Punteggio Narrativo (`narrative`)**: Valuta la naturalezza, la fluidità ed il realismo della storia aziendale (da 1.0 a 10.0).
-3. **Punteggio Distrattori (`distractors`)**: Valuta l'efficacia delle informazioni aziendali di contorno (da 1.0 a 10.0).
-4. **Punteggio Colpi di Scena (`plot_twists`)**: Valuta quanto bene i twist semantici siano stati integrati senza creare ambiguità irrisolvibili (da 1.0 a 10.0).
-5. **Punteggio Gergo (`jargon`)**: Valuta la totale assenza di termini di database vietati (da 1.0 a 10.0).
-6. **Punteggio Composizione SQL (`sql_composition`)**: Valuta la correttezza, la pulizia e la ricchezza delle clausole della query Gold rispetto alle feature richieste (da 1.0 a 10.0).
-7. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
+1. **Vincoli Numerici sui Punteggi**: Tutti i punteggi DEVONO essere numeri decimali (float) compresi rigorosamente nell'intervallo [1.0, 10.0] (ovvero `1.0 <= punteggio <= 10.0`). La sufficienza aziendale ed aulica e' fissata a 6.0.
+2. **GRIGLIA ANALITICA MANIACALE DI CORREZIONE (Punteggi da 1.0 a 10.0)**:
+   Per ciascuna dimensione qualitativa, applica rigorosamente i criteri millimetrici di seguito specificati:
+
+   - **`narrative` (Naturalezza e Fluidita' Narrativa Aziendale)**:
+     * **9.0 - 10.0**: Prosa aziendale italiana impeccabile, registro formale aulico e fluido, narrazione realistica che sembra scritta da un analista senior di processo.
+     * **7.5 - 8.5**: Prosa buona e coerente, ma con costrutti leggermente ripetitivi o leggermente sintetici.
+     * **6.0 - 7.0 (Sufficienza)**: Narrazione accettabile ma piatta, priva di verve aziendale realistica.
+     * **4.0 - 5.5**: Frasi forzate, artificiose o prive di contesto di business plausibile (Richiede Hardening).
+     * **1.0 - 3.5**: Testo disorganico, sconnesso, grammaticalmente errato o incomprensibile.
+
+   - **`distractors` (Efficacia e Plausibilita' dei Distrattori)**:
+     * **9.0 - 10.0**: Informazioni di contorno, tabelle e colonne civetta integrate perfettamente nel racconto aziendale, capaci di sviare il solver senza creare alcuna contraddizione logica.
+     * **7.5 - 8.5**: Distrattori pertinenti e ben contestualizzati.
+     * **6.0 - 7.0 (Sufficienza)**: Distrattori presenti ma semplici o poco incisivi.
+     * **4.0 - 5.5**: Distrattori posticci, banali, o scollati dal resto della storia.
+     * **1.0 - 3.5**: Distrattori contraddittori che rendono impossibile o ambigua l'interpretazione della query.
+
+   - **`plot_twists` (Integrazione dei Twist Semantici e Cambio Nomi)**:
+     * **9.0 - 10.0**: Ridenominazioni (rename), sinonimi e gergo di dominio inseriti con assoluta naturalezza narrativa, motivati dal processo di business.
+     * **7.5 - 8.5**: Twist semantici chiari e ben giustificati.
+     * **6.0 - 7.0 (Sufficienza)**: Twist comprensibili ma spiegati in modo scolastico o meccanico.
+     * **4.0 - 5.5**: Twist forzati, spiegati male o che creano confusione sull'associazione entita'-tabella.
+     * **1.0 - 3.5**: Twist errati che impediscono di ricostruire il mapping verso lo schema DDL.
+
+   - **`jargon` (Assenza di Gergo Tecnico di Database nella Prosa)**:
+     * **9.0 - 10.0**: TOTALE ASSENZA di qualsiasi termine di database o linguaggio SQL. Si usano solo termini aziendali (es. `registro`, `archivio`, `codice`, `importo`).
+     * **7.5 - 8.5**: Assenza di parole chiave SQL, ma uso di termini quali `campo` o `dato`.
+     * **6.0 - 7.0 (Sufficienza)**: Presenza di termini borderline (es. `relazione`, `record`).
+     * **4.0 - 5.5**: Presenza esplicita di termini tecnici come `tabella`, `primary key`, `foreign key`, `colonna`.
+     * **1.0 - 3.5**: Presenza diretta di clausole o sintassi SQL nella prosa (es. `JOIN`, `SELECT`, `WHERE`, `GROUP BY`).
+
+   - **`sql_composition` (Coerenza e Corrispondenza Prosa-SQL Gold)**:
+     * **9.0 - 10.0**: Perfetta corrispondenza 1:1 tra ogni condizione, filtro o aggregazione menzionata nella storia/domanda e l'esatta struttura della query Gold.
+     * **7.5 - 8.5**: Corrispondenza precisa con imperfezioni trascurabili nei dettagli proiettati.
+     * **6.0 - 7.0 (Sufficienza)**: Corrispondenza globale accettabile ma con sottili disallineamenti nelle clausole secondarie.
+     * **4.0 - 5.5**: Disallineamento tra prosa e query (es. la storia cita una condizione non presente nella query o viceversa).
+     * **1.0 - 3.5**: Netta contraddizione tra quanto richiesto dal testo e quanto eseguito dalla query Gold.
+
+3. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
