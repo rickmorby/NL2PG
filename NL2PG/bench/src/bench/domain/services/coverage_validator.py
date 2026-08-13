@@ -39,7 +39,8 @@ class CoverageValidator:
             return CoverageResult(is_valid=False, error=f"AST fallito su query gold: {e}")
         text = (story.story + " " + question.question).lower()
         for ident in tables:
-            if ident.lower() not in text:
+            variants = _expand_name_variants(ident)
+            if not any(v in text for v in variants if v):
                 return CoverageResult(
                     is_valid=False,
                     error=(
@@ -48,7 +49,8 @@ class CoverageValidator:
                     ),
                 )
         for lit in literals:
-            if lit.lower() not in text:
+            variants = _expand_name_variants(lit)
+            if not any(v in text for v in variants if v):
                 return CoverageResult(
                     is_valid=False,
                     error=(
@@ -92,3 +94,15 @@ def _map_table_name(name: str, twist_rules: list[TwistRuleDTO]) -> str:
         ):
             return rule.obsolete_value.lower()
     return name
+
+
+def _expand_name_variants(name: str) -> set[str]:
+    """Espande un identificatore SQL o letterale nelle sue forme narrative equivalenti."""
+    raw = name.lower().strip().strip("%_")
+    if not raw:
+        return set()
+    variants = {raw}
+    variants.add(raw.replace("_", " "))
+    variants.add(raw.replace("-", " "))
+    variants.add(raw.replace("_", "-"))
+    return variants

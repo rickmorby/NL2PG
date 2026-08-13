@@ -13,6 +13,7 @@ _RE_IDENTITY = re_compile(r"GENERATED\s+ALWAYS\s+AS\s+IDENTITY", flags=IGNORECAS
 _RE_TRAILING_COMMAS = re_compile(
     r",\s*(\)|FROM\b|WHERE\b|GROUP\s+BY\b|ORDER\s+BY\b|HAVING\b)", flags=IGNORECASE
 )
+_RE_HYPHENATED_IDENTIFIER = re_compile(r"\b([a-zA-Z][a-zA-Z0-9_]*)-([a-zA-Z][a-zA-Z0-9_]*)\b")
 
 
 class PostgresSQLRepair:
@@ -28,6 +29,7 @@ class PostgresSQLRepair:
         sql = self._fix_escaped_quotes(sql)
         sql = self._fix_identity_columns(sql)
         sql = self._fix_trailing_commas(sql)
+        sql = self._fix_hyphenated_identifiers(sql)
         sql = self._ensure_semicolon(sql)
         return sql.strip()
 
@@ -52,6 +54,10 @@ class PostgresSQLRepair:
     def _fix_trailing_commas(self, sql: str) -> str:
         """Rimuove le virgole pendenti prima di chiusura parentesi o clausole principali."""
         return _RE_TRAILING_COMMAS.sub(r" \1", sql)
+
+    def _fix_hyphenated_identifiers(self, sql: str) -> str:
+        """Sostituisce i trattini negli identificatori SQL non virgolettati con underscore."""
+        return _RE_HYPHENATED_IDENTIFIER.sub(r"\1_\2", sql)
 
     def _ensure_semicolon(self, sql: str) -> str:
         """Assicura che il comando o script SQL termini con punto e virgola ';'."""

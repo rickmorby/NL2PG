@@ -26,7 +26,7 @@ Il JSON di output deve contenere esclusivamente i campi "query", "intent", "orde
    - Se la richiesta implica un ordinamento rigido a livello primario (es. graduatoria, top-N, primi K), imposta `"order_sensitive": true` E inserisci la clausola `ORDER BY` nella query principale (SELECT alla radice).
    - Se `"order_sensitive": true`, la presenza dell'`ORDER BY` nella query principale è **OBBLIGATORIA**.
    - Se l'ordine delle righe è irrilevante per la correttezza della risposta, imposta `"order_sensitive": false`.
-4. **Sintassi PostgreSQL Corretta**: Scrivi SQL pulito per PostgreSQL dove l'istruzione termina con un punto e virgola `;`.
+4. **Sintassi PostgreSQL Corretta**: Scrivi SQL pulito per PostgreSQL dove l'istruzione termina con un punto e virgola `;`. DIVIETO DI TRATTINI NEGLI IDENTIFICATORI: Negli alias di tabelle o colonne usa SEMPRE l'underscore `_` (es. `totale_speso`, `catalogo_merci`). NON usare mai il trattino `-`.
 5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
