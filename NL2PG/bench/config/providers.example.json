@@ -1,24 +1,44 @@
 {
   "chains": {
     "default": [
+      "groq/gpt-oss",
+      "groq/llama70b",
+      "gemini/flash-lite",
       "nous/laguna-s",
+      "openrouter/laguna-s",
       "nous/step-flash",
-      "openrouter/nemotron-120b"
+      "openrouter/nemotron-120b",
+      "openrouter/nemotron-550b"
     ],
     "critic": [
-      "nous/laguna-s",
-      "nous/step-flash",
-      "openrouter/nemotron-120b"
+      "groq/gpt-oss/critic",
+      "groq/llama70b/critic",
+      "gemini/flash-lite/critic",
+      "nous/laguna-s/critic",
+      "openrouter/laguna-s/critic",
+      "nous/step-flash/critic",
+      "openrouter/nemotron-120b/critic",
+      "openrouter/nemotron-550b/critic"
     ],
     "judge": [
-      "nous/laguna-s",
-      "nous/step-flash",
-      "openrouter/nemotron-120b"
+      "groq/gpt-oss/judge",
+      "groq/llama70b/judge",
+      "gemini/flash-lite/judge",
+      "nous/laguna-s/judge",
+      "openrouter/laguna-s/judge",
+      "nous/step-flash/judge",
+      "openrouter/nemotron-120b/judge",
+      "openrouter/nemotron-550b/judge"
     ],
     "calibration": [
-      "nous/laguna-s",
-      "nous/step-flash",
-      "openrouter/nemotron-120b"
+      "groq/gpt-oss/calibration",
+      "groq/llama70b/calibration",
+      "gemini/flash-lite/calibration",
+      "nous/laguna-s/calibration",
+      "openrouter/laguna-s/calibration",
+      "nous/step-flash/calibration",
+      "openrouter/nemotron-120b/calibration",
+      "openrouter/nemotron-550b/calibration"
     ]
   },
   "models": {
@@ -26,17 +46,117 @@
       "provider": "openai",
       "model": "poolside/laguna-s-2.1:free",
       "temperature": 0.7,
-      "request_timeout": 60,
+      "request_timeout": 15,
       "rpm": 30,
       "structured_output": true,
       "base_url": "https://inference-api.nousresearch.com/v1",
       "api_key": "YOUR_NOUS_API_KEY_HERE"
     },
+    "nous/laguna-s/critic": {
+      "provider": "openai",
+      "model": "poolside/laguna-s-2.1:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://inference-api.nousresearch.com/v1",
+      "api_key": "YOUR_NOUS_API_KEY_HERE"
+    },
+    "nous/laguna-s/judge": {
+      "provider": "openai",
+      "model": "poolside/laguna-s-2.1:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://inference-api.nousresearch.com/v1",
+      "api_key": "YOUR_NOUS_API_KEY_HERE"
+    },
+    "nous/laguna-s/calibration": {
+      "provider": "openai",
+      "model": "poolside/laguna-s-2.1:free",
+      "temperature": 0.3,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://inference-api.nousresearch.com/v1",
+      "api_key": "YOUR_NOUS_API_KEY_HERE"
+    },
+    "openrouter/laguna-s": {
+      "provider": "openai",
+      "model": "poolside/laguna-s-2.1:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/laguna-s/critic": {
+      "provider": "openai",
+      "model": "poolside/laguna-s-2.1:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/laguna-s/judge": {
+      "provider": "openai",
+      "model": "poolside/laguna-s-2.1:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/laguna-s/calibration": {
+      "provider": "openai",
+      "model": "poolside/laguna-s-2.1:free",
+      "temperature": 0.3,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
     "nous/step-flash": {
       "provider": "openai",
       "model": "stepfun/step-3.7-flash:free",
       "temperature": 0.7,
-      "request_timeout": 60,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://inference-api.nousresearch.com/v1",
+      "api_key": "YOUR_NOUS_API_KEY_HERE"
+    },
+    "nous/step-flash/critic": {
+      "provider": "openai",
+      "model": "stepfun/step-3.7-flash:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://inference-api.nousresearch.com/v1",
+      "api_key": "YOUR_NOUS_API_KEY_HERE"
+    },
+    "nous/step-flash/judge": {
+      "provider": "openai",
+      "model": "stepfun/step-3.7-flash:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://inference-api.nousresearch.com/v1",
+      "api_key": "YOUR_NOUS_API_KEY_HERE"
+    },
+    "nous/step-flash/calibration": {
+      "provider": "openai",
+      "model": "stepfun/step-3.7-flash:free",
+      "temperature": 0.3,
+      "request_timeout": 15,
       "rpm": 30,
       "structured_output": true,
       "base_url": "https://inference-api.nousresearch.com/v1",
@@ -46,11 +166,201 @@
       "provider": "openai",
       "model": "nvidia/nemotron-3-super-120b-a12b:free",
       "temperature": 0.7,
-      "request_timeout": 60,
+      "request_timeout": 15,
       "rpm": 30,
       "structured_output": true,
       "base_url": "https://openrouter.ai/api/v1",
       "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/nemotron-120b/critic": {
+      "provider": "openai",
+      "model": "nvidia/nemotron-3-super-120b-a12b:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/nemotron-120b/judge": {
+      "provider": "openai",
+      "model": "nvidia/nemotron-3-super-120b-a12b:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/nemotron-120b/calibration": {
+      "provider": "openai",
+      "model": "nvidia/nemotron-3-super-120b-a12b:free",
+      "temperature": 0.3,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/nemotron-550b": {
+      "provider": "openai",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/nemotron-550b/critic": {
+      "provider": "openai",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/nemotron-550b/judge": {
+      "provider": "openai",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "temperature": 0.7,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "openrouter/nemotron-550b/calibration": {
+      "provider": "openai",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "temperature": 0.3,
+      "request_timeout": 15,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://openrouter.ai/api/v1",
+      "api_key": "YOUR_OPENROUTER_API_KEY_HERE"
+    },
+    "groq/gpt-oss": {
+      "provider": "openai",
+      "model": "openai/gpt-oss-120b",
+      "temperature": 0.7,
+      "request_timeout": 30,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_API_KEY_HERE"
+    },
+    "groq/gpt-oss/critic": {
+      "provider": "openai",
+      "model": "openai/gpt-oss-120b",
+      "temperature": 0.7,
+      "request_timeout": 30,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_API_KEY_HERE"
+    },
+    "groq/gpt-oss/judge": {
+      "provider": "openai",
+      "model": "openai/gpt-oss-120b",
+      "temperature": 0.7,
+      "request_timeout": 30,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_API_KEY_HERE"
+    },
+    "groq/gpt-oss/calibration": {
+      "provider": "openai",
+      "model": "openai/gpt-oss-120b",
+      "temperature": 0.3,
+      "request_timeout": 30,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_API_KEY_HERE"
+    },
+    "groq/llama70b": {
+      "provider": "openai",
+      "model": "llama-3.3-70b-versatile",
+      "temperature": 0.7,
+      "request_timeout": 30,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_API_KEY_HERE"
+    },
+    "groq/llama70b/critic": {
+      "provider": "openai",
+      "model": "llama-3.3-70b-versatile",
+      "temperature": 0.7,
+      "request_timeout": 30,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_API_KEY_HERE"
+    },
+    "groq/llama70b/judge": {
+      "provider": "openai",
+      "model": "llama-3.3-70b-versatile",
+      "temperature": 0.7,
+      "request_timeout": 30,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_API_KEY_HERE"
+    },
+    "groq/llama70b/calibration": {
+      "provider": "openai",
+      "model": "llama-3.3-70b-versatile",
+      "temperature": 0.3,
+      "request_timeout": 30,
+      "rpm": 30,
+      "structured_output": true,
+      "base_url": "https://api.groq.com/openai/v1",
+      "api_key": "YOUR_GROQ_API_KEY_HERE"
+    },
+    "gemini/flash-lite": {
+      "provider": "openai",
+      "model": "gemini-3.1-flash-lite",
+      "temperature": 0.7,
+      "request_timeout": 30,
+      "rpm": 15,
+      "structured_output": true,
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "api_key": "YOUR_GEMINI_API_KEY_HERE"
+    },
+    "gemini/flash-lite/critic": {
+      "provider": "openai",
+      "model": "gemini-3.1-flash-lite",
+      "temperature": 0.7,
+      "request_timeout": 30,
+      "rpm": 15,
+      "structured_output": true,
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "api_key": "YOUR_GEMINI_API_KEY_HERE"
+    },
+    "gemini/flash-lite/judge": {
+      "provider": "openai",
+      "model": "gemini-3.1-flash-lite",
+      "temperature": 0.7,
+      "request_timeout": 30,
+      "rpm": 15,
+      "structured_output": true,
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "api_key": "YOUR_GEMINI_API_KEY_HERE"
+    },
+    "gemini/flash-lite/calibration": {
+      "provider": "openai",
+      "model": "gemini-3.1-flash-lite",
+      "temperature": 0.3,
+      "request_timeout": 30,
+      "rpm": 15,
+      "structured_output": true,
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "api_key": "YOUR_GEMINI_API_KEY_HERE"
     }
   },
   "retry": {
