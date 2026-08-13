@@ -9,7 +9,7 @@ Il JSON di output deve contenere esclusivamente il campo "verdict" con uno dei s
 
 <rules_and_guidelines>
 1. **Valori Ammessi per `verdict` (ESATTI)**:
-   - **`hard`**: Il task è completo, tecnicamente impeccabile, ha superato le verifiche di calibrazione e presenta un livello di difficoltà aziendale elevato ed inequivocabile.
+   - **`hard`**: Il task è privo di ambiguità e tecnicamente impeccabile. Anche se il solver automatico non lo ha risolto nei tentativi di calibrazione, la domanda e la storia conducono in modo deterministico ed inequivocabile all'unica query gold corretta.
    - **`ambigua`**: Il testo della storia o della domanda lascia spazio a molteplici interpretazioni SQL tra loro incompatibili.
    - **`incompleta`**: Mancano elementi informativi essenziali per la risoluzione deterministica della query.
 2. **DIVIETO DI VALORI NON STANDARD**: È TASSATIVAMENTE VIETATO restituire stringhe non previste come "successed", "passed", "easy", "medium", "valid", "ok" o "difficile". Usa ESCLUSIVAMENTE una delle tre stringhe minuscole: "hard", "ambigua", "incompleta".
