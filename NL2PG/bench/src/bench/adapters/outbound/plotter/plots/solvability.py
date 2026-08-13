@@ -17,8 +17,8 @@ class SqlFeaturePassrateImpactPlot(AbstractBarPlot):
     """09: Barplot dell'impatto delle feature SQL sul pass rate."""
 
     def __init__(self) -> None:
-        """Inizializza la palette e la rotazione."""
-        super().__init__(palette="Spectral", rotation=35, ylim=(0, 0.5), figsize=(9.5, 5.5))
+        """Inizializza la rotazione ed i limiti Y."""
+        super().__init__(rotation=35, ylim=(0, 0.5), figsize=(9.5, 5.5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -137,8 +137,8 @@ class SchemaSizeVsPassrateBoxplotPlot(AbstractBarPlot):
     """12: Barplot del pass rate vs dimensione schema."""
 
     def __init__(self) -> None:
-        """Inizializza la palette."""
-        super().__init__(palette="mako")
+        """Inizializza la rotazione e la dimensione del grafico."""
+        super().__init__(rotation=35, figsize=(8.5, 5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""

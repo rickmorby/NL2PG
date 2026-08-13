@@ -104,8 +104,8 @@ class Critic5DimensionsRadarPlot(AbstractBarPlot):
     """15: Barplot delle 5 dimensioni qualitative del Critic."""
 
     def __init__(self) -> None:
-        """Inizializza la palette ed i limiti Y."""
-        super().__init__(palette="crest", rotation=35, ylim=(0, 10))
+        """Inizializza la rotazione ed i limiti Y."""
+        super().__init__(rotation=35, ylim=(0, 10))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -134,8 +134,8 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
     """16: Barplot della cardinalità del risultato Gold."""
 
     def __init__(self) -> None:
-        """Inizializza la palette e la rotazione."""
-        super().__init__(palette="viridis", rotation=25, figsize=(8.5, 5))
+        """Inizializza la rotazione e la dimensione del grafico."""
+        super().__init__(rotation=35, figsize=(8.5, 5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""

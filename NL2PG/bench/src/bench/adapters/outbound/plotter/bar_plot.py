@@ -15,7 +15,7 @@ class AbstractBarPlot(AbstractPlot):
 
     def __init__(
         self,
-        palette: str | list[str] = "mako",
+        palette: str | list[str] = "colorblind",
         rotation: int = 0,
         ylim: tuple[float, float] | None = None,
         figsize: tuple[float, float] = (8.0, 5.0),

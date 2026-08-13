@@ -47,8 +47,8 @@ class TwistTypeFrequencyPlot(AbstractBarPlot):
     """07: Barplot della frequenza dei twist."""
 
     def __init__(self) -> None:
-        """Inizializza la palette e la rotazione."""
-        super().__init__(palette="rocket", rotation=35)
+        """Inizializza la rotazione e la dimensione del grafico."""
+        super().__init__(rotation=35, figsize=(9.5, 5.5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -83,8 +83,8 @@ class VocabularyJargonDistributionPlot(AbstractBarPlot):
     """08: Barplot della distribuzione del gergo."""
 
     def __init__(self) -> None:
-        """Inizializza la palette e la rotazione."""
-        super().__init__(palette="magma", rotation=35, figsize=(9.5, 5.5))
+        """Inizializza la rotazione e la dimensione del grafico."""
+        super().__init__(rotation=35, figsize=(9.5, 5.5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""

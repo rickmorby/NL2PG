@@ -15,8 +15,8 @@ class SqlSyntaxDistributionPlot(AbstractBarPlot):
     """01: Barplot della distribuzione delle feature SQL."""
 
     def __init__(self) -> None:
-        """Inizializza la palette e la rotazione."""
-        super().__init__(palette="mako", rotation=35, figsize=(9, 5.5))
+        """Inizializza la rotazione e la dimensione del grafico."""
+        super().__init__(rotation=35, figsize=(9, 5.5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -49,7 +49,7 @@ class AstComplexityDepthPlot(AbstractBarPlot):
 
     def __init__(self, calc: AnalyticsCalculator) -> None:
         """Inietta il calcolatore AST."""
-        super().__init__(palette="viridis")
+        super().__init__(rotation=35, figsize=(9, 5.5))
         self._calc = calc
 
     def filename(self) -> str:
@@ -79,8 +79,8 @@ class SchemaDomainDiversityPlot(AbstractBarPlot):
     """03: Barplot della diversità dei domini."""
 
     def __init__(self) -> None:
-        """Inizializza la palette e la rotazione."""
-        super().__init__(palette="crest", rotation=35, figsize=(9, 5.5))
+        """Inizializza la rotazione e la dimensione del grafico."""
+        super().__init__(rotation=35, figsize=(9, 5.5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -109,8 +109,8 @@ class SchemaComplexityHeatmapPlot(AbstractBarPlot):
     """04: Barplot della complessità dello schema."""
 
     def __init__(self) -> None:
-        """Inizializza la palette."""
-        super().__init__(palette="flare")
+        """Inizializza la rotazione e la dimensione del grafico."""
+        super().__init__(rotation=35, figsize=(9, 5.5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
