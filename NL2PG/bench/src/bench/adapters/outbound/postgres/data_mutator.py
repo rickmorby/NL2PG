@@ -86,25 +86,28 @@ class PostgresDataMutator:
             return None
 
     def _try_mutations(self, ctx: tuple, query: str, orig: list[tuple], attempts: int) -> bool:
-        """Tenta mutazioni casuali finche' una produce un risultato diverso."""
+        """Tenta mutazioni casuali (UPDATE e fallback DELETE) per alterare il risultato."""
         conn, cur, tables, is_agg = ctx
         for _ in range(attempts):
             table = choice(tables)
-            try:
-                if is_agg:
-                    changed = self._delete_one_row(conn, cur, table)
-                else:
-                    changed = self._mutate_random_cell(conn, cur, table, query)
-                if not changed:
+            methods = (
+                [self._delete_one_row]
+                if is_agg
+                else [self._mutate_random_cell, self._delete_one_row]
+            )
+            for method in methods:
+                try:
+                    changed = method(conn, cur, table)
+                    if not changed:
+                        conn.rollback()
+                        continue
+                    cur.execute(query)
+                    new_rows = cur.fetchall()
                     conn.rollback()
-                    continue
-                cur.execute(query)
-                new_rows = cur.fetchall()
-                conn.rollback()
-                if new_rows != orig:
-                    return True
-            except PgError:
-                conn.rollback()
+                    if new_rows != orig:
+                        return True
+                except PgError:
+                    conn.rollback()
         return False
 
     def _is_scalar_aggregate(self, query: str) -> bool:
