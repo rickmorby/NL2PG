@@ -22,6 +22,7 @@ dependencies = [
     "matplotlib>=3.11.1",
     "seaborn>=0.13.2",
     "orjson>=3.11.9",
+    "dateparser>=1.4.2",
 ]
 
 [dependency-groups]

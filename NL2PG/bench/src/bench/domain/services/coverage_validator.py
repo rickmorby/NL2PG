@@ -4,11 +4,15 @@
 """
 
 from dataclasses import dataclass
-from sqlglot import find_tables, parse_one, exp
+
+from dateparser import parse as dateparser_parse
+from dateparser.search import search_dates
+from sqlglot import exp, find_tables, parse_one
 from sqlglot.errors import ParseError
-from bench.domain.models.nlp import StoryDTO, QuestionDTO
-from bench.domain.models.sql import GoldQueryDTO
+
+from bench.domain.models.nlp import QuestionDTO, StoryDTO
 from bench.domain.models.spec import SpecDTO, TwistRuleDTO
+from bench.domain.models.sql import GoldQueryDTO
 
 _MAPPING_TWISTS = frozenset({"rename", "synonym", "jargon", "rephrase", "polysemy"})
 
@@ -49,8 +53,7 @@ class CoverageValidator:
                     ),
                 )
         for lit in literals:
-            variants = _expand_name_variants(lit)
-            if not any(v in text for v in variants if v):
+            if not _is_literal_covered(lit, text):
                 return CoverageResult(
                     is_valid=False,
                     error=(
@@ -106,3 +109,27 @@ def _expand_name_variants(name: str) -> set[str]:
     variants.add(raw.replace("-", " "))
     variants.add(raw.replace("_", "-"))
     return variants
+
+
+def _is_literal_covered(lit: str, text: str) -> bool:
+    """Verifica se un valore letterale (testo, pattern LIKE o data) e' presente nella prosa."""
+    variants = _expand_name_variants(lit)
+    if any(v in text for v in variants if v):
+        return True
+
+    parsed_target = dateparser_parse(lit, settings={"PREFER_DAY_OF_MONTH": "first"})
+    if parsed_target:
+        try:
+            found_dates = search_dates(
+                text,
+                languages=["it"],
+                settings={"PREFER_DAY_OF_MONTH": "first"},
+            )
+            if found_dates:
+                target_date = parsed_target.date()
+                if any(dt.date() == target_date for _, dt in found_dates):
+                    return True
+        except Exception:
+            pass
+
+    return False
