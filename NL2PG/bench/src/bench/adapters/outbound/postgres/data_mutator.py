@@ -4,6 +4,7 @@
 """
 
 from datetime import date, timedelta
+from functools import partial
 from random import choice, shuffle
 from typing import Any
 
@@ -93,7 +94,7 @@ class PostgresDataMutator:
             methods = (
                 [self._delete_one_row]
                 if is_agg
-                else [self._mutate_random_cell, self._delete_one_row]
+                else [partial(self._mutate_random_cell, query=query), self._delete_one_row]
             )
             for method in methods:
                 try:
