@@ -6,8 +6,7 @@
 from collections import Counter, defaultdict
 from typing import Any
 
-from matplotlib.patheffects import withStroke
-from seaborn import scatterplot
+from seaborn import boxplot
 
 from bench.adapters.outbound.plotter.bar_plot import AbstractBarPlot
 from bench.adapters.outbound.plotter.base import AbstractPlot
@@ -49,55 +48,62 @@ class SolverPassrateByDifficultyPlot(AbstractBarPlot):
         return xs, ys
 
 
-class CriticVsPassrateCorrelationPlot(AbstractPlot):
-    """14: Bubble Scatterplot con stroke text."""
+class CriticScoreByCalibrationOutcomePlot(AbstractPlot):
+    """14: Boxplot del Critic Score per esito della calibrazione."""
 
     def __init__(self) -> None:
-        """Inizializza le dimensioni del grafico a bolle."""
+        """Inizializza le dimensioni del grafico."""
         super().__init__(figsize=(8.5, 5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
-        return "14_critic_vs_passrate_correlation.png"
+        return "14_critic_score_by_calibration_outcome.png"
 
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
-        return "14. Correlazione Critic Score vs Pass Rate (Bubble Plot)"
+        return "14. Distribuzione Critic Score per Esito della Calibrazione"
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
-        return "Critic Score"
+        return "Esito Calibrazione Solver"
 
     def ylabel(self) -> str:
         """Restituisce l'etichetta dell'asse Y."""
-        return "Calibration Pass Rate"
+        return "Critic Score"
 
-    def prepare_data(
-        self, tasks: list[dict[str, Any]]
-    ) -> tuple[list[float], list[float], list[int], list[int]]:
-        """Estrae le coordinate e le frequenze delle coppie punteggio/pass_rate."""
-        coords = Counter()
+    def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[float]]:
+        """Estrae i critic score raggruppati per esito della calibrazione."""
+        labels: list[str] = []
+        scores: list[float] = []
         for t in tasks:
-            cs = (t.get("difficulty") or {}).get("critic_score")
-            pr = (t.get("difficulty") or {}).get("calibration_pass_rate")
-            if cs is not None and pr is not None:
-                coords[(round(float(cs), 1), round(float(pr), 3))] += 1
-        xs = [k[0] for k in coords] or [1.0]
-        ys = [k[1] for k in coords] or [0.0]
-        counts = [coords[k] for k in coords] or [1]
-        sizes = [min(c * 25 + 100, 900) for c in counts]
-        return xs, ys, counts, sizes
+            diff = t.get("difficulty") or {}
+            cs = diff.get("critic_score")
+            pr = diff.get("calibration_pass_rate")
+            if cs is None or pr is None:
+                continue
+            outcome = "Passato" if float(pr) > 0.0 else "Fallito"
+            labels.append(outcome)
+            scores.append(float(cs))
+        if not labels:
+            return (["Fallito"], [0.0])
+        return labels, scores
 
-    def draw(self, ax: Any, data: tuple[list[float], list[float], list[int], list[int]]) -> None:
-        """Disegna un bubble plot con contorno bianco del testo per leggibilità 100% nitida."""
-        xs, ys, counts, sizes = data
-        scatterplot(x=xs, y=ys, size=sizes, color="#34495e", ax=ax, legend=False)
-        stroke = withStroke(linewidth=3, foreground="white")
-        for x, y, c in zip(xs, ys, counts, strict=False):
-            txt = ax.text(
-                x, y, f"{c} task", ha="center", va="center", color="#1a252f", fontweight="bold"
-            )
-            txt.set_path_effects([stroke])
+    def draw(self, ax: Any, data: tuple[list[str], list[float]]) -> None:
+        """Disegna un boxplot comparativo con palette colorblind e conteggi sugli assi."""
+        labels, scores = data
+        order = sorted(set(labels), key=lambda o: (o != "Fallito", o))
+        boxplot(
+            x=labels,
+            y=scores,
+            hue=labels,
+            hue_order=order,
+            legend=False,
+            palette={"Fallito": "#0173b2", "Passato": "#029e73"},
+            ax=ax,
+        )
+        counts = Counter(labels)
+        ax.set_xticks(range(len(order)))
+        ax.set_xticklabels([f"{o} (n={counts[o]})" for o in order])
 
 
 class QueryResultCardinalityDistributionPlot(AbstractBarPlot):

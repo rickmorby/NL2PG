@@ -5,7 +5,7 @@
 
 from bench.adapters.outbound.plotter.base import AbstractPlot
 from bench.adapters.outbound.plotter.plots.evaluation import (
-    CriticVsPassrateCorrelationPlot,
+    CriticScoreByCalibrationOutcomePlot,
     QueryResultCardinalityDistributionPlot,
     SolverPassrateByDifficultyPlot,
 )
@@ -46,14 +46,14 @@ def get_default_plots(calculator: AnalyticsCalculator) -> list[AbstractPlot]:
         TwistVsDifficultyHeatmapPlot(),
         SchemaSizeVsPassrateBoxplotPlot(),
         SolverPassrateByDifficultyPlot(),
-        CriticVsPassrateCorrelationPlot(),
+        CriticScoreByCalibrationOutcomePlot(),
         QueryResultCardinalityDistributionPlot(),
     ]
 
 
 __all__ = [
     "AstComplexityDepthPlot",
-    "CriticVsPassrateCorrelationPlot",
+    "CriticScoreByCalibrationOutcomePlot",
     "NlLinguisticComplexityPlot",
     "QueryResultCardinalityDistributionPlot",
     "SchemaComplexityHeatmapPlot",

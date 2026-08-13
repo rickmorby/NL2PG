@@ -40,6 +40,8 @@ class BenchmarkAnalyticsService(AnalyticsServicePort):
         plots_dir.mkdir(parents=True, exist_ok=True)
         analytics = self._calculator.compute_metrics(tasks, run_id)
         self._serializer.write_single_task(analytics.model_dump(), plots_dir / "analytics.json")
+        for stale in plots_dir.glob("*.png"):
+            stale.unlink()
         self._plotter.render_plots(tasks, plots_dir)
         analytics.plots_count = len(list(plots_dir.glob("*.png")))
 
