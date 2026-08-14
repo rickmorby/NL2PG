@@ -51,6 +51,7 @@ VIOLAZIONE INTEGRITÀ REFERENZIALE (ERRATO):
 
 <input_context>
 <schema_ddl>{schema_ddl}</schema_ddl>
+<few_shot>{few_shot}</few_shot>
 </input_context>
 
 <chain_of_thought_protocol>

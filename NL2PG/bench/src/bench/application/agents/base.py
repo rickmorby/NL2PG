@@ -7,12 +7,14 @@ from abc import ABC, abstractmethod
 from logging import getLogger
 from typing import Any
 
+from orjson import dumps as orjson_dumps
 from pydantic import BaseModel, ValidationError
 
 from bench.domain.exceptions import LLMClientError, ModelOutputContractError
 from bench.domain.models.llm import CallOptionsDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
+from bench.domain.ports.outbound.example_port import ExamplePort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 
@@ -27,11 +29,13 @@ class AbstractAgent(ABC):
         llm: LLMGeneratorPort,
         prompts: PromptPort,
         config: ConfigPort,
+        examples: ExamplePort | None = None,
     ) -> None:
-        """Inietta le porte outbound per LLM, prompt e configurazione."""
+        """Inietta le porte outbound per LLM, prompt, configurazione ed esempi."""
         self._llm = llm
         self._prompts = prompts
         self._config = config
+        self._examples = examples
 
     @abstractmethod
     def prompt_name(self) -> str:
@@ -107,6 +111,17 @@ class AbstractAgent(ABC):
 
         _log.warning("Nodo '%s' esaurito dopo %d tentativi. Task scartato.", name, max_attempts)
         return {"verdict": "scrapped", "last_error": err, "last_model": last_model}
+
+    def _few_shot(self, state: TaskStateDTO) -> str:
+        """Restituisce gli esempi few-shot del ruolo dell'agente, o stringa vuota se assenti.
+
+        Unico punto di accesso agli esempi: il ruolo deriva da ``prompt_name()``
+        e la resa (JSON + separatore) è centralizzata qui, non negli agenti.
+        """
+        if self._examples is None:
+            return ""
+        examples = self._examples.load(state.category, self.prompt_name())
+        return "\n---\n".join(orjson_dumps(e).decode() for e in examples)
 
     def _max_retries(self, _state: TaskStateDTO) -> int:
         """Restituisce il numero massimo di tentativi configurato."""

@@ -16,6 +16,7 @@ from contextlib import suppress
 from pathlib import Path
 
 from bench.adapters.outbound.config import ConfigAdapter
+from bench.adapters.outbound.examples import ExampleAdapter
 from bench.adapters.outbound.llm import LLMClientAdapter
 from bench.adapters.outbound.logging import LoggingAdapter
 from bench.adapters.outbound.plotter.seaborn_adapter import SeabornPlotterAdapter
@@ -56,6 +57,7 @@ from bench.domain.ports.inbound import (
     TaskRunnerPort,
 )
 from bench.domain.services.feature_checker import FeatureChecker
+from bench.domain.services.role_example_builder import RoleExampleBuilder
 
 
 class ApplicationBootstrap:
@@ -84,6 +86,8 @@ class ApplicationBootstrap:
         self._sandbox = PostgresSandboxAdapter(self._pg_client)
         self._meta_repo = MetaRepositoryAdapter(self._pg_client)
         self._prompts = PromptAdapter(self._base_dir / "prompts")
+        self._examples = ExampleAdapter(self._base_dir / "examples")
+        self._role_example_builder = RoleExampleBuilder()
 
         schema_validator = SchemaValidator(self._sandbox)
         mutation_tester = MutationTester(self._sandbox)
@@ -119,7 +123,7 @@ class ApplicationBootstrap:
 
     def task_promoter(self) -> TaskPromoterPort:
         """Restituisce la porta astratta TaskPromoterPort per la promozione dei task accettati."""
-        return TaskPromoterService(self._serializer)
+        return TaskPromoterService(self._serializer, self._role_example_builder)
 
     def database_cleaner(self) -> DatabaseCleanerPort:
         """Restituisce la porta astratta DatabaseCleanerPort per la pulizia degli schemi orfani."""
@@ -164,14 +168,15 @@ class ApplicationBootstrap:
         cfg = self._config
         sandbox = self._sandbox
         meta = self._meta_repo
+        examples = self._examples
 
         return {
-            "spec": SpecAgent(llm, prompts, cfg, meta),
-            "schema": SchemaAgent(llm, prompts, cfg, schema_validator),
-            "data": DataAgent(llm, prompts, cfg, sandbox),
-            "query": QueryAgent(llm, prompts, cfg, query_validator),
-            "story": StoryAgent(llm, prompts, cfg),
-            "question": QuestionAgent(llm, prompts, cfg),
+            "spec": SpecAgent(llm, prompts, cfg, meta, examples),
+            "schema": SchemaAgent(llm, prompts, cfg, schema_validator, examples),
+            "data": DataAgent(llm, prompts, cfg, sandbox, examples),
+            "query": QueryAgent(llm, prompts, cfg, query_validator, examples),
+            "story": StoryAgent(llm, prompts, cfg, examples),
+            "question": QuestionAgent(llm, prompts, cfg, examples),
             "critic": CriticAgent(llm, prompts, cfg),
             "hardening": HardeningAgent(llm, prompts, cfg),
             "calibration": CalibrationAgent(llm, prompts, cfg, sandbox),

@@ -31,6 +31,7 @@ class StoryAgent(AbstractAgent):
             "twist": state.spec.twist if state.spec else [],
             "twist_rules": twist_rules,
             "judge_feedback": judge_feedback,
+            "few_shot": self._few_shot(state),
         }
 
     def output_schema(self) -> type:

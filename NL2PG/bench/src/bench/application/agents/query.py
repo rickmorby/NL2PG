@@ -9,6 +9,7 @@ from bench.domain.models.spec import SpecDTO
 from bench.domain.models.sql import GoldQueryDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
+from bench.domain.ports.outbound.example_port import ExamplePort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 
@@ -22,9 +23,10 @@ class QueryAgent(AbstractAgent):
         prompts: PromptPort,
         config: ConfigPort,
         validator: QueryValidator,
+        examples: ExamplePort | None = None,
     ) -> None:
-        """Inietta le porte outbound e il validatore query."""
-        super().__init__(llm, prompts, config)
+        """Inietta le porte outbound, gli esempi e il validatore query."""
+        super().__init__(llm, prompts, config, examples)
         self._validator = validator
 
     def prompt_name(self) -> str:
@@ -37,6 +39,7 @@ class QueryAgent(AbstractAgent):
             "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
             "data_inserts": state.data_inserts.inserts if state.data_inserts else "",
             "feature_sql": state.spec.sql_features if state.spec else [],
+            "few_shot": self._few_shot(state),
         }
 
     def output_schema(self) -> type:

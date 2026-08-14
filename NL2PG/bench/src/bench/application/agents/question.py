@@ -21,6 +21,7 @@ class QuestionAgent(AbstractAgent):
             "story": state.story.story if state.story else "",
             "intent_query": state.gold_query.intent if state.gold_query else "",
             "gold_query": state.gold_query.query if state.gold_query else "",
+            "few_shot": self._few_shot(state),
         }
 
     def output_schema(self) -> type:

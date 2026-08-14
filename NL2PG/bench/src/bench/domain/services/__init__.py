@@ -8,6 +8,7 @@ from bench.domain.services.category_round_picker import CategoryRoundPicker
 from bench.domain.services.coverage_validator import CoverageResult, CoverageValidator
 from bench.domain.services.domain_pool import DOMAIN_POOL
 from bench.domain.services.feature_checker import FeatureCheckResult, FeatureChecker
+from bench.domain.services.role_example_builder import RoleExampleBuilder
 from bench.domain.services.sql_repair import PostgresSQLRepair
 from bench.domain.services.spec_validation import validate_spec
 from bench.domain.services.weighted_mean import weighted_mean
@@ -21,6 +22,7 @@ __all__: list[str] = [
     "FeatureCheckResult",
     "FeatureChecker",
     "PostgresSQLRepair",
+    "RoleExampleBuilder",
     "validate_spec",
     "weighted_mean",
 ]

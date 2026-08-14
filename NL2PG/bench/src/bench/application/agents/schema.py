@@ -9,6 +9,7 @@ from bench.domain.models.category import CategoryDTO
 from bench.domain.models.sql import SchemaDDLDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
+from bench.domain.ports.outbound.example_port import ExamplePort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 
@@ -22,9 +23,10 @@ class SchemaAgent(AbstractAgent):
         prompts: PromptPort,
         config: ConfigPort,
         validator: SchemaValidator,
+        examples: ExamplePort | None = None,
     ) -> None:
-        """Inietta le porte outbound e il validatore schema."""
-        super().__init__(llm, prompts, config)
+        """Inietta le porte outbound, gli esempi e il validatore schema."""
+        super().__init__(llm, prompts, config, examples)
         self._validator = validator
 
     def prompt_name(self) -> str:
@@ -33,7 +35,7 @@ class SchemaAgent(AbstractAgent):
 
     def build_kwargs(self, state: TaskStateDTO) -> dict:
         """Costruisce i kwargs per il prompt con descrizione categoria, spec e few-shot."""
-        few_shot = self._prompts.few_shot(state.category)
+        few_shot = self._few_shot(state)
         cat = self._config.load_categories().get(state.category, CategoryDTO())
         return {
             "cat_descrizione": cat.descrizione,

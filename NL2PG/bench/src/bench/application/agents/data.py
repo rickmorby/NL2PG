@@ -5,6 +5,7 @@
 
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.models.sql import DataInsertsDTO
+from bench.domain.ports.outbound.example_port import ExamplePort
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
 from bench.application.validators.data_validator import DataValidator
 from bench.application.agents.base import AbstractAgent
@@ -13,9 +14,11 @@ from bench.application.agents.base import AbstractAgent
 class DataAgent(AbstractAgent):
     """Genera DataInsertsDTO via LLM e li valida eseguendoli nel sandbox PostgreSQL."""
 
-    def __init__(self, llm, prompts, config, sandbox: SandboxPort) -> None:
-        """Inietta le porte e il validatore dati (creato internamente)."""
-        super().__init__(llm, prompts, config)
+    def __init__(
+        self, llm, prompts, config, sandbox: SandboxPort, examples: ExamplePort | None = None
+    ) -> None:
+        """Inietta le porte, gli esempi e il validatore dati (creato internamente)."""
+        super().__init__(llm, prompts, config, examples)
         self._validator = DataValidator(sandbox)
 
     def prompt_name(self) -> str:
@@ -27,6 +30,7 @@ class DataAgent(AbstractAgent):
         return {
             "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
             "spec": state.spec.model_dump_json() if state.spec else "{}",
+            "few_shot": self._few_shot(state),
         }
 
     def output_schema(self) -> type:

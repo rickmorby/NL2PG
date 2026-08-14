@@ -61,6 +61,7 @@ USO DI GERGO DB O TRONCAMENTO NOMI TABELLA (ERRATO):
 <twist>{twist}</twist>
 <twist_rules>{twist_rules}</twist_rules>
 {judge_feedback}
+<few_shot>{few_shot}</few_shot>
 </input_context>
 
 <chain_of_thought_protocol>

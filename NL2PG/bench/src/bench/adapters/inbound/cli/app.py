@@ -133,7 +133,7 @@ def check_command(
 
 @app.command("promote")
 def promote_command(ctx: Context) -> None:
-    """Promuove i task accettati da output/ verso la cartella esempi examples/<categoria>/."""
+    """Promuove i task accettati da output/ in examples/<categoria>/<ruolo>/."""
     bootstrap: ApplicationBootstrap = ctx.obj
     try:
         base_dir = bootstrap.base_dir

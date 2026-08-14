@@ -8,6 +8,7 @@ from bench.domain.models.category import CategoryDTO
 from bench.domain.models.spec import SpecDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
+from bench.domain.ports.outbound.example_port import ExamplePort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
@@ -24,9 +25,10 @@ class SpecAgent(AbstractAgent):
         prompts: PromptPort,
         config: ConfigPort,
         meta_repo: MetaRepositoryPort,
+        examples: ExamplePort | None = None,
     ) -> None:
-        """Inietta le porte per LLM, prompt, configurazione e repository metadati."""
-        super().__init__(llm, prompts, config)
+        """Inietta le porte per LLM, prompt, configurazione, esempi e repository metadati."""
+        super().__init__(llm, prompts, config, examples)
         self._meta_repo = meta_repo
 
     def prompt_name(self) -> str:
@@ -44,6 +46,7 @@ class SpecAgent(AbstractAgent):
             "cat_vincoli": cat.vincoli,
             "domains": DOMAIN_POOL,
             "target_domain": state.target_domain,
+            "few_shot": self._few_shot(state),
         }
 
     def output_schema(self) -> type:

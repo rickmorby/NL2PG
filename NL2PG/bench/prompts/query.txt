@@ -78,6 +78,7 @@ Colonna non aggregata assente dal GROUP BY (ERRATO):
 <schema_ddl>{schema_ddl}</schema_ddl>
 <data_inserts>{data_inserts}</data_inserts>
 <feature_sql_obbligatorie>{feature_sql}</feature_sql_obbligatorie>
+<few_shot>{few_shot}</few_shot>
 </input_context>
 
 <chain_of_thought_protocol>

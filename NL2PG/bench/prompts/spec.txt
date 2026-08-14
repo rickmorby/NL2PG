@@ -75,6 +75,7 @@ NON USARE VALORI O STRUTTURE FUORI CONTRATTO (ERRATO):
 <category_description>{cat_descrizione}</category_description>
 <available_domains>{domains}</available_domains>
 <target_domain>{target_domain}</target_domain>
+<few_shot>{few_shot}</few_shot>
 </input_context>
 
 <chain_of_thought_protocol>

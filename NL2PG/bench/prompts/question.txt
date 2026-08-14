@@ -50,6 +50,7 @@ CITAZIONE SINTATTICA DI CLAUSOLE SQL O COLONNE (ERRATO):
 <intento_query>{intent_query}</intento_query>
 <gold_query>{gold_query}</gold_query>
 <storia>{story}</storia>
+<few_shot>{few_shot}</few_shot>
 </input_context>
 
 <chain_of_thought_protocol>
