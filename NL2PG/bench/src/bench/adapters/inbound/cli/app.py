@@ -4,6 +4,7 @@
 """
 
 import os
+import signal
 
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
@@ -23,6 +24,22 @@ app = Typer(
 )
 
 _INTERRUPT_MSG = "\n[WARNING] Interruzione da tastiera (Ctrl+C). Chiusura in corso..."
+_INTERRUPT_LIMIT = 2
+_INTERRUPT_EXIT_CODE = 130
+
+
+def _install_two_stage_sigint() -> None:
+    """Installa SIGINT a 2 stadi: 1° KeyboardInterrupt (graceful), 2° os._exit(130)."""
+    counter = {"count": 0}
+
+    def _handler(_signum: int, _frame: object) -> None:
+        counter["count"] += 1
+        if counter["count"] >= _INTERRUPT_LIMIT:
+            secho("[WARNING] Seconda interruzione: uscita forzata immediata.", fg=colors.YELLOW)
+            os._exit(_INTERRUPT_EXIT_CODE)
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGINT, _handler)
 
 
 @app.callback()
@@ -42,6 +59,8 @@ def generate_command(
 ) -> None:
     """Esegue la generazione batch dei task del benchmark in formato JSON unico."""
     bootstrap: ApplicationBootstrap = ctx.obj
+    previous_sigint = signal.getsignal(signal.SIGINT)
+    _install_two_stage_sigint()
     try:
         runner = bootstrap.task_runner()
 
@@ -78,13 +97,13 @@ def generate_command(
                 missing_str = ", ".join(summary.missing_categories)
                 secho(f"  Categorie mai completate: {missing_str}", fg=colors.YELLOW)
     except KeyboardInterrupt:
-        secho(
-            _INTERRUPT_MSG,
-            fg=colors.YELLOW,
-            bold=True,
-        )
+        secho(_INTERRUPT_MSG, fg=colors.YELLOW, bold=True)
+        bootstrap.close()
+        os._exit(_INTERRUPT_EXIT_CODE)
     except Exception as e:
         handle_exception(e)
+    finally:
+        signal.signal(signal.SIGINT, previous_sigint)
 
 
 @app.command("check")

@@ -218,52 +218,57 @@ class TaskRunner(TaskRunnerPort):
         consecutive_failures = 0
 
         desc = f"Generazione Task (Parallel {batch_size})"
-        with (
-            tqdm(total=count, desc=desc, smoothing=0.1) as pbar,
-            ThreadPoolExecutor(max_workers=batch_size) as executor,
-        ):
-            futures: dict = {}
-            self._submit_pending(executor, futures, accepted_tasks, run_info, picker)
+        with tqdm(total=count, desc=desc, smoothing=0.1) as pbar:
+            executor = ThreadPoolExecutor(max_workers=batch_size)
+            try:
+                futures: dict = {}
+                self._submit_pending(executor, futures, accepted_tasks, run_info, picker)
 
-            while futures and consecutive_failures < max_fails:
-                done, _ = wait(futures.keys(), return_when=FIRST_COMPLETED)
-                for fut in done:
-                    cat_id = futures.pop(fut)
-                    try:
-                        result_state = fut.result()
-                        self._meta_repo.save_task(run_id, result_state)
-                        fail_delta = self._process_verdict(
-                            result_state,
-                            accepted_tasks,
-                            counts,
-                            output_file,
-                            picker,
-                            failure_warning_threshold,
+                while futures and consecutive_failures < max_fails:
+                    done, _ = wait(futures.keys(), return_when=FIRST_COMPLETED)
+                    for fut in done:
+                        cat_id = futures.pop(fut)
+                        try:
+                            result_state = fut.result()
+                            self._meta_repo.save_task(run_id, result_state)
+                            fail_delta = self._process_verdict(
+                                result_state,
+                                accepted_tasks,
+                                counts,
+                                output_file,
+                                picker,
+                                failure_warning_threshold,
+                            )
+                            if result_state.verdict in ("accepted", "accept"):
+                                pbar.update(1)
+                            if fail_delta > 0:
+                                consecutive_failures += fail_delta
+                            else:
+                                consecutive_failures = 0
+                        except Exception as e:
+                            _log.debug("Errore task parallelo per categoria '%s': %s", cat_id, e)
+                            counts["failed"] += 1
+                            consecutive_failures += 1
+                            self._resolve_category(cat_id, False, picker, failure_warning_threshold)
+
+                        self._submit_pending(executor, futures, accepted_tasks, run_info, picker)
+
+                        pbar.set_postfix(
+                            acc=len(accepted_tasks),
+                            active=len(futures),
+                            cat=cat_id,
                         )
-                        if result_state.verdict in ("accepted", "accept"):
-                            pbar.update(1)
-                        if fail_delta > 0:
-                            consecutive_failures += fail_delta
-                        else:
-                            consecutive_failures = 0
-                    except Exception as e:
-                        _log.debug("Errore task parallelo per categoria '%s': %s", cat_id, e)
-                        counts["failed"] += 1
-                        consecutive_failures += 1
-                        self._resolve_category(cat_id, False, picker, failure_warning_threshold)
 
-                    self._submit_pending(executor, futures, accepted_tasks, run_info, picker)
-
-                    pbar.set_postfix(
-                        acc=len(accepted_tasks),
-                        active=len(futures),
-                        cat=cat_id,
-                    )
-
-            if consecutive_failures >= max_fails:
-                _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
-                for pending in futures:
-                    pending.cancel()
+                if consecutive_failures >= max_fails:
+                    _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
+                    for pending in futures:
+                        pending.cancel()
+            except KeyboardInterrupt:
+                executor.shutdown(wait=False, cancel_futures=True)
+                _log.warning("Interruzione da tastiera: task in coda annullati.")
+                raise
+            else:
+                executor.shutdown(wait=True)
 
         return self._build_summary_from_db(run_id, output_file, count, accepted_tasks)
 
