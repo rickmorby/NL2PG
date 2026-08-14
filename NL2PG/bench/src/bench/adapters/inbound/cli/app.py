@@ -46,7 +46,7 @@ def generate_command(
 
         secho("[BENCHMARK] Avvio Generazione Batch Task", fg=colors.CYAN, bold=True)
         secho(f"  Task richiesti: {count}", fg=colors.WHITE)
-        cat_str = category if category else "Tutte (Selezione casuale)"
+        cat_str = category if category else "Tutte (Selezione a giri)"
         secho(f"  Categoria: {cat_str}", fg=colors.WHITE)
         secho(f"  Batch size: {batch_size}", fg=colors.WHITE)
 
@@ -60,6 +60,10 @@ def generate_command(
         secho(f"  Task Rigettati: {summary.rejected_count}", fg=colors.WHITE)
         secho(f"  Task Scartati: {summary.scrapped_count}", fg=colors.WHITE)
         secho(f"  Task Falliti: {summary.failed_count}", fg=colors.WHITE)
+        secho(
+            f"  Categorie Coperte: {summary.categories_covered}/{summary.categories_total}",
+            fg=colors.WHITE,
+        )
         secho(f"  Durata: {summary.duration_seconds}s", fg=colors.WHITE)
 
         if summary.accepted_count >= summary.requested_count:
@@ -69,6 +73,9 @@ def generate_command(
             req_c = summary.requested_count
             msg = f"\n[WARNING] Generazione interrotta: generati {acc_c}/{req_c} task."
             secho(msg, fg=colors.YELLOW, bold=True)
+            if summary.missing_categories:
+                missing_str = ", ".join(summary.missing_categories)
+                secho(f"  Categorie mai completate: {missing_str}", fg=colors.YELLOW)
     except KeyboardInterrupt:
         secho(
             _INTERRUPT_MSG,

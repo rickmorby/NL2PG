@@ -7,7 +7,6 @@ from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import datetime, timezone
 from logging import getLogger
 from pathlib import Path
-from random import choice
 from threading import Lock
 from time import time
 
@@ -19,6 +18,7 @@ from bench.domain.ports.inbound.task_runner_port import TaskRunnerPort
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
 from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
+from bench.domain.services.category_round_picker import CategoryRoundPicker
 from bench.domain.services.domain_pool import DOMAIN_POOL
 
 _log = getLogger("bench.application.task_runner")
@@ -61,6 +61,7 @@ class TaskRunner(TaskRunnerPort):
             allowed = sorted(list(categories.keys()))
             msg = f"Categoria '{category}' non valida. Categorie disponibili: {allowed}"
             raise ValueError(msg)
+        picker = None if category else CategoryRoundPicker(list(categories.keys()))
 
         bench_cfg = self._config.load_bench()
         cfg_hash = self._config.config_hash(bench_cfg)
@@ -78,6 +79,7 @@ class TaskRunner(TaskRunnerPort):
             summary = self._run_parallel(
                 run_info=(run_id, run_file, count, category, batch_size),
                 bench_cfg=bench_cfg,
+                picker=picker,
             )
         else:
             summary = self._run_sequential(
@@ -86,6 +88,7 @@ class TaskRunner(TaskRunnerPort):
                 count=count,
                 category=category,
                 bench_cfg=bench_cfg,
+                picker=picker,
             )
 
         duration = round(time() - start_time, 2)
@@ -99,10 +102,16 @@ class TaskRunner(TaskRunnerPort):
 
         return summary
 
-    def _create_initial_state(self, category: str, categories: list[str]) -> TaskStateDTO:
-        """Crea uno stato iniziale per un task assegnando il dominio in Round-Robin."""
-        cat_id = category if category else choice(categories)
+    def _create_initial_state(
+        self,
+        category: str,
+        picker: CategoryRoundPicker | None,
+    ) -> TaskStateDTO | None:
+        """Crea uno stato iniziale assegnando la categoria (a giri) ed il dominio in Round-Robin."""
         with self._lock:
+            cat_id = category if category else (picker.pick() if picker is not None else None)
+            if cat_id is None:
+                return None
             target_domain = DOMAIN_POOL[self._attempt_counter % len(DOMAIN_POOL)]
             self._attempt_counter += 1
         return TaskStateDTO(category=cat_id, target_domain=target_domain)
@@ -114,10 +123,14 @@ class TaskRunner(TaskRunnerPort):
         counts: dict[str, int],
         run_file: Path,
         bench_cfg: dict,
+        picker: CategoryRoundPicker | None,
+        failure_warning_threshold: int,
     ) -> int:
-        """Elabora l'esito di un task aggiornando i contatori, la barra ed il file di output."""
+        """Elabora l'esito di un task aggiornando livelli, contatori e file di output."""
         verdict = result_state.verdict
-        if verdict in ("accepted", "accept"):
+        accepted = verdict in ("accepted", "accept")
+        self._resolve_category(result_state.category, accepted, picker, failure_warning_threshold)
+        if accepted:
             with self._lock:
                 accepted_tasks.append(result_state)
                 weights = bench_cfg.get("critic", {}).get("weights", {})
@@ -133,6 +146,19 @@ class TaskRunner(TaskRunnerPort):
         counts["failed"] += 1
         return 1
 
+    def _resolve_category(
+        self,
+        category: str,
+        accepted: bool,
+        picker: CategoryRoundPicker | None,
+        failure_warning_threshold: int,
+    ) -> None:
+        """Aggiorna il livello della categoria ed avvisa dopo troppi fallimenti consecutivi."""
+        with self._lock:
+            failures = picker.resolve(category, accepted) if picker is not None else 0
+        if failures == failure_warning_threshold:
+            _log.warning("Categoria '%s': %d tentativi falliti consecutivi.", category, failures)
+
     def _run_sequential(
         self,
         run_id: str,
@@ -140,22 +166,31 @@ class TaskRunner(TaskRunnerPort):
         count: int,
         category: str,
         bench_cfg: dict,
+        picker: CategoryRoundPicker | None,
     ) -> BatchSummaryDTO:
         """Esegue la generazione sequenziale di task uno alla volta."""
-        categories = list(self._config.load_categories().keys())
         max_fails = bench_cfg.get("cli", {}).get("max_consecutive_failures", 5)
+        failure_warning_threshold = bench_cfg.get("cli", {}).get("category_failure_warning", 5)
         accepted_tasks: list[TaskStateDTO] = []
         counts = {"rejected": 0, "scrapped": 0, "failed": 0}
         consecutive_failures = 0
 
         with tqdm(total=count, desc="Generazione Task (Sequenziale)", smoothing=0.1) as pbar:
             while len(accepted_tasks) < count:
-                initial_state = self._create_initial_state(category, categories)
+                initial_state = self._create_initial_state(category, picker)
+                if initial_state is None:
+                    break
                 result_state = self._orchestrator.run_task(initial_state, run_id)
                 self._meta_repo.save_task(run_id, result_state)
 
                 fail_delta = self._process_verdict(
-                    result_state, accepted_tasks, counts, output_file, bench_cfg
+                    result_state,
+                    accepted_tasks,
+                    counts,
+                    output_file,
+                    bench_cfg,
+                    picker,
+                    failure_warning_threshold,
                 )
                 if result_state.verdict in ("accepted", "accept"):
                     pbar.update(1)
@@ -179,11 +214,12 @@ class TaskRunner(TaskRunnerPort):
         self,
         run_info: tuple[str, Path, int, str, int],
         bench_cfg: dict,
+        picker: CategoryRoundPicker | None,
     ) -> BatchSummaryDTO:
         """Esegue la generazione parallela in batch tramite ThreadPoolExecutor con Lock."""
-        run_id, output_file, count, category, batch_size = run_info
-        categories = list(self._config.load_categories().keys())
+        run_id, output_file, count, _category, batch_size = run_info
         max_fails = bench_cfg.get("cli", {}).get("max_consecutive_failures", 5)
+        failure_warning_threshold = bench_cfg.get("cli", {}).get("category_failure_warning", 5)
         accepted_tasks: list[TaskStateDTO] = []
         counts = {"rejected": 0, "scrapped": 0, "failed": 0}
         consecutive_failures = 0
@@ -193,12 +229,8 @@ class TaskRunner(TaskRunnerPort):
             tqdm(total=count, desc=desc, smoothing=0.1) as pbar,
             ThreadPoolExecutor(max_workers=batch_size) as executor,
         ):
-            futures = {}
-
-            while len(futures) < batch_size and (len(accepted_tasks) + len(futures)) < count:
-                init_state = self._create_initial_state(category, categories)
-                fut = executor.submit(self._orchestrator.run_task, init_state, run_id)
-                futures[fut] = init_state.category
+            futures: dict = {}
+            self._submit_pending(executor, futures, accepted_tasks, run_info, picker)
 
             while futures and consecutive_failures < max_fails:
                 done, _ = wait(futures.keys(), return_when=FIRST_COMPLETED)
@@ -208,7 +240,13 @@ class TaskRunner(TaskRunnerPort):
                         result_state = fut.result()
                         self._meta_repo.save_task(run_id, result_state)
                         fail_delta = self._process_verdict(
-                            result_state, accepted_tasks, counts, output_file, bench_cfg
+                            result_state,
+                            accepted_tasks,
+                            counts,
+                            output_file,
+                            bench_cfg,
+                            picker,
+                            failure_warning_threshold,
                         )
                         if result_state.verdict in ("accepted", "accept"):
                             pbar.update(1)
@@ -220,13 +258,9 @@ class TaskRunner(TaskRunnerPort):
                         _log.debug("Errore task parallelo per categoria '%s': %s", cat_id, e)
                         counts["failed"] += 1
                         consecutive_failures += 1
+                        self._resolve_category(cat_id, False, picker, failure_warning_threshold)
 
-                    while (
-                        len(futures) < batch_size and (len(accepted_tasks) + len(futures)) < count
-                    ):
-                        next_state = self._create_initial_state(category, categories)
-                        new_fut = executor.submit(self._orchestrator.run_task, next_state, run_id)
-                        futures[new_fut] = next_state.category
+                    self._submit_pending(executor, futures, accepted_tasks, run_info, picker)
 
                     pbar.set_postfix(
                         acc=len(accepted_tasks),
@@ -241,6 +275,23 @@ class TaskRunner(TaskRunnerPort):
 
         return self._build_summary_from_db(run_id, output_file, count, accepted_tasks)
 
+    def _submit_pending(
+        self,
+        executor: ThreadPoolExecutor,
+        futures: dict,
+        accepted_tasks: list[TaskStateDTO],
+        run_info: tuple[str, Path, int, str, int],
+        picker: CategoryRoundPicker | None,
+    ) -> None:
+        """Sottomette nuovi task finché il batch è pieno e la richiesta non è soddisfatta."""
+        run_id, _output_file, count, category, batch_size = run_info
+        while len(futures) < batch_size and (len(accepted_tasks) + len(futures)) < count:
+            init_state = self._create_initial_state(category, picker)
+            if init_state is None:
+                break
+            fut = executor.submit(self._orchestrator.run_task, init_state, run_id)
+            futures[fut] = init_state.category
+
     def _build_summary_from_db(
         self,
         run_id: str,
@@ -250,6 +301,8 @@ class TaskRunner(TaskRunnerPort):
     ) -> BatchSummaryDTO:
         """Costruisce il riepilogo BatchSummaryDTO interrogando il DB come fonte unica di verità."""
         db_counts = self._meta_repo.get_run_verdict_counts(run_id)
+        covered = {task.category for task in accepted_tasks}
+        all_categories = set(self._config.load_categories().keys())
         return BatchSummaryDTO(
             run_id=run_id,
             output_dir=str(output_file.parent),
@@ -258,5 +311,8 @@ class TaskRunner(TaskRunnerPort):
             rejected_count=db_counts.get("rejected", 0),
             scrapped_count=db_counts.get("scrapped", 0),
             failed_count=db_counts.get("failed", 0),
+            categories_covered=len(covered),
+            categories_total=len(all_categories),
+            missing_categories=sorted(all_categories - covered),
             duration_seconds=0.0,
         )

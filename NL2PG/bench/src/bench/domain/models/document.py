@@ -3,6 +3,8 @@
 :author: Riccardo Morabito
 """
 
+from pydantic import Field
+
 from bench.domain.models.base import AbstractDTO
 
 
@@ -16,4 +18,7 @@ class BatchSummaryDTO(AbstractDTO):
     rejected_count: int = 0
     scrapped_count: int = 0
     failed_count: int = 0
+    categories_covered: int = 0
+    categories_total: int = 0
+    missing_categories: list[str] = Field(default_factory=list)
     duration_seconds: float = 0.0

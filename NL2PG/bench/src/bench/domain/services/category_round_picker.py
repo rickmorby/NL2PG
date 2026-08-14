@@ -1,0 +1,70 @@
+"""Selettore a giri delle categorie per la generazione batch dei task.
+
+:author: Riccardo Morabito
+"""
+
+from collections import deque
+from random import sample
+from typing import Sequence
+
+
+class CategoryRoundPicker:
+    """Seleziona le categorie a giri completi, con rotazione e senza esclusioni.
+
+    Ogni categoria è organizzata per livello, dove il livello corrisponde al
+    numero di task accettati per quella categoria. La selezione avviene sempre
+    dal livello più basso non vuoto: in questo modo una run con ``count`` task
+    accettati distribuisce la richiesta in ``count // M`` giri completi sulle M
+    categorie più un giro parziale di ``count % M`` categorie.
+
+    Una categoria che fallisce torna in coda allo stesso livello (rotazione):
+    non viene mai esclusa, garantendo che la distribuzione richiesta venga
+    prima o poi completata.
+    """
+
+    def __init__(self, categories: Sequence[str]) -> None:
+        """Inizializza il selettore con le categorie mescolate al livello zero."""
+        self._levels: dict[int, deque[str]] = {0: deque(sample(categories, len(categories)))}
+        self._pending: dict[str, int] = {}
+        self._failures: dict[str, int] = {}
+
+    def pick(self) -> str | None:
+        """Restituisce la categoria al livello più basso, rimuovendola dalla coda.
+
+        Returns:
+            La categoria selezionata, oppure ``None`` quando nessuna categoria
+            è disponibile (tutte in volo o distribuzione completata).
+
+        """
+        for level in sorted(self._levels):
+            queue = self._levels[level]
+            if queue:
+                category = queue.popleft()
+                self._pending[category] = level
+                return category
+        return None
+
+    def resolve(self, category: str, accepted: bool) -> int:
+        """Registra l'esito di un task e restituisce i fallimenti consecutivi della categoria.
+
+        Se il task è accettato la categoria sale al livello successivo, altrimenti
+        torna in coda allo stesso livello (rotazione). Il contatore dei fallimenti
+        viene azzerato al primo task accettato e incrementato ad ogni esito negativo.
+
+        Args:
+            category: Identificativo della categoria del task appena concluso.
+            accepted: ``True`` se il task è stato accettato, ``False`` altrimenti.
+
+        Returns:
+            Il numero di esiti negativi consecutivi per la categoria (0 se accettato).
+
+        """
+        level = self._pending.pop(category, 0)
+        if accepted:
+            self._failures[category] = 0
+            self._levels.setdefault(level + 1, deque()).append(category)
+            return 0
+        self._levels.setdefault(level, deque()).append(category)
+        failures = self._failures.get(category, 0) + 1
+        self._failures[category] = failures
+        return failures
