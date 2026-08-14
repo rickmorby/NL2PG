@@ -1,4 +1,4 @@
-"""Builder puro delle proiezioni ruolo→campi per gli esempi few-shot.
+"""Builder puro delle proiezioni ruolo->campi per gli esempi few-shot.
 
 Fonte unica di verità su cosa ogni ruolo generativo deve imitare: gli esempi
 promossi contengono SOLO i campi del ruolo (mai il gold completo), così il
@@ -16,12 +16,12 @@ def _spec_example(task: dict) -> dict:
 
 
 def _schema_example(task: dict) -> dict:
-    """Esempio schema: coppia spec → schema_ddl."""
+    """Esempio schema: coppia spec -> schema_ddl."""
     return {"spec": task["spec"], "schema_ddl": task["gold"]["schema_ddl"]}
 
 
 def _data_example(task: dict) -> dict:
-    """Esempio data: spec + schema_ddl → data_inserts."""
+    """Esempio data: spec + schema_ddl -> data_inserts."""
     return {
         "spec": task["spec"],
         "schema_ddl": task["gold"]["schema_ddl"],
@@ -30,7 +30,7 @@ def _data_example(task: dict) -> dict:
 
 
 def _query_example(task: dict) -> dict:
-    """Esempio query: schema_ddl + data_inserts + feature_sql → query gold."""
+    """Esempio query: schema_ddl + data_inserts + feature_sql -> query gold."""
     return {
         "schema_ddl": task["gold"]["schema_ddl"],
         "data_inserts": task["gold"]["data_inserts"],
@@ -40,7 +40,7 @@ def _query_example(task: dict) -> dict:
 
 
 def _story_example(task: dict) -> dict:
-    """Esempio story: schema_ddl + data_inserts → story."""
+    """Esempio story: schema_ddl + data_inserts -> story."""
     return {
         "schema_ddl": task["gold"]["schema_ddl"],
         "data_inserts": task["gold"]["data_inserts"],
@@ -49,14 +49,14 @@ def _story_example(task: dict) -> dict:
 
 
 def _question_example(task: dict) -> dict:
-    """Esempio question: story → question."""
+    """Esempio question: story -> question."""
     return {"story": task["story"], "question": task["question"]}
 
 
 class RoleExampleBuilder:
     """Proietta un task accettato negli esempi role-specific per il few-shot.
 
-    Stateless e puro: nessuna I/O; la proiezione ruolo→campi è definita in un
+    Stateless e puro: nessuna I/O; la proiezione ruolo->campi è definita in un
     unico punto (``_BUILDERS``) e usata dal promotore per scrivere i file.
     """
 
