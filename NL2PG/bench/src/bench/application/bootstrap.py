@@ -110,7 +110,6 @@ class ApplicationBootstrap:
         """Restituisce il percorso della directory radice del progetto bench."""
         return self._base_dir
 
-
     def task_runner(self) -> TaskRunnerPort:
         """Restituisce la porta astratta TaskRunnerPort per la generazione batch dei task."""
         return TaskRunner(
@@ -137,7 +136,6 @@ class ApplicationBootstrap:
         """Restituisce la porta astratta AnalyticsServicePort per la visualizzazione ed analisi."""
         return self._analytics
 
-
     def __enter__(self) -> "ApplicationBootstrap":
         """Consente l'utilizzo di ApplicationBootstrap come context manager."""
         return self
@@ -157,7 +155,6 @@ class ApplicationBootstrap:
             self._pg_client.close()
         with suppress(Exception):
             self._llm.close()
-
 
     def _build_agents(
         self, schema_validator: SchemaValidator, query_validator: QueryValidator
