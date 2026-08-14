@@ -34,8 +34,7 @@ class NlLinguisticComplexityPlot(AbstractPlot):
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[int], list[int]]:
         """Estrae conteggio parole e numero tabelle."""
         words = [
-            len(((t.get("story") or "") + " " + (t.get("question") or "")).split())
-            for t in tasks
+            len(((t.get("story") or "") + " " + (t.get("question") or "")).split()) for t in tasks
         ]
         tables = [(t.get("spec") or {}).get("n_tables", 1) for t in tasks]
         return tables, words

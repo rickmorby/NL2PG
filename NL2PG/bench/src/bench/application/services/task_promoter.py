@@ -16,9 +16,7 @@ _log = getLogger("bench.application.task_promoter")
 class TaskPromoterService(TaskPromoterPort):
     """Servizio applicativo che coordina la promozione dei task accettati."""
 
-    def __init__(
-        self, serializer: BenchmarkSerializerPort, builder: RoleExampleBuilder
-    ) -> None:
+    def __init__(self, serializer: BenchmarkSerializerPort, builder: RoleExampleBuilder) -> None:
         """Inietta l'aggregato unico di serializzazione e il builder delle proiezioni ruolo."""
         self._serializer = serializer
         self._builder = builder

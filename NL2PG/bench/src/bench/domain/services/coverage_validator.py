@@ -17,9 +17,7 @@ from bench.domain.models.spec import SpecDTO, TwistRuleDTO
 from bench.domain.models.sql import GoldQueryDTO
 
 _MAPPING_TWISTS = frozenset({"rename", "synonym", "jargon", "rephrase", "polysemy"})
-_RE_IS_DATE_LIKE = re_compile(
-    r"^\d{4}[-/]\d{1,2}(?:[-/]\d{1,2})?$|^\d{1,2}[-/]\d{1,2}[-/]\d{4}$"
-)
+_RE_IS_DATE_LIKE = re_compile(r"^\d{4}[-/]\d{1,2}(?:[-/]\d{1,2})?$|^\d{1,2}[-/]\d{1,2}[-/]\d{4}$")
 
 
 @dataclass
