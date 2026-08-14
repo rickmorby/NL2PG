@@ -110,4 +110,4 @@ class AbstractAgent(ABC):
 
     def _max_retries(self, _state: TaskStateDTO) -> int:
         """Restituisce il numero massimo di tentativi configurato."""
-        return self._config.load_bench().get("retry", {}).get("max_per_node", 5)
+        return self._config.retry_max_per_node()

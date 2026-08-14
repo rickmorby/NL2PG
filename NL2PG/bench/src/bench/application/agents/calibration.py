@@ -59,9 +59,8 @@ class CalibrationAgent(AbstractAgent):
 
     def run(self, state: TaskStateDTO, chain_role: str = "calibration") -> dict:
         """Esegue N run del solver LLM con temperatura variabile e calcola il pass_rate."""
-        bench_cfg = self._config.load_bench()
-        max_runs = bench_cfg.get("calibration", {}).get("runs", 3)
-        temp = bench_cfg.get("calibration", {}).get("temperature", 0.9)
+        max_runs = self._config.calibration_runs()
+        temp = self._config.calibration_temperature()
         passes = 0
         first_pass = None
         last_model = ""

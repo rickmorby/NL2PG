@@ -63,8 +63,7 @@ class TaskRunner(TaskRunnerPort):
             raise ValueError(msg)
         picker = None if category else CategoryRoundPicker(list(categories.keys()))
 
-        bench_cfg = self._config.load_bench()
-        cfg_hash = self._config.config_hash(bench_cfg)
+        cfg_hash = self._config.bench_hash()
         cat_hash = self._config.config_hash({"categories": list(categories.keys())})
 
         run_id = self._meta_repo.new_run(cfg_hash, cat_hash)
@@ -78,7 +77,6 @@ class TaskRunner(TaskRunnerPort):
         if batch_size > 1:
             summary = self._run_parallel(
                 run_info=(run_id, run_file, count, category, batch_size),
-                bench_cfg=bench_cfg,
                 picker=picker,
             )
         else:
@@ -87,7 +85,6 @@ class TaskRunner(TaskRunnerPort):
                 output_file=run_file,
                 count=count,
                 category=category,
-                bench_cfg=bench_cfg,
                 picker=picker,
             )
 
@@ -122,7 +119,6 @@ class TaskRunner(TaskRunnerPort):
         accepted_tasks: list[TaskStateDTO],
         counts: dict[str, int],
         run_file: Path,
-        bench_cfg: dict,
         picker: CategoryRoundPicker | None,
         failure_warning_threshold: int,
     ) -> int:
@@ -133,7 +129,7 @@ class TaskRunner(TaskRunnerPort):
         if accepted:
             with self._lock:
                 accepted_tasks.append(result_state)
-                weights = bench_cfg.get("critic", {}).get("weights", {})
+                weights = self._config.critic_weights()
                 doc = self._serializer.build_document(accepted_tasks, result_state.run_id, weights)
                 self._serializer.write(doc, run_file)
             return 0
@@ -165,12 +161,11 @@ class TaskRunner(TaskRunnerPort):
         output_file: Path,
         count: int,
         category: str,
-        bench_cfg: dict,
         picker: CategoryRoundPicker | None,
     ) -> BatchSummaryDTO:
         """Esegue la generazione sequenziale di task uno alla volta."""
-        max_fails = bench_cfg.get("cli", {}).get("max_consecutive_failures", 5)
-        failure_warning_threshold = bench_cfg.get("cli", {}).get("category_failure_warning", 5)
+        max_fails = self._config.cli_max_consecutive_failures()
+        failure_warning_threshold = self._config.cli_category_failure_warning()
         accepted_tasks: list[TaskStateDTO] = []
         counts = {"rejected": 0, "scrapped": 0, "failed": 0}
         consecutive_failures = 0
@@ -188,7 +183,6 @@ class TaskRunner(TaskRunnerPort):
                     accepted_tasks,
                     counts,
                     output_file,
-                    bench_cfg,
                     picker,
                     failure_warning_threshold,
                 )
@@ -213,13 +207,12 @@ class TaskRunner(TaskRunnerPort):
     def _run_parallel(
         self,
         run_info: tuple[str, Path, int, str, int],
-        bench_cfg: dict,
         picker: CategoryRoundPicker | None,
     ) -> BatchSummaryDTO:
         """Esegue la generazione parallela in batch tramite ThreadPoolExecutor con Lock."""
         run_id, output_file, count, _category, batch_size = run_info
-        max_fails = bench_cfg.get("cli", {}).get("max_consecutive_failures", 5)
-        failure_warning_threshold = bench_cfg.get("cli", {}).get("category_failure_warning", 5)
+        max_fails = self._config.cli_max_consecutive_failures()
+        failure_warning_threshold = self._config.cli_category_failure_warning()
         accepted_tasks: list[TaskStateDTO] = []
         counts = {"rejected": 0, "scrapped": 0, "failed": 0}
         consecutive_failures = 0
@@ -244,7 +237,6 @@ class TaskRunner(TaskRunnerPort):
                             accepted_tasks,
                             counts,
                             output_file,
-                            bench_cfg,
                             picker,
                             failure_warning_threshold,
                         )

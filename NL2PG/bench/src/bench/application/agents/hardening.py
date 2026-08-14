@@ -53,7 +53,7 @@ class HardeningAgent(AbstractAgent):
 
     def run(self, state: TaskStateDTO, chain_role: str = "default") -> dict:
         """Esegue il retry loop solo se non ha superato max_rounds."""
-        max_rounds = self._config.load_bench().get("hardening", {}).get("max_rounds", 3)
+        max_rounds = self._config.hardening_max_rounds()
         if state.retry_hardening >= max_rounds:
             return {
                 "verdict": "scrapped",

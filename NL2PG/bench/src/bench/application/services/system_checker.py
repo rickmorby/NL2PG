@@ -23,15 +23,14 @@ class SystemCheckService(SystemCheckPort):
 
     def check_configurations(self) -> ConfigCheckResultDTO:
         """Carica le configurazioni e ne calcola gli hash di integrità."""
-        bench_cfg = self._config.load_bench()
         providers_cfg = self._config.load_providers()
         categories = self._config.load_categories()
 
-        cfg_hash = self._config.config_hash(bench_cfg)
+        cfg_hash = self._config.bench_hash()
         cat_hash = self._config.config_hash({"categories": list(categories.keys())})
 
         return ConfigCheckResultDTO(
-            bench_loaded=bool(bench_cfg),
+            bench_loaded=True,
             models_count=len(providers_cfg.get("models", {})),
             categories_count=len(categories),
             config_hash=cfg_hash,

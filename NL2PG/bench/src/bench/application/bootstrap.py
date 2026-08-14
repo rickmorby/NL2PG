@@ -78,7 +78,8 @@ class ApplicationBootstrap:
         self._config = ConfigAdapter(cfg_dir)
         self._llm = LLMClientAdapter(self._config.load_providers())
         self._pg_client = PostgresClientAdapter(
-            config=self._config.load_bench().get("run", {}),
+            sandbox_dsn=self._config.dsn("sandbox_dsn"),
+            meta_dsn=self._config.dsn("meta_dsn"),
         )
         self._sandbox = PostgresSandboxAdapter(self._pg_client)
         self._meta_repo = MetaRepositoryAdapter(self._pg_client)

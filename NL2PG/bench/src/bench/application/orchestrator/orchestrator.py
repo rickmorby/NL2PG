@@ -44,9 +44,7 @@ class Orchestrator:
         state = initial.model_copy(update={"task_id": task_id, "run_id": run_id})
         with self._sandbox.task_scope() as schema:
             state = state.model_copy(update={"sandbox_schema": schema})
-            recursion_limit = (
-                self._config.load_bench().get("orchestrator", {}).get("recursion_limit", 150)
-            )
+            recursion_limit = self._config.recursion_limit()
             config: dict[str, Any] = {
                 "configurable": {"thread_id": task_id},
                 "recursion_limit": recursion_limit,
@@ -163,8 +161,7 @@ class Orchestrator:
         if state.verdict == "scrapped":
             return "scrapped"
         if state.last_error:
-            bench_cfg = self._config.load_bench()
-            max_per_node = bench_cfg.get("retry", {}).get("max_per_node", 3)
+            max_per_node = self._config.retry_max_per_node()
             if state.retry_story >= max_per_node:
                 return "scrapped"
             return "fail"
@@ -182,13 +179,12 @@ class Orchestrator:
             return "scrapped"
         if state.critic is None:
             return "scrapped"
-        bench_cfg = self._config.load_bench()
-        weights = bench_cfg.get("critic", {}).get("weights", {})
-        high = bench_cfg.get("thresholds", {}).get("critic_high", 3.5)
+        weights = self._config.critic_weights()
+        high = self._config.critic_high_threshold()
         media = weighted_mean(state.critic, weights)
         if media >= high:
             return "calib"
-        max_rounds = bench_cfg.get("hardening", {}).get("max_rounds", 3)
+        max_rounds = self._config.hardening_max_rounds()
         if state.retry_hardening >= max_rounds:
             return "calib"
         return "harden"
@@ -207,8 +203,7 @@ class Orchestrator:
             return "reject"
         if state.judge_verdict == "hard":
             return "accept"
-        bench_cfg = self._config.load_bench()
-        max_regens = bench_cfg.get("judge", {}).get("max_regens", 2)
+        max_regens = self._config.judge_max_regens()
         if state.judge_regens >= max_regens:
             return "reject"
         return "regen"
@@ -226,8 +221,7 @@ class Orchestrator:
             state.spec,
         )
         if not result.is_valid:
-            bench_cfg = self._config.load_bench()
-            max_per_node = bench_cfg.get("retry", {}).get("max_per_node", 3)
+            max_per_node = self._config.retry_max_per_node()
             if state.retry_story >= max_per_node:
                 return {"verdict": "scrapped", "last_error": result.error}
             return {"last_error": result.error}
