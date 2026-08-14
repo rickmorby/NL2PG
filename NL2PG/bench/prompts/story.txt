@@ -50,7 +50,7 @@ USO DI GERGO DB O TRONCAMENTO NOMI TABELLA (ERRATO):
 
 <forbidden_actions>
 - DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
-- DIVIETO 2: NON usare MAI parole come *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*. SE SCRIVI LA PAROLA 'tabella', IL TASK È INVALIDATO!
+- DIVIETO 2: NON usare MAI parole come *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*. SE SCRIVI LA PAROLA 'tabella', IL TASK VIENE INVALIDATO!
 - DIVIETO 3: NON abbreviare o modificare il nome letterale di una tabella del DDL o del relativo `obsolete_value`.
 </forbidden_actions>
 

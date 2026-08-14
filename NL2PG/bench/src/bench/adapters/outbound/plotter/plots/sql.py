@@ -118,11 +118,11 @@ class SchemaComplexityHeatmapPlot(AbstractBarPlot):
 
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
-        return "04. Complessità Schema (N° Tabelle)"
+        return "04. Complessità Schema (N. Tabelle)"
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
-        return "N° Tabelle"
+        return "N. Tabelle"
 
     def ylabel(self) -> str:
         """Restituisce l'etichetta dell'asse Y."""

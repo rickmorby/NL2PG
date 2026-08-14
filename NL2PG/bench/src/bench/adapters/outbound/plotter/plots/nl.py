@@ -21,11 +21,11 @@ class NlLinguisticComplexityPlot(AbstractPlot):
 
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
-        return "06. Complessità Linguistica vs N° Tabelle"
+        return "06. Complessità Linguistica vs N. Tabelle"
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
-        return "N° Tabelle Schema"
+        return "N. Tabelle Schema"
 
     def ylabel(self) -> str:
         """Restituisce l'etichetta dell'asse Y."""

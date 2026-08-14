@@ -35,7 +35,7 @@ NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
 ```
 </example_to_avoid>
 <example_to_avoid>
-VIOLAZIONE INTEGRITÀ REFERENZIALE (ERRATO):
+VIOLAZIONE INTEGRITA' REFERENZIALE (ERRATO):
 {
   "inserts": "INSERT INTO ordini (id, cliente_id, ...) VALUES (101, 999, ...);" // cliente_id 999 non esiste in clienti!
 }

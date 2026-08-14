@@ -13,7 +13,7 @@ from bench.domain.ports.outbound.example_port import ExamplePort
 class ExampleAdapter(ExamplePort):
     """Carica fino a 3 esempi JSON da examples/<categoria>/<ruolo>/ come dict Python.
 
-    Puro I/O: non conosce i campi degli esempi; la proiezione ruolo→campi è
+    Puro I/O: non conosce i campi degli esempi; la proiezione ruolo->campi è
     responsabilità del dominio (RoleExampleBuilder) a monte, in promozione.
     """
 

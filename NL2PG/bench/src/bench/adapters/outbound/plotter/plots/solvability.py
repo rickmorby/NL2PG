@@ -51,7 +51,7 @@ class SqlFeaturePassrateImpactPlot(AbstractBarPlot):
 
 
 class TwistCountDegradationCurvePlot(AbstractPlot):
-    """10: Lineplot del degrado pass rate vs n° twist."""
+    """10: Lineplot del degrado pass rate vs n. twist."""
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -59,7 +59,7 @@ class TwistCountDegradationCurvePlot(AbstractPlot):
 
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
-        return "10. Degrado Risolvibilità (Pass Rate) vs N° di Twist"
+        return "10. Degrado Risolvibilità (Pass Rate) vs N. di Twist"
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""

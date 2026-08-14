@@ -119,7 +119,7 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
 
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
-        return "15. Cardinalità Risultato Gold (N° Righe)"
+        return "15. Cardinalità Risultato Gold (N. Righe)"
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""

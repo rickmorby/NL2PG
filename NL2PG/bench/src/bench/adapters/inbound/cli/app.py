@@ -29,7 +29,7 @@ _INTERRUPT_EXIT_CODE = 130
 
 
 def _install_two_stage_sigint() -> None:
-    """Installa SIGINT a 2 stadi: 1° KeyboardInterrupt (graceful), 2° os._exit(130)."""
+    """Installa SIGINT a 2 stadi: 1. KeyboardInterrupt (graceful), 2. os._exit(130)."""
     counter = {"count": 0}
 
     def _handler(_signum: int, _frame: object) -> None:
@@ -119,7 +119,7 @@ def check_command(
         bool, Option("--config", "-cfg", help="Verifica l'integrità delle configurazioni.")
     ] = False,
     all_check: Annotated[
-        bool, Option("--all", "-a", help="Diagnosi completa 360° (Config + Provider + Modelli).")
+        bool, Option("--all", "-a", help="Diagnosi completa (Config + Provider + Modelli).")
     ] = False,
 ) -> None:
     """Diagnosi unificata di configurazioni, connettività provider e modelli LLM."""
