@@ -28,18 +28,23 @@ _INTERRUPT_LIMIT = 2
 _INTERRUPT_EXIT_CODE = 130
 
 
-def _install_two_stage_sigint() -> None:
-    """Installa SIGINT a 2 stadi: 1. KeyboardInterrupt (graceful), 2. os._exit(130)."""
-    counter = {"count": 0}
+class _TwoStageSigintHandler:
+    """Gestore del segnale SIGINT a due stadi (graceful e forzato)."""
 
-    def _handler(_signum: int, _frame: object) -> None:
-        counter["count"] += 1
-        if counter["count"] >= _INTERRUPT_LIMIT:
+    def __init__(self) -> None:
+        self._count = 0
+
+    def __call__(self, _signum: int, _frame: object) -> None:
+        self._count += 1
+        if self._count >= _INTERRUPT_LIMIT:
             secho("[WARNING] Seconda interruzione: uscita forzata immediata.", fg=colors.YELLOW)
             os_exit(_INTERRUPT_EXIT_CODE)
         raise KeyboardInterrupt
 
-    signal(SIGINT, _handler)
+
+def _install_two_stage_sigint() -> None:
+    """Installa SIGINT a 2 stadi: 1. KeyboardInterrupt (graceful), 2. os_exit(130)."""
+    signal(SIGINT, _TwoStageSigintHandler())
 
 
 @app.callback()

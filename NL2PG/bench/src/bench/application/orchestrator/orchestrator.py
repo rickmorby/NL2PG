@@ -20,6 +20,29 @@ from bench.domain.services.weighted_mean import weighted_mean
 _log = getLogger("bench.orchestrator")
 
 
+class _MissingAgentNode:
+    """Nodo di fallback per agente non registrato."""
+
+    def __init__(self, name: str) -> None:
+        self._name = name
+
+    def __call__(self, _state: TaskStateDTO, _config: dict | None = None) -> dict:
+        return {
+            "verdict": "scrapped",
+            "last_error": f"Agente '{self._name}' non registrato.",
+        }
+
+
+class _AgentNodeRunner:
+    """Esecutore di nodo delegato all'agente registrato."""
+
+    def __init__(self, agent: AbstractAgent) -> None:
+        self._agent = agent
+
+    def __call__(self, state: TaskStateDTO, _config: dict | None = None) -> dict:
+        return self._agent.run(state)
+
+
 class Orchestrator:
     """Costruisce ed esegue il grafo LangGraph della pipeline di generazione."""
 
@@ -138,19 +161,8 @@ class Orchestrator:
         """Crea una funzione nodo che invoca l'agente corrispondente."""
         agent = self._agents.get(name)
         if agent is None:
-
-            def missing(_state: TaskStateDTO, _config: dict | None = None) -> dict:
-                return {
-                    "verdict": "scrapped",
-                    "last_error": f"Agente '{name}' non registrato.",
-                }
-
-            return missing
-
-        def node_fn(state: TaskStateDTO, _config: dict | None = None) -> dict:
-            return agent.run(state)
-
-        return node_fn
+            return _MissingAgentNode(name)
+        return _AgentNodeRunner(agent)
 
     def _after_generation_step(self, state: TaskStateDTO) -> str:
         """Instrada dopo uno step di generazione: ok se generato, scrapped se fallito."""

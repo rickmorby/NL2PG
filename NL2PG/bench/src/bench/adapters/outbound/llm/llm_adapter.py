@@ -45,13 +45,15 @@ for _cb_attr in ("_async_success_callback", "_async_failure_callback", "_async_i
     if hasattr(litellm_mod, _cb_attr):
         setattr(litellm_mod, _cb_attr, [])
 
+
+def _noop_service_hook(*_args: Any, **_kwargs: Any) -> None:
+    """Hook no-op per sopprimere i logger interni di LiteLLM."""
+    return
+
+
 with suppress(Exception):
     _sl = modules.get("litellm._service_logger")
     if _sl and hasattr(_sl, "ServiceLogging"):
-
-        def _noop_service_hook(*_args: Any, **_kwargs: Any) -> None:
-            pass
-
         _sl.ServiceLogging.service_success_hook = _noop_service_hook
         _sl.ServiceLogging.async_service_success_hook = _noop_service_hook
 
