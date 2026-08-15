@@ -1,5 +1,8 @@
+name: pg_bench_db
+
 services:
   pg:
+    container_name: pg_bench_db
     image: docker.io/library/postgres:17-alpine
     environment:
       POSTGRES_USER: bench
@@ -7,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - bench_pg:/var/lib/postgresql/data
+      - pg_bench_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U bench -d bench_meta && pg_isready -U bench -d bench_sandbox"]
@@ -17,4 +20,5 @@ services:
       start_period: 5s
 
 volumes:
-  bench_pg:
+  pg_bench_data:
+    name: pg_bench_data
