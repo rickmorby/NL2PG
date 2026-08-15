@@ -3,10 +3,10 @@
 :author: Riccardo Morabito
 """
 
-import os
-import signal
+from os import _exit as os_exit, environ
+from signal import SIGINT, getsignal, signal
 
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
+environ.setdefault("HF_HUB_OFFLINE", "1")
 
 from typing import Annotated, Any
 
@@ -36,10 +36,10 @@ def _install_two_stage_sigint() -> None:
         counter["count"] += 1
         if counter["count"] >= _INTERRUPT_LIMIT:
             secho("[WARNING] Seconda interruzione: uscita forzata immediata.", fg=colors.YELLOW)
-            os._exit(_INTERRUPT_EXIT_CODE)
+            os_exit(_INTERRUPT_EXIT_CODE)
         raise KeyboardInterrupt
 
-    signal.signal(signal.SIGINT, _handler)
+    signal(SIGINT, _handler)
 
 
 @app.callback()
@@ -59,7 +59,7 @@ def generate_command(
 ) -> None:
     """Esegue la generazione batch dei task del benchmark in formato JSON unico."""
     bootstrap: ApplicationBootstrap = ctx.obj
-    previous_sigint = signal.getsignal(signal.SIGINT)
+    previous_sigint = getsignal(SIGINT)
     _install_two_stage_sigint()
     try:
         runner = bootstrap.task_runner()
@@ -99,11 +99,11 @@ def generate_command(
     except KeyboardInterrupt:
         secho(_INTERRUPT_MSG, fg=colors.YELLOW, bold=True)
         bootstrap.close()
-        os._exit(_INTERRUPT_EXIT_CODE)
+        os_exit(_INTERRUPT_EXIT_CODE)
     except Exception as e:
         handle_exception(e)
     finally:
-        signal.signal(signal.SIGINT, previous_sigint)
+        signal(SIGINT, previous_sigint)
 
 
 @app.command("check")

@@ -46,13 +46,14 @@ for _cb_attr in ("_async_success_callback", "_async_failure_callback", "_async_i
         setattr(litellm_mod, _cb_attr, [])
 
 with suppress(Exception):
-    import litellm._service_logger as _sl
+    _sl = modules.get("litellm._service_logger")
+    if _sl and hasattr(_sl, "ServiceLogging"):
 
-    def _noop_service_hook(*_args: Any, **_kwargs: Any) -> None:
-        pass
+        def _noop_service_hook(*_args: Any, **_kwargs: Any) -> None:
+            pass
 
-    _sl.ServiceLogging.service_success_hook = _noop_service_hook
-    _sl.ServiceLogging.async_service_success_hook = _noop_service_hook
+        _sl.ServiceLogging.service_success_hook = _noop_service_hook
+        _sl.ServiceLogging.async_service_success_hook = _noop_service_hook
 
 
 class LLMClientAdapter(LLMGeneratorPort):
