@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "2821365299d51552"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    indirizzo TEXT\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);"
+}

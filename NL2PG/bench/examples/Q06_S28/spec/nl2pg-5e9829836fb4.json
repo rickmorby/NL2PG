@@ -1,0 +1,27 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "conjunctive"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "prop",
+      "obsolete_value": "immobili",
+      "description": "La tabella 'prop' è denominata 'immobili' nella documentazione aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "sqft",
+      "obsolete_value": "superficie_utilizzabile",
+      "description": "Il campo 'sqft' è indicato come 'superficie_utilizzabile' usando gergo interno dell'azienda."
+    }
+  ],
+  "spec_hash": "c716793e46cee86c"
+}

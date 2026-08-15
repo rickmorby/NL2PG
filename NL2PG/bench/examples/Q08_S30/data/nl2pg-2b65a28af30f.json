@@ -1,0 +1,24 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 5,
+    "hierarchy": "self_referential",
+    "sql_features": [
+      "self_join"
+    ],
+    "twist": [
+      "distractor"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "distractor",
+        "target_value": "transazioni",
+        "obsolete_value": "movimenti_contabili",
+        "description": "La tabella 'transazioni' è indicata come 'movimenti_contabili' nella prosa aziendale, introducendo un termine non presente nello schema reale per distrazione. Questo richiede al risolutore di ignorare l'etichetta ambigua e concentrarsi sulla struttura logica del self-join."
+      }
+    ],
+    "spec_hash": "547bd2a9ca248351"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    data_nascita DATE,\n    telefono TEXT\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_conto TEXT NOT NULL UNIQUE,\n    tipo_conto TEXT NOT NULL,\n    saldo NUMERIC(15,2) NOT NULL CHECK (saldo >= 0),\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE tipi_transazione (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    tipo_padre_id INT REFERENCES tipi_transazione(id),\n    descrizione TEXT\n);\n\nCREATE TABLE transazioni (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    tipo_transazione_id INT NOT NULL REFERENCES tipi_transazione(id),\n    importo NUMERIC(15,2) NOT NULL CHECK (importo != 0),\n    data_transazione TIMESTAMP NOT NULL,\n    descrizione TEXT,\n    transazione_padre_id INT REFERENCES transazioni(id)\n);\n\nCREATE TABLE dettagli_transazione (\n    id INT PRIMARY KEY,\n    transazione_id INT NOT NULL REFERENCES transazioni(id),\n    dettaglio_tipo TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(15,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    totale NUMERIC(15,2) NOT NULL CHECK (totale >= 0)\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, email, data_nascita, telefono) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', 'mario.rossi@email.com', '1980-01-15', '3471234567'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', 'laura.bianchi@email.com', '1985-03-22', '3329876543'),\n(3, 'Giuseppe Verdi', 'VRDGPP78C15F205X', 'giuseppe.verdi@email.com', '1978-05-10', '3456789012'),\n(4, 'Anna Neri', 'NRNANN90D20F205W', 'anna.neri@email.com', '1990-07-30', '3401122334');\n\nINSERT INTO conti (id, cliente_id, numero_conto, tipo_conto, saldo, data_apertura) VALUES\n(1, 1, 'IT0000001', 'Corrente', 1500.00, '2020-01-10'),\n(2, 2, 'IT0000002', 'Corrente', 2500.50, '2019-06-15'),\n(3, 3, 'IT0000003', 'Risparmio', 5000.00, '2018-03-22'),\n(4, 1, 'IT0000004', 'Risparmio', 800.75, '2021-09-05'),\n(5, 4, 'IT0000005', 'Corrente', 320.00, '2022-11-18');\n\nINSERT INTO tipi_transazione (id, nome, tipo_padre_id, descrizione) VALUES\n(1, 'Deposito', NULL, 'Versamento di fondi'),\n(2, 'Prelievo', NULL, 'Prelievo di denaro'),\n(3, 'Bonifico', 1, 'Trasferimento tra conti'),\n(4, 'Acconto', 2, 'Pagamento parziale'),\n(5, 'Bolletta', NULL, 'Pagamento bollette');\n\nINSERT INTO transazioni (id, conto_id, tipo_transazione_id, importo, data_transazione, descrizione, transazione_padre_id) VALUES\n(1, 1, 1, 500.00, '2023-05-10 10:30:00', 'Deposito contante', NULL),\n(2, 2, 2, -150.00, '2023-05-11 14:20:00', 'Prelievo ATM', NULL),\n(3, 3, 3, 1000.00, '2023-05-12 09:15:00', 'Bonifico ricevuto', 1),\n(4, 4, 5, -89.50, '2023-05-13 16:45:00', 'Pagamento bolletta elettrica', NULL),\n(5, 5, 4, -50.00, '2023-05-14 11:00:00', 'Acconto fattura', NULL),\n(6, 1, 2, -200.00, '2023-05-15 08:30:00', 'Prelievo conto deposito', 2);\n\nINSERT INTO dettagli_transazione (id, transazione_id, dettaglio_tipo, quantita, prezzo_unitario, totale) VALUES\n(1, 1, 'Fisico', 1, 500.00, 500.00),\n(2, 4, 'Digitale', 1, 89.50, 89.50),\n(3, 6, 'Digitale', 2, 25.00, 50.00),\n(4, 3, 'Digitale', 1, 1000.00, 1000.00),\n(5, 2, 'ATM', 1, 150.00, 150.00);"
+}

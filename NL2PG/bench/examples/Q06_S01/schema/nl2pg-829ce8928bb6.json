@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "8aacf6d1e1fe4d12"
+  },
+  "schema_ddl": "CREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    data_movimento DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    importo NUMERIC(10,2) NOT NULL CHECK (importo <> 0),\n    tipo TEXT CHECK (tipo IN ('entrata', 'uscita'))\n);"
+}

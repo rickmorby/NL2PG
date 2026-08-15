@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "magazzino",
+      "obsolete_value": "centro_logistico",
+      "description": "La tabella magazzino viene denominata centro_logistico nel linguaggio aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "id_magazzino",
+      "obsolete_value": "codice_deposito",
+      "description": "La colonna id_magazzino è indicata come codice_deposito nei documenti operativi."
+    }
+  ],
+  "spec_hash": "767461587caa2a71"
+}

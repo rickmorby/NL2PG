@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "self_join"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_dipendenti",
+        "description": "La tabella dipendenti viene denominata anagrafica_dipendenti nel linguaggio aziendale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "salario",
+        "obsolete_value": "retribuzione",
+        "description": "La colonna salario è indicata come retribuzione nei documenti aziendali."
+      }
+    ],
+    "spec_hash": "6cf063e1b9a4d697"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    id_manager INT REFERENCES dipendenti(id)\n);\n\nCREATE TABLE salari (\n    id SERIAL PRIMARY KEY,\n    dipendente_id INT NOT NULL UNIQUE REFERENCES dipendenti(id),\n    salario NUMERIC(10,2) CHECK (salario >= 0),\n    data_inizio DATE NOT NULL,\n    data_fine DATE\n);",
+  "data_inserts": "INSERT INTO dipendenti (id, nome, cognome, data_nascita, codice_fiscale, id_manager) VALUES\n(1, 'Marco', 'Rossi', '1985-03-15', 'RSSMRC85C15F205X', NULL),\n(2, 'Anna', 'Verdi', '1990-07-22', 'VDRANN90M22F205Y', 1),\n(3, 'Luca', 'Bianchi', '1988-11-30', 'BNNLCU88S30F205Z', 1),\n(4, 'Giulia', 'Esposito', '1995-02-14', 'ESPGLL95B14F205W', 1),\n(5, 'Paolo', 'Conti', '1992-09-05', 'CNTPLO92P05F205V', 2);\n\nINSERT INTO salari (id, dipendente_id, salario, data_inizio, data_fine) VALUES\n(1, 1, 5500.00, '2020-01-15', NULL),\n(2, 2, 3200.50, '2021-03-10', NULL),\n(3, 3, 2800.00, '2019-06-01', '2023-12-31'),\n(4, 4, 3500.75, '2022-09-20', NULL),\n(5, 5, 3000.00, '2021-11-15', NULL);"
+}

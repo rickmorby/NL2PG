@@ -1,0 +1,6 @@
+{
+  "schema_ddl": "CREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('in_attesa', 'processato', 'spedito', 'annullato')),\n    cliente_id INT NOT NULL\n);",
+  "data_inserts": "INSERT INTO ordini (id, data_ordine, importo_totale, stato_ordine, cliente_id) VALUES\n(1, '2023-10-01', 150.50, 'in_attesa', 1),\n(2, '2023-10-05', 89.00, 'processato', 2),\n(3, '2023-10-10', 200.75, 'spedito', 1),\n(4, '2023-10-15', 0.00, 'annullato', 3),\n(5, '2023-10-20', 300.25, 'processato', 4);",
+  "feature_sql": [],
+  "query": "WITH stats_clienti AS (SELECT cliente_id, COUNT(*) AS numero_ordini, SUM(importo_totale) AS totale_speso, AVG(importo_totale) AS media_ordine FROM ordini WHERE stato_ordine != 'annullato' GROUP BY cliente_id), media_globale AS (SELECT AVG(totale_speso) AS media_spesa_clienti FROM stats_clienti) SELECT s.cliente_id, s.numero_ordini, s.totale_speso, s.media_ordine FROM stats_clienti s CROSS JOIN media_globale m WHERE s.totale_speso > m.media_spesa_clienti ORDER BY s.totale_speso DESC;"
+}

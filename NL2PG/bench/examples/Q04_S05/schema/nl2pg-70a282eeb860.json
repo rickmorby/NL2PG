@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "5ed2c2c8fcf733b8"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    email TEXT\n);\n\nCREATE TABLE fatture (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_fattura DATE NOT NULL,\n    importo NUMERIC(10,2) CHECK (importo >= 0),\n    descrizione TEXT\n);"
+}

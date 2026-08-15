@@ -1,0 +1,28 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "pazienti",
+        "obsolete_value": "anagrafica_pazienti",
+        "description": "La tabella pazienti viene denominata anagrafica_pazienti nel linguaggio aziistico."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "visite",
+        "obsolete_value": "controlli",
+        "description": "La colonna visite è indicata come controlli nella prosa aziale."
+      }
+    ],
+    "spec_hash": "7f961b71d1dd09ea"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    sesso CHAR(1) NOT NULL CHECK (sesso IN ('M', 'F')),\n    indirizzo TEXT,\n    telefono TEXT,\n    email TEXT UNIQUE,\n    visite INT NOT NULL DEFAULT 0 CHECK (visite >= 0)\n);"
+}

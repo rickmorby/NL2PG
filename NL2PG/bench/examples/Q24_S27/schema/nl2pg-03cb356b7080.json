@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "one_to_many_implicit",
+    "sql_features": [
+      "join",
+      "left_outer_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "599d4fd002b0973f"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    email TEXT\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    data_spedizione DATE NOT NULL,\n    destinazione TEXT NOT NULL,\n    stato TEXT CHECK (stato IN ('in_transito', 'consegnato', 'in_attesa'))\n);\n\nCREATE INDEX idx_ordini_cliente_id ON ordini(cliente_id);\n\nCREATE INDEX idx_spedizioni_ordine_id ON spedizioni(ordine_id);"
+}

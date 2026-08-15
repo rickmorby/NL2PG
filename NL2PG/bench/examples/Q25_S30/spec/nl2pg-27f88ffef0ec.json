@@ -1,0 +1,20 @@
+{
+  "domain": "sanità",
+  "n_tables": 5,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "natural_join"
+  ],
+  "twist": [
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "pazienti",
+      "obsolete_value": "anagrafica_sanitaria",
+      "description": "La tabella anagrafica_sanitaria condivide colonne con nomi comuni (codice_fiscale, data_registrazione, tipologia) con le tabelle principali del dominio sanitario, creando join NATURAL ambigui e deviando l'attenzione da pazienti, medici e visite verso dati irrilevanti."
+    }
+  ],
+  "spec_hash": "8e02cc724783c9fa"
+}

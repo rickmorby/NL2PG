@@ -1,0 +1,27 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "window"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "periodo_attivazione",
+      "obsolete_value": "intervallo_servizio",
+      "description": "La colonna periodo_attivazione (timestamp di inizio attivazione del servizio) viene denominata intervallo_servizio nel linguaggio aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "abbonati",
+      "description": "La tabella clienti (rappresentante gli utenti iscritti ai servizi) è indicata come abbonati nella prosa aziendale per enfatizzare la relazione contrattuale."
+    }
+  ],
+  "spec_hash": "87b0fdce8b6f3be2"
+}

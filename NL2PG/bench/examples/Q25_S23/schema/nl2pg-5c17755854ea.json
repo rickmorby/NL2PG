@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "4577d45aba6d870b"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    cliente_id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    indirizzo TEXT\n);\n\nCREATE TABLE ordini (\n    ordine_id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(cliente_id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE dettagli_ordini (\n    dettaglio_id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(ordine_id),\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);"
+}

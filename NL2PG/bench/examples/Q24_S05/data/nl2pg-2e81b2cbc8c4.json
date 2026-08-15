@@ -1,0 +1,25 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join",
+      "left_outer_join"
+    ],
+    "twist": [
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rephrase",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_iscritti",
+        "description": "La tabella clienti viene indicata come anagrafica_iscritti nel linguaggio aziendale, richiedendo l'uso del nome originale nella query."
+      }
+    ],
+    "spec_hash": "59a1ea8457eb401c"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) CHECK (importo_totale >= 0)\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z'),\n(3, 'Giuseppe Verdi', 'VDRGSP90C34F205Z');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, importo_totale) VALUES\n(101, 1, '2026-01-15', 150.50),\n(102, 2, '2026-02-20', 89.00),\n(103, 3, '2026-03-10', 200.75);"
+}

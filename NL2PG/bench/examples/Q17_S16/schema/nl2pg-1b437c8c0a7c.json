@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobili",
+        "obsolete_value": "proprieta",
+        "description": "La tabella immobili viene indicata come proprieta nel linguaggio aziendale, causando ambiguità con la colonna 'tipo_proprieta' che descrive la classificazione degli immobili."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "contratti",
+        "obsolete_value": "accordi",
+        "description": "La tabella contratti viene chiamata accordi in alcuni contesti aziendali, introducendo un sinonimo non ufficiale che potrebbe generare confusione con la tabella 'clausole' che descrive i dettagli contrattuali."
+      }
+    ],
+    "spec_hash": "19b839e6076bd87e"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT,\n    telefono TEXT\n);\n\nCREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    tipo_proprieta TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    prezzo NUMERIC(12,2) NOT NULL CHECK (prezzo >= 0),\n    superficie INT NOT NULL CHECK (superficie > 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    immobile_id INT NOT NULL REFERENCES immobili(id),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    prezzo_vendita NUMERIC(12,2) NOT NULL CHECK (prezzo_vendita >= 0),\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('vendita', 'affitto'))\n);"
+}

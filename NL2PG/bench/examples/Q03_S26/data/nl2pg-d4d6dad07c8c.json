@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "top_n"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "9d8d194964aebe28"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    prezzo NUMERIC(12,2) CHECK (prezzo >= 0),\n    tipo TEXT CHECK (tipo IN ('appartamento', 'villa', 'ufficio', 'locale_commerciale')),\n    superficie_metri_quadri INT CHECK (superficie_metri_quadri > 0),\n    data_inserimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    cliente_id INT NOT NULL REFERENCES clienti(id)\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, email, telefono) VALUES\n(1, 'Mario Rossi', 'mario@example.com', '123456789'),\n(2, 'Laura Bianchi', 'laura@example.com', '987654321'),\n(3, 'Giovanni Verdi', 'giovanni@example.com', '112233445');\n\nINSERT INTO immobili (id, indirizzo, prezzo, tipo, superficie_metri_quadri, cliente_id) VALUES\n(101, 'Via Roma 10', 250000.00, 'appartamento', 80, 1),\n(102, 'Via Milano 5', 450000.00, 'villa', 200, 2),\n(103, 'Corso Italia 3', 150000.00, 'ufficio', 120, 3),\n(104, 'Piazza Venezia 20', 300000.00, 'locale_commerciale', 150, 1);"
+}

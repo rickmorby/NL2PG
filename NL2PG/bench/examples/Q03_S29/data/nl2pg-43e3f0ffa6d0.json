@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [
+      "top_n"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "3f98ae33b4db5715"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE CHECK (data_nascita <= CURRENT_DATE),\n    data_assunzione DATE NOT NULL,\n    stipendio NUMERIC(10,2) CHECK (stipendio >= 0),\n    ruolo TEXT\n);\n\nCREATE INDEX idx_dipendenti_stipendio ON dipendenti(stipendio DESC);",
+  "data_inserts": "INSERT INTO dipendenti (id, nome, cognome, data_nascita, data_assunzione, stipendio, ruolo) VALUES\n(1, 'Mario', 'Rossi', '1980-05-15', '2010-03-20', 3500.00, 'Manager'),\n(2, 'Laura', 'Bianchi', '1985-09-22', '2015-07-10', 2800.50, 'Developer'),\n(3, 'Giuseppe', 'Verdi', '1990-04-01', '2018-11-05', 2200.75, 'Designer'),\n(4, 'Anna', 'Neri', '1978-12-30', '2005-01-15', 4200.00, 'Director'),\n(5, 'Luca', 'Marino', '2000-03-10', '2020-09-25', 1800.00, 'Intern');"
+}

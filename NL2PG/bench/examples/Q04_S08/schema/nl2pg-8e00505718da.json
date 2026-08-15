@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "4daf95ce17abdb07"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE conti_correnti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL UNIQUE REFERENCES clienti(id),\n    numero_conto TEXT NOT NULL UNIQUE,\n    saldo NUMERIC(15,2) NOT NULL CHECK (saldo >= 0),\n    data_apertura DATE NOT NULL,\n    data_chiusura DATE\n);"
+}

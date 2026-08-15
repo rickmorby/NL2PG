@@ -1,0 +1,20 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "join"
+  ],
+  "twist": [
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "abbonati",
+      "obsolete_value": "storico_pagamenti",
+      "description": "La tabella abbonati (PK: id_abbonato) è collegata alla tabella abbonamenti (FK: id_abbonato) tramite una relazione uno-a-molti. Tuttavia, lo schema include tre tabelle aggiuntive non rilevanti per la query (storico_pagamenti, log_accessi_rete, configurazioni_tecnologie) che fungono da distrazione per deviare l'attenzione dal join tra abbonati e abbonamenti."
+    }
+  ],
+  "spec_hash": "cce50a7c5ef89d17"
+}

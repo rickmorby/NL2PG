@@ -1,0 +1,31 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "scalar_agg",
+    "group_agg",
+    "filtered_agg",
+    "having",
+    "window"
+  ],
+  "twist": [
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "sinistri",
+      "obsolete_value": "contenziosi",
+      "description": "Nella terminologia aziale interna dell'assicuratore, la tabella sinistri è comunemente indicata come 'contenziosi', termine gergale che si riferisce ai casi in cui il contraente assicurativo contesta il importo del rimborso spettante. Tale utilizzo linguistico costringe il motore a mappare il termine 'contenziosi' alla tabella reale 'sinistri' durante la composizione delle query, introducendo ambiguità terminologica che richiede interpretazione contestuale per risolvere correttamente il task Zero-Data relativo al calcolo del costo medio per sinistro e della redditività del portafoglio."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "polizze",
+      "obsolete_value": "assicurazioni",
+      "description": "Nella comunicazione non tecnica tra dipartimenti, la tabella polizze è spesso indicata con il sinonimo 'assicurazioni', un termine più generico che può confondere il lettore con il concetto di compagnia assicurativa o con il prodotto assicurativo stesso. Questo twist costringe il motore a riconoscere che 'assicurazioni' è un sinonimo della tabella 'polizze' e a mappare correttamente i campi come premio_annuo e tipo_polizza, indispensabili per calcolare il KPI Zero-Data di redditività = (premio_annuo - importo_rimborsato) / premio_annuo aggregato per tipologia di polizza."
+    }
+  ],
+  "spec_hash": "f2d2315fef58dd80"
+}

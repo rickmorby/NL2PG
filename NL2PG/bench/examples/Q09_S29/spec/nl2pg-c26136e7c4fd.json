@@ -1,0 +1,21 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "group_agg",
+    "having"
+  ],
+  "twist": [
+    "rename"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "registro_acquisti",
+      "description": "La tabella ordini viene denominata registro_acquisti nel linguaggio aziendale, creando ambiguità tra entità e descrizioni testuali."
+    }
+  ],
+  "spec_hash": "49fa37de99d5c948"
+}

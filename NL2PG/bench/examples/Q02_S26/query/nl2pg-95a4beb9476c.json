@@ -1,0 +1,8 @@
+{
+  "schema_ddl": "CREATE TABLE conti (\n    id SERIAL PRIMARY KEY,\n    descrizione TEXT NOT NULL,\n    saldo TEXT NOT NULL CHECK (saldo ~ '^-?\\d+(\\.\\d+)?$'),\n    data_aggiornamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_inserts": "INSERT INTO conti (id, descrizione, saldo, data_aggiornamento) VALUES\n(1, 'Conto corrente principale', '1500.75', '2023-10-05'),\n(2, 'Conto risparmio', '2500.00', '2023-10-06'),\n(3, 'Conto aziendale', '-300.50', '2023-10-07'),\n(4, 'Conto corrente secondario', '800.25', '2023-10-08'),\n(5, 'Conto risparmio speciale', '5000.00', '2023-10-09');",
+  "feature_sql": [
+    "scalar_agg"
+  ],
+  "query": "SELECT SUM(saldo::NUMERIC) AS totale_saldo, COUNT(*) AS numero_conti, AVG(saldo::NUMERIC) AS saldo_medio FROM conti;"
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "dd23a0ff6ac29521"
+}

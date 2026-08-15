@@ -1,0 +1,21 @@
+{
+  "domain": "finanza",
+  "n_tables": 3,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "join",
+    "left_outer_join"
+  ],
+  "twist": [
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "polysemy",
+      "target_value": "saldo",
+      "obsolete_value": "saldo",
+      "description": "Il termine 'saldo' è utilizzato in contesti finanziari con ambiguità semantica: in alcuni casi si riferisce al saldo di una posizione (es. saldo conto), in altri al saldo di un movimento (es. importo lordo di una transazione). Questo duplex significato introduce ambiguità nella progettazione dello schema e nelle query SQL."
+    }
+  ],
+  "spec_hash": "1ad41eac398cd789"
+}

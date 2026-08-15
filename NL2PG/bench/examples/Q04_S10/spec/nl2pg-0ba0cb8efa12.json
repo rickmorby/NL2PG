@@ -1,0 +1,20 @@
+{
+  "domain": "sanità",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "join"
+  ],
+  "twist": [
+    "ambiguity"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "ambiguity",
+      "target_value": "paziente_id",
+      "obsolete_value": "codice_fiscale",
+      "description": "La colonna paziente_id nella tabella pazienti viene ambiguamente indicata come codice_fiscale nel linguaggio aziendale, causando potenziali fraintendimenti tra team tecnici e operativi."
+    }
+  ],
+  "spec_hash": "0b4eb73432d641b2"
+}

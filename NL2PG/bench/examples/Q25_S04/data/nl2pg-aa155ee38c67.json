@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "0aa75e8a784c6c9e"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY REFERENCES clienti(id),\n    saldo NUMERIC(15,2) CHECK (saldo >= 0),\n    numero_conto TEXT NOT NULL UNIQUE,\n    data_apertura DATE NOT NULL\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, data_nascita) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', '1980-01-01'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', '1985-04-02'),\n(3, 'Giuseppe Verdi', 'VRDGPP90C30F205Z', '1990-03-03'),\n(4, 'Anna Esposito', 'ESPNNA95D15F205Z', '1995-04-05'),\n(5, 'Marco Neri', 'NRNMRC88E20F205Z', '1988-05-06');\n\nINSERT INTO conti (id, saldo, numero_conto, data_apertura) VALUES\n(1, 1500.50, 'IT0000000001', '2020-01-15'),\n(2, 2500.75, 'IT0000000002', '2021-03-20'),\n(3, 0.00, 'IT0000000003', '2022-06-10'),\n(4, 5000.00, 'IT0000000004', '2019-11-05'),\n(5, 100.25, 'IT0000000005', '2023-02-28');"
+}

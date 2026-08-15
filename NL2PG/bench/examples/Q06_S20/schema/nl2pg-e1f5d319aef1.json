@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "255a45a5a314d7ec"
+  },
+  "schema_ddl": "CREATE TABLE corsi (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice TEXT NOT NULL UNIQUE,\n    crediti INT CHECK (crediti >= 0),\n    prerequisito_id INT REFERENCES corsi(id)\n);"
+}

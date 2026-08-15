@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 3,
+    "hierarchy": "many_to_many",
+    "sql_features": [
+      "join",
+      "multi_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "9b2bcb6522e40a1b"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    data_nascita DATE\n);\n\nCREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    prezzo NUMERIC(10,2) CHECK (prezzo >= 0),\n    tipo TEXT CHECK (tipo IN ('appartamento', 'villa', 'ufficio', 'magazzino')),\n    metri_quadri INT CHECK (metri_quadri > 0)\n);\n\nCREATE TABLE clienti_immobili (\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    immobile_id INT NOT NULL REFERENCES immobili(id),\n    data_acquisto DATE NOT NULL,\n    prezzo_vendita NUMERIC(10,2) CHECK (prezzo_vendita >= 0),\n    PRIMARY KEY (cliente_id, immobile_id)\n);"
+}

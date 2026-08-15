@@ -1,0 +1,16 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 1,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "cte",
+      "recursive_cte"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "6c1be9dd41f9123b"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    data_assunzione DATE NOT NULL,\n    stipendio NUMERIC(10,2) CHECK (stipendio >= 0),\n    manager_id INT REFERENCES dipendenti(id)\n);\n\nCREATE INDEX idx_dipendenti_manager ON dipendenti(manager_id);",
+  "data_inserts": "INSERT INTO dipendenti (id, nome, cognome, email, data_nascita, data_assunzione, stipendio, manager_id) VALUES\n(1, 'Mario', 'Rossi', 'mario.rossi@azienda.it', '1975-03-15', '2010-06-01', 85000.00, NULL),\n(2, 'Laura', 'Bianchi', 'laura.bianchi@azienda.it', '1982-09-22', '2015-03-10', 65000.00, 1),\n(3, 'Gianluca', 'Verdi', 'gianluca.verdi@azienda.it', '1978-11-05', '2012-09-15', 70000.00, 1),\n(4, 'Sofia', 'Neri', 'sofia.neri@azienda.it', '1990-07-18', '2018-01-20', 55000.00, 2),\n(5, 'Alessandro', 'Russo', 'alessandro.russo@azienda.it', '1988-12-03', '2017-05-12', 52000.00, 2),\n(6, 'Elena', 'Gialli', 'elena.gialli@azienda.it', '1985-04-28', '2016-08-08', 58000.00, 1);"
+}

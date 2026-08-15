@@ -1,0 +1,38 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "jargon",
+      "synonym",
+      "ambiguity"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "glicemia",
+        "obsolete_value": "zucchero",
+        "description": "Nel linguaggio medico giullodoso, la colonna glicemia viene indicata come 'zucchero', creando ambiguità sulla natura del valore misurato e costringendo l'analista a mappare correttamente il termine prima di applicare funzioni di finestra statistiche."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "cartelle_cliniche",
+        "obsolete_value": "anagrafica_pazienti",
+        "description": "La tabella cartelle_cliniche viene commercialmente referita come anagrafica_pazienti nel discorso aziendale, pur essendo concettualmente distinta: la prima contiene dati clinici e misurazioni, la seconda un semplice registro anagrafico."
+      },
+      {
+        "twist_type": "ambiguity",
+        "target_value": "pressione_sistolica",
+        "obsolete_value": "pressione",
+        "description": "Nel contesto aziendale il termine 'pressione' è ambiguo: potrebbe riferirsi alla pressione sistolica, a quella diastolica o alla pressione media. Questa ambiguità costringe il modello a disambiguare prima di utilizzare la colonna pressione_sistolica in calcoli finestra."
+      }
+    ],
+    "spec_hash": "bfec60cac0d7ee2b"
+  },
+  "schema_ddl": "CREATE TABLE cartelle_cliniche (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    sesso CHAR(1) CHECK (sesso IN ('M', 'F')),\n    glicemia NUMERIC(5,2) CHECK (glicemia BETWEEN 50 AND 200),\n    pressione_sistolica INT CHECK (pressione_sistolica BETWEEN 80 AND 200),\n    pressione_diastolica INT CHECK (pressione_diastolica BETWEEN 60 AND 120),\n    data_visita TIMESTAMP NOT NULL\n);",
+  "data_inserts": "INSERT INTO cartelle_cliniche (id, nome, cognome, data_nascita, sesso, glicemia, pressione_sistolica, pressione_diastolica, data_visita) VALUES\n(1, 'Mario', 'Rossi', '1980-05-15', 'M', 95.50, 120, 80, '2026-01-15 09:30:00'),\n(2, 'Laura', 'Bianchi', '1990-03-22', 'F', 88.25, 110, 70, '2026-01-16 10:00:00'),\n(3, 'Giuseppe', 'Verdi', '1975-11-30', 'M', 150.75, 140, 90, '2026-01-17 14:15:00'),\n(4, 'Anna', 'Ferrari', '2000-07-08', 'F', 92.00, 105, 65, '2026-01-18 11:45:00'),\n(5, 'Luca', 'Esposito', '1965-12-25', 'M', 110.30, 130, 85, '2026-01-19 16:20:00');"
+}

@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "215292f9d5c287c6"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    indirizzo TEXT NOT NULL\n);\n\nCREATE TABLE servizi (\n    id INT PRIMARY KEY,\n    nome_servizio TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_mensile NUMERIC(10,2) NOT NULL CHECK (prezzo_mensile >= 0)\n);\n\nCREATE TABLE abbonamenti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    servizio_id INT NOT NULL REFERENCES servizi(id),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('attivo', 'inattivo', 'sospeso'))\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, cognome, email, telefono, indirizzo) VALUES\n(1, 'Mario', 'Rossi', 'mario.rossi@email.it', '3216547890', 'Via Roma 10, Milano'),\n(2, 'Laura', 'Bianchi', 'laura.bianchi@email.it', '3321234567', 'Corso Italia 25, Torino'),\n(3, 'Giuseppe', 'Verdi', 'giuseppe.verdi@email.it', '3459876543', 'Piazza Venezia 5, Roma'),\n(4, 'Anna', 'Ferrari', 'anna.ferrari@email.it', '3667788990', 'Via Napoli 18, Bari'),\n(5, 'Paolo', 'Esposito', 'paolo.esposito@email.it', '3774455667', 'Lungomare 3, Genova');\n\nINSERT INTO servizi (id, nome_servizio, descrizione, prezzo_mensile) VALUES\n(1, 'Cloud Storage', 'Archiviazione sicura su cloud con backup automatici', 9.99),\n(2, 'Email Hosting', 'Posta elettronica professionale con dominio personalizzato', 14.50),\n(3, 'Web Hosting', 'Spazio web e database per siti aziendali', 19.90),\n(4, 'VPN Aziendale', 'Connessione VPN crittografata per lavoro remoto', 24.99);\n\nINSERT INTO abbonamenti (id, cliente_id, servizio_id, data_inizio, data_fine, stato) VALUES\n(1, 1, 1, '2025-01-15', '2026-01-15', 'attivo'),\n(2, 2, 2, '2025-03-10', '2026-03-10', 'attivo'),\n(3, 3, 3, '2024-11-20', '2025-11-20', 'sospeso'),\n(4, 4, 4, '2025-06-01', NULL, 'attivo'),\n(5, 5, 1, '2024-09-05', '2025-09-05', 'inattivo');"
+}

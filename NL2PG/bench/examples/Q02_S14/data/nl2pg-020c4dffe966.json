@@ -1,0 +1,38 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_assicurativi",
+        "description": "La tabella polizze viene denominata contratti_assicurativi nella documentazione aziendale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "premio_totale",
+        "obsolete_value": "importo_assicurato",
+        "description": "Il campo premio_totale è sinonimo di importo_assicurato, usato per indicare l'ammontare del premio assicurativo."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "numero_sinistri",
+        "obsolete_value": "conteggio sinistri",
+        "description": "La colonna numero_sinistri è descritta come conteggio sinistri per rendere più leggibile il risultato dell'aggregazione scalar."
+      }
+    ],
+    "spec_hash": "3fd144a806ad1535"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    numero_sinistri INT CHECK (numero_sinistri >= 0)\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    premio_totale NUMERIC(10,2) CHECK (premio_totale >= 0),\n    data_polizza DATE NOT NULL\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, numero_sinistri) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', 0),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', 2),\n(3, 'Luca Verdi', 'VRLUCA82D50M201Y', 1),\n(4, 'Giulia Neri', 'NRGJLA90C60F205X', 0),\n(5, 'Marco Gialli', 'GLLMRC88B15H501R', 3);\n\nINSERT INTO polizze (id, cliente_id, premio_totale, data_polizza) VALUES\n(101, 1, 150.50, '2023-10-15'),\n(102, 2, 89.00, '2023-11-20'),\n(103, 3, 200.75, '2024-01-10'),\n(104, 4, 120.00, '2023-09-05'),\n(105, 5, 300.25, '2024-03-22');"
+}

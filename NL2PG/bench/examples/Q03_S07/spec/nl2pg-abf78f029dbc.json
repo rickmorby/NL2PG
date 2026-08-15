@@ -1,0 +1,20 @@
+{
+  "domain": "università",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "top_n"
+  ],
+  "twist": [
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rephrase",
+      "target_value": "dipartimenti",
+      "obsolete_value": "unità_organizzative",
+      "description": "Nella prosa aziionale, la tabella 'dipartimenti' viene indicata come 'unità_organizzative'. La struttura SQL mantiene però il nome originale 'dipartimenti' con un riferimento autoreferenziale (parent_id) per rappresentare gerarchie di sottodipartimenti."
+    }
+  ],
+  "spec_hash": "53534116332159cc"
+}

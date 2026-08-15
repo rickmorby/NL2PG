@@ -1,0 +1,12 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 3,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "join",
+    "multi_join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "9b2bcb6522e40a1b"
+}

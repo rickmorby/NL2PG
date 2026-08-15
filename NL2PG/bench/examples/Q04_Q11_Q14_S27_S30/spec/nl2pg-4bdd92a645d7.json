@@ -1,0 +1,28 @@
+{
+  "domain": "sanità",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "join",
+    "subquery",
+    "set_op"
+  ],
+  "twist": [
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "medici",
+      "obsolete_value": "anagrafica_medici",
+      "description": "La tabella medici contiene informazioni sui dottori ma non è coinvolta nella query principale, agendo da distrazione per gli studenti."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "assicurazioni",
+      "obsolete_value": "polizze_pazienti",
+      "description": "La tabella assicurazioni include dati sulle polizze dei pazienti ma non è utilizzata nella query, inducendo gli studenti a valutare erroneamente la sua rilevanza."
+    }
+  ],
+  "spec_hash": "63e3a113cac7e00a"
+}

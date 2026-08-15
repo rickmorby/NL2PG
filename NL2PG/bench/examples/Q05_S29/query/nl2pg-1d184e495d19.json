@@ -1,0 +1,8 @@
+{
+  "schema_ddl": "CREATE TABLE corrieri (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE CHECK (LENGTH(partita_iva) = 11)\n);\n\nCREATE TABLE veicoli (\n    id SERIAL PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    tipo TEXT,\n    corriere_id INT NOT NULL REFERENCES corrieri(id)\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    data_spedizione DATE NOT NULL,\n    destinazione TEXT NOT NULL,\n    peso NUMERIC(10,2) CHECK (peso >= 0),\n    veicolo_id INT NOT NULL REFERENCES veicoli(id)\n);",
+  "data_inserts": "INSERT INTO corrieri (id, nome, partita_iva) VALUES\n(1, 'Mario Rossi Trasporti', '12345678901'),\n(2, 'Logistica Bianchi SRL', '98765432109'),\n(3, 'Courier Express', '45678912301');\n\nINSERT INTO veicoli (id, targa, tipo, corriere_id) VALUES\n(1, 'AB123CD', 'Furgone', 1),\n(2, 'XY789ZT', 'Camion', 2),\n(3, 'LM456PQ', 'Furgone', 3),\n(4, 'RS012UV', 'Auto', 1);\n\nINSERT INTO spedizioni (id, data_spedizione, destinazione, peso, veicolo_id) VALUES\n(1, '2026-01-15', 'Milano', 12.50, 1),\n(2, '2026-01-18', 'Roma', 45.00, 2),\n(3, '2026-02-03', 'Napoli', 8.75, 3),\n(4, '2026-02-10', 'Torino', 30.25, 4),\n(5, '2026-02-15', 'Firenze', 15.00, 1);",
+  "feature_sql": [
+    "group_agg"
+  ],
+  "query": "SELECT c.nome, COUNT(s.id) AS numero_spedizioni, SUM(s.peso) AS peso_totale FROM corrieri c JOIN veicoli v ON c.id = v.corriere_id JOIN spedizioni s ON v.id = s.veicolo_id GROUP BY c.nome;"
+}

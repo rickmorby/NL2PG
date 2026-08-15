@@ -1,0 +1,12 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "cte",
+    "recursive_cte"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "6c1be9dd41f9123b"
+}

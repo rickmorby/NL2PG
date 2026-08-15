@@ -1,0 +1,23 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [
+      "ambiguity"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "ambiguity",
+        "target_value": "paziente_id",
+        "obsolete_value": "codice_fiscale",
+        "description": "La colonna paziente_id nella tabella pazienti viene ambiguamente indicata come codice_fiscale nel linguaggio aziendale, causando potenziali fraintendimenti tra team tecnici e operativi."
+      }
+    ],
+    "spec_hash": "0b4eb73432d641b2"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    paziente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE visite (\n    visita_id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(paziente_id),\n    medico TEXT NOT NULL,\n    data_visita DATE NOT NULL,\n    descrizione TEXT,\n    durata_minuti INT CHECK (durata_minuti > 0)\n);\n\nCREATE INDEX idx_visite_paziente_id ON visite(paziente_id);"
+}

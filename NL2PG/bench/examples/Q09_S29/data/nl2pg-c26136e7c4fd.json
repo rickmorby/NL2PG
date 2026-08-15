@@ -1,0 +1,25 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "rename"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "registro_acquisti",
+        "description": "La tabella ordini viene denominata registro_acquisti nel linguaggio aziendale, creando ambiguità tra entità e descrizioni testuali."
+      }
+    ],
+    "spec_hash": "49fa37de99d5c948"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_registrazione DATE NOT NULL\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    totale NUMERIC(10,2) CHECK (totale >= 0),\n    stato TEXT NOT NULL\n);\n\nCREATE TABLE dettagli_ordini (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, email, codice_fiscale, data_registrazione) VALUES\n(1, 'Mario Rossi', 'mario.rossi@email.com', 'RSSMRA80A01H501U', '2024-01-15'),\n(2, 'Laura Bianchi', 'laura.bianchi@email.com', 'BNCLRA85B42F205Z', '2024-02-20'),\n(3, 'Giuseppe Verdi', 'giuseppe.verdi@email.com', 'VRDGPE70C30H501R', '2024-03-10'),\n(4, 'Anna Neri', 'anna.neri@email.com', 'NRNANN88D50H501X', '2024-04-05');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, totale, stato) VALUES\n(101, 1, '2025-06-01', 150.50, 'Completato'),\n(102, 2, '2025-06-03', 89.00, 'In elaborazione'),\n(103, 3, '2025-06-05', 230.75, 'Completato'),\n(104, 4, '2025-06-07', 45.20, 'Annullato'),\n(105, 1, '2025-06-10', 199.99, 'Completato');\n\nINSERT INTO dettagli_ordini (id, ordine_id, prodotto, quantita, prezzo_unitario) VALUES\n(1, 101, 'Laptop', 1, 150.50),\n(2, 102, 'Mouse', 2, 44.50),\n(3, 103, 'Tastiera meccanica', 1, 89.99),\n(4, 103, 'Cuffia wireless', 1, 140.76),\n(5, 105, 'Monitor 4K', 1, 199.99);"
+}

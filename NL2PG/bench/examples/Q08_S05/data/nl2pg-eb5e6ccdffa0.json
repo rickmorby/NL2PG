@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "self_join"
+    ],
+    "twist": [
+      "rename",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "pazienti",
+        "obsolete_value": "anagrafica_pazienti",
+        "description": "La tabella pazienti viene denominata anagrafica_pazienti nel linguaggio aziistico, riflettendo un'etichetta più descrittiva per il contesto sanitario."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "id_paziente",
+        "obsolete_value": "identificativo_paziente",
+        "description": "La colonna id_paziente viene indicata come identificativo_paziente nel contesto aziistico, enfatizzando la sua funzione univoca di identificazione."
+      }
+    ],
+    "spec_hash": "e94413a0030a23d2"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id_paziente SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    sesso CHAR(1) NOT NULL CHECK (sesso IN ('M', 'F')),\n    codice_fiscale TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE referti (\n    id_referto SERIAL PRIMARY KEY,\n    id_paziente INT NOT NULL REFERENCES pazienti(id_paziente),\n    data_referto DATE NOT NULL,\n    descrizione TEXT,\n    id_referto_padre INT REFERENCES referti(id_referto)\n);",
+  "data_inserts": "INSERT INTO pazienti (id_paziente, nome, cognome, data_nascita, sesso, codice_fiscale) VALUES\n(1, 'Mario', 'Rossi', '1980-01-01', 'M', 'RSSMRA80A01H501U'),\n(2, 'Laura', 'Bianchi', '1985-05-15', 'F', 'BNCLRA85B42F205Z'),\n(3, 'Giovanni', 'Verdi', '1990-03-10', 'M', 'VRTGNI90C23G333Y'),\n(4, 'Anna', 'Neri', '1978-08-20', 'F', 'NRIANA78H42G111X');\n\nINSERT INTO referti (id_referto, id_paziente, data_referto, descrizione, id_referto_padre) VALUES\n(1, 1, '2023-01-15', 'Routine check-up', NULL),\n(2, 2, '2023-02-20', 'Blood test results', NULL),\n(3, 3, '2023-03-10', 'MRI scan', 1),\n(4, 4, '2023-04-05', 'X-ray', 2);"
+}

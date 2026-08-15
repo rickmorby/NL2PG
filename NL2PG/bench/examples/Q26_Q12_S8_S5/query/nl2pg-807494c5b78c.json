@@ -1,0 +1,11 @@
+{
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    posizione TEXT NOT NULL,\n    stipendio NUMERIC(10,2) CHECK (stipendio > 0),\n    data_assunzione DATE NOT NULL,\n    manager_id INT REFERENCES dipendenti(id)\n);\n\nCREATE INDEX idx_dipendenti_manager ON dipendenti(manager_id);",
+  "data_inserts": "INSERT INTO dipendenti (id, nome, cognome, posizione, stipendio, data_assunzione, manager_id)\nVALUES\n(1, 'Mario', 'Rossi', 'CEO', 75000.00, '2020-01-15', NULL),\n(2, 'Luca', 'Verdi', 'HR Manager', 60000.00, '2021-03-10', 1),\n(3, 'Anna', 'Neri', 'IT Manager', 65000.00, '2019-07-22', 1),\n(4, 'Paolo', 'Bianchi', 'Recruiter', 45000.00, '2022-05-01', 2),\n(5, 'Sofia', 'Gallo', 'Developer', 55000.00, '2023-09-15', 3);",
+  "feature_sql": [
+    "subquery",
+    "correlated_subquery",
+    "exists",
+    "anti_join"
+  ],
+  "query": "SELECT d.nome, d.cognome, d.posizione, d.stipendio, (SELECT COUNT(*) FROM dipendenti) AS totale_dipendenti FROM dipendenti d WHERE NOT EXISTS (SELECT 1 FROM dipendenti s WHERE s.manager_id = d.id) AND d.stipendio < (SELECT AVG(stipendio) FROM dipendenti) AND EXISTS (SELECT 1 FROM dipendenti m WHERE m.id = d.manager_id);"
+}

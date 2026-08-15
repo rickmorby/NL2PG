@@ -1,0 +1,25 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "telefoni",
+      "obsolete_value": "numeri_contatti",
+      "description": "La tabella telefoni viene denominata numeri_contatti nel gergo aziendale, creando ambiguità nella mappatura tra entità e nome logico."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "cliente_id",
+      "obsolete_value": "anagrafica_cliente",
+      "description": "La colonna cliente_id è indicata come anagrafica_cliente nel linguaggio aziendale, anche se non rappresenta direttamente l'entità referenziata."
+    }
+  ],
+  "spec_hash": "a47066bcedbf3daf"
+}

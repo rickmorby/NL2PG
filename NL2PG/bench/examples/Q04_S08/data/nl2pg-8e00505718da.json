@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "4daf95ce17abdb07"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE conti_correnti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL UNIQUE REFERENCES clienti(id),\n    numero_conto TEXT NOT NULL UNIQUE,\n    saldo NUMERIC(15,2) NOT NULL CHECK (saldo >= 0),\n    data_apertura DATE NOT NULL,\n    data_chiusura DATE\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, data_nascita, email, telefono) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', '1980-01-01', 'mario.rossi@example.com', '3331234567'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', '1985-04-02', 'laura.bianchi@example.com', '3339876543'),\n(3, 'Gianna Verdi', 'VRDGNN90C65H501X', '1990-06-05', 'gianna.verdi@example.com', '3205551122'),\n(4, 'Marco Neri', 'NRNMRC92D12F205Y', '1992-03-12', 'marco.neri@example.com', '3334445566'),\n(5, 'Sofia Gialli', 'GLLSSF95E34H501W', '1995-04-30', 'sofia.gialli@example.com', '3337778899');\n\nINSERT INTO conti_correnti (id, cliente_id, numero_conto, saldo, data_apertura, data_chiusura) VALUES\n(101, 1, 'IT123456789012345678901234', 1500.50, '2020-01-15', NULL),\n(102, 2, 'IT098765432109876543210987', 2500.00, '2019-05-20', NULL),\n(103, 3, 'IT112233445566778899001122', 0.00, '2021-11-10', '2023-04-01'),\n(104, 4, 'IT556677889900112233445566', 300.75, '2022-03-25', NULL),\n(105, 5, 'IT667788990011223344556677', 5000.00, '2018-07-12', NULL);"
+}

@@ -1,0 +1,28 @@
+{
+  "domain": "erp",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "group_agg",
+    "having"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "cl",
+      "obsolete_value": "anagrafica_clienti",
+      "description": "La tabella cl viene denominata anagrafica_clienti nel linguaggio aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "prd",
+      "obsolete_value": "articoli",
+      "description": "La tabella prd è indicata come articoli nel contesto operativo, nonostante il nome tecnico prd."
+    }
+  ],
+  "spec_hash": "1c561110ae7d2f45"
+}

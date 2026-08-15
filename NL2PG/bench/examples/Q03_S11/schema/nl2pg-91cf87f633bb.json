@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [
+      "top_n"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fatture",
+        "obsolete_value": "scritture_contabili",
+        "description": "La tabella fatture viene indicata come scritture_contabili nel linguaggio aziendale contabile."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo",
+        "obsolete_value": "totale_documento",
+        "description": "La colonna importo viene sinonimizzata come totale_documento nella prosa aziendale, rendendo necessario un mapping semantico per risolvere la query."
+      }
+    ],
+    "spec_hash": "b96578a48b95c324"
+  },
+  "schema_ddl": "CREATE TABLE fatture (\n    id SERIAL PRIMARY KEY,\n    data_fattura DATE NOT NULL CHECK (data_fattura <= CURRENT_DATE),\n    numero_fattura TEXT NOT NULL UNIQUE,\n    cliente TEXT NOT NULL,\n    importo NUMERIC(10,2) NOT NULL CHECK (importo >= 0),\n    tipo TEXT NOT NULL CHECK (tipo IN ('entrata', 'uscita')),\n    descrizione TEXT,\n    aliquota_iva NUMERIC(5,2) CHECK (aliquota_iva BETWEEN 0 AND 100),\n    iva NUMERIC(10,2) CHECK (iva >= 0),\n    totale_con_iva NUMERIC(10,2) CHECK (totale_con_iva >= 0)\n);"
+}

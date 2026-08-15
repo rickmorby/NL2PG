@@ -1,0 +1,13 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "aee047c80aee3f2a"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    genere CHAR(1) NOT NULL CHECK (genere IN ('M', 'F', 'O')),\n    data_assunzione DATE NOT NULL,\n    dipartimento TEXT NOT NULL,\n    ruolo TEXT NOT NULL,\n    salario NUMERIC(10,2) NOT NULL CHECK (salario >= 0),\n    email TEXT UNIQUE CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')\n);\n\nCREATE INDEX idx_dipendenti_dipartimento ON dipendenti(dipartimento);\nCREATE INDEX idx_dipendenti_ruolo ON dipendenti(ruolo);",
+  "data_inserts": "INSERT INTO dipendenti (id, nome, cognome, data_nascita, genere, data_assunzione, dipartimento, ruolo, salario, email) VALUES\n(1, 'Mario', 'Rossi', '1980-01-01', 'M', '2020-05-15', 'IT', 'Developer', 60000.00, 'mario.rossi@example.com'),\n(2, 'Laura', 'Bianchi', '1985-03-12', 'F', '2018-09-01', 'HR', 'Manager', 75000.00, 'laura.bianchi@example.com'),\n(3, 'Giovanni', 'Verdi', '1990-07-22', 'M', '2021-03-10', 'Finance', 'Analyst', 55000.00, 'giovanni.verdi@example.com'),\n(4, 'Sofia', 'Neri', '1995-11-30', 'F', '2022-06-20', 'Marketing', 'Specialist', 50000.00, 'sofia.neri@example.com'),\n(5, 'Luca', 'Marroni', '1988-04-15', 'O', '2019-02-28', 'IT', 'DevOps Engineer', 65000.00, 'luca.marroni@example.com');"
+}

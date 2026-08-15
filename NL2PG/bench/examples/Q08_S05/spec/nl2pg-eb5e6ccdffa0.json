@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [
+    "rename",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "pazienti",
+      "obsolete_value": "anagrafica_pazienti",
+      "description": "La tabella pazienti viene denominata anagrafica_pazienti nel linguaggio aziistico, riflettendo un'etichetta più descrittiva per il contesto sanitario."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "id_paziente",
+      "obsolete_value": "identificativo_paziente",
+      "description": "La colonna id_paziente viene indicata come identificativo_paziente nel contesto aziistico, enfatizzando la sua funzione univoca di identificazione."
+    }
+  ],
+  "spec_hash": "e94413a0030a23d2"
+}

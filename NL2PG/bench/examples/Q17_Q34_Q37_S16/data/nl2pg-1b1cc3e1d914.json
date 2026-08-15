@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "periodo_attivazione",
+        "obsolete_value": "intervallo_servizio",
+        "description": "La colonna periodo_attivazione (timestamp di inizio attivazione del servizio) viene denominata intervallo_servizio nel linguaggio aziendale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "abbonati",
+        "description": "La tabella clienti (rappresentante gli utenti iscritti ai servizi) è indicata come abbonati nella prosa aziendale per enfatizzare la relazione contrattuale."
+      }
+    ],
+    "spec_hash": "87b0fdce8b6f3be2"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE CHECK (LENGTH(codice_fiscale) = 16),\n    data_nascita DATE CHECK (data_nascita <= CURRENT_DATE),\n    email TEXT UNIQUE,\n    telefono TEXT,\n    indirizzo TEXT,\n    periodo_attivazione TIMESTAMP NOT NULL CHECK (periodo_attivazione <= CURRENT_TIMESTAMP),\n    tipo_servizio TEXT,\n    stato_attivo BOOLEAN DEFAULT TRUE\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, data_nascita, email, telefono, indirizzo, periodo_attivazione, tipo_servizio, stato_attivo) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', '1980-01-01', 'mario.rossi@email.it', '333-1234567', 'Via Roma 10, Milano', '2023-01-15 10:30:00', 'Premium', TRUE),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', '1985-02-11', 'laura.bianchi@email.it', '345-9876543', 'Via Firenze 22, Firenze', '2023-02-20 14:45:00', 'Standard', TRUE),\n(3, 'Giovanni', 'Verdi', 'VRDGIO75C15F205X', '1975-03-15', 'giovanni.verdi@email.it', '328-5551212', 'Corso Italia 5, Roma', '2022-11-05 09:00:00', 'Premium', FALSE),\n(4, 'Anna', 'Neri', 'NRRANA88D20F205Y', '1988-04-20', 'anna.neri@email.it', '339-7788990', 'Piazza Venezia 3, Venezia', '2023-03-10 16:20:00', 'Standard', TRUE),\n(5, 'Luca', 'Marino', 'MRNLCZ90E25H501T', '1990-05-25', 'luca.marino@email.it', '331-4455667', 'Via Milano 15, Napoli', '2024-01-01 12:00:00', 'Premium', TRUE);"
+}

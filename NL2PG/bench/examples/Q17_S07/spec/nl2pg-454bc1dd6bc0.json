@@ -1,0 +1,11 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 1,
+  "hierarchy": "self_reference",
+  "sql_features": [
+    "window"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "4bbeff5a17637643"
+}

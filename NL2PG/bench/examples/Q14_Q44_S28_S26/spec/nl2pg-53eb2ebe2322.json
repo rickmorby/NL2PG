@@ -1,0 +1,34 @@
+{
+  "domain": "logistica",
+  "n_tables": 2,
+  "hierarchy": "one_to_one",
+  "sql_features": [
+    "set_op"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "movimenti_logistici",
+      "description": "La tabella originale 'spedizioni' viene rinominata in 'movimenti_logistici' per allinearsi al linguaggio interno dell'azienda."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "peso",
+      "obsolete_value": "massa",
+      "description": "La colonna 'peso' è sinonimo di 'massa'; nella documentazione aziendale viene usato il termine 'massa' per indicare lo stesso attributo."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "data_consegna",
+      "obsolete_value": "ETA",
+      "description": "Il campo 'data_consegna' è espresso come 'ETA' (Estimated Time of Arrival) nel gergo operativo della logistica."
+    }
+  ],
+  "spec_hash": "1f1a1fddae7b84ee"
+}

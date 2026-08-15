@@ -1,0 +1,18 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [],
+  "twist": [
+    "rename"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_assicurativi",
+      "description": "La tabella polizze viene denominata contratti_assicurativi nel linguaggio aziistico per riflettere il loro ruolo nella gestione dei portafogli clienti."
+    }
+  ],
+  "spec_hash": "6458672935886e4c"
+}

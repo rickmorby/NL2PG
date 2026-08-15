@@ -1,0 +1,21 @@
+{
+  "domain": "vendite",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "join",
+    "left_outer_join"
+  ],
+  "twist": [
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "prodotti",
+      "obsolete_value": "catalogo_prodotti",
+      "description": "La tabella prodotti (aliasata come catalogo_prodotti) e la tabella tabella_errori_sistema (aliasata come log_sistema_vendite) sono distrettori nel schema ampio. Appaiono rilevanti per una query su clienti e ordini, ma non partecipano al LEFT JOIN richiesto. Il risolutore deve identificare il percorso corretto tra la tabella clienti (sinistra) e ordini (destra), ignorando le tabelle irrilevanti che offrono percorsi alternativi fuorvianti."
+    }
+  ],
+  "spec_hash": "4ad7ade0be3e8b72"
+}

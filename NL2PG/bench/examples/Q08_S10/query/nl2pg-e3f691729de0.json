@@ -1,0 +1,8 @@
+{
+  "schema_ddl": "CREATE TABLE categorie (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    categoria_padre_id INT REFERENCES categorie(id),\n    CHECK (categoria_padre_id <> id)\n);",
+  "data_inserts": "INSERT INTO categorie (id, nome, descrizione, categoria_padre_id) VALUES\n(1, 'Elettronica', 'Prodotti elettronici generali', NULL),\n(2, 'Informatica', 'Prodotti informatici e computer', NULL),\n(3, 'Telefonia', 'Dispositivi telefonici e accessori', 1),\n(4, 'Smartphone', 'Telefoni intelligenti e smartphone', 3),\n(5, 'Accessori PC', 'Accessori per computer e laptop', 2);",
+  "feature_sql": [
+    "self_join"
+  ],
+  "query": "WITH gerarchia_categorie AS (SELECT c.id, c.nome AS categoria_nome, p.nome AS categoria_padre_nome, COUNT(cp.id) AS sotto_categorie_count FROM categorie c LEFT JOIN categorie p ON c.categoria_padre_id = p.id LEFT JOIN categorie cp ON cp.categoria_padre_id = c.id GROUP BY c.id, c.nome, p.nome HAVING COUNT(cp.id) > 0) SELECT categoria_nome, categoria_padre_nome, sotto_categorie_count, (SELECT COUNT(*) FROM categorie WHERE categoria_padre_id IS NULL) AS totale_categorie_radice, ROW_NUMBER() OVER (ORDER BY sotto_categorie_count DESC, categoria_nome) AS posizione FROM gerarchia_categorie ORDER BY sotto_categorie_count DESC, categoria_nome LIMIT 5;"
+}

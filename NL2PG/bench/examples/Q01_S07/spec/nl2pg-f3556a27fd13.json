@@ -1,0 +1,9 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "34fb136a339cbe8c"
+}

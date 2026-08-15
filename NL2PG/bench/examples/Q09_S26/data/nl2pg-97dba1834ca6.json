@@ -1,0 +1,16 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "3354fa578300e028"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL CHECK (data_nascita <= CURRENT_DATE),\n    data_assunzione DATE NOT NULL CHECK (data_assunzione <= CURRENT_DATE),\n    salario NUMERIC(10,2) NOT NULL CHECK (salario >= 0),\n    email TEXT NOT NULL UNIQUE\n);",
+  "data_inserts": "INSERT INTO dipendenti (codice_fiscale, nome, cognome, data_nascita, data_assunzione, salario, email) VALUES\n('RSSMRA80E15A562R', 'Mario', 'Rossi', '1990-05-15', '2020-03-10', 35000.00, 'mario.rossi@example.com'),\n('BNCLRA85B42F205Z', 'Laura', 'Bianchi', '1985-08-22', '2018-07-01', 42000.50, 'laura.bianchi@example.com'),\n('VGDGSP78R30I456W', 'Giuseppe', 'Verdi', '1978-11-30', '2010-09-25', 55000.75, 'giuseppe.verdi@example.com'),\n('NRNNNA95B54L234T', 'Anna', 'Neri', '1995-02-14', '2022-01-15', 28000.00, 'anna.neri@example.com'),\n('GLLLuca88F07M123X', 'Luca', 'Gialli', '1988-06-07', '2019-04-20', 48000.25, 'luca.gialli@example.com');"
+}

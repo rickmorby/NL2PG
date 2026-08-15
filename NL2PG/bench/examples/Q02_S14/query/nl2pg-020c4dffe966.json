@@ -1,0 +1,8 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    numero_sinistri INT CHECK (numero_sinistri >= 0)\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    premio_totale NUMERIC(10,2) CHECK (premio_totale >= 0),\n    data_polizza DATE NOT NULL\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, numero_sinistri) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', 0),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', 2),\n(3, 'Luca Verdi', 'VRLUCA82D50M201Y', 1),\n(4, 'Giulia Neri', 'NRGJLA90C60F205X', 0),\n(5, 'Marco Gialli', 'GLLMRC88B15H501R', 3);\n\nINSERT INTO polizze (id, cliente_id, premio_totale, data_polizza) VALUES\n(101, 1, 150.50, '2023-10-15'),\n(102, 2, 89.00, '2023-11-20'),\n(103, 3, 200.75, '2024-01-10'),\n(104, 4, 120.00, '2023-09-05'),\n(105, 5, 300.25, '2024-03-22');",
+  "feature_sql": [
+    "scalar_agg"
+  ],
+  "query": "SELECT COUNT(p.id) AS totale_polizze, COUNT(DISTINCT c.id) AS totale_clienti, SUM(p.premio_totale) AS premio_totale, AVG(p.premio_totale) AS premio_medio, MAX(p.premio_totale) AS premio_massimo, MIN(p.premio_totale) AS premio_minimo, COUNT(*) FILTER (WHERE c.numero_sinistri = 0) AS clienti_senza_sinistri, COUNT(*) FILTER (WHERE c.numero_sinistri > 0) AS clienti_con_sinistri, (SELECT cl.nome FROM clienti cl JOIN polizze pl ON cl.id = pl.cliente_id ORDER BY pl.premio_totale DESC LIMIT 1) AS top_client_per_premio FROM clienti c JOIN polizze p ON c.id = p.cliente_id;"
+}

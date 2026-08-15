@@ -1,0 +1,22 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [],
+    "twist": [
+      "rename"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "ordini_clienti",
+        "description": "La tabella 'ordini' viene indicata con il nome 'ordini_clienti' nel linguaggio aziendale, anche se la struttura fisica del database utilizza il nome 'ordini'."
+      }
+    ],
+    "spec_hash": "254bd85719feb89b"
+  },
+  "schema_ddl": "CREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('in_attesa', 'processato', 'spedito', 'annullato')),\n    cliente_id INT NOT NULL\n);",
+  "data_inserts": "INSERT INTO ordini (id, data_ordine, importo_totale, stato_ordine, cliente_id) VALUES\n(1, '2023-10-01', 150.50, 'in_attesa', 1),\n(2, '2023-10-05', 89.00, 'processato', 2),\n(3, '2023-10-10', 200.75, 'spedito', 1),\n(4, '2023-10-15', 0.00, 'annullato', 3),\n(5, '2023-10-20', 300.25, 'processato', 4);"
+}

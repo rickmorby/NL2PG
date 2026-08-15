@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "0b22fa2ed61cf0dc"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    email TEXT,\n    telefono TEXT\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    tipo_polizza TEXT NOT NULL,\n    premio NUMERIC(10,2) CHECK (premio >= 0)\n);"
+}

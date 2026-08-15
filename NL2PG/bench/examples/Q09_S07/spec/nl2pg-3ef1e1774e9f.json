@@ -1,0 +1,12 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "group_agg",
+    "having"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "1fb0bde51ef381c9"
+}

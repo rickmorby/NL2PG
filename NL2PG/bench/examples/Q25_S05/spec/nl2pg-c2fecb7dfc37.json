@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "natural_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "fatture_emesse",
+      "description": "La tabella ordini viene indicata come 'fatture_emesse' nella prosa aziendale, creando ambiguità su se rappresenti fatture o ordini."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "totale",
+      "obsolete_value": "valore_complessivo",
+      "description": "La colonna totale viene definita 'valore_complessivo' internamente, anche se il nome tecnico del database è più semplice."
+    }
+  ],
+  "spec_hash": "3ba9b9ccfa7b110a"
+}

@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "c286a323fd88ba09"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    indirizzo TEXT,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE linee_telefoniche (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_telefono TEXT NOT NULL UNIQUE,\n    data_attivazione DATE NOT NULL,\n    piano_tariffario TEXT NOT NULL,\n    costo_mensile NUMERIC(10,2) CHECK (costo_mensile >= 0)\n);",
+  "data_inserts": "INSERT INTO clienti (id, codice_fiscale, nome, cognome, data_nascita, indirizzo, email, telefono) VALUES\n(1, 'RSSMRA80A01H501U', 'Mario', 'Rossi', '1980-01-01', 'Via Roma 1, Milano', 'mario.rossi@email.it', '3211234567'),\n(2, 'BNCLRA85B42F205Z', 'Laura', 'Bianchi', '1985-02-15', 'Via Milano 2, Torino', 'laura.bianchi@email.it', '3219876543'),\n(3, 'VRDTOP70C30G123W', 'Davide', 'Verdi', '1970-03-30', 'Via Venezia 3, Roma', 'davide.verdi@email.it', '3214567890'),\n(4, 'SGRPNR90D15H501X', 'Patrizia', 'Santoro', '1990-04-20', 'Via Firenze 4, Napoli', 'patrizia.santoro@email.it', '3212345678'),\n(5, 'FRRMRA75E10G456Y', 'Marco', 'Ferrari', '1975-05-10', 'Via Genova 5, Bologna', 'marco.ferrari@email.it', '3218765432');\n\nINSERT INTO linee_telefoniche (id, cliente_id, numero_telefono, data_attivazione, piano_tariffario, costo_mensile) VALUES\n(1, 1, '3511234567', '2023-01-15', 'Base', 15.00),\n(2, 2, '3519876543', '2023-02-20', 'Premium', 35.50),\n(3, 3, '3514567890', '2023-03-10', 'Business', 60.00),\n(4, 4, '3512345678', '2023-04-05', 'Base', 15.00),\n(5, 5, '3518765432', '2023-05-25', 'Premium', 35.50);"
+}

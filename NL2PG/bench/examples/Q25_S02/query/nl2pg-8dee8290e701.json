@@ -1,0 +1,8 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    email TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE polizze (\n    id_polizza SERIAL PRIMARY KEY,\n    id INT NOT NULL REFERENCES clienti(id),\n    numero_polizza TEXT NOT NULL UNIQUE,\n    data_inizio DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    premio NUMERIC(10,2) NOT NULL CHECK (premio >= 0),\n    tipo_polizza TEXT NOT NULL,\n    CHECK (data_scadenza > data_inizio)\n);",
+  "data_inserts": "INSERT INTO clienti (id, nome, cognome, codice_fiscale, data_nascita, email, telefono) VALUES\n(1, 'Mario', 'Rossi', 'RSSMRA80A01H501U', '1980-01-01', 'mario.rossi@email.com', '3331234567'),\n(2, 'Laura', 'Bianchi', 'BNCLRA85B42F205Z', '1985-02-15', 'laura.bianchi@email.com', '3339876543'),\n(3, 'Giuseppe', 'Verdi', 'VRDGPE78C30F456Y', '1978-03-10', 'giuseppe.verdi@email.com', '3334567890'),\n(4, 'Anna', 'Ferrari', 'FERRAN90D20G789X', '1990-04-20', 'anna.ferrari@email.com', '3332223333');\n\nINSERT INTO polizze (id_polizza, id, numero_polizza, data_inizio, data_scadenza, premio, tipo_polizza) VALUES\n(1, 1, 'POL0012024', '2024-01-01', '2025-01-01', 500.00, 'VITA'),\n(2, 2, 'POL0022024', '2024-02-15', '2025-02-15', 1200.50, 'AUTOMOBILE'),\n(3, 3, 'POL0032024', '2024-03-10', '2025-03-10', 800.75, 'CASA'),\n(4, 4, 'POL0042024', '2024-04-20', '2025-04-20', 1500.00, 'SANITARIA');",
+  "feature_sql": [
+    "natural_join"
+  ],
+  "query": "SELECT c.nome, c.cognome, c.email, p.numero_polizza, p.tipo_polizza, p.premio, p.data_inizio, p.data_scadenza FROM clienti c NATURAL JOIN polizze p ORDER BY c.nome, c.cognome;"
+}

@@ -1,0 +1,29 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "window",
+    "join",
+    "conjunctive"
+  ],
+  "twist": [
+    "ambiguity",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "ambiguity",
+      "target_value": "clienti",
+      "obsolete_value": "clienti_attivi",
+      "description": "Nel linguaggio aziendale, il termine 'clienti_attivi' è utilizzato in modo ambiguo per indicare i clienti che hanno effettuato almeno un ordine negli ultimi 30 giorni, mentre la tabella 'clienti' include tutti i clienti registrati, indipendentemente dall'attività recente. Questa ambiguità costringe il modello a interpretare correttamente la relazione tra clienti e ordini per evitare sovrastime o sottostime dei dati."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "fatturato",
+      "obsolete_value": "gestione_fatturazione",
+      "description": "Il gestore aziendale si riferisce al 'fatturato' come 'gestione_fatturazione', un termine gergale che include non solo il totale degli ordini completati, ma anche le fatture emesse e le note di credito. La colonna 'fatturato' nella tabella 'ordini' rappresenta esclusivamente il totale lordo degli ordini confermati, costringendo il modello a differenziare il gergo aziendale dal significato preciso della colonna."
+    }
+  ],
+  "spec_hash": "166f600018a0615b"
+}

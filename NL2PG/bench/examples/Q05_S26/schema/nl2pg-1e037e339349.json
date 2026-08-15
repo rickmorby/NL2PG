@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "c286a323fd88ba09"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    indirizzo TEXT,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE linee_telefoniche (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_telefono TEXT NOT NULL UNIQUE,\n    data_attivazione DATE NOT NULL,\n    piano_tariffario TEXT NOT NULL,\n    costo_mensile NUMERIC(10,2) CHECK (costo_mensile >= 0)\n);"
+}

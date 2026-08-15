@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "synonym",
+      "target_value": "art",
+      "obsolete_value": "anagrafica_merce",
+      "description": "La tabella art (articoli) viene indicata come anagrafica_merce nel linguaggio aziendale, creando ambiguità nella mappatura semantica."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_ven",
+      "obsolete_value": "valore_reso",
+      "description": "La colonna importo_ven (importo delle vendite) viene indicata come valore_reso nel gergo specialistico aziendale, richiedendo decodifica del significato reale per eseguire l'aggregazione scalare."
+    }
+  ],
+  "spec_hash": "86e6176c1da1f602"
+}

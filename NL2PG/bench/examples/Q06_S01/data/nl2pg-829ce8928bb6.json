@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "8aacf6d1e1fe4d12"
+  },
+  "schema_ddl": "CREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    data_movimento DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    importo NUMERIC(10,2) NOT NULL CHECK (importo <> 0),\n    tipo TEXT CHECK (tipo IN ('entrata', 'uscita'))\n);",
+  "data_inserts": "INSERT INTO movimenti_contabili (id, data_movimento, descrizione, importo, tipo) VALUES\n(1, '2026-07-01', 'Vendita prodotti A', 1250.00, 'entrata'),\n(2, '2026-07-03', 'Acquisto materie prime', -800.50, 'uscita'),\n(3, '2026-07-10', 'Incasso fattura 2026/07', 3400.75, 'entrata'),\n(4, '2026-07-15', 'Pagamento fornitore XYZ', -1200.00, 'uscita'),\n(5, '2026-07-20', 'Interessi attivi', 150.25, 'entrata');"
+}

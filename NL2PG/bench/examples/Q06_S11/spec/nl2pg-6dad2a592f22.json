@@ -1,0 +1,11 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 5,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "conjunctive"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "7ccb44ce57203398"
+}

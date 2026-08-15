@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "215292f9d5c287c6"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    indirizzo TEXT NOT NULL\n);\n\nCREATE TABLE servizi (\n    id INT PRIMARY KEY,\n    nome_servizio TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_mensile NUMERIC(10,2) NOT NULL CHECK (prezzo_mensile >= 0)\n);\n\nCREATE TABLE abbonamenti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    servizio_id INT NOT NULL REFERENCES servizi(id),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('attivo', 'inattivo', 'sospeso'))\n);"
+}

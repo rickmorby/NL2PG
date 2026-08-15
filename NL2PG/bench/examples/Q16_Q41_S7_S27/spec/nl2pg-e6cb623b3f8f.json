@@ -1,0 +1,20 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "recursive_cte"
+  ],
+  "twist": [
+    "ambiguity"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "ambiguity",
+      "target_value": "responsabile",
+      "obsolete_value": "referente",
+      "description": "Nel linguaggio aziendale il termine 'referente' è semanticamente ambiguo: può indicare il supervisore diretto (manager_id nella gerarchia ricorsiva), il responsabile del dipartimento o il coordinatore di progetto. Nel database la colonna 'responsabile' contiene esclusivamente il riferimento al supervisore diretto nella struttura self-referencing, mentre l'ambiguità del termine 'referente' richiede al risolutore di disambiguare il significato corretto durante la navigazione ricorsiva con WITH RECURSIVE."
+    }
+  ],
+  "spec_hash": "4f4e961e47d0a334"
+}

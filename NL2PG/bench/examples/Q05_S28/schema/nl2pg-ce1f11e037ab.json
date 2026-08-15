@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [
+      "jargon",
+      "rename"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "movimenti_contabili",
+        "obsolete_value": "registro_economico",
+        "description": "La tabella movimenti_contabili viene indicata come registro_economico nel linguaggio aziendale interno, introducendo ambiguità nel riferimento a dati contabili."
+      },
+      {
+        "twist_type": "rename",
+        "target_value": "saldi",
+        "obsolete_value": "stato_conto",
+        "description": "La tabella saldi viene ribattezzata stato_conto nella prosa aziendale, alterando il naming abbreviato originale con un termine più formale ma meno diretto."
+      }
+    ],
+    "spec_hash": "5e8be3fcd904d88d"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    partita_iva TEXT\n);\n\nCREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_movimento DATE NOT NULL,\n    importo NUMERIC(10,2) CHECK (importo >= 0),\n    descrizione TEXT,\n    tipo_movimento TEXT CHECK (tipo_movimento IN ('entrata', 'uscita'))\n);\n\nCREATE TABLE saldi (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    saldo_iniziale NUMERIC(10,2) CHECK (saldo_iniziale >= 0),\n    saldo_attuale NUMERIC(10,2) CHECK (saldo_attuale >= 0),\n    data_aggiornamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);"
+}

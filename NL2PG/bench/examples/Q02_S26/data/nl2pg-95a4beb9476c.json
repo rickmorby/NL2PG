@@ -1,0 +1,24 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [
+      "ambiguity"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "ambiguity",
+        "target_value": "saldo",
+        "obsolete_value": "totale_disponibile",
+        "description": "Il campo saldo, memorizzato come TEXT nonostante rappresenti un valore numerico, viene comunemente indicato come totale_disponibile nel linguaggio aziendale, creando ambiguità su se si riferisca a un saldo corrente o a un totale aggregato. Questo induce a cast forzato o interpretazioni errate durante aggregazioni scalari come SUM."
+      }
+    ],
+    "spec_hash": "5acf11acc98a2ceb"
+  },
+  "schema_ddl": "CREATE TABLE conti (\n    id SERIAL PRIMARY KEY,\n    descrizione TEXT NOT NULL,\n    saldo TEXT NOT NULL CHECK (saldo ~ '^-?\\d+(\\.\\d+)?$'),\n    data_aggiornamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_inserts": "INSERT INTO conti (id, descrizione, saldo, data_aggiornamento) VALUES\n(1, 'Conto corrente principale', '1500.75', '2023-10-05'),\n(2, 'Conto risparmio', '2500.00', '2023-10-06'),\n(3, 'Conto aziendale', '-300.50', '2023-10-07'),\n(4, 'Conto corrente secondario', '800.25', '2023-10-08'),\n(5, 'Conto risparmio speciale', '5000.00', '2023-10-09');"
+}

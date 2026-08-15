@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 1,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "cte",
+      "recursive_cte"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "6c1be9dd41f9123b"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    data_assunzione DATE NOT NULL,\n    stipendio NUMERIC(10,2) CHECK (stipendio >= 0),\n    manager_id INT REFERENCES dipendenti(id)\n);\n\nCREATE INDEX idx_dipendenti_manager ON dipendenti(manager_id);"
+}

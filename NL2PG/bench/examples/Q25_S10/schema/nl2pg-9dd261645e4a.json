@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "7ab3936118397d10"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    email TEXT CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$')\n);\n\nCREATE TABLE conti (\n    conto_id SERIAL PRIMARY KEY,\n    id INT NOT NULL REFERENCES clienti(id),\n    numero_conto TEXT NOT NULL UNIQUE,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('corrente', 'risparmio')),\n    saldo_iniziale NUMERIC(12,2) NOT NULL CHECK (saldo_iniziale >= 0),\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE transazioni (\n    transazione_id SERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(conto_id),\n    data_transazione DATE NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo <> 0),\n    descrizione TEXT,\n    tipo_transazione TEXT NOT NULL CHECK (tipo_transazione IN ('accredito', 'addebito'))\n);"
+}

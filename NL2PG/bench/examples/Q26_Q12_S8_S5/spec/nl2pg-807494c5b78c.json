@@ -1,0 +1,14 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "subquery",
+    "correlated_subquery",
+    "exists",
+    "anti_join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "c197a5a929b78f0b"
+}

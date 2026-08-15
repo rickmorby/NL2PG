@@ -1,0 +1,8 @@
+{
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    data_assunzione DATE NOT NULL,\n    salario NUMERIC(10,2) NOT NULL CHECK (salario >= 0),\n    responsabile_id INTEGER REFERENCES dipendenti(id)\n);\n\nCREATE INDEX idx_dipendenti_responsabile ON dipendenti(responsabile_id);",
+  "data_inserts": "INSERT INTO dipendenti (id, nome, cognome, data_nascita, data_assunzione, salario, responsabile_id) VALUES\n(1, 'Mario', 'Rossi', '1975-03-15', '2005-06-20', 85000.00, NULL),\n(2, 'Laura', 'Bianchi', '1980-08-22', '2008-01-10', 82000.00, NULL),\n(3, 'Giovanni', 'Verdi', '1985-11-30', '2010-03-15', 65000.00, 1),\n(4, 'Anna', 'Neri', '1988-04-12', '2012-07-01', 63000.00, 2),\n(5, 'Carlo', 'Blu', '1990-09-05', '2015-09-10', 48000.00, 3),\n(6, 'Diana', 'Rosa', '1992-01-18', '2016-11-20', 47000.00, 4);",
+  "feature_sql": [
+    "recursive_cte"
+  ],
+  "query": "WITH RECURSIVE gerarchia_dipendenti AS (SELECT id, nome, cognome, salario, responsabile_id, 0 AS livello, nome || ' ' || cognome AS percorso_responsabilita FROM dipendenti WHERE responsabile_id IS NULL UNION ALL SELECT d.id, d.nome, d.cognome, d.salario, d.responsabile_id, g.livello + 1, g.percorso_responsabilita || ' -> ' || d.nome || ' ' || d.cognome FROM dipendenti d JOIN gerarchia_dipendenti g ON d.responsabile_id = g.id) SELECT id, nome, cognome, salario, responsabile_id, livello, percorso_responsabilita FROM gerarchia_dipendenti ORDER BY livello ASC, nome ASC, cognome ASC;"
+}

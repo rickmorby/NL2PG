@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "fd0436826f1bc7a5"
+  },
+  "schema_ddl": "CREATE TABLE cartelle_cliniche (\n    id INT PRIMARY KEY,\n    paziente_nome TEXT NOT NULL,\n    paziente_cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL CHECK (data_nascita < CURRENT_DATE),\n    sesso CHAR(1) NOT NULL CHECK (sesso IN ('M', 'F')),\n    codice_fiscale TEXT NOT NULL UNIQUE CHECK (LENGTH(codice_fiscale) = 16),\n    data_visita DATE NOT NULL CHECK (data_visita < CURRENT_DATE),\n    medico_nome TEXT NOT NULL,\n    medico_cognome TEXT NOT NULL,\n    diagnosi TEXT,\n    trattamento TEXT,\n    farmaci TEXT,\n    note TEXT,\n    costo NUMERIC(10,2) CHECK (costo >= 0)\n);"
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "group_agg"
+  ],
+  "twist": [
+    "jargon",
+    "rename"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "movimenti_contabili",
+      "obsolete_value": "registro_economico",
+      "description": "La tabella movimenti_contabili viene indicata come registro_economico nel linguaggio aziendale interno, introducendo ambiguità nel riferimento a dati contabili."
+    },
+    {
+      "twist_type": "rename",
+      "target_value": "saldi",
+      "obsolete_value": "stato_conto",
+      "description": "La tabella saldi viene ribattezzata stato_conto nella prosa aziendale, alterando il naming abbreviato originale con un termine più formale ma meno diretto."
+    }
+  ],
+  "spec_hash": "5e8be3fcd904d88d"
+}

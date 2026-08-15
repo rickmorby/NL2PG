@@ -1,0 +1,29 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "pazienti",
+        "obsolete_value": "anagrafica_pazienti",
+        "description": "La tabella pazienti viene denominata anagrafica_pazienti nel linguaggio aziistico."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "visite",
+        "obsolete_value": "controlli",
+        "description": "La colonna visite è indicata come controlli nella prosa aziale."
+      }
+    ],
+    "spec_hash": "7f961b71d1dd09ea"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    sesso CHAR(1) NOT NULL CHECK (sesso IN ('M', 'F')),\n    indirizzo TEXT,\n    telefono TEXT,\n    email TEXT UNIQUE,\n    visite INT NOT NULL DEFAULT 0 CHECK (visite >= 0)\n);",
+  "data_inserts": "INSERT INTO pazienti (id, nome, cognome, data_nascita, sesso, indirizzo, telefono, email, visite) VALUES\n(1, 'Mario', 'Rossi', '1980-05-15', 'M', 'Via Roma 1', '3331234567', 'mario.rossi@example.com', 3),\n(2, 'Luigi', 'Verdi', '1990-08-22', 'M', 'Via Milano 5', '3456789012', 'luigi.verdi@example.com', 5),\n(3, 'Anna', 'Bianchi', '1975-12-10', 'F', 'Via Firenze 10', '3678901234', 'anna.bianchi@example.com', 2),\n(4, 'Maria', 'Neri', '2000-03-30', 'F', 'Via Venezia 15', '3890123456', 'maria.neri@example.com', 0),\n(5, 'Giovanni', 'Gialli', '1968-11-05', 'M', 'Via Torino 20', '3339876543', 'giovanni.gialli@example.com', 4);\n"
+}

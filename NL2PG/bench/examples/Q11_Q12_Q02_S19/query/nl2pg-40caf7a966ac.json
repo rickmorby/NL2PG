@@ -1,0 +1,9 @@
+{
+  "schema_ddl": "CREATE TABLE registri_contabili (\n    id SERIAL PRIMARY KEY,\n    data DATE NOT NULL,\n    descrizione TEXT,\n    ammontare_lordo NUMERIC(12,2) NOT NULL CHECK (ammontare_lordo >= 0),\n    tipo_transazione TEXT CHECK (tipo_transazione IN ('DEBITO', 'CREDITO')),\n    riferimento_esterno TEXT\n);\n\nCREATE INDEX idx_registri_data ON registri_contabili(data);\nCREATE INDEX idx_registri_tipo ON registri_contabili(tipo_transazione);",
+  "data_inserts": "INSERT INTO registri_contabili (id, data, descrizione, ammontare_lordo, tipo_transazione, riferimento_esterno) VALUES\n(1, '2023-10-01', 'Acquisto forniture di ufficio', 150.50, 'DEBITO', 'FATTURA-001'),\n(2, '2023-10-02', 'Vendita prodotti al dettaglio', 300.00, 'CREDITO', 'FATTURA-002'),\n(3, '2023-10-03', 'Pagamento affitto sede legale', 800.00, 'DEBITO', 'PAGAMENTO-003'),\n(4, '2023-10-04', 'Ricevuta da cliente per servizi', 250.75, 'CREDITO', 'FATTURA-004'),\n(5, '2023-10-05', 'Acquisto servizi di consulenza', 120.00, 'DEBITO', 'FATTURA-005');",
+  "feature_sql": [
+    "subquery",
+    "correlated_subquery"
+  ],
+  "query": "SELECT r.id, r.data, r.descrizione, r.tipo_transazione, r.ammontare_lordo, (SELECT COUNT(*) FROM registri_contabili r2 WHERE r2.tipo_transazione = r.tipo_transazione AND r2.ammontare_lordo < r.ammontare_lordo) AS transazioni_sottostanti, (SELECT AVG(ammontare_lordo) FROM registri_contabili) AS media_generale FROM registri_contabili r WHERE r.ammontare_lordo > (SELECT AVG(ammontare_lordo) FROM registri_contabili r4 WHERE r4.tipo_transazione = r.tipo_transazione) ORDER BY r.ammontare_lordo DESC;"
+}

@@ -1,0 +1,28 @@
+{
+  "domain": "finanza",
+  "n_tables": 1,
+  "hierarchy": "single_table",
+  "sql_features": [
+    "subquery",
+    "correlated_subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "registri_contabili",
+      "description": "La tabella transazioni viene denominata registri_contabili nel linguaggio aziendale, alterando la semantica delle query SQL."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "totale",
+      "obsolete_value": "ammontare lordo",
+      "description": "La colonna totale viene indicata come ammontare lordo nel gergo finanziario, introducendo ambiguità nella formulazione delle condizioni di filtro."
+    }
+  ],
+  "spec_hash": "aa51d28130da735a"
+}
