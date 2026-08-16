@@ -23,6 +23,25 @@ class NlLinguisticComplexityPlot(AbstractPlot):
         """Restituisce il titolo del grafico."""
         return "06. Complessità Linguistica vs N. Tabelle"
 
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Rapporto tra la lunghezza del testo naturale (storia + domanda) "
+            "e la dimensione dello schema."
+        )
+
+    def insight(self, data: tuple[list[int], list[int]]) -> str:
+        """Estrae l'evidenza sulla ricchezza descrittiva dei testi."""
+        _tables, words = data
+        if not words:
+            return "Nessun testo analizzato nei task."
+        avg_w = round(sum(words) / len(words), 1)
+        min_w, max_w = min(words), max(words)
+        return (
+            f"I testi hanno una lunghezza media di {avg_w} parole "
+            f"(range: {min_w} - {max_w} parole), ricchi di contesto aziendale."
+        )
+
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
         return "N. Tabelle Schema"
@@ -50,7 +69,7 @@ class TwistTypeFrequencyPlot(AbstractBarPlot):
 
     def __init__(self) -> None:
         """Inizializza la rotazione e la dimensione del grafico."""
-        super().__init__(rotation=35, figsize=(9.5, 5.5))
+        super().__init__(rotation=35, figsize=(9.2, 5.8))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -59,6 +78,24 @@ class TwistTypeFrequencyPlot(AbstractBarPlot):
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
         return "07. Frequenza Disturbi Semantici (Twist)"
+
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Frequenza delle tipologie di disturbo semantico (Twist) inserite per "
+            "testare la robustezza dei modelli."
+        )
+
+    def insight(self, data: tuple[list[str], list[int]]) -> str:
+        """Estrae l'evidenza sulla tipologia di disturbo dominante."""
+        xs, ys = data
+        if not xs or not ys or sum(ys) == 0:
+            return "Nessun disturbo semantico presente."
+        top_tw, top_n = xs[0], ys[0]
+        return (
+            f"Il disturbo piu' frequente e' '{top_tw}' ({top_n} regole), "
+            f"per saggiare il disallineamento lessicale."
+        )
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
@@ -85,8 +122,8 @@ class VocabularyJargonDistributionPlot(AbstractBarPlot):
     """08: Barplot della distribuzione del gergo."""
 
     def __init__(self) -> None:
-        """Inizializza la rotazione e la dimensione del grafico."""
-        super().__init__(rotation=35, figsize=(9.5, 5.5))
+        """Inizializza la rotazione, dimensione e margine per etichette lunghe."""
+        super().__init__(rotation=35, figsize=(9.2, 5.8), bottom_margin=0.30)
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -95,6 +132,24 @@ class VocabularyJargonDistributionPlot(AbstractBarPlot):
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
         return "08. Frequenza Gergo e Sinonimi nei Twist"
+
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Frequenza dei termini di gergo aziendale e acronimi inseriti nelle storie "
+            "per mascherare lo schema."
+        )
+
+    def insight(self, data: tuple[list[str], list[int]]) -> str:
+        """Estrae l'evidenza sui termini di gergo obsoleti."""
+        xs, ys = data
+        if not xs or not ys or sum(ys) == 0 or xs[0] == "nessun_gergo":
+            return "Nessun termine di gergo obsoleto registrato."
+        top_j, top_n = xs[0], ys[0]
+        return (
+            f"Il termine gergale piu' frequente e' '{top_j}' ({top_n} occorrenze), "
+            f"richiedendo disambiguazione semantica."
+        )
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""

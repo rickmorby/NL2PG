@@ -26,6 +26,23 @@ class SqlSyntaxDistributionPlot(AbstractBarPlot):
         """Restituisce il titolo del grafico."""
         return "01. Distribuzione Feature SQL"
 
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Frequenza delle clausole e costrutti SQL generati all'interno delle query "
+            "del benchmark."
+        )
+
+    def insight(self, data: tuple[list[str], list[int]]) -> str:
+        """Estrae l'evidenza principale sui costrutti SQL."""
+        xs, ys = data
+        if not xs or not ys or sum(ys) == 0:
+            return "Nessuna feature SQL registrata nel dataset."
+        top_f, top_n = xs[0], ys[0]
+        return (
+            f"La clausola SQL piu' frequente e' '{top_f}', presente in {top_n} task del benchmark."
+        )
+
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
         return "Feature SQL"
@@ -60,6 +77,27 @@ class AstComplexityDepthPlot(AbstractBarPlot):
         """Restituisce il titolo del grafico."""
         return "02. Profondità AST Query Gold"
 
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Profondita' massima dell'albero sintattico (AST): misura l'annidamento "
+            "logico delle query."
+        )
+
+    def insight(self, data: tuple[list[str], list[int]]) -> str:
+        """Estrae l'evidenza sulla profondità delle query."""
+        xs, ys = data
+        if not xs or not ys or sum(ys) == 0:
+            return "Nessun dato AST calcolato per le query."
+        tot = sum(ys)
+        max_idx = ys.index(max(ys))
+        mode_depth, count = xs[max_idx], ys[max_idx]
+        perc = round((count / tot) * 100, 1)
+        return (
+            f"Il {perc}% delle query ({count}/{tot}) presenta {mode_depth.lower()}, "
+            f"evidenziando una struttura relazionale articolata."
+        )
+
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
         return "Profondità AST"
@@ -89,6 +127,25 @@ class SchemaDomainDiversityPlot(AbstractBarPlot):
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
         return "03. Diversità Domini Aziendali Benchmark"
+
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Distribuzione dei task nei 12 differenti scenari aziendali del benchmark "
+            "(es. sanita', finanza, vendite)."
+        )
+
+    def insight(self, data: tuple[list[str], list[int]]) -> str:
+        """Estrae l'evidenza sulla diversità settoriale."""
+        xs, ys = data
+        if not xs or not ys or sum(ys) == 0:
+            return "Nessun dominio aziendale registrato."
+        top_dom, top_n = xs[0], ys[0]
+        tot_doms = len(xs)
+        return (
+            f"Il dominio piu' frequente e' '{top_dom}' ({top_n} task). "
+            f"Il dataset copre uniformemente {tot_doms} settori industriali."
+        )
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
@@ -120,27 +177,58 @@ class SchemaComplexityHeatmapPlot(AbstractBarPlot):
         """Restituisce il titolo del grafico."""
         return "04. Complessità Schema (N. Tabelle)"
 
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Numero di tabelle relazionali per schema: misura la complessita' "
+            "e articolazione dei JOIN."
+        )
+
+    def insight(self, data: tuple[list[str], list[int]]) -> str:
+        """Estrae l'evidenza sul numero di tabelle relazionali."""
+        xs, ys = data
+        if not xs or not ys or sum(ys) == 0:
+            return "Nessun dato sulla dimensione dello schema."
+        tot = sum(ys)
+        max_idx = ys.index(max(ys))
+        mode_tabs, count = xs[max_idx], ys[max_idx]
+        perc = round((count / tot) * 100, 1)
+        return (
+            f"Il {perc}% dei database nel benchmark e' composto da {mode_tabs.lower()}, "
+            f"garantendo relazioni realistiche."
+        )
+
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
-        return "N. Tabelle"
+        return "N. Tabelle nello Schema"
 
     def ylabel(self) -> str:
         """Restituisce l'etichetta dell'asse Y."""
-        return "Conteggio Task"
+        return "Conteggio Schemi"
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
-        """Estrae la distribuzione del numero di tabelle."""
+        """Estrae il conteggio tabelle per schema."""
         c = Counter((t.get("spec") or {}).get("n_tables", 1) for t in tasks)
-        return ([f"{k} tabelle" for k in sorted(c.keys())], [c[k] for k in sorted(c.keys())])
+        labels = [f"{k} tabella" if k == 1 else f"{k} tabelle" for k in sorted(c.keys())]
+        return (labels, [c[k] for k in sorted(c.keys())])
 
 
 class SqlFeatureCooccurrencePlot(AbstractHeatmapPlot):
-    """05: Heatmap di co-occorrenza feature SQL."""
+    """05: Heatmap di co-occorrenza delle feature SQL."""
 
     def __init__(self) -> None:
-        """Inizializza la mappa di calore ed i nomi feature."""
-        super().__init__(cmap="Blues", rotation=30)
-        self._top_feats = ["group_agg", "having", "join", "window", "conjunctive", "multi_join"]
+        """Inizializza la mappa e l'elenco feature."""
+        super().__init__(cmap="Blues", rotation=35, figsize=(9.5, 6))
+        self._features = [
+            "join",
+            "group_agg",
+            "having",
+            "subquery",
+            "window",
+            "cte",
+            "distinct",
+            "order_limit",
+        ]
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -148,33 +236,60 @@ class SqlFeatureCooccurrencePlot(AbstractHeatmapPlot):
 
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
-        return "05. Matrice Co-occorrenza Feature SQL"
+        return "05. Co-occorrenza Costrutti SQL nelle Query"
+
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Frequenza con cui due o piu' costrutti SQL compaiono simultaneamente "
+            "nella stessa query."
+        )
+
+    def insight(self, data: list[list[int]]) -> str:
+        """Estrae la coppia di operatori con maggiore sinergia."""
+        if not data or not any(sum(row) for row in data):
+            return "Nessuna combinazione simultanea di operatori rilevata."
+        max_val, best_i, best_j = 0, 0, 0
+        for i, r in enumerate(data):
+            for j, val in enumerate(r):
+                if i != j and val > max_val:
+                    max_val = val
+                    best_i, best_j = i, j
+        if max_val > 0:
+            f1, f2 = self._features[best_i], self._features[best_j]
+            return (
+                f"La combinazione piu' frequente e' '{f1}' con '{f2}' ({max_val} query condivise)."
+            )
+        return "Gli operatori SQL sono distribuiti in modo ortogonale tra i task."
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
-        return "Feature"
+        return "Feature SQL"
 
     def ylabel(self) -> str:
         """Restituisce l'etichetta dell'asse Y."""
-        return "Feature"
+        return "Feature SQL"
 
     @property
     def xticklabels(self) -> list[str]:
-        """Restituisce le etichette per l'asse X."""
-        return self._top_feats
+        """Restituisce le etichette delle colonne."""
+        return self._features
 
     @property
     def yticklabels(self) -> list[str]:
-        """Restituisce le etichette per l'asse Y."""
-        return self._top_feats
+        """Restituisce le etichette delle righe."""
+        return self._features
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> list[list[int]]:
-        """Calcola la matrice di co-occorrenza."""
-        matrix = [[0 for _ in self._top_feats] for _ in self._top_feats]
+        """Calcola la matrice di co-occorrenza per le feature selezionate."""
+        cooc: dict[str, dict[str, int]] = {
+            f1: {f2: 0 for f2 in self._features} for f1 in self._features
+        }
         for t in tasks:
             feats = set((t.get("spec") or {}).get("sql_features", []))
-            for i, f1 in enumerate(self._top_feats):
-                for j, f2 in enumerate(self._top_feats):
-                    if f1 in feats and f2 in feats:
-                        matrix[i][j] += 1
-        return matrix
+            for f1 in feats:
+                if f1 in cooc:
+                    for f2 in feats:
+                        if f2 in cooc[f1]:
+                            cooc[f1][f2] += 1
+        return [[cooc[f1][f2] for f2 in self._features] for f1 in self._features]

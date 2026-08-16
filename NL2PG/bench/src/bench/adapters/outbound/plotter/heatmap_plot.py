@@ -17,10 +17,11 @@ class AbstractHeatmapPlot(AbstractPlot):
         self,
         cmap: str = "Blues",
         rotation: int = 0,
-        figsize: tuple[float, float] = (8.0, 5.5),
+        figsize: tuple[float, float] = (9.2, 5.8),
     ) -> None:
         """Inizializza la mappa cromatica e la rotazione delle etichette."""
-        super().__init__(figsize=figsize)
+        bottom_margin = 0.24 if rotation > 0 else 0.18
+        super().__init__(figsize=figsize, bottom_margin=bottom_margin)
         self.cmap = cmap
         self.rotation = rotation
 
@@ -51,3 +52,5 @@ class AbstractHeatmapPlot(AbstractPlot):
         super().format_axes(ax)
         if self.rotation:
             ax.tick_params(axis="x", rotation=self.rotation)
+            for tick in ax.get_xticklabels():
+                tick.set_ha("right")

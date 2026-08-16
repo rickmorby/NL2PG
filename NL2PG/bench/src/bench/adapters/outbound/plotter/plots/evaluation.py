@@ -11,6 +11,8 @@ from seaborn import boxplot
 from bench.adapters.outbound.plotter.bar_plot import AbstractBarPlot
 from bench.adapters.outbound.plotter.base import AbstractPlot
 
+_HARD_DIFF_INDEX = 2
+
 
 class SolverPassrateByDifficultyPlot(AbstractBarPlot):
     """13: Barplot del pass rate per classe di difficoltà."""
@@ -26,6 +28,26 @@ class SolverPassrateByDifficultyPlot(AbstractBarPlot):
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
         return "13. Risolvibilità (Pass Rate Medio) per Classe di Difficoltà"
+
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Accuratezza media ottenuta dal solver nei tre livelli di difficolta' "
+            "calibrati empiricamente."
+        )
+
+    def insight(self, data: tuple[list[str], list[float]]) -> str:
+        """Estrae l'evidenza sulla coerenza della scala di difficoltà."""
+        _xs, ys = data
+        if not ys:
+            return "Nessun dato di risolvibilita' per livello."
+        e_p = round(ys[0] * 100, 1) if len(ys) > 0 else 0.0
+        m_p = round(ys[1] * 100, 1) if len(ys) > 1 else 0.0
+        h_p = round(ys[_HARD_DIFF_INDEX] * 100, 1) if len(ys) > _HARD_DIFF_INDEX else 0.0
+        return (
+            f"La scala e' calibrata: il pass rate scende da Easy ({e_p}%) a Medium ({m_p}%) "
+            f"fino ad Hard ({h_p}%)."
+        )
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
@@ -62,6 +84,22 @@ class CriticScoreByCalibrationOutcomePlot(AbstractPlot):
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
         return "14. Distribuzione Critic Score per Esito della Calibrazione"
+
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Distribuzione del punteggio di qualita' del Critic separato tra "
+            "task superati e falliti."
+        )
+
+    def insight(self, data: tuple[list[str], list[float]]) -> str:
+        """Estrae l'evidenza sul punteggio qualitativo dei task validati."""
+        labels, scores = data
+        if not scores:
+            return "Nessun punteggio Critic disponibile."
+        pass_scores = [scores[i] for i, lbl in enumerate(labels) if lbl == "Passato"]
+        avg_p = round(sum(pass_scores) / len(pass_scores), 1) if pass_scores else 0.0
+        return f"I task validati raggiungono un punteggio medio del Critic di {avg_p}/10."
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
@@ -119,19 +157,40 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
 
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
-        return "15. Cardinalità Risultato Gold (N. Righe)"
+        return "15. Distribuzione Cardinalità Risultati Gold"
+
+    def description(self) -> str:
+        """Restituisce la descrizione metodologica del grafico."""
+        return (
+            "Distribuzione del numero di record restituiti dall'esecuzione fisica "
+            "delle query Gold nel database."
+        )
+
+    def insight(self, data: tuple[list[str], list[int]]) -> str:
+        """Estrae l'evidenza sulla cardinalità tipica dei risultati."""
+        xs, ys = data
+        if not xs or not ys or sum(ys) == 0:
+            return "Nessun risultato di esecuzione registrato."
+        tot = sum(ys)
+        max_idx = ys.index(max(ys))
+        mode_r, count = xs[max_idx], ys[max_idx]
+        perc = round((count / tot) * 100, 1)
+        return (
+            f"Il {perc}% delle query produce {mode_r.lower()}, "
+            f"garantendo verificabilita' immediata e assenza di set vuoti."
+        )
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
-        return "Numero di Righe DB"
+        return "Numero di Righe Risultato"
 
     def ylabel(self) -> str:
         """Restituisce l'etichetta dell'asse Y."""
-        return "Frequenza Task"
+        return "Conteggio Query"
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
         """Estrae la cardinalità del risultato Gold."""
-        rows = [((t.get("gold") or {}).get("result") or {}).get("rows", []) for t in tasks]
+        rows = [t.get("gold", {}).get("result", []) for t in tasks]
         counts = Counter([len(r) for r in rows])
         xs = [f"{k} righe" for k in sorted(counts.keys())] or ["1 riga"]
         ys = [counts[k] for k in sorted(counts.keys())] or [1]

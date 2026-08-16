@@ -18,10 +18,12 @@ class AbstractBarPlot(AbstractPlot):
         palette: str | list[str] = "colorblind",
         rotation: int = 0,
         ylim: tuple[float, float] | None = None,
-        figsize: tuple[float, float] = (8.0, 5.0),
+        figsize: tuple[float, float] = (9.2, 5.8),
+        bottom_margin: float | None = None,
     ) -> None:
         """Inizializza le opzioni di palette, rotazione e limiti Y per i barplot."""
-        super().__init__(figsize=figsize)
+        b_margin = bottom_margin or (0.28 if rotation > 0 else 0.19)
+        super().__init__(figsize=figsize, bottom_margin=b_margin)
         self.palette = palette
         self.rotation = rotation
         self.ylim = ylim
@@ -42,3 +44,5 @@ class AbstractBarPlot(AbstractPlot):
             ax.set_ylim(*self.ylim)
         if self.rotation:
             ax.tick_params(axis="x", rotation=self.rotation)
+            for tick in ax.get_xticklabels():
+                tick.set_ha("right")
