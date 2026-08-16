@@ -58,7 +58,14 @@ def main_callback(ctx: Context) -> None:
 @app.command("generate")
 def generate_command(
     ctx: Context,
-    count: Annotated[int, Option("--count", "-c", help="Numero di task da generare.")] = 10,
+    limit: Annotated[
+        int,
+        Option(
+            "--limit",
+            "-l",
+            help="Task da generare (default: 116, copertura categorie senza duplicati).",
+        ),
+    ] = 116,
     category: Annotated[str, Option("--category", "-cat", help="Filtro id categoria.")] = "",
     batch_size: Annotated[int, Option("--batch-size", "-b", help="Worker concorrenti.")] = 1,
 ) -> None:
@@ -70,12 +77,12 @@ def generate_command(
         runner = bootstrap.task_runner()
 
         secho("[BENCHMARK] Avvio Generazione Batch Task", fg=colors.CYAN, bold=True)
-        secho(f"  Task richiesti: {count}", fg=colors.WHITE)
+        secho(f"  Task richiesti (limit): {limit}", fg=colors.WHITE)
         cat_str = category if category else "Tutte (Selezione a giri)"
         secho(f"  Categoria: {cat_str}", fg=colors.WHITE)
         secho(f"  Batch size: {batch_size}", fg=colors.WHITE)
 
-        summary = runner.run_batch(count=count, category=category, batch_size=batch_size)
+        summary = runner.run_batch(count=limit, category=category, batch_size=batch_size)
 
         secho("\n[RIEPILOGO RUN]", fg=colors.CYAN, bold=True)
         secho(f"  Run ID: {summary.run_id}", fg=colors.WHITE)
