@@ -8,17 +8,23 @@ Il JSON di output deve contenere esclusivamente il campo "question".
 </objective>
 
 <rules_and_guidelines>
-1. **Risolvibilità Deterministica (Completezza Informativa)**: La domanda deve contenere tutti gli elementi concettuali necessari (filtri, raggruppamenti, ordinamenti, limiti) affinché la query SQL Gold sia l'unica risposta logicamente corretta, senza costringere il Solver a fare indovinelli.
-2. **Naturalezza Espressiva**: Esprimi la richiesta nel tono naturale di un manager o utente aziendale.
-3. **DIVIETO DI SCHEMA LEAKAGE**: NON citare alla lettera i nomi tecnici delle colonne SQL (es. scrivi "data di immatricolazione", NON "la colonna data_immatricolazione").
-4. **DIVIETO DI GERGO DB**: NON usare parole come *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*.
-5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
+1. **Risolvibilità Deterministica e Coerenza di Proiezione**:
+   - La domanda deve indicare chiaramente tutti gli attributi informativi, le metriche aggregate e le posizioni di classifica presenti nella SELECT finale della Gold Query (ad esempio: *"mostrando il nome del cliente, il totale speso, la data e la posizione in graduatoria"*). Non omettere attributi estratti dalla query.
+2. **Esplicitazione delle Formule e Regole di Calcolo**:
+   - Se la query Gold esegue calcoli aritmetici o formule composite (es. `quantità * prezzo_unitario`, differenze tra importi `entrate - uscite`, sconti, percentuali), descrivi sinteticamente nel testo la logica con cui viene determinata la metrica (es. *"inteso come differenza tra entrate e uscite"* oppure *"calcolato moltiplicando le quantita per il prezzo unitario"*).
+3. **Semantica di Inclusione ed Esclusione**:
+   - Se la query include entità prive di corrispondenza (LEFT JOIN / COALESCE), esplicita: *"includendo anche coloro che non hanno..."*.
+   - Se la query include solo entità con corrispondenza (INNER JOIN), usa formule selettive: *"tra i soli clienti che hanno registrato almeno..."*.
+4. **Naturalezza Espressiva**: Esprimi la richiesta nel tono naturale di un manager o utente aziendale.
+5. **DIVIETO DI SCHEMA LEAKAGE**: NON citare alla lettera i nomi tecnici delle colonne SQL (es. scrivi "data di immatricolazione", NON "la colonna data_immatricolazione").
+6. **DIVIETO DI GERGO DB**: NON usare parole come *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record, SELECT*.
+7. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
 <example>
 {
-  "question": "Quali sono i 3 studenti con la media voti più alta tra quelli che hanno ottenuto una valutazione non inferiore a 24?"
+  "question": "Quali sono i 3 studenti con la media voti più alta tra quelli che hanno ottenuto una valutazione non inferiore a 24, mostrando il nome, il cognome e la media conseguita?"
 }
 </example>
 </positive_examples>
@@ -31,6 +37,12 @@ NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
   "question": "Quali sono i 3 studenti con la media voti più alta..."
 }
 ```
+</example_to_avoid>
+<example_to_avoid>
+OMISSIONE DEI CAMPI DI PROIEZIONE O DELLE FORMULE (ERRATO):
+{
+  "question": "Dammi i clienti migliori." // SBAGLIATO! Non specifica quali informazioni mostrare, come calcolare la metrica, né l'ordinamento o il limite!
+}
 </example_to_avoid>
 <example_to_avoid>
 CITAZIONE SINTATTICA DI CLAUSOLE SQL O COLONNE (ERRATO):
