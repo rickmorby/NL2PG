@@ -1,9 +1,0 @@
-{
-  "schema_ddl": "CREATE TABLE dipartimenti (\n    id SERIAL PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL UNIQUE,\n    budget_annuale NUMERIC(12,2) CHECK (budget_annuale >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    nome_dipendente TEXT NOT NULL,\n    cognome_dipendente TEXT NOT NULL,\n    data_assunzione DATE NOT NULL,\n    salario_mensile NUMERIC(10,2) CHECK (salario_mensile >= 0),\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id)\n);",
-  "data_inserts": "INSERT INTO dipartimenti (nome_dipartimento, budget_annuale) VALUES\n('IT', 500000.00),\n('HR', 200000.50),\n('Finance', 300000.75),\n('Marketing', 250000.00);\n\nINSERT INTO dipendenti (nome_dipendente, cognome_dipendente, data_assunzione, salario_mensile, dipartimento_id) VALUES\n('Mario', 'Rossi', '2020-01-15', 3000.00, 1),\n('Laura', 'Bianchi', '2019-05-20', 2500.00, 2),\n('Giuseppe', 'Verdi', '2021-08-10', 4000.00, 3),\n('Anna', 'Neri', '2022-03-12', 3500.00, 4),\n('Luca', 'Marroni', '2018-11-01', 2800.00, 1);",
-  "feature_sql": [
-    "group_agg",
-    "having"
-  ],
-  "query": "SELECT d.nome_dipartimento, SUM(e.salario_mensile) AS totale_stipendi FROM dipartimenti d JOIN dipendenti e ON d.id = e.dipartimento_id GROUP BY d.nome_dipartimento HAVING SUM(e.salario_mensile) > 3000 ORDER BY totale_stipendi DESC;"
-}

@@ -1,8 +1,0 @@
-{
-  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    totale NUMERIC(10,2) CHECK (totale >= 0)\n);",
-  "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z'),\n(3, 'Giuseppe Verdi', 'VRDGPP90C20F205Z'),\n(4, 'Anna Neri', 'NERANN88D30F205Z'),\n(5, 'Luca Marino', 'MARNLC92E40F205Z');\n\nINSERT INTO ordini (id, cliente_id, data_ordine, totale) VALUES\n(101, 1, '2026-01-15', 150.50),\n(102, 2, '2026-01-16', 89.00),\n(103, 3, '2026-02-20', 200.75),\n(104, 4, '2026-03-10', 120.00),\n(105, 5, '2026-04-05', 90.25);",
-  "feature_sql": [
-    "natural_join"
-  ],
-  "query": "WITH clienti_per_join AS (SELECT id AS cliente_id, nome, codice_fiscale FROM clienti) SELECT cp.nome, o.totale, o.data_ordine FROM clienti_per_join cp NATURAL JOIN ordini o ORDER BY o.totale DESC;"
-}

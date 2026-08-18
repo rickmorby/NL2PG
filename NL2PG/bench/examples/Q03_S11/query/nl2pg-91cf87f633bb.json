@@ -1,8 +1,0 @@
-{
-  "schema_ddl": "CREATE TABLE fatture (\n    id SERIAL PRIMARY KEY,\n    data_fattura DATE NOT NULL CHECK (data_fattura <= CURRENT_DATE),\n    numero_fattura TEXT NOT NULL UNIQUE,\n    cliente TEXT NOT NULL,\n    importo NUMERIC(10,2) NOT NULL CHECK (importo >= 0),\n    tipo TEXT NOT NULL CHECK (tipo IN ('entrata', 'uscita')),\n    descrizione TEXT,\n    aliquota_iva NUMERIC(5,2) CHECK (aliquota_iva BETWEEN 0 AND 100),\n    iva NUMERIC(10,2) CHECK (iva >= 0),\n    totale_con_iva NUMERIC(10,2) CHECK (totale_con_iva >= 0)\n);",
-  "data_inserts": "INSERT INTO fatture (id, data_fattura, numero_fattura, cliente, importo, tipo, descrizione, aliquota_iva, iva, totale_con_iva) VALUES\n(1, '2024-05-10', 'FATT-001', 'Azienda Alpha', 1500.00, 'entrata', 'Vendita prodotti', 22.00, 330.00, 1830.00),\n(2, '2025-03-15', 'FATT-002', 'Società Beta', 890.50, 'uscita', 'Acquisto materie prime', 10.00, 89.05, 979.55),\n(3, '2023-11-20', 'FATT-003', 'Commercio Gamma', 2000.00, 'entrata', 'Servizi prestati', 0.00, 0.00, 2000.00),\n(4, '2024-08-05', 'FATT-004', 'Industrie Delta', 300.75, 'uscita', 'Acquisto attrezzature', 22.00, 66.17, 366.92),\n(5, '2026-06-20', 'FATT-005', 'Servizi Epsilon', 1200.00, 'entrata', 'Fatturazione mensile', 10.00, 120.00, 1320.00);",
-  "feature_sql": [
-    "top_n"
-  ],
-  "query": "SELECT id, numero_fattura, cliente, importo, tipo, data_fattura FROM fatture ORDER BY importo DESC LIMIT 5;"
-}

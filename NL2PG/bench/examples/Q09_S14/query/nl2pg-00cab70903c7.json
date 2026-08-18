@@ -1,9 +1,0 @@
-{
-  "schema_ddl": "CREATE TABLE materie (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    crediti INT NOT NULL CHECK (crediti > 0),\n    docente TEXT\n);\n\nCREATE TABLE candidati_iscritti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    email TEXT,\n    materia_id INT NOT NULL REFERENCES materie(id)\n);",
-  "data_inserts": "INSERT INTO materie (id, nome, descrizione, crediti, docente) VALUES\n(1, 'Matematica', 'Fondamenti di algebra e analisi', 6, 'Prof. Alessandro Bianchi'),\n(2, 'Fisica', 'Meccanica e termodinamica', 5, 'Prof.ssa Laura Verdi'),\n(3, 'Informatica', 'Programmazione e algoritmi', 8, 'Prof. Marco Rossi'),\n(4, 'Storia', 'Storia contemporanea', 4, 'Prof.ssa Elena Neri');\n\nINSERT INTO candidati_iscritti (id, nome, cognome, codice_fiscale, data_nascita, email, materia_id) VALUES\n(1, 'Giovanni', 'Rossi', 'RSSGNN85M01H501U', '2000-03-15', 'giovanni.rossi@example.com', 1),\n(2, 'Anna', 'Bianchi', 'BCHANN90F12D123X', '1999-07-22', 'anna.bianchi@example.com', 2),\n(3, 'Luca', 'Verdi', 'VRDLUC92H23C456Y', '2001-11-05', 'luca.verdi@example.com', 3),\n(4, 'Sara', 'Neri', 'NRSARA94K04E789Z', '1998-02-28', 'sara.neri@example.com', 4),\n(5, 'Marco', 'Gialli', 'GLLMRC96L15F012W', '2002-09-10', 'marco.gialli@example.com', 1);",
-  "feature_sql": [
-    "group_agg",
-    "having"
-  ],
-  "query": "SELECT m.nome, COUNT(ci.id) AS num_candidati FROM materie m JOIN candidati_iscritti ci ON m.id = ci.materia_id GROUP BY m.nome HAVING COUNT(ci.id) > 1;"
-}

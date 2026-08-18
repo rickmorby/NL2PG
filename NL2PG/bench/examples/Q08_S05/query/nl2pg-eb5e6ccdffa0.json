@@ -1,8 +1,0 @@
-{
-  "schema_ddl": "CREATE TABLE pazienti (\n    id_paziente SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    sesso CHAR(1) NOT NULL CHECK (sesso IN ('M', 'F')),\n    codice_fiscale TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE referti (\n    id_referto SERIAL PRIMARY KEY,\n    id_paziente INT NOT NULL REFERENCES pazienti(id_paziente),\n    data_referto DATE NOT NULL,\n    descrizione TEXT,\n    id_referto_padre INT REFERENCES referti(id_referto)\n);",
-  "data_inserts": "INSERT INTO pazienti (id_paziente, nome, cognome, data_nascita, sesso, codice_fiscale) VALUES\n(1, 'Mario', 'Rossi', '1980-01-01', 'M', 'RSSMRA80A01H501U'),\n(2, 'Laura', 'Bianchi', '1985-05-15', 'F', 'BNCLRA85B42F205Z'),\n(3, 'Giovanni', 'Verdi', '1990-03-10', 'M', 'VRTGNI90C23G333Y'),\n(4, 'Anna', 'Neri', '1978-08-20', 'F', 'NRIANA78H42G111X');\n\nINSERT INTO referti (id_referto, id_paziente, data_referto, descrizione, id_referto_padre) VALUES\n(1, 1, '2023-01-15', 'Routine check-up', NULL),\n(2, 2, '2023-02-20', 'Blood test results', NULL),\n(3, 3, '2023-03-10', 'MRI scan', 1),\n(4, 4, '2023-04-05', 'X-ray', 2);",
-  "feature_sql": [
-    "self_join"
-  ],
-  "query": "SELECT p.nome, p.cognome, r.id_referto AS id_referto_figlio, r.descrizione AS descrizione_referto_figlio, r.data_referto AS data_referto_figlio, rp.id_referto AS id_referto_padre, rp.descrizione AS descrizione_referto_padre, rp.data_referto AS data_referto_padre FROM pazienti p JOIN referti r ON p.id_paziente = r.id_paziente JOIN referti rp ON r.id_referto_padre = rp.id_referto ORDER BY p.cognome, p.nome, r.data_referto;"
-}

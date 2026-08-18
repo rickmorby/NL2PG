@@ -1,9 +1,0 @@
-{
-  "domain": "erp",
-  "n_tables": 3,
-  "hierarchy": "range_type",
-  "sql_features": [],
-  "twist": [],
-  "twist_rules": [],
-  "spec_hash": "16dbf091fdb6f816"
-}

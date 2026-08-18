@@ -1,8 +1,0 @@
-{
-  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_registrazione DATE\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT CHECK (quantita > 0),\n    data_ordine DATE NOT NULL,\n    costo_totale NUMERIC(10,2) CHECK (costo_totale >= 0)\n);",
-  "data_inserts": "INSERT INTO clienti (id, nome, codice_fiscale, data_registrazione) VALUES\n(1, 'Mario Rossi', 'RSSMRA80A01H501U', '2025-05-10'),\n(2, 'Laura Bianchi', 'BNCLRA85B42F205Z', '2025-06-15'),\n(3, 'Giuseppe Verdi', 'VRDGPP75C10H501R', '2025-07-20'),\n(4, 'Francesca Neri', 'NRIFRC90D15H501S', '2025-08-01');\n\nINSERT INTO prodotti (id, nome, prezzo_unitario) VALUES\n(1, 'Penna a sfera', 1.20),\n(2, 'Quaderno A5', 3.50),\n(3, 'Zaino da trekking', 45.00),\n(4, 'Mouse ergonomico', 25.75);\n\nINSERT INTO ordini (id, cliente_id, prodotto_id, quantita, data_ordine, costo_totale) VALUES\n(101, 1, 2, 3, '2026-01-10', 10.50),\n(102, 2, 1, 10, '2026-01-12', 12.00),\n(103, 3, 3, 1, '2026-01-13', 45.00),\n(104, 1, 4, 2, '2026-01-14', 51.50),\n(105, 4, 2, 5, '2026-01-15', 17.50);",
-  "feature_sql": [
-    "top_n"
-  ],
-  "query": "SELECT c.nome, SUM(o.costo_totale) AS totale_speso FROM clienti c JOIN ordini o ON c.id = o.cliente_id GROUP BY c.nome ORDER BY totale_speso DESC LIMIT 3;"
-}

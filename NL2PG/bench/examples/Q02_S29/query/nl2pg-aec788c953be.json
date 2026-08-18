@@ -1,8 +1,0 @@
-{
-  "schema_ddl": "CREATE TABLE registro_fatture (\n    id SERIAL PRIMARY KEY,\n    numero_fattura TEXT NOT NULL UNIQUE,\n    data_fattura DATE NOT NULL,\n    acquirente TEXT NOT NULL,\n    imponibile_netto NUMERIC(10,2) NOT NULL CHECK (imponibile_netto >= 0),\n    aliquota_iva NUMERIC(5,2) NOT NULL CHECK (aliquota_iva >= 0 AND aliquota_iva <= 100),\n    totale_iva NUMERIC(10,2) NOT NULL CHECK (totale_iva >= 0),\n    totale_fattura NUMERIC(10,2) NOT NULL CHECK (totale_fattura >= 0)\n);",
-  "data_inserts": "INSERT INTO registro_fatture (id, numero_fattura, data_fattura, acquirente, imponibile_netto, aliquota_iva, totale_iva, totale_fattura) VALUES\n(1, 'FATT-2023-001', '2023-01-15', 'Mario Rossi', 150.00, 22.00, 33.00, 183.00),\n(2, 'FATT-2023-002', '2023-02-20', 'Laura Bianchi', 200.00, 10.00, 20.00, 220.00),\n(3, 'FATT-2023-003', '2023-03-10', 'Giuseppe Verdi', 500.00, 4.00, 20.00, 520.00),\n(4, 'FATT-2023-004', '2023-04-05', 'Anna Neri', 75.50, 22.00, 16.61, 92.11),\n(5, 'FATT-2023-005', '2023-05-12', 'Luca Gialli', 300.00, 10.00, 30.00, 330.00);",
-  "feature_sql": [
-    "scalar_agg"
-  ],
-  "query": "SELECT COUNT(*) AS numero_fatture_totali, SUM(totale_fattura) AS totale_fatturato, AVG(totale_iva) AS media_iva, MIN(imponibile_netto) AS minima_imponibile, MAX(imponibile_netto) AS massima_imponibile FROM registro_fatture;"
-}
