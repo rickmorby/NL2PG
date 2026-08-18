@@ -9,6 +9,8 @@ from sys import exit as sys_exit, modules
 from rich.console import Console
 
 from bench.domain.exceptions.clients_exc import (
+    DatabaseClientError,
+    LLMClientError,
     ModelOutputContractError,
     ProviderConfigError,
     SpecDuplicatedError,
@@ -76,6 +78,20 @@ def _handle_logging_config_error(exc: LoggingConfigError) -> None:
     """Handler per LoggingConfigError."""
     _log.warning("%s", exc.message)
     _console.print(f"[bold yellow][WARNING][/bold yellow] {exc.message}")
+
+
+@handle_exception.register(DatabaseClientError)
+def _handle_database_client_error(exc: DatabaseClientError) -> None:
+    """Handler per errori di connessione o esecuzione verso PostgreSQL."""
+    _log.error("Errore infrastruttura database PostgreSQL: %s", exc.message)
+    _console.print(f"[bold red][DATABASE ERROR][/bold red] {exc.message}")
+
+
+@handle_exception.register(LLMClientError)
+def _handle_llm_client_error(exc: LLMClientError) -> None:
+    """Handler per errori irrevocabili di invocazione verso i provider LLM."""
+    _log.error("Errore client LLM / Provider: %s", exc.message)
+    _console.print(f"[bold red][LLM ERROR][/bold red] {exc.message}")
 
 
 def _global_excepthook(

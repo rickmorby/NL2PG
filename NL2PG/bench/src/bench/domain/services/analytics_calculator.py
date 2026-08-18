@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from sqlglot import parse_one
+from sqlglot.errors import ParseError
 
 from bench.domain.models.analytics import AnalyticsDTO
 
@@ -57,7 +58,7 @@ class AnalyticsCalculator:
         try:
             tree = parse_one(query, read="postgres")
             return self._tree_depth(tree)
-        except Exception:
+        except (ParseError, ValueError, AttributeError):
             return 3
 
     def _tree_depth(self, node: Any) -> int:

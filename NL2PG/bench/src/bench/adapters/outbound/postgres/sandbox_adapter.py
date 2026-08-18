@@ -12,6 +12,7 @@ from typing import Any, Generator
 
 from psycopg import sql
 from sqlglot import exp, parse as parse_sql
+from sqlglot.errors import ParseError, TokenError
 
 from bench.adapters.outbound.postgres.data_mutator import PostgresDataMutator
 from bench.adapters.outbound.postgres.database_adapter import PostgresClientAdapter
@@ -148,7 +149,7 @@ class PostgresSandboxAdapter(SandboxPort):
         repaired_sql = self._repair.repair(sql_text)
         try:
             parsed_expressions = parse_sql(repaired_sql, read="postgres")
-        except Exception as e:
+        except (ParseError, TokenError, ValueError, AttributeError) as e:
             raise DatabaseClientError(f"Errore durante il parsing del codice SQL: {e}") from e
 
         valid_statements: list[str] = []

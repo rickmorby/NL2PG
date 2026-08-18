@@ -15,5 +15,5 @@ class TqdmHandler(Handler):
         try:
             msg = self.format(record)
             tqdm.write(msg)
-        except Exception:
+        except (RecursionError, ValueError, TypeError, OSError, RuntimeError):
             self.handleError(record)

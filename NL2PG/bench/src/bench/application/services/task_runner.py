@@ -10,9 +10,13 @@ from pathlib import Path
 from threading import Lock
 from time import time
 
+from psycopg.errors import Error as PgError
+from pydantic import ValidationError
+from sqlglot.errors import ParseError
 from tqdm import tqdm
 
 from bench.application.orchestrator.orchestrator import Orchestrator
+from bench.domain.exceptions import BenchException
 from bench.domain.models import BatchSummaryDTO, TaskStateDTO
 from bench.domain.ports.inbound.task_runner_port import TaskRunnerPort
 from bench.domain.ports.outbound.config_port import ConfigPort
@@ -94,7 +98,7 @@ class TaskRunner(TaskRunnerPort):
         if self._analytics:
             try:
                 self._analytics.generate_analytics(run_file)
-            except Exception as e:
+            except (BenchException, OSError, ValueError, RuntimeError) as e:
                 _log.warning("Generazione analytics per la run '%s' fallita: %s", run_id, e)
 
         return summary
@@ -245,7 +249,14 @@ class TaskRunner(TaskRunnerPort):
                                 consecutive_failures += fail_delta
                             else:
                                 consecutive_failures = 0
-                        except Exception as e:
+                        except (
+                            BenchException,
+                            PgError,
+                            ParseError,
+                            ValidationError,
+                            ValueError,
+                            RuntimeError,
+                        ) as e:
                             _log.debug("Errore task parallelo per categoria '%s': %s", cat_id, e)
                             counts["failed"] += 1
                             consecutive_failures += 1

@@ -5,10 +5,12 @@
 
 from dataclasses import dataclass
 
+from psycopg.errors import Error as PgError
 from sqlglot import exp, find_tables, parse_one
 from sqlglot.errors import ParseError
 
 from bench.application.validators.mutation_tester import MutationTester
+from bench.domain.exceptions import DatabaseClientError
 from bench.domain.models.spec import SpecDTO
 from bench.domain.models.sql import GoldQueryDTO, GoldResultDTO
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
@@ -92,7 +94,7 @@ class QueryValidator:
         """Esegue la query nel sandbox PostgreSQL e valida righe, tabelle e mutazioni."""
         try:
             cols, rows = self._sandbox.run_query(schema, query.query)
-        except Exception as e:
+        except (DatabaseClientError, PgError) as e:
             msg = f"Errore di esecuzione SQL in PostgreSQL: {e}"
             return QueryValidationResult(is_valid=False, error=msg)
 

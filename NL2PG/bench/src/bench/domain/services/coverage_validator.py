@@ -135,7 +135,7 @@ def _is_literal_covered(lit: str, text: str) -> bool:
                 target_date = parsed_target.date()
                 if any(dt.date() == target_date for _, dt in found_dates):
                     return True
-        except Exception:
+        except (ValueError, TypeError, OverflowError, AttributeError):
             pass
 
     return False

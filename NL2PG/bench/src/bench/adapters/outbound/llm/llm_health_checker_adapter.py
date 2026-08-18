@@ -6,7 +6,7 @@
 from http import HTTPStatus
 from typing import Any
 
-from httpx import Client
+from httpx import Client, HTTPError
 
 from bench.domain.models.llm import (
     ModelHealthDTO,
@@ -155,7 +155,7 @@ class LLMHealthCheckerAdapter:
                 ),
                 set(),
             )
-        except Exception as e:
+        except (HTTPError, OSError, ValueError, RuntimeError) as e:
             return (
                 ProviderHealthDTO(
                     provider_name=provider_name,
@@ -210,7 +210,7 @@ class LLMHealthCheckerAdapter:
                 is_healthy=False,
                 error_message=f"HTTP {resp.status_code}: {resp.text[:120]}",
             )
-        except Exception as e:
+        except (HTTPError, OSError, ValueError, RuntimeError) as e:
             return ModelHealthDTO(
                 model_id=model_id,
                 target_model=target_model,

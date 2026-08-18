@@ -11,6 +11,7 @@ from typing import Any
 from psycopg import Connection, sql
 from psycopg.errors import Error as PgError, ForeignKeyViolation
 from sqlglot import exp, parse_one
+from sqlglot.errors import ParseError
 
 _MUTATABLE_TYPES = frozenset(
     {
@@ -116,7 +117,7 @@ class PostgresDataMutator:
         try:
             tree = parse_one(query, read="postgres")
             return bool(tree.find(exp.AggFunc)) and tree.args.get("group") is None
-        except Exception:
+        except (ParseError, ValueError, AttributeError):
             return False
 
     def _delete_one_row(self, conn: Connection, cur: Any, table: str) -> bool:
@@ -187,7 +188,7 @@ class PostgresDataMutator:
                 if (c.table and c.table.lower() in aliases) or not c.table:
                     used.add(c.name.lower())
             return used
-        except Exception:
+        except (ParseError, ValueError, AttributeError):
             return set()
 
     def _has_mutatable_cols(self, cur: Any, table: str, _used: set[str]) -> bool:

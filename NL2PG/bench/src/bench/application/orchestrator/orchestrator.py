@@ -8,7 +8,12 @@ from typing import Any, Callable
 from uuid import uuid4
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
+from psycopg.errors import Error as PgError
+from pydantic import ValidationError
+from sqlglot.errors import ParseError
+
 from bench.application.agents.base import AbstractAgent
+from bench.domain.exceptions import BenchException
 from bench.domain.exceptions.handler import handle_exception
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
@@ -76,7 +81,15 @@ class Orchestrator:
             try:
                 result = graph.invoke(state, config=config)
                 return TaskStateDTO.model_validate(result)
-            except Exception as e:
+            except (
+                BenchException,
+                PgError,
+                ParseError,
+                ValidationError,
+                ValueError,
+                RuntimeError,
+                TimeoutError,
+            ) as e:
                 handle_exception(e)
                 failed = self._recover_state(graph, config, state)
                 return failed.model_copy(
@@ -94,7 +107,7 @@ class Orchestrator:
             snap = graph.get_state(config)
             if snap and snap.values:
                 return TaskStateDTO.model_validate(snap.values)
-        except Exception:
+        except (KeyError, ValueError, ValidationError, AttributeError):
             pass
         return fallback
 

@@ -6,6 +6,9 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
+from psycopg.errors import Error as PgError
+
+from bench.domain.exceptions import DatabaseClientError
 from bench.domain.models.base import AbstractDTO
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
 
@@ -49,6 +52,6 @@ class AbstractSandboxValidator(ABC):
         try:
             self._execute_sql(schema, sql_text)
             return ValidationResult()
-        except Exception as e:
+        except (DatabaseClientError, PgError) as e:
             prefix = self._failure_error_prefix()
             return ValidationResult(is_valid=False, error=f"{prefix}: {e}")

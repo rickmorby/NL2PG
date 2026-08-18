@@ -8,9 +8,11 @@ from logging import getLogger
 from typing import Any
 
 from orjson import dumps as orjson_dumps
+from psycopg.errors import Error as PgError
 from pydantic import BaseModel, ValidationError
+from sqlglot.errors import ParseError
 
-from bench.domain.exceptions import LLMClientError, ModelOutputContractError
+from bench.domain.exceptions import BenchException, LLMClientError, ModelOutputContractError
 from bench.domain.models.llm import CallOptionsDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
@@ -99,7 +101,14 @@ class AbstractAgent(ABC):
                 err = f"Errore infrastruttura LLM per nodo '{name}': {e}"
                 _log.warning("Nodo '%s' interrotto per errore client LLM: %s", name, e)
                 break
-            except Exception as e:
+            except (
+                BenchException,
+                PgError,
+                ParseError,
+                ValueError,
+                TypeError,
+                KeyError,
+            ) as e:
                 err = f"Errore invocazione agente '{name}': {e}"
                 _log.info(
                     "Nodo '%s' (tentativo %d/%d) eccezione: %s",

@@ -16,6 +16,8 @@ from litellm import (
     in_memory_llm_clients_cache,
     stream_chunk_builder,
 )
+from litellm.exceptions import APIError, RateLimitError, Timeout
+from openai import OpenAIError
 from pydantic import BaseModel, ValidationError
 
 from bench.adapters.outbound.llm.llm_health_checker_adapter import (
@@ -157,7 +159,15 @@ class LLMClientAdapter(LLMGeneratorPort):
             return CallResultDTO(output=output, model_used=response.model)
         except ModelOutputContractError:
             raise
-        except Exception as e:
+        except (
+            APIError,
+            Timeout,
+            RateLimitError,
+            OpenAIError,
+            OSError,
+            ValueError,
+            RuntimeError,
+        ) as e:
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 
     def check_all_providers(self, check_models: bool = True) -> SystemHealthReportDTO:

@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from sqlglot.errors import ParseError
 
 from bench.application.agents.base import AbstractAgent
-from bench.domain.exceptions import LLMClientError, ModelOutputContractError
+from bench.domain.exceptions import DatabaseClientError, LLMClientError, ModelOutputContractError
 from bench.domain.models.llm import CallOptionsDTO
 from bench.domain.models.nlp import CalibrationResultDTO
 from bench.domain.models.sql import GoldResultDTO, SolverOutputDTO
@@ -93,12 +93,12 @@ class CalibrationAgent(AbstractAgent):
             return False
         try:
             _, rows = self._sandbox.run_query(schema, candidate)
-        except Exception:
+        except (DatabaseClientError, PgError):
             repaired_sql = self._repair.repair(candidate)
             if repaired_sql and repaired_sql != candidate:
                 try:
                     _, rows = self._sandbox.run_query(schema, repaired_sql)
-                except Exception:
+                except (DatabaseClientError, PgError):
                     return False
             else:
                 return False

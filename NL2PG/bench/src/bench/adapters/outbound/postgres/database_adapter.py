@@ -12,6 +12,7 @@ from psycopg import Connection, errors as pg_errors, sql
 from psycopg_pool import ConnectionPool
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.engine import make_url
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
 from bench.adapters.outbound.postgres.loaders import register_json_safe_loaders
@@ -127,7 +128,7 @@ class PostgresClientAdapter(DatabasePort):
         session = self._meta_sessionmaker()
         try:
             yield session
-        except Exception as e:
+        except (SQLAlchemyError, pg_errors.Error, OSError, ValueError) as e:
             session.rollback()
             raise DatabaseClientError(f"Errore durante l'esecuzione della sessione ORM: {e}") from e
         finally:

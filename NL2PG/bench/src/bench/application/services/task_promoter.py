@@ -45,7 +45,7 @@ class TaskPromoterService(TaskPromoterPort):
                         role_dir = examples_dir / cat / role
                         self._serializer.write_single_task(example, role_dir / f"{task_id}.json")
                         promoted_count += 1
-            except Exception as e:
+            except (OSError, ValueError, TypeError, KeyError) as e:
                 _log.warning("Errore durante la promozione del file '%s': %s", sample_file.name, e)
 
         return promoted_count
