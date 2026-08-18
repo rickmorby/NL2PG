@@ -48,20 +48,18 @@ for _cb_attr in ("_async_success_callback", "_async_failure_callback", "_async_i
         setattr(litellm_mod, _cb_attr, [])
 
 
-def _noop_service_hook(*_args: Any, **_kwargs: Any) -> None:
-    """Hook no-op per sopprimere i logger interni di LiteLLM."""
-    return
-
-
-with suppress(Exception):
-    _sl = modules.get("litellm._service_logger")
-    if _sl and hasattr(_sl, "ServiceLogging"):
-        _sl.ServiceLogging.service_success_hook = _noop_service_hook
-        _sl.ServiceLogging.async_service_success_hook = _noop_service_hook
-
-
 class LLMClientAdapter(LLMGeneratorPort):
     """Adattatore per l'invocazione di modelli LLM con failover automatico via liteLLM Router."""
+
+    @staticmethod
+    def _noop_service_hook(*_args: Any, **_kwargs: Any) -> None:
+        """Hook no-op per sopprimere i logger interni di LiteLLM."""
+        return
+
+    @staticmethod
+    def _extract_json_payload(text: str) -> str:
+        """Estrae l'oggetto JSON finale da un testo LLM scartando CoT e riparando la sintassi."""
+        return repair_json(text.strip(), ensure_ascii=False) if text else ""
 
     def __init__(
         self,
@@ -135,7 +133,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             msg = response.choices[0].message
             content = getattr(msg, "content", None) or ""
 
-            cleaned_json = _extract_json_payload(content)
+            cleaned_json = self._extract_json_payload(content)
 
             if not cleaned_json:
                 msg_err = (
@@ -240,8 +238,3 @@ class LLMClientAdapter(LLMGeneratorPort):
                     if idx < len(mid_list) - 1:
                         fallbacks.append({mid: mid_list[idx + 1 :]})
         return fallbacks
-
-
-def _extract_json_payload(text: str) -> str:
-    """Estrae l'oggetto JSON finale da un testo LLM scartando CoT e riparando la sintassi."""
-    return repair_json(text.strip(), ensure_ascii=False) if text else ""

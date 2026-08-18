@@ -1,12 +1,15 @@
-"""Modulo servizio di dominio per la verifica delle feature sintattiche SQL.
+"""Modulo servizio di dominio per la verifica delle feature sintattiche SQL richieste.
 
 :author: Riccardo Morabito
 """
 
 from dataclasses import dataclass, field
 from typing import ClassVar
-from sqlglot import parse_one, exp
+
+from sqlglot import exp, parse_one
 from sqlglot.errors import ParseError
+
+_MIN_MULTI_COUNT = 2
 
 
 @dataclass
@@ -17,16 +20,70 @@ class FeatureCheckResult:
     missing: list[str] = field(default_factory=list)
 
 
-_MIN_MULTI_COUNT = 2
-
-
 class FeatureChecker:
     """Servizio di dominio per la verifica delle feature sintattiche SQL richieste."""
+
+    @staticmethod
+    def _direct_tables(select_node: exp.Select) -> list:
+        """Restituisce le tabelle referenziate direttamente da FROM/JOIN in un nodo SELECT."""
+        tables = []
+        from_clause = select_node.args.get("from_") or select_node.args.get("from")
+        if from_clause:
+            tables.extend(
+                t
+                for t in from_clause.find_all(exp.Table)
+                if t.find_ancestor(exp.Select) is select_node
+            )
+        for j in select_node.find_all(exp.Join):
+            t = j.find(exp.Table)
+            if t and t.find_ancestor(exp.Select) is select_node:
+                tables.append(t)
+        return tables
+
+    @staticmethod
+    def _check_self_join(tree: exp.Expression) -> bool:
+        """Verifica se la query contiene self-join (sia su tabelle fisiche che su CTE)."""
+        for select in tree.find_all(exp.Select):
+            tables = FeatureChecker._direct_tables(select)
+            names = [t.name.lower() for t in tables if t.name]
+            if len(names) != len(set(names)):
+                return True
+        return False
+
+    @staticmethod
+    def _check_anti_join(tree: exp.Expression) -> bool:
+        """Verifica se la query contiene anti-join (NOT EXISTS, NOT IN)."""
+        has_anti = any(
+            "ANTI" in str(j.args.get("kind", "")).upper() for j in tree.find_all(exp.Join)
+        )
+        has_not = any(isinstance(n.this, (exp.Exists, exp.In)) for n in tree.find_all(exp.Not))
+        has_negated = any(bool(n.args.get("is_negated")) for n in tree.find_all(exp.In))
+        return has_anti or has_not or has_negated
+
+    @staticmethod
+    def _check_correlated(tree: exp.Expression) -> bool:
+        """Verifica se la query contiene subquery correlate."""
+        selects = list(tree.find_all(exp.Select))
+        if len(selects) < _MIN_MULTI_COUNT:
+            return False
+        root_tables = {t.alias_or_name.lower() for t in selects[0].find_all(exp.Table)}
+        for sq in selects[1:]:
+            sq_tables = {t.alias_or_name.lower() for t in sq.find_all(exp.Table)}
+            outer_tables = root_tables - sq_tables
+            if any(c.table and c.table.lower() in outer_tables for c in sq.find_all(exp.Column)):
+                return True
+        return False
+
+    @staticmethod
+    def _is_recursive(tree: exp.Expression) -> bool:
+        """Verifica se la WITH RECURSIVE e' presente."""
+        with_node = tree.find(exp.With)
+        return bool(with_node and with_node.args.get("recursive"))
 
     _CHECKS: ClassVar = {
         "join": lambda t: bool(t.find(exp.Join)),
         "multi_join": lambda t: len(list(t.find_all(exp.Join))) >= _MIN_MULTI_COUNT,
-        "self_join": lambda t: _check_self_join(t),
+        "self_join": _check_self_join,
         "scalar_agg": lambda t: bool(t.find(exp.AggFunc)) and t.args.get("group") is None,
         "group_agg": lambda t: bool(t.find(exp.Group)),
         "top_n": lambda t: bool(t.find(exp.Limit)),
@@ -37,12 +94,12 @@ class FeatureChecker:
         ),
         "having": lambda t: bool(t.find(exp.Having)),
         "subquery": lambda t: len(list(t.find_all(exp.Select))) >= _MIN_MULTI_COUNT,
-        "correlated_subquery": lambda t: _check_correlated(t),
+        "correlated_subquery": _check_correlated,
         "exists": lambda t: bool(t.find(exp.Exists)),
-        "anti_join": lambda t: _check_anti_join(t),
+        "anti_join": _check_anti_join,
         "set_op": lambda t: bool(t.find(exp.Union, exp.Intersect, exp.Except)),
         "cte": lambda t: bool(t.find(exp.CTE)),
-        "recursive_cte": lambda t: bool(t.find(exp.With)) and _is_recursive(t),
+        "recursive_cte": lambda t: bool(t.find(exp.With)) and FeatureChecker._is_recursive(t),
         "window": lambda t: bool(t.find(exp.Window)),
         "lateral": lambda t: bool(t.find(exp.Lateral)),
         "full_outer_join": lambda t: any(
@@ -72,62 +129,10 @@ class FeatureChecker:
                 tree = parse_one(query, read="postgres")
             except ParseError:
                 return FeatureCheckResult(is_valid=False, missing=required)
+
         missing = [feat for feat in required if not self._CHECKS.get(feat, lambda _: True)(tree)]
         return FeatureCheckResult(is_valid=len(missing) == 0, missing=missing)
 
     def uses_features(self, query: str | exp.Expression, required: list[str]) -> bool:
         """Restituisce True se la query contiene tutte le feature richieste."""
         return self.check(query, required).is_valid
-
-
-def _check_self_join(tree: exp.Expression) -> bool:
-    """Verifica se la query contiene self-join (sia su tabelle fisiche che su CTE)."""
-    for select in tree.find_all(exp.Select):
-        tables = _direct_tables(select)
-        names = [t.name.lower() for t in tables if t.name]
-        if len(names) != len(set(names)):
-            return True
-    return False
-
-
-def _direct_tables(select_node: exp.Select) -> list:
-    """Restituisce le tabelle referenziate direttamente da FROM/JOIN in un nodo SELECT."""
-    tables = []
-    from_clause = select_node.args.get("from")
-    if from_clause:
-        tables.extend(
-            t for t in from_clause.find_all(exp.Table) if t.find_ancestor(exp.Select) is select_node
-        )
-    for j in select_node.find_all(exp.Join):
-        t = j.find(exp.Table)
-        if t and t.find_ancestor(exp.Select) is select_node:
-            tables.append(t)
-    return tables
-
-
-def _check_anti_join(tree: exp.Expression) -> bool:
-    """Verifica se la query contiene anti-join (NOT EXISTS, NOT IN)."""
-    has_anti = any("ANTI" in str(j.args.get("kind", "")).upper() for j in tree.find_all(exp.Join))
-    has_not = any(isinstance(n.this, (exp.Exists, exp.In)) for n in tree.find_all(exp.Not))
-    has_negated = any(bool(n.args.get("is_negated")) for n in tree.find_all(exp.In))
-    return has_anti or has_not or has_negated
-
-
-def _check_correlated(tree: exp.Expression) -> bool:
-    """Verifica se la query contiene subquery correlate."""
-    selects = list(tree.find_all(exp.Select))
-    if len(selects) < _MIN_MULTI_COUNT:
-        return False
-    root_tables = {t.alias_or_name.lower() for t in selects[0].find_all(exp.Table)}
-    for sq in selects[1:]:
-        sq_tables = {t.alias_or_name.lower() for t in sq.find_all(exp.Table)}
-        outer_tables = root_tables - sq_tables
-        if any(c.table and c.table.lower() in outer_tables for c in sq.find_all(exp.Column)):
-            return True
-    return False
-
-
-def _is_recursive(tree: exp.Expression) -> bool:
-    """Verifica se la WITH RECURSIVE e' presente."""
-    with_node = tree.find(exp.With)
-    return bool(with_node and with_node.args.get("recursive"))

@@ -10,32 +10,32 @@ _EPSILON_TOLERANCE = 0.02
 _MAX_PERMUTATION_COLS = 8
 
 
-def are_values_equivalent(c: Any, g: Any) -> bool:
-    """Confronta due valori singoli (stringhe, numeri, float, Decimal, None/null)."""
-    if c == g or (c is None and g is None):
-        return True
-
-    str_c = str(c).strip().strip('"').lower() if c is not None else "null"
-    str_g = str(g).strip().strip('"').lower() if g is not None else "null"
-    if str_c == str_g:
-        return True
-
-    try:
-        cf, gf = float(c), float(g)
-        return (
-            round(cf, 4) == round(gf, 4)
-            or abs(cf - gf) <= _EPSILON_TOLERANCE
-            or round(cf / 100.0, 4) == round(gf, 4)
-            or abs(cf / 100.0 - gf) <= _EPSILON_TOLERANCE
-            or round(cf, 4) == round(gf / 100.0, 4)
-            or abs(cf - gf / 100.0) <= _EPSILON_TOLERANCE
-        )
-    except (ValueError, TypeError):
-        return False
-
-
 class ResultComparator:
     """Confronta il risultato candidato con il gold determinando l'equivalenza relazionale."""
+
+    @staticmethod
+    def are_values_equivalent(c: Any, g: Any) -> bool:
+        """Confronta due valori singoli (stringhe, numeri, float, Decimal, None/null)."""
+        if c == g or (c is None and g is None):
+            return True
+
+        str_c = str(c).strip().strip('"').lower() if c is not None else "null"
+        str_g = str(g).strip().strip('"').lower() if g is not None else "null"
+        if str_c == str_g:
+            return True
+
+        try:
+            cf, gf = float(c), float(g)
+            return (
+                round(cf, 4) == round(gf, 4)
+                or abs(cf - gf) <= _EPSILON_TOLERANCE
+                or round(cf / 100.0, 4) == round(gf, 4)
+                or abs(cf / 100.0 - gf) <= _EPSILON_TOLERANCE
+                or round(cf, 4) == round(gf / 100.0, 4)
+                or abs(cf - gf / 100.0) <= _EPSILON_TOLERANCE
+            )
+        except (ValueError, TypeError):
+            return False
 
     def compare(
         self,
@@ -73,7 +73,10 @@ class ResultComparator:
         """Verifica se due insiemi di righe corrispondono direttamente o come multiset."""
         if order_sensitive:
             return all(
-                all(are_values_equivalent(cv, gv) for cv, gv in zip(c, g, strict=False))
+                all(
+                    ResultComparator.are_values_equivalent(cv, gv)
+                    for cv, gv in zip(c, g, strict=False)
+                )
                 for c, g in zip(cand, gold, strict=False)
             )
 
@@ -81,7 +84,10 @@ class ResultComparator:
         for c in cand:
             found_idx = None
             for idx, g in enumerate(unmatched):
-                if all(are_values_equivalent(cv, gv) for cv, gv in zip(c, g, strict=False)):
+                if all(
+                    ResultComparator.are_values_equivalent(cv, gv)
+                    for cv, gv in zip(c, g, strict=False)
+                ):
                     found_idx = idx
                     break
             if found_idx is None:

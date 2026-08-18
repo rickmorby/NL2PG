@@ -43,8 +43,12 @@ class JsonSafeByteaLoader(Loader):
         return data.tobytes().decode("utf-8", errors="replace")
 
 
-def register_json_safe_loaders() -> None:
-    """Registra globalmente i loader JSON-safe nel template delle connessioni psycopg."""
-    adapters.register_loader("numeric", JsonSafeNumericLoader)
-    adapters.register_loader("interval", JsonSafeIntervalLoader)
-    adapters.register_loader("bytea", JsonSafeByteaLoader)
+class JsonSafeLoadersRegistry:
+    """Registry di utilità per la configurazione dei loader JSON-safe in psycopg."""
+
+    @staticmethod
+    def register() -> None:
+        """Registra globalmente i loader JSON-safe nel template delle connessioni psycopg."""
+        adapters.register_loader("numeric", JsonSafeNumericLoader)
+        adapters.register_loader("interval", JsonSafeIntervalLoader)
+        adapters.register_loader("bytea", JsonSafeByteaLoader)
