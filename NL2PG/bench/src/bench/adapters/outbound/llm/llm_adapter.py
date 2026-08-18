@@ -5,10 +5,11 @@
 
 from asyncio import get_event_loop
 from contextlib import suppress
-from logging import getLogger
+from logging import CRITICAL as LOG_CRITICAL, getLogger
 from sys import modules
 from typing import Any
 
+from httpx import HTTPError
 from json_repair import repair_json
 from litellm import (
     Router,
@@ -16,7 +17,21 @@ from litellm import (
     in_memory_llm_clients_cache,
     stream_chunk_builder,
 )
-from litellm.exceptions import APIError, RateLimitError, Timeout
+from litellm.exceptions import (
+    APIConnectionError,
+    APIError,
+    AuthenticationError,
+    BadRequestError,
+    ContextWindowExceededError,
+    InternalServerError,
+    NotFoundError,
+    PermissionDeniedError,
+    RateLimitError,
+    ServiceUnavailableError,
+    Timeout,
+    UnprocessableEntityError,
+)
+from litellm.types.router import RouterRateLimitError
 from openai import OpenAIError
 from pydantic import BaseModel, ValidationError
 
@@ -33,9 +48,35 @@ from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 _log = getLogger("bench.adapters.llm")
 
+getLogger("LiteLLM").setLevel(LOG_CRITICAL)
+getLogger("LiteLLM Router").setLevel(LOG_CRITICAL)
+getLogger("LiteLLM Proxy").setLevel(LOG_CRITICAL)
+
 litellm_mod = modules["litellm"]
 litellm_mod.suppress_debug_info = True
 litellm_mod.turn_off_message_logging = True
+litellm_mod.set_verbose = False
+
+_LITELLM_PROVIDER_EXCEPTIONS = (
+    APIConnectionError,
+    APIError,
+    AuthenticationError,
+    BadRequestError,
+    ContextWindowExceededError,
+    InternalServerError,
+    NotFoundError,
+    PermissionDeniedError,
+    RateLimitError,
+    ServiceUnavailableError,
+    Timeout,
+    UnprocessableEntityError,
+    RouterRateLimitError,
+    OpenAIError,
+    HTTPError,
+    OSError,
+    ValueError,
+    RuntimeError,
+)
 litellm_mod.callbacks = []
 litellm_mod.success_callback = []
 litellm_mod.failure_callback = []
@@ -72,8 +113,8 @@ class LLMClientAdapter(LLMGeneratorPort):
         strategy = self._config.get("routing_strategy", "simple-shuffle")
         retry_cfg = self._config.get("retry", {})
         num_retries = retry_cfg.get("num_retries", 0)
-        cooldown_time = retry_cfg.get("cooldown_time_seconds", 15)
-        allowed_fails = retry_cfg.get("allowed_fails", 1)
+        cooldown_time = 0
+        allowed_fails = 999999
         self._stream_timeout = retry_cfg.get("stream_timeout", 60)
 
         self._router = Router(
@@ -157,15 +198,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             return CallResultDTO(output=output, model_used=response.model)
         except ModelOutputContractError:
             raise
-        except (
-            APIError,
-            Timeout,
-            RateLimitError,
-            OpenAIError,
-            OSError,
-            ValueError,
-            RuntimeError,
-        ) as e:
+        except _LITELLM_PROVIDER_EXCEPTIONS as e:
             raise LLMClientError(f"Catena {role} esaurita: {e}") from e
 
     def check_all_providers(self, check_models: bool = True) -> SystemHealthReportDTO:
