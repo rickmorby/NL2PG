@@ -113,8 +113,11 @@ class LLMClientAdapter(LLMGeneratorPort):
         strategy = self._config.get("routing_strategy", "simple-shuffle")
         retry_cfg = self._config.get("retry", {})
         num_retries = retry_cfg.get("num_retries", 0)
-        cooldown_time = 0
-        allowed_fails = 999999
+        cooldown_time = retry_cfg.get("cooldown_time_seconds", 0)
+        allowed_fails = retry_cfg.get("allowed_fails", 999999)
+        optional_pre_call_checks = self._config.get(
+            "optional_pre_call_checks", ["enforce_model_rate_limits"]
+        )
         self._stream_timeout = retry_cfg.get("stream_timeout", 60)
 
         self._router = Router(
@@ -124,6 +127,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             num_retries=num_retries,
             cooldown_time=cooldown_time,
             allowed_fails=allowed_fails,
+            optional_pre_call_checks=optional_pre_call_checks,
             stream_timeout=self._stream_timeout,
             set_verbose=False,
         )
@@ -136,6 +140,15 @@ class LLMClientAdapter(LLMGeneratorPort):
         """Restituisce la lista dei model_id per un ruolo dalla configurazione."""
         chains = self._config.get("chains", {})
         return list(chains.get(role, []))
+
+    def _primary_pool(self, role: str) -> str:
+        """Risolve il ruolo nel pool primario (primo gateway della sua catena)."""
+        models = self._config.get("models", {})
+        for mid in self.get_chain(role):
+            mc = models.get(mid)
+            if mc is not None:
+                return mc.get("pool", mid)
+        return role
 
     def call_model(
         self,
@@ -154,7 +167,7 @@ class LLMClientAdapter(LLMGeneratorPort):
 
         try:
             kwargs: dict[str, Any] = {
-                "model": role,
+                "model": self._primary_pool(role),
                 "messages": messages,
                 "stream": True,
             }
@@ -224,25 +237,26 @@ class LLMClientAdapter(LLMGeneratorPort):
 
     @classmethod
     def _build_model_list(cls, config: dict[str, Any]) -> list[dict[str, Any]]:
-        """Costruisce la model_list per liteLLM Router con identificativi univoci."""
-        model_list: list[dict[str, Any]] = []
+        """Costruisce la model_list raggruppando i modelli fisici in pool per gateway."""
         models = config.get("models", {})
         chains = config.get("chains", {})
-        registered_keys: set[tuple[str, str]] = set()
+        pool_of = {mid: mc.get("pool", mid) for mid, mc in models.items()}
 
-        for role, mid_list in chains.items():
-            if not mid_list:
-                continue
-
-            for idx, mid in enumerate(mid_list):
-                mc = models.get(mid)
-                model_key = role if idx == 0 else mid
-                if mc and (model_key, mid) not in registered_keys:
-                    params = cls._make_litellm_params(mc)
-                    model_list.append({"model_name": model_key, "litellm_params": params})
-                    registered_keys.add((model_key, mid))
-
-        return model_list
+        ordered_pools = list(
+            dict.fromkeys(
+                pool_of.get(mid, mid) for mid_list in chains.values() for mid in mid_list
+            )
+        )
+        by_pool: dict[str, list[dict[str, Any]]] = {}
+        for mid, mc in models.items():
+            by_pool.setdefault(pool_of.get(mid, mid), []).append(
+                cls._make_litellm_params(mc)
+            )
+        return [
+            {"model_name": pool, "litellm_params": params}
+            for pool in ordered_pools
+            for params in by_pool.get(pool, [])
+        ]
 
     @staticmethod
     def _make_litellm_params(mc: dict[str, Any]) -> dict[str, Any]:
@@ -257,17 +271,26 @@ class LLMClientAdapter(LLMGeneratorPort):
             params["max_tokens"] = mc["max_tokens"]
         if "base_url" in mc:
             params["api_base"] = mc["base_url"]
+        if mc.get("rpm") is not None:
+            params["rpm"] = mc["rpm"]
+        if mc.get("tpm") is not None:
+            params["tpm"] = mc["tpm"]
         return params
 
     @staticmethod
     def _build_fallbacks(config: dict[str, Any]) -> list[dict[str, list[str]]]:
-        """Costruisce la lista di fallback deterministici tra provider per ciascun ruolo."""
+        """Costruisce i fallback deterministici a livello di pool tra gateway."""
         fallbacks: list[dict[str, list[str]]] = []
+        models = config.get("models", {})
         chains = config.get("chains", {})
-        for role, mid_list in chains.items():
-            if len(mid_list) > 1:
-                fallbacks.append({role: mid_list[1:]})
-                for idx, mid in enumerate(mid_list):
-                    if idx < len(mid_list) - 1:
-                        fallbacks.append({mid: mid_list[idx + 1 :]})
+        pool_of = {mid: mc.get("pool", mid) for mid, mc in models.items()}
+
+        seen_chains: set[tuple[str, ...]] = set()
+        for mid_list in chains.values():
+            chain = list(dict.fromkeys(pool_of.get(mid, mid) for mid in mid_list))
+            key = tuple(chain)
+            if key in seen_chains or len(chain) <= 1:
+                continue
+            seen_chains.add(key)
+            fallbacks.extend({chain[i]: chain[i + 1 :]} for i in range(len(chain) - 1))
         return fallbacks
