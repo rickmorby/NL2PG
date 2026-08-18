@@ -27,7 +27,11 @@ Il JSON di output deve contenere esclusivamente i campi "query", "intent", "orde
    - Se `"order_sensitive": true`, la presenza dell'`ORDER BY` nella query principale è **OBBLIGATORIA**.
    - Se l'ordine delle righe è irrilevante per la correttezza della risposta, imposta `"order_sensitive": false`.
 4. **Sintassi PostgreSQL Corretta**: Scrivi SQL pulito per PostgreSQL dove l'istruzione termina con un punto e virgola `;`. DIVIETO DI TRATTINI NEGLI IDENTIFICATORI: Negli alias di tabelle o colonne usa SEMPRE l'underscore `_` (es. `totale_speso`, `catalogo_merci`). NON usare mai il trattino `-`. **REGOLE GROUP BY**: Se la query usa funzioni di aggregazione (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`), OGNI colonna non aggregata presente nella SELECT DEVE comparire nella clausola `GROUP BY`; la stessa regola vale per le colonne non aggregate usate in `ORDER BY` o `HAVING` (vanno raggruppate o aggregate). Con operatori d'insieme (`UNION`, `INTERSECT`, `EXCEPT`) OGNI ramo della SELECT con aggregazioni DEVE avere la propria clausola `GROUP BY` completa con tutte le colonne non aggregate di quel ramo; un `GROUP BY` presente in una CTE o in un altro ramo NON vale per gli altri rami.
-5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
+5. **PROIEZIONE PERTINENTE DI BUSINESS (DIVIETO CHIAVI ACCESSORIE E WILDCARD)**:
+   - La SELECT principale (alla radice della query) DEVE contenere ESCLUSIVAMENTE le metriche e gli attributi informativi di business utili all'utente (es. nomi, descrizioni, somme aggregate, posizioni di classifica).
+   - NON includere chiavi primarie tecniche autoincrementali (es. `id`, `uuid`) o chiavi esterne (es. `parent_id`, `cliente_id`, `dipendente_id`) nella SELECT principale, a meno che l'intento non chieda espressamente un "codice identificativo" o "id".
+   - È SEVERAMENTE VIETATO usare `SELECT *` o `SELECT tabella.*` nella SELECT principale. Elenca sempre esplicitamente ogni colonna richiesta con alias descrittivi in italiano con underscore.
+6. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
@@ -72,6 +76,7 @@ Colonna non aggregata assente dal GROUP BY (ERRATO):
 - DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
 - DIVIETO 2: NON qualificare le tabelle con prefissi di schema.
 - DIVIETO 3: NON impostare `order_sensitive: true` senza la clausola `ORDER BY` nella query principale.
+- DIVIETO 4: NON usare proiezioni generiche '*' (SELECT * o SELECT tabella.*) nella query principale.
 </forbidden_actions>
 
 <input_context>

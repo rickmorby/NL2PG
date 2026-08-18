@@ -62,6 +62,13 @@ class QueryValidator:
             )
             return msg, None
 
+        if self._has_star_projection(tree):
+            msg = (
+                "La query SQL non deve usare proiezioni generiche '*' (es. SELECT *). "
+                "Elenca esplicitamente le sole colonne e metriche di business richieste."
+            )
+            return msg, None
+
         if query.order_sensitive and not self._has_root_order_by(tree):
             msg = (
                 "La query ha order_sensitive=true ma manca della clausola ORDER BY "
@@ -112,6 +119,26 @@ class QueryValidator:
     def _has_explicit_schema(tree: exp.Expression) -> bool:
         """Verifica se la query contiene riferimenti espliciti a schemi (es. schema.tabella)."""
         return any(t.db or t.catalog for t in tree.find_all(exp.Table))
+
+    @staticmethod
+    def _has_star_projection(tree: exp.Expression) -> bool:
+        """Verifica se la query SQL principale contiene proiezioni generiche '*' o 'tabella.*'."""
+        main_body = tree.this if isinstance(tree, exp.With) else tree
+        if isinstance(main_body, exp.Union):
+            selects = [main_body.this, main_body.expression]
+        elif isinstance(main_body, exp.Select):
+            selects = [main_body]
+        else:
+            selects = list(main_body.find_all(exp.Select))
+
+        for sel in selects:
+            if isinstance(sel, exp.Select):
+                for expr in sel.expressions:
+                    if isinstance(expr, exp.Star):
+                        return True
+                    if isinstance(expr, exp.Column) and isinstance(expr.this, exp.Star):
+                        return True
+        return False
 
     @staticmethod
     def _tables_used(tree: exp.Expression) -> list[str]:
