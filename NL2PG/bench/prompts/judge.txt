@@ -9,9 +9,13 @@ Il JSON di output deve contenere esclusivamente il campo "verdict" con uno dei s
 
 <rules_and_guidelines>
 1. **Valori Ammessi per `verdict` (ESATTI)**:
-   - **`hard`**: Il task è privo di ambiguità e tecnicamente impeccabile. Anche se il solver automatico non lo ha risolto nei tentativi di calibrazione, la domanda e la storia conducono in modo deterministico ed inequivocabile all'unica query gold corretta.
-   - **`ambigua`**: Il testo della storia o della domanda lascia spazio a molteplici interpretazioni SQL tra loro incompatibili.
-   - **`incompleta`**: Mancano elementi informativi essenziali per la risoluzione deterministica della query.
+   - **`hard`**: Il task è privo di ambiguità, coerente e tecnicamente impeccabile:
+     * **Simmetria di Proiezione Domanda <-> Gold Query**: Tutte le metriche e gli attributi informativi presenti nella SELECT finale della Gold Query trovano corrispondenza concettuale diretta nel testo della Domanda (nessuna colonna non richiesta o non menzionata).
+     * **Correttezza Logico-Matematica delle Formule**: Le espressioni aritmetiche, le aggregazioni e i calcoli nella Gold Query (es. `quantità * prezzo_unitario`, differenze algebriche `entrate - uscite`, percentuali di sconto/maggiorazione) sono matematicamente e logicamente corretti e riflettono con precisione le regole di business descritte.
+     * **Simmetria Semantica Storia <-> Schema**: Le entità, gli archivi gestionali e i valori letterali narrati nella storia trovano riscontro nello schema DDL e nei dati.
+     * **Risolvibilità Deterministica**: Un analista o un sistema Text-to-SQL avanzato è in grado di dedurre univocamente la query SQL corretta senza dover indovinare filtri nascosti o formule di calcolo arbitrarie.
+   - **`ambigua`**: Il testo della storia o della domanda è vago, contraddittorio o lascia spazio a molteplici interpretazioni SQL incompatibili (es. ambiguità su formule di calcolo o inclusione/esclusione di record nulli che altera il risultato).
+   - **`incompleta`**: Mancano elementi informativi essenziali per la risoluzione deterministica (es. la Gold Query proietta colonne o applica filtri non specificati nella domanda, oppure le formule di calcolo del dominio non sono definite).
 2. **DIVIETO DI VALORI NON STANDARD**: VIETATO restituire stringhe non previste come "successed", "passed", "easy", "medium", "valid", "ok" o "difficile". Usa ESCLUSIVAMENTE una delle tre stringhe minuscole: "hard", "ambigua", "incompleta".
 3. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
@@ -51,10 +55,12 @@ NON USARE VALORI NON INCLUSI NEL CONTRATTO (ERRATO):
 </input_context>
 
 <chain_of_thought_protocol>
-1. Esamina l'intero materiale del task ed i risultati di calibrazione.
-2. Valida la chiarezza ed la completezza informativa.
-3. Assegna il verdetto finale scegliendo rigorosamente tra: "hard", "ambigua" o "incompleta".
-4. Genera l'oggetto JSON puro valido conforme alla classe `Judge`.
+1. Esamina l'intero materiale del task (Schema DDL, Query Gold, Storia, Domanda, Critic e Calibrazione).
+2. Valida la simmetria tra i campi proiettati nella SELECT della Gold Query e le informazioni richieste nella Domanda.
+3. Valida la correttezza logico-matematica di tutte le formule, aggregazioni ed espressioni aritmetiche della Gold Query.
+4. Valida la chiarezza complessiva del contesto e l'assenza di ambiguità semantiche.
+5. Assegna il verdetto finale scegliendo rigorosamente tra: "hard", "ambigua" o "incompleta".
+6. Genera l'oggetto JSON puro valido conforme alla classe `Judge`.
 </chain_of_thought_protocol>
 
 <output_format>
