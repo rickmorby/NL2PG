@@ -3,8 +3,6 @@
 :author: Riccardo Morabito
 """
 
-from collections import Counter
-
 from psycopg.errors import Error as PgError
 from pydantic import ValidationError
 from sqlglot.errors import ParseError
@@ -19,6 +17,7 @@ from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.domain.services.result_comparator import ResultComparator
 from bench.domain.services.sql_repair import PostgresSQLRepair
 
 
@@ -36,6 +35,7 @@ class CalibrationAgent(AbstractAgent):
         super().__init__(llm, prompts, config)
         self._sandbox = sandbox
         self._repair = PostgresSQLRepair()
+        self._comparator = ResultComparator()
 
     def prompt_name(self) -> str:
         """Restituisce 'calibration_solver' come nome del template prompt."""
@@ -89,13 +89,13 @@ class CalibrationAgent(AbstractAgent):
 
     def _matches_gold(self, schema: str, candidate: str, gold: GoldResultDTO | None) -> bool:
         """Esegue la query candidata (applicando sql_repair) e confronta con il gold."""
-        if not gold:
+        if not gold or not candidate or not candidate.strip():
             return False
         try:
             _, rows = self._sandbox.run_query(schema, candidate)
         except Exception:
             repaired_sql = self._repair.repair(candidate)
-            if repaired_sql != candidate:
+            if repaired_sql and repaired_sql != candidate:
                 try:
                     _, rows = self._sandbox.run_query(schema, repaired_sql)
                 except Exception:
@@ -103,7 +103,8 @@ class CalibrationAgent(AbstractAgent):
             else:
                 return False
 
-        rows = [list(row) for row in rows]
-        if gold.order_sensitive:
-            return rows == gold.rows
-        return Counter(map(tuple, rows)) == Counter(map(tuple, gold.rows))
+        return self._comparator.compare(
+            candidate_rows=rows,
+            gold_rows=gold.rows,
+            order_sensitive=gold.order_sensitive,
+        )
