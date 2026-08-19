@@ -104,13 +104,13 @@ def main_callback(ctx: Context) -> None:
 def generate_command(
     ctx: Context,
     limit: Annotated[
-        int,
+        int | None,
         Option(
             "--limit",
             "-l",
-            help="Task da generare (default: 116, copertura categorie senza duplicati).",
+            help="Task da generare (default: tutte le categorie del catalogo, senza duplicati).",
         ),
-    ] = 116,
+    ] = None,
     category: Annotated[str, Option("--category", "-cat", help="Filtro id categoria.")] = "",
     batch_size: Annotated[int, Option("--batch-size", "-b", help="Worker concorrenti.")] = 1,
 ) -> None:

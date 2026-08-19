@@ -54,13 +54,15 @@ class TaskRunner(TaskRunnerPort):
 
     def run_batch(
         self,
-        count: int = 10,
+        count: int | None = None,
         category: str = "",
         batch_size: int = 1,
     ) -> BatchSummaryDTO:
         """Esegue una run di generazione in modalità sequenziale o parallela."""
         start_time = time()
         categories = self._config.load_categories()
+        if count is None:
+            count = len(categories)
         if category and category not in categories:
             allowed = sorted(list(categories.keys()))
             msg = f"Categoria '{category}' non valida. Categorie disponibili: {allowed}"

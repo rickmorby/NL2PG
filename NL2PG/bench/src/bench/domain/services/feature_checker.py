@@ -118,6 +118,64 @@ class FeatureChecker:
         "natural_join": lambda t: any(
             str(j.args.get("method", "")).upper() == "NATURAL" for j in t.find_all(exp.Join)
         ),
+        "sorting": lambda t: t.args.get("order") is not None,
+        "distinct": lambda t: bool(t.find(exp.Distinct)),
+        "agg_distinct": lambda t: any(
+            isinstance(a.args.get("this"), exp.Distinct) for a in t.find_all(exp.AggFunc)
+        ),
+        "is_distinct_from": lambda t: bool(t.find(exp.NullSafeNEQ)),
+        "between": lambda t: bool(t.find(exp.Between)),
+        "in_condition": lambda t: bool(t.find(exp.In)),
+        "is_null": lambda t: any(
+            isinstance(i.expression, exp.Null) for i in t.find_all(exp.Is)
+        ),
+        "disjunctive": lambda t: bool(t.find(exp.Or)),
+        "like": lambda t: bool(t.find(exp.Like)),
+        "any_all": lambda t: bool(t.find(exp.Any, exp.All)),
+        "relative_time": lambda t: bool(
+            t.find(
+                exp.CurrentDate, exp.CurrentTimestamp, exp.CurrentTime, exp.Interval
+            )
+        ),
+        "overlaps": lambda t: bool(t.find(exp.Overlaps)),
+        "offset_fetch": lambda t: bool(t.find(exp.Offset, exp.Fetch)),
+        "ordered_set_agg": lambda t: bool(
+            t.find(exp.PercentileCont, exp.PercentileDisc, exp.WithinGroup)
+        ),
+        "grouping_sets": lambda t: bool(t.find(exp.GroupingSets)),
+        "row_types": lambda t: bool(t.find(exp.Tuple)),
+        "values": lambda t: bool(t.find(exp.Values)),
+        "case": lambda t: bool(t.find(exp.Case)),
+        "string_funcs": lambda t: bool(
+            t.find(
+                exp.Upper,
+                exp.Lower,
+                exp.Concat,
+                exp.Substring,
+                exp.Trim,
+                exp.Replace,
+                exp.Initcap,
+                exp.Length,
+            )
+        ),
+        "math_funcs": lambda t: bool(
+            t.find(
+                exp.Round,
+                exp.Abs,
+                exp.Pow,
+                exp.Mod,
+                exp.Ceil,
+                exp.Floor,
+                exp.Sqrt,
+                exp.Exp,
+                exp.Ln,
+                exp.Log,
+            )
+        ),
+        "cast": lambda t: bool(t.find(exp.Cast, exp.TryCast)),
+        "boolean_predicate": lambda t: any(
+            isinstance(i.expression, exp.Boolean) for i in t.find_all(exp.Is)
+        ),
     }
 
     def check(self, query: str | exp.Expression, required: list[str]) -> FeatureCheckResult:
@@ -130,8 +188,17 @@ class FeatureChecker:
             except ParseError:
                 return FeatureCheckResult(is_valid=False, missing=required)
 
-        missing = [feat for feat in required if not self._CHECKS.get(feat, lambda _: True)(tree)]
+        missing = [
+            feat
+            for feat in required
+            if feat not in self._CHECKS or not self._CHECKS[feat](tree)
+        ]
         return FeatureCheckResult(is_valid=len(missing) == 0, missing=missing)
+
+    @classmethod
+    def known_features(cls) -> frozenset[str]:
+        """Restituisce il vocabolario completo delle feature verificabili."""
+        return frozenset(cls._CHECKS)
 
     def uses_features(self, query: str | exp.Expression, required: list[str]) -> bool:
         """Restituisce True se la query contiene tutte le feature richieste."""
