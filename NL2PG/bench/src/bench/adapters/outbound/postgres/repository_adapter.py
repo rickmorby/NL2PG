@@ -61,23 +61,6 @@ class MetaRepositoryAdapter(MetaRepositoryPort):
             msg = f"Errore durante la verifica della deduplicazione: {e}"
             raise DatabaseClientError(msg) from e
 
-    def get_top_k_tasks(self, category: str, k: int) -> list[str]:
-        """Restituisce gli identificativi dei migliori k task accettati per una data categoria."""
-        try:
-            with self._client.get_meta_session() as session:
-                stmt = (
-                    select(TaskEntity.task_id)
-                    .where(TaskEntity.category == category)
-                    .where(TaskEntity.verdict == "accepted")
-                    .order_by(TaskEntity.critic_score.desc())
-                    .limit(k)
-                )
-                return list(session.scalars(stmt).all())
-        except DatabaseClientError:
-            raise
-        except (pg_errors.Error, Exception) as e:
-            raise DatabaseClientError(f"Errore durante la lettura dei top-k task: {e}") from e
-
     def save_task(self, run_id: str, state: TaskStateDTO) -> None:
         """Esegue l'upsert dello stato di un task mediante SQLAlchemy ORM session.merge."""
         task_entity = TaskStateMapper.dto_to_entity(run_id, state)

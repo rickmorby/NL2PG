@@ -33,7 +33,7 @@ class LLMHealthCheckerAdapter:
         with Client(timeout=10.0) as client:
             for pool_name, pool_data in pools_grouped.items():
                 target_models = pool_data["models"]
-                p_report, server_models = self._check_provider_endpoint(
+                p_report = self._check_provider_endpoint(
                     client, pool_name, pool_data["base_url"], pool_data["api_key"]
                 )
                 total_physical_models += len(target_models)
@@ -48,7 +48,6 @@ class LLMHealthCheckerAdapter:
                                 client=client,
                                 model_info=(data["model_ids"][0], t_model, sorted_roles),
                                 endpoint=(pool_data["base_url"], pool_data["api_key"]),
-                                server_models=server_models,
                             )
                             if m_report.is_healthy:
                                 healthy_models_count += 1
@@ -57,7 +56,6 @@ class LLMHealthCheckerAdapter:
                                 model_id=data["model_ids"][0],
                                 target_model=t_model,
                                 roles=sorted_roles,
-                                is_available_on_server=True,
                                 is_healthy=True,
                                 error_message="",
                             )
@@ -69,7 +67,6 @@ class LLMHealthCheckerAdapter:
                             model_id=data["model_ids"][0],
                             target_model=t_model,
                             roles=sorted(list(data["roles"])),
-                            is_available_on_server=False,
                             is_healthy=False,
                             error_message="Provider non raggiungibile o autenticazione fallita.",
                         )
@@ -119,7 +116,7 @@ class LLMHealthCheckerAdapter:
 
     def _check_provider_endpoint(
         self, client: Client, provider_name: str, base_url: str, api_key: str
-    ) -> tuple[ProviderHealthDTO, set[str]]:
+    ) -> ProviderHealthDTO:
         """Invia una richiesta GET /v1/models per verificare se il provider e' raggiungibile."""
         clean_url = base_url.rstrip("/")
         models_url = f"{clean_url}/models" if not clean_url.endswith("/models") else clean_url
@@ -128,39 +125,24 @@ class LLMHealthCheckerAdapter:
         try:
             resp = client.get(models_url, headers=headers)
             if resp.status_code == HTTPStatus.OK:
-                data = resp.json()
-                server_model_ids = {
-                    item.get("id")
-                    for item in data.get("data", [])
-                    if isinstance(item, dict) and item.get("id")
-                }
-                return (
-                    ProviderHealthDTO(
-                        provider_name=provider_name,
-                        base_url=base_url,
-                        is_reachable=True,
-                        error_message="",
-                    ),
-                    server_model_ids,
-                )
-            return (
-                ProviderHealthDTO(
+                return ProviderHealthDTO(
                     provider_name=provider_name,
                     base_url=base_url,
-                    is_reachable=False,
-                    error_message=f"HTTP {resp.status_code}: {resp.text[:120]}",
-                ),
-                set(),
+                    is_reachable=True,
+                    error_message="",
+                )
+            return ProviderHealthDTO(
+                provider_name=provider_name,
+                base_url=base_url,
+                is_reachable=False,
+                error_message=f"HTTP {resp.status_code}: {resp.text[:120]}",
             )
         except (HTTPError, OSError, ValueError, RuntimeError) as e:
-            return (
-                ProviderHealthDTO(
-                    provider_name=provider_name,
-                    base_url=base_url,
-                    is_reachable=False,
-                    error_message=f"Errore di connessione: {e}",
-                ),
-                set(),
+            return ProviderHealthDTO(
+                provider_name=provider_name,
+                base_url=base_url,
+                is_reachable=False,
+                error_message=f"Errore di connessione: {e}",
             )
 
     def _check_model_health(
@@ -168,16 +150,10 @@ class LLMHealthCheckerAdapter:
         client: Client,
         model_info: tuple[str, str, list[str]],
         endpoint: tuple[str, str],
-        server_models: set[str],
     ) -> ModelHealthDTO:
         """Invia un ping di completamento per verificare la reale fruibilità del modello."""
         model_id, target_model, roles = model_info
         base_url, api_key = endpoint
-        is_available = bool(
-            not server_models
-            or target_model in server_models
-            or any(target_model in m for m in server_models)
-        )
 
         clean_url = base_url.rstrip("/")
         comp_url = f"{clean_url}/chat/completions"
@@ -195,7 +171,6 @@ class LLMHealthCheckerAdapter:
                     model_id=model_id,
                     target_model=target_model,
                     roles=roles,
-                    is_available_on_server=is_available,
                     is_healthy=True,
                     error_message="",
                 )
@@ -203,7 +178,6 @@ class LLMHealthCheckerAdapter:
                 model_id=model_id,
                 target_model=target_model,
                 roles=roles,
-                is_available_on_server=is_available,
                 is_healthy=False,
                 error_message=f"HTTP {resp.status_code}: {resp.text[:120]}",
             )
@@ -212,7 +186,6 @@ class LLMHealthCheckerAdapter:
                 model_id=model_id,
                 target_model=target_model,
                 roles=roles,
-                is_available_on_server=is_available,
                 is_healthy=False,
                 error_message=f"Errore ping completamento: {e}",
             )

@@ -188,12 +188,3 @@ class FeatureChecker:
             feat for feat in required if feat not in self._CHECKS or not self._CHECKS[feat](tree)
         ]
         return FeatureCheckResult(is_valid=len(missing) == 0, missing=missing)
-
-    @classmethod
-    def known_features(cls) -> frozenset[str]:
-        """Restituisce il vocabolario completo delle feature verificabili."""
-        return frozenset(cls._CHECKS)
-
-    def uses_features(self, query: str | exp.Expression, required: list[str]) -> bool:
-        """Restituisce True se la query contiene tutte le feature richieste."""
-        return self.check(query, required).is_valid

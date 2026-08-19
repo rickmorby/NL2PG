@@ -19,10 +19,6 @@ class MetaRepositoryPort(ABC):
         """Verifica se una specifica è già presente per la categoria in stato accepted/pending."""
 
     @abstractmethod
-    def get_top_k_tasks(self, category: str, k: int) -> list[str]:
-        """Restituisce i task_id dei migliori k task accettati per la categoria specificata."""
-
-    @abstractmethod
     def save_task(self, run_id: str, state: TaskStateDTO) -> None:
         """Esegue l'upsert dello stato di un task nella tabella bench_meta.tasks."""
 

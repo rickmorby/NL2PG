@@ -70,17 +70,6 @@ class PostgresClientAdapter(DatabasePort):
             else None
         )
 
-        self._meta_pool: ConnectionPool | None = (
-            ConnectionPool(
-                self._meta_dsn,
-                min_size=min_size,
-                max_size=max_size,
-                open=False,
-            )
-            if self._meta_dsn
-            else None
-        )
-
         self._meta_engine: Engine | None = None
         self._meta_sessionmaker: sessionmaker[Session] | None = None
 
@@ -138,22 +127,6 @@ class PostgresClientAdapter(DatabasePort):
         """Apre esplicitamente i connection pool."""
         if self._sandbox_pool and self._sandbox_pool.closed:
             self._sandbox_pool.open()
-        if self._meta_pool and self._meta_pool.closed:
-            self._meta_pool.open()
-
-    @contextmanager
-    def get_meta_connection(self) -> Generator[Connection, None, None]:
-        """Ottiene una connessione dal pool dei metadati."""
-        if not self._meta_pool:
-            raise DatabaseClientError("Pool del database meta non configurato.")
-        if self._meta_pool.closed:
-            self._meta_pool.open()
-        try:
-            with self._meta_pool.connection() as conn:
-                conn.autocommit = True
-                yield conn
-        except pg_errors.Error as e:
-            raise DatabaseClientError(f"Errore nella connessione meta: {e}") from e
 
     @contextmanager
     def get_sandbox_connection(
@@ -219,8 +192,6 @@ class PostgresClientAdapter(DatabasePort):
         """Chiude i pool ed inattiva l'Engine SQLAlchemy del client."""
         if self._sandbox_pool and not self._sandbox_pool.closed:
             self._sandbox_pool.close()
-        if self._meta_pool and not self._meta_pool.closed:
-            self._meta_pool.close()
         if self._meta_engine:
             self._meta_engine.dispose()
         _log.info("Client PostgreSQL e risorse ORM chiuse correttamente.")

@@ -20,7 +20,6 @@ class CallResultDTO(AbstractDTO):
 class CallOptionsDTO(AbstractDTO):
     """Opzioni per la chiamata a un LLM."""
 
-    force_model: str | None = None
     temperature_override: float | None = None
     error_feedback: str | None = None
 
@@ -28,7 +27,6 @@ class CallOptionsDTO(AbstractDTO):
 class ConfigCheckResultDTO(AbstractDTO):
     """Esito del controllo di integrità delle configurazioni del sistema."""
 
-    bench_loaded: bool = True
     models_count: int = 0
     categories_count: int = 0
     config_hash: str = ""
@@ -41,7 +39,6 @@ class ModelHealthDTO(AbstractDTO):
     model_id: str
     target_model: str = ""
     roles: list[str] = Field(default_factory=list)
-    is_available_on_server: bool = False
     is_healthy: bool = False
     error_message: str = ""
 

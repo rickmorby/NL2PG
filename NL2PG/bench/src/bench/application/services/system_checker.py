@@ -30,7 +30,6 @@ class SystemCheckService(SystemCheckPort):
         cat_hash = self._config.config_hash({"categories": list(categories.keys())})
 
         return ConfigCheckResultDTO(
-            bench_loaded=True,
             models_count=len(providers_cfg.get("models", {})),
             categories_count=len(categories),
             config_hash=cfg_hash,

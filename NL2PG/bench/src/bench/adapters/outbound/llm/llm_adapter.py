@@ -93,11 +93,6 @@ class LLMClientAdapter(LLMGeneratorPort):
     """Adattatore per l'invocazione di modelli LLM con failover automatico via liteLLM Router."""
 
     @staticmethod
-    def _noop_service_hook(*_args: Any, **_kwargs: Any) -> None:
-        """Hook no-op per sopprimere i logger interni di LiteLLM."""
-        return
-
-    @staticmethod
     def _extract_json_payload(text: str) -> str:
         """Estrae l'oggetto JSON finale da un testo LLM scartando CoT e riparando la sintassi."""
         return repair_json(text.strip(), ensure_ascii=False) if text else ""
@@ -131,10 +126,6 @@ class LLMClientAdapter(LLMGeneratorPort):
             stream_timeout=self._stream_timeout,
             set_verbose=False,
         )
-
-    def get_config(self) -> dict[str, Any]:
-        """Restituisce il dizionario di configurazione dell'adattatore."""
-        return self._config
 
     def get_chain(self, role: str) -> list[str]:
         """Restituisce la lista dei model_id per un ruolo dalla configurazione."""

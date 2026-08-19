@@ -188,8 +188,3 @@ class SchemaTypeChecker:
             f"Lo schema DDL non rispetta il tipo di schema richiesto '{tipo_schema}': manca {hint}."
         )
         return SchemaTypeCheckResult(is_valid=False, error=error)
-
-    @classmethod
-    def known_types(cls) -> frozenset[str]:
-        """Restituisce il vocabolario dei tipi di schema verificabili via DDL."""
-        return frozenset(cls._CHECKS)

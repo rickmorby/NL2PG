@@ -11,10 +11,6 @@ class DatabasePort(ABC):
     """Porta outbound per le operazioni di trasporto a basso livello sul database PostgreSQL."""
 
     @abstractmethod
-    def get_meta_connection(self) -> Generator[Any, None, None]:
-        """Ottiene una connessione al database dei metadati."""
-
-    @abstractmethod
     def get_sandbox_connection(
         self, schema: str = "", autocommit: bool = False
     ) -> Generator[Any, None, None]:
