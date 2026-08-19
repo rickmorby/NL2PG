@@ -16,7 +16,7 @@ Il JSON di output deve contenere esclusivamente il campo "verdict" con uno dei s
      * **Risolvibilità Deterministica**: Un analista o un sistema Text-to-SQL avanzato è in grado di dedurre univocamente la query SQL corretta senza dover indovinare filtri nascosti o formule di calcolo arbitrarie.
    - **`ambigua`**: Il testo della storia o della domanda è vago, contraddittorio o lascia spazio a molteplici interpretazioni SQL incompatibili (es. ambiguità su formule di calcolo o inclusione/esclusione di record nulli che altera il risultato).
    - **`incompleta`**: Mancano elementi informativi essenziali per la risoluzione deterministica (es. la Gold Query proietta colonne o applica filtri non specificati nella domanda, oppure le formule di calcolo del dominio non sono definite).
-2. **DIVIETO DI VALORI NON STANDARD**: VIETATO restituire stringhe non previste come "successed", "passed", "easy", "medium", "valid", "ok" o "difficile". Usa ESCLUSIVAMENTE una delle tre stringhe minuscole: "hard", "ambigua", "incompleta".
+2. **DIVIETO DI VALORI NON STANDARD**: VIETATO restituire stringhe non previste come "successed", "passed", "easy", "valid", "ok" o "difficile". Usa ESCLUSIVAMENTE una delle tre stringhe minuscole: "hard", "ambigua", "incompleta".
 3. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 

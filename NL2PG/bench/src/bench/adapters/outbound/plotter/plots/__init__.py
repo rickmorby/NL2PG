@@ -18,7 +18,7 @@ from bench.adapters.outbound.plotter.plots.solvability import (
     SchemaSizeVsPassrateBoxplotPlot,
     SqlFeaturePassrateImpactPlot,
     TwistCountDegradationCurvePlot,
-    TwistVsDifficultyHeatmapPlot,
+    TwistVsDifficultyPlot,
 )
 from bench.adapters.outbound.plotter.plots.sql import (
     AstComplexityDepthPlot,
@@ -43,7 +43,7 @@ def get_default_plots(calculator: AnalyticsCalculator) -> list[AbstractPlot]:
         VocabularyJargonDistributionPlot(),
         SqlFeaturePassrateImpactPlot(),
         TwistCountDegradationCurvePlot(),
-        TwistVsDifficultyHeatmapPlot(),
+        TwistVsDifficultyPlot(),
         SchemaSizeVsPassrateBoxplotPlot(),
         SolverPassrateByDifficultyPlot(),
         CriticScoreByCalibrationOutcomePlot(),
@@ -65,7 +65,7 @@ __all__ = [
     "SqlSyntaxDistributionPlot",
     "TwistCountDegradationCurvePlot",
     "TwistTypeFrequencyPlot",
-    "TwistVsDifficultyHeatmapPlot",
+    "TwistVsDifficultyPlot",
     "VocabularyJargonDistributionPlot",
     "get_default_plots",
 ]

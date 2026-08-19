@@ -253,13 +253,11 @@ class Orchestrator:
         return {"last_error": ""}
 
     def _accept_node(self, state: TaskStateDTO) -> dict:
-        """Imposta verdict accepted e calcola il label di difficolta'."""
+        """Imposta verdict accepted e calcola il label binario di difficolta' (one-shot vs no)."""
         label = "hard"
         cal = state.calibration
         if cal and cal.first_pass_attempt == 1:
             label = "easy"
-        elif cal and (cal.first_pass_attempt in (2, 3) or cal.passes > 0):
-            label = "medium"
         return {"verdict": "accepted", "difficulty_label": label}
 
     def _reject_node(self, state: TaskStateDTO) -> dict:

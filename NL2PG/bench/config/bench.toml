@@ -19,7 +19,7 @@ recursion_limit = 150
 max_rounds = 3
 
 [calibration]
-runs        = 3
+runs        = 2
 temperature = 0.9
 
 [judge]

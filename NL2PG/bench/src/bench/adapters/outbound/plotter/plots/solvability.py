@@ -10,9 +10,7 @@ from seaborn import boxplot, lineplot
 
 from bench.adapters.outbound.plotter.bar_plot import AbstractBarPlot
 from bench.adapters.outbound.plotter.base import AbstractPlot
-from bench.adapters.outbound.plotter.heatmap_plot import AbstractHeatmapPlot
-
-_HARD_COL_INDEX = 2
+from bench.adapters.outbound.plotter.grouped_bar_plot import AbstractGroupedBarPlot
 
 
 class SqlFeaturePassrateImpactPlot(AbstractBarPlot):
@@ -137,37 +135,38 @@ class TwistCountDegradationCurvePlot(AbstractPlot):
         lineplot(x=xs, y=ys, marker="o", linewidth=2.5, color="#8e44ad", ax=ax)
 
 
-class TwistVsDifficultyHeatmapPlot(AbstractHeatmapPlot):
-    """11: Heatmap Bivariata (Twist vs Difficoltà)."""
+class TwistVsDifficultyPlot(AbstractGroupedBarPlot):
+    """11: Barplot raggruppato (Twist vs Difficoltà binaria)."""
 
     def __init__(self) -> None:
-        """Inizializza le dimensioni della matrice bivariata; i twist sono derivati dai task."""
-        super().__init__(cmap="YlOrRd")
+        """Inizializza palette e difficoltà binarie; i twist sono derivati dai task."""
+        super().__init__(palette=["#2ecc71", "#e74c3c"], rotation=35)
         self._twist_types: list[str] = []
-        self._difficulties = ["easy", "medium", "hard"]
+        self._difficulties = ["easy", "hard"]
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
-        return "11_twist_vs_difficulty_heatmap.png"
+        return "11_twist_vs_difficulty.png"
 
     def title(self) -> str:
         """Restituisce il titolo del grafico."""
-        return "11. Correlazione Tipo Twist vs Difficoltà Task"
+        return "11. Numero di Task per Tipo Twist e Classe di Difficoltà"
 
     def description(self) -> str:
         """Restituisce la descrizione metodologica del grafico."""
         return (
-            "Correlazione tra la tipologia di disturbo semantico e la classe "
-            "di difficolta' del task."
+            "Confronto binario del numero di task per tipologia di disturbo semantico "
+            "tra le classi di difficolta' Easy e Hard."
         )
 
-    def insight(self, data: list[list[int]]) -> str:
-        """Estrae l'evidenza sul disturbo a maggiore impatto sulla difficoltà."""
-        if not data or not any(sum(row) for row in data):
+    def insight(self, data: tuple[list[str], dict[str, list[int]]]) -> str:
+        """Estrae l'evidenza sul disturbo a maggiore impatto sulla difficoltà Hard."""
+        twist_types, by_group = data
+        hard = by_group.get("Hard") or []
+        if not twist_types or not hard or not any(hard):
             return "Nessuna correlazione calcolabile."
-        hard_counts = [row[_HARD_COL_INDEX] if len(row) > _HARD_COL_INDEX else 0 for row in data]
-        max_hard_idx = hard_counts.index(max(hard_counts))
-        top_twist_hard = self._twist_types[max_hard_idx]
+        max_hard_idx = hard.index(max(hard))
+        top_twist_hard = twist_types[max_hard_idx]
         return (
             f"I disturbi di tipo '{top_twist_hard}' sono la causa principale "
             f"di difficolta' Hard nel dataset."
@@ -175,24 +174,17 @@ class TwistVsDifficultyHeatmapPlot(AbstractHeatmapPlot):
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
-        return "Difficoltà"
+        return "Tipo Twist"
 
     def ylabel(self) -> str:
         """Restituisce l'etichetta dell'asse Y."""
-        return "Tipo Twist"
+        return "Numero di Task"
 
-    @property
-    def xticklabels(self) -> list[str]:
-        """Restituisce le etichette delle colonne."""
-        return [d.capitalize() for d in self._difficulties]
-
-    @property
-    def yticklabels(self) -> list[str]:
-        """Restituisce le etichette delle righe."""
-        return [t.capitalize() for t in self._twist_types]
-
-    def prepare_data(self, tasks: list[dict[str, Any]]) -> list[list[int]]:
-        """Calcola la matrice bivariata (Twist vs Difficoltà) sui tipi presenti nei task."""
+    def prepare_data(
+        self,
+        tasks: list[dict[str, Any]],
+    ) -> tuple[list[str], dict[str, list[int]]]:
+        """Calcola i conteggi per tipo twist e classe di difficoltà (gruppi binari)."""
         type_counts: Counter = Counter()
         for t in tasks:
             for tr in (t.get("spec") or {}).get("twist_rules", []):
@@ -200,14 +192,18 @@ class TwistVsDifficultyHeatmapPlot(AbstractHeatmapPlot):
                 if ttype:
                     type_counts[ttype] += 1
         self._twist_types = [tt for tt, _ in type_counts.most_common()] or ["rename"]
-        counts = {tt: {d: 0 for d in self._difficulties} for tt in self._twist_types}
+        groups = [d.capitalize() for d in self._difficulties]
+        by_group = {g: [0] * len(self._twist_types) for g in groups}
         for t in tasks:
             diff = (t.get("difficulty") or {}).get("label", "easy").lower()
+            if diff not in self._difficulties:
+                continue
             for tr in (t.get("spec") or {}).get("twist_rules", []):
                 ttype = tr.get("twist_type", "").lower()
-                if ttype in counts and diff in self._difficulties:
-                    counts[ttype][diff] += 1
-        return [[counts[tt][d] for d in self._difficulties] for tt in self._twist_types]
+                if ttype in self._twist_types:
+                    by_group[diff.capitalize()][self._twist_types.index(ttype)] += 1
+        self._adapt_layout(len(self._twist_types))
+        return self._twist_types, by_group
 
 
 class SchemaSizeVsPassrateBoxplotPlot(AbstractPlot):

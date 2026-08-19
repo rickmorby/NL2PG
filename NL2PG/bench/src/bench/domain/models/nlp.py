@@ -81,6 +81,5 @@ class CalibrationResultDTO(AbstractDTO):
 
     pass_rate: float = Field(default=0.0, ge=0.0, le=1.0)
     passes: int = Field(default=0, ge=0)
-    runs: int = Field(default=0, ge=0)
     first_pass_attempt: int | None = None
     model: str = ""

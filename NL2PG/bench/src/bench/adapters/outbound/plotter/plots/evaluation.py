@@ -11,15 +11,15 @@ from seaborn import boxplot
 from bench.adapters.outbound.plotter.bar_plot import AbstractBarPlot
 from bench.adapters.outbound.plotter.base import AbstractPlot
 
-_HARD_DIFF_INDEX = 2
+_HARD_DIFF_INDEX = 1
 
 
 class SolverPassrateByDifficultyPlot(AbstractBarPlot):
     """13: Barplot del pass rate per classe di difficoltà."""
 
     def __init__(self) -> None:
-        """Inizializza la palette cromatica sui 3 livelli."""
-        super().__init__(palette=["#2ecc71", "#f39c12", "#e74c3c"], ylim=(0, 0.5))
+        """Inizializza la palette cromatica sui 2 livelli."""
+        super().__init__(palette=["#2ecc71", "#e74c3c"], ylim=(0, 1.0))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -32,7 +32,7 @@ class SolverPassrateByDifficultyPlot(AbstractBarPlot):
     def description(self) -> str:
         """Restituisce la descrizione metodologica del grafico."""
         return (
-            "Accuratezza media ottenuta dal solver nei tre livelli di difficolta' "
+            "Accuratezza media ottenuta dal solver nei due livelli di difficolta' "
             "calibrati empiricamente."
         )
 
@@ -42,12 +42,8 @@ class SolverPassrateByDifficultyPlot(AbstractBarPlot):
         if not ys:
             return "Nessun dato di risolvibilita' per livello."
         e_p = round(ys[0] * 100, 1) if len(ys) > 0 else 0.0
-        m_p = round(ys[1] * 100, 1) if len(ys) > 1 else 0.0
         h_p = round(ys[_HARD_DIFF_INDEX] * 100, 1) if len(ys) > _HARD_DIFF_INDEX else 0.0
-        return (
-            f"La scala e' calibrata: il pass rate scende da Easy ({e_p}%) a Medium ({m_p}%) "
-            f"fino ad Hard ({h_p}%)."
-        )
+        return f"La scala e' calibrata: il pass rate scende da Easy ({e_p}%) a Hard ({h_p}%)."
 
     def xlabel(self) -> str:
         """Restituisce l'etichetta dell'asse X."""
@@ -64,7 +60,7 @@ class SolverPassrateByDifficultyPlot(AbstractBarPlot):
             diff = (t.get("difficulty") or {}).get("label", "easy")
             pr = (t.get("difficulty") or {}).get("calibration_pass_rate", 0.0)
             prs[diff].append(float(pr))
-        difficulties = ["easy", "medium", "hard"]
+        difficulties = ["easy", "hard"]
         xs = [d.capitalize() for d in difficulties]
         ys = [round(sum(prs[d]) / len(prs[d]), 3) if prs[d] else 0.0 for d in difficulties]
         return xs, ys

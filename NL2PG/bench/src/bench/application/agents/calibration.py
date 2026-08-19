@@ -58,7 +58,10 @@ class CalibrationAgent(AbstractAgent):
         return {}
 
     def run(self, state: TaskStateDTO, chain_role: str = "calibration") -> dict:
-        """Esegue N run del solver LLM con temperatura variabile e calcola il pass_rate."""
+        """Esegue fino a N tentativi del solver LLM.
+
+        Calcola il pass_rate sui tentativi eseguiti (break al primo passaggio).
+        """
         max_runs = self._config.calibration_runs()
         temp = self._config.calibration_temperature()
         passes = 0
@@ -77,11 +80,11 @@ class CalibrationAgent(AbstractAgent):
                         break
             except (PgError, ParseError, ModelOutputContractError, LLMClientError, ValidationError):
                 pass
-        rate = passes / max_runs
+        attempts = first_pass if first_pass is not None else max_runs
+        rate = passes / attempts
         cal = CalibrationResultDTO(
             pass_rate=rate,
             passes=passes,
-            runs=max_runs,
             first_pass_attempt=first_pass,
             model=last_model,
         )
