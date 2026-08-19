@@ -34,10 +34,11 @@ class SchemaAgent(AbstractAgent):
         return "schema"
 
     def build_kwargs(self, state: TaskStateDTO) -> dict:
-        """Costruisce i kwargs per il prompt con descrizione categoria, spec e few-shot."""
+        """Costruisce i kwargs per il prompt con tipo schema, descrizione, spec e few-shot."""
         few_shot = self._few_shot(state)
         cat = self._config.load_categories().get(state.category, CategoryDTO())
         return {
+            "cat_tipo_schema": cat.tipo_schema,
             "cat_descrizione": cat.descrizione,
             "spec": state.spec.model_dump_json() if state.spec else "{}",
             "few_shot": few_shot,

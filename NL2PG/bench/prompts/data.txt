@@ -42,7 +42,13 @@ Il JSON di output deve contenere esclusivamente il campo "tables".
 
 8. **DETERMINISMO**: Il seed e' derivato dal task_id: a parita' di DataSpec i dati sono riproducibili, e gli agenti a valle (query, story, critic) vedranno un profilo dati con righe campione REALI. Usa quindi valori che un analista filtra davvero.
 
-9. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
+9. **TIPOLOGIE DI SCHEMA SPECIALI**: Se il DDL contiene costrutti particolari, regole dedicate:
+   - `generated_columns`: NON inserire mai nei template una colonna `GENERATED ALWAYS AS (...)`. Ometti la colonna calcolata: PostgreSQL la valorizza da solo. Se è rilevante per l'analisi, includi le colonne da cui deriva (es. `quantita` e `prezzo`) nei template.
+   - `composite_column`: per una colonna di tipo composito (es. `CREATE TYPE indirizzo AS (via TEXT, civico INT)`) usa la sintassi `ROW(...)` nei template, es. `{"indirizzo_spedizione": "ROW('Via Roma 1', 10)"}` oppure la stringa tipizzata `'(Via Roma 1,10)'`. La sintassi deve essere valida per PostgreSQL.
+   - `partitioned`: le tabelle partizionate si popolano inserendo nella tabella padre (es. `INSERT INTO ordini ...`): il DB instrada automaticamente la riga nella partizione giusta. Scegli valori della partition key sufficientemente vari (es. più date) per popolare più partizioni.
+   - `enum_type`: usa negli insert esattamente i valori dichiarati nel `CREATE TYPE ... AS ENUM`.
+   - `range_type` (es. `daterange`, `tsrange`): usa valori range validi come `'[2026-01-01, 2026-06-01)'` (estremo inferiore incluso, superiore escluso).
+10. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>

@@ -9,19 +9,60 @@ Il JSON di output deve contenere esclusivamente i campi "query", "intent", "orde
 
 <rules_and_guidelines>
 1. **DIVIETO TASSATIVO DI QUALIFICAZIONE SCHEMA**: NON qualificare MAI le tabelle con prefissi di schema (usa `FROM clienti`, MAI `FROM task_xxx.clienti`).
-2. **Inclusione Feature Obbligatorie**: La query DEVE contenere TUTTE le clausole ed i costrutti indicati in `<feature_sql_obbligatorie>`:
-   - `scalar_agg`: usa una funzione di aggregazione scalare (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`) SENZA `GROUP BY`.
-   - `group_agg`: usa `GROUP BY` con una funzione di aggregazione.
-   - `top_n`: usa la clausola `LIMIT`.
-   - `having`: usa la clausola `HAVING` dopo `GROUP BY`.
-   - `join` / `multi_join`: usa clausole `JOIN` per unire 2 o più tabelle.
-   - `self_join`: unisci la stessa tabella con se stessa con alias distinti.
-   - `filtered_agg`: usa aggregazioni filtrate (`COUNT(*) FILTER (WHERE ...)` o `SUM(CASE WHEN ... THEN ... END)`).
-   - `subquery` / `correlated_subquery`: usa sottoquery nella SELECT, FROM o WHERE.
-   - `anti_join`: usa `NOT EXISTS`, `NOT IN` o `LEFT JOIN` con `WHERE IS NULL`.
-   - `set_op`: usa operatori d'insieme (`UNION`, `INTERSECT`, `EXCEPT`).
-   - `cte` / `recursive_cte`: usa clausole `WITH` o `WITH RECURSIVE`.
-   - `window`: usa funzioni finestra (`ROW_NUMBER() OVER (...)`, `RANK() OVER (...)`, `DENSE_RANK() OVER (...)`).
+2. **Inclusione Feature Obbligatorie**: La query DEVE contenere TUTTE le clausole ed i costrutti indicati in `<feature_sql_obbligatorie>`. Guida sintattica per ogni feature (`nome`: costrutto richiesto):
+   - **SELEZIONE E FILTRI**:
+     - `conjunctive`: un filtro congiuntivo con `AND` (piu' condizioni contemporanee)
+     - `disjunctive`: un filtro disgiuntivo con `OR`
+     - `between`: `colonna BETWEEN valore_min AND valore_max`
+     - `in_condition`: `colonna IN (val1, val2, ...)`
+     - `like`: `colonna LIKE 'pattern'` (con `%` e `_` per i caratteri jolly)
+     - `is_null`: `IS NULL` o `IS NOT NULL` per filtrare valori nulli
+     - `is_distinct_from`: `colonna IS DISTINCT FROM valore` o `IS NOT DISTINCT FROM` per il confronto con semantica NULL
+     - `boolean_predicate`: una condizione booleana `colonna IS TRUE` / `IS FALSE` o l'uso esplicito di un campo booleano nel `WHERE`
+     - `any_all`: `expr OPERATORE ANY (...) / ALL (...)` (confronto contro sottoinsieme)
+     - `exists`: `EXISTS (...)` o `NOT EXISTS (...)`
+   - **UNICITA' E ORDINAMENTO**:
+     - `distinct`: `SELECT DISTINCT` per eliminare righe duplicate
+     - `agg_distinct`: una funzione di aggregazione su valori distinti: `COUNT(DISTINCT colonna)`
+     - `distinct_on`: `SELECT DISTINCT ON (colonna) ... ORDER BY colonna, ...` per estrarre la prima riga per gruppo
+     - `sorting`: un `ORDER BY` multi-colonna nella query principale
+     - `top_n`: la clausola `LIMIT` per limitare le righe risultato
+     - `offset_fetch`: `OFFSET n ROWS` con `FETCH FIRST n ROWS ONLY` per la paginazione
+   - **PROIEZIONE E TRASFORMAZIONE**:
+     - `case`: `CASE WHEN condizione THEN valore ELSE valore END` per la logica condizionale
+     - `cast`: un cast esplicito di tipo: `colonna::tipo` oppure `CAST(colonna AS tipo)`
+     - `string_funcs`: una funzione stringa (`UPPER`, `LOWER`, `CONCAT`, `SUBSTRING`, `TRIM`, `REPLACE`, `INITCAP`, `LENGTH` o `LEN`)
+     - `math_funcs`: una funzione matematica (`ROUND`, `ABS`, `POW`, `MOD`, `CEIL`, `FLOOR`, `SQRT`, `EXP`, `LN`, `LOG`)
+     - `relative_time`: una funzione di tempo relativo (`CURRENT_DATE`, `CURRENT_TIMESTAMP`, `CURRENT_TIME`) o `INTERVAL` (es. `CURRENT_DATE - INTERVAL '30 days'`)
+     - `row_types`: un tipo riga: `ROW(colonna1, colonna2)`
+     - `values`: la clausola `VALUES (...), (...)` (come CTE o sottoquery), es. `WITH t(col1, col2) AS (VALUES (..., ...), (..., ...))`
+   - **JOIN E RELAZIONI**:
+     - `join`: una clausola `JOIN` per unire 2 tabelle
+     - `multi_join`: piu' clausole `JOIN` per unire 3 o piu' tabelle
+     - `self_join`: unire la stessa tabella con se stessa con alias distinti (es. `FROM dipendenti d JOIN dipendenti m ON d.manager_id = m.id`)
+     - `cross_join`: un `CROSS JOIN` (prodotto cartesiano)
+     - `left_outer_join`: un `LEFT JOIN` (mantiene le righe della tabella sinistra anche senza corrispondenza)
+     - `right_outer_join`: un `RIGHT JOIN` (mantiene le righe della tabella destra anche senza corrispondenza)
+     - `full_outer_join`: un `FULL OUTER JOIN` (mantiene entrambe le tabelle anche senza corrispondenza)
+     - `natural_join`: un `NATURAL JOIN` (unione sulle colonne con lo stesso nome)
+     - `anti_join`: `NOT EXISTS`, `NOT IN` o un `LEFT JOIN` con `WHERE colonna IS NULL` per selezionare entita' senza corrispondenza
+     - `lateral`: una `LEFT JOIN LATERAL` o `CROSS JOIN LATERAL` con una sottoquery dipendente dalla riga esterna
+   - **AGGREGAZIONE E FINESTRE**:
+     - `scalar_agg`: una funzione di aggregazione scalare (`COUNT`, `SUM`, `AVG`, `MIN`, `MAX`) SENZA `GROUP BY`
+     - `group_agg`: `GROUP BY` con una funzione di aggregazione
+     - `having`: la clausola `HAVING` dopo `GROUP BY`
+     - `filtered_agg`: un'aggregazione filtrata: `COUNT(*) FILTER (WHERE ...)` oppure `SUM(CASE WHEN ... THEN ... END)`
+     - `window`: una funzione finestra (`ROW_NUMBER() OVER (...)`, `RANK() OVER (...)`, `DENSE_RANK() OVER (...)` o altre)
+     - `grouping_sets`: `GROUP BY GROUPING SETS ((...), (...))` o `ROLLUP` / `CUBE` per aggregazioni multiple
+     - `ordered_set_agg`: un'aggregazione ordinata: `PERCENTILE_CONT(n) WITHIN GROUP (ORDER BY colonna)` o `PERCENTILE_DISC(n) WITHIN GROUP (ORDER BY colonna)`
+   - **SOTTOQUERY E INSIEMI**:
+     - `subquery`: una sottoquery nella SELECT, FROM o WHERE
+     - `correlated_subquery`: una sottoquery correlata (riferisce una colonna della query esterna)
+     - `cte`: una Common Table Expression: `WITH nome AS (...)`
+     - `recursive_cte`: una CTE ricorsiva: `WITH RECURSIVE nome AS (... UNION ...)`
+     - `set_op`: un operatore d'insieme (`UNION`, `INTERSECT`, `EXCEPT`; usa `UNION ALL` per mantenere i duplicati)
+     - `overlaps`: l'operatore `OVERLAPS` per intervalli temporali: `(inizio1, fine1) OVERLAPS (inizio2, fine2)`
+
 3. **Regola order_sensitive**:
    - Se la richiesta implica un ordinamento rigido a livello primario (es. graduatoria, top-N, primi K), imposta `"order_sensitive": true` E inserisci la clausola `ORDER BY` nella query principale (SELECT alla radice).
    - Se `"order_sensitive": true`, la presenza dell'`ORDER BY` nella query principale è **OBBLIGATORIA**.
@@ -89,7 +130,7 @@ Colonna non aggregata assente dal GROUP BY (ERRATO):
 
 <chain_of_thought_protocol>
 1. Scomponi le clausole e le feature SQL obbligatorie richieste da `<feature_sql_obbligatorie>`.
-2. Progetta la query PostgreSQL integrando tutte le clausole necessarie.
+2. Progetta la query PostgreSQL integrando TUTTE le clausole indicate in `<feature_sql_obbligatorie>`, seguendo la guida sintattica della regola 2.
 3. Determina se l'ordinamento è rilevante: se sì, imposta `order_sensitive: true` ed aggiungi la clausola `ORDER BY` alla radice della SELECT.
 4. Redigi l'intenzione in linguaggio naturale (`intent`).
 5. Genera l'oggetto JSON puro valido conforme alla classe `GoldQuery`.
