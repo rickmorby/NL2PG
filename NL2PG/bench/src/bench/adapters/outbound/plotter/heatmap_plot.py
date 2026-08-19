@@ -9,6 +9,9 @@ from seaborn import heatmap
 
 from bench.adapters.outbound.plotter.base import AbstractPlot
 
+_SMALL_MAX_ITEMS = 8
+_MEDIUM_MAX_ITEMS = 14
+
 
 class AbstractHeatmapPlot(AbstractPlot):
     """Specializzazione di AbstractPlot per le matrici di calore (Heatmap)."""
@@ -24,6 +27,21 @@ class AbstractHeatmapPlot(AbstractPlot):
         super().__init__(figsize=figsize, bottom_margin=bottom_margin)
         self.cmap = cmap
         self.rotation = rotation
+
+    def _adapt_layout(self, n_items: int) -> None:
+        """Adatta dimensioni, rotazione e margini al numero di etichette della matrice."""
+        if n_items <= _SMALL_MAX_ITEMS:
+            self.figsize = (9.5, 6)
+            self.rotation = 35
+            self.bottom_margin = 0.24
+        elif n_items <= _MEDIUM_MAX_ITEMS:
+            self.figsize = (13, 10)
+            self.rotation = 45
+            self.bottom_margin = 0.28
+        else:
+            self.figsize = (16, 12)
+            self.rotation = 60
+            self.bottom_margin = 0.30
 
     @property
     def xticklabels(self) -> list[str] | bool:

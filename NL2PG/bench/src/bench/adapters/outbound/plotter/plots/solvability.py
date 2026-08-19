@@ -14,6 +14,16 @@ from bench.adapters.outbound.plotter.heatmap_plot import AbstractHeatmapPlot
 
 _HARD_COL_INDEX = 2
 
+_TWIST_CANONICAL_ORDER = [
+    "rename",
+    "synonym",
+    "jargon",
+    "polysemy",
+    "ambiguity",
+    "rephrase",
+    "distractor",
+]
+
 
 class SqlFeaturePassrateImpactPlot(AbstractBarPlot):
     """09: Barplot dell'impatto delle feature SQL sul pass rate."""
@@ -58,17 +68,17 @@ class SqlFeaturePassrateImpactPlot(AbstractBarPlot):
         return "Pass Rate Medio Solver"
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[float]]:
-        """Calcola la media del pass rate per feature."""
+        """Calcola la media del pass rate per ogni feature SQL presente nei task."""
         prs = defaultdict(list)
         for t in tasks:
             pr = (t.get("difficulty") or {}).get("calibration_pass_rate", 0.0)
             for f in (t.get("spec") or {}).get("sql_features", []):
                 prs[f].append(float(pr))
         sorted_feats = sorted(prs.items(), key=lambda x: sum(x[1]) / len(x[1]))
-        return (
-            [x[0] for x in sorted_feats][:8] or ["join"],
-            [round(sum(x[1]) / len(x[1]), 3) for x in sorted_feats][:8] or [0.0],
-        )
+        xs = [x[0] for x in sorted_feats] or ["join"]
+        ys = [round(sum(x[1]) / len(x[1]), 3) for x in sorted_feats] or [0.0]
+        self._adapt_layout(len(xs))
+        return xs, ys
 
 
 class TwistCountDegradationCurvePlot(AbstractPlot):
@@ -141,9 +151,9 @@ class TwistVsDifficultyHeatmapPlot(AbstractHeatmapPlot):
     """11: Heatmap Bivariata (Twist vs Difficoltà)."""
 
     def __init__(self) -> None:
-        """Inizializza le dimensioni della matrice bivariata."""
+        """Inizializza le dimensioni della matrice bivariata; i twist sono derivati dai task."""
         super().__init__(cmap="YlOrRd")
-        self._twist_types = ["rename", "synonym", "jargon", "ambiguity", "rephrase", "distractor"]
+        self._twist_types: list[str] = []
         self._difficulties = ["easy", "medium", "hard"]
 
     def filename(self) -> str:
@@ -192,7 +202,16 @@ class TwistVsDifficultyHeatmapPlot(AbstractHeatmapPlot):
         return [t.capitalize() for t in self._twist_types]
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> list[list[int]]:
-        """Calcola la matrice bivariata (Twist vs Difficoltà)."""
+        """Calcola la matrice bivariata (Twist vs Difficoltà) sui tipi presenti nei task."""
+        present: set[str] = set()
+        for t in tasks:
+            for tr in (t.get("spec") or {}).get("twist_rules", []):
+                present.add(tr.get("twist_type", "").lower())
+        self._twist_types = [tt for tt in _TWIST_CANONICAL_ORDER if tt in present] + sorted(
+            present - set(_TWIST_CANONICAL_ORDER)
+        )
+        if not self._twist_types:
+            self._twist_types = ["rename"]
         counts = {tt: {d: 0 for d in self._difficulties} for tt in self._twist_types}
         for t in tasks:
             diff = (t.get("difficulty") or {}).get("label", "easy").lower()

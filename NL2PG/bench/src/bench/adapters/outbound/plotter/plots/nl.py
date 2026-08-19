@@ -106,16 +106,16 @@ class TwistTypeFrequencyPlot(AbstractBarPlot):
         return "Conteggio"
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
-        """Estrae la frequenza dei twist semantici."""
+        """Estrae la frequenza di tutti i tipi di twist presenti nei task."""
         c: Counter = Counter()
         for t in tasks:
             for tr in (t.get("spec") or {}).get("twist_rules", []):
                 c[tr.get("twist_type", "unknown")] += 1
-        items = c.most_common(6)
-        return (
-            [i[0] for i in items] if items else ["baseline"],
-            [i[1] for i in items] if items else [len(tasks)],
-        )
+        items = c.most_common()
+        xs = [i[0] for i in items] if items else ["baseline"]
+        ys = [i[1] for i in items] if items else [len(tasks)]
+        self._adapt_layout(len(xs))
+        return xs, ys
 
 
 class VocabularyJargonDistributionPlot(AbstractBarPlot):

@@ -11,6 +11,9 @@ from bench.adapters.outbound.plotter.heatmap_plot import AbstractHeatmapPlot
 from bench.domain.services.analytics_calculator import AnalyticsCalculator
 
 
+_COOCCURRENCE_TOP_K = 14
+
+
 class SqlSyntaxDistributionPlot(AbstractBarPlot):
     """01: Barplot della distribuzione delle feature SQL."""
 
@@ -52,13 +55,16 @@ class SqlSyntaxDistributionPlot(AbstractBarPlot):
         return "Frequenza Task"
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
-        """Estrae le top 8 feature SQL."""
+        """Estrae la distribuzione completa delle feature SQL presenti nei task."""
         counts: Counter = Counter()
         for t in tasks:
             for f in (t.get("spec") or {}).get("sql_features", []):
                 counts[f] += 1
-        items = counts.most_common(8)
-        return ([i[0] for i in items] or ["join"], [i[1] for i in items] or [0])
+        items = counts.most_common()
+        xs = [i[0] for i in items] or ["join"]
+        ys = [i[1] for i in items] or [0]
+        self._adapt_layout(len(xs))
+        return xs, ys
 
 
 class AstComplexityDepthPlot(AbstractBarPlot):
@@ -217,18 +223,9 @@ class SqlFeatureCooccurrencePlot(AbstractHeatmapPlot):
     """05: Heatmap di co-occorrenza delle feature SQL."""
 
     def __init__(self) -> None:
-        """Inizializza la mappa e l'elenco feature."""
-        super().__init__(cmap="Blues", rotation=35, figsize=(9.5, 6))
-        self._features = [
-            "join",
-            "group_agg",
-            "having",
-            "subquery",
-            "window",
-            "cte",
-            "distinct",
-            "order_limit",
-        ]
+        """Inizializza la mappa; l'elenco feature è derivato dinamicamente dai task."""
+        super().__init__(cmap="Blues", rotation=35, figsize=(13, 10))
+        self._features: list[str] = []
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -241,8 +238,8 @@ class SqlFeatureCooccurrencePlot(AbstractHeatmapPlot):
     def description(self) -> str:
         """Restituisce la descrizione metodologica del grafico."""
         return (
-            "Frequenza con cui due o piu' costrutti SQL compaiono simultaneamente "
-            "nella stessa query."
+            "Frequenza con cui i costrutti SQL piu' frequenti del run compaiono "
+            "simultaneamente nella stessa query."
         )
 
     def insight(self, data: list[list[int]]) -> str:
@@ -281,7 +278,13 @@ class SqlFeatureCooccurrencePlot(AbstractHeatmapPlot):
         return self._features
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> list[list[int]]:
-        """Calcola la matrice di co-occorrenza per le feature selezionate."""
+        """Calcola la matrice di co-occorrenza dei costrutti SQL piu' frequenti."""
+        counts: Counter = Counter()
+        for t in tasks:
+            for f in (t.get("spec") or {}).get("sql_features", []):
+                counts[f] += 1
+        self._features = [f for f, _ in counts.most_common(_COOCCURRENCE_TOP_K)] or ["join"]
+        self._adapt_layout(len(self._features))
         cooc: dict[str, dict[str, int]] = {
             f1: {f2: 0 for f2 in self._features} for f1 in self._features
         }
