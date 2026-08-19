@@ -58,6 +58,7 @@ from bench.domain.ports.inbound import (
 )
 from bench.domain.services.feature_checker import FeatureChecker
 from bench.domain.services.role_example_builder import RoleExampleBuilder
+from bench.domain.services.schema_type_checker import SchemaTypeChecker
 
 
 class ApplicationBootstrap:
@@ -89,7 +90,7 @@ class ApplicationBootstrap:
         self._examples = ExampleAdapter(self._base_dir / "examples")
         self._role_example_builder = RoleExampleBuilder()
 
-        schema_validator = SchemaValidator(self._sandbox)
+        schema_validator = SchemaValidator(self._sandbox, SchemaTypeChecker())
         mutation_tester = MutationTester(self._sandbox)
         query_validator = QueryValidator(self._sandbox, FeatureChecker(), mutation_tester)
 
