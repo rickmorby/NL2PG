@@ -30,16 +30,17 @@ Il JSON di output deve contenere esclusivamente il campo "tables".
    - `shift`: sposta un valore numerico o di data; richiede `delta_min` e `delta_max` (es. {axis:"shift", delta_min:-3, delta_max:3}).
    - `scale`: scala un valore numerico; richiede `factor_min` e `factor_max` (es. {axis:"scale", factor_min:0.5, factor_max:2.0}).
    - `pool`: sceglie da una lista di valori testuali; richiede `pool` (es. {axis:"pool", pool:["Roma","Milano","Torino"]}).
-   - NON dichiarare variazioni su chiavi primarie o chiavi esterne.
+   - NON dichiarare variazioni su chiavi primarie, chiavi esterne o colonne con vincolo UNIQUE.
 
-5. **CHIAVI PRIMARIE ED ESTERNE (GESTITE DAL MOTORE)**:
+5. **CHIAVI PRIMARIE, ESTERNE E UNIQUE (GESTITE DAL MOTORE)**:
    - Le PK sono generate dal motore come valori univoci e sequenziali (la base numerica nel template, es. 1, e' solo il punto di partenza).
    - Le FK sono legate automaticamente a PK reali della tabella padre gia' generate: NON cercare di coordinare a mano i valori delle FK nei template (possono essere omesse o lasciate indicative; verranno sostituite).
+   - Le colonne con vincolo UNIQUE sono gestite dal motore come le PK: i valori univoci vengono generati automaticamente a partire dal template.
    - La coerenza referenziale e' garantita per costruzione, anche con catene, stelle, relazioni N:N (PK composite) e self-reference.
 
 6. **MOLTIPLICATORE per_parent_rows** (opzionale): per tabelle con ESATTAMENTE una FK (e mai self-reference) puoi impostare `per_parent_rows` (numero decimale, es. 3.0): il numero di righe figlie diventa ~ padre × moltiplicatore. Non usarlo su tabelle con due o piu' FK.
 
-7. **RUMORE CONTROLLATO (GESTITO DAL MOTORE)**: NULL occasionali su colonne nullable, duplicati sporadici e outlier entro i limiti dichiarati vengono iniettati automaticamente; non preoccupartene. Mai su chiavi o colonne NOT NULL.
+7. **RUMORE CONTROLLATO (GESTITO DAL MOTORE)**: NULL occasionali su colonne nullable, duplicati sporadici e outlier entro i limiti dichiarati vengono iniettati automaticamente; non preoccupartene. Mai su chiavi primarie, chiavi esterne o colonne UNIQUE.
 
 8. **DETERMINISMO**: Il seed e' derivato dal task_id: a parita' di DataSpec i dati sono riproducibili, e gli agenti a valle (query, story, critic) vedranno un profilo dati con righe campione REALI. Usa quindi valori che un analista filtra davvero.
 

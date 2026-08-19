@@ -20,6 +20,7 @@ class ColumnSchema:
         nullable: bool,
         is_pk: bool = False,
         is_fk: bool = False,
+        is_unique: bool = False,
         fk_parent_table: str | None = None,
         fk_parent_column: str | None = None,
     ) -> None:
@@ -29,6 +30,7 @@ class ColumnSchema:
         self.nullable = nullable
         self.is_pk = is_pk
         self.is_fk = is_fk
+        self.is_unique = is_unique
         self.fk_parent_table = fk_parent_table
         self.fk_parent_column = fk_parent_column
 
@@ -36,12 +38,18 @@ class ColumnSchema:
 class TableSchema:
     """Metadati di una tabella: colonne, chiavi primarie ed esterne."""
 
-    def __init__(self, name: str, columns: list[ColumnSchema]) -> None:
-        """Inizializza i metadati della tabella e deriva PK ed FK."""
+    def __init__(
+        self,
+        name: str,
+        columns: list[ColumnSchema],
+        unique_groups: list[list[str]] | None = None,
+    ) -> None:
+        """Inizializza i metadati della tabella e deriva PK, FK e UNIQUE."""
         self.name = name
         self.columns = columns
         self.pk_columns: list[str] = [c.name for c in columns if c.is_pk]
         self.fk_columns: list[ColumnSchema] = [c for c in columns if c.is_fk]
+        self.unique_groups: list[list[str]] = unique_groups or []
 
     def column(self, name: str) -> ColumnSchema | None:
         """Restituisce la colonna per nome o None se assente."""

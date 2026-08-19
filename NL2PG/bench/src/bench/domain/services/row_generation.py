@@ -1,9 +1,10 @@
 """Generazione delle righe per tabella: espansione template e rumore.
 
 Due responsabilita' separate: ``RowExpander`` orchestra l'espansione dei
-template canonici per tabella (loop, duplicati, PK composite), ``RowBuilder``
-costruisce una singola riga applicando variazioni, PK univoche e rumore
-controllato (NULL, outlier). I volumi sono calcolati da ``RowCounter``.
+template canonici per tabella (loop, duplicati, PK composite, UNIQUE),
+``RowBuilder`` costruisce una singola riga applicando variazioni, PK e valori
+UNIQUE univoci e rumore controllato (NULL, outlier). I volumi sono calcolati
+da ``RowCounter``.
 
 :author: Riccardo Morabito
 """
@@ -27,6 +28,24 @@ from bench.domain.services.column_types import (
 )
 
 _OUTLIER_COIN_FLIP = 0.5
+
+
+def _generate_unique(
+    column: ColumnSchema, template_value: Any, instance_index: int, used: set[Any]
+) -> Any:
+    """Genera un valore univoco partendo dal template (sequenziale per int, suffisso per str)."""
+    if is_integer_type(column.data_type):
+        base = template_value if isinstance(template_value, int) else 1
+        candidate = base + instance_index
+        while candidate in used:
+            candidate += 1
+    else:
+        base = template_value if template_value is not None else column.name
+        candidate = base if instance_index == 0 else f"{base}_{instance_index}"
+        while candidate in used:
+            candidate = f"{candidate}_"
+    used.add(candidate)
+    return candidate
 
 
 class RowExpander:
@@ -67,16 +86,33 @@ class RowExpander:
         base = count // len(templates)
         remainder = count % len(templates)
         used_pk: dict[str, set[Any]] = {col: set() for col in table.pk_columns}
+        used_unique: dict[str, set[Any]] = {
+            col.name: set()
+            for col in table.columns
+            if col.is_unique and not col.is_pk and not col.is_fk
+        }
         used_composite: set[tuple] = set()
+        used_composite_unique: dict[tuple[str, ...], set[tuple]] = {
+            tuple(group): set() for group in table.unique_groups if len(group) > 1
+        }
         for template_index, template in enumerate(templates):
             instances = base + (1 if template_index < remainder else 0)
             for instance_index in range(instances):
                 duplicate = rng.random() < self._dup_rate and bool(result)
                 row = self._builder.build(
-                    table_spec, table, template, instance_index, used_pk, rng, duplicate
+                    table_spec,
+                    table,
+                    template,
+                    instance_index,
+                    used_pk,
+                    used_unique,
+                    rng,
+                    duplicate,
                 )
                 if len(table.pk_columns) > 1:
                     self._ensure_composite_unique(table, row, used_composite)
+                for group_key, used_set in used_composite_unique.items():
+                    self._ensure_composite_unique_group(table, row, list(group_key), used_set)
                 result.append(row)
         return result
 
@@ -95,9 +131,30 @@ class RowExpander:
             composite_key = tuple(row[col] for col in table.pk_columns)
         used_composite.add(composite_key)
 
+    @staticmethod
+    def _ensure_composite_unique_group(
+        table: TableSchema,
+        row: dict[str, Any],
+        group: list[str],
+        used: set[tuple],
+    ) -> None:
+        """Rende unica una combinazione UNIQUE composita incrementando l'ultima colonna."""
+        key = tuple(row[col] for col in group)
+        suffix = 1
+        while key in used:
+            last_col = group[-1]
+            col_schema = table.column(last_col)
+            if col_schema and is_integer_type(col_schema.data_type):
+                row[last_col] = int(row[last_col]) + suffix
+            else:
+                row[last_col] = f"{row[last_col]}_{suffix}"
+            suffix += 1
+            key = tuple(row[col] for col in group)
+        used.add(key)
+
 
 class RowBuilder:
-    """Costruisce una singola riga: PK univoche, variazioni e rumore controllato."""
+    """Costruisce una singola riga: PK e UNIQUE univoche, variazioni e rumore controllato."""
 
     def __init__(
         self, null_rate: float = 0.05, dup_rate: float = 0.03, outlier_rate: float = 0.02
@@ -114,16 +171,25 @@ class RowBuilder:
         template: dict[str, Any],
         instance_index: int,
         used_pk: dict[str, set[Any]],
+        used_unique: dict[str, set[Any]],
         rng: random.Random,
         duplicate: bool,
     ) -> dict[str, Any]:
-        """Costruisce una riga applicando variazioni, PK uniche, NULL e outlier."""
+        """Costruisce una riga applicando variazioni, PK/UNIQUE uniche, NULL e outlier."""
         row: dict[str, Any] = {}
         for column in table.columns:
             variation = table_spec.variations.get(column.name)
             template_value = template.get(column.name)
             self._set_column_value(
-                column, template_value, variation, instance_index, used_pk, rng, duplicate, row
+                column,
+                template_value,
+                variation,
+                instance_index,
+                used_pk,
+                used_unique,
+                rng,
+                duplicate,
+                row,
             )
             self._inject_noise(column, variation, template_value, row, rng)
         for column in table.columns:
@@ -138,14 +204,19 @@ class RowBuilder:
         variation: ColumnVariationDTO | None,
         instance_index: int,
         used_pk: dict[str, set[Any]],
+        used_unique: dict[str, set[Any]],
         rng: random.Random,
         duplicate: bool,
         row: dict[str, Any],
     ) -> None:
-        """Assegna il valore della colonna: PK, FK/duplicato, variazione o template."""
+        """Assegna il valore della colonna: PK, UNIQUE, FK/duplicato, variazione o template."""
         if column.is_pk:
             row[column.name] = self._unique_pk_value(
                 column, template_value, instance_index, used_pk[column.name]
+            )
+        elif column.is_unique and not column.is_fk and column.name in used_unique:
+            row[column.name] = self._unique_value(
+                column, template_value, instance_index, used_unique[column.name]
             )
         elif column.is_fk or duplicate:
             row[column.name] = template_value
@@ -180,18 +251,14 @@ class RowBuilder:
         column: ColumnSchema, template_value: Any, instance_index: int, used: set[Any]
     ) -> Any:
         """Genera un valore PK univoco partendo dal template (sequenziale per int)."""
-        if is_integer_type(column.data_type):
-            base = template_value if isinstance(template_value, int) else 1
-            candidate = base + instance_index
-            while candidate in used:
-                candidate += 1
-        else:
-            base = template_value if template_value is not None else column.name
-            candidate = base if instance_index == 0 else f"{base}_{instance_index}"
-            while candidate in used:
-                candidate = f"{candidate}_"
-        used.add(candidate)
-        return candidate
+        return _generate_unique(column, template_value, instance_index, used)
+
+    @staticmethod
+    def _unique_value(
+        column: ColumnSchema, template_value: Any, instance_index: int, used: set[Any]
+    ) -> Any:
+        """Genera un valore UNIQUE univoco partendo dal template."""
+        return _generate_unique(column, template_value, instance_index, used)
 
     @staticmethod
     def _vary_value(
