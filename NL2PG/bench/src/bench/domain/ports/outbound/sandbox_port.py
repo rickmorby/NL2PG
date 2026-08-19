@@ -7,6 +7,8 @@ from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from typing import Any, Generator
 
+from bench.domain.models.data import SchemaModel
+
 
 class SandboxPort(ABC):
     """Porta outbound per l'amministrazione degli schemi temporanei sandbox ed esecuzione AST."""
@@ -22,6 +24,10 @@ class SandboxPort(ABC):
     @abstractmethod
     def execute_inserts(self, schema: str, inserts: str) -> None:
         """Valida l'AST ed inserisce i dati sintetici nello schema temporaneo."""
+
+    @abstractmethod
+    def introspect_schema(self, schema: str) -> SchemaModel:
+        """Restituisce il modello dello schema (tabelle, colonne, PK, FK) da information_schema."""
 
     @abstractmethod
     def run_query(self, schema: str, query: str) -> tuple[list[str], list[tuple[Any, ...]]]:

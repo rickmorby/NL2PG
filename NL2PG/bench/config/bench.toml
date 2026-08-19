@@ -27,3 +27,13 @@ max_regens = 2
 
 [critic]
 weights = { narrative = 1.0, distractors = 1.0, plot_twists = 1.0, jargon = 1.0, sql_composition = 1.5 }
+
+[data]
+nature_ranges = { lookup = [5, 50], dimension = [100, 800], fact = [300, 3000] }
+max_rows_per_table = 3000
+max_total_rows = 30000
+batch_size = 100
+null_rate = 0.05
+dup_rate = 0.03
+outlier_rate = 0.02
+preview_size = 8

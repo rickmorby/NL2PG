@@ -68,5 +68,37 @@ class ConfigPort(ABC):
         """Soglia di fallimenti per il warning di categoria ([cli].category_failure_warning)."""
 
     @abstractmethod
+    def data_nature_ranges(self) -> dict[str, tuple[int, int]]:
+        """Range di righe per natura di tabella ([data].nature_ranges)."""
+
+    @abstractmethod
+    def data_max_rows_per_table(self) -> int:
+        """Massimo righe per tabella materializzabile ([data].max_rows_per_table)."""
+
+    @abstractmethod
+    def data_max_total_rows(self) -> int:
+        """Massimo righe totali per task ([data].max_total_rows)."""
+
+    @abstractmethod
+    def data_batch_size(self) -> int:
+        """Dimensione dei batch INSERT ([data].batch_size)."""
+
+    @abstractmethod
+    def data_null_rate(self) -> float:
+        """Tasso di NULL iniettati su colonne nullable ([data].null_rate)."""
+
+    @abstractmethod
+    def data_dup_rate(self) -> float:
+        """Tasso di righe duplicate per tabella ([data].dup_rate)."""
+
+    @abstractmethod
+    def data_outlier_rate(self) -> float:
+        """Tasso di outlier entro i limiti dichiarati ([data].outlier_rate)."""
+
+    @abstractmethod
+    def data_preview_size(self) -> int:
+        """Numero di righe reali mostrate nel profilo dati ([data].preview_size)."""
+
+    @abstractmethod
     def config_hash(self, cfg: dict) -> str:
         """Calcola l'hash SHA256 di una configurazione per identificare la run."""

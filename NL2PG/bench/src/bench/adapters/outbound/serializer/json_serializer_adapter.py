@@ -69,7 +69,9 @@ class JsonBenchmarkSerializerAdapter(BenchmarkSerializerPort):
             "question": state.question.question if state.question else "",
             "gold": {
                 "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
+                "data_spec": state.data_spec.model_dump() if state.data_spec else None,
                 "data_inserts": state.data_inserts.inserts if state.data_inserts else "",
+                "data_profile": state.data_profile.model_dump() if state.data_profile else None,
                 "query": state.gold_query.query if state.gold_query else "",
                 "result": {
                     "columns": state.gold_result.columns if state.gold_result else [],

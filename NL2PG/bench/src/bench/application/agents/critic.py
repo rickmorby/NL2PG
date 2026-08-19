@@ -20,7 +20,7 @@ class CriticAgent(AbstractAgent):
         return {
             "spec": state.spec.model_dump_json() if state.spec else "{}",
             "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
-            "data_inserts": state.data_inserts.inserts if state.data_inserts else "",
+            "data_profile": state.data_profile.model_dump_json() if state.data_profile else "{}",
             "gold_query": state.gold_query.query if state.gold_query else "",
             "story": state.story.story if state.story else "",
             "question": state.question.question if state.question else "",

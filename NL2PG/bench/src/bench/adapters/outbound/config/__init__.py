@@ -35,6 +35,20 @@ class ConfigAdapter(ConfigPort):
         "critic": {"weights": {}},
         "thresholds": {"critic_high": 6.0},
         "judge": {"max_regens": 2},
+        "data": {
+            "nature_ranges": {
+                "lookup": [5, 50],
+                "dimension": [100, 800],
+                "fact": [300, 3000],
+            },
+            "max_rows_per_table": 3000,
+            "max_total_rows": 30000,
+            "batch_size": 100,
+            "null_rate": 0.05,
+            "dup_rate": 0.03,
+            "outlier_rate": 0.02,
+            "preview_size": 8,
+        },
         "cli": {"max_consecutive_failures": 5, "category_failure_warning": 5},
     }
 
@@ -106,6 +120,39 @@ class ConfigAdapter(ConfigPort):
     def cli_category_failure_warning(self) -> int:
         """Restituisce la soglia di fallimenti per il warning di categoria."""
         return int(self._section("cli")["category_failure_warning"])
+
+    def data_nature_ranges(self) -> dict[str, tuple[int, int]]:
+        """Restituisce i range di righe per natura di tabella."""
+        raw = dict(self._section("data")["nature_ranges"])
+        return {k: (int(v[0]), int(v[1])) for k, v in raw.items()}
+
+    def data_max_rows_per_table(self) -> int:
+        """Restituisce il massimo di righe per tabella materializzabile."""
+        return int(self._section("data")["max_rows_per_table"])
+
+    def data_max_total_rows(self) -> int:
+        """Restituisce il massimo di righe totali per task."""
+        return int(self._section("data")["max_total_rows"])
+
+    def data_batch_size(self) -> int:
+        """Restituisce la dimensione dei batch INSERT."""
+        return int(self._section("data")["batch_size"])
+
+    def data_null_rate(self) -> float:
+        """Restituisce il tasso di NULL su colonne nullable."""
+        return float(self._section("data")["null_rate"])
+
+    def data_dup_rate(self) -> float:
+        """Restituisce il tasso di righe duplicate."""
+        return float(self._section("data")["dup_rate"])
+
+    def data_outlier_rate(self) -> float:
+        """Restituisce il tasso di outlier entro i limiti dichiarati."""
+        return float(self._section("data")["outlier_rate"])
+
+    def data_preview_size(self) -> int:
+        """Restituisce il numero di righe reali mostrate nel profilo dati."""
+        return int(self._section("data")["preview_size"])
 
     def load_providers(self) -> dict:
         """Restituisce il contenuto di providers.json come dict."""

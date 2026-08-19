@@ -34,10 +34,10 @@ class QueryAgent(AbstractAgent):
         return "query"
 
     def build_kwargs(self, state: TaskStateDTO) -> dict:
-        """Costruisce i kwargs per il prompt con schema_ddl, data_inserts e feature_sql."""
+        """Costruisce i kwargs per il prompt con schema_ddl, data_profile e feature_sql."""
         return {
             "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
-            "data_inserts": state.data_inserts.inserts if state.data_inserts else "",
+            "data_profile": state.data_profile.model_dump_json() if state.data_profile else "{}",
             "feature_sql": state.spec.sql_features if state.spec else [],
             "few_shot": self._few_shot(state),
         }

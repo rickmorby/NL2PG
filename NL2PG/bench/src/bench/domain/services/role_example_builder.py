@@ -29,29 +29,29 @@ class RoleExampleBuilder:
 
     @staticmethod
     def _data_example(task: dict) -> dict:
-        """Esempio data: spec + schema_ddl -> data_inserts."""
+        """Esempio data: spec + schema_ddl -> data_spec (la DataSpec sostituisce le INSERT)."""
         return {
             "spec": task["spec"],
             "schema_ddl": task["gold"]["schema_ddl"],
-            "data_inserts": task["gold"]["data_inserts"],
+            "data_spec": task["gold"]["data_spec"],
         }
 
     @staticmethod
     def _query_example(task: dict) -> dict:
-        """Esempio query: schema_ddl + data_inserts + feature_sql -> query gold."""
+        """Esempio query: schema_ddl + data_profile + feature_sql -> query gold."""
         return {
             "schema_ddl": task["gold"]["schema_ddl"],
-            "data_inserts": task["gold"]["data_inserts"],
+            "data_profile": task["gold"]["data_profile"],
             "feature_sql": task["spec"]["sql_features"],
             "query": task["gold"]["query"],
         }
 
     @staticmethod
     def _story_example(task: dict) -> dict:
-        """Esempio story: schema_ddl + data_inserts -> story."""
+        """Esempio story: schema_ddl + data_profile -> story."""
         return {
             "schema_ddl": task["gold"]["schema_ddl"],
-            "data_inserts": task["gold"]["data_inserts"],
+            "data_profile": task["gold"]["data_profile"],
             "story": task["story"],
         }
 

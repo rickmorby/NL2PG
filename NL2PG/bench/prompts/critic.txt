@@ -91,7 +91,7 @@ NON USARE PUNTEGGI FUORI DALL'INTERVALLO [1.0, 10.0] (ERRATO):
 <input_context>
 <spec>{spec}</spec>
 <schema_ddl>{schema_ddl}</schema_ddl>
-<data_inserts>{data_inserts}</data_inserts>
+<data_profile>{data_profile}</data_profile>
 <gold_query>{gold_query}</gold_query>
 <storia>{story}</storia>
 <domanda>{question}</domanda>

@@ -16,7 +16,11 @@ from sqlglot.errors import ParseError, TokenError
 
 from bench.adapters.outbound.postgres.data_mutator import PostgresDataMutator
 from bench.adapters.outbound.postgres.database_adapter import PostgresClientAdapter
+from bench.adapters.outbound.postgres.schema_introspector import (
+    introspect_schema as introspect_schema_model,
+)
 from bench.domain.exceptions import DatabaseClientError
+from bench.domain.models.data import SchemaModel
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
 from bench.domain.services.sql_repair import PostgresSQLRepair
 
@@ -71,6 +75,12 @@ class PostgresSandboxAdapter(SandboxPort):
         with self._client.get_sandbox_connection(schema) as conn, conn.transaction():
             for stmt in statements:
                 self._client.execute_prepared(conn, stmt)
+
+    def introspect_schema(self, schema: str) -> SchemaModel:
+        """Costruisce il SchemaModel corrente dello schema temporaneo da information_schema."""
+        self._validate_schema_name(schema)
+        with self._client.get_sandbox_connection(schema) as conn:
+            return introspect_schema_model(conn, schema)
 
     def run_query(self, schema: str, query: str) -> tuple[list[str], list[tuple[Any, ...]]]:
         """Valida che la query sia una SELECT read-only ed esegue la lettura nello schema."""

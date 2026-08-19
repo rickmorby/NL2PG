@@ -26,7 +26,7 @@ class StoryAgent(AbstractAgent):
             twist_rules = [r.model_dump() for r in state.spec.twist_rules]
         return {
             "schema_ddl": state.schema_ddl.ddl if state.schema_ddl else "",
-            "data_inserts": state.data_inserts.inserts if state.data_inserts else "",
+            "data_profile": state.data_profile.model_dump_json() if state.data_profile else "{}",
             "intent_query": state.gold_query.intent if state.gold_query else "",
             "twist": state.spec.twist if state.spec else [],
             "twist_rules": twist_rules,

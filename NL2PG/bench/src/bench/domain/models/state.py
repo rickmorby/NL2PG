@@ -7,6 +7,7 @@ from pydantic import field_validator
 
 from bench.domain.exceptions.domain_exc import DomainValidationError
 from bench.domain.models.base import AbstractDTO
+from bench.domain.models.data import DataProfileDTO, DataSpecDTO
 from bench.domain.models.nlp import CalibrationResultDTO, CriticScoresDTO, QuestionDTO, StoryDTO
 from bench.domain.models.spec import SpecDTO
 from bench.domain.models.sql import DataInsertsDTO, GoldQueryDTO, GoldResultDTO, SchemaDDLDTO
@@ -24,7 +25,9 @@ class TaskStateDTO(AbstractDTO):
     sandbox_schema: str = ""
     spec: SpecDTO | None = None
     schema_ddl: SchemaDDLDTO | None = None
+    data_spec: DataSpecDTO | None = None
     data_inserts: DataInsertsDTO | None = None
+    data_profile: DataProfileDTO | None = None
     gold_query: GoldQueryDTO | None = None
     gold_result: GoldResultDTO | None = None
     story: StoryDTO | None = None
