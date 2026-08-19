@@ -175,9 +175,12 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
         max_idx = ys.index(max(ys))
         mode_r, count = xs[max_idx], ys[max_idx]
         perc = round((count / tot) * 100, 1)
+        min_r, max_r = xs[0], xs[-1]
+        if min_r == max_r:
+            return f"Tutti i risultati hanno cardinalità {mode_r}, senza set vuoti."
         return (
-            f"Il {perc}% delle query produce {mode_r.lower()}, "
-            f"garantendo verificabilita' immediata e assenza di set vuoti."
+            f"La cardinalità più frequente è {mode_r} ({perc}% dei task); "
+            f"i risultati spaziano da {min_r} a {max_r}, senza set vuoti."
         )
 
     def xlabel(self) -> str:
@@ -189,9 +192,9 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
         return "Conteggio Query"
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
-        """Estrae la cardinalità del risultato Gold."""
-        rows = [t.get("gold", {}).get("result", []) for t in tasks]
-        counts = Counter([len(r) for r in rows])
-        xs = [f"{k} righe" for k in sorted(counts.keys())] or ["1 riga"]
+        """Estrae la cardinalità del risultato Gold (numero di righe restituite)."""
+        rows = [t.get("gold", {}).get("result", {}).get("rows", []) for t in tasks]
+        counts = Counter(len(r) for r in rows)
+        xs = [f"{k} riga" if k == 1 else f"{k} righe" for k in sorted(counts.keys())] or ["1 riga"]
         ys = [counts[k] for k in sorted(counts.keys())] or [1]
         return xs, ys
