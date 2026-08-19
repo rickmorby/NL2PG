@@ -13,7 +13,7 @@ Il modello deve dedurre dinamicamente lo schema del database a partire da un tes
 NON sono di nostro interesse:
 
 - Formati complessi (JSON, XML, Array)
-- Ottimizzazioni (Viste materializzate, Partizioni, TABLESAMPLE)
+- Ottimizzazioni (Viste materializzate, TABLESAMPLE). Il partizionamento è escluso come tecnica di ottimizzazione delle query, mentre lo schema pattern della tabella partizionata è incluso (S35): è trasparente alle query, che restano SQL ordinario.
 - Ricerca Full-Text nativa (`tsvector`/`tsquery`)
 - Generazione fittizia di dati
 - Interazioni Multi-Turn o conversazionali
@@ -495,3 +495,67 @@ NON sono di nostro interesse:
   - `SELECT title FROM books WHERE genre = ?`
 - **Riferimenti**:
   - **Paper:** [Hazoom, M. et al., 2021. "Text-to-SQL in the wild: A naturally-occurring dataset based on Stack Exchange data (SEDE)."](https://arxiv.org/abs/2106.05006)
+
+> **STATO: ESCLUSA — verificata con esecuzione su PostgreSQL 17** (doppio controllo, vedi `doc_bench/pg_verification_report.md`).
+> I placeholder `?` e `@UserId` non sono sintassi PostgreSQL: `SELECT 1 WHERE 1 = ?` → `syntax error`;
+> `SELECT 1 WHERE 1 = @UserId` → `column \"userid\" does not exist`. L'unica forma nativa è `PREPARE ... $1`,
+> ma una gold query con parametri non è eseguibile standalone (`there is no parameter $1`).
+> → Q47 **rimossa dal catalogo** e nessuna categoria Q47×S sarà generata.
+
+## 48. SELECT DISTINCT query (Interrogazione con SELECT DISTINCT)
+
+- **Descrizione**: eliminazione dei duplicati dalle righe del risultato tramite `SELECT DISTINCT`, senza aggregazione
+- **Esempi**:
+  - `SELECT DISTINCT Country FROM singer`
+  - `SELECT DISTINCT category_id FROM products`
+  - `SELECT DISTINCT status FROM orders`
+- **Riferimenti**:
+  - **Documentazione PostgreSQL**: [sql-select.html#SQL-DISTINCT](https://www.postgresql.org/docs/current/sql-select.html#SQL-DISTINCT)
+
+## 49. IS DISTINCT FROM predicate (Predicato IS DISTINCT FROM)
+
+- **Descrizione**: confronto di disuguaglianza NULL-safe: `a IS DISTINCT FROM b` è vero anche quando un operando è `NULL` (a differenza di `<>`)
+- **Esempi**:
+  - `SELECT Name FROM customer WHERE phone_number IS DISTINCT FROM '000'`
+  - `SELECT id FROM orders WHERE deleted_at IS DISTINCT FROM NULL`
+  - `SELECT title FROM documents WHERE last_modified_by IS DISTINCT FROM current_user_id`
+- **Riferimenti**:
+  - **Documentazione PostgreSQL**: [functions-comparison](https://www.postgresql.org/docs/current/functions-comparison.html)
+
+## 50. Boolean predicates (Predicati booleani)
+
+- **Descrizione**: utilizzo di colonne booleane e predicati `IS TRUE`, `IS FALSE`, `IS UNKNOWN`, `NOT` come condizione diretta nel `WHERE`
+- **Esempi**:
+  - `SELECT Name FROM users WHERE is_active IS TRUE`
+  - `SELECT id FROM orders WHERE NOT is_cancelled AND amount > 100`
+  - `SELECT title FROM products WHERE in_stock IS FALSE`
+- **Riferimenti**:
+  - **Documentazione PostgreSQL**: [functions-logical](https://www.postgresql.org/docs/current/functions-logical.html)
+
+## 51. OVERLAPS condition (Condizione OVERLAPS)
+
+- **Descrizione**: verifica di sovrapposizione di due intervalli temporali definiti da coppie di date/timestamp tramite l'operatore `OVERLAPS`
+- **Esempi**:
+  - `SELECT * FROM events WHERE (start_date, end_date) OVERLAPS ('2026-01-01', '2026-02-01')`
+  - `SELECT id FROM campaigns WHERE (valid_from, valid_to) OVERLAPS (CURRENT_DATE, CURRENT_DATE + 30)`
+- **Riferimenti**:
+  - **Documentazione PostgreSQL**: [functions-datetime.html#FUNCTIONS-DATETIME-OVERLAP](https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-OVERLAP)
+
+## 52. OFFSET / FETCH pagination (Paginazione OFFSET / FETCH)
+
+- **Descrizione**: paginazione del risultato tramite `OFFSET n ROWS` e `FETCH FIRST m ROWS ONLY` (alternativa standard a `LIMIT`)
+- **Esempi**:
+  - `SELECT name FROM employees ORDER BY salary DESC OFFSET 10 ROWS FETCH FIRST 5 ROWS ONLY`
+  - `SELECT title FROM articles ORDER BY published_at DESC OFFSET 20 FETCH NEXT 10 ROWS ONLY`
+- **Riferimenti**:
+  - **Documentazione PostgreSQL**: [queries-limit](https://www.postgresql.org/docs/current/queries-limit.html)
+
+## 53. Ordered-set aggregate (Aggregati ordinati)
+
+- **Descrizione**: aggregati che operano su un ordinamento esplicito (`WITHIN GROUP (ORDER BY ...)`): `percentile_cont`, `percentile_disc`, `mode`, varianti `WITHIN GROUP` di `rank`
+- **Esempi**:
+  - `SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY salary) FROM employees`
+  - `SELECT mode() WITHIN GROUP (ORDER BY category) FROM products`
+  - `SELECT department, percentile_disc(0.9) WITHIN GROUP (ORDER BY amount) FROM sales GROUP BY department`
+- **Riferimenti**:
+  - **Documentazione PostgreSQL**: [functions-aggregate.html#FUNCTIONS-ORDEREDSET-TABLE](https://www.postgresql.org/docs/current/functions-aggregate.html#FUNCTIONS-ORDEREDSET-TABLE)

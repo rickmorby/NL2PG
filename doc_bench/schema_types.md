@@ -13,7 +13,7 @@ Il modello deve dedurre dinamicamente lo schema del database a partire da un tes
 NON sono di nostro interesse:
 
 - Modelli di dati complessi non relazionali (JSON, XML, Array nativi).
-- Strutture fisiche o di ottimizzazione (Viste materializzate, Partizioni, Indici specifici, Tablespaces).
+- Strutture fisiche o di ottimizzazione (Viste materializzate, Indici specifici, Tablespaces). Il partizionamento dichiarativo come pattern di schema è incluso (S35, trasparente alle query); è escluso solo come tecnica di ottimizzazione delle query.
 - Configurazioni specifiche di ricerca Full-Text nativa o di estensioni (PostGIS, pgvector).
 
 ## 1. Single-entity extraction (Estrazione di entità singola)
@@ -298,6 +298,60 @@ NON sono di nostro interesse:
 - **Riferimenti:**
   - **Paper:** [Chen, P. B. et al., 2024. "BEAVER: An Enterprise Benchmark for Text-to-SQL."](https://arxiv.org/abs/2409.02038)
   - **Paper:** [Zhao, A. et al., 2024. "SQaLe: Evaluating Text-to-SQL Systems with Large-Scale Enterprise Schemas."](https://arxiv.org/abs/2404.03053)
+
+## 31. Denormalized schema (Schema denormalizzato)
+
+- **Descrizione:** attributi che sarebbero normalizzati in tabelle collegate vengono incorporati come nomi ripetuti nella stessa tabella (es. `category_name`, `supplier_name`), riducendo i join ma introducendo ridondanza controllata
+- **Esempi:**
+  - `CREATE TABLE product (id INT PRIMARY KEY, name TEXT, category_name TEXT, supplier_name TEXT)`
+  - `CREATE TABLE sale (id INT PRIMARY KEY, product_name TEXT, store_name TEXT, amount NUMERIC)`
+- **Riferimenti:**
+  - **Documentazione PostgreSQL:** [ddl-basics](https://www.postgresql.org/docs/current/ddl-basics.html)
+
+## 32. Audit columns (Colonne di audit)
+
+- **Descrizione:** colonne che tracciano creazione/modifica dei record (`created_at`, `created_by`, `updated_at`, `updated_by`), utili per interrogazioni su recency e responsabilità
+- **Esempi:**
+  - `CREATE TABLE audited_row (id INT PRIMARY KEY, value TEXT, created_at TIMESTAMPTZ DEFAULT now(), created_by TEXT, updated_at TIMESTAMPTZ, updated_by TEXT)`
+  - `CREATE TABLE document (id INT PRIMARY KEY, content TEXT, created_at TIMESTAMP DEFAULT now(), last_modified_by TEXT)`
+- **Riferimenti:**
+  - **Documentazione PostgreSQL:** [functions-datetime.html#FUNCTIONS-DATETIME-CURRENT](https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT)
+
+## 33. Generated columns (Colonne generate)
+
+- **Descrizione:** colonne calcolate automaticamente da altre colonne della stessa riga tramite `GENERATED ALWAYS AS (...) STORED`, sempre coerenti con i dati di origine
+- **Esempi:**
+  - `CREATE TABLE line_item (id INT PRIMARY KEY, qty INT, unit_price NUMERIC, total NUMERIC GENERATED ALWAYS AS (qty * unit_price) STORED)`
+  - `CREATE TABLE citizen (id INT PRIMARY KEY, age INT, is_adult BOOLEAN GENERATED ALWAYS AS (age >= 18) STORED)`
+- **Riferimenti:**
+  - **Documentazione PostgreSQL:** [ddl-generated-columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html)
+
+## 34. Optional relationship (Relazione opzionale)
+
+- **Descrizione:** relazione 1:N in cui il riferimento al padre può mancare (FK nullable), tipica per relazioni facoltative o informazioni non ancora assegnate
+- **Esempi:**
+  - `CREATE TABLE project (id INT PRIMARY KEY, name TEXT, owner_id INT REFERENCES employee(id))`
+  - `CREATE TABLE task (id INT PRIMARY KEY, title TEXT, assignee_id INT REFERENCES user_account(id))`
+- **Riferimenti:**
+  - **Documentazione PostgreSQL:** [ddl-constraints.html#DDL-CONSTRAINTS-FK](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-FK)
+
+## 35. Partitioned table (Tabella partizionata)
+
+- **Descrizione:** tabella logicamente unica divisa in partizioni dichiarative (`PARTITION BY RANGE/LIST/HASH`), trasparente alle query che restano SQL ordinario; pattern tipico per dati temporali o voluminosi
+- **Esempi:**
+  - `CREATE TABLE sensor_reading (id BIGINT, device_id INT, temp NUMERIC, read_at TIMESTAMPTZ NOT NULL) PARTITION BY RANGE (read_at)`
+  - `CREATE TABLE sensor_reading_2025 PARTITION OF sensor_reading FOR VALUES FROM ('2025-01-01') TO ('2026-01-01')`
+- **Riferimenti:**
+  - **Documentazione PostgreSQL:** [ddl-partitioning](https://www.postgresql.org/docs/current/ddl-partitioning.html)
+
+## 36. Composite-typed column (Colonna di tipo composito)
+
+- **Descrizione:** colonna il cui tipo è un tipo composito definito dall'utente (`CREATE TYPE ... AS (...)`), con accesso ai campi tramite notazione `(colonna).campo` o `colonna.campo`
+- **Esempi:**
+  - `CREATE TYPE address_type AS (street TEXT, city TEXT, zip TEXT); CREATE TABLE contact (id INT PRIMARY KEY, name TEXT, address address_type)`
+  - `SELECT (address).city FROM contact WHERE (address).zip = '00100'`
+- **Riferimenti:**
+  - **Documentazione PostgreSQL:** [rowtypes](https://www.postgresql.org/docs/current/rowtypes.html)
 
 ## 29. Column Equivalence & Splitting (Equivalenza o suddivisione di colonne)
 
