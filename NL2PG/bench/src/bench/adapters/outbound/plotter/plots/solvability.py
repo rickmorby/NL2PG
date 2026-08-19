@@ -3,7 +3,7 @@
 :author: Riccardo Morabito
 """
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from typing import Any
 
 from seaborn import boxplot, lineplot
@@ -13,16 +13,6 @@ from bench.adapters.outbound.plotter.base import AbstractPlot
 from bench.adapters.outbound.plotter.heatmap_plot import AbstractHeatmapPlot
 
 _HARD_COL_INDEX = 2
-
-_TWIST_CANONICAL_ORDER = [
-    "rename",
-    "synonym",
-    "jargon",
-    "polysemy",
-    "ambiguity",
-    "rephrase",
-    "distractor",
-]
 
 
 class SqlFeaturePassrateImpactPlot(AbstractBarPlot):
@@ -203,15 +193,13 @@ class TwistVsDifficultyHeatmapPlot(AbstractHeatmapPlot):
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> list[list[int]]:
         """Calcola la matrice bivariata (Twist vs Difficoltà) sui tipi presenti nei task."""
-        present: set[str] = set()
+        type_counts: Counter = Counter()
         for t in tasks:
             for tr in (t.get("spec") or {}).get("twist_rules", []):
-                present.add(tr.get("twist_type", "").lower())
-        self._twist_types = [tt for tt in _TWIST_CANONICAL_ORDER if tt in present] + sorted(
-            present - set(_TWIST_CANONICAL_ORDER)
-        )
-        if not self._twist_types:
-            self._twist_types = ["rename"]
+                ttype = tr.get("twist_type", "").lower()
+                if ttype:
+                    type_counts[ttype] += 1
+        self._twist_types = [tt for tt, _ in type_counts.most_common()] or ["rename"]
         counts = {tt: {d: 0 for d in self._difficulties} for tt in self._twist_types}
         for t in tasks:
             diff = (t.get("difficulty") or {}).get("label", "easy").lower()

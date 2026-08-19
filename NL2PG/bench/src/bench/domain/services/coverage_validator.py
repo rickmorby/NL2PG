@@ -15,7 +15,6 @@ from bench.domain.models.nlp import QuestionDTO, StoryDTO
 from bench.domain.models.spec import SpecDTO, TwistRuleDTO
 from bench.domain.models.sql import GoldQueryDTO
 
-_MAPPING_TWISTS = frozenset({"rename", "synonym", "jargon", "rephrase", "polysemy"})
 _RE_IS_DATE_LIKE = re_compile(r"^\d{4}[-/]\d{1,2}(?:[-/]\d{1,2})?$|^\d{1,2}[-/]\d{1,2}[-/]\d{4}$")
 
 
@@ -32,11 +31,15 @@ class CoverageValidator:
 
     @staticmethod
     def _map_table_name(name: str, twist_rules: list[TwistRuleDTO]) -> str:
-        """Applica il mapping inverso per ricondurre il nome tabella alla forma originale."""
+        """Applica il mapping inverso per ricondurre il nome tabella alla forma originale.
+
+        Il contratto TwistRule e' identico per ogni tipo di twist (target_value = entita'
+        reale, obsolete_value = perifrasi in prosa): il mapping scatta quando il target
+        coincide con il nome tabella, senza filtrare per tipo di twist.
+        """
         for rule in twist_rules:
             if (
-                rule.twist_type in _MAPPING_TWISTS
-                and rule.target_value
+                rule.target_value
                 and rule.obsolete_value
                 and (rule.target_value.lower() in name or name in rule.target_value.lower())
             ):
