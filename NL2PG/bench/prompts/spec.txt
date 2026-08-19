@@ -10,7 +10,7 @@ Il JSON di output deve contenere esclusivamente le chiavi: "domain", "n_tables",
 
 <rules_and_guidelines>
 1. **Selezione Dominio**: Se `<target_domain>` è specificato e non vuoto, DEVI impostare il campo "domain" esattamente a quel valore. Altrimenti sceglilo da `<available_domains>`.
-2. **Dimensionamento Schema**: Imposta `n_tables` come numero intero compreso rigorosamente tra 1 e 5 (`1 <= n_tables <= 5`), in aderenza con `<schema_type>`.
+2. **Dimensionamento Schema**: Imposta `n_tables` ESATTAMENTE al valore indicato in `<target_n_tables>`. Questo valore e' stato scelto deterministicamente all'interno dell'intervallo ammesso per la categoria (`<n_tables_range>`), in aderenza con `<schema_type>`. Il numero di tabelle NON e' fisso: cambia da categoria a categoria in base alla complessita' dello schema e della query attesa.
 3. **Selezione Feature SQL**: Scegli un sottoinsieme di `sql_features` appartenenti ESCLUSIVAMENTE a `<allowed_sql_features>`. NON aggiungere mai feature non presenti nella lista fornita.
 4. **Selezione Twist**: Scegli un sottoinsieme di `twist` appartenenti ESCLUSIVAMENTE a `<allowed_twists>`.
 5. **Generazione Regole Twist (`twist_rules`)**: Per OGNI elemento scelto in `twist`, DEVI creare esattamente un oggetto `TwistRule` contenente:
@@ -54,7 +54,7 @@ NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
 NON USARE VALORI O STRUTTURE FUORI CONTRATTO (ERRATO):
 {
   "domain": "università",
-  "n_tables": 12, // SBAGLIATO! n_tables deve essere compreso tra 1 e 5.
+  "n_tables": 12, // SBAGLIATO! n_tables non corrisponde a <target_n_tables> indicato.
   "twist": ["rename"],
   "twist_rules": [] // SBAGLIATO! twist ha 1 elemento ma twist_rules è vuoto!
 }
@@ -64,7 +64,7 @@ NON USARE VALORI O STRUTTURE FUORI CONTRATTO (ERRATO):
 <forbidden_actions>
 - DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
 - DIVIETO 2: NON inserire `sql_features` o `twist` non inclusi negli elenchi consentiti.
-- DIVIETO 3: NON impiegare `n_tables` minori di 1 o maggiori di 5.
+- DIVIETO 3: NON impostare `n_tables` ad un valore diverso da `<target_n_tables>` (il range per categoria e' `<n_tables_range>`).
 </forbidden_actions>
 
 <input_context>
@@ -75,13 +75,15 @@ NON USARE VALORI O STRUTTURE FUORI CONTRATTO (ERRATO):
 <category_description>{cat_descrizione}</category_description>
 <available_domains>{domains}</available_domains>
 <target_domain>{target_domain}</target_domain>
+<n_tables_range>{n_tables_range}</n_tables_range>
+<target_n_tables>{target_n_tables}</target_n_tables>
 <few_shot>{few_shot}</few_shot>
 </input_context>
 
 <chain_of_thought_protocol>
 1. Analizza la categoria, la descrizione e i vincoli in ingresso.
 2. Scegli il dominio aziendale idoneo tra quelli forniti.
-3. Determina il numero di tabelle (1-5) e la gerarchia in base a `<schema_type>`.
+3. Determina il numero di tabelle (`n_tables`) esattamente uguale a `<target_n_tables>` e la gerarchia in base a `<schema_type>`.
 4. Seleziona le feature SQL richieste e le tipologie di twist da applicare.
 5. Per ogni twist selezionato, compila la corrispondente `TwistRule`.
 6. Genera l'oggetto JSON puro valido conforme alla classe `Spec`.

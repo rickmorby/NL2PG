@@ -9,7 +9,7 @@ Il JSON di output deve contenere esclusivamente il campo "story".
 
 <rules_and_guidelines>
 1. **Risoluzione Rilievi Critic**: Correggi la narrazione per migliorare i punteggi di narrative, distractors o jargon.
-2. **Mantenimento Coverage Tabella**: Ogni nome esatto di tabella del DDL (o relativo `obsolete_value`) DEVE rimanere presente nella storia senza essere abbreviato.
+2. **Mantenimento Coverage Tabella**: Ogni nome esatto di tabella del DDL (o relativo `obsolete_value`) DEVE rimanere presente nella storia senza essere abbreviato. Il numero di tabelle non è fisso (può variare da 1 a 12): la copertura resta obbligatoria per ciascuna.
 3. **Mantenimento Letterali**: Tutti i valori letterali della query Gold DEVONO rimanere presenti nel testo.
 4. **DIVIETO GERGO DB**: Elimina qualsiasi residuo di terminologia informatica (*tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*).
 5. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).

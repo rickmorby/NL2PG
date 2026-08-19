@@ -42,6 +42,11 @@ class SchemaValidator(AbstractSandboxValidator):
         """Alias sigillato di ``validate_with_type`` per una firma tipizzata e stabile."""
         return self.validate_with_type(dto, schema, tipo_schema)
 
+    def table_count(self, schema: str) -> int:
+        """Restituisce il numero di tabelle effettivamente create nello schema sandbox."""
+        model = self._sandbox.introspect_schema(schema)
+        return len(model.tables)
+
     def _extract_sql(self, dto: AbstractDTO) -> str:
         """Estrae lo script DDL dal DTO."""
         if isinstance(dto, SchemaDDLDTO):

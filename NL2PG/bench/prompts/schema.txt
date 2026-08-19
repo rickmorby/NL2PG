@@ -25,6 +25,7 @@ Il JSON di output deve contenere esclusivamente il campo "ddl" con lo script SQL
    - `temporal_modeling`: includi colonne di validità temporale (es. `valid_from`, `valid_to`, `data_inizio`, `data_fine`).
    - `denormalized`: includi colonne ridondanti o derivate tipiche della denormalizzazione (es. `totale_speso` sulla tabella clienti, `saldo`, `n_ordini`).
    - Altri tipi (es. `single_entity`, `one_to_many`, `many_to_many`, `self_referencing` non richiesto): progetta uno schema relazionale normalizzato conforme alla gerarchia della `Spec`.
+   - **NUMERO DI TABELLE VARIABILE**: il numero esatto di tabelle da creare è fissato dal campo `n_tables` della `Spec` e può variare da task a task (da 1 a 12). Genera ESATTAMENTE quel numero di tabelle, né di più né di meno.
    Il campo `<category_description>` fornisce il contesto aggiuntivo della categoria: rispettalo.
 4. **Vincoli Relazionali Espliciti**:
    - Definisci sempre la Primary Key (`PRIMARY KEY`) per ogni tabella (usa chiavi naturali come `codice_fiscale` o surrogate come `id`).

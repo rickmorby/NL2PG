@@ -23,6 +23,10 @@
       ],
       "schema_type_ids": [
         1
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -39,6 +43,10 @@
       ],
       "schema_type_ids": [
         7
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -55,6 +63,10 @@
       ],
       "schema_type_ids": [
         11
+      ],
+      "n_tables_range": [
+        1,
+        4
       ]
     },
     {
@@ -79,6 +91,10 @@
       ],
       "schema_type_ids": [
         14
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -100,6 +116,10 @@
       ],
       "schema_type_ids": [
         17
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -116,6 +136,10 @@
       ],
       "schema_type_ids": [
         20
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -137,6 +161,10 @@
       ],
       "schema_type_ids": [
         26
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -158,6 +186,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -178,6 +210,10 @@
       ],
       "schema_type_ids": [
         28
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -199,6 +235,10 @@
       ],
       "schema_type_ids": [
         29
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -225,7 +265,11 @@
       "schema_type_ids": [
         31
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        2,
+        6
+      ]
     },
     {
       "id": "Q01_S34",
@@ -251,7 +295,11 @@
       "schema_type_ids": [
         34
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        2,
+        6
+      ]
     },
     {
       "id": "Q01_S36",
@@ -277,7 +325,11 @@
       "schema_type_ids": [
         36
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        1,
+        5
+      ]
     },
     {
       "id": "Q02_S01",
@@ -295,6 +347,10 @@
         2
       ],
       "schema_type_ids": [
+        1
+      ],
+      "n_tables_range": [
+        1,
         1
       ]
     },
@@ -315,6 +371,10 @@
       ],
       "schema_type_ids": [
         7
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -334,6 +394,10 @@
       ],
       "schema_type_ids": [
         11
+      ],
+      "n_tables_range": [
+        1,
+        4
       ]
     },
     {
@@ -358,6 +422,10 @@
       ],
       "schema_type_ids": [
         14
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -377,6 +445,10 @@
       ],
       "schema_type_ids": [
         17
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -405,6 +477,10 @@
       ],
       "feature_sql": [
         "scalar_agg"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -424,6 +500,10 @@
       ],
       "schema_type_ids": [
         20
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -446,6 +526,10 @@
       ],
       "schema_type_ids": [
         26
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -473,6 +557,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -497,6 +585,10 @@
       ],
       "schema_type_ids": [
         28
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -528,6 +620,10 @@
       ],
       "schema_type_ids": [
         29
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -556,6 +652,10 @@
       ],
       "feature_sql": [
         "scalar_agg"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -584,6 +684,10 @@
       ],
       "feature_sql": [
         "scalar_agg"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -612,6 +716,10 @@
       ],
       "feature_sql": [
         "scalar_agg"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -636,6 +744,10 @@
       ],
       "schema_type_ids": [
         1
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -658,6 +770,10 @@
       ],
       "schema_type_ids": [
         7
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -683,6 +799,10 @@
       ],
       "schema_type_ids": [
         11
+      ],
+      "n_tables_range": [
+        1,
+        4
       ]
     },
     {
@@ -702,6 +822,10 @@
       ],
       "schema_type_ids": [
         14
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -730,6 +854,10 @@
       ],
       "feature_sql": [
         "top_n"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -754,6 +882,10 @@
       ],
       "schema_type_ids": [
         17
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -777,6 +909,10 @@
       ],
       "schema_type_ids": [
         20
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -796,6 +932,10 @@
       ],
       "schema_type_ids": [
         26
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -815,6 +955,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -839,6 +983,10 @@
       ],
       "schema_type_ids": [
         28
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -861,6 +1009,10 @@
       ],
       "schema_type_ids": [
         29
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -889,6 +1041,10 @@
       ],
       "feature_sql": [
         "top_n"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -917,6 +1073,10 @@
       ],
       "feature_sql": [
         "top_n"
+      ],
+      "n_tables_range": [
+        2,
+        8
       ]
     },
     {
@@ -947,6 +1107,10 @@
       "schema_type_ids": [
         27,
         30
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -966,6 +1130,10 @@
       ],
       "schema_type_ids": [
         2
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -985,6 +1153,10 @@
       ],
       "schema_type_ids": [
         4
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -1004,6 +1176,10 @@
       ],
       "schema_type_ids": [
         5
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -1023,6 +1199,10 @@
       ],
       "schema_type_ids": [
         8
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -1045,6 +1225,10 @@
       ],
       "schema_type_ids": [
         10
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -1073,6 +1257,10 @@
       ],
       "feature_sql": [
         "join"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -1092,6 +1280,10 @@
       ],
       "schema_type_ids": [
         23
+      ],
+      "n_tables_range": [
+        3,
+        5
       ]
     },
     {
@@ -1120,6 +1312,10 @@
       ],
       "feature_sql": [
         "join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -1139,6 +1335,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -1161,6 +1361,10 @@
       ],
       "schema_type_ids": [
         30
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -1189,6 +1393,10 @@
       ],
       "feature_sql": [
         "join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -1207,6 +1415,10 @@
         5
       ],
       "schema_type_ids": [
+        1
+      ],
+      "n_tables_range": [
+        1,
         1
       ]
     },
@@ -1227,6 +1439,10 @@
       ],
       "schema_type_ids": [
         7
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -1246,6 +1462,10 @@
       ],
       "schema_type_ids": [
         11
+      ],
+      "n_tables_range": [
+        1,
+        4
       ]
     },
     {
@@ -1265,6 +1485,10 @@
       ],
       "schema_type_ids": [
         14
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1284,6 +1508,10 @@
       ],
       "schema_type_ids": [
         17
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -1312,6 +1540,10 @@
       ],
       "feature_sql": [
         "group_agg"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -1335,6 +1567,10 @@
       ],
       "schema_type_ids": [
         20
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1363,6 +1599,10 @@
       ],
       "feature_sql": [
         "group_agg"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -1385,6 +1625,10 @@
       ],
       "schema_type_ids": [
         26
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1413,6 +1657,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -1437,6 +1685,10 @@
       ],
       "schema_type_ids": [
         28
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1459,6 +1711,10 @@
       ],
       "schema_type_ids": [
         29
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1487,6 +1743,10 @@
       ],
       "feature_sql": [
         "group_agg"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -1515,6 +1775,10 @@
       ],
       "feature_sql": [
         "group_agg"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -1543,6 +1807,10 @@
       ],
       "feature_sql": [
         "group_agg"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -1561,6 +1829,10 @@
         6
       ],
       "schema_type_ids": [
+        1
+      ],
+      "n_tables_range": [
+        1,
         1
       ]
     },
@@ -1581,6 +1853,10 @@
       ],
       "schema_type_ids": [
         7
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -1603,6 +1879,10 @@
       ],
       "schema_type_ids": [
         11
+      ],
+      "n_tables_range": [
+        1,
+        4
       ]
     },
     {
@@ -1622,6 +1902,10 @@
       ],
       "schema_type_ids": [
         14
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1646,6 +1930,10 @@
       ],
       "schema_type_ids": [
         17
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -1665,6 +1953,10 @@
       ],
       "schema_type_ids": [
         20
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1684,6 +1976,10 @@
       ],
       "schema_type_ids": [
         26
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1703,6 +1999,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -1729,6 +2029,10 @@
       ],
       "schema_type_ids": [
         28
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1753,6 +2057,10 @@
       ],
       "schema_type_ids": [
         29
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -1781,6 +2089,10 @@
       ],
       "feature_sql": [
         "conjunctive"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -1808,6 +2120,10 @@
       ],
       "schema_type_ids": [
         3
+      ],
+      "n_tables_range": [
+        3,
+        5
       ]
     },
     {
@@ -1831,6 +2147,10 @@
       ],
       "schema_type_ids": [
         6
+      ],
+      "n_tables_range": [
+        3,
+        5
       ]
     },
     {
@@ -1858,6 +2178,10 @@
       ],
       "schema_type_ids": [
         9
+      ],
+      "n_tables_range": [
+        3,
+        5
       ]
     },
     {
@@ -1882,6 +2206,10 @@
       ],
       "schema_type_ids": [
         19
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -1910,6 +2238,10 @@
       ],
       "feature_sql": [
         "multi_join"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -1938,6 +2270,10 @@
       ],
       "feature_sql": [
         "multi_join"
+      ],
+      "n_tables_range": [
+        2,
+        8
       ]
     },
     {
@@ -1957,6 +2293,10 @@
       ],
       "schema_type_ids": [
         2
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -1981,6 +2321,10 @@
       ],
       "schema_type_ids": [
         4
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -2004,6 +2348,10 @@
       ],
       "schema_type_ids": [
         5
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -2032,6 +2380,10 @@
       ],
       "feature_sql": [
         "self_join"
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -2055,6 +2407,10 @@
       ],
       "schema_type_ids": [
         8
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -2074,6 +2430,10 @@
       ],
       "schema_type_ids": [
         10
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -2102,6 +2462,10 @@
       ],
       "feature_sql": [
         "self_join"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -2130,6 +2494,10 @@
       ],
       "schema_type_ids": [
         23
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -2149,6 +2517,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -2171,6 +2543,10 @@
       ],
       "schema_type_ids": [
         30
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -2190,6 +2566,10 @@
         9
       ],
       "schema_type_ids": [
+        1
+      ],
+      "n_tables_range": [
+        1,
         1
       ]
     },
@@ -2211,6 +2591,10 @@
       ],
       "schema_type_ids": [
         7
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -2236,6 +2620,10 @@
       ],
       "schema_type_ids": [
         11
+      ],
+      "n_tables_range": [
+        1,
+        4
       ]
     },
     {
@@ -2260,6 +2648,10 @@
       ],
       "schema_type_ids": [
         14
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -2284,6 +2676,10 @@
       ],
       "schema_type_ids": [
         17
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -2308,6 +2704,10 @@
       ],
       "schema_type_ids": [
         20
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -2336,6 +2736,10 @@
       ],
       "feature_sql": [
         "having"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -2356,6 +2760,10 @@
       ],
       "schema_type_ids": [
         26
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -2381,6 +2789,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -2409,6 +2821,10 @@
       ],
       "schema_type_ids": [
         28
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -2436,6 +2852,10 @@
       ],
       "schema_type_ids": [
         29
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -2462,7 +2882,11 @@
       "schema_type_ids": [
         14
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        1,
+        5
+      ]
     },
     {
       "id": "Q10_S15",
@@ -2488,7 +2912,11 @@
       "schema_type_ids": [
         15
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        1,
+        3
+      ]
     },
     {
       "id": "Q11_Q12_Q02_S19",
@@ -2524,6 +2952,10 @@
       ],
       "schema_type_ids": [
         19
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -2557,6 +2989,10 @@
       "schema_type_ids": [
         19,
         27
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -2585,6 +3021,10 @@
       ],
       "feature_sql": [
         "subquery"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -2613,6 +3053,10 @@
       ],
       "feature_sql": [
         "subquery"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -2641,6 +3085,10 @@
       ],
       "feature_sql": [
         "subquery"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -2669,6 +3117,10 @@
       ],
       "feature_sql": [
         "subquery"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -2697,6 +3149,10 @@
       ],
       "feature_sql": [
         "subquery"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -2725,6 +3181,10 @@
       ],
       "feature_sql": [
         "correlated_subquery"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -2753,6 +3213,10 @@
       ],
       "feature_sql": [
         "correlated_subquery"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -2781,6 +3245,10 @@
       ],
       "feature_sql": [
         "correlated_subquery"
+      ],
+      "n_tables_range": [
+        3,
+        6
       ]
     },
     {
@@ -2809,6 +3277,10 @@
       ],
       "feature_sql": [
         "correlated_subquery"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -2837,6 +3309,10 @@
       ],
       "feature_sql": [
         "correlated_subquery"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -2865,6 +3341,10 @@
       ],
       "feature_sql": [
         "correlated_subquery"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -2893,6 +3373,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -2921,6 +3405,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -2949,6 +3437,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -2977,6 +3469,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        3,
+        6
       ]
     },
     {
@@ -3005,6 +3501,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -3033,6 +3533,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        3,
+        6
       ]
     },
     {
@@ -3061,6 +3565,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -3089,6 +3597,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -3117,6 +3629,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -3145,6 +3661,10 @@
       ],
       "feature_sql": [
         "exists"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -3171,6 +3691,10 @@
       "schema_type_ids": [
         28,
         26
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -3199,6 +3723,10 @@
       ],
       "feature_sql": [
         "set_op"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -3227,6 +3755,10 @@
       ],
       "feature_sql": [
         "set_op"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -3255,6 +3787,10 @@
       ],
       "feature_sql": [
         "set_op"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -3283,6 +3819,10 @@
       ],
       "feature_sql": [
         "set_op"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -3311,6 +3851,10 @@
       ],
       "feature_sql": [
         "set_op"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -3339,6 +3883,10 @@
       ],
       "feature_sql": [
         "set_op"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -3367,6 +3915,10 @@
       ],
       "feature_sql": [
         "set_op"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -3400,6 +3952,10 @@
       "schema_type_ids": [
         19,
         30
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -3431,6 +3987,10 @@
       "schema_type_ids": [
         19,
         27
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -3459,6 +4019,10 @@
       ],
       "feature_sql": [
         "cte"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -3487,6 +4051,10 @@
       ],
       "feature_sql": [
         "cte"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -3515,6 +4083,10 @@
       ],
       "feature_sql": [
         "cte"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -3543,6 +4115,10 @@
       ],
       "feature_sql": [
         "cte"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -3571,6 +4147,10 @@
       ],
       "feature_sql": [
         "cte"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -3592,6 +4172,10 @@
       "schema_type_ids": [
         7,
         27
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -3612,6 +4196,10 @@
       ],
       "schema_type_ids": [
         7
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -3640,6 +4228,10 @@
       ],
       "feature_sql": [
         "recursive_cte"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -3663,6 +4255,10 @@
       ],
       "schema_type_ids": [
         25
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -3691,6 +4287,10 @@
       ],
       "feature_sql": [
         "recursive_cte"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -3719,6 +4319,10 @@
       ],
       "feature_sql": [
         "recursive_cte"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -3751,6 +4355,10 @@
       "schema_type_ids": [
         19,
         27
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -3784,6 +4392,10 @@
       ],
       "schema_type_ids": [
         16
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -3805,6 +4417,10 @@
       "schema_type_ids": [
         16,
         17
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -3837,6 +4453,10 @@
       ],
       "schema_type_ids": [
         22
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -3856,6 +4476,10 @@
       ],
       "schema_type_ids": [
         7
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -3885,6 +4509,10 @@
       ],
       "schema_type_ids": [
         16
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -3913,6 +4541,10 @@
       ],
       "feature_sql": [
         "window"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -3941,6 +4573,10 @@
       ],
       "feature_sql": [
         "window"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -3969,6 +4605,10 @@
       ],
       "feature_sql": [
         "window"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -3997,6 +4637,10 @@
       ],
       "feature_sql": [
         "window"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -4025,6 +4669,10 @@
       ],
       "feature_sql": [
         "window"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -4053,6 +4701,10 @@
       ],
       "feature_sql": [
         "lateral"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -4081,6 +4733,10 @@
       ],
       "feature_sql": [
         "lateral"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -4109,6 +4765,10 @@
       ],
       "feature_sql": [
         "lateral"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -4137,6 +4797,10 @@
       ],
       "feature_sql": [
         "lateral"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -4165,6 +4829,10 @@
       ],
       "feature_sql": [
         "lateral"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -4193,6 +4861,10 @@
       ],
       "feature_sql": [
         "lateral"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -4221,6 +4893,10 @@
       ],
       "feature_sql": [
         "lateral"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -4249,6 +4925,10 @@
       ],
       "feature_sql": [
         "full_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -4277,6 +4957,10 @@
       ],
       "feature_sql": [
         "full_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -4305,6 +4989,10 @@
       ],
       "feature_sql": [
         "full_outer_join"
+      ],
+      "n_tables_range": [
+        3,
+        6
       ]
     },
     {
@@ -4333,6 +5021,10 @@
       ],
       "feature_sql": [
         "full_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -4361,6 +5053,10 @@
       ],
       "feature_sql": [
         "full_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -4389,6 +5085,10 @@
       ],
       "feature_sql": [
         "full_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -4417,6 +5117,10 @@
       ],
       "feature_sql": [
         "full_outer_join"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -4445,6 +5149,10 @@
       ],
       "feature_sql": [
         "full_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -4473,6 +5181,10 @@
       ],
       "feature_sql": [
         "right_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -4501,6 +5213,10 @@
       ],
       "feature_sql": [
         "right_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -4529,6 +5245,10 @@
       ],
       "feature_sql": [
         "right_outer_join"
+      ],
+      "n_tables_range": [
+        3,
+        6
       ]
     },
     {
@@ -4557,6 +5277,10 @@
       ],
       "feature_sql": [
         "right_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -4585,6 +5309,10 @@
       ],
       "feature_sql": [
         "right_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -4613,6 +5341,10 @@
       ],
       "feature_sql": [
         "right_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -4641,6 +5373,10 @@
       ],
       "feature_sql": [
         "right_outer_join"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -4669,6 +5405,10 @@
       ],
       "feature_sql": [
         "right_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -4697,6 +5437,10 @@
       ],
       "feature_sql": [
         "cross_join"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -4725,6 +5469,10 @@
       ],
       "feature_sql": [
         "cross_join"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -4753,6 +5501,10 @@
       ],
       "feature_sql": [
         "cross_join"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -4781,6 +5533,10 @@
       ],
       "feature_sql": [
         "cross_join"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -4809,6 +5565,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -4837,6 +5597,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -4865,6 +5629,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        3,
+        6
       ]
     },
     {
@@ -4893,6 +5661,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -4921,6 +5693,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -4949,6 +5725,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -4977,6 +5757,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -5005,6 +5789,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -5033,6 +5821,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -5061,6 +5853,10 @@
       ],
       "feature_sql": [
         "distinct_on"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -5089,6 +5885,10 @@
       ],
       "feature_sql": [
         "filtered_agg"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -5117,6 +5917,10 @@
       ],
       "feature_sql": [
         "filtered_agg"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -5145,6 +5949,10 @@
       ],
       "feature_sql": [
         "filtered_agg"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -5173,6 +5981,10 @@
       ],
       "feature_sql": [
         "filtered_agg"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -5201,6 +6013,10 @@
       ],
       "feature_sql": [
         "filtered_agg"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -5229,6 +6045,10 @@
       ],
       "feature_sql": [
         "filtered_agg"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -5257,6 +6077,10 @@
       ],
       "feature_sql": [
         "filtered_agg"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -5285,6 +6109,10 @@
       ],
       "feature_sql": [
         "filtered_agg"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -5313,6 +6141,10 @@
       ],
       "feature_sql": [
         "filtered_agg"
+      ],
+      "n_tables_range": [
+        2,
+        8
       ]
     },
     {
@@ -5333,6 +6165,10 @@
       ],
       "schema_type_ids": [
         2
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -5357,6 +6193,10 @@
       ],
       "schema_type_ids": [
         4
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -5383,6 +6223,10 @@
       ],
       "schema_type_ids": [
         5
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -5407,6 +6251,10 @@
       ],
       "schema_type_ids": [
         8
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -5427,6 +6275,10 @@
       ],
       "schema_type_ids": [
         10
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -5450,6 +6302,10 @@
       ],
       "schema_type_ids": [
         23
+      ],
+      "n_tables_range": [
+        3,
+        5
       ]
     },
     {
@@ -5470,6 +6326,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -5496,6 +6356,10 @@
       ],
       "schema_type_ids": [
         30
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -5524,6 +6388,10 @@
       ],
       "feature_sql": [
         "left_outer_join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -5543,6 +6411,10 @@
       ],
       "schema_type_ids": [
         2
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -5562,6 +6434,10 @@
       ],
       "schema_type_ids": [
         4
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -5590,6 +6466,10 @@
       ],
       "schema_type_ids": [
         5
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -5609,6 +6489,10 @@
       ],
       "schema_type_ids": [
         8
+      ],
+      "n_tables_range": [
+        2,
+        2
       ]
     },
     {
@@ -5628,6 +6512,10 @@
       ],
       "schema_type_ids": [
         10
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -5650,6 +6538,10 @@
       ],
       "schema_type_ids": [
         23
+      ],
+      "n_tables_range": [
+        3,
+        5
       ]
     },
     {
@@ -5674,6 +6566,10 @@
       ],
       "schema_type_ids": [
         27
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -5696,6 +6592,10 @@
       ],
       "schema_type_ids": [
         30
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -5724,6 +6624,10 @@
       ],
       "feature_sql": [
         "natural_join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -5751,6 +6655,10 @@
       "schema_type_ids": [
         8,
         5
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -5779,6 +6687,10 @@
       ],
       "feature_sql": [
         "anti_join"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -5807,6 +6719,10 @@
       ],
       "feature_sql": [
         "anti_join"
+      ],
+      "n_tables_range": [
+        3,
+        6
       ]
     },
     {
@@ -5835,6 +6751,10 @@
       ],
       "feature_sql": [
         "anti_join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -5863,6 +6783,10 @@
       ],
       "feature_sql": [
         "anti_join"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -5891,6 +6815,10 @@
       ],
       "feature_sql": [
         "grouping_sets"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -5919,6 +6847,10 @@
       ],
       "feature_sql": [
         "grouping_sets"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -5947,6 +6879,10 @@
       ],
       "feature_sql": [
         "grouping_sets"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -5975,6 +6911,10 @@
       ],
       "feature_sql": [
         "grouping_sets"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6003,6 +6943,10 @@
       ],
       "feature_sql": [
         "grouping_sets"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -6031,6 +6975,10 @@
       ],
       "feature_sql": [
         "grouping_sets"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6059,6 +7007,10 @@
       ],
       "feature_sql": [
         "grouping_sets"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6087,6 +7039,10 @@
       ],
       "feature_sql": [
         "grouping_sets"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -6115,6 +7071,10 @@
       ],
       "feature_sql": [
         "grouping_sets"
+      ],
+      "n_tables_range": [
+        2,
+        8
       ]
     },
     {
@@ -6135,6 +7095,10 @@
       ],
       "schema_type_ids": [
         16
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -6151,6 +7115,10 @@
       ],
       "schema_type_ids": [
         21
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6179,6 +7147,10 @@
       ],
       "feature_sql": [
         "agg_distinct"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -6207,6 +7179,10 @@
       ],
       "feature_sql": [
         "agg_distinct"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -6235,6 +7211,10 @@
       ],
       "feature_sql": [
         "agg_distinct"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6263,6 +7243,10 @@
       ],
       "feature_sql": [
         "agg_distinct"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6291,6 +7275,10 @@
       ],
       "feature_sql": [
         "agg_distinct"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -6319,6 +7307,10 @@
       ],
       "feature_sql": [
         "agg_distinct"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6347,6 +7339,10 @@
       ],
       "feature_sql": [
         "agg_distinct"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6375,6 +7371,10 @@
       ],
       "feature_sql": [
         "agg_distinct"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -6403,6 +7403,10 @@
       ],
       "feature_sql": [
         "row_types"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -6431,6 +7435,10 @@
       ],
       "feature_sql": [
         "row_types"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -6459,6 +7467,10 @@
       ],
       "feature_sql": [
         "row_types"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6487,6 +7499,10 @@
       ],
       "feature_sql": [
         "row_types"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6513,7 +7529,11 @@
       "schema_type_ids": [
         20
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        1,
+        5
+      ]
     },
     {
       "id": "Q32_S02",
@@ -6541,6 +7561,10 @@
       ],
       "feature_sql": [
         "values"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -6569,6 +7593,10 @@
       ],
       "feature_sql": [
         "values"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -6597,6 +7625,10 @@
       ],
       "feature_sql": [
         "values"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -6625,6 +7657,10 @@
       ],
       "feature_sql": [
         "values"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -6653,6 +7689,10 @@
       ],
       "feature_sql": [
         "like"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -6681,6 +7721,10 @@
       ],
       "feature_sql": [
         "like"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -6709,6 +7753,10 @@
       ],
       "feature_sql": [
         "like"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6737,6 +7785,10 @@
       ],
       "feature_sql": [
         "like"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -6765,6 +7817,10 @@
       ],
       "feature_sql": [
         "like"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6793,6 +7849,10 @@
       ],
       "feature_sql": [
         "like"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6821,6 +7881,10 @@
       ],
       "feature_sql": [
         "like"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -6849,6 +7913,10 @@
       ],
       "feature_sql": [
         "like"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -6875,7 +7943,11 @@
       "schema_type_ids": [
         16
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        2,
+        6
+      ]
     },
     {
       "id": "Q34_S17",
@@ -6901,7 +7973,11 @@
       "schema_type_ids": [
         17
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        1,
+        6
+      ]
     },
     {
       "id": "Q34_S32",
@@ -6927,7 +8003,11 @@
       "schema_type_ids": [
         32
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        1,
+        6
+      ]
     },
     {
       "id": "Q35_S01",
@@ -6955,6 +8035,10 @@
       ],
       "feature_sql": [
         "case"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -6983,6 +8067,10 @@
       ],
       "feature_sql": [
         "case"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7011,6 +8099,10 @@
       ],
       "feature_sql": [
         "case"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -7039,6 +8131,10 @@
       ],
       "feature_sql": [
         "case"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7067,6 +8163,10 @@
       ],
       "feature_sql": [
         "case"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7095,6 +8195,10 @@
       ],
       "feature_sql": [
         "case"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7123,6 +8227,10 @@
       ],
       "feature_sql": [
         "case"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7151,6 +8259,10 @@
       ],
       "feature_sql": [
         "case"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -7179,6 +8291,10 @@
       ],
       "feature_sql": [
         "string_funcs"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -7207,6 +8323,10 @@
       ],
       "feature_sql": [
         "string_funcs"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7235,6 +8355,10 @@
       ],
       "feature_sql": [
         "string_funcs"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7263,6 +8387,10 @@
       ],
       "feature_sql": [
         "string_funcs"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7291,6 +8419,10 @@
       ],
       "feature_sql": [
         "string_funcs"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -7319,6 +8451,10 @@
       ],
       "feature_sql": [
         "string_funcs"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7349,6 +8485,10 @@
       ],
       "schema_type_ids": [
         14
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -7377,6 +8517,10 @@
       ],
       "feature_sql": [
         "math_funcs"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7405,6 +8549,10 @@
       ],
       "feature_sql": [
         "math_funcs"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -7433,6 +8581,10 @@
       ],
       "feature_sql": [
         "math_funcs"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -7461,6 +8613,10 @@
       ],
       "feature_sql": [
         "math_funcs"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7489,6 +8645,10 @@
       ],
       "feature_sql": [
         "math_funcs"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7517,6 +8677,10 @@
       ],
       "feature_sql": [
         "math_funcs"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -7545,6 +8709,10 @@
       ],
       "feature_sql": [
         "any_all"
+      ],
+      "n_tables_range": [
+        2,
+        4
       ]
     },
     {
@@ -7573,6 +8741,10 @@
       ],
       "feature_sql": [
         "any_all"
+      ],
+      "n_tables_range": [
+        4,
+        8
       ]
     },
     {
@@ -7601,6 +8773,10 @@
       ],
       "feature_sql": [
         "any_all"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -7629,6 +8805,10 @@
       ],
       "feature_sql": [
         "any_all"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -7657,6 +8837,10 @@
       ],
       "feature_sql": [
         "any_all"
+      ],
+      "n_tables_range": [
+        6,
+        12
       ]
     },
     {
@@ -7685,6 +8869,10 @@
       ],
       "feature_sql": [
         "between"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -7713,6 +8901,10 @@
       ],
       "feature_sql": [
         "between"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -7741,6 +8933,10 @@
       ],
       "feature_sql": [
         "between"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -7769,6 +8965,10 @@
       ],
       "feature_sql": [
         "between"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7797,6 +8997,10 @@
       ],
       "feature_sql": [
         "between"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7825,6 +9029,10 @@
       ],
       "feature_sql": [
         "between"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7853,6 +9061,10 @@
       ],
       "feature_sql": [
         "between"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -7881,6 +9093,10 @@
       ],
       "feature_sql": [
         "between"
+      ],
+      "n_tables_range": [
+        2,
+        8
       ]
     },
     {
@@ -7909,6 +9125,10 @@
       ],
       "feature_sql": [
         "in_condition"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -7937,6 +9157,10 @@
       ],
       "feature_sql": [
         "in_condition"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -7965,6 +9189,10 @@
       ],
       "feature_sql": [
         "in_condition"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -7993,6 +9221,10 @@
       ],
       "feature_sql": [
         "in_condition"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8021,6 +9253,10 @@
       ],
       "feature_sql": [
         "in_condition"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -8049,6 +9285,10 @@
       ],
       "feature_sql": [
         "in_condition"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8077,6 +9317,10 @@
       ],
       "feature_sql": [
         "in_condition"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -8105,6 +9349,10 @@
       ],
       "feature_sql": [
         "is_null"
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     },
     {
@@ -8133,6 +9381,10 @@
       ],
       "feature_sql": [
         "is_null"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -8161,6 +9413,10 @@
       ],
       "feature_sql": [
         "is_null"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -8189,6 +9445,10 @@
       ],
       "feature_sql": [
         "is_null"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -8217,6 +9477,10 @@
       ],
       "feature_sql": [
         "is_null"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -8245,6 +9509,10 @@
       ],
       "feature_sql": [
         "disjunctive"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -8273,6 +9541,10 @@
       ],
       "feature_sql": [
         "disjunctive"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8301,6 +9573,10 @@
       ],
       "feature_sql": [
         "disjunctive"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -8329,6 +9605,10 @@
       ],
       "feature_sql": [
         "disjunctive"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8357,6 +9637,10 @@
       ],
       "feature_sql": [
         "disjunctive"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8385,6 +9669,10 @@
       ],
       "feature_sql": [
         "disjunctive"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8413,6 +9701,10 @@
       ],
       "feature_sql": [
         "disjunctive"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8441,6 +9733,10 @@
       ],
       "feature_sql": [
         "disjunctive"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -8469,6 +9765,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -8497,6 +9797,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -8525,6 +9829,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -8553,6 +9861,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8581,6 +9893,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8609,6 +9925,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8637,6 +9957,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8665,6 +9989,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -8693,6 +10021,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -8721,6 +10053,10 @@
       ],
       "feature_sql": [
         "sorting"
+      ],
+      "n_tables_range": [
+        2,
+        8
       ]
     },
     {
@@ -8749,6 +10085,10 @@
       ],
       "feature_sql": [
         "cast"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8777,6 +10117,10 @@
       ],
       "feature_sql": [
         "cast"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -8803,7 +10147,11 @@
       "schema_type_ids": [
         13
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        2,
+        5
+      ]
     },
     {
       "id": "Q45_S14",
@@ -8829,7 +10177,11 @@
       "schema_type_ids": [
         14
       ],
-      "feature_sql": []
+      "feature_sql": [],
+      "n_tables_range": [
+        1,
+        5
+      ]
     },
     {
       "id": "Q46_S16",
@@ -8857,6 +10209,10 @@
       ],
       "feature_sql": [
         "relative_time"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -8885,6 +10241,10 @@
       ],
       "feature_sql": [
         "relative_time"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -8913,6 +10273,10 @@
       ],
       "feature_sql": [
         "relative_time"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -8941,6 +10305,10 @@
       ],
       "feature_sql": [
         "relative_time"
+      ],
+      "n_tables_range": [
+        2,
+        8
       ]
     },
     {
@@ -8969,6 +10337,10 @@
       ],
       "feature_sql": [
         "distinct"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -8997,6 +10369,10 @@
       ],
       "feature_sql": [
         "distinct"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -9025,6 +10401,10 @@
       ],
       "feature_sql": [
         "distinct"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -9053,6 +10433,10 @@
       ],
       "feature_sql": [
         "distinct"
+      ],
+      "n_tables_range": [
+        2,
+        5
       ]
     },
     {
@@ -9081,6 +10465,10 @@
       ],
       "feature_sql": [
         "distinct"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -9109,6 +10497,10 @@
       ],
       "feature_sql": [
         "distinct"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -9137,6 +10529,10 @@
       ],
       "feature_sql": [
         "is_distinct_from"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -9165,6 +10561,10 @@
       ],
       "feature_sql": [
         "is_distinct_from"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -9193,6 +10593,10 @@
       ],
       "feature_sql": [
         "is_distinct_from"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -9221,6 +10625,10 @@
       ],
       "feature_sql": [
         "boolean_predicate"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -9249,6 +10657,10 @@
       ],
       "feature_sql": [
         "boolean_predicate"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -9277,6 +10689,10 @@
       ],
       "feature_sql": [
         "boolean_predicate"
+      ],
+      "n_tables_range": [
+        3,
+        6
       ]
     },
     {
@@ -9305,6 +10721,10 @@
       ],
       "feature_sql": [
         "boolean_predicate"
+      ],
+      "n_tables_range": [
+        1,
+        3
       ]
     },
     {
@@ -9333,6 +10753,10 @@
       ],
       "feature_sql": [
         "overlaps"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -9361,6 +10785,10 @@
       ],
       "feature_sql": [
         "overlaps"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -9389,6 +10817,10 @@
       ],
       "feature_sql": [
         "offset_fetch"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -9417,6 +10849,10 @@
       ],
       "feature_sql": [
         "offset_fetch"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -9445,6 +10881,10 @@
       ],
       "feature_sql": [
         "offset_fetch"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -9473,6 +10913,10 @@
       ],
       "feature_sql": [
         "offset_fetch"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -9501,6 +10945,10 @@
       ],
       "feature_sql": [
         "offset_fetch"
+      ],
+      "n_tables_range": [
+        1,
+        6
       ]
     },
     {
@@ -9529,6 +10977,10 @@
       ],
       "feature_sql": [
         "offset_fetch"
+      ],
+      "n_tables_range": [
+        2,
+        8
       ]
     },
     {
@@ -9557,6 +11009,10 @@
       ],
       "feature_sql": [
         "ordered_set_agg"
+      ],
+      "n_tables_range": [
+        1,
+        1
       ]
     },
     {
@@ -9585,6 +11041,10 @@
       ],
       "feature_sql": [
         "ordered_set_agg"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -9613,6 +11073,10 @@
       ],
       "feature_sql": [
         "ordered_set_agg"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -9641,6 +11105,10 @@
       ],
       "feature_sql": [
         "ordered_set_agg"
+      ],
+      "n_tables_range": [
+        4,
+        10
       ]
     },
     {
@@ -9669,6 +11137,10 @@
       ],
       "feature_sql": [
         "ordered_set_agg"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -9697,6 +11169,10 @@
       ],
       "feature_sql": [
         "ordered_set_agg"
+      ],
+      "n_tables_range": [
+        1,
+        5
       ]
     },
     {
@@ -9725,6 +11201,10 @@
       ],
       "feature_sql": [
         "ordered_set_agg"
+      ],
+      "n_tables_range": [
+        2,
+        6
       ]
     },
     {
@@ -9743,6 +11223,10 @@
       "schema_type_ids": [
         19,
         30
+      ],
+      "n_tables_range": [
+        1,
+        2
       ]
     }
   ]

@@ -49,10 +49,17 @@ class SchemaAgent(AbstractAgent):
         return SchemaDDLDTO
 
     def validate(self, output: SchemaDDLDTO, state: TaskStateDTO) -> tuple[bool, str, dict]:
-        """Valida il DDL eseguendolo nel sandbox e verificando il tipo di schema richiesto."""
+        """Valida il DDL eseguendolo nel sandbox e verificando tipo e numero di tabelle."""
         cat = self._config.load_categories().get(state.category, CategoryDTO())
         result = self._validator.validate_with_type(output, state.sandbox_schema, cat.tipo_schema)
-        return (result.is_valid, result.error, {})
+        if not result.is_valid:
+            return (False, result.error, {})
+        expected = state.spec.n_tables if state.spec else 0
+        if expected:
+            actual = self._validator.table_count(state.sandbox_schema)
+            if actual != expected:
+                return (False, f"DDL con {actual} tabelle, ma la spec richiede {expected}", {})
+        return (True, "", {})
 
     def build_updates(self, output: SchemaDDLDTO, _state: TaskStateDTO) -> dict:
         """Aggiorna lo stato con schema_ddl."""

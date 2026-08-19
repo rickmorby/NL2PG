@@ -17,6 +17,7 @@ Il JSON di output deve contenere esclusivamente il campo "tables".
    - `fact` (300-3000 righe): tabelle di eventi/transazioni (es. ordini, vendite, movimenti).
    - `explicit`: volume fisso; richiede `min_rows` e `max_rows` (usa range contenuti).
    Se preferisci non lasciare il volume alla natura, puoi specificare `min_rows`/`max_rows` anche per lookup/dimension/fact per vincolarlo.
+   - **SCHEMI GRANDI**: il numero di tabelle non è fisso (può arrivare a 12). Con molti tabelle, assegna `fact` solo alle tabelle-evento principali e usa `lookup`/`dimension` per quelle di supporto, così da restare entro il budget totale di righe materializzabile.
 
 3. **TEMPLATE COERENTI (DA 3 A 10 RIGHE-TEMPIO)**:
    - L'unita' di coerenza e' la RIGA: ogni riga-tempio deve essere internamente coerente e realistica (es. `data_ordine` non dopo `data_consegna`; se `stato` e' `'spedito'` allora `data_spedizione` valorizzata).

@@ -20,7 +20,7 @@ class SpecDTO(AbstractDTO):
     """Specifica per la generazione di uno schema sintetico."""
 
     domain: str = Field(default="")
-    n_tables: int = Field(default=1, ge=1, le=5)
+    n_tables: int = Field(default=1, ge=1, le=12)
     hierarchy: str = Field(default="")
     sql_features: list[str] = Field(default_factory=list)
     twist: list[str] = Field(default_factory=list)
