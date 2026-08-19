@@ -4,6 +4,7 @@
 """
 
 from collections import Counter, defaultdict
+from statistics import median
 from typing import Any
 
 from seaborn import boxplot, lineplot
@@ -12,13 +13,28 @@ from bench.adapters.outbound.plotter.bar_plot import AbstractBarPlot
 from bench.adapters.outbound.plotter.base import AbstractPlot
 from bench.adapters.outbound.plotter.grouped_bar_plot import AbstractGroupedBarPlot
 
+_TABLE_BINS: list[tuple[int, int, str]] = [
+    (1, 2, "1-2"),
+    (3, 4, "3-4"),
+    (5, 6, "5-6"),
+    (7, 12, "7-12"),
+]
+
+
+def _bucket_n_tables(n_tables: int) -> str:
+    """Raggruppa il numero di tabelle in fasce per campioni statisticamente robusti."""
+    for lo, hi, label in _TABLE_BINS:
+        if lo <= n_tables <= hi:
+            return label
+    return "7-12"
+
 
 class SqlFeaturePassrateImpactPlot(AbstractBarPlot):
     """09: Barplot dell'impatto delle feature SQL sul pass rate."""
 
     def __init__(self) -> None:
         """Inizializza la rotazione ed i limiti Y."""
-        super().__init__(rotation=35, ylim=(0, 0.5), figsize=(9.5, 5.5))
+        super().__init__(rotation=35, ylim=(0, 1.0), figsize=(9.5, 5.5))
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""
@@ -224,18 +240,41 @@ class SchemaSizeVsPassrateBoxplotPlot(AbstractPlot):
     def description(self) -> str:
         """Restituisce la descrizione metodologica del grafico."""
         return (
-            "Distribuzione del pass rate del solver in base al numero di tabelle "
-            "relazionali nel database."
+            "Distribuzione del pass rate del solver per fasce di dimensione dello schema "
+            "(numero di tabelle relazionali nel database)."
         )
 
     def insight(self, data: tuple[list[str], list[float]]) -> str:
         """Estrae l'evidenza sull'impatto della dimensione dello schema."""
-        _labels, prs = data
+        labels, prs = data
         if not prs:
             return "Nessun dato sul pass rate per dimensione schema."
+        grouped: dict[str, list[float]] = {}
+        for lbl, pr in zip(labels, prs, strict=True):
+            grouped.setdefault(lbl, []).append(pr)
+        medians = {lbl: median(vals) for lbl, vals in grouped.items()}
+        ordered = [lbl for _, _, lbl in _TABLE_BINS if lbl in medians]
+        if not ordered:
+            return "Nessun dato sul pass rate per dimensione schema."
+        first = medians[ordered[0]]
+        last = medians[ordered[-1]]
+        first_pct = round(first * 100, 1)
+        last_pct = round(last * 100, 1)
+        if last < first:
+            delta = round((first - last) * 100, 1)
+            return (
+                f"Il pass rate mediano scende dal {first_pct}% (fascia {ordered[0]}) "
+                f"al {last_pct}% (fascia {ordered[-1]}): calo di {delta}%."
+            )
+        if last > first:
+            delta = round((last - first) * 100, 1)
+            return (
+                f"Il pass rate mediano sale dal {first_pct}% (fascia {ordered[0]}) "
+                f"al {last_pct}% (fascia {ordered[-1]}): +{delta}%."
+            )
         return (
-            "All'aumentare delle tabelle, la varianza degli errori cresce "
-            "per la complessita' dei percorsi JOIN."
+            f"Il pass rate mediano resta stabile al {first_pct}% "
+            f"tra la fascia {ordered[0]} e la fascia {ordered[-1]}."
         )
 
     def xlabel(self) -> str:
@@ -247,17 +286,18 @@ class SchemaSizeVsPassrateBoxplotPlot(AbstractPlot):
         return "Pass Rate Calibrazione Solver"
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[float]]:
-        """Estrae i pass rate raggruppati per numero di tabelle."""
+        """Estrae i pass rate raggruppati per fascia di tabelle."""
         labels: list[str] = []
         prs: list[float] = []
         for t in tasks:
             n_tab = (t.get("spec") or {}).get("n_tables", 1)
             pr = (t.get("difficulty") or {}).get("calibration_pass_rate", 0.0)
-            labels.append(f"{n_tab} tab")
+            labels.append(_bucket_n_tables(n_tab))
             prs.append(float(pr))
         return labels, prs
 
     def draw(self, ax: Any, data: tuple[list[str], list[float]]) -> None:
-        """Disegna un boxplot Seaborn."""
+        """Disegna un boxplot Seaborn con fasce ordinate."""
         labels, prs = data
-        boxplot(x=labels, y=prs, color="#2980b9", ax=ax)
+        order = [lbl for _, _, lbl in _TABLE_BINS if lbl in set(labels)]
+        boxplot(x=labels, y=prs, order=order, color="#2980b9", ax=ax)

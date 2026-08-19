@@ -199,9 +199,10 @@ class SchemaComplexityHeatmapPlot(AbstractBarPlot):
         max_idx = ys.index(max(ys))
         mode_tabs, count = xs[max_idx], ys[max_idx]
         perc = round((count / tot) * 100, 1)
+        lo_label, hi_label = xs[0], xs[-1]
         return (
-            f"Il {perc}% dei database nel benchmark e' composto da {mode_tabs.lower()}, "
-            f"garantendo relazioni realistiche."
+            f"La dimensione piu' frequente e' {mode_tabs.lower()} ({perc}% degli schemi); "
+            f"il benchmark spazia da {lo_label} a {hi_label} ({len(xs)} cardinalita' distinte)."
         )
 
     def xlabel(self) -> str:
