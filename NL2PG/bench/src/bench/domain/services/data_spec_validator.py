@@ -45,8 +45,7 @@ class DataSpecValidator:
         """Verifica limite righe, template e variazioni di una singola voce."""
         if table_spec.max_rows is not None and table_spec.max_rows > self._max_rows_per_table:
             raise DataSpecValidationError(
-                f"max_rows di '{table_spec.table}' supera il limite "
-                f"{self._max_rows_per_table}"
+                f"max_rows di '{table_spec.table}' supera il limite {self._max_rows_per_table}"
             )
         for template in table_spec.templates:
             self._validate_template(table_spec, table, template)
@@ -73,8 +72,7 @@ class DataSpecValidator:
         """Verifica che la variazione riguardi una colonna reale della tabella."""
         if table.column(column_name) is None:
             raise DataSpecValidationError(
-                f"Variazione su colonna sconosciuta '{column_name}' in "
-                f"'{table_spec.table}'"
+                f"Variazione su colonna sconosciuta '{column_name}' in '{table_spec.table}'"
             )
 
     @staticmethod

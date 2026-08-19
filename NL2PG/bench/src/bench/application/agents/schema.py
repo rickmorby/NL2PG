@@ -51,9 +51,7 @@ class SchemaAgent(AbstractAgent):
     def validate(self, output: SchemaDDLDTO, state: TaskStateDTO) -> tuple[bool, str, dict]:
         """Valida il DDL eseguendolo nel sandbox e verificando il tipo di schema richiesto."""
         cat = self._config.load_categories().get(state.category, CategoryDTO())
-        result = self._validator.validate_with_type(
-            output, state.sandbox_schema, cat.tipo_schema
-        )
+        result = self._validator.validate_with_type(output, state.sandbox_schema, cat.tipo_schema)
         return (result.is_valid, result.error, {})
 
     def build_updates(self, output: SchemaDDLDTO, _state: TaskStateDTO) -> dict:

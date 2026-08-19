@@ -19,7 +19,7 @@ class DataProfileBuilder:
         profile: dict[str, Any] = {}
         for table_name, table_rows in rows.items():
             columns: dict[str, Any] = {}
-            for column_name in (table_rows[0].keys() if table_rows else []):
+            for column_name in table_rows[0].keys() if table_rows else []:
                 values = [r[column_name] for r in table_rows]
                 distinct = sorted({str(v) for v in values if v is not None})
                 numeric = [v for v in values if isinstance(v, (int, float)) and v is not None]

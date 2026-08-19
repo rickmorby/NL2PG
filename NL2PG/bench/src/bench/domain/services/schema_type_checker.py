@@ -100,9 +100,7 @@ class SchemaTypeChecker:
             if not match:
                 continue
             table = match.group(0).split()[-1].strip('"')
-            pattern = re_compile(
-                rf"REFERENCES\s+[\"\']?{re_escape(table)}[\"\']?\b", IGNORECASE
-            )
+            pattern = re_compile(rf"REFERENCES\s+[\"\']?{re_escape(table)}[\"\']?\b", IGNORECASE)
             if pattern.search(stmt):
                 return True
         return False
@@ -187,8 +185,7 @@ class SchemaTypeChecker:
             return SchemaTypeCheckResult()
         hint = self._HINTS.get(tipo_schema, "il costrutto DDL atteso")
         error = (
-            f"Lo schema DDL non rispetta il tipo di schema richiesto '{tipo_schema}': "
-            f"manca {hint}."
+            f"Lo schema DDL non rispetta il tipo di schema richiesto '{tipo_schema}': manca {hint}."
         )
         return SchemaTypeCheckResult(is_valid=False, error=error)
 

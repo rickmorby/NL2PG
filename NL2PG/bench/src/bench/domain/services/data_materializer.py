@@ -55,9 +55,7 @@ class DataMaterializer:
     ) -> None:
         """Inietta i parametri (sezione [data]) e compone i collaboratori di dominio."""
         self._validator = DataSpecValidator(max_rows_per_table=max_rows_per_table)
-        self._counter = RowCounter(
-            nature_ranges, max_rows_per_table, max_total_rows
-        )
+        self._counter = RowCounter(nature_ranges, max_rows_per_table, max_total_rows)
         self._expander = RowExpander(null_rate, dup_rate, outlier_rate)
         self._binder = ForeignKeyBinder(null_rate)
         self._script_builder = InsertScriptBuilder(batch_size)

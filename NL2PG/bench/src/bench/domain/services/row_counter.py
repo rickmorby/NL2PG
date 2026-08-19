@@ -34,9 +34,7 @@ class RowCounter:
         self._max_rows_per_table = max_rows_per_table
         self._max_total_rows = max_total_rows
 
-    def compute(
-        self, spec: DataSpecDTO, schema: SchemaModel, rng: random.Random
-    ) -> dict[str, int]:
+    def compute(self, spec: DataSpecDTO, schema: SchemaModel, rng: random.Random) -> dict[str, int]:
         """Calcola i conteggi per tabella in ordine di spec."""
         counts: dict[str, int] = {}
         for table_spec in spec.tables:

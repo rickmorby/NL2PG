@@ -217,16 +217,12 @@ class RowBuilder:
         """Valore estremo entro i confini dichiarati (per domande max/min sensate)."""
         if variation.axis == "shift":
             extreme = (
-                variation.delta_max
-                if rng.random() < _OUTLIER_COIN_FLIP
-                else variation.delta_min
+                variation.delta_max if rng.random() < _OUTLIER_COIN_FLIP else variation.delta_min
             )
             return shift_value(template_value, column, extreme or 0)
         if variation.axis == "scale":
             extreme = (
-                variation.factor_max
-                if rng.random() < _OUTLIER_COIN_FLIP
-                else variation.factor_min
+                variation.factor_max if rng.random() < _OUTLIER_COIN_FLIP else variation.factor_min
             )
             return scale_value(template_value, extreme or 1)
         return template_value

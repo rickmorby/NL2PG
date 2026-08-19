@@ -126,16 +126,12 @@ class FeatureChecker:
         "is_distinct_from": lambda t: bool(t.find(exp.NullSafeNEQ)),
         "between": lambda t: bool(t.find(exp.Between)),
         "in_condition": lambda t: bool(t.find(exp.In)),
-        "is_null": lambda t: any(
-            isinstance(i.expression, exp.Null) for i in t.find_all(exp.Is)
-        ),
+        "is_null": lambda t: any(isinstance(i.expression, exp.Null) for i in t.find_all(exp.Is)),
         "disjunctive": lambda t: bool(t.find(exp.Or)),
         "like": lambda t: bool(t.find(exp.Like)),
         "any_all": lambda t: bool(t.find(exp.Any, exp.All)),
         "relative_time": lambda t: bool(
-            t.find(
-                exp.CurrentDate, exp.CurrentTimestamp, exp.CurrentTime, exp.Interval
-            )
+            t.find(exp.CurrentDate, exp.CurrentTimestamp, exp.CurrentTime, exp.Interval)
         ),
         "overlaps": lambda t: bool(t.find(exp.Overlaps)),
         "offset_fetch": lambda t: bool(t.find(exp.Offset, exp.Fetch)),
@@ -189,9 +185,7 @@ class FeatureChecker:
                 return FeatureCheckResult(is_valid=False, missing=required)
 
         missing = [
-            feat
-            for feat in required
-            if feat not in self._CHECKS or not self._CHECKS[feat](tree)
+            feat for feat in required if feat not in self._CHECKS or not self._CHECKS[feat](tree)
         ]
         return FeatureCheckResult(is_valid=len(missing) == 0, missing=missing)
 

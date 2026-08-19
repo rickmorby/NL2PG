@@ -243,15 +243,11 @@ class LLMClientAdapter(LLMGeneratorPort):
         pool_of = {mid: mc.get("pool", mid) for mid, mc in models.items()}
 
         ordered_pools = list(
-            dict.fromkeys(
-                pool_of.get(mid, mid) for mid_list in chains.values() for mid in mid_list
-            )
+            dict.fromkeys(pool_of.get(mid, mid) for mid_list in chains.values() for mid in mid_list)
         )
         by_pool: dict[str, list[dict[str, Any]]] = {}
         for mid, mc in models.items():
-            by_pool.setdefault(pool_of.get(mid, mid), []).append(
-                cls._make_litellm_params(mc)
-            )
+            by_pool.setdefault(pool_of.get(mid, mid), []).append(cls._make_litellm_params(mc))
         return [
             {"model_name": pool, "litellm_params": params}
             for pool in ordered_pools
