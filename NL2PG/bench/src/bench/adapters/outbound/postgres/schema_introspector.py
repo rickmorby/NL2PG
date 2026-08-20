@@ -21,11 +21,17 @@ def introspect_schema(connection, schema_name: str) -> SchemaModel:
 
     tables: dict[str, list[ColumnSchema]] = {}
     for row in columns:
-        table_name, column_name, data_type, is_nullable = row
+        if len(row) == 6:  # noqa: PLR2004
+            table_name, column_name, data_type, is_nullable, max_len, is_gen = row
+        else:
+            table_name, column_name, data_type, is_nullable = row[:4]
+            max_len, is_gen = None, "NEVER"
         column = ColumnSchema(
             name=column_name,
             data_type=data_type,
             nullable=is_nullable == "YES",
+            max_length=max_len,
+            is_generated=is_gen != "NEVER",
         )
         tables.setdefault(table_name, []).append(column)
 
@@ -72,9 +78,10 @@ def _apply_unique_constraints(
 
 
 def _fetch_columns(connection, schema_name: str) -> list[tuple]:
-    """Restituisce colonne, tipi e nullabilita' delle tabelle dello schema."""
+    """Restituisce colonne, tipi, nullabilita', lunghezza max e flag generated."""
     query = (
-        "SELECT table_name, column_name, data_type, is_nullable "
+        "SELECT table_name, column_name, data_type, is_nullable, "
+        "character_maximum_length, is_generated "
         "FROM information_schema.columns "
         "WHERE table_schema = %s ORDER BY table_name, ordinal_position"
     )

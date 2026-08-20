@@ -63,7 +63,7 @@ class ForeignKeyBinder:
         rows: dict[str, list[dict[str, Any]]],
         rng: Random,
     ) -> None:
-        """Lega una singola colonna FK, gestendo self-reference con solo righe precedenti."""
+        """Lega una singola colonna FK, gestendo self-reference e UNIQUE."""
         parent = rows.get((column.fk_parent_table or "").lower(), [])
         parent_keys = [
             row[column.fk_parent_column or ""]
@@ -71,6 +71,9 @@ class ForeignKeyBinder:
             if row.get(column.fk_parent_column or "") is not None
         ]
         is_self = column.fk_parent_table == table.name
+        used_unique: set[Any] = set()
+        available_unique = list(parent_keys)
+        rng.shuffle(available_unique) if column.is_unique and available_unique else None
         bound_prefix: list[Any] = []
         for row in rows[table.name]:
             if column.nullable and rng.random() < self._null_rate:
@@ -79,7 +82,18 @@ class ForeignKeyBinder:
                 if bound_prefix:
                     row[column.name] = rng.choice(bound_prefix)
             elif parent_keys:
-                row[column.name] = rng.choice(parent_keys)
+                if column.is_unique and available_unique:
+                    row[column.name] = available_unique.pop()
+                    used_unique.add(row[column.name])
+                elif column.is_unique and used_unique:
+                    remaining = [k for k in parent_keys if k not in used_unique]
+                    if remaining:
+                        row[column.name] = rng.choice(remaining)
+                        used_unique.add(row[column.name])
+                    else:
+                        row[column.name] = rng.choice(parent_keys)
+                else:
+                    row[column.name] = rng.choice(parent_keys)
             if is_self and row.get(column.fk_parent_column or "") is not None:
                 bound_prefix.append(row[column.fk_parent_column or ""])
 

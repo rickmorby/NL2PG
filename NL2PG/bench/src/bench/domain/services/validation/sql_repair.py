@@ -3,7 +3,7 @@
 :author: Riccardo Morabito
 """
 
-from re import DOTALL, IGNORECASE, Match, compile as re_compile
+from re import DOTALL, IGNORECASE, MULTILINE, Match, compile as re_compile
 
 _RE_MARKDOWN_BLOCK = re_compile(r"```(?:sql|postgres)?\s*(.*?)\s*```", flags=DOTALL | IGNORECASE)
 _RE_MARKDOWN_PREFIX = re_compile(r"^```[a-zA-Z]*\n?")
@@ -15,6 +15,14 @@ _RE_TRAILING_COMMAS = re_compile(
 )
 _RE_HYPHENATED_IDENTIFIER = re_compile(
     r"('(?:''|[^'])*')|\b([a-zA-Z][a-zA-Z0-9_]*)-([a-zA-Z][a-zA-Z0-9_]*)\b"
+)
+_RE_GENERATED_SUBQUERY = re_compile(
+    r"GENERATED\s+ALWAYS\s+AS\s*\(.*?SELECT.*?\)\s*STORED", flags=IGNORECASE | DOTALL
+)
+_RE_DOUBLE_PAREN_STORED = re_compile(r"\){2,}\s*STORED", flags=IGNORECASE)
+_RE_STRAY_COLUMN_STMT = re_compile(r"^\s*Column\.?\s*;?\s*$", flags=IGNORECASE | MULTILINE)
+_RE_CREATE_TABLE_NAME = re_compile(
+    r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?\"?([a-zA-Z_][a-zA-Z0-9_]*)\"?", flags=IGNORECASE
 )
 
 
@@ -30,6 +38,10 @@ class PostgresSQLRepair:
         sql = self._strip_markdown_fences(sql)
         sql = self._fix_escaped_quotes(sql)
         sql = self._fix_identity_columns(sql)
+        sql = self._fix_generated_subquery(sql)
+        sql = self._fix_double_paren_stored(sql)
+        sql = self._fix_stray_column_stmt(sql)
+        sql = self._dedupe_create_table(sql)
         sql = self._fix_trailing_commas(sql)
         sql = self._fix_hyphenated_identifiers(sql)
         sql = self._ensure_semicolon(sql)
@@ -67,6 +79,43 @@ class PostgresSQLRepair:
         if match.group(1):
             return match.group(1)
         return f"{match.group(2)}_{match.group(3)}"
+
+    def _fix_generated_subquery(self, sql: str) -> str:
+        """Rimuove GENERATED con subquery SELECT (non ammessa da Postgres)."""
+        return _RE_GENERATED_SUBQUERY.sub("", sql)
+
+    def _fix_double_paren_stored(self, sql: str) -> str:
+        """Corregge doppia parentesi prima di STORED (es. ...))) STORED)."""
+        return _RE_DOUBLE_PAREN_STORED.sub(") STORED", sql)
+
+    def _fix_stray_column_stmt(self, sql: str) -> str:
+        """Rimuove statement spuri tipo 'Column.' generati dall'LLM."""
+        lines = []
+        for line in sql.splitlines():
+            if _RE_STRAY_COLUMN_STMT.match(line):
+                continue
+            lines.append(line)
+        return "\n".join(lines)
+
+    def _dedupe_create_table(self, sql: str) -> str:
+        """Rimuove definizioni duplicate della stessa tabella (mantiene la prima)."""
+        seen: set[str] = set()
+        parts = sql.split(";")
+        kept: list[str] = []
+        for part in parts:
+            stripped = part.strip()
+            if not stripped:
+                continue
+            m = _RE_CREATE_TABLE_NAME.search(stripped)
+            if m:
+                name = m.group(1).lower()
+                if name in seen:
+                    continue
+                seen.add(name)
+            kept.append(part)
+        if len(kept) == len(parts):
+            return sql
+        return ";".join(kept) + (";" if sql.strip().endswith(";") else "")
 
     def _ensure_semicolon(self, sql: str) -> str:
         """Assicura che il comando o script SQL termini con punto e virgola ';'."""

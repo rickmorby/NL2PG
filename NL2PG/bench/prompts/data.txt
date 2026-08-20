@@ -29,7 +29,7 @@ Il JSON di output deve contenere esclusivamente il campo "tables".
    - `fixed` (default): la colonna mantiene il valore del template per tutte le righe.
    - `shift`: sposta un valore numerico o di data; richiede `delta_min` e `delta_max` (es. {axis:"shift", delta_min:-3, delta_max:3}).
    - `scale`: scala un valore numerico; richiede `factor_min` e `factor_max` (es. {axis:"scale", factor_min:0.5, factor_max:2.0}).
-   - `pool`: sceglie da una lista di valori testuali; richiede `pool` (es. {axis:"pool", pool:["Roma","Milano","Torino"]}).
+   - `pool`: sceglie da una lista di valori **SEMPRE testuali e quotati**; richiede `pool` (es. {axis:"pool", pool:["Roma","Milano","Torino"]}). **ATTENZIONE**: anche per colonne numeriche/booleane il pool DEV'essere di stringhe (es. {axis:"pool", pool:["1","2","3"]} NON [1,2,3]; {axis:"pool", pool:["true","false"]} NON [true,false]).
    - NON dichiarare variazioni su chiavi primarie, chiavi esterne o colonne con vincolo UNIQUE.
 
 5. **CHIAVI PRIMARIE, ESTERNE E UNIQUE (GESTITE DAL MOTORE)**:
@@ -38,14 +38,14 @@ Il JSON di output deve contenere esclusivamente il campo "tables".
    - Le colonne con vincolo UNIQUE sono gestite dal motore come le PK: i valori univoci vengono generati automaticamente a partire dal template.
    - La coerenza referenziale e' garantita per costruzione, anche con catene, stelle, relazioni N:N (PK composite) e self-reference.
 
-6. **MOLTIPLICATORE per_parent_rows** (opzionale): per tabelle con ESATTAMENTE una FK (e mai self-reference) puoi impostare `per_parent_rows` (numero decimale, es. 3.0): il numero di righe figlie diventa ~ padre × moltiplicatore. Non usarlo su tabelle con due o piu' FK.
+6. **MOLTIPLICATORE per_parent_rows** (opzionale): per tabelle con ESATTAMENTE una FK (e mai self-reference) puoi impostare `per_parent_rows` (numero decimale, es. 3.0): il numero di righe figlie diventa ~ padre × moltiplicatore. Non usarlo su tabelle con due o piu' FK. **VERIFICA SEMPRE sul DDL il numero di REFERENCES per tabella prima di impostarlo**; se la tabella ha 0 FK (lookup) o ≥2 FK (es. dettagli_ordine con ordine_id+prodotto_id) o self-reference, OMetti il campo.
 
 7. **RUMORE CONTROLLATO (GESTITO DAL MOTORE)**: NULL occasionali su colonne nullable, duplicati sporadici e outlier entro i limiti dichiarati vengono iniettati automaticamente; non preoccupartene. Mai su chiavi primarie, chiavi esterne o colonne UNIQUE.
 
 8. **DETERMINISMO**: Il seed e' derivato dal task_id: a parita' di DataSpec i dati sono riproducibili, e gli agenti a valle (query, story, critic) vedranno un profilo dati con righe campione REALI. Usa quindi valori che un analista filtra davvero.
 
 9. **TIPOLOGIE DI SCHEMA SPECIALI**: Se il DDL contiene costrutti particolari, regole dedicate:
-   - `generated_columns`: NON inserire mai nei template una colonna `GENERATED ALWAYS AS (...)`. Ometti la colonna calcolata: PostgreSQL la valorizza da solo. Se è rilevante per l'analisi, includi le colonne da cui deriva (es. `quantita` e `prezzo`) nei template.
+   - `generated_columns`: **DIVIETO ASSOLUTO** — NON inserire mai nei template una colonna `GENERATED ALWAYS AS (...)` (es. `prezzo_al_mq`, `totale_riga`). Ometti completamente la colonna calcolata: PostgreSQL la valorizza da solo e l'inserimento fallisce con `cannot insert into generated column`. Se è rilevante per l'analisi, includi le colonne da cui deriva (es. `quantita` e `prezzo`) nei template.
    - `composite_column`: per una colonna di tipo composito (es. `CREATE TYPE indirizzo AS (via TEXT, civico INT)`) usa la sintassi `ROW(...)` nei template, es. `{"indirizzo_spedizione": "ROW('Via Roma 1', 10)"}` oppure la stringa tipizzata `'(Via Roma 1,10)'`. La sintassi deve essere valida per PostgreSQL.
    - `partitioned`: le tabelle partizionate si popolano inserendo nella tabella padre (es. `INSERT INTO ordini ...`): il DB instrada automaticamente la riga nella partizione giusta. Scegli valori della partition key sufficientemente vari (es. più date) per popolare più partizioni.
    - `enum_type`: usa negli insert esattamente i valori dichiarati nel `CREATE TYPE ... AS ENUM`.
@@ -91,6 +91,17 @@ Il JSON di output deve contenere esclusivamente il campo "tables".
 
 <negative_examples>
 <example_to_avoid>
+pool CON NUMERI NON QUOTATI (ERRATO):
+{
+  "tables": [{
+    "table": "ordini",
+    "nature": "fact",
+    "templates": [{"id": 1, "quantita": 1}],
+    "variations": {"quantita": {"axis": "pool", "pool": [1, 2, 3]}}
+  }]
+} // SBAGLIATO! pool richiede stringhe quotate ["1","2","3"], non interi.
+</example_to_avoid>
+<example_to_avoid>
 NON RACCHIUDERE IL JSON IN BLOCCHI MARKDOWN (ERRATO):
 ```json
 { "tables": [...] }
@@ -131,6 +142,8 @@ per_parent_rows SU TABELLA CON DUE FK (ERRATO):
 - DIVIETO 3: NON usare nature o assi di variazione non previsti (nature: lookup, dimension, fact, explicit; assi: fixed, shift, scale, pool).
 - DIVIETO 4: NON dichiarare variazioni su chiavi primarie o esterne, e NON usare per_parent_rows su self-reference o tabelle con piu' di una FK.
 - DIVIETO 5: NON inserire valori che violano i vincoli CHECK del DDL.
+- DIVIETO 6: NON inserire nel pool valori non stringa (numeri/booleani vanno quotati).
+- DIVIETO 7: NON inserire mai colonne GENERATED ALWAYS AS nei template.
 </forbidden_actions>
 
 <input_context>

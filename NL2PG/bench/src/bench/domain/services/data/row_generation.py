@@ -21,6 +21,7 @@ from bench.domain.models.data import (
     TableSchema,
 )
 from bench.domain.services.data.column_types import (
+    is_date_type,
     is_integer_type,
     neutral_value,
     scale_value,
@@ -33,17 +34,31 @@ _OUTLIER_COIN_FLIP = 0.5
 def _generate_unique(
     column: ColumnSchema, template_value: Any, instance_index: int, used: set[Any]
 ) -> Any:
-    """Genera un valore univoco partendo dal template (sequenziale per int, suffisso per str)."""
+    """Genera valore univoco dal template (int/data/string)."""
     if is_integer_type(column.data_type):
         base = template_value if isinstance(template_value, int) else 1
         candidate = base + instance_index
         while candidate in used:
             candidate += 1
+    elif is_date_type(column.data_type) and isinstance(template_value, str):
+        candidate = shift_value(template_value, column, instance_index)
+        suffix = 1
+        while candidate in used:
+            candidate = shift_value(template_value, column, instance_index + suffix)
+            suffix += 1
     else:
         base = template_value if template_value is not None else column.name
+        if column.max_length is not None and isinstance(base, str):
+            suffix_len = len(f"_{instance_index}") if instance_index else 0
+            max_base = column.max_length - suffix_len
+            if len(base) > max_base > 0:
+                base = base[:max_base]
         candidate = base if instance_index == 0 else f"{base}_{instance_index}"
         while candidate in used:
-            candidate = f"{candidate}_"
+            if column.max_length is not None and len(candidate) >= column.max_length:
+                candidate = candidate[: column.max_length - 1] + "_"
+            else:
+                candidate = f"{candidate}_"
     used.add(candidate)
     return candidate
 
@@ -138,7 +153,7 @@ class RowExpander:
         group: list[str],
         used: set[tuple],
     ) -> None:
-        """Rende unica una combinazione UNIQUE composita incrementando l'ultima colonna."""
+        """Rende unica una combinazione UNIQUE composita."""
         key = tuple(row[col] for col in group)
         suffix = 1
         while key in used:
@@ -146,8 +161,18 @@ class RowExpander:
             col_schema = table.column(last_col)
             if col_schema and is_integer_type(col_schema.data_type):
                 row[last_col] = int(row[last_col]) + suffix
+            elif col_schema and is_date_type(col_schema.data_type):
+                row[last_col] = shift_value(row[last_col], col_schema, suffix)
             else:
-                row[last_col] = f"{row[last_col]}_{suffix}"
+                val = str(row[last_col])
+                if col_schema and col_schema.max_length is not None:
+                    suffix_str = f"_{suffix}"
+                    max_base = col_schema.max_length - len(suffix_str)
+                    if len(val) > max_base:
+                        val = val[:max_base]
+                    row[last_col] = f"{val}{suffix_str}"
+                else:
+                    row[last_col] = f"{val}_{suffix}"
             suffix += 1
             key = tuple(row[col] for col in group)
         used.add(key)

@@ -13,7 +13,7 @@ Il JSON di output deve contenere esclusivamente il campo "story".
    - Il numero di tabelle non è fisso (può variare da 1 a 12): la copertura resta OBBLIGATORIA per ciascuna tabella presente nel DDL.
    - Usa espressioni gestionali naturali come "l'archivio denominato anagrafica_clienti" o "il registro intitolato ordini". Se nel DDL la tabella si chiama `anagrafica_fornitori`, DEVI scrivere la stringa esatta `anagrafica_fornitori` nel racconto (MAI abbreviarla in `fornitori`).
 2. **REQUISITO COVERAGE LETTERALI (OBBLIGATORIO)**:
-   - Ogni valore letterale presente nei filtri e nelle join della query (es. il valore `'24'`, `'Francia'`, `'2026-01-01'`) DEVE comparire ESPLICITAMENTE nel testo della storia. Il `<data_profile>` contiene i valori reali presenti nel database (campioni, `sample`, `min`/`max`): usali per i valori letterali.
+   - Ogni valore letterale presente nei filtri e nelle join della query (es. il valore `'24'`, `'Francia'`, `'2026-01-01'`, `'365'`) DEVE comparire ESPLICITAMENTE nel testo della storia come numero/testo identico (es. se la query contiene `365`, scrivi `365` o `365 giorni` nella prosa). Il `<data_profile>` contiene i valori reali presenti nel database (campioni, `sample`, `min`/`max`): usali per i valori letterali.
 3. **DIVIETO ASSOLUTO GERGO DB (PRINCIPIO PORTANTE)**:
    - NON USARE MAI parole come: *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*.
    - Usa termini di business come *archivio, registro, scheda, elemento, voce, sezione*.

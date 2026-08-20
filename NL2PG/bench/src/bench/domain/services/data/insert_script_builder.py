@@ -32,12 +32,14 @@ class InsertScriptBuilder:
         for table_name in table_order(schema):
             table_rows = rows.get(table_name, [])
             table = schema.table(table_name)
-            columns = table.columns
+            columns = [c for c in table.columns if not c.is_generated]
+            if not columns:
+                continue
             names = ", ".join(f'"{c.name}"' for c in columns)
             for start in range(0, len(table_rows), self._batch_size):
                 batch = table_rows[start : start + self._batch_size]
                 values = ", ".join(
-                    "(" + ", ".join(self._format_value(row[c.name], c) for c in columns) + ")"
+                    "(" + ", ".join(self._format_value(row.get(c.name), c) for c in columns) + ")"
                     for row in batch
                 )
                 statements.append(f'INSERT INTO "{table.name}" ({names}) VALUES\n{values};')
@@ -48,6 +50,12 @@ class InsertScriptBuilder:
         """Formatta un valore SQL: stringhe quotate, NULL, booleani, numeri, date."""
         if value is None:
             return "NULL"
+        if (
+            isinstance(value, str)
+            and column.max_length is not None
+            and len(value) > column.max_length
+        ):
+            value = value[: column.max_length]
         if is_bool_type(column.data_type):
             return "TRUE" if value else "FALSE"
         if is_integer_type(column.data_type):

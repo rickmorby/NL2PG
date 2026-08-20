@@ -5,7 +5,7 @@
 
 from typing import Any, Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from bench.domain.models.base import AbstractDTO
 
@@ -23,6 +23,8 @@ class ColumnSchema:
         is_unique: bool = False,
         fk_parent_table: str | None = None,
         fk_parent_column: str | None = None,
+        max_length: int | None = None,
+        is_generated: bool = False,
     ) -> None:
         """Inizializza i metadati della colonna."""
         self.name = name
@@ -33,6 +35,8 @@ class ColumnSchema:
         self.is_unique = is_unique
         self.fk_parent_table = fk_parent_table
         self.fk_parent_column = fk_parent_column
+        self.max_length = max_length
+        self.is_generated = is_generated
 
 
 class TableSchema:
@@ -77,6 +81,14 @@ class ColumnVariationDTO(AbstractDTO):
     factor_min: float | None = None
     factor_max: float | None = None
     pool: list[str] = Field(default_factory=list)
+
+    @field_validator("pool", mode="before")
+    @classmethod
+    def _coerce_pool(cls, value: Any) -> list[str]:
+        """Coercizza pool a stringhe: LLM invia int/float/bool non quotati."""
+        if isinstance(value, list):
+            return [str(v) if not isinstance(v, str) else v for v in value]
+        return value  # type: ignore[return-value]
 
     @model_validator(mode="after")
     def _check_pool_values(self) -> "ColumnVariationDTO":

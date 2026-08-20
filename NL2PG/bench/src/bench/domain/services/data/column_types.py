@@ -7,7 +7,7 @@ generazione righe e costruzione dello script INSERT.
 :author: Riccardo Morabito
 """
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from bench.domain.models.data import ColumnSchema
@@ -52,10 +52,24 @@ def neutral_value(column: ColumnSchema) -> Any:
 
 
 def shift_value(value: Any, column: ColumnSchema, delta: float) -> Any:
-    """Sposta un valore numerico o di data di delta unita'."""
+    """Sposta un valore numerico o di data di delta unita' (tollerante a T/spazio/Z)."""
     if is_date_type(column.data_type) and isinstance(value, str):
-        parsed = date.fromisoformat(value)
-        return (parsed + timedelta(days=int(delta))).isoformat()
+        normalized = value.strip().replace(" ", "T").rstrip("Z")
+        try:
+            dt = datetime.fromisoformat(normalized)
+            dt = dt + timedelta(days=int(delta))
+            if column.data_type.lower() == "date":
+                return dt.date().isoformat()
+            iso = dt.isoformat()
+            if " " in value and "T" in iso:
+                iso = iso.replace("T", " ", 1)
+            return iso
+        except ValueError:
+            try:
+                parsed = date.fromisoformat(value.strip().split(" ")[0].split("T")[0])
+                return (parsed + timedelta(days=int(delta))).isoformat()
+            except ValueError:
+                return value
     if isinstance(value, (int, float)):
         return value + delta
     return value

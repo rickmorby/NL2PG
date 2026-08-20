@@ -9,6 +9,7 @@ Pydantic e falliscono gia' al parsing dell'output LLM.
 :author: Riccardo Morabito
 """
 
+from logging import getLogger
 from typing import Any
 
 from bench.domain.exceptions.domain_exc import DomainValidationError
@@ -18,6 +19,8 @@ from bench.domain.models.data import (
     TableDataSpecDTO,
     TableSchema,
 )
+
+_log = getLogger("bench.domain.data_spec_validator")
 
 
 class DataSpecValidationError(DomainValidationError):
@@ -58,12 +61,21 @@ class DataSpecValidator:
     def _validate_template(
         table_spec: TableDataSpecDTO, table: TableSchema, template: dict[str, Any]
     ) -> None:
-        """Verifica che le chiavi del template siano colonne reali della tabella."""
+        """Verifica le chiavi del template; rimuove colonne sconosciute con warning."""
         unknown = [key for key in template if table.column(key) is None]
         if unknown:
-            raise DataSpecValidationError(
-                f"Colonne sconosciute nei template di '{table_spec.table}': {unknown}"
+            for key in unknown:
+                template.pop(key, None)
+            _log.warning(
+                "Template di '%s' conteneva colonne sconosciute %s — rimosse",
+                table_spec.table,
+                unknown,
             )
+            if not template:
+                raise DataSpecValidationError(
+                    f"Template di '{table_spec.table}' vuoto dopo "
+                    f"rimozione colonne sconosciute {unknown}"
+                )
 
     @staticmethod
     def _validate_variation(
@@ -77,13 +89,20 @@ class DataSpecValidator:
 
     @staticmethod
     def _validate_per_parent(table_spec: TableDataSpecDTO, table: TableSchema) -> None:
-        """Verifica il moltiplicatore per-parent: una sola FK e non self-reference."""
+        """Verifica il moltiplicatore per-parent; auto-ripara se FK non singola."""
         if len(table.fk_columns) != 1:
-            raise DataSpecValidationError(
-                f"'per_parent_rows' su '{table_spec.table}' richiede esattamente una FK"
+            _log.warning(
+                "'per_parent_rows' su '%s' richiede 1 FK (trovate %d) — ignorato",
+                table_spec.table,
+                len(table.fk_columns),
             )
+            table_spec.per_parent_rows = None
+            return
         fk = table.fk_columns[0]
         if fk.fk_parent_table == table.name:
-            raise DataSpecValidationError(
-                f"'per_parent_rows' non ammesso su self-reference '{table.name}'"
+            _log.warning(
+                "'per_parent_rows' non ammesso su self-reference '%s' — ignorato",
+                table.name,
             )
+            table_spec.per_parent_rows = None
+            return
