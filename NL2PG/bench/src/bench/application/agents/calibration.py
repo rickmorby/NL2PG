@@ -17,8 +17,8 @@ from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
-from bench.domain.services.result_comparator import ResultComparator
-from bench.domain.services.sql_repair import PostgresSQLRepair
+from bench.domain.services.validation.result_comparator import ResultComparator
+from bench.domain.services.validation.sql_repair import PostgresSQLRepair
 
 
 class CalibrationAgent(AbstractAgent):

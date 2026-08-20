@@ -6,7 +6,7 @@
 from bench.application.agents.base import AbstractAgent
 from bench.domain.models.nlp import StoryDTO
 from bench.domain.models.state import TaskStateDTO
-from bench.domain.services.coverage_validator import CoverageValidator
+from bench.domain.services.validation.coverage_validator import CoverageValidator
 
 
 class HardeningAgent(AbstractAgent):

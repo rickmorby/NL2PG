@@ -1,19 +1,3 @@
-"""Pool dei domini aziendali validi per la generazione delle specifiche.
+"""Shim compatibilita: re-export da bench.domain.services.picking.domain_pool."""
 
-:author: Riccardo Morabito
-"""
-
-DOMAIN_POOL: list[str] = [
-    "vendite",
-    "logistica",
-    "sanità",
-    "contabilità",
-    "università",
-    "erp",
-    "ecommerce",
-    "finanza",
-    "risorse_umane",
-    "telecomunicazioni",
-    "assicurazioni",
-    "immobiliare",
-]
+from bench.domain.services.picking.domain_pool import *  # noqa: F403

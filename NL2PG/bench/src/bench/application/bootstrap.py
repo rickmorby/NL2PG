@@ -56,9 +56,9 @@ from bench.domain.ports.inbound import (
     TaskPromoterPort,
     TaskRunnerPort,
 )
-from bench.domain.services.feature_checker import FeatureChecker
-from bench.domain.services.role_example_builder import RoleExampleBuilder
-from bench.domain.services.schema_type_checker import SchemaTypeChecker
+from bench.domain.services.validation.feature_checker import FeatureChecker
+from bench.domain.services.picking.role_example_builder import RoleExampleBuilder
+from bench.domain.services.validation.schema_type_checker import SchemaTypeChecker
 
 
 class ApplicationBootstrap:

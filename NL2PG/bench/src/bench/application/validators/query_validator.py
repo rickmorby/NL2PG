@@ -14,7 +14,7 @@ from bench.domain.exceptions import DatabaseClientError
 from bench.domain.models.spec import SpecDTO
 from bench.domain.models.sql import GoldQueryDTO, GoldResultDTO
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
-from bench.domain.services.feature_checker import FeatureChecker
+from bench.domain.services.validation.feature_checker import FeatureChecker
 
 
 @dataclass

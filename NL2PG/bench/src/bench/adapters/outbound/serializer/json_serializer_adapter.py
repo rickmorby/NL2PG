@@ -10,7 +10,7 @@ from orjson import OPT_INDENT_2, dumps as orjson_dumps, loads as orjson_loads
 
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
-from bench.domain.services.weighted_mean import weighted_mean
+from bench.domain.services.analytics.weighted_mean import weighted_mean
 
 
 class JsonBenchmarkSerializerAdapter(BenchmarkSerializerPort):

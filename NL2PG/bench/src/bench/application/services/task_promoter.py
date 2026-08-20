@@ -8,7 +8,7 @@ from pathlib import Path
 
 from bench.domain.ports.inbound.task_promoter_port import TaskPromoterPort
 from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
-from bench.domain.services.role_example_builder import RoleExampleBuilder
+from bench.domain.services.picking.role_example_builder import RoleExampleBuilder
 
 _log = getLogger("bench.application.task_promoter")
 

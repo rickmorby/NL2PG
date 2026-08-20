@@ -17,7 +17,7 @@ from tqdm import tqdm
 
 from bench.domain.exceptions import BenchException
 from bench.domain.models import TaskStateDTO
-from bench.domain.services.category_round_picker import CategoryRoundPicker
+from bench.domain.services.picking.category_round_picker import CategoryRoundPicker
 
 _log = getLogger("bench.application.generation_loop")
 

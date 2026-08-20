@@ -9,7 +9,7 @@ from typing import Any
 from bench.adapters.outbound.plotter.base import AbstractPlot
 from bench.adapters.outbound.plotter.plots import get_default_plots
 from bench.domain.ports.outbound.plotter_port import PlotterPort
-from bench.domain.services.analytics_calculator import AnalyticsCalculator
+from bench.domain.services.analytics.analytics_calculator import AnalyticsCalculator
 
 
 class SeabornPlotterAdapter(PlotterPort):

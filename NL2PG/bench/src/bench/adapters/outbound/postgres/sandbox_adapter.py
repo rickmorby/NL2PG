@@ -22,7 +22,7 @@ from bench.adapters.outbound.postgres.schema_introspector import (
 from bench.domain.exceptions import DatabaseClientError
 from bench.domain.models.data import SchemaModel
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
-from bench.domain.services.sql_repair import PostgresSQLRepair
+from bench.domain.services.validation.sql_repair import PostgresSQLRepair
 
 _log = getLogger("bench.adapters.postgres")
 

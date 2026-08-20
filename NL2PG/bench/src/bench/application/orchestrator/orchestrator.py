@@ -19,8 +19,8 @@ from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
-from bench.domain.services.coverage_validator import CoverageValidator
-from bench.domain.services.weighted_mean import weighted_mean
+from bench.domain.services.validation.coverage_validator import CoverageValidator
+from bench.domain.services.analytics.weighted_mean import weighted_mean
 
 _log = getLogger("bench.orchestrator")
 

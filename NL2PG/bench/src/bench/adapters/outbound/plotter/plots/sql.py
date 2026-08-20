@@ -8,7 +8,7 @@ from typing import Any
 
 from bench.adapters.outbound.plotter.bar_plot import AbstractBarPlot
 from bench.adapters.outbound.plotter.heatmap_plot import AbstractHeatmapPlot
-from bench.domain.services.analytics_calculator import AnalyticsCalculator
+from bench.domain.services.analytics.analytics_calculator import AnalyticsCalculator
 
 
 _COOCCURRENCE_TOP_K = 14

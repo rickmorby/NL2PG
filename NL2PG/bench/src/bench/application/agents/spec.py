@@ -15,8 +15,8 @@ from bench.domain.ports.outbound.example_port import ExamplePort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
-from bench.domain.services.domain_pool import DOMAIN_POOL
-from bench.domain.services.spec_validation import compute_spec_hash, validate_spec
+from bench.domain.services.picking.domain_pool import DOMAIN_POOL
+from bench.domain.services.validation.spec_validation import compute_spec_hash, validate_spec
 
 
 class SpecAgent(AbstractAgent):

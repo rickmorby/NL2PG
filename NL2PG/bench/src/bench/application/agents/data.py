@@ -19,7 +19,7 @@ from bench.domain.models.sql import DataInsertsDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.example_port import ExamplePort
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
-from bench.domain.services.data_materializer import DataMaterializer
+from bench.domain.services.data.data_materializer import DataMaterializer
 
 _SEED_HEX_LEN = 8
 

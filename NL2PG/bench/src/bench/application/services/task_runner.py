@@ -17,8 +17,8 @@ from bench.domain.ports.inbound.task_runner_port import TaskRunnerPort
 from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
 from bench.domain.ports.outbound.serializer_port import BenchmarkSerializerPort
-from bench.domain.services.category_round_picker import CategoryRoundPicker
-from bench.domain.services.domain_pool import DOMAIN_POOL
+from bench.domain.services.picking.category_round_picker import CategoryRoundPicker
+from bench.domain.services.picking.domain_pool import DOMAIN_POOL
 
 _log = getLogger("bench.application.task_runner")
 

@@ -27,7 +27,7 @@ from bench.adapters.outbound.plotter.plots.sql import (
     SqlFeatureCooccurrencePlot,
     SqlSyntaxDistributionPlot,
 )
-from bench.domain.services.analytics_calculator import AnalyticsCalculator
+from bench.domain.services.analytics.analytics_calculator import AnalyticsCalculator
 
 
 def get_default_plots(calculator: AnalyticsCalculator) -> list[AbstractPlot]:
