@@ -4,6 +4,7 @@
 """
 
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from logging import getLogger
 from pathlib import Path
@@ -26,6 +27,19 @@ from bench.domain.services.category_round_picker import CategoryRoundPicker
 from bench.domain.services.domain_pool import DOMAIN_POOL
 
 _log = getLogger("bench.application.task_runner")
+
+
+@dataclass(frozen=True)
+class _RunContext:
+    """Contesto immutabile di una singola esecuzione del loop di generazione."""
+
+    run_id: str
+    output_file: Path
+    target_new: int
+    requested_count: int
+    category: str
+    batch_size: int
+    document: dict
 
 
 class TaskRunner(TaskRunnerPort):
@@ -89,16 +103,16 @@ class TaskRunner(TaskRunnerPort):
         )
 
         if remaining:
-            summary = self._dispatch_generation(
-                run_id,
-                run_file,
-                remaining,
-                count,
-                category,
-                batch_size,
-                picker,
-                resume_document,
+            context = _RunContext(
+                run_id=run_id,
+                output_file=run_file,
+                target_new=remaining,
+                requested_count=count,
+                category=category,
+                batch_size=batch_size,
+                document=resume_document,
             )
+            summary = self._run_generation(context, picker)
         else:
             self._serializer.write(resume_document, run_file)
             summary = self._build_summary_from_db(run_id, run_file, count, [])
@@ -142,34 +156,6 @@ class TaskRunner(TaskRunnerPort):
             return run_id, run_file, self._serializer.build_document([], run_id), {}
         return self._prepare_resume(resume_path, cfg_hash, cat_hash, categories)
 
-    def _dispatch_generation(
-        self,
-        run_id: str,
-        run_file: Path,
-        remaining: int,
-        requested_count: int,
-        category: str,
-        batch_size: int,
-        picker: CategoryRoundPicker | None,
-        output_document: dict,
-    ) -> BatchSummaryDTO:
-        """Smista l'esecuzione tra parallela e sequenziale."""
-        if batch_size > 1:
-            return self._run_parallel(
-                run_info=(run_id, run_file, remaining, requested_count, category, batch_size),
-                picker=picker,
-                output_document=output_document,
-            )
-        return self._run_sequential(
-            run_id=run_id,
-            output_file=run_file,
-            count=remaining,
-            requested_count=requested_count,
-            category=category,
-            picker=picker,
-            output_document=output_document,
-        )
-
     def _try_analytics(self, run_id: str, run_file: Path) -> None:
         """Tenta la generazione analytics senza propagare errori."""
         if self._analytics:
@@ -207,9 +193,7 @@ class TaskRunner(TaskRunnerPort):
             raise ValueError("La configurazione bench.toml non corrisponde a quella della run.")
         if metadata.categories_hash != categories_hash:
             raise ValueError("Il catalogo categories.json non corrisponde a quello della run.")
-
         json_counts = self._count_json_tasks(document, categories)
-
         db_counts = self._meta_repo.get_accepted_counts_by_category(run_id)
         if db_counts != json_counts:
             raise ValueError(
@@ -258,12 +242,11 @@ class TaskRunner(TaskRunnerPort):
     def _process_verdict(
         self,
         result_state: TaskStateDTO,
+        context: _RunContext,
         accepted_tasks: list[TaskStateDTO],
         counts: dict[str, int],
-        run_file: Path,
         picker: CategoryRoundPicker | None,
         failure_warning_threshold: int,
-        output_document: dict,
     ) -> int:
         """Elabora l'esito di un task aggiornando livelli, contatori e file di output."""
         verdict = result_state.verdict
@@ -273,8 +256,8 @@ class TaskRunner(TaskRunnerPort):
             with self._lock:
                 accepted_tasks.append(result_state)
                 weights = self._config.critic_weights()
-                doc = self._serializer.merge_tasks(output_document, [result_state], weights)
-                self._serializer.write(doc, run_file)
+                doc = self._serializer.merge_tasks(context.document, [result_state], weights)
+                self._serializer.write(doc, context.output_file)
             return 0
         if verdict == "rejected":
             counts["rejected"] += 1
@@ -298,94 +281,41 @@ class TaskRunner(TaskRunnerPort):
         if failures == failure_warning_threshold:
             _log.warning("Categoria '%s': %d tentativi falliti consecutivi.", category, failures)
 
-    def _run_sequential(
+    def _run_generation(
         self,
-        run_id: str,
-        output_file: Path,
-        count: int,
-        requested_count: int,
-        category: str,
+        context: _RunContext,
         picker: CategoryRoundPicker | None,
-        output_document: dict,
     ) -> BatchSummaryDTO:
-        """Esegue la generazione sequenziale di task uno alla volta."""
+        """Esegue la generazione dei task con un pool di worker (1 worker = sequenziale)."""
         max_fails = self._config.cli_max_consecutive_failures()
         failure_warning_threshold = self._config.cli_category_failure_warning()
         accepted_tasks: list[TaskStateDTO] = []
         counts = {"rejected": 0, "scrapped": 0, "failed": 0}
         consecutive_failures = 0
-
-        with tqdm(total=count, desc="Generazione Task (Sequenziale)", smoothing=0.1) as pbar:
-            while len(accepted_tasks) < count:
-                initial_state = self._create_initial_state(category, picker)
-                if initial_state is None:
-                    break
-                result_state = self._orchestrator.run_task(initial_state, run_id)
-                self._meta_repo.save_task(run_id, result_state)
-
-                fail_delta = self._process_verdict(
-                    result_state,
-                    accepted_tasks,
-                    counts,
-                    output_file,
-                    picker,
-                    failure_warning_threshold,
-                    output_document,
-                )
-                if result_state.verdict in ("accepted", "accept"):
-                    pbar.update(1)
-                if fail_delta > 0:
-                    consecutive_failures += fail_delta
-                    if consecutive_failures >= max_fails:
-                        _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
-                        break
-                else:
-                    consecutive_failures = 0
-
-                pbar.set_postfix(
-                    acc=len(accepted_tasks),
-                    rej=counts["rejected"],
-                    verdict=result_state.verdict,
-                )
-
-        return self._build_summary_from_db(run_id, output_file, requested_count, accepted_tasks)
-
-    def _run_parallel(
-        self,
-        run_info: tuple[str, Path, int, int, str, int],
-        picker: CategoryRoundPicker | None,
-        output_document: dict,
-    ) -> BatchSummaryDTO:
-        """Esegue la generazione parallela in batch tramite ThreadPoolExecutor con Lock."""
-        run_id, output_file, count, requested_count, _category, batch_size = run_info
-        max_fails = self._config.cli_max_consecutive_failures()
-        failure_warning_threshold = self._config.cli_category_failure_warning()
-        accepted_tasks: list[TaskStateDTO] = []
-        counts = {"rejected": 0, "scrapped": 0, "failed": 0}
-        consecutive_failures = 0
-
-        desc = f"Generazione Task (Parallel {batch_size})"
-        with tqdm(total=count, desc=desc, smoothing=0.1) as pbar:
-            executor = ThreadPoolExecutor(max_workers=batch_size)
+        desc = (
+            "Generazione Task (Sequenziale)"
+            if context.batch_size == 1
+            else f"Generazione Task (Parallel {context.batch_size})"
+        )
+        with tqdm(total=context.target_new, desc=desc, smoothing=0.1) as pbar:
+            executor = ThreadPoolExecutor(max_workers=context.batch_size)
             try:
                 futures: dict = {}
-                self._submit_pending(executor, futures, accepted_tasks, run_info, picker)
-
+                self._submit_pending(executor, futures, accepted_tasks, context, picker)
                 while futures and consecutive_failures < max_fails:
                     done, _ = wait(futures.keys(), return_when=FIRST_COMPLETED)
                     for fut in done:
                         cat_id = futures.pop(fut)
                         try:
                             result_state = fut.result()
-                            self._meta_repo.save_task(run_id, result_state)
+                            self._meta_repo.save_task(context.run_id, result_state)
                             fail_delta = self._process_verdict(
                                 result_state,
+                                context,
                                 accepted_tasks,
                                 counts,
-                                output_file,
                                 picker,
                                 failure_warning_threshold,
-                                output_document,
                             )
                             if result_state.verdict in ("accepted", "accept"):
                                 pbar.update(1)
@@ -401,19 +331,16 @@ class TaskRunner(TaskRunnerPort):
                             ValueError,
                             RuntimeError,
                         ) as e:
-                            _log.debug("Errore task parallelo per categoria '%s': %s", cat_id, e)
+                            _log.debug("Errore task per categoria '%s': %s", cat_id, e)
                             counts["failed"] += 1
                             consecutive_failures += 1
                             self._resolve_category(cat_id, False, picker, failure_warning_threshold)
-
-                        self._submit_pending(executor, futures, accepted_tasks, run_info, picker)
-
+                        self._submit_pending(executor, futures, accepted_tasks, context, picker)
                         pbar.set_postfix(
                             acc=len(accepted_tasks),
                             active=len(futures),
                             cat=cat_id,
                         )
-
                 if consecutive_failures >= max_fails:
                     _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
                     for pending in futures:
@@ -425,23 +352,27 @@ class TaskRunner(TaskRunnerPort):
             else:
                 executor.shutdown(wait=True)
 
-        return self._build_summary_from_db(run_id, output_file, requested_count, accepted_tasks)
+        return self._build_summary_from_db(
+            context.run_id, context.output_file, context.requested_count, accepted_tasks
+        )
 
     def _submit_pending(
         self,
         executor: ThreadPoolExecutor,
         futures: dict,
         accepted_tasks: list[TaskStateDTO],
-        run_info: tuple[str, Path, int, int, str, int],
+        context: _RunContext,
         picker: CategoryRoundPicker | None,
     ) -> None:
         """Sottomette nuovi task finché il batch è pieno e la richiesta non è soddisfatta."""
-        run_id, _output_file, count, _requested_count, category, batch_size = run_info
-        while len(futures) < batch_size and (len(accepted_tasks) + len(futures)) < count:
-            init_state = self._create_initial_state(category, picker)
+        while (
+            len(futures) < context.batch_size
+            and (len(accepted_tasks) + len(futures)) < context.target_new
+        ):
+            init_state = self._create_initial_state(context.category, picker)
             if init_state is None:
                 break
-            fut = executor.submit(self._orchestrator.run_task, init_state, run_id)
+            fut = executor.submit(self._orchestrator.run_task, init_state, context.run_id)
             futures[fut] = init_state.category
 
     def _build_summary_from_db(
