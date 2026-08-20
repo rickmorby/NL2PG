@@ -73,3 +73,4 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "src/bench/adapters/inbound/cli/app.py" = ["BLE001"]
+"src/bench/adapters/inbound/cli/commands/*.py" = ["BLE001"]
