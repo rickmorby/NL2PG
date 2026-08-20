@@ -4,6 +4,7 @@
 """
 
 from abc import ABC, abstractmethod
+from bench.domain.models.document import RunMetadataDTO
 from bench.domain.models.state import TaskStateDTO
 
 
@@ -13,6 +14,14 @@ class MetaRepositoryPort(ABC):
     @abstractmethod
     def new_run(self, config_hash: str, categories_hash: str) -> str:
         """Registra una nuova esecuzione e restituisce l'identificativo univoco run_id."""
+
+    @abstractmethod
+    def get_run_metadata(self, run_id: str) -> RunMetadataDTO | None:
+        """Restituisce i metadati persistiti della run, oppure None se assente."""
+
+    @abstractmethod
+    def get_accepted_counts_by_category(self, run_id: str) -> dict[str, int]:
+        """Restituisce il numero di task accepted per categoria nella run."""
 
     @abstractmethod
     def is_spec_duplicated(self, category: str, spec_hash: str) -> bool:

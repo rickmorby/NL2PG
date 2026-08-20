@@ -10,6 +10,7 @@ from bench.adapters.outbound.postgres.database_adapter import PostgresClientAdap
 from bench.adapters.outbound.postgres.entities import RunEntity, TaskEntity
 from bench.adapters.outbound.postgres.mappers import TaskStateMapper
 from bench.domain.exceptions import DatabaseClientError
+from bench.domain.models.document import RunMetadataDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
 
@@ -38,6 +39,41 @@ class MetaRepositoryAdapter(MetaRepositoryPort):
             raise
         except (pg_errors.Error, Exception) as e:
             msg = f"Errore durante la registrazione della nuova run: {e}"
+            raise DatabaseClientError(msg) from e
+
+    def get_run_metadata(self, run_id: str) -> RunMetadataDTO | None:
+        """Restituisce i metadati di una run persistita, se esistente."""
+        try:
+            with self._client.get_meta_session() as session:
+                entity = session.get(RunEntity, run_id)
+                if entity is None:
+                    return None
+                return RunMetadataDTO(
+                    run_id=entity.id,
+                    config_hash=entity.config_hash,
+                    categories_hash=entity.categories_hash,
+                )
+        except DatabaseClientError:
+            raise
+        except (pg_errors.Error, Exception) as e:
+            msg = f"Errore durante il recupero dei metadati della run '{run_id}': {e}"
+            raise DatabaseClientError(msg) from e
+
+    def get_accepted_counts_by_category(self, run_id: str) -> dict[str, int]:
+        """Restituisce i conteggi accepted per categoria di una run persistita."""
+        try:
+            with self._client.get_meta_session() as session:
+                stmt = (
+                    select(TaskEntity.category, func.count(TaskEntity.task_id))
+                    .where(TaskEntity.run_id == run_id)
+                    .where(TaskEntity.verdict.in_(["accepted", "accept"]))
+                    .group_by(TaskEntity.category)
+                )
+                return {category: count for category, count in session.execute(stmt).all()}
+        except DatabaseClientError:
+            raise
+        except (pg_errors.Error, Exception) as e:
+            msg = f"Errore durante il recupero dei conteggi accepted della run '{run_id}': {e}"
             raise DatabaseClientError(msg) from e
 
     def is_spec_duplicated(self, category: str, spec_hash: str) -> bool:

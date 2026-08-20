@@ -26,6 +26,15 @@ class BenchmarkSerializerPort(ABC):
         """Legge e deserializza in byte UTF-8 un file JSON su filesystem."""
 
     @abstractmethod
+    def merge_tasks(
+        self,
+        document: dict,
+        tasks: list[TaskStateDTO],
+        weights: dict | None = None,
+    ) -> dict:
+        """Aggiunge task accepted a un documento esistente senza duplicarli."""
+
+    @abstractmethod
     def write(self, document: dict, output_path: Path) -> None:
         """Scrive atomicamente il documento JSON su file temporaneo e lo rimpiazza."""
 

@@ -57,53 +57,189 @@ class TaskRunner(TaskRunnerPort):
         count: int | None = None,
         category: str = "",
         batch_size: int = 1,
+        resume_path: Path | None = None,
     ) -> BatchSummaryDTO:
-        """Esegue una run di generazione in modalità sequenziale o parallela."""
+        """Esegue una nuova run oppure riprende una run esistente da un JSON."""
         start_time = time()
         categories = self._config.load_categories()
+        count, category = self._validate_run_args(count, category, categories, resume_path)
+
+        cfg_hash = self._config.bench_hash()
+        cat_hash = self._config.config_hash({"categories": list(categories.keys())})
+        run_id, run_file, resume_document, accepted_counts = self._init_or_resume(
+            resume_path, cfg_hash, cat_hash, categories
+        )
+        accepted_count = sum(accepted_counts.values())
+        if resume_path is not None and count < accepted_count:
+            raise ValueError(
+                f"Il limite di resume ({count}) è inferiore ai task già accettati "
+                f"({accepted_count})."
+            )
+
+        remaining = count - accepted_count
+        picker = None if category else CategoryRoundPicker(list(categories.keys()), accepted_counts)
+        _log.info(
+            "%s run: run_id=%s, target=%d, accepted=%d, remaining=%d, run_file=%s",
+            "Resume" if resume_path else "Nuova",
+            run_id,
+            count,
+            accepted_count,
+            remaining,
+            run_file.name,
+        )
+
+        if remaining:
+            summary = self._dispatch_generation(
+                run_id,
+                run_file,
+                remaining,
+                count,
+                category,
+                batch_size,
+                picker,
+                resume_document,
+            )
+        else:
+            self._serializer.write(resume_document, run_file)
+            summary = self._build_summary_from_db(run_id, run_file, count, [])
+
+        duration = round(time() - start_time, 2)
+        summary.duration_seconds = duration
+        self._try_analytics(run_id, run_file)
+        return summary
+
+    @staticmethod
+    def _validate_run_args(
+        count: int | None,
+        category: str,
+        categories: dict,
+        resume_path: Path | None,
+    ) -> tuple[int, str]:
+        """Valida e normalizza gli argomenti di ingresso."""
         if count is None:
             count = len(categories)
+        if count <= 0:
+            raise ValueError("Il limite deve essere maggiore di zero.")
         if category and category not in categories:
             allowed = sorted(list(categories.keys()))
             msg = f"Categoria '{category}' non valida. Categorie disponibili: {allowed}"
             raise ValueError(msg)
-        picker = None if category else CategoryRoundPicker(list(categories.keys()))
+        if category and resume_path is not None:
+            raise ValueError("--category non può essere usato insieme a --resume.")
+        return count, category
 
-        cfg_hash = self._config.bench_hash()
-        cat_hash = self._config.config_hash({"categories": list(categories.keys())})
+    def _init_or_resume(
+        self,
+        resume_path: Path | None,
+        cfg_hash: str,
+        cat_hash: str,
+        categories: dict,
+    ) -> tuple[str, Path, dict, dict[str, int]]:
+        """Inizializza una nuova run o prepara il resume da file esistente."""
+        if resume_path is None:
+            run_id = self._meta_repo.new_run(cfg_hash, cat_hash)
+            run_file = self._new_run_file(run_id)
+            return run_id, run_file, self._serializer.build_document([], run_id), {}
+        return self._prepare_resume(resume_path, cfg_hash, cat_hash, categories)
 
-        run_id = self._meta_repo.new_run(cfg_hash, cat_hash)
-        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-        benchmarks_dir = self._base_output_dir / "benchmarks"
-        benchmarks_dir.mkdir(parents=True, exist_ok=True)
-        run_file = benchmarks_dir / f"run_{timestamp}_{run_id}.json"
-
-        _log.info("Nuova run avviata: run_id=%s, run_file=%s", run_id, run_file.name)
-
+    def _dispatch_generation(
+        self,
+        run_id: str,
+        run_file: Path,
+        remaining: int,
+        requested_count: int,
+        category: str,
+        batch_size: int,
+        picker: CategoryRoundPicker | None,
+        output_document: dict,
+    ) -> BatchSummaryDTO:
+        """Smista l'esecuzione tra parallela e sequenziale."""
         if batch_size > 1:
-            summary = self._run_parallel(
-                run_info=(run_id, run_file, count, category, batch_size),
+            return self._run_parallel(
+                run_info=(run_id, run_file, remaining, requested_count, category, batch_size),
                 picker=picker,
+                output_document=output_document,
             )
-        else:
-            summary = self._run_sequential(
-                run_id=run_id,
-                output_file=run_file,
-                count=count,
-                category=category,
-                picker=picker,
-            )
+        return self._run_sequential(
+            run_id=run_id,
+            output_file=run_file,
+            count=remaining,
+            requested_count=requested_count,
+            category=category,
+            picker=picker,
+            output_document=output_document,
+        )
 
-        duration = round(time() - start_time, 2)
-        summary.duration_seconds = duration
-
+    def _try_analytics(self, run_id: str, run_file: Path) -> None:
+        """Tenta la generazione analytics senza propagare errori."""
         if self._analytics:
             try:
                 self._analytics.generate_analytics(run_file)
             except (BenchException, OSError, ValueError, RuntimeError) as e:
                 _log.warning("Generazione analytics per la run '%s' fallita: %s", run_id, e)
 
-        return summary
+    def _new_run_file(self, run_id: str) -> Path:
+        """Crea il percorso del JSON per una nuova run."""
+        timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        benchmarks_dir = self._base_output_dir / "benchmarks"
+        benchmarks_dir.mkdir(parents=True, exist_ok=True)
+        return benchmarks_dir / f"run_{timestamp}_{run_id}.json"
+
+    def _prepare_resume(
+        self,
+        resume_path: Path,
+        config_hash: str,
+        categories_hash: str,
+        categories: dict,
+    ) -> tuple[str, Path, dict, dict[str, int]]:
+        """Valida JSON e database e ricostruisce lo stato accepted della run."""
+        path = resume_path.expanduser().resolve()
+        if not path.is_file():
+            raise ValueError(f"File di resume non trovato: {path}")
+        document = self._serializer.read(path)
+        run_id = document.get("run_id", "")
+        if not isinstance(run_id, str) or not run_id:
+            raise ValueError("Il documento di resume non contiene un run_id valido.")
+        metadata = self._meta_repo.get_run_metadata(run_id)
+        if metadata is None:
+            raise ValueError(f"La run '{run_id}' non esiste nel database dei metadati.")
+        if metadata.config_hash != config_hash:
+            raise ValueError("La configurazione bench.toml non corrisponde a quella della run.")
+        if metadata.categories_hash != categories_hash:
+            raise ValueError("Il catalogo categories.json non corrisponde a quello della run.")
+
+        json_counts = self._count_json_tasks(document, categories)
+
+        db_counts = self._meta_repo.get_accepted_counts_by_category(run_id)
+        if db_counts != json_counts:
+            raise ValueError(
+                "JSON e database non sono allineati sui task accepted; "
+                "resume annullato per evitare perdita di dati."
+            )
+        return run_id, path, document, db_counts
+
+    @staticmethod
+    def _count_json_tasks(document: dict, categories: dict) -> dict[str, int]:
+        """Conta i task accepted per categoria presenti nel JSON."""
+        tasks = document.get("tasks")
+        if not isinstance(tasks, list):
+            raise ValueError("Il documento di resume deve contenere una lista 'tasks'.")
+        json_counts: dict[str, int] = {}
+        task_ids: set[str] = set()
+        for task in tasks:
+            if not isinstance(task, dict):
+                raise ValueError("Il documento di resume contiene un task non valido.")
+            task_id = task.get("task_id")
+            task_category = task.get("category")
+            if not isinstance(task_id, str) or not task_id or task_id in task_ids:
+                raise ValueError("Il documento di resume contiene task_id mancanti o duplicati.")
+            if task_category not in categories:
+                raise ValueError(
+                    f"Il documento di resume contiene categoria sconosciuta: {task_category}"
+                )
+            task_ids.add(task_id)
+            json_counts[task_category] = json_counts.get(task_category, 0) + 1
+        return json_counts
 
     def _create_initial_state(
         self,
@@ -127,6 +263,7 @@ class TaskRunner(TaskRunnerPort):
         run_file: Path,
         picker: CategoryRoundPicker | None,
         failure_warning_threshold: int,
+        output_document: dict,
     ) -> int:
         """Elabora l'esito di un task aggiornando livelli, contatori e file di output."""
         verdict = result_state.verdict
@@ -136,7 +273,7 @@ class TaskRunner(TaskRunnerPort):
             with self._lock:
                 accepted_tasks.append(result_state)
                 weights = self._config.critic_weights()
-                doc = self._serializer.build_document(accepted_tasks, result_state.run_id, weights)
+                doc = self._serializer.merge_tasks(output_document, [result_state], weights)
                 self._serializer.write(doc, run_file)
             return 0
         if verdict == "rejected":
@@ -166,8 +303,10 @@ class TaskRunner(TaskRunnerPort):
         run_id: str,
         output_file: Path,
         count: int,
+        requested_count: int,
         category: str,
         picker: CategoryRoundPicker | None,
+        output_document: dict,
     ) -> BatchSummaryDTO:
         """Esegue la generazione sequenziale di task uno alla volta."""
         max_fails = self._config.cli_max_consecutive_failures()
@@ -191,6 +330,7 @@ class TaskRunner(TaskRunnerPort):
                     output_file,
                     picker,
                     failure_warning_threshold,
+                    output_document,
                 )
                 if result_state.verdict in ("accepted", "accept"):
                     pbar.update(1)
@@ -208,15 +348,16 @@ class TaskRunner(TaskRunnerPort):
                     verdict=result_state.verdict,
                 )
 
-        return self._build_summary_from_db(run_id, output_file, count, accepted_tasks)
+        return self._build_summary_from_db(run_id, output_file, requested_count, accepted_tasks)
 
     def _run_parallel(
         self,
-        run_info: tuple[str, Path, int, str, int],
+        run_info: tuple[str, Path, int, int, str, int],
         picker: CategoryRoundPicker | None,
+        output_document: dict,
     ) -> BatchSummaryDTO:
         """Esegue la generazione parallela in batch tramite ThreadPoolExecutor con Lock."""
-        run_id, output_file, count, _category, batch_size = run_info
+        run_id, output_file, count, requested_count, _category, batch_size = run_info
         max_fails = self._config.cli_max_consecutive_failures()
         failure_warning_threshold = self._config.cli_category_failure_warning()
         accepted_tasks: list[TaskStateDTO] = []
@@ -244,6 +385,7 @@ class TaskRunner(TaskRunnerPort):
                                 output_file,
                                 picker,
                                 failure_warning_threshold,
+                                output_document,
                             )
                             if result_state.verdict in ("accepted", "accept"):
                                 pbar.update(1)
@@ -283,18 +425,18 @@ class TaskRunner(TaskRunnerPort):
             else:
                 executor.shutdown(wait=True)
 
-        return self._build_summary_from_db(run_id, output_file, count, accepted_tasks)
+        return self._build_summary_from_db(run_id, output_file, requested_count, accepted_tasks)
 
     def _submit_pending(
         self,
         executor: ThreadPoolExecutor,
         futures: dict,
         accepted_tasks: list[TaskStateDTO],
-        run_info: tuple[str, Path, int, str, int],
+        run_info: tuple[str, Path, int, int, str, int],
         picker: CategoryRoundPicker | None,
     ) -> None:
         """Sottomette nuovi task finché il batch è pieno e la richiesta non è soddisfatta."""
-        run_id, _output_file, count, category, batch_size = run_info
+        run_id, _output_file, count, _requested_count, category, batch_size = run_info
         while len(futures) < batch_size and (len(accepted_tasks) + len(futures)) < count:
             init_state = self._create_initial_state(category, picker)
             if init_state is None:

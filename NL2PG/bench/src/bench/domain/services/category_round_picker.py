@@ -22,9 +22,21 @@ class CategoryRoundPicker:
     prima o poi completata.
     """
 
-    def __init__(self, categories: Sequence[str]) -> None:
-        """Inizializza il selettore con le categorie mescolate al livello zero."""
-        self._levels: dict[int, deque[str]] = {0: deque(sample(categories, len(categories)))}
+    def __init__(
+        self,
+        categories: Sequence[str],
+        accepted_counts: dict[str, int] | None = None,
+    ) -> None:
+        """Inizializza il selettore dai conteggi accepted, o dal livello zero."""
+        counts = accepted_counts or {}
+        unknown = set(counts) - set(categories)
+        if unknown:
+            raise ValueError(f"Conteggi accepted per categorie sconosciute: {sorted(unknown)}")
+        self._levels: dict[int, deque[str]] = {}
+        shuffled = sample(list(categories), len(categories))
+        for category in shuffled:
+            level = counts.get(category, 0)
+            self._levels.setdefault(level, deque()).append(category)
         self._pending: dict[str, int] = {}
         self._failures: dict[str, int] = {}
 

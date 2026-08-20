@@ -8,6 +8,7 @@ from signal import SIGINT, getsignal, signal
 
 environ.setdefault("HF_HUB_OFFLINE", "1")
 
+from pathlib import Path
 from typing import Annotated, Any
 
 from rich.console import Console
@@ -113,6 +114,10 @@ def generate_command(
     ] = None,
     category: Annotated[str, Option("--category", "-cat", help="Filtro id categoria.")] = "",
     batch_size: Annotated[int, Option("--batch-size", "-b", help="Worker concorrenti.")] = 1,
+    resume: Annotated[
+        Path | None,
+        Option("--resume", help="Riprende una run esistente dal relativo file JSON."),
+    ] = None,
 ) -> None:
     """Esegue la generazione batch dei task del benchmark in formato JSON unico."""
     bootstrap: ApplicationBootstrap = ctx.obj
@@ -126,8 +131,15 @@ def generate_command(
         cat_str = category if category else "Tutte (Selezione a giri)"
         secho(f"  Categoria: {cat_str}", fg=colors.WHITE)
         secho(f"  Batch size: {batch_size}", fg=colors.WHITE)
+        if resume:
+            secho(f"  Resume: {resume}", fg=colors.WHITE)
 
-        summary = runner.run_batch(count=limit, category=category, batch_size=batch_size)
+        summary = runner.run_batch(
+            count=limit,
+            category=category,
+            batch_size=batch_size,
+            resume_path=resume,
+        )
 
         secho("\n[RIEPILOGO RUN]", fg=colors.CYAN, bold=True)
         secho(f"  Run ID: {summary.run_id}", fg=colors.WHITE)

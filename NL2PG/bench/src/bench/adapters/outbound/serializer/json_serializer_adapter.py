@@ -36,6 +36,20 @@ class JsonBenchmarkSerializerAdapter(BenchmarkSerializerPort):
             "tasks": [self._build_entry(t, weights or {}) for t in accepted],
         }
 
+    def merge_tasks(
+        self,
+        document: dict,
+        tasks: list[TaskStateDTO],
+        weights: dict | None = None,
+    ) -> dict:
+        """Aggiunge task accepted al documento esistente usando task_id come chiave."""
+        entries = {entry["task_id"]: entry for entry in document.get("tasks", [])}
+        for task in tasks:
+            if task.verdict in ("accepted", "accept"):
+                entries[task.task_id] = self._build_entry(task, weights or {})
+        document["tasks"] = list(entries.values())
+        return document
+
     def read(self, input_path: Path) -> dict:
         """Legge e deserializza in byte UTF-8 un file JSON su filesystem."""
         return orjson_loads(input_path.read_bytes())
