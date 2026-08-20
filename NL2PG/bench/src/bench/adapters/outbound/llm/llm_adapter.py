@@ -3,6 +3,7 @@
 :author: Riccardo Morabito
 """
 
+import time
 from asyncio import get_event_loop
 from contextlib import suppress
 from logging import CRITICAL as LOG_CRITICAL, getLogger
@@ -114,6 +115,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             "optional_pre_call_checks", ["enforce_model_rate_limits"]
         )
         self._stream_timeout = retry_cfg.get("stream_timeout", 60)
+        self._max_call_seconds = float(retry_cfg.get("max_call_seconds", 240))
 
         model_list = self._build_model_list(self._config)
         fallbacks = self._build_fallbacks(self._config)
@@ -151,7 +153,7 @@ class LLMClientAdapter(LLMGeneratorPort):
                 return model_id
         return role
 
-    def call_model(
+    def call_model(  # noqa: C901, PLR0912, PLR0915
         self,
         role: str,
         prompt: str,
@@ -183,7 +185,27 @@ class LLMClientAdapter(LLMGeneratorPort):
                 if opts.temperature_override is not None:
                     kwargs["temperature"] = opts.temperature_override
 
-                chunks = list(self._router.completion(**kwargs))
+                deadline = (
+                    time.monotonic() + self._max_call_seconds if self._max_call_seconds else None
+                )
+                chunks: list[Any] = []
+                stream = self._router.completion(**kwargs)
+                try:
+                    for chunk in stream:
+                        if deadline is not None and time.monotonic() > deadline:
+                            with suppress(Exception):
+                                if hasattr(stream, "close"):
+                                    stream.close()  # type: ignore[attr-defined]
+                            raise Timeout(
+                                message=f"Watchdog {self._max_call_seconds:g}s exceeded",
+                                model=model_group,
+                                llm_provider="watchdog",
+                            )
+                        chunks.append(chunk)
+                finally:
+                    with suppress(Exception):
+                        if hasattr(stream, "close"):
+                            stream.close()  # type: ignore[attr-defined]
                 response = stream_chunk_builder(chunks, messages=messages)
                 if response is None:
                     msg_err = (
