@@ -115,9 +115,20 @@ class LLMClientAdapter(LLMGeneratorPort):
         )
         self._stream_timeout = retry_cfg.get("stream_timeout", 60)
 
+        model_list = self._build_model_list(self._config)
+        fallbacks = self._build_fallbacks(self._config)
+        max_fallbacks = (
+            max(
+                (len(chain) for chain in self._config.get("chains", {}).values()),
+                default=1,
+            )
+            - 1
+        )
+
         self._router = Router(
-            model_list=self._build_model_list(self._config),
-            fallbacks=self._build_fallbacks(self._config),
+            model_list=model_list,
+            fallbacks=fallbacks,
+            max_fallbacks=max_fallbacks,
             routing_strategy=strategy,
             num_retries=num_retries,
             cooldown_time=cooldown_time,
@@ -132,13 +143,12 @@ class LLMClientAdapter(LLMGeneratorPort):
         chains = self._config.get("chains", {})
         return list(chains.get(role, []))
 
-    def _primary_pool(self, role: str) -> str:
-        """Risolve il ruolo nel pool primario (primo gateway della sua catena)."""
+    def _primary_model_group(self, role: str) -> str:
+        """Risolve il ruolo nel model group del primo modello della catena."""
         models = self._config.get("models", {})
-        for mid in self.get_chain(role):
-            mc = models.get(mid)
-            if mc is not None:
-                return mc.get("pool", mid)
+        for model_id in self.get_chain(role):
+            if model_id in models:
+                return model_id
         return role
 
     def call_model(
@@ -148,62 +158,77 @@ class LLMClientAdapter(LLMGeneratorPort):
         schema: type[BaseModel] | type,
         options: CallOptionsDTO | None = None,
     ) -> CallResultDTO:
-        """Chiama la catena LLM guidata dai prompt con failover automatico via liteLLM Router."""
+        """Chiama i modelli della catena e passa subito al successivo su errore provider."""
         opts = options or CallOptionsDTO()
         messages = [{"role": "user", "content": prompt}]
-
         if opts.error_feedback:
             msg = f"ERRORE PRECEDENTE:\n{opts.error_feedback}\n\nCorreggi e riprova."
             messages.append({"role": "user", "content": msg})
 
-        try:
-            kwargs: dict[str, Any] = {
-                "model": self._primary_pool(role),
-                "messages": messages,
-                "stream": True,
-            }
-            if opts.temperature_override is not None:
-                kwargs["temperature"] = opts.temperature_override
+        models = self._config.get("models", {})
+        chain = [model_id for model_id in self.get_chain(role) if model_id in models]
+        if not chain:
+            chain = [self._primary_model_group(role)]
 
-            chunks = list(self._router.completion(**kwargs))
-            response = stream_chunk_builder(chunks, messages=messages)
-            if response is None:
-                msg_err = (
-                    "L'output del modello è vuoto. "
-                    "Il modello potrebbe aver esaurito i token nel ragionamento CoT. "
-                    "Rispondere ESCLUSIVAMENTE con JSON valido."
-                )
-                payload = {"schema": schema.__name__, "raw": ""}
-                raise ModelOutputContractError(msg_err, payload=payload)
-            msg = response.choices[0].message
-            content = getattr(msg, "content", None) or ""
-
-            cleaned_json = self._extract_json_payload(content)
-
-            if not cleaned_json:
-                msg_err = (
-                    f"L'output del modello '{response.model}' è vuoto. "
-                    "Il modello potrebbe aver esaurito i token nel ragionamento CoT. "
-                    "Rispondere ESCLUSIVAMENTE con JSON valido."
-                )
-                payload = {"schema": schema.__name__, "raw": ""}
-                raise ModelOutputContractError(msg_err, payload=payload)
-
+        provider_errors: list[str] = []
+        for model_group in chain:
             try:
-                output = schema.model_validate_json(cleaned_json)
-            except ValidationError as ve:
-                msg_err = (
-                    f"L'output del modello '{response.model}' non rispetta lo schema "
-                    f"'{schema.__name__}': {ve}. Rispondere ESCLUSIVAMENTE con JSON valido."
-                )
-                payload = {"schema": schema.__name__, "raw": cleaned_json}
-                raise ModelOutputContractError(msg_err, payload=payload) from ve
+                kwargs: dict[str, Any] = {
+                    "model": model_group,
+                    "messages": messages,
+                    "stream": True,
+                    "disable_fallbacks": True,
+                    "num_retries": 0,
+                }
+                if opts.temperature_override is not None:
+                    kwargs["temperature"] = opts.temperature_override
 
-            return CallResultDTO(output=output, model_used=response.model)
-        except ModelOutputContractError:
-            raise
-        except _LITELLM_PROVIDER_EXCEPTIONS as e:
-            raise LLMClientError(f"Catena {role} esaurita: {e}") from e
+                chunks = list(self._router.completion(**kwargs))
+                response = stream_chunk_builder(chunks, messages=messages)
+                if response is None:
+                    msg_err = (
+                        "L'output del modello è vuoto. "
+                        "Il modello potrebbe aver esaurito i token nel ragionamento CoT. "
+                        "Rispondere ESCLUSIVAMENTE con JSON valido."
+                    )
+                    payload = {"schema": schema.__name__, "raw": ""}
+                    raise ModelOutputContractError(msg_err, payload=payload)
+                msg = response.choices[0].message
+                content = getattr(msg, "content", None) or ""
+                cleaned_json = self._extract_json_payload(content)
+
+                if not cleaned_json:
+                    msg_err = (
+                        f"L'output del modello '{response.model}' è vuoto. "
+                        "Il modello potrebbe aver esaurito i token nel ragionamento CoT. "
+                        "Rispondere ESCLUSIVAMENTE con JSON valido."
+                    )
+                    payload = {"schema": schema.__name__, "raw": ""}
+                    raise ModelOutputContractError(msg_err, payload=payload)
+
+                try:
+                    output = schema.model_validate_json(cleaned_json)
+                except ValidationError as ve:
+                    msg_err = (
+                        f"L'output del modello '{response.model}' non rispetta lo schema "
+                        f"'{schema.__name__}': {ve}. Rispondere ESCLUSIVAMENTE con JSON valido."
+                    )
+                    payload = {"schema": schema.__name__, "raw": cleaned_json}
+                    raise ModelOutputContractError(msg_err, payload=payload) from ve
+
+                return CallResultDTO(output=output, model_used=response.model)
+            except ModelOutputContractError:
+                raise
+            except _LITELLM_PROVIDER_EXCEPTIONS as e:
+                provider_errors.append(f"{model_group}: {e}")
+                _log.warning(
+                    "Modello '%s' fallito per il ruolo '%s': passo immediatamente al successivo.",
+                    model_group,
+                    role,
+                )
+
+        details = "; ".join(provider_errors)
+        raise LLMClientError(f"Catena {role} esaurita: {details}")
 
     def check_all_providers(self, check_models: bool = True) -> SystemHealthReportDTO:
         """Esegue la diagnosi multilivello dei provider e dei modelli fisici univoci."""
@@ -228,21 +253,24 @@ class LLMClientAdapter(LLMGeneratorPort):
 
     @classmethod
     def _build_model_list(cls, config: dict[str, Any]) -> list[dict[str, Any]]:
-        """Costruisce la model_list raggruppando i modelli fisici in pool per gateway."""
+        """Costruisce un model group distinto per ogni modello della configurazione.
+
+        Il gateway (`pool`) identifica solo l'endpoint condiviso e non deve diventare
+        il gruppo di routing: se più modelli condividono il gateway, un errore su uno
+        di essi deve poter passare immediatamente al modello successivo della catena.
+        """
         models = config.get("models", {})
         chains = config.get("chains", {})
-        pool_of = {mid: mc.get("pool", mid) for mid, mc in models.items()}
-
-        ordered_pools = list(
-            dict.fromkeys(pool_of.get(mid, mid) for mid_list in chains.values() for mid in mid_list)
+        ordered_model_ids = list(
+            dict.fromkeys(model_id for chain in chains.values() for model_id in chain)
         )
-        by_pool: dict[str, list[dict[str, Any]]] = {}
-        for mid, mc in models.items():
-            by_pool.setdefault(pool_of.get(mid, mid), []).append(cls._make_litellm_params(mc))
+        ordered_model_ids.extend(
+            model_id for model_id in models if model_id not in ordered_model_ids
+        )
         return [
-            {"model_name": pool, "litellm_params": params}
-            for pool in ordered_pools
-            for params in by_pool.get(pool, [])
+            {"model_name": model_id, "litellm_params": cls._make_litellm_params(models[model_id])}
+            for model_id in ordered_model_ids
+            if model_id in models
         ]
 
     @staticmethod
@@ -266,15 +294,14 @@ class LLMClientAdapter(LLMGeneratorPort):
 
     @staticmethod
     def _build_fallbacks(config: dict[str, Any]) -> list[dict[str, list[str]]]:
-        """Costruisce i fallback deterministici a livello di pool tra gateway."""
+        """Costruisce fallback immediati tra modelli consecutivi della stessa catena."""
         fallbacks: list[dict[str, list[str]]] = []
         models = config.get("models", {})
         chains = config.get("chains", {})
-        pool_of = {mid: mc.get("pool", mid) for mid, mc in models.items()}
 
         seen_chains: set[tuple[str, ...]] = set()
-        for mid_list in chains.values():
-            chain = list(dict.fromkeys(pool_of.get(mid, mid) for mid in mid_list))
+        for model_ids in chains.values():
+            chain = list(dict.fromkeys(model_id for model_id in model_ids if model_id in models))
             key = tuple(chain)
             if key in seen_chains or len(chain) <= 1:
                 continue
