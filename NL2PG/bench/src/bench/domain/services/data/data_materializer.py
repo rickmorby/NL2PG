@@ -13,7 +13,7 @@ stesse righe, stesso script e stesso profilo.
 :author: Riccardo Morabito
 """
 
-import random
+from random import Random
 from typing import Any
 
 from bench.domain.models.data import DataSpecDTO, SchemaModel
@@ -66,7 +66,7 @@ class DataMaterializer:
     ) -> MaterializationResult:
         """Materializza la spec in script INSERT, profilo e righe strutturate."""
         self._validator.validate(spec, schema)
-        rng = random.Random(seed)
+        rng = Random(seed)
         counts = self._counter.compute(spec, schema, rng)
         rows = self._expander.expand(spec, schema, counts, rng)
         self._binder.bind(schema, rows, rng)

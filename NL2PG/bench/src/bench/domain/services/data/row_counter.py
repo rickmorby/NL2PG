@@ -8,7 +8,7 @@ tabella e per task.
 :author: Riccardo Morabito
 """
 
-import random
+from random import Random
 
 from bench.domain.models.data import DataSpecDTO, SchemaModel, TableDataSpecDTO, TableSchema
 from bench.domain.services.data.data_spec_validator import DataSpecValidationError
@@ -34,7 +34,7 @@ class RowCounter:
         self._max_rows_per_table = max_rows_per_table
         self._max_total_rows = max_total_rows
 
-    def compute(self, spec: DataSpecDTO, schema: SchemaModel, rng: random.Random) -> dict[str, int]:
+    def compute(self, spec: DataSpecDTO, schema: SchemaModel, rng: Random) -> dict[str, int]:
         """Calcola i conteggi per tabella in ordine di spec."""
         counts: dict[str, int] = {}
         for table_spec in spec.tables:
@@ -49,7 +49,7 @@ class RowCounter:
             )
         return counts
 
-    def _base_count(self, table_spec: TableDataSpecDTO, rng: random.Random) -> int:
+    def _base_count(self, table_spec: TableDataSpecDTO, rng: Random) -> int:
         """Conteggio di base: range esplicito oppure range della natura."""
         if table_spec.nature == "explicit":
             lo, hi = table_spec.min_rows, table_spec.max_rows
@@ -63,7 +63,7 @@ class RowCounter:
         table: TableSchema,
         counts: dict[str, int],
         count: int,
-        rng: random.Random,
+        rng: Random,
     ) -> int:
         """Moltiplica per il numero di righe del padre quando dichiarato."""
         parent = table.fk_columns[0] if len(table.fk_columns) == 1 else None

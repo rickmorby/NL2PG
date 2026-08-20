@@ -8,7 +8,7 @@ topologico (padri prima dei figli) per la costruzione dello script INSERT.
 :author: Riccardo Morabito
 """
 
-import random
+from random import Random
 from typing import Any
 
 from bench.domain.models.data import SchemaModel
@@ -49,9 +49,7 @@ class ForeignKeyBinder:
         """Inietta il tasso di NULL applicabile alle FK nullable."""
         self._null_rate = null_rate
 
-    def bind(
-        self, schema: SchemaModel, rows: dict[str, list[dict[str, Any]]], rng: random.Random
-    ) -> None:
+    def bind(self, schema: SchemaModel, rows: dict[str, list[dict[str, Any]]], rng: Random) -> None:
         """Sostituisce ogni FK con una PK reale del padre (o NULL se nullable)."""
         for table_name in rows:
             table = schema.table(table_name)
@@ -63,7 +61,7 @@ class ForeignKeyBinder:
         table,
         column,
         rows: dict[str, list[dict[str, Any]]],
-        rng: random.Random,
+        rng: Random,
     ) -> None:
         """Lega una singola colonna FK, gestendo self-reference con solo righe precedenti."""
         parent = rows.get((column.fk_parent_table or "").lower(), [])
@@ -86,7 +84,7 @@ class ForeignKeyBinder:
                 bound_prefix.append(row[column.fk_parent_column or ""])
 
     def dedupe_composite_keys(
-        self, schema: SchemaModel, rows: dict[str, list[dict[str, Any]]], rng: random.Random
+        self, schema: SchemaModel, rows: dict[str, list[dict[str, Any]]], rng: Random
     ) -> None:
         """Rende uniche le PK composite dopo il binding FK (che puo' creare collisioni)."""
         for table_name, table_rows in rows.items():

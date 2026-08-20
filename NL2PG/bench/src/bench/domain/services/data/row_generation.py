@@ -9,7 +9,7 @@ da ``RowCounter``.
 :author: Riccardo Morabito
 """
 
-import random
+from random import Random
 from typing import Any
 
 from bench.domain.models.data import (
@@ -63,7 +63,7 @@ class RowExpander:
         spec: DataSpecDTO,
         schema: SchemaModel,
         counts: dict[str, int],
-        rng: random.Random,
+        rng: Random,
     ) -> dict[str, list[dict[str, Any]]]:
         """Genera le righe di ogni tabella espandendo i template lungo gli assi."""
         rows: dict[str, list[dict[str, Any]]] = {}
@@ -78,7 +78,7 @@ class RowExpander:
         table_spec: TableDataSpecDTO,
         table: TableSchema,
         count: int,
-        rng: random.Random,
+        rng: Random,
     ) -> list[dict[str, Any]]:
         """Genera le righe di una singola tabella da template, variazioni e rumore."""
         result: list[dict[str, Any]] = []
@@ -172,7 +172,7 @@ class RowBuilder:
         instance_index: int,
         used_pk: dict[str, set[Any]],
         used_unique: dict[str, set[Any]],
-        rng: random.Random,
+        rng: Random,
         duplicate: bool,
     ) -> dict[str, Any]:
         """Costruisce una riga applicando variazioni, PK/UNIQUE uniche, NULL e outlier."""
@@ -205,7 +205,7 @@ class RowBuilder:
         instance_index: int,
         used_pk: dict[str, set[Any]],
         used_unique: dict[str, set[Any]],
-        rng: random.Random,
+        rng: Random,
         duplicate: bool,
         row: dict[str, Any],
     ) -> None:
@@ -231,7 +231,7 @@ class RowBuilder:
         variation: ColumnVariationDTO | None,
         template_value: Any,
         row: dict[str, Any],
-        rng: random.Random,
+        rng: Random,
     ) -> None:
         """Inietta NULL (colonne nullable) e outlier entro i limiti dichiarati."""
         if not column.is_pk and column.nullable and rng.random() < self.null_rate:
@@ -262,7 +262,7 @@ class RowBuilder:
 
     @staticmethod
     def _vary_value(
-        column: ColumnSchema, template_value: Any, variation: ColumnVariationDTO, rng: random.Random
+        column: ColumnSchema, template_value: Any, variation: ColumnVariationDTO, rng: Random
     ) -> Any:
         """Applica l'asse di variazione dichiarato al valore del template."""
         if template_value is None:
@@ -279,9 +279,9 @@ class RowBuilder:
 
     @staticmethod
     def _outlier_value(
-        column: ColumnSchema, template_value: Any, variation: ColumnVariationDTO, rng: random.Random
+        column: ColumnSchema, template_value: Any, variation: ColumnVariationDTO, rng: Random
     ) -> Any:
-        """Valore estremo entro i confini dichiarati (per domande max/min sensate)."""
+        """Valore estremo" entro i confini dichiarati (per domande max/min sensate)."""
         if variation.axis == "shift":
             extreme = (
                 variation.delta_max if rng.random() < _OUTLIER_COIN_FLIP else variation.delta_min

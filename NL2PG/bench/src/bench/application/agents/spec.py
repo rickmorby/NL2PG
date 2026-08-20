@@ -3,8 +3,8 @@
 :author: Riccardo Morabito
 """
 
-import random
 from hashlib import sha1
+from random import Random
 
 from bench.application.agents.base import AbstractAgent
 from bench.domain.models.category import CategoryDTO
@@ -61,7 +61,7 @@ class SpecAgent(AbstractAgent):
         """Deriva deterministicamente il numero di tabelle dal task_id entro il range."""
         lo, hi = table_range
         digest = sha1(f"{task_id}:{category}".encode("utf-8")).hexdigest()
-        return random.Random(int(digest[:8], 16)).randint(lo, hi)
+        return Random(int(digest[:8], 16)).randint(lo, hi)
 
     def output_schema(self) -> type:
         """Restituisce SpecDTO come schema per lo structured output."""
