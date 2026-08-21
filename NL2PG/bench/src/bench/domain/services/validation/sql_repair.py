@@ -36,6 +36,9 @@ _RE_CREATE_FUNCTION = re_compile(
     flags=IGNORECASE,
 )
 _RE_CREATE_TRIGGER = re_compile(r"CREATE\s+TRIGGER.*?;", flags=IGNORECASE | DOTALL)
+_RE_COMPOSITE_ROW = re_compile(r"ROW\s*\(\s*'([^']*)'\s*,\s*'([0-9]+)'", flags=IGNORECASE)
+_RE_ANY_MISSING_OP = re_compile(r"(\w+)\s+ANY\s*\(", flags=IGNORECASE)
+_RE_FETCH_MULTIPLE = re_compile(r"(FETCH\s+FIRST\s+\d+\s+ROWS\s+ONLY).*", flags=IGNORECASE | DOTALL)
 
 
 class PostgresSQLRepair:
@@ -55,6 +58,9 @@ class PostgresSQLRepair:
         sql = self._fix_double_paren_stored(sql)
         sql = self._fix_stray_column_stmt(sql)
         sql = self._fix_function_trigger(sql)
+        sql = self._fix_composite_row(sql)
+        sql = self._fix_any_missing_operator(sql)
+        sql = self._fix_fetch_multiple(sql)
         sql = self._dedupe_create_table(sql)
         sql = self._fix_trailing_commas(sql)
         sql = self._fix_hyphenated_identifiers(sql)
@@ -120,6 +126,31 @@ class PostgresSQLRepair:
         """Rimuove CREATE FUNCTION/TRIGGER non ammessi in DDL."""
         sql = _RE_CREATE_FUNCTION.sub("", sql)
         return _RE_CREATE_TRIGGER.sub("", sql)
+
+    def _fix_composite_row(self, sql: str) -> str:
+        """Corregge ROW con numerici quotati: ROW('Via', '10') -> ROW('Via', 10)."""
+
+        def _replace_row(m: Match[str]) -> str:
+            inner = m.group(1)
+            inner = re_compile(r"'([0-9]+)'").sub(r"\1", inner)
+            return f"ROW({inner})"
+
+        return re_compile(r"ROW\s*\(([^)]*)\)", flags=IGNORECASE).sub(_replace_row, sql)
+
+    def _fix_any_missing_operator(self, sql: str) -> str:
+        """Aggiunge = prima di ANY se manca operatore: col ANY ( -> col = ANY (."""
+        return _RE_ANY_MISSING_OP.sub(lambda m: f"{m.group(1)} = ANY (", sql)
+
+    def _fix_fetch_multiple(self, sql: str) -> str:
+        """Tiene solo la prima FETCH FIRST n ROWS ONLY."""
+        m = _RE_FETCH_MULTIPLE.search(sql)
+        if m and sql.count("FETCH") > 1:
+            first = sql.find("FETCH")
+            end = sql.find("ONLY", first) + len("ONLY")
+            tail = sql[end:]
+            if "FETCH" in tail.upper():
+                sql = sql[:end]
+        return sql
 
     def _dedupe_create_table(self, sql: str) -> str:
         """Rimuove definizioni duplicate della stessa tabella (mantiene la prima)."""
