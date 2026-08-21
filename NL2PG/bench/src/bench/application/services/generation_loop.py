@@ -104,6 +104,8 @@ class GenerationLoop:
                             ValidationError,
                             ValueError,
                             RuntimeError,
+                            OverflowError,
+                            ArithmeticError,
                         ) as e:
                             _log.debug("Errore task per categoria '%s': %s", cat_id, e)
                             counts["failed"] += 1
