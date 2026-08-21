@@ -84,6 +84,7 @@ litellm_mod.failure_callback = []
 litellm_mod.input_callback = []
 litellm_mod.service_callback = []
 litellm_mod.telemetry = False
+litellm_mod.cache = None
 
 for _cb_attr in ("_async_success_callback", "_async_failure_callback", "_async_input_callback"):
     if hasattr(litellm_mod, _cb_attr):
@@ -138,6 +139,7 @@ class LLMClientAdapter(LLMGeneratorPort):
             optional_pre_call_checks=optional_pre_call_checks,
             stream_timeout=self._stream_timeout,
             set_verbose=False,
+            cache_responses=False,
         )
 
     def get_chain(self, role: str) -> list[str]:
