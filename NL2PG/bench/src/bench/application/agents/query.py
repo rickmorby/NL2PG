@@ -49,7 +49,7 @@ class QueryAgent(AbstractAgent):
     def validate(self, output: GoldQueryDTO, state: TaskStateDTO) -> tuple[bool, str, dict]:
         """Valida la query via QueryValidator e restituisce gold_result se valida."""
         spec = state.spec or SpecDTO()
-        result = self._validator.validate(output, spec, state.sandbox_schema)
+        result = self._validator.validate(output, spec, state.sandbox_schema, state.data_profile)
         if not result.is_valid:
             return False, result.error, {}
         return True, "", {"gold_result": result.gold_result}

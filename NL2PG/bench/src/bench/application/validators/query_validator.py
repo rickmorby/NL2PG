@@ -4,6 +4,7 @@
 """
 
 from dataclasses import dataclass
+from typing import Any
 
 from psycopg.errors import Error as PgError
 from sqlglot import exp, find_tables, parse_one
@@ -11,11 +12,14 @@ from sqlglot.errors import ParseError
 
 from bench.application.validators.mutation_tester import MutationTester
 from bench.domain.exceptions import DatabaseClientError
+from bench.domain.models.data import DataProfileDTO
 from bench.domain.models.spec import SpecDTO
 from bench.domain.models.sql import GoldQueryDTO, GoldResultDTO
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
 from bench.domain.services.validation.error_feedback_builder import ErrorFeedbackBuilder
 from bench.domain.services.validation.feature_checker import FeatureChecker
+
+_MAX_DISTINCT_SAMPLES = 2
 
 
 @dataclass
@@ -41,13 +45,19 @@ class QueryValidator:
         self._feature_checker = feature_checker
         self._mutation_tester = mutation_tester
 
-    def validate(self, query: GoldQueryDTO, spec: SpecDTO, schema: str) -> QueryValidationResult:
+    def validate(
+        self,
+        query: GoldQueryDTO,
+        spec: SpecDTO,
+        schema: str,
+        profile: DataProfileDTO | None = None,
+    ) -> QueryValidationResult:
         """Esegue la query, verifica feature e mutazioni, e restituisce il risultato gold."""
         ast_err, tree = self._validate_ast_rules(query, spec)
         if ast_err:
             return QueryValidationResult(is_valid=False, error=ast_err)
 
-        return self._validate_execution(query, schema, tree)
+        return self._validate_execution(query, schema, tree, profile)
 
     def _validate_ast_rules(
         self, query: GoldQueryDTO, spec: SpecDTO
@@ -90,7 +100,11 @@ class QueryValidator:
         return "", tree
 
     def _validate_execution(
-        self, query: GoldQueryDTO, schema: str, tree: exp.Expression | None
+        self,
+        query: GoldQueryDTO,
+        schema: str,
+        tree: exp.Expression | None,
+        profile: DataProfileDTO | None = None,
     ) -> QueryValidationResult:
         """Esegue la query nel sandbox PostgreSQL e valida righe, tabelle e mutazioni."""
         try:
@@ -100,7 +114,9 @@ class QueryValidator:
             return QueryValidationResult(is_valid=False, error=msg)
 
         if not rows:
-            msg = ErrorFeedbackBuilder().for_empty_result(None, {})
+            distinct = self._distinct_from_profile(profile, tree)
+            where = self._where_from_tree(tree)
+            msg = ErrorFeedbackBuilder().for_empty_result(where, distinct)
             return QueryValidationResult(is_valid=False, error=msg)
 
         tables = self._tables_used(tree) if tree else []
@@ -110,7 +126,8 @@ class QueryValidator:
 
         mut_res = self._mutation_tester.test(schema, query.query, tables)
         if not mut_res.is_valid:
-            msg = ErrorFeedbackBuilder().for_mutation(tables, {})
+            distinct = self._distinct_from_profile(profile, tree)
+            msg = ErrorFeedbackBuilder().for_mutation(tables, distinct)
             return QueryValidationResult(is_valid=False, error=f"{mut_res.error} | {msg}")
 
         gold = self._build_gold(query, cols, rows)
@@ -150,6 +167,38 @@ class QueryValidator:
     def _has_root_order_by(tree: exp.Expression) -> bool:
         """Verifica che la query SQL contenga la clausola ORDER BY a livello radice."""
         return tree.args.get("order") is not None
+
+    @staticmethod
+    def _distinct_from_profile(profile: Any | None, tree: exp.Expression | None) -> dict[str, Any]:
+        if profile is None or tree is None:
+            return {}
+        try:
+            data = profile.profile if hasattr(profile, "profile") else {}
+            tables = {t.name.lower() for t in tree.find_all(exp.Table)}
+            out: dict[str, Any] = {}
+            for tname, tdata in data.items():
+                if tname.lower() in tables:
+                    cols = tdata.get("columns", {})
+                    for cname, cdata in cols.items():
+                        if cdata.get("distinct", 0) > 1:
+                            sample = cdata.get("sample", [])
+                            if sample:
+                                out[f"{tname}.{cname}"] = sample[0]
+                                if len(out) >= _MAX_DISTINCT_SAMPLES:
+                                    return out
+            return out
+        except (AttributeError, TypeError, KeyError, ValueError):
+            return {}
+
+    @staticmethod
+    def _where_from_tree(tree: exp.Expression | None) -> str | None:
+        if tree is None:
+            return None
+        try:
+            where = tree.find(exp.Where)
+            return where.sql(dialect="postgres") if where else None
+        except (AttributeError, ValueError):
+            return None
 
     @staticmethod
     def _build_gold(query: GoldQueryDTO, cols: list[str], rows: list[tuple]) -> GoldResultDTO:
