@@ -31,6 +31,11 @@ _RE_STRAY_COLUMN_STMT = re_compile(r"^\s*Column\.?\s*;?\s*$", flags=IGNORECASE |
 _RE_CREATE_TABLE_NAME = re_compile(
     r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?\"?([a-zA-Z_][a-zA-Z0-9_]*)\"?", flags=IGNORECASE
 )
+_RE_CREATE_FUNCTION = re_compile(
+    r"CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION[\s\S]*?LANGUAGE\s+plpgsql\s*;",
+    flags=IGNORECASE,
+)
+_RE_CREATE_TRIGGER = re_compile(r"CREATE\s+TRIGGER.*?;", flags=IGNORECASE | DOTALL)
 
 
 class PostgresSQLRepair:
@@ -49,6 +54,7 @@ class PostgresSQLRepair:
         sql = self._fix_generated_current(sql)
         sql = self._fix_double_paren_stored(sql)
         sql = self._fix_stray_column_stmt(sql)
+        sql = self._fix_function_trigger(sql)
         sql = self._dedupe_create_table(sql)
         sql = self._fix_trailing_commas(sql)
         sql = self._fix_hyphenated_identifiers(sql)
@@ -109,6 +115,11 @@ class PostgresSQLRepair:
                 continue
             lines.append(line)
         return "\n".join(lines)
+
+    def _fix_function_trigger(self, sql: str) -> str:
+        """Rimuove CREATE FUNCTION/TRIGGER non ammessi in DDL."""
+        sql = _RE_CREATE_FUNCTION.sub("", sql)
+        return _RE_CREATE_TRIGGER.sub("", sql)
 
     def _dedupe_create_table(self, sql: str) -> str:
         """Rimuove definizioni duplicate della stessa tabella (mantiene la prima)."""

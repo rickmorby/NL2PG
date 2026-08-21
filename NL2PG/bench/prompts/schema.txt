@@ -80,6 +80,7 @@ TIPO DI SCHEMA NON RISPETTATO (ERRATO):
 - DIVIETO 7: NON usare subquery (`SELECT`) dentro `GENERATED ALWAYS AS (...)`; l'espressione deve essere deterministica e senza SELECT.
 - DIVIETO 8: NON usare `CURRENT_DATE`, `CURRENT_TIMESTAMP`, `NOW()` o funzioni non immutabili dentro `GENERATED ALWAYS AS (...)`.
 - DIVIETO 9: NON usare virgole finali prima di `)` o clausole (`..., FROM`).
+- DIVIETO 10: NON creare `FUNCTION`, `TRIGGER`, `PROCEDURE` o `CREATE OR REPLACE FUNCTION/TRIGGER` — usa solo `CREATE TABLE`/`CREATE TYPE`.
 </forbidden_actions>
 
 <input_context>
