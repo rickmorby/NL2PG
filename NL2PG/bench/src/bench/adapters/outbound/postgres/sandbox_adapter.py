@@ -6,7 +6,7 @@
 from contextlib import contextmanager
 from logging import getLogger
 from random import choices
-from re import compile as re_compile
+from re import compile as re_compile, IGNORECASE
 from string import ascii_lowercase, digits
 from typing import Any, Generator
 
@@ -60,6 +60,15 @@ class PostgresSandboxAdapter(SandboxPort):
         """Valida l'AST del DDL tramite sqlglot ed esegue la creazione tabelle nello schema."""
         self._execute_statements(
             schema, ddl, allowed_types=(exp.Create, exp.Alter, exp.Comment, exp.Drop)
+        )
+
+    @staticmethod
+    def _is_create_domain(parsed: object) -> bool:
+        """Riconosce CREATE DOMAIN: valido PostgreSQL ma sqlglot lo degrada a Command."""
+        return isinstance(parsed, exp.Command) and bool(
+            re_compile(r"^\s*CREATE\s+DOMAIN\b", IGNORECASE).match(
+                getattr(parsed, "sql", lambda **_: str(parsed))(dialect="postgres")
+            )
         )
 
     def execute_inserts(self, schema: str, inserts: str) -> None:
@@ -166,7 +175,7 @@ class PostgresSandboxAdapter(SandboxPort):
         for parsed in parsed_expressions:
             if parsed is None:
                 continue
-            if not isinstance(parsed, allowed_types):
+            if not isinstance(parsed, allowed_types) and not self._is_create_domain(parsed):
                 raise DatabaseClientError(
                     f"Tipo di istruzione SQL non ammesso: {type(parsed).__name__}."
                 )
