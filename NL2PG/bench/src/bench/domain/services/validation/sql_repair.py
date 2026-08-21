@@ -19,7 +19,14 @@ _RE_HYPHENATED_IDENTIFIER = re_compile(
 _RE_GENERATED_SUBQUERY = re_compile(
     r"GENERATED\s+ALWAYS\s+AS\s*\(.*?SELECT.*?\)\s*STORED", flags=IGNORECASE | DOTALL
 )
-_RE_DOUBLE_PAREN_STORED = re_compile(r"\){2,}\s*STORED", flags=IGNORECASE)
+_RE_GENERATED_CURRENT = re_compile(
+    r"GENERATED\s+ALWAYS\s+AS\s*\(.*?CURRENT_(?:DATE|TIMESTAMP|TIME).*?\)\s*STORED",
+    flags=IGNORECASE | DOTALL,
+)
+_RE_GENERATED_NOW = re_compile(
+    r"GENERATED\s+ALWAYS\s+AS\s*\(.*?NOW\s*\(\).*?\)\s*STORED", flags=IGNORECASE | DOTALL
+)
+_RE_DOUBLE_PAREN_STORED = re_compile(r"\){4,}\s*STORED", flags=IGNORECASE)
 _RE_STRAY_COLUMN_STMT = re_compile(r"^\s*Column\.?\s*;?\s*$", flags=IGNORECASE | MULTILINE)
 _RE_CREATE_TABLE_NAME = re_compile(
     r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?\"?([a-zA-Z_][a-zA-Z0-9_]*)\"?", flags=IGNORECASE
@@ -39,6 +46,7 @@ class PostgresSQLRepair:
         sql = self._fix_escaped_quotes(sql)
         sql = self._fix_identity_columns(sql)
         sql = self._fix_generated_subquery(sql)
+        sql = self._fix_generated_current(sql)
         sql = self._fix_double_paren_stored(sql)
         sql = self._fix_stray_column_stmt(sql)
         sql = self._dedupe_create_table(sql)
@@ -84,9 +92,14 @@ class PostgresSQLRepair:
         """Rimuove GENERATED con subquery SELECT (non ammessa da Postgres)."""
         return _RE_GENERATED_SUBQUERY.sub("", sql)
 
+    def _fix_generated_current(self, sql: str) -> str:
+        """Rimuove GENERATED con CURRENT_DATE/TIMESTAMP o NOW() (non immutable)."""
+        sql = _RE_GENERATED_CURRENT.sub("", sql)
+        return _RE_GENERATED_NOW.sub("", sql)
+
     def _fix_double_paren_stored(self, sql: str) -> str:
-        """Corregge doppia parentesi prima di STORED (es. ...))) STORED)."""
-        return _RE_DOUBLE_PAREN_STORED.sub(") STORED", sql)
+        """Corregge parentesi extra prima di STORED (conservativo)."""
+        return re_compile(r"\){4,}\s*STORED", flags=IGNORECASE).sub("))) STORED", sql)
 
     def _fix_stray_column_stmt(self, sql: str) -> str:
         """Rimuove statement spuri tipo 'Column.' generati dall'LLM."""

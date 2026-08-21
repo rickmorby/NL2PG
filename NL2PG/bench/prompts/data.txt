@@ -34,7 +34,7 @@ Il JSON di output deve contenere esclusivamente il campo "tables".
 
 5. **CHIAVI PRIMARIE, ESTERNE E UNIQUE (GESTITE DAL MOTORE)**:
    - Le PK sono generate dal motore come valori univoci e sequenziali (la base numerica nel template, es. 1, e' solo il punto di partenza).
-   - Le FK sono legate automaticamente a PK reali della tabella padre gia' generate: NON cercare di coordinare a mano i valori delle FK nei template (possono essere omesse o lasciate indicative; verranno sostituite).
+   - Le FK sono legate automaticamente a PK reali della tabella padre gia' generate: NON cercare di coordinare a mano i valori delle FK nei template (possono essere omesse o lasciate indicative; verranno sostituite). Per tabelle ponte N:N con 2 FK (es. `dettagli_ordine` con `ordine_id`+`prodotto_id`), usa nei template coppie diverse (es. `{"ordine_id":1,"prodotto_id":10}`, `{"ordine_id":2,"prodotto_id":20}`) così la combinazione resta unica anche dopo il binding.
    - Le colonne con vincolo UNIQUE sono gestite dal motore come le PK: i valori univoci vengono generati automaticamente a partire dal template.
    - La coerenza referenziale e' garantita per costruzione, anche con catene, stelle, relazioni N:N (PK composite) e self-reference.
 
