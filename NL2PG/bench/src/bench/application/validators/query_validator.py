@@ -14,6 +14,7 @@ from bench.domain.exceptions import DatabaseClientError
 from bench.domain.models.spec import SpecDTO
 from bench.domain.models.sql import GoldQueryDTO, GoldResultDTO
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.domain.services.validation.error_feedback_builder import ErrorFeedbackBuilder
 from bench.domain.services.validation.feature_checker import FeatureChecker
 
 
@@ -95,14 +96,11 @@ class QueryValidator:
         try:
             cols, rows = self._sandbox.run_query(schema, query.query)
         except (DatabaseClientError, PgError) as e:
-            msg = f"Errore di esecuzione SQL in PostgreSQL: {e}"
+            msg = ErrorFeedbackBuilder().from_pg_error("Errore di esecuzione SQL in PostgreSQL", e)
             return QueryValidationResult(is_valid=False, error=msg)
 
         if not rows:
-            msg = (
-                "La query ha restituito un risultato vuoto (0 righe). "
-                "Inserisci dati o modifica la query in modo da restituire risultati validi."
-            )
+            msg = ErrorFeedbackBuilder().for_empty_result(None, {})
             return QueryValidationResult(is_valid=False, error=msg)
 
         tables = self._tables_used(tree) if tree else []
@@ -112,7 +110,8 @@ class QueryValidator:
 
         mut_res = self._mutation_tester.test(schema, query.query, tables)
         if not mut_res.is_valid:
-            return QueryValidationResult(is_valid=False, error=mut_res.error)
+            msg = ErrorFeedbackBuilder().for_mutation(tables, {})
+            return QueryValidationResult(is_valid=False, error=f"{mut_res.error} | {msg}")
 
         gold = self._build_gold(query, cols, rows)
         return QueryValidationResult(is_valid=True, gold_result=gold)
