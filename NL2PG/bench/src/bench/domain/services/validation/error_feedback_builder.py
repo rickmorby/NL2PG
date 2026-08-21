@@ -49,11 +49,21 @@ class ErrorFeedbackBuilder:
 
     def for_mutation(self, tables: list[str], distinct: dict[str, Any]) -> str:
         """Messaggio per query insensibile alla mutazione."""
-        sample = ", ".join(f"{k}={v}" for k, v in list(distinct.items())[:2])
+        use = {k: v for k, v in distinct.items() if not self._is_key_column(k)}
+        if not use:
+            use = distinct
+        sample = ", ".join(f"{k}={v}" for k, v in list(use.items())[:2])
         return (
-            f"Query insensibile su {', '.join(tables)}: risultato identico prima/dopo mutazione. "
-            f"Aggiungi WHERE su colonna con distinct>1. Sample: {sample}."
+            f"Query insensibile su {', '.join(tables)}: risultato identico "
+            f"prima/dopo mutazione. Aggiungi WHERE su colonna mutabile "
+            f"(non PK) con distinct>1, es. nome/stato. Sample: {sample}."
         )
+
+    @staticmethod
+    def _is_key_column(qualified: str) -> bool:
+        """Riconosce i nomi tipici di chiavi PK/FK (id, id_x, x_id) da escludere."""
+        column = qualified.rsplit(".", 1)[-1].lower()
+        return column == "id" or column.startswith("id_") or column.endswith("_id")
 
     def for_empty_result(self, where: str | None, distinct: dict[str, Any]) -> str:
         """Messaggio per query con 0 righe."""
