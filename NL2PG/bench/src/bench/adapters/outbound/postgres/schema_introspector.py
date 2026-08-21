@@ -18,6 +18,7 @@ def introspect_schema(connection, schema_name: str) -> SchemaModel:
     primary_keys = _fetch_primary_keys(connection, schema_name)
     foreign_keys = _fetch_foreign_keys(connection, schema_name)
     unique_constraints = _fetch_unique_constraints(connection, schema_name)
+    check_constraints = _fetch_check_constraints(connection, schema_name)
 
     tables: dict[str, list[ColumnSchema]] = {}
     for row in columns:
@@ -38,6 +39,7 @@ def introspect_schema(connection, schema_name: str) -> SchemaModel:
     _apply_primary_keys(tables, primary_keys)
     _apply_foreign_keys(tables, foreign_keys)
     unique_groups = _apply_unique_constraints(tables, unique_constraints)
+    _apply_check_constraints(tables, check_constraints)
 
     return SchemaModel(
         [TableSchema(name, cols, unique_groups.get(name)) for name, cols in tables.items()]
@@ -137,3 +139,37 @@ def _fetch_unique_constraints(connection, schema_name: str) -> list[tuple[str, l
     for table_name, constraint_name, column_name in rows:
         groups.setdefault((table_name, constraint_name), []).append(column_name)
     return [(table, cols) for (table, _), cols in groups.items()]
+
+
+def _fetch_check_constraints(connection, schema_name: str) -> list[tuple[str, str, str]]:
+    """Restituisce (tabella, colonna, check_clause) per ogni CHECK."""
+    query = (
+        "SELECT tc.table_name, ccu.column_name, cc.check_clause "
+        "FROM information_schema.table_constraints tc "
+        "JOIN information_schema.check_constraints cc "
+        "ON tc.constraint_name = cc.constraint_name "
+        "AND tc.constraint_schema = cc.constraint_schema "
+        "JOIN information_schema.constraint_column_usage ccu "
+        "ON tc.constraint_name = ccu.constraint_name "
+        "AND tc.table_schema = ccu.table_schema "
+        "WHERE tc.constraint_type = 'CHECK' AND tc.table_schema = %s"
+    )
+    try:
+        return connection.execute(query, (schema_name,)).fetchall()
+    except (AttributeError, ValueError, RuntimeError):
+        return []
+
+
+def _apply_check_constraints(
+    tables: dict[str, list[ColumnSchema]],
+    checks: list[tuple[str, str, str]],
+) -> None:
+    """Associa l'espressione CHECK alla colonna corrispondente."""
+    for table_name, column_name, clause in checks:
+        for col in tables.get(table_name, []):
+            if col.name == column_name:
+                if col.check_expr:
+                    col.check_expr = f"{col.check_expr} AND {clause}"
+                else:
+                    col.check_expr = clause
+                break

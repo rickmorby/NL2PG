@@ -9,6 +9,7 @@ da ``RowCounter``.
 :author: Riccardo Morabito
 """
 
+import re
 from random import Random
 from typing import Any
 
@@ -32,40 +33,104 @@ _OUTLIER_COIN_FLIP = 0.5
 _CF_LENGTH = 16
 _ALPHABET_SIZE = 26
 _MAX_SUFFIX_ATTEMPTS = 100
+_RE_CHECK_REGEX = re.compile(r"~\*?\s*'([^']+)'")
+_RE_CHECK_LENGTH = re.compile(r"length\s*\(\s*\w+\s*\)\s*([<>]=?|=)\s*(\d+)", re.I)
+
+
+def _check_regex_part(value: str, part: str) -> bool | None:
+    """Valida regex se presente, altrimenti None."""
+    m = _RE_CHECK_REGEX.search(part)
+    if not m:
+        return None
+    pat = m.group(1)
+    try:
+        return bool(re.search(pat, value))
+    except re.error:
+        return True
+
+
+def _check_length_part(value: str, part: str) -> bool | None:
+    """Valida length se presente, altrimenti None."""
+    ml = _RE_CHECK_LENGTH.search(part)
+    if not ml:
+        return None
+    op, num = ml.group(1), int(ml.group(2))
+    lv = len(value)
+    checks = {
+        ">=": lv >= num,
+        ">": lv > num,
+        "<=": lv <= num,
+        "<": lv < num,
+        "=": lv == num,
+    }
+    return checks.get(op, True)
+
+
+def _satisfies_check(value: str, check_expr: str | None) -> bool:
+    """Valida value contro CHECK di colonna (regex e length), generico ed efficiente."""
+    if not check_expr:
+        return True
+    for raw_part in check_expr.split(" AND "):
+        part = raw_part.strip()
+        res = _check_regex_part(value, part)
+        if res is not None:
+            if not res:
+                return False
+            continue
+        res = _check_length_part(value, part)
+        if res is not None and not res:
+            return False
+    return True
+
+
+def _unique_email(base: str, idx: int, max_len: int | None) -> str:
+    """Variante email: local+idx@domain."""
+    local, domain = base.split("@", 1)
+    cand = f"{local}{idx}@{domain}"
+    if max_len is not None and len(cand) > max_len:
+        max_local = max_len - len(f"{idx}@{domain}")
+        local = local[: max(1, max_local)]
+        cand = f"{local}{idx}@{domain}"
+    return cand
+
+
+def _unique_cf(base: str, idx: int, max_len: int | None) -> str:
+    """Variante codice fiscale."""
+    if idx < _ALPHABET_SIZE:
+        cand = base[: _CF_LENGTH - 1] + chr(ord("A") + idx)
+    else:
+        try:
+            serial = int(base[12:15])
+        except ValueError:
+            serial = 0
+        new_serial = (serial + idx) % 1000
+        last = chr(ord("A") + (idx % _ALPHABET_SIZE))
+        cand = f"{base[:12]}{new_serial:03d}{last}"
+    if max_len is not None and len(cand) > max_len:
+        cand = cand[:max_len]
+    return cand
 
 
 def _unique_string(base: str, idx: int, max_len: int | None) -> str:
-    """Genera stringa unica preservando CHECK comuni (email, codice fiscale)."""
+    """Genera stringa unica (email/CF/generico) senza validazione CHECK."""
     if idx == 0:
         return base
     if "@" in base:
-        local, domain = base.split("@", 1)
-        candidate = f"{local}{idx}@{domain}"
-        if max_len is not None and len(candidate) > max_len:
-            max_local = max_len - len(f"{idx}@{domain}")
-            local = local[: max(1, max_local)]
-            candidate = f"{local}{idx}@{domain}"
-        return candidate
+        return _unique_email(base, idx, max_len)
     if len(base) == _CF_LENGTH and base[:6].isalpha() and base[:6].isupper():
-        if idx < _ALPHABET_SIZE:
-            candidate = base[: _CF_LENGTH - 1] + chr(ord("A") + idx)
-        else:
-            try:
-                serial = int(base[12:15])
-            except ValueError:
-                serial = 0
-            new_serial = (serial + idx) % 1000
-            last = chr(ord("A") + (idx % _ALPHABET_SIZE))
-            candidate = f"{base[:12]}{new_serial:03d}{last}"
-        if max_len is not None and len(candidate) > max_len:
-            candidate = candidate[:max_len]
-        return candidate
-    candidate = f"{base}{idx}"
-    if max_len is not None and len(candidate) > max_len:
+        return _unique_cf(base, idx, max_len)
+    cand = f"{base}{idx}"
+    if max_len is not None and len(cand) > max_len:
         max_base = max_len - len(str(idx))
-        base = base[: max(1, max_base)]
-        candidate = f"{base}{idx}"
-    return candidate
+        cand = f"{base[: max(1, max_base)]}{idx}"
+    if base.isdigit():
+        try:
+            cand2 = str(int(base) + idx).zfill(len(base))
+            if (max_len is None or len(cand2) <= max_len) and len(cand2) < len(cand):
+                return cand2
+        except ValueError:
+            pass
+    return cand
 
 
 def _generate_unique(
@@ -86,17 +151,19 @@ def _generate_unique(
     else:
         base = template_value if template_value is not None else column.name
         base_str = str(base)
+        check = getattr(column, "check_expr", None)
         candidate = (
             base_str
             if instance_index == 0
             else _unique_string(base_str, instance_index, column.max_length)
         )
         suffix = 1
-        while candidate in used:
+        while candidate in used or not _satisfies_check(candidate, check):
             candidate = _unique_string(base_str, instance_index + suffix, column.max_length)
             suffix += 1
             if suffix > _MAX_SUFFIX_ATTEMPTS:
                 candidate = f"{base_str}_{instance_index + suffix}"
+                break
     used.add(candidate)
     return candidate
 
@@ -194,9 +261,13 @@ class RowExpander:
         """Rende unica una combinazione UNIQUE composita."""
         key = tuple(row[col] for col in group)
         suffix = 1
-        while key in used:
+        while True:
+            col_schema = table.column(group[-1])
+            check = getattr(col_schema, "check_expr", None) if col_schema else None
+            val_ok = _satisfies_check(str(row[group[-1]]), check) if col_schema else True
+            if key not in used and val_ok:
+                break
             last_col = group[-1]
-            col_schema = table.column(last_col)
             if col_schema and is_integer_type(col_schema.data_type):
                 row[last_col] = int(row[last_col]) + suffix
             elif col_schema and is_date_type(col_schema.data_type):
@@ -204,10 +275,12 @@ class RowExpander:
             else:
                 val = str(row[last_col])
                 row[last_col] = _unique_string(
-                    val, suffix, col_schema.max_length if col_schema else None
+                    val, suffix, col_schema.max_length if col_schema else None, check
                 )
             suffix += 1
             key = tuple(row[col] for col in group)
+            if suffix > _MAX_SUFFIX_ATTEMPTS:
+                break
         used.add(key)
 
 

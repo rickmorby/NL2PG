@@ -25,6 +25,7 @@ class ColumnSchema:
         fk_parent_column: str | None = None,
         max_length: int | None = None,
         is_generated: bool = False,
+        check_expr: str | None = None,
     ) -> None:
         """Inizializza i metadati della colonna."""
         self.name = name
@@ -37,6 +38,7 @@ class ColumnSchema:
         self.fk_parent_column = fk_parent_column
         self.max_length = max_length
         self.is_generated = is_generated
+        self.check_expr = check_expr
 
 
 class TableSchema:
