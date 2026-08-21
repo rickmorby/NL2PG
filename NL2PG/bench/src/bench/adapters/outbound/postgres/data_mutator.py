@@ -3,9 +3,10 @@
 :author: Riccardo Morabito
 """
 
+from collections import defaultdict
 from datetime import date, timedelta
 from functools import partial
-from random import choice, shuffle
+from random import shuffle
 from typing import Any
 
 from psycopg import Connection, sql
@@ -88,15 +89,15 @@ class PostgresDataMutator:
             return None
 
     def _try_mutations(self, ctx: tuple, query: str, orig: list[tuple], attempts: int) -> bool:
-        """Tenta mutazioni casuali (UPDATE e fallback DELETE) per alterare il risultato."""
+        """Tenta mutazioni mirate ai filtri, poi casuali, infine DELETE."""
         conn, cur, tables, is_agg = ctx
-        for _ in range(attempts):
-            table = choice(tables)
-            methods = (
-                [self._delete_one_row]
-                if is_agg
-                else [partial(self._mutate_random_cell, query=query), self._delete_one_row]
-            )
+        ordered = sorted(tables, key=lambda t: not self._get_filter_literals(query, t))
+        for attempt in range(attempts):
+            table = ordered[attempt % len(ordered)]
+            methods = [partial(self._mutate_filtered_cell, query=query)]
+            if not is_agg:
+                methods.append(partial(self._mutate_random_cell, query=query))
+            methods.append(self._delete_one_row)
             for method in methods:
                 try:
                     changed = method(conn, cur, table)
@@ -108,9 +109,112 @@ class PostgresDataMutator:
                     conn.rollback()
                     if new_rows != orig:
                         return True
-                except PgError:
+                except (PgError, TypeError, ValueError):
                     conn.rollback()
         return False
+
+    def _mutate_filtered_cell(self, conn: Connection, cur: Any, table: str, query: str) -> bool:
+        """Sostituisce i valori filtrati dal WHERE con altri valori reali della colonna."""
+        literals_map = self._get_filter_literals(query, table)
+        if not literals_map:
+            return False
+        candidates = {c[0] for c in self._get_mutatable_candidates(cur, table, query)}
+        items = list(literals_map.items())
+        shuffle(items)
+        for col_name, literals in items:
+            if col_name not in candidates:
+                continue
+            placeholders = sql.SQL(",").join(sql.Placeholder() * len(literals))
+            swap_source = sql.SQL(
+                "(SELECT {} FROM {} WHERE {} NOT IN ({}) ORDER BY random() LIMIT 1)"
+            ).format(
+                sql.Identifier(col_name),
+                sql.Identifier(table),
+                sql.Identifier(col_name),
+                placeholders,
+            )
+            stmt = sql.SQL("UPDATE {} SET {} = {}").format(
+                sql.Identifier(table), sql.Identifier(col_name), swap_source
+            )
+            predicate = sql.SQL(" WHERE {} IN ({})").format(sql.Identifier(col_name), placeholders)
+            try:
+                cur.execute(stmt + predicate, (*literals, *literals))
+                if cur.rowcount > 0:
+                    return True
+                conn.rollback()
+            except PgError:
+                conn.rollback()
+        return False
+
+    def _get_filter_literals(self, query: str, table_name: str) -> dict[str, list[Any]]:
+        """Estrae i valori letterali confrontati con le colonne della tabella nel WHERE."""
+        try:
+            tree = parse_one(query, read="postgres")
+        except (ParseError, ValueError):
+            return {}
+        aliases = {table_name.lower()}
+        for t in tree.find_all(exp.Table):
+            if t.name.lower() == table_name.lower() and t.alias:
+                aliases.add(t.alias.lower())
+        literals: dict[str, list[Any]] = defaultdict(list)
+        for comparison in tree.find_all(exp.EQ):
+            self._collect_eq_literals(comparison, aliases, literals)
+        for in_expr in tree.find_all(exp.In):
+            self._collect_in_literals(in_expr, aliases, literals)
+        return dict(literals)
+
+    def _collect_eq_literals(
+        self, comparison: exp.EQ, aliases: set[str], literals: dict[str, list[Any]]
+    ) -> None:
+        """Raccoglie i valori da un confronto di uguaglianza colonna = letterale."""
+        left, right = comparison.this, comparison.expression
+        column, value = self._column_literal_pair(left, right) or (None, None)
+        if column is None:
+            return
+        if column.table and column.table.lower() not in aliases:
+            return
+        parsed = self._literal_value(value)
+        if parsed is not None:
+            literals[column.name.lower()].append(parsed)
+
+    def _collect_in_literals(
+        self, in_expr: exp.In, aliases: set[str], literals: dict[str, list[Any]]
+    ) -> None:
+        """Raccoglie i valori da una condizione colonna IN (letterali)."""
+        column = in_expr.this
+        if not isinstance(column, exp.Column):
+            return
+        if column.table and column.table.lower() not in aliases:
+            return
+        for item in in_expr.expressions:
+            parsed = self._literal_value(item)
+            if parsed is not None:
+                literals[column.name.lower()].append(parsed)
+
+    @staticmethod
+    def _column_literal_pair(
+        left: exp.Expression, right: exp.Expression
+    ) -> tuple[exp.Column, exp.Expression] | None:
+        """Restituisce la coppia (colonna, letterale) in qualunque ordine."""
+        if isinstance(left, exp.Column) and isinstance(right, (exp.Literal, exp.Boolean)):
+            return left, right
+        if isinstance(right, exp.Column) and isinstance(left, (exp.Literal, exp.Boolean)):
+            return right, left
+        return None
+
+    @staticmethod
+    def _literal_value(node: exp.Expression) -> Any:
+        """Converte un nodo letterale sqlglot nel valore Python corrispondente."""
+        if isinstance(node, exp.Boolean):
+            return bool(node.this)
+        if isinstance(node, exp.Literal) and node.is_string:
+            return node.name
+        if isinstance(node, exp.Literal):
+            try:
+                return node.to_py()
+            except ValueError:
+                return None
+        return None
 
     def _is_scalar_aggregate(self, query: str) -> bool:
         """Verifica se la query e' un'aggregazione scalare (senza GROUP BY)."""
