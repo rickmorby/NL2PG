@@ -143,9 +143,14 @@ class LLMClientAdapter(LLMGeneratorPort):
         )
 
     def get_chain(self, role: str) -> list[str]:
-        """Restituisce la lista dei model_id per un ruolo dalla configurazione."""
+        """Restituisce i model_id abilitati per un ruolo (i disabilitati sono filtrati)."""
         chains = self._config.get("chains", {})
-        return list(chains.get(role, []))
+        models = self._config.get("models", {})
+        return [
+            model_id
+            for model_id in chains.get(role, [])
+            if models.get(model_id, {}).get("enabled", True)
+        ]
 
     def _primary_model_group(self, role: str) -> str:
         """Risolve il ruolo nel model group del primo modello della catena."""
@@ -286,10 +291,17 @@ class LLMClientAdapter(LLMGeneratorPort):
         models = config.get("models", {})
         chains = config.get("chains", {})
         ordered_model_ids = list(
-            dict.fromkeys(model_id for chain in chains.values() for model_id in chain)
+            dict.fromkeys(
+                model_id
+                for chain in chains.values()
+                for model_id in chain
+                if models.get(model_id, {}).get("enabled", True)
+            )
         )
         ordered_model_ids.extend(
-            model_id for model_id in models if model_id not in ordered_model_ids
+            model_id
+            for model_id in models
+            if model_id not in ordered_model_ids and models[model_id].get("enabled", True)
         )
         return [
             {"model_name": model_id, "litellm_params": cls._make_litellm_params(models[model_id])}
@@ -325,7 +337,13 @@ class LLMClientAdapter(LLMGeneratorPort):
 
         seen_chains: set[tuple[str, ...]] = set()
         for model_ids in chains.values():
-            chain = list(dict.fromkeys(model_id for model_id in model_ids if model_id in models))
+            chain = list(
+                dict.fromkeys(
+                    model_id
+                    for model_id in model_ids
+                    if model_id in models and models[model_id].get("enabled", True)
+                )
+            )
             key = tuple(chain)
             if key in seen_chains or len(chain) <= 1:
                 continue
