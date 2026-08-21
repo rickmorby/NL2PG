@@ -29,6 +29,39 @@ from bench.domain.services.data.column_types import (
 )
 
 _OUTLIER_COIN_FLIP = 0.5
+_CF_LENGTH = 16
+_ALPHABET_SIZE = 26
+_MAX_SUFFIX_ATTEMPTS = 100
+
+
+def _unique_string(base: str, idx: int, max_len: int | None) -> str:
+    """Genera stringa unica preservando CHECK comuni (email, codice fiscale)."""
+    if idx == 0:
+        return base
+    if "@" in base:
+        local, domain = base.split("@", 1)
+        candidate = f"{local}{idx}@{domain}"
+        if max_len is not None and len(candidate) > max_len:
+            max_local = max_len - len(f"{idx}@{domain}")
+            local = local[: max(1, max_local)]
+            candidate = f"{local}{idx}@{domain}"
+        return candidate
+    if len(base) == _CF_LENGTH and base[:6].isalpha() and base[:6].isupper():
+        last = chr(ord("A") + (idx % _ALPHABET_SIZE))
+        prefix = base[: _CF_LENGTH - 1]
+        if idx >= _ALPHABET_SIZE:
+            extra = chr(ord("A") + ((idx // _ALPHABET_SIZE) % _ALPHABET_SIZE))
+            prefix = base[: _CF_LENGTH - 2] + extra
+        candidate = prefix + last
+        if max_len is not None and len(candidate) > max_len:
+            candidate = candidate[:max_len]
+        return candidate
+    candidate = f"{base}{idx}"
+    if max_len is not None and len(candidate) > max_len:
+        max_base = max_len - len(str(idx))
+        base = base[: max(1, max_base)]
+        candidate = f"{base}{idx}"
+    return candidate
 
 
 def _generate_unique(
@@ -48,17 +81,18 @@ def _generate_unique(
             suffix += 1
     else:
         base = template_value if template_value is not None else column.name
-        if column.max_length is not None and isinstance(base, str):
-            suffix_len = len(f"_{instance_index}") if instance_index else 0
-            max_base = column.max_length - suffix_len
-            if len(base) > max_base > 0:
-                base = base[:max_base]
-        candidate = base if instance_index == 0 else f"{base}_{instance_index}"
+        base_str = str(base)
+        candidate = (
+            base_str
+            if instance_index == 0
+            else _unique_string(base_str, instance_index, column.max_length)
+        )
+        suffix = 1
         while candidate in used:
-            if column.max_length is not None and len(candidate) >= column.max_length:
-                candidate = candidate[: column.max_length - 1] + "_"
-            else:
-                candidate = f"{candidate}_"
+            candidate = _unique_string(base_str, instance_index + suffix, column.max_length)
+            suffix += 1
+            if suffix > _MAX_SUFFIX_ATTEMPTS:
+                candidate = f"{base_str}_{instance_index + suffix}"
     used.add(candidate)
     return candidate
 
@@ -165,14 +199,9 @@ class RowExpander:
                 row[last_col] = shift_value(row[last_col], col_schema, suffix)
             else:
                 val = str(row[last_col])
-                if col_schema and col_schema.max_length is not None:
-                    suffix_str = f"_{suffix}"
-                    max_base = col_schema.max_length - len(suffix_str)
-                    if len(val) > max_base:
-                        val = val[:max_base]
-                    row[last_col] = f"{val}{suffix_str}"
-                else:
-                    row[last_col] = f"{val}_{suffix}"
+                row[last_col] = _unique_string(
+                    val, suffix, col_schema.max_length if col_schema else None
+                )
             suffix += 1
             key = tuple(row[col] for col in group)
         used.add(key)
