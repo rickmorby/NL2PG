@@ -35,4 +35,5 @@ class CriticAgent(AbstractAgent):
         return {"critic": output}
 
     def _max_retries(self, _state: TaskStateDTO) -> int:
-        return 1
+        """Allineato agli altri nodi: anche l'ultimo step merita i retry configurati."""
+        return self._config.retry_max_per_node()
