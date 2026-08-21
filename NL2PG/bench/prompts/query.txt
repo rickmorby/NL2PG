@@ -121,6 +121,22 @@ Query insensibile alla mutazione (ERRATO):
   "order_sensitive": false // SBAGLIATO! Senza WHERE su colonna con distinct>1 la mutazione non cambia e il task viene scartato. Corretto: SELECT COUNT(*) FROM clienti WHERE segmento = 'premium';
 }
 </example_to_avoid>
+<example_to_avoid>
+ANY senza operatore (ERRATO):
+{
+  "query": "SELECT nome FROM clienti WHERE id ANY (SELECT cliente_id FROM ordini);",
+  "intent": "Clienti con ordini.",
+  "order_sensitive": false // SBAGLIATO! ANY richiede operatore: WHERE id = ANY (SELECT ...) o WHERE id > ANY (...)
+}
+</example_to_avoid>
+<example_to_avoid>
+FETCH multiplo (ERRATO):
+{
+  "query": "SELECT nome FROM clienti ORDER BY nome FETCH FIRST 5 ROWS ONLY FETCH FIRST 3 ROWS ONLY;",
+  "intent": "Primi clienti.",
+  "order_sensitive": true // SBAGLIATO! Solo una clausola FETCH per query
+}
+</example_to_avoid>
 </negative_examples>
 
 <forbidden_actions>
