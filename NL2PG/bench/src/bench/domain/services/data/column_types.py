@@ -64,11 +64,11 @@ def shift_value(value: Any, column: ColumnSchema, delta: float) -> Any:
             if " " in value and "T" in iso:
                 iso = iso.replace("T", " ", 1)
             return iso
-        except ValueError:
+        except (ValueError, OverflowError):
             try:
                 parsed = date.fromisoformat(value.strip().split(" ")[0].split("T")[0])
                 return (parsed + timedelta(days=int(delta))).isoformat()
-            except ValueError:
+            except (ValueError, OverflowError):
                 return value
     if isinstance(value, (int, float)):
         return value + delta
