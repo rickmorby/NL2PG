@@ -47,12 +47,16 @@ def _unique_string(base: str, idx: int, max_len: int | None) -> str:
             candidate = f"{local}{idx}@{domain}"
         return candidate
     if len(base) == _CF_LENGTH and base[:6].isalpha() and base[:6].isupper():
-        last = chr(ord("A") + (idx % _ALPHABET_SIZE))
-        prefix = base[: _CF_LENGTH - 1]
-        if idx >= _ALPHABET_SIZE:
-            extra = chr(ord("A") + ((idx // _ALPHABET_SIZE) % _ALPHABET_SIZE))
-            prefix = base[: _CF_LENGTH - 2] + extra
-        candidate = prefix + last
+        if idx < _ALPHABET_SIZE:
+            candidate = base[: _CF_LENGTH - 1] + chr(ord("A") + idx)
+        else:
+            try:
+                serial = int(base[12:15])
+            except ValueError:
+                serial = 0
+            new_serial = (serial + idx) % 1000
+            last = chr(ord("A") + (idx % _ALPHABET_SIZE))
+            candidate = f"{base[:12]}{new_serial:03d}{last}"
         if max_len is not None and len(candidate) > max_len:
             candidate = candidate[:max_len]
         return candidate
