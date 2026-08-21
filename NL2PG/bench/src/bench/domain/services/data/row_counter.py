@@ -66,6 +66,13 @@ class RowCounter:
         rng: Random,
     ) -> int:
         """Moltiplica per il numero di righe del padre quando dichiarato."""
+        pk_fk = {c.name for c in table.columns if c.is_pk and c.is_fk}
+        if pk_fk:
+            parent_tbl = next((c.fk_parent_table for c in table.columns if c.name in pk_fk), None)
+            if parent_tbl:
+                parent_count = counts.get(parent_tbl.lower(), 0)
+                if parent_count > 0:
+                    return min(count, parent_count)
         parent = table.fk_columns[0] if len(table.fk_columns) == 1 else None
         if parent is None or table_spec.per_parent_rows is None:
             return count
