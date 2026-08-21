@@ -12,6 +12,7 @@ from random import Random
 
 from bench.domain.models.data import DataSpecDTO, SchemaModel, TableDataSpecDTO, TableSchema
 from bench.domain.services.data.data_spec_validator import DataSpecValidationError
+from bench.domain.services.data.foreign_key_binder import table_order
 
 _DEFAULT_NATURE_RANGES: dict[str, tuple[int, int]] = {
     "lookup": (5, 50),
@@ -35,13 +36,17 @@ class RowCounter:
         self._max_total_rows = max_total_rows
 
     def compute(self, spec: DataSpecDTO, schema: SchemaModel, rng: Random) -> dict[str, int]:
-        """Calcola i conteggi per tabella in ordine di spec."""
+        """Calcola i conteggi per tabella in ordine topologico (padri prima)."""
         counts: dict[str, int] = {}
-        for table_spec in spec.tables:
-            table = schema.table(table_spec.table)
+        specs = {t.table.lower(): t for t in spec.tables}
+        for name in table_order(schema):
+            table_spec = specs.get(name)
+            if table_spec is None:
+                continue
+            table = schema.table(name)
             count = self._base_count(table_spec, rng)
             count = self._apply_parent_multiplier(table_spec, table, counts, count, rng)
-            counts[table.name.lower()] = min(count, self._max_rows_per_table)
+            counts[name] = min(count, self._max_rows_per_table)
         total = sum(counts.values())
         if total > self._max_total_rows:
             raise DataSpecValidationError(
