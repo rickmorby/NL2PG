@@ -17,11 +17,12 @@ Il JSON di output deve contenere esclusivamente il campo "story".
 3. **DIVIETO ASSOLUTO GERGO DB (PRINCIPIO PORTANTE)**:
    - NON USARE MAI parole come: *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*.
    - Usa termini di business come *archivio, registro, scheda, elemento, voce, sezione*.
-4. **Perifrasi per le Colonne**:
+4. **Adattamento al dominio**: adatta il lessico a `spec.domain`. Usa il termine di registro piu naturale per quel dominio (sanita usa cartella clinica, logistica usa bolla o registro spedizioni, finanza usa libro mastro). Non usare mai tabella o colonna se il dominio non e tecnico. Se il dominio e tecnico puoi usare il gergo tecnico. Il nome tabella con underscore puo essere scritto con spazio se piu narrativo (anagrafica clienti).
+5. **Perifrasi per le Colonne**:
    - Descrivi i campi mediante perifrasi aziendali naturali (es. "l'anno in cui l'allievo ha avviato il percorso", "la valutazione conseguita nell'esame").
-5. **Iniezione Distrattori e Narrazione Naturale**:
+6. **Iniezione Distrattori e Narrazione Naturale**:
    - Aggiungi processi aziendali e dettagli gestionali per rendere la storia ricca, fluida e verosimile.
-6. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
+7. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
 </rules_and_guidelines>
 
 <positive_examples>
