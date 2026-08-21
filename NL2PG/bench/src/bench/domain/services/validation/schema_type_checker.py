@@ -10,6 +10,9 @@ strutturali) non vengono controllati e passano senza vincoli.
 
 from dataclasses import dataclass
 from re import IGNORECASE, compile as re_compile, escape as re_escape
+
+from sqlglot import exp, parse_one
+from sqlglot.errors import ParseError
 from typing import Callable, ClassVar
 
 _RE_PARTITION_BY = re_compile(r"\bPARTITION\s+BY\b", IGNORECASE)
@@ -27,6 +30,113 @@ _RE_AUDIT_COLUMN = re_compile(
     IGNORECASE,
 )
 _RE_DEFAULT_NOW = re_compile(r"\bDEFAULT\s+CURRENT_TIMESTAMP\b", IGNORECASE)
+_DENORMALIZED_MARKERS: tuple[str, ...] = (
+    "totale",
+    "totali",
+    "tot",
+    "somma",
+    "somme",
+    "sommi",
+    "subtotale",
+    "subtotali",
+    "totalizz",
+    "saldo",
+    "saldi",
+    "residuo",
+    "residua",
+    "residui",
+    "residue",
+    "rimanenza",
+    "rimanenze",
+    "eccedenza",
+    "eccedenze",
+    "conteggio",
+    "conteggi",
+    "numero",
+    "numeri",
+    "num",
+    "n",
+    "importo",
+    "importi",
+    "imp",
+    "valore",
+    "valori",
+    "val",
+    "giacenza",
+    "giacenze",
+    "netto",
+    "netta",
+    "netti",
+    "nette",
+    "medio",
+    "media",
+    "medi",
+    "medie",
+    "cumulativo",
+    "cumulativa",
+    "cumulativi",
+    "cumulate",
+    "cumulato",
+    "cumulata",
+    "accumulato",
+    "accumulata",
+    "accumulati",
+    "accumulate",
+    "punteggio",
+    "punteggi",
+    "punti",
+    "rating",
+    "consumato",
+    "consumata",
+    "consumati",
+    "consumate",
+    "utilizzato",
+    "utilizzata",
+    "utilizzati",
+    "utilizzate",
+    "impegnato",
+    "impegnata",
+    "impegnati",
+    "impegnate",
+    "arpu",
+    "traffico",
+    "ammortamento",
+    "ammortamenti",
+    "consuntivo",
+    "consuntiva",
+    "consuntivi",
+    "consuntive",
+    "progressivo",
+    "progressiva",
+    "progressivi",
+    "progressive",
+    "calcolato",
+    "calcolata",
+    "calcolati",
+    "calcolate",
+    "derivato",
+    "derivata",
+    "derivati",
+    "derivate",
+    "riportato",
+    "riportata",
+    "riportati",
+    "riportate",
+    "variazione",
+    "variazioni",
+    "aggregato",
+    "aggregata",
+    "aggregati",
+    "aggregate",
+    "totalizzato",
+    "totalizzata",
+)
+_DENORMALIZED_MARKERS_RE = "|".join(_DENORMALIZED_MARKERS)
+_MIN_COMPOSITE_FK = 2
+_MIN_FACT_FK = 2
+
+_RE_CREATE_DOMAIN = re_compile(r"^\s*CREATE\s+DOMAIN\b", IGNORECASE)
+_RE_EXCLUSIVE_CHECK = re_compile(r"CHECK\s*\(.*IS\s+NULL.*\)", IGNORECASE)
 _RE_SOFT_DELETE_COLUMN = re_compile(
     r"\b(?:deleted_at|is_deleted|data_eliminazione|is_active|eliminato|cancellato)\b",
     IGNORECASE,
@@ -37,7 +147,8 @@ _RE_TEMPORAL_COLUMN = re_compile(
     IGNORECASE,
 )
 _RE_DENORMALIZED_COLUMN = re_compile(
-    r"\b(?:totale_|tot_|saldo_|subtotale_|conteggio_|n_ordini|numero_ordini)\w*",
+    r"(?:^|[,(]\s*)(?:" + _DENORMALIZED_MARKERS_RE + r")(?:_[a-z0-9]+)*\s+"
+    r"(?:TEXT|NUMERIC|INT|INTEGER|BIGINT|SMALLINT|REAL|DOUBLE|DECIMAL|BOOLEAN)",
     IGNORECASE,
 )
 _RE_CREATE_TABLE = re_compile(r"CREATE\s+TABLE\s+[\w\"]+", IGNORECASE)
@@ -61,6 +172,31 @@ class SchemaTypeCheckResult:
 
 class SchemaTypeChecker:
     """Servizio di dominio per la verifica dei marcatori DDL del tipo di schema."""
+
+    @staticmethod
+    def _collect_pk_fk(create: exp.Create) -> tuple[set[str], set[str]]:
+        """Raccoglie colonne PK e FK di una CREATE TABLE (livello colonna e tabella)."""
+        pk_cols: set[str] = set()
+        fk_cols: set[str] = set()
+        for cd in create.find_all(exp.ColumnDef):
+            for spec in cd.find_all(exp.ColumnConstraint):
+                if isinstance(spec.kind, exp.PrimaryKeyColumnConstraint):
+                    pk_cols.add(cd.name.lower())
+                if isinstance(spec.kind, exp.Reference):
+                    fk_cols.add(cd.name.lower())
+        for cons in create.find_all(exp.PrimaryKey):
+            pk_cols.update(
+                e.name.lower()
+                for e in cons.expressions
+                if isinstance(e, (exp.Column, exp.Identifier))
+            )
+        for ft in create.find_all(exp.ForeignKey):
+            fk_cols.update(
+                e.name.lower()
+                for e in ft.expressions
+                if isinstance(e, (exp.Column, exp.Identifier))
+            )
+        return pk_cols, fk_cols
 
     @staticmethod
     def _has_partition_by(ddl: str) -> bool:
@@ -135,6 +271,133 @@ class SchemaTypeChecker:
         """Verifica la presenza di colonne ridondanti o derivate (denormalizzazione)."""
         return bool(_RE_DENORMALIZED_COLUMN.search(ddl))
 
+    @staticmethod
+    def _has_create_domain(ddl: str) -> bool:
+        """Verifica la presenza di CREATE DOMAIN (vincoli di dominio)."""
+        return bool(_RE_CREATE_DOMAIN.search(ddl))
+
+    @staticmethod
+    def _has_weak_entity_pk(ddl: str) -> bool:
+        """Verifica una tabella la cui PK composta include la colonna FK del proprietario."""
+        try:
+            tree = parse_one(ddl, read="postgres")
+        except (ParseError, ValueError, AttributeError):
+            return False
+        for create in tree.find_all(exp.Create):
+            pk_cols, fk_cols = SchemaTypeChecker._collect_pk_fk(create)
+            if len(pk_cols) >= _MIN_COMPOSITE_FK and (pk_cols & fk_cols):
+                return True
+        return False
+
+    @staticmethod
+    def _has_isa_tables(ddl: str) -> bool:
+        """Verifica il pattern ISA: tabella figlia con PK che e' anche FK verso il padre."""
+        try:
+            tree = parse_one(ddl, read="postgres")
+        except (ParseError, ValueError, AttributeError):
+            return False
+        for create in tree.find_all(exp.Create):
+            pk_single: str | None = None
+            fk_target: str | None = None
+            for cd in create.find_all(exp.ColumnDef):
+                is_pk = any(
+                    isinstance(s.kind, exp.PrimaryKeyColumnConstraint)
+                    for s in cd.find_all(exp.ColumnConstraint)
+                )
+                ref = next(
+                    (
+                        s
+                        for s in cd.find_all(exp.ColumnConstraint)
+                        if isinstance(s.kind, exp.Reference)
+                    ),
+                    None,
+                )
+                if is_pk and ref is not None:
+                    pk_single = cd.name.lower()
+                    this = ref.kind.args.get("this")
+                    tbl = this.find(exp.Table) if this is not None else None
+                    fk_target = tbl.name.lower() if tbl else None
+            if pk_single and fk_target:
+                return True
+        return False
+
+    @staticmethod
+    def _has_junction_table(ddl: str) -> bool:
+        """Verifica una tabella ponte: due o piu' FK che compongono la chiave primaria."""
+        try:
+            tree = parse_one(ddl, read="postgres")
+        except (ParseError, ValueError, AttributeError):
+            return False
+        for create in tree.find_all(exp.Create):
+            fk_cols: set[str] = set()
+            pk_cols: list[str] = []
+            for cd in create.find_all(exp.ColumnDef):
+                for spec in cd.find_all(exp.ColumnConstraint):
+                    if isinstance(spec.kind, exp.Reference):
+                        fk_cols.add(cd.name.lower())
+                    if isinstance(spec.kind, exp.PrimaryKeyColumnConstraint):
+                        pk_cols.append(cd.name.lower())
+            for ft in create.find_all(exp.ForeignKey):
+                fk_cols.update(
+                    e.name.lower()
+                    for e in ft.expressions
+                    if isinstance(e, (exp.Column, exp.Identifier))
+                )
+            for cons in create.find_all(exp.PrimaryKey):
+                pk_cols.extend(
+                    e.name.lower()
+                    for e in cons.expressions
+                    if isinstance(e, (exp.Column, exp.Identifier))
+                )
+            if len(fk_cols) >= _MIN_COMPOSITE_FK and fk_cols.issubset(set(pk_cols)):
+                return True
+        return False
+
+    @staticmethod
+    def _has_fact_table(ddl: str) -> bool:
+        """Verifica una tabella dei fatti con almeno due FK verso dimensioni."""
+        try:
+            tree = parse_one(ddl, read="postgres")
+        except (ParseError, ValueError, AttributeError):
+            return False
+        for create in tree.find_all(exp.Create):
+            fk_cols: set[str] = set()
+            for cd in create.find_all(exp.ColumnDef):
+                if any(
+                    isinstance(s.kind, exp.Reference) for s in cd.find_all(exp.ColumnConstraint)
+                ):
+                    fk_cols.add(cd.name.lower())
+            for ft in create.find_all(exp.ForeignKey):
+                fk_cols.update(
+                    e.name.lower()
+                    for e in ft.expressions
+                    if isinstance(e, (exp.Column, exp.Identifier))
+                )
+            if len(fk_cols) >= _MIN_FACT_FK:
+                return True
+        return False
+
+    @staticmethod
+    def _has_exclusive_arcs(ddl: str) -> bool:
+        """Verifica archi esclusivi: piu' FK nullable piu' CHECK di esclusivita' IS NULL."""
+        if not _RE_EXCLUSIVE_CHECK.search(ddl):
+            return False
+        try:
+            tree = parse_one(ddl, read="postgres")
+        except (ParseError, ValueError, AttributeError):
+            return False
+        refs = 0
+        for cd in tree.find_all(exp.ColumnDef):
+            if any(isinstance(s.kind, exp.Reference) for s in cd.find_all(exp.ColumnConstraint)):
+                nulls = [
+                    s
+                    for s in cd.find_all(exp.ColumnConstraint)
+                    if isinstance(s.kind, exp.NotNullColumnConstraint)
+                ]
+                if not nulls:
+                    refs += 1
+        return refs >= _MIN_FACT_FK
+
     _CHECKS: ClassVar[dict[str, Callable[[str], bool]]] = {
         "partitioned": _has_partition_by,
         "composite_column": _has_composite_type,
@@ -148,6 +411,13 @@ class SchemaTypeChecker:
         "soft_deletion": _has_soft_deletion,
         "temporal_modeling": _has_temporal_columns,
         "denormalized": _has_denormalized_column,
+        "domain_constraint": _has_create_domain,
+        "weak_entity": _has_weak_entity_pk,
+        "isa": _has_isa_tables,
+        "associative_entity": _has_junction_table,
+        "many_to_many": _has_junction_table,
+        "dimensional_modeling": _has_fact_table,
+        "polymorphic": _has_exclusive_arcs,
     }
 
     _HINTS: ClassVar[dict[str, str]] = {
@@ -174,7 +444,32 @@ class SchemaTypeChecker:
         "temporal_modeling": (
             "colonne di validita' temporale (es. valid_from, valid_to, data_inizio, data_fine)"
         ),
-        "denormalized": "una colonna ridondante o derivata (es. totale_speso, saldo, n_ordini)",
+        "denormalized": (
+            "una colonna derivata o ridondante il cui nome contiene uno dei termini "
+            "di aggregazione previsti (es. totale_speso NUMERIC, saldo_contabile NUMERIC, "
+            "n_ordini INT, importo_residuo NUMERIC, valore_stock NUMERIC, giacenza_disponibile INT)"
+        ),
+        "domain_constraint": "CREATE DOMAIN nome AS tipo CHECK (VALUE IN (...) o altra condizione)",
+        "weak_entity": (
+            "una tabella la cui PRIMARY KEY composta include la colonna FK del proprietario "
+            "(es. PRIMARY KEY (fattura_id, numero_riga))"
+        ),
+        "isa": (
+            "una tabella figlia la cui PK e' anche FK verso la tabella padre "
+            "(es. id INT PRIMARY KEY REFERENCES dipendenti(id))"
+        ),
+        "associative_entity": (
+            "una tabella ponte con due o piu' colonne FK "
+            "(es. studente_id REFERENCES studenti(id), corso_id REFERENCES corsi(id))"
+        ),
+        "many_to_many": ("una tabella ponte con doppia FK che risolve la relazione N:N"),
+        "dimensional_modeling": (
+            "una tabella dei fatti con almeno due FK verso tabelle dimensione (star schema)"
+        ),
+        "polymorphic": (
+            "due o piu' FK nullable con un CHECK che impone esattamente una valorizzata "
+            "(es. CHECK ((cliente_id IS NULL) <> (fornitore_id IS NULL)))"
+        ),
     }
 
     def check(self, ddl: str, tipo_schema: str) -> SchemaTypeCheckResult:
