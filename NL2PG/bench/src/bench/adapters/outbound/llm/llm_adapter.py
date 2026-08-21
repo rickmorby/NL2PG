@@ -3,7 +3,6 @@
 :author: Riccardo Morabito
 """
 
-import json
 import time
 from asyncio import get_event_loop
 from contextlib import suppress
@@ -98,16 +97,7 @@ class LLMClientAdapter(LLMGeneratorPort):
     @staticmethod
     def _extract_json_payload(text: str) -> str:
         """Estrae l'oggetto JSON finale da un testo LLM scartando CoT e riparando la sintassi."""
-        if not text:
-            return ""
-        repaired = repair_json(text.strip(), ensure_ascii=False)
-        try:
-            parsed = json.loads(repaired)
-        except (json.JSONDecodeError, ValueError):
-            return repaired
-        if isinstance(parsed, list) and len(parsed) == 1 and isinstance(parsed[0], dict):
-            return json.dumps(parsed[0], ensure_ascii=False)
-        return repaired
+        return repair_json(text.strip(), ensure_ascii=False) if text else ""
 
     def __init__(
         self,
