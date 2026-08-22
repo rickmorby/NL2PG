@@ -3,6 +3,7 @@
 :author: Riccardo Morabito
 """
 
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -20,6 +21,11 @@ from bench.domain.services.validation.error_feedback_builder import ErrorFeedbac
 from bench.domain.services.validation.feature_checker import FeatureChecker
 
 _MAX_DISTINCT_SAMPLES = 2
+_RE_VOLATILE_TEXT = re.compile(
+    r"\b(?:NOW\s*\(|LOCALTIME(?:STAMP)?\b|CLOCK_TIMESTAMP|TRANSACTION_TIMESTAMP|"
+    r"STATEMENT_TIMESTAMP)",
+    flags=re.IGNORECASE,
+)
 
 
 @dataclass
@@ -82,12 +88,9 @@ class QueryValidator:
             )
             return msg, None
 
-        if query.order_sensitive and not self._has_root_order_by(tree):
-            msg = (
-                "La query ha order_sensitive=true ma manca della clausola ORDER BY "
-                "nella query principale della SELECT."
-            )
-            return msg, None
+        det_err = self._check_determinism(query, tree)
+        if det_err:
+            return det_err, None
 
         feat_res = self._feature_checker.check(tree, spec.sql_features)
         if not feat_res.is_valid:
@@ -133,6 +136,27 @@ class QueryValidator:
         gold = self._build_gold(query, cols, rows)
         return QueryValidationResult(is_valid=True, gold_result=gold)
 
+    def _check_determinism(self, query: GoldQueryDTO, tree: exp.Expression) -> str:
+        """Verifica le regole di riproducibilità del gold result della query.
+
+        Controlla che un eventuale order_sensitive sia accompagnato da ORDER BY e che
+        non compaiano funzioni temporali volatili (CURRENT_DATE, NOW, …).
+        """
+        if query.order_sensitive and not self._has_root_order_by(tree):
+            return (
+                "La query ha order_sensitive=true ma manca della clausola ORDER BY "
+                "nella query principale della SELECT."
+            )
+        volatile = self._volatile_time_function(tree)
+        if volatile:
+            return (
+                f"La query usa la funzione temporale volatile '{volatile}': il risultato "
+                "cambierebbe a ogni esecuzione rendendo il gold non riproducibile. Usa una "
+                "data/ora fissa come letterale (es. DATE '2026-08-21') eventualmente combinata "
+                "con INTERVAL."
+            )
+        return ""
+
     @staticmethod
     def _has_explicit_schema(tree: exp.Expression) -> bool:
         """Verifica se la query contiene riferimenti espliciti a schemi (es. schema.tabella)."""
@@ -167,6 +191,25 @@ class QueryValidator:
     def _has_root_order_by(tree: exp.Expression) -> bool:
         """Verifica che la query SQL contenga la clausola ORDER BY a livello radice."""
         return tree.args.get("order") is not None
+
+    @staticmethod
+    def _volatile_time_function(tree: exp.Expression) -> str | None:
+        """Ritorna il nome della funzione temporale volatile usata, se presente.
+
+        CURRENT_DATE/NOW e simili rendono il gold result non riproducibile: il solver
+        eseguito in un giorno diverso otterrebbe righe diverse per le stesse domande.
+        """
+        for cls, name in (
+            (exp.CurrentDate, "CURRENT_DATE"),
+            (exp.CurrentTimestamp, "CURRENT_TIMESTAMP"),
+            (exp.CurrentTime, "CURRENT_TIME"),
+            (exp.CurrentDatetime, "CURRENT_DATETIME"),
+        ):
+            if tree.find(cls):
+                return name
+        if _RE_VOLATILE_TEXT.search(tree.sql(dialect="postgres")):
+            return "NOW/LOCALTIMESTAMP"
+        return None
 
     @staticmethod
     def _distinct_from_profile(profile: Any | None, tree: exp.Expression | None) -> dict[str, Any]:
