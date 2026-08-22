@@ -18,6 +18,7 @@ from tqdm import tqdm
 from bench.domain.exceptions import BenchException
 from bench.domain.models import TaskStateDTO
 from bench.domain.services.picking.category_round_picker import CategoryRoundPicker
+from langgraph.errors import GraphRecursionError
 
 _log = getLogger("bench.application.generation_loop")
 
@@ -80,43 +81,21 @@ class GenerationLoop:
                     done, _ = wait(futures.keys(), return_when=FIRST_COMPLETED)
                     for fut in done:
                         cat_id = futures.pop(fut)
-                        try:
-                            result_state = fut.result()
-                            self._meta_repo.save_task(context.run_id, result_state)  # type: ignore[attr-defined]
-                            fail_delta = self._process_verdict(
-                                result_state,
-                                context,
-                                accepted_tasks,
-                                counts,
-                                picker,
-                                failure_warning_threshold,
-                            )
-                            if result_state.verdict in ("accepted", "accept"):
-                                pbar.update(1)
-                            if fail_delta > 0:
-                                consecutive_failures += fail_delta
-                            else:
-                                consecutive_failures = 0
-                        except (
-                            BenchException,
-                            PgError,
-                            ParseError,
-                            ValidationError,
-                            ValueError,
-                            RuntimeError,
-                            OverflowError,
-                            ArithmeticError,
-                        ) as e:
-                            _log.debug("Errore task per categoria '%s': %s", cat_id, e)
-                            counts["failed"] += 1
-                            consecutive_failures += 1
-                            self._resolve_category(cat_id, False, picker, failure_warning_threshold)
-                        self._submit_pending(executor, futures, accepted_tasks, context, picker)
-                        pbar.set_postfix(
-                            acc=len(accepted_tasks),
-                            active=len(futures),
-                            cat=cat_id,
+                        consecutive_failures = self._drain_done(
+                            fut,
+                            cat_id,
+                            context,
+                            executor,
+                            futures,
+                            accepted_tasks,
+                            counts,
+                            picker,
+                            pbar,
+                            consecutive_failures,
+                            failure_warning_threshold,
                         )
+                    self._submit_pending(executor, futures, accepted_tasks, context, picker)
+                    pbar.set_postfix(acc=len(accepted_tasks), active=len(futures))
                 if consecutive_failures >= max_fails:
                     _log.warning("Circuit breaker: %d fallimenti.", consecutive_failures)
                     for pending in futures:
@@ -128,6 +107,41 @@ class GenerationLoop:
             else:
                 executor.shutdown(wait=True)
         return accepted_tasks
+
+    def _drain_done(
+        self,
+        fut,
+        cat_id: str,
+        context: _RunContext,
+        executor,
+        futures: dict,
+        accepted_tasks: list[TaskStateDTO],
+        counts: dict[str, int],
+        picker: CategoryRoundPicker | None,
+        pbar,
+        consecutive_failures: int,
+        failure_warning_threshold: int,
+    ) -> int:
+        """Raccoglie un future completato aggiornando contatori e coda di lavoro."""
+        try:
+            result_state = fut.result()
+            self._meta_repo.save_task(context.run_id, result_state)  # type: ignore[attr-defined]
+            fail_delta = self._process_verdict(
+                result_state, context, accepted_tasks, counts, picker, failure_warning_threshold
+            )
+            if result_state.verdict in ("accepted", "accept"):
+                pbar.update(1)
+            return consecutive_failures + fail_delta
+        except Exception as e:
+            handled = self._handle_task_error(
+                type(e), e, cat_id, counts, picker, failure_warning_threshold
+            )
+            if not handled:
+                raise
+            return consecutive_failures + 1
+        finally:
+            self._submit_pending(executor, futures, accepted_tasks, context, picker)
+            pbar.set_postfix(acc=len(accepted_tasks), active=len(futures), cat=cat_id)
 
     def _process_verdict(
         self,
@@ -157,6 +171,46 @@ class GenerationLoop:
             return 0
         counts["failed"] += 1
         return 1
+
+    def _handle_task_error(
+        self,
+        exc_type: type[BaseException],
+        error: BaseException,
+        cat_id: str,
+        counts: dict[str, int],
+        picker: CategoryRoundPicker | None,
+        failure_warning_threshold: int,
+    ) -> bool:
+        """Gestisce gli errori previsti dei worker; True se l'errore era previsto."""
+        expected = (
+            BenchException,
+            PgError,
+            ParseError,
+            ValidationError,
+            ValueError,
+            RuntimeError,
+            OverflowError,
+            ArithmeticError,
+        )
+        if issubclass(exc_type, GraphRecursionError):
+            self._handle_recursion(cat_id, error, counts)
+        elif issubclass(exc_type, expected):
+            _log.debug("Errore task per categoria '%s': %s", cat_id, error)
+            counts["failed"] += 1
+        else:
+            return False
+        self._resolve_category(cat_id, False, picker, failure_warning_threshold)
+        return True
+
+    def _handle_recursion(
+        self,
+        cat_id: str,
+        error: GraphRecursionError,
+        counts: dict[str, int],
+    ) -> None:
+        """Scarta il task quando il grafo supera il limite di step senza crashare."""
+        _log.warning("Task categoria '%s' scartato: %s", cat_id, error)
+        counts["failed"] += 1
 
     def _resolve_category(
         self,
