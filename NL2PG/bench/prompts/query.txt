@@ -33,7 +33,7 @@ Il JSON di output deve contenere esclusivamente i campi "query", "intent", "orde
      - `cast`: un cast esplicito di tipo: `colonna::tipo` oppure `CAST(colonna AS tipo)`
      - `string_funcs`: una funzione stringa (`UPPER`, `LOWER`, `CONCAT`, `SUBSTRING`, `TRIM`, `REPLACE`, `INITCAP`, `LENGTH` o `LEN`)
      - `math_funcs`: una funzione matematica (`ROUND`, `ABS`, `POW`, `MOD`, `CEIL`, `FLOOR`, `SQRT`, `EXP`, `LN`, `LOG`)
-     - `relative_time`: una funzione di tempo relativo (`CURRENT_DATE`, `CURRENT_TIMESTAMP`, `CURRENT_TIME`) o `INTERVAL` (es. `CURRENT_DATE - INTERVAL '30 days'`)
+     - `relative_time`: aritmetica degli intervalli su date FISSE con `INTERVAL` (es. `DATE '2026-08-21' - INTERVAL '30 days'`). VIETATO usare funzioni volatili (`CURRENT_DATE`, `CURRENT_TIMESTAMP`, `CURRENT_TIME`, `NOW()`): renderebbero il risultato non riproducibile
      - `row_types`: un tipo riga: `ROW(colonna1, colonna2)`
      - `values`: la clausola `VALUES (...), (...)` (come CTE o sottoquery), es. `WITH t(col1, col2) AS (VALUES (..., ...), (..., ...))`
    - **JOIN E RELAZIONI**:

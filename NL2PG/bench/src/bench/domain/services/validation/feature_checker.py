@@ -130,9 +130,7 @@ class FeatureChecker:
         "disjunctive": lambda t: bool(t.find(exp.Or)),
         "like": lambda t: bool(t.find(exp.Like)),
         "any_all": lambda t: bool(t.find(exp.Any, exp.All)),
-        "relative_time": lambda t: bool(
-            t.find(exp.CurrentDate, exp.CurrentTimestamp, exp.CurrentTime, exp.Interval)
-        ),
+        "relative_time": lambda t: bool(t.find(exp.Interval)),
         "overlaps": lambda t: bool(t.find(exp.Overlaps)),
         "offset_fetch": lambda t: bool(t.find(exp.Offset, exp.Fetch)),
         "ordered_set_agg": lambda t: bool(
