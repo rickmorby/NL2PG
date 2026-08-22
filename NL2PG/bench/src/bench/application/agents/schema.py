@@ -3,6 +3,11 @@
 :author: Riccardo Morabito
 """
 
+import sqlglot
+from sqlglot import exp
+
+from typing import ClassVar
+
 from bench.application.agents.base import AbstractAgent
 from bench.application.validators.schema_validator import SchemaValidator
 from bench.domain.models.category import CategoryDTO
@@ -56,12 +61,60 @@ class SchemaAgent(AbstractAgent):
         result = self._validator.validate_with_type(output, state.sandbox_schema, cat.tipo_schema)
         if not result.is_valid:
             return (False, result.error, {})
+        en_err = self._check_italian_identifiers(output.ddl)
+        if en_err:
+            return (False, en_err, {})
         expected = state.spec.n_tables if state.spec else 0
         if expected:
             actual = self._validator.table_count(state.sandbox_schema)
             if actual != expected:
                 return (False, f"DDL con {actual} tabelle, ma la spec richiede {expected}", {})
         return (True, "", {})
+
+    _EN_IDENTS: ClassVar[dict[str, str]] = {
+        "first_name": "nome",
+        "last_name": "cognome",
+        "full_name": "nome_completo",
+        "birth_date": "data_nascita",
+        "hire_date": "data_assunzione",
+        "start_date": "data_inizio",
+        "end_date": "data_fine",
+        "salary": "stipendio",
+        "price": "prezzo",
+        "amount": "importo",
+        "quantity": "quantita",
+        "qty": "quantita",
+        "address": "indirizzo",
+        "city": "citta",
+        "country": "paese",
+        "phone": "telefono",
+        "customer": "cliente",
+        "employee": "dipendente",
+        "supplier": "fornitore",
+        "warehouse": "magazzino",
+    }
+
+    def _check_italian_identifiers(self, ddl: str) -> str:
+        """Respinge DDL con identificatori inglesi non ammessi dal contratto naming."""
+        try:
+            idents: set[str] = set()
+            for st in sqlglot.parse(ddl, read="postgres"):
+                if isinstance(st, exp.Create) and isinstance(st.this, exp.Schema):
+                    tname = getattr(st.this.this, "name", None)
+                    if tname and str(tname).lower() in self._EN_IDENTS:
+                        idents.add(str(tname))
+                    for e in st.this.expressions or []:
+                        if isinstance(e, exp.ColumnDef) and str(e.name).lower() in self._EN_IDENTS:
+                            idents.add(str(e.name))
+        except Exception:  # noqa: BLE001
+            return ""
+        if not idents:
+            return ""
+        sug = ", ".join(f"{k} → {self._EN_IDENTS[k]}" for k in sorted(idents)[:6])
+        return (
+            "Il benchmark e' in italiano: gli identificatori devono essere italiani. "
+            f"Trovati nomi inglesi non ammessi: {sug}. Rinominali con l'equivalente italiano."
+        )
 
     def build_updates(self, output: SchemaDDLDTO, _state: TaskStateDTO) -> dict:
         """Aggiorna lo stato con il DDL riparato.
