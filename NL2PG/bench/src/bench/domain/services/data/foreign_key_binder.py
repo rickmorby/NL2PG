@@ -63,7 +63,7 @@ class ForeignKeyBinder:
         rows: dict[str, list[dict[str, Any]]],
         rng: Random,
     ) -> None:
-        """Lega una singola colonna FK, gestendo self-reference e UNIQUE."""
+        """Lega una singola colonna FK, gestendo self-reference, PK e UNIQUE."""
         parent = rows.get((column.fk_parent_table or "").lower(), [])
         parent_keys = [
             row[column.fk_parent_column or ""]
@@ -71,10 +71,18 @@ class ForeignKeyBinder:
             if row.get(column.fk_parent_column or "") is not None
         ]
         is_self = column.fk_parent_table == table.name
+        is_single_pk = len(table.pk_columns) == 1 and column.name in table.pk_columns
+        must_be_unique = column.is_unique or is_single_pk
+
+        if must_be_unique and len(rows[table.name]) > len(parent_keys):
+            rows[table.name] = rows[table.name][: len(parent_keys)]
+
         used_unique: set[Any] = set()
         available_unique = list(parent_keys)
-        rng.shuffle(available_unique) if column.is_unique and available_unique else None
+        if must_be_unique and available_unique:
+            rng.shuffle(available_unique)
         bound_prefix: list[Any] = []
+
         for row in rows[table.name]:
             if column.nullable and rng.random() < self._null_rate:
                 row[column.name] = None
@@ -82,20 +90,32 @@ class ForeignKeyBinder:
                 if bound_prefix:
                     row[column.name] = rng.choice(bound_prefix)
             elif parent_keys:
-                if column.is_unique and available_unique:
-                    row[column.name] = available_unique.pop()
-                    used_unique.add(row[column.name])
-                elif column.is_unique and used_unique:
-                    remaining = [k for k in parent_keys if k not in used_unique]
-                    if remaining:
-                        row[column.name] = rng.choice(remaining)
-                        used_unique.add(row[column.name])
-                    else:
-                        row[column.name] = rng.choice(parent_keys)
-                else:
-                    row[column.name] = rng.choice(parent_keys)
+                row[column.name] = self._pick_parent_key(
+                    parent_keys, available_unique, used_unique, must_be_unique, rng
+                )
             if is_self and row.get(column.fk_parent_column or "") is not None:
                 bound_prefix.append(row[column.fk_parent_column or ""])
+
+    @staticmethod
+    def _pick_parent_key(
+        parent_keys: list[Any],
+        available_unique: list[Any],
+        used_unique: set[Any],
+        must_be_unique: bool,
+        rng: Random,
+    ) -> Any:
+        """Seleziona una chiave genitore gestendo l'unicità senza ripetizioni."""
+        if must_be_unique and available_unique:
+            val = available_unique.pop()
+            used_unique.add(val)
+            return val
+        if must_be_unique and used_unique:
+            remaining = [k for k in parent_keys if k not in used_unique]
+            if remaining:
+                val = rng.choice(remaining)
+                used_unique.add(val)
+                return val
+        return rng.choice(parent_keys)
 
     def dedupe_composite_keys(
         self, schema: SchemaModel, rows: dict[str, list[dict[str, Any]]], rng: Random
