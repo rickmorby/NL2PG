@@ -65,6 +65,7 @@ class PostgresSQLRepair:
         sql = self._dedupe_create_table(sql)
         sql = self._fix_trailing_commas(sql)
         sql = self._fix_hyphenated_identifiers(sql)
+        sql = self._ensure_default_partition(sql)
         sql = self._ensure_semicolon(sql)
         return sql.strip()
 
@@ -167,6 +168,20 @@ class PostgresSQLRepair:
         if len(kept) == len(parts):
             return sql
         return ";".join(kept) + (";" if sql.strip().endswith(";") else "")
+
+    def _ensure_default_partition(self, sql: str) -> str:
+        """Aggiunge la partizione DEFAULT per tabelle partizionate se non presente."""
+        pattern = (
+            r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?\"?([a-zA-Z_][a-zA-Z0-9_]*)\"?\s*"
+            r"\([^;]+PARTITION\s+BY\s+(?:RANGE|LIST)"
+        )
+        for m in re_compile(pattern, flags=IGNORECASE).finditer(sql):
+            parent = m.group(1)
+            pat_def = rf"PARTITION\s+OF\s+\"?{parent}\"?\s+DEFAULT\b"
+            if not re_compile(pat_def, flags=IGNORECASE).search(sql):
+                def_table = f"CREATE TABLE {parent}_default PARTITION OF {parent} DEFAULT;"
+                sql = f"{sql.rstrip().rstrip(';')};\n{def_table}"
+        return sql
 
     def _ensure_semicolon(self, sql: str) -> str:
         """Assicura che il comando o script SQL termini con punto e virgola ';'."""

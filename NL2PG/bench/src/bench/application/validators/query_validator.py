@@ -63,40 +63,30 @@ class QueryValidator:
         if ast_err:
             return QueryValidationResult(is_valid=False, error=ast_err)
 
-        if query.order_sensitive:
-            tie_err = self._check_tiebreaker(tree, schema)
-            if tie_err:
-                return QueryValidationResult(is_valid=False, error=tie_err)
+        if query.order_sensitive and tree:
+            self._ensure_tiebreaker(query, tree, schema)
 
         return self._validate_execution(query, schema, tree, profile)
 
-    def _check_tiebreaker(self, tree: exp.Expression | None, schema: str) -> str:
-        """Esige che l'ultima chiave dell'ORDER BY sia una colonna univoca."""
-        order = tree.args.get("order") if tree else None
+    def _ensure_tiebreaker(self, query: GoldQueryDTO, tree: exp.Expression, schema: str) -> None:
+        """Aggiunge automaticamente un tiebreaker univoco (PK ASC) se l'ORDER BY non e' univoco."""
+        order = tree.args.get("order")
         if not order or not order.expressions:
-            return ""
+            return
         last_expr = order.expressions[-1]
         last = last_expr.this if isinstance(last_expr, exp.Ordered) else last_expr
         col = last.find(exp.Column) if last is not None else None
-        if col is None:
-            return (
-                "L'ultima chiave dell'ORDER BY non e' una colonna semplice: aggiungi in coda "
-                "una colonna con valori univoci (es. la chiave primaria) come tiebreaker."
-            )
         try:
             model = self._sandbox.introspect_schema(schema)
         except Exception:  # noqa: BLE001
-            return ""
+            return
         unique_cols = self._collect_unique_columns(model)
-        target_col = self._resolve_column_alias(tree, col.name.lower())
+        target_col = self._resolve_column_alias(tree, col.name.lower()) if col else ""
         if target_col in unique_cols:
-            return ""
+            return
         hint = sorted(unique_cols)[0] if unique_cols else "id"
-        return (
-            f"L'ultima chiave dell'ORDER BY ('{col.name}') non e' una colonna univoca: le parita' "
-            f"rendono l'ordine non riproducibile. Aggiungi in coda un tiebreaker univoco "
-            f"(es. `{hint} ASC`)."
-        )
+        order.expressions.append(exp.Ordered(this=exp.Column(this=exp.to_identifier(hint))))
+        query.query = tree.sql(dialect="postgres")
 
     @staticmethod
     def _collect_unique_columns(model: Any) -> set[str]:
