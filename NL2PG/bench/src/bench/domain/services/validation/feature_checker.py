@@ -137,7 +137,10 @@ class FeatureChecker:
             t.find(exp.PercentileCont, exp.PercentileDisc, exp.WithinGroup)
         ),
         "grouping_sets": lambda t: bool(t.find(exp.GroupingSets)),
-        "row_types": lambda t: bool(t.find(exp.Tuple)),
+        "row_types": lambda t: (
+            bool(t.find(exp.Tuple))
+            or any(isinstance(e, exp.Anonymous) and e.name.upper() == "ROW" for e in t.walk())
+        ),
         "values": lambda t: bool(t.find(exp.Values)),
         "case": lambda t: bool(t.find(exp.Case)),
         "string_funcs": lambda t: bool(
