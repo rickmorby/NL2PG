@@ -147,6 +147,12 @@ class QueryValidator:
                 "La query ha order_sensitive=true ma manca della clausola ORDER BY "
                 "nella query principale della SELECT."
             )
+        if tree.find(exp.Limit) and not self._has_root_order_by(tree):
+            return (
+                "La query usa LIMIT senza ORDER BY nella SELECT principale: le righe "
+                "restituite non sarebbero deterministiche. Aggiungi un ORDER BY che definisca "
+                "quale sottoinsieme di righe selezionare prima del LIMIT."
+            )
         volatile = self._volatile_time_function(tree)
         if volatile:
             return (
