@@ -63,7 +63,51 @@ class QueryValidator:
         if ast_err:
             return QueryValidationResult(is_valid=False, error=ast_err)
 
+        if query.order_sensitive:
+            tie_err = self._check_tiebreaker(tree, schema)
+            if tie_err:
+                return QueryValidationResult(is_valid=False, error=tie_err)
+
         return self._validate_execution(query, schema, tree, profile)
+
+    def _check_tiebreaker(self, tree: exp.Expression | None, schema: str) -> str:
+        """Esige che l'ultima chiave dell'ORDER BY sia una colonna univoca.
+
+        Senza tiebreaker univoco le parita' di ordinamento rendono l'ordine delle righe
+        non riproducibile: il solver risponderebbe correttamente ma con ordine diverso.
+        """
+        order = tree.args.get("order") if tree else None
+        if not order:
+            return ""
+        keys = list(order.expressions)
+        if not keys:
+            return ""
+        last = keys[-1].this if isinstance(keys[-1], exp.Ordered) else keys[-1]
+        col = last.find(exp.Column) if last is not None else None
+        if col is None:
+            return (
+                "L'ultima chiave dell'ORDER BY non e' una colonna semplice: aggiungi in coda "
+                "una colonna con valori univoci (es. la chiave primaria) come tiebreaker."
+            )
+        try:
+            model = self._sandbox.introspect_schema(schema)
+        except Exception:  # noqa: BLE001
+            return ""
+        unique_cols: set[str] = set()
+        for table in model.tables.values():
+            if len(table.pk_columns) == 1:
+                unique_cols.add(table.pk_columns[0].lower())
+            for group in table.unique_groups:
+                if len(group) == 1:
+                    unique_cols.add(group[0].lower())
+        if col.name.lower() in unique_cols:
+            return ""
+        hint = sorted(unique_cols)[0] if unique_cols else "id"
+        return (
+            f"L'ultima chiave dell'ORDER BY ('{col.name}') non e' una colonna univoca: le parita' "
+            f"rendono l'ordine non riproducibile. Aggiungi in coda un tiebreaker univoco "
+            f"(es. `{hint} ASC`)."
+        )
 
     def _validate_ast_rules(
         self, query: GoldQueryDTO, spec: SpecDTO
