@@ -45,23 +45,27 @@ class InsertScriptBuilder:
                 statements.append(f'INSERT INTO "{table.name}" ({names}) VALUES\n{values};')
         return "\n\n".join(statements)
 
-    @staticmethod
-    def _format_value(value: Any, column: ColumnSchema) -> str:
+    @classmethod
+    def _format_value(cls, value: Any, column: ColumnSchema) -> str:
         """Formatta un valore SQL: stringhe quotate, NULL, booleani, numeri, date."""
         if value is None:
             return "NULL"
-        if (
-            isinstance(value, str)
-            and column.max_length is not None
-            and len(value) > column.max_length
-        ):
-            value = value[: column.max_length]
+        if isinstance(value, str):
+            return cls._format_string_value(value, column)
         if is_bool_type(column.data_type):
             return "TRUE" if value else "FALSE"
         if is_integer_type(column.data_type):
             return str(int(value))
         if is_numeric_type(column.data_type):
             return str(round_numeric(value, column))
-        if isinstance(value, str):
-            return "'" + value.replace("'", "''") + "'"
         return str(value)
+
+    @staticmethod
+    def _format_string_value(value: str, column: ColumnSchema) -> str:
+        """Formatta un valore testuale o record composito."""
+        if column.max_length is not None and len(value) > column.max_length:
+            value = value[: column.max_length]
+        val_clean = value.strip()
+        if val_clean.upper().startswith("ROW(") and val_clean.endswith(")"):
+            return val_clean
+        return "'" + value.replace("'", "''") + "'"

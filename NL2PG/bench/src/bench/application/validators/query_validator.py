@@ -69,7 +69,7 @@ class QueryValidator:
         return self._validate_execution(query, schema, tree, profile)
 
     def _ensure_tiebreaker(self, query: GoldQueryDTO, tree: exp.Expression, schema: str) -> None:
-        """Aggiunge automaticamente un tiebreaker univoco (PK ASC) se l'ORDER BY non e' univoco."""
+        """Aggiunge automaticamente un tiebreaker univoco (GROUP BY o PK ASC) se non univoco."""
         order = tree.args.get("order")
         if not order or not order.expressions:
             return
@@ -84,6 +84,18 @@ class QueryValidator:
         target_col = self._resolve_column_alias(tree, col.name.lower()) if col else ""
         if target_col in unique_cols:
             return
+
+        group = tree.args.get("group")
+        if group and group.expressions and not tree.find(exp.GroupingSets):
+            for g_expr in group.expressions:
+                if not any(
+                    e.this.sql(dialect="postgres") == g_expr.sql(dialect="postgres")
+                    for e in order.expressions
+                ):
+                    order.expressions.append(exp.Ordered(this=g_expr.copy()))
+            query.query = tree.sql(dialect="postgres")
+            return
+
         hint = sorted(unique_cols)[0] if unique_cols else "id"
         order.expressions.append(exp.Ordered(this=exp.Column(this=exp.to_identifier(hint))))
         query.query = tree.sql(dialect="postgres")
