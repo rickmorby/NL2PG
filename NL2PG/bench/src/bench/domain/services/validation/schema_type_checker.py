@@ -10,10 +10,11 @@ strutturali) non vengono controllati e passano senza vincoli.
 
 from dataclasses import dataclass
 from re import IGNORECASE, compile as re_compile, escape as re_escape
-
-from sqlglot import exp, parse_one
-from sqlglot.errors import ParseError
 from typing import Callable, ClassVar
+
+import sqlglot
+from sqlglot import exp
+from sqlglot.errors import ParseError
 
 _RE_PARTITION_BY = re_compile(r"\bPARTITION\s+BY\b", IGNORECASE)
 _RE_COMPOSITE_TYPE = re_compile(r"CREATE\s+TYPE\s+[\w\"]+\s+AS\s*\(", IGNORECASE)
@@ -136,7 +137,10 @@ _MIN_COMPOSITE_FK = 2
 _MIN_FACT_FK = 2
 
 _RE_CREATE_DOMAIN = re_compile(r"^\s*CREATE\s+DOMAIN\b", IGNORECASE)
-_RE_EXCLUSIVE_CHECK = re_compile(r"CHECK\s*\(.*IS\s+NULL.*\)", IGNORECASE)
+_RE_EXCLUSIVE_CHECK = re_compile(
+    r"CHECK\s*\([\s\S]*?(?:IS\s+(?:NOT\s+)?NULL|num_nonnulls|\bCASE\b|<>|=)[\s\S]*?\)",
+    flags=IGNORECASE,
+)
 _RE_SOFT_DELETE_COLUMN = re_compile(
     r"\b(?:deleted_at|is_deleted|data_eliminazione|is_active|eliminato|cancellato)\b",
     IGNORECASE,
@@ -277,13 +281,24 @@ class SchemaTypeChecker:
         return bool(_RE_CREATE_DOMAIN.search(ddl))
 
     @staticmethod
+    def _get_all_creates(ddl: str) -> list[exp.Create]:
+        """Estrae tutte le istruzioni CREATE TABLE dal DDL multi-statement."""
+        try:
+            trees = sqlglot.parse(ddl, read="postgres")
+            creates = []
+            for t in trees:
+                if t:
+                    if isinstance(t, exp.Create):
+                        creates.append(t)
+                    creates.extend(t.find_all(exp.Create))
+            return list(dict.fromkeys(creates))
+        except (ParseError, ValueError, AttributeError):
+            return []
+
+    @staticmethod
     def _has_weak_entity_pk(ddl: str) -> bool:
         """Verifica una tabella la cui PK composta include la colonna FK del proprietario."""
-        try:
-            tree = parse_one(ddl, read="postgres")
-        except (ParseError, ValueError, AttributeError):
-            return False
-        for create in tree.find_all(exp.Create):
+        for create in SchemaTypeChecker._get_all_creates(ddl):
             pk_cols, fk_cols = SchemaTypeChecker._collect_pk_fk(create)
             if len(pk_cols) >= _MIN_COMPOSITE_FK and (pk_cols & fk_cols):
                 return True
@@ -292,11 +307,7 @@ class SchemaTypeChecker:
     @staticmethod
     def _has_isa_tables(ddl: str) -> bool:
         """Verifica il pattern ISA: tabella figlia con PK che e' anche FK verso il padre."""
-        try:
-            tree = parse_one(ddl, read="postgres")
-        except (ParseError, ValueError, AttributeError):
-            return False
-        for create in tree.find_all(exp.Create):
+        for create in SchemaTypeChecker._get_all_creates(ddl):
             pk_single: str | None = None
             fk_target: str | None = None
             for cd in create.find_all(exp.ColumnDef):
@@ -324,11 +335,7 @@ class SchemaTypeChecker:
     @staticmethod
     def _has_junction_table(ddl: str) -> bool:
         """Verifica una tabella ponte: due o piu' FK che compongono la chiave primaria."""
-        try:
-            tree = parse_one(ddl, read="postgres")
-        except (ParseError, ValueError, AttributeError):
-            return False
-        for create in tree.find_all(exp.Create):
+        for create in SchemaTypeChecker._get_all_creates(ddl):
             fk_cols: set[str] = set()
             pk_cols: list[str] = []
             for cd in create.find_all(exp.ColumnDef):
@@ -356,11 +363,7 @@ class SchemaTypeChecker:
     @staticmethod
     def _has_fact_table(ddl: str) -> bool:
         """Verifica una tabella dei fatti con almeno due FK verso dimensioni."""
-        try:
-            tree = parse_one(ddl, read="postgres")
-        except (ParseError, ValueError, AttributeError):
-            return False
-        for create in tree.find_all(exp.Create):
+        for create in SchemaTypeChecker._get_all_creates(ddl):
             fk_cols: set[str] = set()
             for cd in create.find_all(exp.ColumnDef):
                 if any(
@@ -382,20 +385,22 @@ class SchemaTypeChecker:
         """Verifica archi esclusivi: piu' FK nullable piu' CHECK di esclusivita' IS NULL."""
         if not _RE_EXCLUSIVE_CHECK.search(ddl):
             return False
-        try:
-            tree = parse_one(ddl, read="postgres")
-        except (ParseError, ValueError, AttributeError):
-            return False
         refs = 0
-        for cd in tree.find_all(exp.ColumnDef):
-            if any(isinstance(s.kind, exp.Reference) for s in cd.find_all(exp.ColumnConstraint)):
-                nulls = [
-                    s
-                    for s in cd.find_all(exp.ColumnConstraint)
-                    if isinstance(s.kind, exp.NotNullColumnConstraint)
-                ]
-                if not nulls:
-                    refs += 1
+        for create in SchemaTypeChecker._get_all_creates(ddl):
+            for cd in create.find_all(exp.ColumnDef):
+                has_ref = any(
+                    isinstance(s.kind, exp.Reference) for s in cd.find_all(exp.ColumnConstraint)
+                )
+                if has_ref:
+                    nulls = [
+                        s
+                        for s in cd.find_all(exp.ColumnConstraint)
+                        if isinstance(s.kind, exp.NotNullColumnConstraint)
+                    ]
+                    if not nulls:
+                        refs += 1
+            for _ft in create.find_all(exp.ForeignKey):
+                refs += 1
         return refs >= _MIN_FACT_FK
 
     _CHECKS: ClassVar[dict[str, Callable[[str], bool]]] = {

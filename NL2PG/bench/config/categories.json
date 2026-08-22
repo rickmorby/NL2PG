@@ -6983,8 +6983,8 @@
     },
     {
       "id": "Q27_S29",
-      "descrizione": "Query: GROUP BY GROUPING SETS ((col1),(col2),()). Schema: concetto unico spezzato in più colonne (first_name/last_name) o fuso.",
-      "vincoli": "Elencare i livelli di aggregazione con GROUP BY GROUPING SETS ((col1), (col2), ()) in una sola passata. Ricomporre il concetto con CONCAT(first_name, ' ', last_name) o confrontare le parti separatamente. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome, indirizzo).",
+      "descrizione": "Query: GROUP BY GROUPING SETS ((col1),(col2),()). Schema: concetto unico spezzato in più colonne (nome/cognome) o fuso.",
+      "vincoli": "Elencare i livelli di aggregazione con GROUP BY GROUPING SETS ((col1), (col2), ()) in una sola passata. Ricomporre il concetto con CONCAT(nome, ' ', cognome) o confrontare le parti separatamente. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome, indirizzo).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
         "rename",
@@ -7315,8 +7315,8 @@
     },
     {
       "id": "Q29_S29",
-      "descrizione": "Query: aggregatore COUNT(DISTINCT col) con GROUP BY. Schema: dato unico spezzato su first_name/last_name.",
-      "vincoli": "Usare COUNT(DISTINCT last_name) con GROUP BY first_name, oppure ricomporre il nome con CONCAT prima del conteggio distinto. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
+      "descrizione": "Query: aggregatore COUNT(DISTINCT col) con GROUP BY. Schema: dato unico spezzato su nome/cognome.",
+      "vincoli": "Usare COUNT(DISTINCT cognome) con GROUP BY nome, oppure ricomporre il nome con CONCAT prima del conteggio distinto. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
         "rename",
@@ -7443,8 +7443,8 @@
     },
     {
       "id": "Q30_S29",
-      "descrizione": "Query: confronto di tuple ROW(c1,c2). Schema: dato unico spezzato su first_name/last_name.",
-      "vincoli": "Confrontare il nome completo come tuppa con WHERE ROW(first_name, last_name) = ROW(v_first, v_last). Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
+      "descrizione": "Query: confronto di tuple ROW(c1,c2). Schema: dato unico spezzato su nome/cognome.",
+      "vincoli": "Confrontare il nome completo come tuppa con WHERE ROW(nome, cognome) = ROW(v_first, v_last). Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
         "rename",
@@ -7825,8 +7825,8 @@
     },
     {
       "id": "Q33_S29",
-      "descrizione": "Query: pattern matching con LIKE/ILIKE. Schema: dato unico spezzato su first_name/last_name.",
-      "vincoli": "Cercare il nome completo con WHERE first_name LIKE 'pattern%' OR last_name LIKE 'pattern%', o ricomporre con CONCAT prima del LIKE. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
+      "descrizione": "Query: pattern matching con LIKE/ILIKE. Schema: dato unico spezzato su nome/cognome.",
+      "vincoli": "Cercare il nome completo con WHERE nome LIKE 'pattern%' OR cognome LIKE 'pattern%', o ricomporre con CONCAT prima del LIKE. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
         "rename",
@@ -8203,8 +8203,8 @@
     },
     {
       "id": "Q35_S29",
-      "descrizione": "Query: CASE WHEN e COALESCE in proiezione. Schema: dato unico spezzato su first_name/last_name.",
-      "vincoli": "Ricomporre con COALESCE(CONCAT(first_name, ' ', last_name), 'sconosciuto') e CASE WHEN first_name IS NULL THEN ... END. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
+      "descrizione": "Query: CASE WHEN e COALESCE in proiezione. Schema: dato unico spezzato su nome/cognome.",
+      "vincoli": "Ricomporre con COALESCE(CONCAT(nome, ' ', cognome), 'sconosciuto') e CASE WHEN nome IS NULL THEN ... END. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
         "rename",
@@ -8363,8 +8363,8 @@
     },
     {
       "id": "Q36_S29",
-      "descrizione": "Query: manipolazione stringhe con UPPER/CONCAT/SUBSTRING. Schema: dato unico spezzato su first_name/last_name.",
-      "vincoli": "Ricompore il nome con CONCAT(first_name, ' ', last_name) e formattare con UPPER/SUBSTRING nella SELECT. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
+      "descrizione": "Query: manipolazione stringhe con UPPER/CONCAT/SUBSTRING. Schema: dato unico spezzato su nome/cognome.",
+      "vincoli": "Ricompore il nome con CONCAT(nome, ' ', cognome) e formattare con UPPER/SUBSTRING nella SELECT. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
         "rename",
@@ -8621,7 +8621,7 @@
     },
     {
       "id": "Q37_S29",
-      "descrizione": "Query: calcoli scalari con ROUND/ABS/POWER. Schema: dato unico spezzato su first_name/last_name.",
+      "descrizione": "Query: calcoli scalari con ROUND/ABS/POWER. Schema: dato unico spezzato su nome/cognome.",
       "vincoli": "Applicare ROUND/ABS/POWER sulle colonne numeriche, scegliendo le parti corrette del dato spezzato. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
@@ -9005,7 +9005,7 @@
     },
     {
       "id": "Q39_S29",
-      "descrizione": "Query: filtro di intervallo chiuso con BETWEEN. Schema: dato unico spezzato su first_name/last_name.",
+      "descrizione": "Query: filtro di intervallo chiuso con BETWEEN. Schema: dato unico spezzato su nome/cognome.",
       "vincoli": "Applicare WHERE col BETWEEN v1 AND v2 alla colonna corretta del dato spezzato. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
@@ -9677,8 +9677,8 @@
     },
     {
       "id": "Q42_S29",
-      "descrizione": "Query: condizioni alternative con OR nella WHERE. Schema: dato unico spezzato su first_name/last_name.",
-      "vincoli": "Cercare su entrambe le parti con WHERE first_name = 'val' OR last_name = 'val'. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
+      "descrizione": "Query: condizioni alternative con OR nella WHERE. Schema: dato unico spezzato su nome/cognome.",
+      "vincoli": "Cercare su entrambe le parti con WHERE nome = 'val' OR cognome = 'val'. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
         "rename",
@@ -9933,8 +9933,8 @@
     },
     {
       "id": "Q43_S29",
-      "descrizione": "Query: ordinamento ORDER BY multi-colonna senza LIMIT. Schema: dato unico spezzato su first_name/last_name.",
-      "vincoli": "Ordinare con ORDER BY last_name ASC, first_name ASC sulle colonne del dato spezzato. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
+      "descrizione": "Query: ordinamento ORDER BY multi-colonna senza LIMIT. Schema: dato unico spezzato su nome/cognome.",
+      "vincoli": "Ordinare con ORDER BY cognome ASC, nome ASC sulle colonne del dato spezzato. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
         "rename",
@@ -11145,7 +11145,7 @@
     },
     {
       "id": "Q53_S29",
-      "descrizione": "Query: aggregato ordered-set con PERCENTILE_CONT/MODE. Schema: dato unico spezzato su first_name/last_name.",
+      "descrizione": "Query: aggregato ordered-set con PERCENTILE_CONT/MODE. Schema: dato unico spezzato su nome/cognome.",
       "vincoli": "Calcolare mode() WITHIN GROUP (ORDER BY col) sulla colonna corretta del dato spezzato. Schema: dato logico unico archiviato spezzato su più colonne (nome/cognome).",
       "tipo_schema": "column_splitting",
       "twist_ammessi": [
