@@ -53,8 +53,43 @@ class ForeignKeyBinder:
         """Sostituisce ogni FK con una PK reale del padre (o NULL se nullable)."""
         for table_name in rows:
             table = schema.table(table_name)
+            exclusive_bound = self._bind_exclusive_arcs(table, rows, rng)
             for column in table.fk_columns:
+                if exclusive_bound and column.nullable and column.fk_parent_table != table.name:
+                    continue
                 self._bind_column(table, column, rows, rng)
+
+    def _bind_exclusive_arcs(
+        self, table: Any, rows: dict[str, list[dict[str, Any]]], rng: Random
+    ) -> bool:
+        """Popola esattamente una FK per riga nelle tabelle con archi esclusivi."""
+        exclusive_fks = [
+            c for c in table.fk_columns if c.nullable and c.fk_parent_table != table.name
+        ]
+        if len(exclusive_fks) < _COMPOSITE_PK_MIN:
+            return False
+        has_exclusive = any(
+            "IS NULL" in str(getattr(c, "check_expr", "")).upper()
+            or "<>" in str(getattr(c, "check_expr", ""))
+            or "= 1" in str(getattr(c, "check_expr", ""))
+            for c in table.columns
+        )
+        if not has_exclusive:
+            return False
+        for row in rows[table.name]:
+            chosen_col = rng.choice(exclusive_fks)
+            for col in exclusive_fks:
+                if col.name == chosen_col.name:
+                    parent = rows.get((col.fk_parent_table or "").lower(), [])
+                    parent_keys = [
+                        r[col.fk_parent_column or ""]
+                        for r in parent
+                        if r.get(col.fk_parent_column or "") is not None
+                    ]
+                    row[col.name] = rng.choice(parent_keys) if parent_keys else None
+                else:
+                    row[col.name] = None
+        return True
 
     def _bind_column(
         self,

@@ -6,7 +6,7 @@
 import sqlglot
 from sqlglot import exp
 
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from bench.application.agents.base import AbstractAgent
 from bench.application.validators.schema_validator import SchemaValidator
@@ -64,11 +64,14 @@ class SchemaAgent(AbstractAgent):
         en_err = self._check_italian_identifiers(output.ddl)
         if en_err:
             return (False, en_err, {})
-        expected = state.spec.n_tables if state.spec else 0
-        if expected:
-            actual = self._validator.table_count(state.sandbox_schema)
-            if actual != expected:
-                return (False, f"DDL con {actual} tabelle, ma la spec richiede {expected}", {})
+        actual = self._validator.table_count(state.sandbox_schema)
+        if actual < 1:
+            return (False, "Lo script DDL non crea alcuna tabella valida nel database", {})
+        min_tab = cat.n_tables_range[0] if cat.n_tables_range else 1
+        max_tab = cat.n_tables_range[1] if cat.n_tables_range else 12
+        if not (min_tab <= actual <= max_tab):
+            msg = f"DDL con {actual} tabelle, ma la categoria ammette tra {min_tab} e {max_tab}"
+            return (False, msg, {})
         return (True, "", {})
 
     _EN_IDENTS: ClassVar[dict[str, str]] = {
@@ -116,11 +119,11 @@ class SchemaAgent(AbstractAgent):
             f"Trovati nomi inglesi non ammessi: {sug}. Rinominali con l'equivalente italiano."
         )
 
-    def build_updates(self, output: SchemaDDLDTO, _state: TaskStateDTO) -> dict:
-        """Aggiorna lo stato con il DDL riparato.
-
-        Il gold deve coincidere con l'SQL effettivamente eseguito dal sandbox (che
-        ripara prima di eseguire), altrimenti il solver caricherebbe un DDL diverso
-        (es. GENERATED con subquery) e crasherebbe.
-        """
-        return {"schema_ddl": SchemaDDLDTO(ddl=self._repair.repair(output.ddl))}
+    def build_updates(self, output: SchemaDDLDTO, state: TaskStateDTO) -> dict:
+        """Aggiorna lo stato con il DDL riparato e sincronizza n_tables nella Spec."""
+        actual = self._validator.table_count(state.sandbox_schema)
+        repaired_ddl = self._repair.repair(output.ddl)
+        updates: dict[str, Any] = {"schema_ddl": SchemaDDLDTO(ddl=repaired_ddl)}
+        if state.spec and actual > 0 and state.spec.n_tables != actual:
+            updates["spec"] = state.spec.model_copy(update={"n_tables": actual})
+        return updates
