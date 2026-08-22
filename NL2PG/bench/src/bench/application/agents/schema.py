@@ -12,6 +12,7 @@ from bench.domain.ports.outbound.config_port import ConfigPort
 from bench.domain.ports.outbound.example_port import ExamplePort
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
+from bench.domain.services.validation.sql_repair import PostgresSQLRepair
 
 
 class SchemaAgent(AbstractAgent):
@@ -28,6 +29,7 @@ class SchemaAgent(AbstractAgent):
         """Inietta le porte outbound, gli esempi e il validatore schema."""
         super().__init__(llm, prompts, config, examples)
         self._validator = validator
+        self._repair = PostgresSQLRepair()
 
     def prompt_name(self) -> str:
         """Restituisce 'schema' come nome del template prompt."""
@@ -62,5 +64,10 @@ class SchemaAgent(AbstractAgent):
         return (True, "", {})
 
     def build_updates(self, output: SchemaDDLDTO, _state: TaskStateDTO) -> dict:
-        """Aggiorna lo stato con schema_ddl."""
-        return {"schema_ddl": output}
+        """Aggiorna lo stato con il DDL riparato.
+
+        Il gold deve coincidere con l'SQL effettivamente eseguito dal sandbox (che
+        ripara prima di eseguire), altrimenti il solver caricherebbe un DDL diverso
+        (es. GENERATED con subquery) e crasherebbe.
+        """
+        return {"schema_ddl": SchemaDDLDTO(ddl=self._repair.repair(output.ddl))}
