@@ -49,6 +49,7 @@ class TableSchema:
         name: str,
         columns: list[ColumnSchema],
         unique_groups: list[list[str]] | None = None,
+        is_partition: bool = False,
     ) -> None:
         """Inizializza i metadati della tabella e deriva PK, FK e UNIQUE."""
         self.name = name
@@ -56,6 +57,7 @@ class TableSchema:
         self.pk_columns: list[str] = [c.name for c in columns if c.is_pk]
         self.fk_columns: list[ColumnSchema] = [c for c in columns if c.is_fk]
         self.unique_groups: list[list[str]] = unique_groups or []
+        self.is_partition = is_partition
 
     def column(self, name: str) -> ColumnSchema | None:
         """Restituisce la colonna per nome o None se assente."""

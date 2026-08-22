@@ -19,6 +19,7 @@ def introspect_schema(connection, schema_name: str) -> SchemaModel:
     foreign_keys = _fetch_foreign_keys(connection, schema_name)
     unique_constraints = _fetch_unique_constraints(connection, schema_name)
     check_constraints = _fetch_check_constraints(connection, schema_name)
+    partition_children = _fetch_partition_children(connection, schema_name)
 
     tables: dict[str, list[ColumnSchema]] = {}
     for row in columns:
@@ -42,7 +43,15 @@ def introspect_schema(connection, schema_name: str) -> SchemaModel:
     _apply_check_constraints(tables, check_constraints)
 
     return SchemaModel(
-        [TableSchema(name, cols, unique_groups.get(name)) for name, cols in tables.items()]
+        [
+            TableSchema(
+                name,
+                cols,
+                unique_groups.get(name),
+                is_partition=name in partition_children,
+            )
+            for name, cols in tables.items()
+        ]
     )
 
 
@@ -158,6 +167,22 @@ def _fetch_check_constraints(connection, schema_name: str) -> list[tuple[str, st
         return connection.execute(query, (schema_name,)).fetchall()
     except (AttributeError, ValueError, RuntimeError):
         return []
+
+
+def _fetch_partition_children(connection, schema_name: str) -> set[str]:
+    """Restituisce i nomi delle tabelle che sono partizioni fisiche figlie."""
+    query = (
+        "SELECT c.relname "
+        "FROM pg_class c "
+        "JOIN pg_inherits i ON c.oid = i.inhrelid "
+        "JOIN pg_namespace n ON n.oid = c.relnamespace "
+        "WHERE n.nspname = %s"
+    )
+    try:
+        rows = connection.execute(query, (schema_name,)).fetchall()
+        return {r[0] for r in rows}
+    except (AttributeError, ValueError, RuntimeError):
+        return set()
 
 
 def _apply_check_constraints(

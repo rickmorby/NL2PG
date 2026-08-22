@@ -17,7 +17,7 @@ _RE_HYPHENATED_IDENTIFIER = re_compile(
     r"('(?:''|[^'])*')|\b([a-zA-Z][a-zA-Z0-9_]*)-([a-zA-Z][a-zA-Z0-9_]*)\b"
 )
 _RE_GENERATED_SUBQUERY = re_compile(
-    r"GENERATED\s+ALWAYS\s+AS\s*\(.*?SELECT.*?\)\s*STORED", flags=IGNORECASE | DOTALL
+    r"GENERATED\s+ALWAYS\s+AS\s*\(.*?\bSELECT\b.*?\)\s*STORED", flags=IGNORECASE | DOTALL
 )
 _RE_GENERATED_CURRENT = re_compile(
     r"GENERATED\s+ALWAYS\s+AS\s*\(.*?CURRENT_(?:DATE|TIMESTAMP|TIME).*?\)\s*STORED",
