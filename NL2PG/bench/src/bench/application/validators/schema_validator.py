@@ -43,9 +43,9 @@ class SchemaValidator(AbstractSandboxValidator):
         return self.validate_with_type(dto, schema, tipo_schema)
 
     def table_count(self, schema: str) -> int:
-        """Restituisce il numero di tabelle effettivamente create nello schema sandbox."""
+        """Restituisce il numero di tabelle primarie (escluse le partizioni) create nello schema."""
         model = self._sandbox.introspect_schema(schema)
-        return len(model.tables)
+        return len([t for t in model.tables.values() if not getattr(t, "is_partition", False)])
 
     def _extract_sql(self, dto: AbstractDTO) -> str:
         """Estrae lo script DDL dal DTO."""
@@ -54,7 +54,8 @@ class SchemaValidator(AbstractSandboxValidator):
         return ""
 
     def _execute_sql(self, schema: str, sql_text: str) -> None:
-        """Esegue il DDL nello schema sandbox."""
+        """Esegue il DDL nello schema sandbox pulendolo prima per supportare i retry."""
+        self._sandbox.reset_schema(schema)
         self._sandbox.execute_ddl(schema, sql_text)
 
     def _empty_error_msg(self) -> str:

@@ -112,6 +112,16 @@ class PostgresSandboxAdapter(SandboxPort):
         except DatabaseClientError as e:
             _log.warning("nodo=cleanup schema=%s errore=%s (ignorato)", schema, str(e)[:100])
 
+    def reset_schema(self, schema: str) -> None:
+        """Pulisce lo schema temporaneo eliminando e ricreando gli oggetti al suo interno."""
+        self._validate_schema_name(schema)
+        try:
+            with self._client.get_sandbox_connection(autocommit=True) as conn:
+                self._client.execute_identifier(conn, "DROP SCHEMA IF EXISTS {} CASCADE", schema)
+                self._client.execute_identifier(conn, "CREATE SCHEMA IF NOT EXISTS {}", schema)
+        except DatabaseClientError as e:
+            _log.warning("nodo=reset schema=%s errore=%s", schema, str(e)[:100])
+
     def cleanup_orphan_schemas(self) -> list[str]:
         """Elimina tutti gli schemi temporanei orfani (task_*) nel database sandbox."""
         removed_schemas: list[str] = []

@@ -38,6 +38,10 @@ class SandboxPort(ABC):
         """Elimina uno schema temporaneo e le relative tabelle."""
 
     @abstractmethod
+    def reset_schema(self, schema: str) -> None:
+        """Pulisce lo schema temporaneo eliminando e ricreando le tabelle per i retry."""
+
+    @abstractmethod
     def test_data_mutation(
         self, schema: str, query: str, tables: list[str], attempts: int = 3
     ) -> tuple[bool, str]:
