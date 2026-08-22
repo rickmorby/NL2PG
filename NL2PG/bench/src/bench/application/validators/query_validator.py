@@ -71,18 +71,12 @@ class QueryValidator:
         return self._validate_execution(query, schema, tree, profile)
 
     def _check_tiebreaker(self, tree: exp.Expression | None, schema: str) -> str:
-        """Esige che l'ultima chiave dell'ORDER BY sia una colonna univoca.
-
-        Senza tiebreaker univoco le parita' di ordinamento rendono l'ordine delle righe
-        non riproducibile: il solver risponderebbe correttamente ma con ordine diverso.
-        """
+        """Esige che l'ultima chiave dell'ORDER BY sia una colonna univoca."""
         order = tree.args.get("order") if tree else None
-        if not order:
+        if not order or not order.expressions:
             return ""
-        keys = list(order.expressions)
-        if not keys:
-            return ""
-        last = keys[-1].this if isinstance(keys[-1], exp.Ordered) else keys[-1]
+        last_expr = order.expressions[-1]
+        last = last_expr.this if isinstance(last_expr, exp.Ordered) else last_expr
         col = last.find(exp.Column) if last is not None else None
         if col is None:
             return (
@@ -93,14 +87,9 @@ class QueryValidator:
             model = self._sandbox.introspect_schema(schema)
         except Exception:  # noqa: BLE001
             return ""
-        unique_cols: set[str] = set()
-        for table in model.tables.values():
-            if len(table.pk_columns) == 1:
-                unique_cols.add(table.pk_columns[0].lower())
-            for group in table.unique_groups:
-                if len(group) == 1:
-                    unique_cols.add(group[0].lower())
-        if col.name.lower() in unique_cols:
+        unique_cols = self._collect_unique_columns(model)
+        target_col = self._resolve_column_alias(tree, col.name.lower())
+        if target_col in unique_cols:
             return ""
         hint = sorted(unique_cols)[0] if unique_cols else "id"
         return (
@@ -108,6 +97,28 @@ class QueryValidator:
             f"rendono l'ordine non riproducibile. Aggiungi in coda un tiebreaker univoco "
             f"(es. `{hint} ASC`)."
         )
+
+    @staticmethod
+    def _collect_unique_columns(model: Any) -> set[str]:
+        """Estrae l'insieme delle colonne univoche (PK o vincolo UNIQUE) dello schema."""
+        unique_cols: set[str] = set()
+        for table in model.tables.values():
+            if len(table.pk_columns) == 1:
+                unique_cols.add(table.pk_columns[0].lower())
+            for group in table.unique_groups:
+                if len(group) == 1:
+                    unique_cols.add(group[0].lower())
+        return unique_cols
+
+    @staticmethod
+    def _resolve_column_alias(tree: exp.Expression, col_name: str) -> str:
+        """Risolve un eventuale alias di proiezione risalendo alla colonna fisica sottostante."""
+        for a in tree.find_all(exp.Alias):
+            if a.alias.lower() == col_name:
+                col_expr = a.this.find(exp.Column)
+                if col_expr:
+                    return col_expr.name.lower()
+        return col_name
 
     def _validate_ast_rules(
         self, query: GoldQueryDTO, spec: SpecDTO
