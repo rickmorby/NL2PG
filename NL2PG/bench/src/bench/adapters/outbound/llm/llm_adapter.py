@@ -9,6 +9,7 @@ from contextlib import suppress
 from logging import CRITICAL as LOG_CRITICAL, getLogger
 from sys import modules
 from typing import Any
+from warnings import filterwarnings
 
 from httpx import HTTPError
 from json_repair import repair_json
@@ -85,6 +86,7 @@ litellm_mod.input_callback = []
 litellm_mod.service_callback = []
 litellm_mod.telemetry = False
 litellm_mod.cache = None
+filterwarnings("ignore", message=r".*DualCache\.async_batch_get_cache.*")
 
 for _cb_attr in ("_async_success_callback", "_async_failure_callback", "_async_input_callback"):
     if hasattr(litellm_mod, _cb_attr):
@@ -215,25 +217,15 @@ class LLMClientAdapter(LLMGeneratorPort):
                             stream.close()  # type: ignore[attr-defined]
                 response = stream_chunk_builder(chunks, messages=messages)
                 if response is None:
-                    msg_err = (
-                        "L'output del modello è vuoto. "
-                        "Il modello potrebbe aver esaurito i token nel ragionamento CoT. "
-                        "Rispondere ESCLUSIVAMENTE con JSON valido."
-                    )
-                    payload = {"schema": schema.__name__, "raw": ""}
-                    raise ModelOutputContractError(msg_err, payload=payload)
+                    msg_vuoto = "Output del modello vuoto (CoT esaurito?): fallback al successivo."
+                    raise ValueError(msg_vuoto)
                 msg = response.choices[0].message
                 content = getattr(msg, "content", None) or ""
                 cleaned_json = self._extract_json_payload(content)
 
                 if not cleaned_json:
-                    msg_err = (
-                        f"L'output del modello '{response.model}' è vuoto. "
-                        "Il modello potrebbe aver esaurito i token nel ragionamento CoT. "
-                        "Rispondere ESCLUSIVAMENTE con JSON valido."
-                    )
-                    payload = {"schema": schema.__name__, "raw": ""}
-                    raise ModelOutputContractError(msg_err, payload=payload)
+                    msg_modello = f"Output di '{response.model}' vuoto: fallback al successivo."
+                    raise ValueError(msg_modello)
 
                 try:
                     output = schema.model_validate_json(cleaned_json)
