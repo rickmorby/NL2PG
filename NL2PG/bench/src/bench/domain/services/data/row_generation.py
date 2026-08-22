@@ -12,7 +12,7 @@ da ``RowCounter``.
 import re
 from contextlib import suppress
 from random import Random
-from typing import Any
+from typing import Any, ClassVar
 
 from bench.domain.models.data import (
     ColumnSchema,
@@ -370,7 +370,35 @@ class RowBuilder:
         for column in table.columns:
             if row[column.name] is None and not column.nullable and not column.is_pk:
                 row[column.name] = neutral_value(column)
+        self._enforce_temporal_ordering(row)
         return row
+
+    _DATE_PAIRS: ClassVar[list[tuple[str, str]]] = [
+        ("data_inizio", "data_fine"),
+        ("data_decorrenza", "data_scadenza"),
+        ("data_ammissione", "data_dimissione"),
+        ("data_ordine", "data_consegna"),
+        ("data_ordine", "data_spedizione"),
+        ("data_spedizione", "data_consegna"),
+        ("data_partenza", "data_consegna"),
+        ("data_partenza", "data_arrivo"),
+        ("data_evento", "data_denuncia"),
+        ("data_attivazione", "data_scadenza"),
+        ("data_apertura", "data_chiusura"),
+        ("ora_inizio", "ora_fine"),
+        ("data_assunzione", "data_dimissione"),
+        ("data_assunzione", "data_fine"),
+        ("valid_from", "valid_to"),
+    ]
+
+    @classmethod
+    def _enforce_temporal_ordering(cls, row: dict[str, Any]) -> None:
+        """Garantisce la coerenza temporale tra date di inizio e fine nella stessa riga."""
+        for start_key, end_key in cls._DATE_PAIRS:
+            if start_key in row and end_key in row:
+                s_val, e_val = row[start_key], row[end_key]
+                if s_val is not None and e_val is not None and str(e_val) < str(s_val):
+                    row[start_key], row[end_key] = e_val, s_val
 
     def _set_column_value(
         self,
