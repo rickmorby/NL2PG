@@ -10,6 +10,7 @@ da ``RowCounter``.
 """
 
 import re
+from contextlib import suppress
 from random import Random
 from typing import Any
 
@@ -66,18 +67,61 @@ def _check_length_part(value: str, part: str) -> bool | None:
     return checks.get(op, True)
 
 
+_RE_CHECK_BETWEEN = re.compile(
+    r"(?:VALUE|[a-zA-Z0-9_]+)\s+BETWEEN\s+(-?\d+(?:\.\d+)?)\s+AND\s+(-?\d+(?:\.\d+)?)",
+    re.IGNORECASE,
+)
+_RE_CHECK_CMP = re.compile(
+    r"(?:VALUE|[a-zA-Z0-9_]+)\s*(>=|<=|>|<|=)\s*(-?\d+(?:\.\d+)?)", re.IGNORECASE
+)
+_RE_CHECK_IN = re.compile(r"(?:VALUE|[a-zA-Z0-9_]+)\s+IN\s*\(([^)]+)\)", re.IGNORECASE)
+
+
+def _check_numeric_parts(val_num: float, check_expr: str) -> bool:
+    """Valida vincoli BETWEEN e di confronto numerico."""
+    for m in _RE_CHECK_BETWEEN.finditer(check_expr):
+        low, high = float(m.group(1)), float(m.group(2))
+        if not (low <= val_num <= high):
+            return False
+    clean_check = _RE_CHECK_BETWEEN.sub("", check_expr)
+    for m in _RE_CHECK_CMP.finditer(clean_check):
+        op, limit = m.group(1), float(m.group(2))
+        if (
+            (op == ">=" and val_num < limit)
+            or (op == ">" and val_num <= limit)
+            or (op == "<=" and val_num > limit)
+            or (op == "<" and val_num >= limit)
+            or (op == "=" and val_num != limit)
+        ):
+            return False
+    return True
+
+
 def _satisfies_check(value: str, check_expr: str | None) -> bool:
-    """Valida value contro CHECK di colonna (regex e length), generico ed efficiente."""
-    if not check_expr:
+    """Valida value contro CHECK di colonna (regex, length, between, cmp, in)."""
+    if not check_expr or value is None:
         return True
+    val_str = str(value).strip("'")
+    val_num = None
+    with suppress(ValueError, TypeError):
+        val_num = float(val_str)
+
+    if val_num is not None and not _check_numeric_parts(val_num, check_expr):
+        return False
+
+    for m in _RE_CHECK_IN.finditer(check_expr):
+        allowed = [x.strip().strip("'\"") for x in m.group(1).split(",")]
+        if val_str not in allowed:
+            return False
+
     for raw_part in check_expr.split(" AND "):
         part = raw_part.strip()
-        res = _check_regex_part(value, part)
+        res = _check_regex_part(val_str, part)
         if res is not None:
             if not res:
                 return False
             continue
-        res = _check_length_part(value, part)
+        res = _check_length_part(val_str, part)
         if res is not None and not res:
             return False
     return True
@@ -352,7 +396,11 @@ class RowBuilder:
         elif column.is_fk or duplicate:
             row[column.name] = template_value
         elif variation is not None and variation.axis != "fixed":
-            row[column.name] = self._vary_value(column, template_value, variation, rng)
+            val = self._vary_value(column, template_value, variation, rng)
+            check = getattr(column, "check_expr", None)
+            if check and not _satisfies_check(str(val), check):
+                val = template_value
+            row[column.name] = val
         else:
             row[column.name] = template_value
 
@@ -375,7 +423,10 @@ class RowBuilder:
             and row[column.name] is not None
             and rng.random() < self._outlier_rate
         ):
-            row[column.name] = self._outlier_value(column, template_value, variation, rng)
+            outlier = self._outlier_value(column, template_value, variation, rng)
+            check = getattr(column, "check_expr", None)
+            if not check or _satisfies_check(str(outlier), check):
+                row[column.name] = outlier
 
     @staticmethod
     def _unique_pk_value(
