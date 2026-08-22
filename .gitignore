@@ -224,3 +224,6 @@ providers.json
 NL2PG/solver/
 
 
+
+# Curation working data (artefatti grandi, non versionare)
+NL2PG/bench/output/curation/
