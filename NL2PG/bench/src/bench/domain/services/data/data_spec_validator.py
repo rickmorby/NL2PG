@@ -36,6 +36,13 @@ class DataSpecValidator:
 
     def validate(self, spec: DataSpecDTO, schema: SchemaModel) -> None:
         """Verifica ogni voce della spec contro le tabelle dello schema."""
+        spec_tables = {table_spec.table.lower() for table_spec in spec.tables}
+        schema_tables = set(schema.tables.keys())
+        missing = schema_tables - spec_tables
+        if missing:
+            raise DataSpecValidationError(
+                f"Mancano le specifiche dei dati per le tabelle dello schema: {sorted(missing)}"
+            )
         for table_spec in spec.tables:
             table = schema.table(table_spec.table)
             if table is None:
