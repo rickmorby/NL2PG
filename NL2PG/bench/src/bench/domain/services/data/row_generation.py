@@ -371,6 +371,7 @@ class RowBuilder:
         for column in table.columns:
             if row[column.name] is None and not column.nullable and not column.is_pk:
                 row[column.name] = neutral_value(column)
+        self._enforce_email_coherence(row, table, instance_index, used_unique)
         self._enforce_temporal_ordering(row)
         return row
 
@@ -400,6 +401,70 @@ class RowBuilder:
                 s_val, e_val = row[start_key], row[end_key]
                 if s_val is not None and e_val is not None and str(e_val) < str(s_val):
                     row[start_key], row[end_key] = e_val, s_val
+
+    _EMAIL_TOKEN: ClassVar[re.Pattern[str]] = re.compile(r"email", re.IGNORECASE)
+
+    @staticmethod
+    def _slug_person(value: str) -> str:
+        """Riduce un nome/cognome a token alfanumerico minuscolo per l'indirizzo email."""
+        return re.sub(r"[^a-z0-9]+", "", value.lower())
+
+    @classmethod
+    def enforce_email_coherence(
+        cls,
+        row: dict[str, Any],
+        table: TableSchema,
+        instance_index: int,
+        used_unique: dict[str, set[Any]],
+    ) -> None:
+        """API pubblica di :meth:`_enforce_email_coherence` (per test e riuso)."""
+        cls._enforce_email_coherence(row, table, instance_index, used_unique)
+
+    @classmethod
+    def _enforce_email_coherence(
+        cls,
+        row: dict[str, Any],
+        table: TableSchema,
+        instance_index: int,
+        used_unique: dict[str, set[Any]],
+    ) -> None:
+        """Deriva l'email dalla persona della riga (nome/cognome) quando presente.
+
+        Un indirizzo email non è un asse di variazione indipendente ma una funzione
+        dell'anagrafica: la sua assenza di coerenza produce dati assurdi (es. 'Laura
+        Colombo' con mario.rossi@example.com). Il dominio viene conservato dal valore
+        esistente; la parte locale è ricostruita da nome e cognome, aggiungendo il
+        discriminante d'istanza solo per colonne UNIQUE o su collisione.
+        """
+        email_col = next((c for c in table.columns if cls._EMAIL_TOKEN.search(c.name)), None)
+        if email_col is None:
+            return
+        nome = row.get("nome")
+        cognome = row.get("cognome")
+        current = row.get(email_col.name)
+        if not isinstance(current, str) or "@" not in current:
+            return
+        if not isinstance(nome, str) or not isinstance(cognome, str):
+            return
+        local_slug = f"{cls._slug_person(nome)}.{cls._slug_person(cognome)}"
+        if not local_slug.strip("."):
+            return
+        domain = current.split("@", 1)[1] or "example.com"
+        new_local = local_slug
+        if email_col.is_unique:
+            new_local = f"{local_slug}{instance_index}"
+        candidate = f"{new_local}@{domain}"
+        if email_col.max_length is not None and len(candidate) > email_col.max_length:
+            keep = max(1, email_col.max_length - len(f"@{domain}"))
+            candidate = f"{new_local[:keep]}@{domain}"
+        used = used_unique.setdefault(email_col.name, set())
+        if candidate in used and not email_col.is_unique:
+            candidate = f"{new_local}{instance_index}@{domain}"
+            if email_col.max_length is not None and len(candidate) > email_col.max_length:
+                keep = max(1, email_col.max_length - len(f"@{domain}"))
+                candidate = f"{new_local[:keep]}{instance_index}@{domain}"
+        row[email_col.name] = candidate
+        used.add(candidate)
 
     def _set_column_value(
         self,
