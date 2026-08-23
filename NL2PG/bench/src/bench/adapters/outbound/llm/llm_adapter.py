@@ -1,148 +1,60 @@
-"""Adattatore outbound per l'invocazione di modelli LLM con failover automatico via liteLLM Router.
+"""Adattatore outbound per l'invocazione di modelli LLM con failover via Router.
+
+``call_model`` orchestra la catena dei modelli del ruolo: streaming con
+watchdog wall-clock, passaggio immediato al modello successivo su errore
+provider e validazione contrattuale dell'output JSON rispetto allo schema.
 
 :author: Riccardo Morabito
 """
 
 from asyncio import get_event_loop
 from contextlib import suppress
-from logging import CRITICAL as LOG_CRITICAL, getLogger
-from sys import modules
+from logging import getLogger
 from time import monotonic
 from typing import Any
-from warnings import filterwarnings
 
-from httpx import HTTPError
 from json_repair import repair_json
 from litellm import (
-    Router,
     close_litellm_async_clients,
     in_memory_llm_clients_cache,
     stream_chunk_builder,
 )
-from litellm.exceptions import (
-    APIConnectionError,
-    APIError,
-    AuthenticationError,
-    BadRequestError,
-    ContextWindowExceededError,
-    InternalServerError,
-    NotFoundError,
-    PermissionDeniedError,
-    RateLimitError,
-    ServiceUnavailableError,
-    Timeout,
-    UnprocessableEntityError,
-)
-from litellm.types.router import RouterRateLimitError
-from openai import OpenAIError
+from litellm.exceptions import Timeout
 from pydantic import BaseModel, ValidationError
 
-from bench.adapters.outbound.llm.llm_health_checker_adapter import (
-    LLMHealthCheckerAdapter,
+from bench.adapters.outbound.llm.llm_health_checker_adapter import LLMHealthCheckerAdapter
+from bench.adapters.outbound.llm.llm_router_factory import (
+    build_router,
+    primary_model_group,
+    resolve_chain,
+)
+from bench.adapters.outbound.llm.llm_runtime import (
+    _LITELLM_PROVIDER_EXCEPTIONS,
+    configure_litellm_runtime,
 )
 from bench.domain.exceptions import LLMClientError, ModelOutputContractError
-from bench.domain.models.llm import (
-    CallOptionsDTO,
-    CallResultDTO,
-    SystemHealthReportDTO,
-)
+from bench.domain.models.llm import CallOptionsDTO, CallResultDTO, SystemHealthReportDTO
 from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 
 _log = getLogger("bench.adapters.llm")
-
-getLogger("LiteLLM").setLevel(LOG_CRITICAL)
-getLogger("LiteLLM Router").setLevel(LOG_CRITICAL)
-getLogger("LiteLLM Proxy").setLevel(LOG_CRITICAL)
-
-litellm_mod = modules["litellm"]
-litellm_mod.suppress_debug_info = True
-litellm_mod.turn_off_message_logging = True
-litellm_mod.set_verbose = False
-
-_LITELLM_PROVIDER_EXCEPTIONS = (
-    APIConnectionError,
-    APIError,
-    AuthenticationError,
-    BadRequestError,
-    ContextWindowExceededError,
-    InternalServerError,
-    NotFoundError,
-    PermissionDeniedError,
-    RateLimitError,
-    ServiceUnavailableError,
-    Timeout,
-    UnprocessableEntityError,
-    RouterRateLimitError,
-    OpenAIError,
-    HTTPError,
-    OSError,
-    ValueError,
-    RuntimeError,
-)
-litellm_mod.callbacks = []
-litellm_mod.success_callback = []
-litellm_mod.failure_callback = []
-litellm_mod.input_callback = []
-litellm_mod.service_callback = []
-litellm_mod.telemetry = False
-litellm_mod.cache = None
-filterwarnings("ignore", message=r".*DualCache\.async_batch_get_cache.*")
-
-for _cb_attr in ("_async_success_callback", "_async_failure_callback", "_async_input_callback"):
-    if hasattr(litellm_mod, _cb_attr):
-        setattr(litellm_mod, _cb_attr, [])
+configure_litellm_runtime()
 
 
 class LLMClientAdapter(LLMGeneratorPort):
-    """Adattatore per l'invocazione di modelli LLM con failover automatico via liteLLM Router."""
-
-    @staticmethod
-    def _extract_json_payload(text: str) -> str:
-        """Estrae l'oggetto JSON finale da un testo LLM scartando CoT e riparando la sintassi."""
-        return repair_json(text.strip(), ensure_ascii=False) if text else ""
+    """Adattatore per l'invocazione di modelli LLM con failover automatico."""
 
     def __init__(
         self,
         config: dict[str, Any] | None = None,
         health_checker: LLMHealthCheckerAdapter | None = None,
     ):
-        """Inizializza l'adattatore con la configurazione dei provider e i fallback."""
+        """Inizializza router e watchdog dalla configurazione dei provider."""
         self._config = config or {}
         self._health_checker = health_checker or LLMHealthCheckerAdapter(self._config)
-        strategy = self._config.get("routing_strategy", "simple-shuffle")
         retry_cfg = self._config.get("retry", {})
-        num_retries = retry_cfg.get("num_retries", 0)
-        cooldown_time = retry_cfg.get("cooldown_time_seconds", 0)
-        allowed_fails = retry_cfg.get("allowed_fails", 999999)
-        optional_pre_call_checks = self._config.get(
-            "optional_pre_call_checks", ["enforce_model_rate_limits"]
-        )
         self._stream_timeout = retry_cfg.get("stream_timeout", 60)
         self._max_call_seconds = float(retry_cfg.get("max_call_seconds", 240))
-
-        model_list = self._build_model_list(self._config)
-        fallbacks = self._build_fallbacks(self._config)
-        max_fallbacks = (
-            max(
-                (len(chain) for chain in self._config.get("chains", {}).values()),
-                default=1,
-            )
-            - 1
-        )
-
-        self._router = Router(
-            model_list=model_list,
-            fallbacks=fallbacks,
-            max_fallbacks=max_fallbacks,
-            routing_strategy=strategy,
-            num_retries=num_retries,
-            cooldown_time=cooldown_time,
-            allowed_fails=allowed_fails,
-            optional_pre_call_checks=optional_pre_call_checks,
-            stream_timeout=self._stream_timeout,
-            set_verbose=False,
-            cache_responses=False,
-        )
+        self._router = build_router(self._config, self._stream_timeout)
 
     def get_chain(self, role: str) -> list[str]:
         """Restituisce i model_id abilitati per un ruolo (i disabilitati sono filtrati)."""
@@ -154,89 +66,32 @@ class LLMClientAdapter(LLMGeneratorPort):
             if models.get(model_id, {}).get("enabled", True)
         ]
 
-    def _primary_model_group(self, role: str) -> str:
-        """Risolve il ruolo nel model group del primo modello della catena."""
-        models = self._config.get("models", {})
-        for model_id in self.get_chain(role):
-            if model_id in models:
-                return model_id
-        return role
+    def check_all_providers(self, check_models: bool = True) -> SystemHealthReportDTO:
+        """Esegue la diagnosi multilivello dei provider e dei modelli fisici univoci."""
+        return self._health_checker.check_all_providers(check_models=check_models)
 
-    def call_model(  # noqa: C901, PLR0912, PLR0915
+    def call_model(
         self,
         role: str,
         prompt: str,
         schema: type[BaseModel] | type,
         options: CallOptionsDTO | None = None,
     ) -> CallResultDTO:
-        """Chiama i modelli della catena e passa subito al successivo su errore provider."""
+        """Chiude la catena del ruolo: al primo errore provider passa al modello successivo."""
         opts = options or CallOptionsDTO()
-        messages = [{"role": "user", "content": prompt}]
-        if opts.error_feedback:
-            msg = f"ERRORE PRECEDENTE:\n{opts.error_feedback}\n\nCorreggi e riprova."
-            messages.append({"role": "user", "content": msg})
-
+        messages = self._prepare_messages(prompt, opts)
         models = self._config.get("models", {})
-        chain = [model_id for model_id in self.get_chain(role) if model_id in models]
+        chain = [m for m in resolve_chain(self._config, role) if m in models]
         if not chain:
-            chain = [self._primary_model_group(role)]
+            chain = [primary_model_group(self._config, role)]
 
         provider_errors: list[str] = []
         for model_group in chain:
             try:
-                kwargs: dict[str, Any] = {
-                    "model": model_group,
-                    "messages": messages,
-                    "stream": True,
-                    "disable_fallbacks": True,
-                    "num_retries": 0,
-                }
-                if opts.temperature_override is not None:
-                    kwargs["temperature"] = opts.temperature_override
-
-                deadline = (
-                    monotonic() + self._max_call_seconds if self._max_call_seconds else None
+                response = self._complete_with_watchdog(
+                    model_group, messages, opts.temperature_override
                 )
-                chunks: list[Any] = []
-                stream = self._router.completion(**kwargs)
-                try:
-                    for chunk in stream:
-                        if deadline is not None and monotonic() > deadline:
-                            with suppress(Exception):
-                                if hasattr(stream, "close"):
-                                    stream.close()  # type: ignore[attr-defined]
-                            raise Timeout(
-                                message=f"Watchdog {self._max_call_seconds:g}s exceeded",
-                                model=model_group,
-                                llm_provider="watchdog",
-                            )
-                        chunks.append(chunk)
-                finally:
-                    with suppress(Exception):
-                        if hasattr(stream, "close"):
-                            stream.close()  # type: ignore[attr-defined]
-                response = stream_chunk_builder(chunks, messages=messages)
-                if response is None:
-                    msg_vuoto = "Output del modello vuoto (CoT esaurito?): fallback al successivo."
-                    raise ValueError(msg_vuoto)
-                msg = response.choices[0].message
-                content = getattr(msg, "content", None) or ""
-                cleaned_json = self._extract_json_payload(content)
-
-                if not cleaned_json:
-                    msg_modello = f"Output di '{response.model}' vuoto: fallback al successivo."
-                    raise ValueError(msg_modello)
-
-                try:
-                    output = schema.model_validate_json(cleaned_json)
-                except ValidationError as ve:
-                    msg_err = (
-                        f"L'output del modello '{response.model}' non rispetta lo schema "
-                        f"'{schema.__name__}': {ve}. Rispondere ESCLUSIVAMENTE con JSON valido."
-                    )
-                    payload = {"schema": schema.__name__, "raw": cleaned_json}
-                    raise ModelOutputContractError(msg_err, payload=payload) from ve
-
+                output = self._validate_output(response, schema)
                 return CallResultDTO(output=output, model_used=response.model)
             except ModelOutputContractError:
                 raise
@@ -247,13 +102,76 @@ class LLMClientAdapter(LLMGeneratorPort):
                     model_group,
                     role,
                 )
+        raise LLMClientError(f"Catena {role} esaurita: {'; '.join(provider_errors)}")
 
-        details = "; ".join(provider_errors)
-        raise LLMClientError(f"Catena {role} esaurita: {details}")
+    @staticmethod
+    def _prepare_messages(prompt: str, opts: CallOptionsDTO) -> list[dict[str, str]]:
+        """Costruisce i messaggi utente, includendo l'eventuale feedback d'errore."""
+        messages = [{"role": "user", "content": prompt}]
+        if opts.error_feedback:
+            feedback = f"ERRORE PRECEDENTE:\n{opts.error_feedback}\n\nCorreggi e riprova."
+            messages.append({"role": "user", "content": feedback})
+        return messages
 
-    def check_all_providers(self, check_models: bool = True) -> SystemHealthReportDTO:
-        """Esegue la diagnosi multilivello dei provider e dei modelli fisici univoci."""
-        return self._health_checker.check_all_providers(check_models=check_models)
+    def _complete_with_watchdog(
+        self, model_group: str, messages: list[dict[str, str]], temperature: float | None
+    ) -> Any:
+        """Esegue lo stream del modello applicando il watchdog wall-clock.
+
+        Al superamento della deadline chiude lo stream e solleva ``Timeout``
+        cosi' da trattare il modello muto come un qualunque errore provider.
+        """
+        kwargs: dict[str, Any] = {
+            "model": model_group,
+            "messages": messages,
+            "stream": True,
+            "disable_fallbacks": True,
+            "num_retries": 0,
+        }
+        if temperature is not None:
+            kwargs["temperature"] = temperature
+
+        deadline = monotonic() + self._max_call_seconds if self._max_call_seconds else None
+        chunks: list[Any] = []
+        stream = self._router.completion(**kwargs)
+        try:
+            for chunk in stream:
+                if deadline is not None and monotonic() > deadline:
+                    with suppress(Exception):
+                        if hasattr(stream, "close"):
+                            stream.close()
+                    raise Timeout(
+                        message=f"Watchdog {self._max_call_seconds:g}s exceeded",
+                        model=model_group,
+                        llm_provider="watchdog",
+                    )
+                chunks.append(chunk)
+        finally:
+            with suppress(Exception):
+                if hasattr(stream, "close"):
+                    stream.close()
+
+        response = stream_chunk_builder(chunks, messages=messages)
+        if response is None:
+            raise ValueError("Output del modello vuoto (CoT esaurito?): fallback al successivo.")
+        return response
+
+    def _validate_output(self, response: Any, schema: type[BaseModel] | type) -> BaseModel:
+        """Estrae e valida il JSON dall'output del modello secondo lo schema atteso."""
+        content = getattr(response.choices[0].message, "content", None) or ""
+        cleaned_json = repair_json(content.strip(), ensure_ascii=False) if content else ""
+        if not cleaned_json:
+            msg = f"Output di '{response.model}' vuoto: fallback al successivo."
+            raise ValueError(msg)
+        try:
+            return schema.model_validate_json(cleaned_json)
+        except ValidationError as ve:
+            msg_err = (
+                f"L'output del modello '{response.model}' non rispetta lo schema "
+                f"'{schema.__name__}': {ve}. Rispondere ESCLUSIVAMENTE con JSON valido."
+            )
+            payload = {"schema": schema.__name__, "raw": cleaned_json}
+            raise ModelOutputContractError(msg_err, payload=payload) from ve
 
     def close(self) -> None:
         """Rilascia le risorse di rete, i pool ed i meccanismi di cache dei client LLM."""
@@ -271,74 +189,3 @@ class LLMClientAdapter(LLMGeneratorPort):
         with suppress(Exception):
             if isinstance(in_memory_llm_clients_cache, dict):
                 in_memory_llm_clients_cache.clear()
-
-    @classmethod
-    def _build_model_list(cls, config: dict[str, Any]) -> list[dict[str, Any]]:
-        """Costruisce un model group distinto per ogni modello della configurazione.
-
-        Il gateway (`pool`) identifica solo l'endpoint condiviso e non deve diventare
-        il gruppo di routing: se più modelli condividono il gateway, un errore su uno
-        di essi deve poter passare immediatamente al modello successivo della catena.
-        """
-        models = config.get("models", {})
-        chains = config.get("chains", {})
-        ordered_model_ids = list(
-            dict.fromkeys(
-                model_id
-                for chain in chains.values()
-                for model_id in chain
-                if models.get(model_id, {}).get("enabled", True)
-            )
-        )
-        ordered_model_ids.extend(
-            model_id
-            for model_id in models
-            if model_id not in ordered_model_ids and models[model_id].get("enabled", True)
-        )
-        return [
-            {"model_name": model_id, "litellm_params": cls._make_litellm_params(models[model_id])}
-            for model_id in ordered_model_ids
-            if model_id in models
-        ]
-
-    @staticmethod
-    def _make_litellm_params(mc: dict[str, Any]) -> dict[str, Any]:
-        """Costruisce il dizionario dei parametri litellm_params per una configurazione modello."""
-        params: dict[str, Any] = {
-            "model": f"{mc['provider']}/{mc['model']}",
-            "api_key": mc["api_key"],
-            "temperature": mc["temperature"],
-            "timeout": mc.get("request_timeout", 120),
-        }
-        if "max_tokens" in mc:
-            params["max_tokens"] = mc["max_tokens"]
-        if "base_url" in mc:
-            params["api_base"] = mc["base_url"]
-        if mc.get("rpm") is not None:
-            params["rpm"] = mc["rpm"]
-        if mc.get("tpm") is not None:
-            params["tpm"] = mc["tpm"]
-        return params
-
-    @staticmethod
-    def _build_fallbacks(config: dict[str, Any]) -> list[dict[str, list[str]]]:
-        """Costruisce fallback immediati tra modelli consecutivi della stessa catena."""
-        fallbacks: list[dict[str, list[str]]] = []
-        models = config.get("models", {})
-        chains = config.get("chains", {})
-
-        seen_chains: set[tuple[str, ...]] = set()
-        for model_ids in chains.values():
-            chain = list(
-                dict.fromkeys(
-                    model_id
-                    for model_id in model_ids
-                    if model_id in models and models[model_id].get("enabled", True)
-                )
-            )
-            key = tuple(chain)
-            if key in seen_chains or len(chain) <= 1:
-                continue
-            seen_chains.add(key)
-            fallbacks.extend({chain[i]: chain[i + 1 :]} for i in range(len(chain) - 1))
-        return fallbacks
