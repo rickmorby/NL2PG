@@ -167,13 +167,7 @@ def stacked_share(
             if share > _INSIDE_LABEL_MIN:
                 inside_rows.append(entry)
             else:
-                outside_rows.append(
-                    {
-                        **entry,
-                        "nota": f"{status_value} {share:.0%}",
-                        "colore": colors[order.index(status_value)],
-                    }
-                )
+                outside_rows.append({**entry, "nota": f"{status_value} {share:.0%}"})
             cumulative += segment
     bars = (
         alt.Chart(_data(rows))
@@ -185,7 +179,7 @@ def stacked_share(
                 f"{status}:N",
                 scale=alt.Scale(domain=order, range=colors),
                 title=None,
-            ),
+            ).legend(orient="top"),
         )
         .properties(width=width, height=alt.Step(44))
     )
@@ -205,7 +199,7 @@ def stacked_share(
     )
     outside = (
         alt.Chart(_data(outside_rows))
-        .mark_text(baseline="bottom", dy=-16, fontSize=11, fontWeight="bold")
+        .mark_text(baseline="bottom", dy=-16, fontSize=11, fontWeight="bold", color=theme.LABEL)
         .encode(
             x=alt.X(
                 "center:Q",
@@ -214,7 +208,6 @@ def stacked_share(
             ),
             y=alt.Y(f"{cat}:N", sort=cat_order, title=None),
             text=alt.Text("nota:N"),
-            color=alt.Color("colore:N", scale=None, legend=None),
         )
     )
     return bars + inside + outside
