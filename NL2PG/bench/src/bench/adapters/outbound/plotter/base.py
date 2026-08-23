@@ -17,10 +17,12 @@ class AbstractPlot(ABC):
         self,
         figsize: tuple[float, float] = (9.2, 5.8),
         bottom_margin: float = 0.19,
+        evidence_y: float = 0.025,
     ) -> None:
         """Inizializza la dimensione della figura e il margine inferiore per le etichette."""
         self.figsize = figsize
         self.bottom_margin = bottom_margin
+        self.evidence_y = evidence_y
 
     def render(self, tasks: list[dict[str, Any]], output_path: Path) -> None:
         """Template Method: estrae dati, disegna grafico, applica spiegazione, stile ed evidenze."""
@@ -48,7 +50,7 @@ class AbstractPlot(ABC):
         if ins:
             fig.text(
                 0.5,
-                0.025,
+                self.evidence_y,
                 f"Evidenza: {ins}",
                 fontsize=8.5,
                 color="#1a252f",
