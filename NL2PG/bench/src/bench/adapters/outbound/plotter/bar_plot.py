@@ -11,6 +11,7 @@ from bench.adapters.outbound.plotter.base import AbstractPlot
 
 _SMALL_MAX_ITEMS = 20
 _MEDIUM_MAX_ITEMS = 30
+_HEADROOM_FACTOR = 1.15
 
 
 class AbstractBarPlot(AbstractPlot):
@@ -30,6 +31,7 @@ class AbstractBarPlot(AbstractPlot):
         self.palette = palette
         self.rotation = rotation
         self.ylim = ylim
+        self._max_data_val: float = 1.0
 
     def _adapt_layout(self, n_items: int) -> None:
         """Adatta dimensioni, rotazione e margini al numero di etichette sull'asse X."""
@@ -54,14 +56,23 @@ class AbstractBarPlot(AbstractPlot):
         has_floats = any(isinstance(v, float) for v in ys)
         fmt = "%.2f" if has_floats else "%g"
         label_fs = 7.5 if getattr(self, "_label_count", 0) > _MEDIUM_MAX_ITEMS else 9
+        numeric_ys = [v for v in ys if isinstance(v, (int, float))]
+        self._max_data_val = max(numeric_ys, default=1.0)
         for c in ax.containers:
             ax.bar_label(c, padding=3, fmt=fmt, fontsize=label_fs)
 
     def format_axes(self, ax: Any) -> None:
-        """Applica il titolo, le etichette degli assi e la rotazione dei tick X."""
+        """Applica il titolo, le etichette degli assi e la rotazione dei tick X.
+
+        L'headroom del 15% viene applicato SEMPRE per ultima per garantire che le
+        etichette ``bar_label`` non escano mai dal riquadro del grafico.
+        """
         super().format_axes(ax)
         if self.ylim:
-            ax.set_ylim(*self.ylim)
+            lower, upper = self.ylim[0], self.ylim[1] * _HEADROOM_FACTOR
+        else:
+            lower, upper = 0, self._max_data_val * _HEADROOM_FACTOR
+        ax.set_ylim(lower, upper)
         if self.rotation:
             ax.tick_params(axis="x", rotation=self.rotation)
             for tick in ax.get_xticklabels():

@@ -171,12 +171,9 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
         max_idx = ys.index(max(ys))
         mode_r, count = xs[max_idx], ys[max_idx]
         perc = round((count / tot) * 100, 1)
-        min_r, max_r = xs[0], xs[-1]
-        if min_r == max_r:
-            return f"Tutti i risultati hanno cardinalità {mode_r}, senza set vuoti."
         return (
-            f"La cardinalità più frequente è {mode_r} ({perc}% dei task); "
-            f"i risultati spaziano da {min_r} a {max_r}, senza set vuoti."
+            f"Il bucket più frequente è {mode_r} ({perc}% dei task); "
+            f"la distribuzione spazia da risultati singolari a oltre 500 righe."
         )
 
     def xlabel(self) -> str:
@@ -188,9 +185,29 @@ class QueryResultCardinalityDistributionPlot(AbstractBarPlot):
         return "Conteggio Query"
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[int]]:
-        """Estrae la cardinalità del risultato Gold (numero di righe restituite)."""
+        """Estrae la cardinalità del risultato Gold aggregandola in bucket scientifici."""
         rows = [t.get("gold", {}).get("result", {}).get("rows", []) for t in tasks]
-        counts = Counter(len(r) for r in rows)
-        xs = [f"{k} riga" if k == 1 else f"{k} righe" for k in sorted(counts.keys())] or ["1 riga"]
-        ys = [counts[k] for k in sorted(counts.keys())] or [1]
+        cardinalities = [len(r) for r in rows]
+        xs = [label for label, _ in _CARDINALITY_BINS]
+        ys = [
+            sum(1 for c in cardinalities if _in_bin(c, lo, hi)) for _, (lo, hi) in _CARDINALITY_BINS
+        ]
         return xs, ys
+
+
+_CARDINALITY_BINS: tuple[tuple[str, tuple[int, int | None]], ...] = (
+    ("1 riga", (1, 1)),
+    ("2 - 5", (2, 5)),
+    ("6 - 10", (6, 10)),
+    ("11 - 25", (11, 25)),
+    ("26 - 50", (26, 50)),
+    ("51 - 100", (51, 100)),
+    ("101 - 250", (101, 250)),
+    ("251 - 500", (251, 500)),
+    ("> 500", (501, None)),
+)
+
+
+def _in_bin(n: int, lo: int, hi: int | None) -> bool:
+    """Verifica se n cade nel bucket [lo, hi] (hi=None = nessun limite superiore)."""
+    return n >= lo and (hi is None or n <= hi)
