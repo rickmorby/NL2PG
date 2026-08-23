@@ -22,7 +22,7 @@ from bench.domain.services.data.data_spec_validator import DataSpecValidator
 from bench.domain.services.data.foreign_key_binder import ForeignKeyBinder
 from bench.domain.services.data.insert_script_builder import InsertScriptBuilder
 from bench.domain.services.data.row_counter import RowCounter
-from bench.domain.services.data.row_generation import RowExpander
+from bench.domain.services.data.row_expander import RowExpander
 
 
 class MaterializationResult:
