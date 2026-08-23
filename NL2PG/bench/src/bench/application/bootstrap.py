@@ -19,7 +19,7 @@ from bench.adapters.outbound.config import ConfigAdapter
 from bench.adapters.outbound.examples import ExampleAdapter
 from bench.adapters.outbound.llm import LLMClientAdapter
 from bench.adapters.outbound.logging import LoggingAdapter
-from bench.adapters.outbound.plotter.seaborn_adapter import SeabornPlotterAdapter
+from bench.adapters.outbound.plotter.altair import AltairPlotterAdapter
 from bench.adapters.outbound.postgres import (
     MetaRepositoryAdapter,
     PostgresClientAdapter,
@@ -103,7 +103,7 @@ class ApplicationBootstrap:
             agents,
         )
         self._serializer = JsonBenchmarkSerializerAdapter()
-        self._plotter = SeabornPlotterAdapter()
+        self._plotter = AltairPlotterAdapter()
         self._analytics = BenchmarkAnalyticsService(self._serializer, self._plotter)
 
     @property
