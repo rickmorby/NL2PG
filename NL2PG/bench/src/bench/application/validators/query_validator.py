@@ -19,6 +19,10 @@ from bench.domain.models.sql import GoldQueryDTO, GoldResultDTO
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
 from bench.domain.services.validation.error_feedback_builder import ErrorFeedbackBuilder
 from bench.domain.services.validation.feature_checker import FeatureChecker
+from bench.domain.services.validation.gold_normalizer import (
+    canonicalize_rows,
+    find_none_literal,
+)
 
 _MAX_DISTINCT_SAMPLES = 2
 _RE_VOLATILE_TEXT = re.compile(
@@ -190,6 +194,10 @@ class QueryValidator:
             msg = ErrorFeedbackBuilder().for_mutation(tables, distinct)
             return QueryValidationResult(is_valid=False, error=f"{mut_res.error} | {msg}")
 
+        none_err = find_none_literal([list(r) for r in rows])
+        if none_err:
+            return QueryValidationResult(is_valid=False, error=none_err)
+
         gold = self._build_gold(query, cols, rows)
         return QueryValidationResult(is_valid=True, gold_result=gold)
 
@@ -308,9 +316,9 @@ class QueryValidator:
 
     @staticmethod
     def _build_gold(query: GoldQueryDTO, cols: list[str], rows: list[tuple]) -> GoldResultDTO:
-        """Costruisce un GoldResultDTO convertendo le righe in liste di tipi nativi."""
+        """Costruisce un GoldResultDTO con celle temporali canonizzate a forma testuale."""
         return GoldResultDTO(
             columns=cols,
-            rows=[list(row) for row in rows],
+            rows=canonicalize_rows(rows),
             order_sensitive=query.order_sensitive,
         )
