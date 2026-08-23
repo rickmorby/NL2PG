@@ -57,19 +57,10 @@ class CategoryRoundPicker:
         return None
 
     def resolve(self, category: str, accepted: bool) -> int:
-        """Registra l'esito di un task e restituisce i fallimenti consecutivi della categoria.
+        """Registra l'esito del task e restituisce i fallimenti consecutivi della categoria.
 
-        Se il task è accettato la categoria sale al livello successivo, altrimenti
-        torna in coda allo stesso livello (rotazione). Il contatore dei fallimenti
-        viene azzerato al primo task accettato e incrementato ad ogni esito negativo.
-
-        Args:
-            category: Identificativo della categoria del task appena concluso.
-            accepted: ``True`` se il task è stato accettato, ``False`` altrimenti.
-
-        Returns:
-            Il numero di esiti negativi consecutivi per la categoria (0 se accettato).
-
+        L'accettazione promuove la categoria al livello successivo e azzera il
+        contatore; il fallimento la rimette in coda allo stesso livello.
         """
         level = self._pending.pop(category, 0)
         if accepted:
