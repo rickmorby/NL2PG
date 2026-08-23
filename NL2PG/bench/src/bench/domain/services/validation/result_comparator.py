@@ -3,11 +3,39 @@
 :author: Riccardo Morabito
 """
 
+import re
+from datetime import date, datetime
 from itertools import permutations
 from typing import Any
 
 _EPSILON_TOLERANCE = 0.02
 _MAX_PERMUTATION_COLS = 8
+
+_RE_TIMESTAMP_SEP = re.compile(r"(\d{4}-\d{2}-\d{2})[Tt ](\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?)")
+
+
+def _canonicalize_value(value: Any) -> Any:
+    """Riduce un valore cella alla sua forma canonica testuale per il confronto.
+
+    I ``datetime`` vengono proiettati sulla loro rappresentazione ``str()`` (separatore
+    spazio), che è la forma prodotta dai driver PostgreSQL a runtime: ciò rende la
+    comparazione indipendente dal formato di serializzazione JSON (RFC3339 con 'T').
+    Le altre tipologie transitano immutate.
+    """
+    if isinstance(value, datetime):
+        return str(value)
+    if isinstance(value, date):
+        return str(value)
+    return value
+
+
+def _normalize_timestamp_text(text: str) -> str:
+    """Uniforma il separatore data-ora ('T', 't' o spazio) in spazio.
+
+    Il pattern richiede una data completa seguita da un orario: le stringhe generiche
+    (parole, codici, identificatori) non contengono il match e restano invariate.
+    """
+    return _RE_TIMESTAMP_SEP.sub(r"\1 \2", text)
 
 
 class ResultComparator:
@@ -16,11 +44,18 @@ class ResultComparator:
     @staticmethod
     def are_values_equivalent(c: Any, g: Any) -> bool:
         """Confronta due valori singoli (stringhe, numeri, float, Decimal, None/null)."""
+        c = _canonicalize_value(c)
+        g = _canonicalize_value(g)
         if c == g or (c is None and g is None):
             return True
 
         str_c = str(c).strip().strip('"').lower() if c is not None else "null"
         str_g = str(g).strip().strip('"').lower() if g is not None else "null"
+        if str_c == str_g:
+            return True
+
+        str_c = _normalize_timestamp_text(str_c)
+        str_g = _normalize_timestamp_text(str_g)
         if str_c == str_g:
             return True
 
