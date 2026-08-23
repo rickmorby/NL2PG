@@ -356,6 +356,7 @@ class RowBuilder:
             variation = table_spec.variations.get(column.name)
             template_value = template.get(column.name)
             self._set_column_value(
+                table,
                 column,
                 template_value,
                 variation,
@@ -402,6 +403,7 @@ class RowBuilder:
 
     def _set_column_value(
         self,
+        table: TableSchema,
         column: ColumnSchema,
         template_value: Any,
         variation: ColumnVariationDTO | None,
@@ -413,7 +415,10 @@ class RowBuilder:
         row: dict[str, Any],
     ) -> None:
         """Assegna il valore della colonna: PK, UNIQUE, FK/duplicato, variazione o template."""
-        if column.is_pk:
+        is_secondary_pk = (
+            column.is_pk and len(table.pk_columns) > 1 and column.name != table.pk_columns[0]
+        )
+        if column.is_pk and not is_secondary_pk:
             row[column.name] = self._unique_pk_value(
                 column, template_value, instance_index, used_pk[column.name]
             )
@@ -421,8 +426,15 @@ class RowBuilder:
             row[column.name] = self._unique_value(
                 column, template_value, instance_index, used_unique[column.name]
             )
-        elif column.is_fk or duplicate:
-            row[column.name] = template_value
+        elif column.is_fk or duplicate or is_secondary_pk:
+            if is_secondary_pk and variation is not None and variation.axis != "fixed":
+                val = self._vary_value(column, template_value, variation, rng)
+                check = getattr(column, "check_expr", None)
+                if check and not _satisfies_check(str(val), check):
+                    val = template_value
+                row[column.name] = val
+            else:
+                row[column.name] = template_value
         elif variation is not None and variation.axis != "fixed":
             val = self._vary_value(column, template_value, variation, rng)
             check = getattr(column, "check_expr", None)
