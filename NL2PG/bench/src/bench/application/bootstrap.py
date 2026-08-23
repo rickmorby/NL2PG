@@ -174,7 +174,9 @@ class ApplicationBootstrap:
             "data": DataAgent(llm, prompts, cfg, sandbox, examples),
             "query": QueryAgent(llm, prompts, cfg, query_validator, examples),
             "story": StoryAgent(llm, prompts, cfg, examples),
-            "question": QuestionAgent(llm, prompts, cfg, examples),
+            "question": QuestionAgent(
+                llm, prompts, cfg, query_validator=query_validator, examples=examples
+            ),
             "critic": CriticAgent(llm, prompts, cfg),
             "hardening": HardeningAgent(llm, prompts, cfg),
             "calibration": CalibrationAgent(llm, prompts, cfg, sandbox),

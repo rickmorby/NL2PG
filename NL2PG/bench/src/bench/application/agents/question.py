@@ -6,6 +6,7 @@
 from logging import getLogger
 
 from bench.application.agents.base import AbstractAgent
+from bench.application.validators.query_validator import QueryValidator
 from bench.domain.models.nlp import QuestionDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.services.validation.order_sensitivity_policy import (
@@ -16,7 +17,19 @@ _log = getLogger("bench.application.agents")
 
 
 class QuestionAgent(AbstractAgent):
-    """Genera QuestionDTO via LLM contestualizzando la storia e la query gold."""
+    """Genera QuestionDTO via LLM contestualizzando la storia e la query gold.
+
+    Alla promozione ``order_sensitive`` (regola D1 della policy) delega al
+    ``QueryValidator`` l'iniezione del tiebreaker univoco nell'ORDER BY.
+    """
+
+    def __init__(
+        self, llm, prompts, config, query_validator: QueryValidator | None = None, examples=None
+    ) -> None:
+        """Inietta le dipendenze base e il validatore query per il tiebreaker."""
+        super().__init__(llm, prompts, config)
+        self._query_validator = query_validator
+        self._examples = examples
 
     def prompt_name(self) -> str:
         """Restituisce 'question' come nome del template prompt."""
@@ -46,9 +59,12 @@ class QuestionAgent(AbstractAgent):
             )
             if reason:
                 _log.warning("nodo=question task=%s %s", state.task_id, reason)
-                updates["gold_query"] = state.gold_query.model_copy(
-                    update={"order_sensitive": resolved}
-                )
+                gold_query = state.gold_query.model_copy(update={"order_sensitive": resolved})
+                if resolved and self._query_validator and state.sandbox_schema:
+                    gold_query = self._query_validator.ensure_tiebreaker(
+                        gold_query, state.sandbox_schema
+                    )
+                updates["gold_query"] = gold_query
                 updates["gold_result"] = state.gold_result.model_copy(
                     update={"order_sensitive": resolved}
                 )

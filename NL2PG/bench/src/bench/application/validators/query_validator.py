@@ -72,6 +72,15 @@ class QueryValidator:
 
         return self._validate_execution(query, schema, tree, profile)
 
+    def ensure_tiebreaker(self, query: GoldQueryDTO, schema: str) -> GoldQueryDTO:
+        """API pubblica: garantisce l'ORDER BY univoco (usato alla promozione D1)."""
+        try:
+            tree = parse_one(query.query, read="postgres")
+        except ParseError:
+            return query
+        self._ensure_tiebreaker(query, tree, schema)
+        return query
+
     def _ensure_tiebreaker(self, query: GoldQueryDTO, tree: exp.Expression, schema: str) -> None:
         """Aggiunge automaticamente un tiebreaker univoco (GROUP BY o PK ASC) se non univoco."""
         order = tree.args.get("order")

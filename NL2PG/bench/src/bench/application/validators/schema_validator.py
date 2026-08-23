@@ -8,6 +8,10 @@ from bench.domain.exceptions import DatabaseClientError
 from bench.domain.models.base import AbstractDTO
 from bench.domain.models.sql import SchemaDDLDTO
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.domain.services.validation.column_type_policy import (
+    find_text_monetary_columns,
+    text_monetary_error,
+)
 from bench.domain.services.validation.identifier_policy import (
     english_identifier_error,
     find_english_identifiers,
@@ -36,6 +40,10 @@ class SchemaValidator(AbstractSandboxValidator):
         ident_err = english_identifier_error(ident_hits)
         if ident_err:
             return ValidationResult(is_valid=False, error=ident_err)
+        money_hits = find_text_monetary_columns(sql_text)
+        money_err = text_monetary_error(money_hits)
+        if money_err:
+            return ValidationResult(is_valid=False, error=money_err)
         type_result = self._type_checker.check(sql_text, tipo_schema)
         if not type_result.is_valid:
             return ValidationResult(is_valid=False, error=type_result.error)
