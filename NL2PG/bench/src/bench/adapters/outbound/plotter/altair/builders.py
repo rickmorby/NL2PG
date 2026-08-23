@@ -127,7 +127,9 @@ def bars_discrete(
     return bars + labels
 
 
-_INSIDE_LABEL_MIN = 0.08
+_TEXT_PX_PER_CHAR = 6.5
+_TEXT_PADDING_PX = 10
+"""Stima di ingombro testo (font 11): decide se l'etichetta entra nel segmento."""
 """Quota minima perché l'etichetta entri nel segmento; sotto, va fuori con nota."""
 
 
@@ -164,10 +166,12 @@ def stacked_share(
                 "center": (cumulative + segment / 2) / totals[category],
                 "pct": share,
             }
-            if share > _INSIDE_LABEL_MIN:
+            label = f"{share:.0%}"
+            fits = share * width >= len(label) * _TEXT_PX_PER_CHAR + _TEXT_PADDING_PX
+            if fits:
                 inside_rows.append(entry)
             else:
-                outside_rows.append({**entry, "nota": f"{status_value} {share:.0%}"})
+                outside_rows.append({**entry, "nota": f"{status_value} {label}"})
             cumulative += segment
     bars = (
         alt.Chart(_data(rows))

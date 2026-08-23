@@ -43,7 +43,7 @@ class PassRateByDifficultyPlot(Plot):
             OUTCOME_COLORS,
             "Quota di task",
             cat_order=["Easy", "Hard"],
-            width=560,
+            width=760,
         )
 
     def evidence(self, rows: list[dict[str, Any]]) -> str | None:

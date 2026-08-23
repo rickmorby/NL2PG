@@ -174,7 +174,7 @@ class PassRateBySchemaBandPlot(Plot):
             OUTCOME_COLORS,
             "Quota di task",
             cat_order=ordered,
-            width=640,
+            width=900,
         )
 
     def evidence(self, rows: list[dict[str, Any]]) -> str | None:
