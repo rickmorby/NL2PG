@@ -226,8 +226,8 @@ class SchemaSizeVsPassrateBoxplotPlot(AbstractPlot):
     """12: Boxplot dello schema size vs pass rate."""
 
     def __init__(self) -> None:
-        """Inizializza le dimensioni del grafico."""
-        super().__init__(figsize=(8.5, 5))
+        """Inizializza le dimensioni del grafico con margine per l'evidenza."""
+        super().__init__(figsize=(8.5, 5), bottom_margin=0.25)
 
     def filename(self) -> str:
         """Restituisce il nome del file PNG."""

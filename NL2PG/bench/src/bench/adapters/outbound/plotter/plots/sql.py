@@ -226,6 +226,7 @@ class SqlFeatureCooccurrencePlot(AbstractHeatmapPlot):
     def __init__(self) -> None:
         """Inizializza la mappa; l'elenco feature è derivato dinamicamente dai task."""
         super().__init__(cmap="Blues", rotation=35, figsize=(13, 10))
+        self.bottom_margin = 0.18
         self._features: list[str] = []
 
     def filename(self) -> str:
