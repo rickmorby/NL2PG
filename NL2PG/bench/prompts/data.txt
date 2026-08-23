@@ -42,6 +42,8 @@ Il JSON di output deve contenere esclusivamente il campo "tables".
 
 7. **RUMORE CONTROLLATO (GESTITO DAL MOTORE)**: NULL occasionali su colonne nullable, duplicati sporadici e outlier entro i limiti dichiarati vengono iniettati automaticamente; non preoccupartene. Mai su chiavi primarie, chiavi esterne o colonne UNIQUE.
 
+7-bis. **ASSENZA DI VALORE = NULL, MAI STRINGHE**: se una colonna nullable deve restare senza valore, OMETTI la chiave dal template (o usa il JSON null). È VIETATO inserire le stringhe "None", "null" o "N/D" come valore: in SQL sono testo, non assenza di dato, e inquinano query e profilo. La DataSpec viene rigettata se contiene questi letterali.
+
 8. **DETERMINISMO**: Il seed e' derivato dal task_id: a parita' di DataSpec i dati sono riproducibili, e gli agenti a valle (query, story, critic) vedranno un profilo dati con righe campione REALI. Usa quindi valori che un analista filtra davvero.
 
 9. **TIPOLOGIE DI SCHEMA SPECIALI**: Se il DDL contiene costrutti particolari, regole dedicate:

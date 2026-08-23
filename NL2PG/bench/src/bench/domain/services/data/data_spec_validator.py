@@ -10,6 +10,7 @@ Pydantic e falliscono gia' al parsing dell'output LLM.
 """
 
 from logging import getLogger
+import re
 from typing import Any
 
 from bench.domain.exceptions.domain_exc import DomainValidationError
@@ -21,6 +22,8 @@ from bench.domain.models.data import (
 )
 
 _log = getLogger("bench.domain.data_spec_validator")
+
+_NONE_LIKE = re.compile(r"^(none|null)$", re.IGNORECASE)
 
 
 class DataSpecValidationError(DomainValidationError):
@@ -72,7 +75,7 @@ class DataSpecValidator:
     def _validate_template(
         table_spec: TableDataSpecDTO, table: TableSchema, template: dict[str, Any]
     ) -> None:
-        """Verifica le chiavi del template; rimuove colonne sconosciute con warning."""
+        """Verifica le chiavi del template e i valori cella; scarta i letterali null testuali."""
         unknown = [key for key in template if table.column(key) is None]
         if unknown:
             for key in unknown:
@@ -86,6 +89,13 @@ class DataSpecValidator:
                 raise DataSpecValidationError(
                     f"Template di '{table_spec.table}' vuoto dopo "
                     f"rimozione colonne sconosciute {unknown}"
+                )
+        for column_name, value in template.items():
+            if isinstance(value, str) and _NONE_LIKE.fullmatch(value.strip()):
+                raise DataSpecValidationError(
+                    f"Colonna '{column_name}' di '{table_spec.table}' contiene il letterale "
+                    f"testuale {value!r}: esprimere l'assenza di valore con NULL "
+                    f"(valore assente dal template o None), mai come stringa"
                 )
 
     @staticmethod
