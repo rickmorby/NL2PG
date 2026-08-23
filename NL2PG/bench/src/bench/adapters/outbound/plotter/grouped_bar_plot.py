@@ -67,14 +67,18 @@ class AbstractGroupedBarPlot(AbstractPlot):
                 xs.append(category)
                 ys.append(by_group[group][i])
                 hues.append(group)
-        barplot(x=xs, y=ys, hue=hues, ax=ax, palette=self.palette, legend=False)
-        ax.legend(
-            title="Difficoltà",
-            loc="upper right",
-            frameon=False,
-            fontsize=8,
-            title_fontsize=9,
-        )
+        barplot(x=xs, y=ys, hue=hues, ax=ax, palette=self.palette)
+        handles, labels = ax.get_legend_handles_labels()
+        if handles and labels:
+            ax.legend(
+                handles=handles,
+                labels=labels,
+                title="Difficoltà",
+                loc="upper right",
+                frameon=False,
+                fontsize=8,
+                title_fontsize=9,
+            )
         has_floats = any(isinstance(v, float) for v in ys)
         fmt = "%.2f" if has_floats else "%g"
         label_fs = 7.5 if getattr(self, "_label_count", 0) > _MEDIUM_MAX_ITEMS else 9
