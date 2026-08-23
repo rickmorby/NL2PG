@@ -4,10 +4,10 @@
 """
 
 from collections import Counter, defaultdict
-from statistics import median
+from statistics import mean, median
 from typing import Any
 
-from seaborn import boxplot, lineplot
+from seaborn import lineplot
 
 from bench.adapters.outbound.plotter.bar_plot import AbstractBarPlot
 from bench.adapters.outbound.plotter.base import AbstractPlot
@@ -286,7 +286,7 @@ class SchemaSizeVsPassrateBoxplotPlot(AbstractPlot):
         return "Pass Rate Calibrazione Solver"
 
     def prepare_data(self, tasks: list[dict[str, Any]]) -> tuple[list[str], list[float]]:
-        """Estrae i pass rate raggruppati per fascia di tabelle."""
+        """Estrae il pass rate medio (proporzione di successi) per fascia di tabelle."""
         labels: list[str] = []
         prs: list[float] = []
         for t in tasks:
@@ -297,7 +297,21 @@ class SchemaSizeVsPassrateBoxplotPlot(AbstractPlot):
         return labels, prs
 
     def draw(self, ax: Any, data: tuple[list[str], list[float]]) -> None:
-        """Disegna un boxplot Seaborn con fasce ordinate."""
+        """Disegna un barplot del pass rate percentuale per fascia di tabelle.
+
+        Poiché ``calibration_pass_rate`` è binario (0 o 1), un boxplot non è
+        informativo: si usa la media aritmetica come proporzione di successi,
+        che è la rappresentazione standard nei paper per outcome dicotomici.
+        """
         labels, prs = data
         order = [lbl for _, _, lbl in _TABLE_BINS if lbl in set(labels)]
-        boxplot(x=labels, y=prs, order=order, color="#2980b9", ax=ax)
+        grouped: dict[str, list[float]] = {}
+        for lbl, pr in zip(labels, prs, strict=True):
+            grouped.setdefault(lbl, []).append(pr)
+        means = [mean(grouped[lbl]) * 100 if grouped[lbl] else 0 for lbl in order]
+        counts = {lbl: len(grouped[lbl]) for lbl in order}
+        tick_labels = [f"{lbl}\n(n={counts[lbl]})" for lbl in order]
+        ax.bar(range(len(order)), means, color="#2980b9", width=0.6)
+        ax.set_xticks(range(len(order)))
+        ax.set_xticklabels(tick_labels)
+        self._max_data_val = max(means, default=1.0)
