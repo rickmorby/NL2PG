@@ -10,11 +10,11 @@ Garantisce due invarianti del benchmark:
 :author: Riccardo Morabito
 """
 
-import re
 from datetime import date, datetime
+from re import IGNORECASE, compile as re_compile
 from typing import Any
 
-_NONE_LIKE = re.compile(r"^(none|null)$", re.IGNORECASE)
+_NONE_LIKE = re_compile(r"^(none|null)$", IGNORECASE)
 
 _ERROR_NONE_LITERAL = (
     "Il risultato contiene la stringa {cell!r}: usare il keyword SQL NULL, "

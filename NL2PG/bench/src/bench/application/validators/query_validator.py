@@ -3,8 +3,8 @@
 :author: Riccardo Morabito
 """
 
-import re
 from dataclasses import dataclass
+from re import IGNORECASE, compile as re_compile
 from typing import Any
 
 from psycopg.errors import Error as PgError
@@ -25,10 +25,10 @@ from bench.domain.services.validation.gold_normalizer import (
 )
 
 _MAX_DISTINCT_SAMPLES = 2
-_RE_VOLATILE_TEXT = re.compile(
+_RE_VOLATILE_TEXT = re_compile(
     r"\b(?:NOW\s*\(|LOCALTIME(?:STAMP)?\b|CLOCK_TIMESTAMP|TRANSACTION_TIMESTAMP|"
     r"STATEMENT_TIMESTAMP)",
-    flags=re.IGNORECASE,
+    flags=IGNORECASE,
 )
 
 

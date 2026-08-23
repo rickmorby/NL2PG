@@ -8,7 +8,7 @@ tecnico italiano.
 :author: Riccardo Morabito
 """
 
-import re
+from re import compile as re_compile
 from sqlglot import exp, parse_one
 from sqlglot.errors import ParseError
 
@@ -53,7 +53,7 @@ _ENGLISH_TERMS: frozenset[str] = frozenset(
 
 _WHITELIST: frozenset[str] = frozenset({"email"})
 
-_RE_IDENTIFIER = re.compile(r"^[a-z_][a-z0-9_]*$")
+_RE_IDENTIFIER = re_compile(r"^[a-z_][a-z0-9_]*$")
 
 
 def _token_is_english(identifier: str) -> bool:

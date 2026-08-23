@@ -7,17 +7,17 @@ incrociando il nome colonna con il lessico economico italiano.
 :author: Riccardo Morabito
 """
 
-import re
+from re import IGNORECASE, match, compile as re_compile
 from sqlglot import exp, parse_one
 from sqlglot.errors import ParseError
 
-_MONEY_TOKEN = re.compile(
+_MONEY_TOKEN = re_compile(
     r"\b(importo|prezzo|totale|saldo|costo|stipendio|canone|premio|fatturato"
     r"|valore|ricavo|emolumento)\w*",
-    re.IGNORECASE,
+    IGNORECASE,
 )
 
-_RE_IDENTIFIER = re.compile(r"^[a-z_][a-z0-9_]*$")
+_RE_IDENTIFIER = re_compile(r"^[a-z_][a-z0-9_]*$")
 
 
 def _is_moneyish(column_name: str) -> bool:
@@ -62,13 +62,13 @@ def _split_statements(ddl: str) -> list[str]:
 def _collect_fallback(ddl: str, hits: set[tuple[str, str]]) -> None:
     """Fallback statement-per-statement per DDL con costrutti non supportati."""
     for stmt_ddl in _split_statements(ddl):
-        m = re.match(r"CREATE\s+TABLE\s+(\w+)\s*\(", stmt_ddl, re.I)
+        m = match(r"CREATE\s+TABLE\s+(\w+)\s*\(", stmt_ddl, IGNORECASE)
         if not m:
             continue
         table_name = m.group(1).lower()
         body = stmt_ddl[m.end() : stmt_ddl.rfind(")")]
         for part in _split_top_level(body):
-            cm = re.match(r'"?(\w+)"?\s+TEXT\b', part.strip(), re.I)
+            cm = match(r'"?(\w+)"?\s+TEXT\b', part.strip(), IGNORECASE)
             if (
                 cm
                 and _RE_IDENTIFIER.fullmatch(cm.group(1).lower())

@@ -12,8 +12,7 @@ from dataclasses import dataclass
 from re import IGNORECASE, compile as re_compile, escape as re_escape
 from typing import Callable, ClassVar
 
-import sqlglot
-from sqlglot import exp
+from sqlglot import exp, parse
 from sqlglot.errors import ParseError
 
 _RE_PARTITION_BY = re_compile(r"\bPARTITION\s+BY\b", IGNORECASE)
@@ -284,7 +283,7 @@ class SchemaTypeChecker:
     def _get_all_creates(ddl: str) -> list[exp.Create]:
         """Estrae tutte le istruzioni CREATE TABLE dal DDL multi-statement."""
         try:
-            trees = sqlglot.parse(ddl, read="postgres")
+            trees = parse(ddl, read="postgres")
             creates = []
             for t in trees:
                 if t:

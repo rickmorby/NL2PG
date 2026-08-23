@@ -16,22 +16,22 @@ aggregati ("il peso massimo registrato"), minimizzando i falsi positivi.
 :author: Riccardo Morabito
 """
 
-import re
+from re import DOTALL, IGNORECASE, compile as re_compile
 
-_RE_ORDER_OUTPUT = re.compile(
+_RE_ORDER_OUTPUT = re_compile(
     r"(ordinando|ordinare|\bordinat[oaie]\b|\bordina\b|disponendo|dispost[ei]\b"
     r"|in ordine\s+\w+|alfabetic\w*|decrescent\w*|crescent\w*|cronologic\w*"
     r"|\bclassifica\b|graduatoria"
     r"|\bdal pi(ù|u') \w+ (al|alla) pi(ù|u')|\bdalla \w+ pi(ù|u') recent"
     r"|partendo dal)",
-    re.IGNORECASE,
+    IGNORECASE,
 )
 
-_RE_LIMIT_OFFSET = re.compile(r"\b(LIMIT|OFFSET)\b", re.IGNORECASE)
+_RE_LIMIT_OFFSET = re_compile(r"\b(LIMIT|OFFSET)\b", IGNORECASE)
 
-_RE_WINDOW_OVER = re.compile(r"OVER\s*\([^)]*\)", re.IGNORECASE | re.DOTALL)
+_RE_WINDOW_OVER = re_compile(r"OVER\s*\([^)]*\)", IGNORECASE | DOTALL)
 
-_RE_ORDER_BY = re.compile(r"\bORDER\s+BY\b", re.IGNORECASE)
+_RE_ORDER_BY = re_compile(r"\bORDER\s+BY\b", IGNORECASE)
 
 
 def question_requests_output_order(question: str) -> bool:

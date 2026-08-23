@@ -9,9 +9,9 @@ da ``RowCounter``.
 :author: Riccardo Morabito
 """
 
-import re
 from contextlib import suppress
 from random import Random
+from re import IGNORECASE, Pattern, error, search, sub, compile as re_compile
 from typing import Any, ClassVar
 
 from bench.domain.models.data import (
@@ -34,8 +34,8 @@ _OUTLIER_COIN_FLIP = 0.5
 _CF_LENGTH = 16
 _ALPHABET_SIZE = 26
 _MAX_SUFFIX_ATTEMPTS = 100
-_RE_CHECK_REGEX = re.compile(r"~\*?\s*'([^']+)'")
-_RE_CHECK_LENGTH = re.compile(r"length\s*\(\s*\w+\s*\)\s*([<>]=?|=)\s*(\d+)", re.I)
+_RE_CHECK_REGEX = re_compile(r"~\*?\s*'([^']+)'")
+_RE_CHECK_LENGTH = re_compile(r"length\s*\(\s*\w+\s*\)\s*([<>]=?|=)\s*(\d+)", IGNORECASE)
 
 
 def _check_regex_part(value: str, part: str) -> bool | None:
@@ -45,8 +45,8 @@ def _check_regex_part(value: str, part: str) -> bool | None:
         return None
     pat = m.group(1)
     try:
-        return bool(re.search(pat, value))
-    except re.error:
+        return bool(search(pat, value))
+    except error:
         return True
 
 
@@ -67,14 +67,14 @@ def _check_length_part(value: str, part: str) -> bool | None:
     return checks.get(op, True)
 
 
-_RE_CHECK_BETWEEN = re.compile(
+_RE_CHECK_BETWEEN = re_compile(
     r"(?:VALUE|[a-zA-Z0-9_]+)\s+BETWEEN\s+(-?\d+(?:\.\d+)?)\s+AND\s+(-?\d+(?:\.\d+)?)",
-    re.IGNORECASE,
+    IGNORECASE,
 )
-_RE_CHECK_CMP = re.compile(
-    r"(?:VALUE|[a-zA-Z0-9_]+)\s*(>=|<=|>|<|=)\s*(-?\d+(?:\.\d+)?)", re.IGNORECASE
+_RE_CHECK_CMP = re_compile(
+    r"(?:VALUE|[a-zA-Z0-9_]+)\s*(>=|<=|>|<|=)\s*(-?\d+(?:\.\d+)?)", IGNORECASE
 )
-_RE_CHECK_IN = re.compile(r"(?:VALUE|[a-zA-Z0-9_]+)\s+IN\s*\(([^)]+)\)", re.IGNORECASE)
+_RE_CHECK_IN = re_compile(r"(?:VALUE|[a-zA-Z0-9_]+)\s+IN\s*\(([^)]+)\)", IGNORECASE)
 
 
 def _check_numeric_parts(val_num: float, check_expr: str) -> bool:
@@ -402,12 +402,12 @@ class RowBuilder:
                 if s_val is not None and e_val is not None and str(e_val) < str(s_val):
                     row[start_key], row[end_key] = e_val, s_val
 
-    _EMAIL_TOKEN: ClassVar[re.Pattern[str]] = re.compile(r"email", re.IGNORECASE)
+    _EMAIL_TOKEN: ClassVar[Pattern[str]] = re_compile(r"email", IGNORECASE)
 
     @staticmethod
     def _slug_person(value: str) -> str:
         """Riduce un nome/cognome a token alfanumerico minuscolo per l'indirizzo email."""
-        return re.sub(r"[^a-z0-9]+", "", value.lower())
+        return sub(r"[^a-z0-9]+", "", value.lower())
 
     @classmethod
     def enforce_email_coherence(

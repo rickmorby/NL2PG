@@ -3,15 +3,15 @@
 :author: Riccardo Morabito
 """
 
-import re
 from datetime import date, datetime
 from itertools import permutations
+from re import compile as re_compile
 from typing import Any
 
 _EPSILON_TOLERANCE = 0.02
 _MAX_PERMUTATION_COLS = 8
 
-_RE_TIMESTAMP_SEP = re.compile(r"(\d{4}-\d{2}-\d{2})[Tt ](\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?)")
+_RE_TIMESTAMP_SEP = re_compile(r"(\d{4}-\d{2}-\d{2})[Tt ](\d{2}:\d{2}(?::\d{2})?(?:\.\d+)?)")
 
 
 def _canonicalize_value(value: Any) -> Any:

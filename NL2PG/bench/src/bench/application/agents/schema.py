@@ -3,8 +3,7 @@
 :author: Riccardo Morabito
 """
 
-import sqlglot
-from sqlglot import exp
+from sqlglot import exp, parse
 
 from typing import Any, ClassVar
 
@@ -101,7 +100,7 @@ class SchemaAgent(AbstractAgent):
         """Respinge DDL con identificatori inglesi non ammessi dal contratto naming."""
         try:
             idents: set[str] = set()
-            for st in sqlglot.parse(ddl, read="postgres"):
+            for st in parse(ddl, read="postgres"):
                 if isinstance(st, exp.Create) and isinstance(st.this, exp.Schema):
                     tname = getattr(st.this.this, "name", None)
                     if tname and str(tname).lower() in self._EN_IDENTS:

@@ -10,7 +10,7 @@ Pydantic e falliscono gia' al parsing dell'output LLM.
 """
 
 from logging import getLogger
-import re
+from re import IGNORECASE, compile as re_compile
 from typing import Any
 
 from bench.domain.exceptions.domain_exc import DomainValidationError
@@ -23,7 +23,7 @@ from bench.domain.models.data import (
 
 _log = getLogger("bench.domain.data_spec_validator")
 
-_NONE_LIKE = re.compile(r"^(none|null)$", re.IGNORECASE)
+_NONE_LIKE = re_compile(r"^(none|null)$", IGNORECASE)
 
 
 class DataSpecValidationError(DomainValidationError):

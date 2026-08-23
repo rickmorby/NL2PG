@@ -3,11 +3,11 @@
 :author: Riccardo Morabito
 """
 
-import time
 from asyncio import get_event_loop
 from contextlib import suppress
 from logging import CRITICAL as LOG_CRITICAL, getLogger
 from sys import modules
+from time import monotonic
 from typing import Any
 from warnings import filterwarnings
 
@@ -195,13 +195,13 @@ class LLMClientAdapter(LLMGeneratorPort):
                     kwargs["temperature"] = opts.temperature_override
 
                 deadline = (
-                    time.monotonic() + self._max_call_seconds if self._max_call_seconds else None
+                    monotonic() + self._max_call_seconds if self._max_call_seconds else None
                 )
                 chunks: list[Any] = []
                 stream = self._router.completion(**kwargs)
                 try:
                     for chunk in stream:
-                        if deadline is not None and time.monotonic() > deadline:
+                        if deadline is not None and monotonic() > deadline:
                             with suppress(Exception):
                                 if hasattr(stream, "close"):
                                     stream.close()  # type: ignore[attr-defined]
