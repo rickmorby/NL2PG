@@ -4,7 +4,7 @@
 """
 
 from dataclasses import dataclass
-from re import compile as re_compile
+from re import IGNORECASE, compile as re_compile
 
 from dateparser import parse as dateparser_parse
 from dateparser.search import search_dates
@@ -16,6 +16,11 @@ from bench.domain.models.spec import SpecDTO, TwistRuleDTO
 from bench.domain.models.sql import GoldQueryDTO
 
 _RE_IS_DATE_LIKE = re_compile(r"^\d{4}[-/]\d{1,2}(?:[-/]\d{1,2})?$|^\d{1,2}[-/]\d{1,2}[-/]\d{4}$")
+_RE_STRIP_DEMAND = re_compile(
+    r"senza (spazi|simboli|trattini|punteggiatura)|rimuov\w+ (spazi|simboli|trattini)",
+    IGNORECASE,
+)
+_RE_STRIP_FUNC = re_compile(r"\b(REGEXP_REPLACE|TRANSLATE)\s*\(", IGNORECASE)
 
 
 @dataclass
@@ -140,4 +145,24 @@ class CoverageValidator:
                         f"Inserisci il valore '{lit}' nella narrazione."
                     ),
                 )
+        sql_text = query.query if isinstance(query, GoldQueryDTO) else ""
+        fmt_err = self.check_strip_coherence(question.question, sql_text)
+        if fmt_err:
+            return CoverageResult(is_valid=False, error=fmt_err)
         return CoverageResult()
+
+    @staticmethod
+    def check_strip_coherence(question_text: str, sql: str) -> str:
+        """Verifica la coerenza tra richieste di pulizia testo e funzioni SQL usate.
+
+        Se la question chiede testo 'senza spazi/simboli/trattini' la gold query deve
+        applicare una funzione di rimozione caratteri (REGEXP_REPLACE o TRANSLATE):
+        un semplice TRIM non e' sufficiente perche' agisce solo sui bordi.
+        """
+        if _RE_STRIP_DEMAND.search(question_text) and not _RE_STRIP_FUNC.search(sql):
+            return (
+                "La question chiede testo senza spazi/simboli ma la gold query non usa "
+                "REGEXP_REPLACE (o TRANSLATE) per rimuovere i caratteri: un TRIM agisce "
+                "solo ai bordi della stringa. Allinea query e question."
+            )
+        return ""
