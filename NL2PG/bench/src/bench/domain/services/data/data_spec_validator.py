@@ -9,7 +9,6 @@ Pydantic e falliscono gia' al parsing dell'output LLM.
 :author: Riccardo Morabito
 """
 
-from logging import getLogger
 from re import IGNORECASE, compile as re_compile
 from typing import Any
 
@@ -21,7 +20,6 @@ from bench.domain.models.data import (
     TableSchema,
 )
 
-_log = getLogger("bench.domain.data_spec_validator")
 
 _NONE_LIKE = re_compile(r"^(none|null)$", IGNORECASE)
 
@@ -80,11 +78,6 @@ class DataSpecValidator:
         if unknown:
             for key in unknown:
                 template.pop(key, None)
-            _log.warning(
-                "Template di '%s' conteneva colonne sconosciute %s — rimosse",
-                table_spec.table,
-                unknown,
-            )
             if not template:
                 raise DataSpecValidationError(
                     f"Template di '{table_spec.table}' vuoto dopo "
@@ -112,18 +105,9 @@ class DataSpecValidator:
     def _validate_per_parent(table_spec: TableDataSpecDTO, table: TableSchema) -> None:
         """Verifica il moltiplicatore per-parent; auto-ripara se FK non singola."""
         if len(table.fk_columns) != 1:
-            _log.warning(
-                "'per_parent_rows' su '%s' richiede 1 FK (trovate %d) — ignorato",
-                table_spec.table,
-                len(table.fk_columns),
-            )
             table_spec.per_parent_rows = None
             return
         fk = table.fk_columns[0]
         if fk.fk_parent_table == table.name:
-            _log.warning(
-                "'per_parent_rows' non ammesso su self-reference '%s' — ignorato",
-                table.name,
-            )
             table_spec.per_parent_rows = None
             return
