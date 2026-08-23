@@ -20,14 +20,34 @@ class HierarchyDistributionPlot(Plot):
         "Numero di task per topologia dichiarata nella specifica (one-to-many, many-to-many, ...)."
     )
 
+    _TOP = 12
+
     def rows(self, tasks: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Conta i task per tipo di gerarchia."""
-        counts = Counter((task.get("spec") or {}).get("hierarchy") for task in tasks)
-        return [{"gerarchia": key, "task": value} for key, value in counts.most_common() if key]
+        """Top 12 topologie; la coda di topologie rare e' aggregata in un bucket."""
+        counts = Counter(
+            (task.get("spec") or {}).get("hierarchy")
+            for task in tasks
+            if (task.get("spec") or {}).get("hierarchy")
+        )
+        top = counts.most_common(self._TOP)
+        rows_out = [{"gerarchia": key, "task": value} for key, value in top]
+        tail_types = len(counts) - len(top)
+        if tail_types > 0:
+            tail_tasks = sum(value for _, value in counts.most_common()[self._TOP :])
+            rows_out.append({"gerarchia": f"altre ({tail_types} topologie)", "task": tail_tasks})
+        return rows_out
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre orizzontali ordinate per frequenza."""
-        return builders.hbar_values(rows, "gerarchia", "task", "N. task", reverse=True)
+        return builders.hbar_values(
+            rows,
+            "gerarchia",
+            "task",
+            "N. task",
+            reverse=True,
+            accent_value=rows[0]["gerarchia"],
+            order=[row["gerarchia"] for row in rows],
+        )
 
 
 class RowsPerTablePlot(Plot):
@@ -81,6 +101,9 @@ class RowsPerTablePlot(Plot):
         )
 
 
+_MIN_COMPOUND_FEATURES = 2
+
+
 class QueryTypeFeatureCoveragePlot(Plot):
     """18: matrice di copertura tipo-query (Qxx) x feature SQL."""
 
@@ -88,15 +111,25 @@ class QueryTypeFeatureCoveragePlot(Plot):
     slug = "querytype_feature_coverage"
     title = "Copertura tipo-query x feature"
     subtitle = (
-        "Quante query di ogni tipo (Qxx) esercitano ciascuna feature: "
-        "evidenzia buchi e ridondanze della tassonomia."
+        "Solo i tipi-query che combinano piu' feature (l'incrocio interessante); "
+        "i tipi a feature singola sono coperti dai grafici 01 e 09."
     )
 
     def rows(self, tasks: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Conta le coppie (tipo-query, feature) esplodendo i token Q del codice categoria."""
+        """Coppie (tipo-query, feature) solo per i tipi che combinano piu' feature."""
+        per_type: dict = {}
+        for task in tasks:
+            tokens = set(re_findall(r"Q\d+", task.get("category", "")))
+            for q_token in tokens:
+                per_type.setdefault(q_token, set()).update(
+                    (task.get("spec") or {}).get("sql_features", [])
+                )
+        compound = {
+            q for q, features in per_type.items() if len(features) >= _MIN_COMPOUND_FEATURES
+        }
         counts: Counter = Counter()
         for task in tasks:
-            for q_token in re_findall(r"Q\d+", task.get("category", "")):
+            for q_token in set(re_findall(r"Q\d+", task.get("category", ""))) & compound:
                 for feature in (task.get("spec") or {}).get("sql_features", []):
                     counts[(q_token, feature)] += 1
         return [

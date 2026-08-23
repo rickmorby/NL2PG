@@ -5,7 +5,7 @@ from typing import Any
 
 import altair as alt
 
-from bench.adapters.outbound.plotter.altair import builders
+from bench.adapters.outbound.plotter.altair import builders, theme
 from bench.adapters.outbound.plotter.altair.base import (
     OUTCOME_COLORS,
     OUTCOMES,
@@ -18,6 +18,9 @@ from bench.adapters.outbound.plotter.altair.base import (
 )
 
 
+_MIN_SAMPLE = 5
+
+
 class FeaturePassRatePlot(Plot):
     """09: pass rate medio di calibrazione per feature SQL obbligatoria."""
 
@@ -25,7 +28,8 @@ class FeaturePassRatePlot(Plot):
     slug = "feature_passrate_impact"
     title = "Impatto delle feature SQL sulla risolvibilita'"
     subtitle = (
-        "Pass rate medio in calibrazione; la numerosita' (n) e' dichiarata accanto a ogni feature."
+        "Le 15 feature piu' ostiche con campione affidabile (n >= 5); "
+        "la numerosita' e' dichiarata accanto a ogni feature."
     )
 
     def rows(self, tasks: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -33,20 +37,29 @@ class FeaturePassRatePlot(Plot):
         grouped: defaultdict[str, list[float]] = defaultdict(list)
         for row in feature_rate_rows(tasks):
             grouped[row["feature"]].append(row["pass_rate"])
+        reliable = {f: r for f, r in grouped.items() if len(r) >= _MIN_SAMPLE}
+        hardest = sorted(reliable.items(), key=lambda item: sum(item[1]) / len(item[1]))
         return [
             {
                 "feature": f"{feature} (n={len(rates)})",
                 "pass_rate": round(sum(rates) / len(rates), 3),
                 "_name": feature,
             }
-            for feature, rates in sorted(
-                grouped.items(), key=lambda item: sum(item[1]) / len(item[1])
-            )
+            for feature, rates in hardest[:15]
         ]
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre orizzontali su scala [0, 1]: il peggiore in alto, lettura immediata."""
-        return builders.hbar_values(rows, "feature", "pass_rate", "Pass rate medio", domain=[0, 1])
+        return builders.hbar_values(
+            rows,
+            "feature",
+            "pass_rate",
+            "Pass rate medio",
+            domain=[0, 1],
+            fmt=".0%",
+            accent_value=rows[0]["feature"],
+            accent_color=theme.BAD,
+        )
 
     def evidence(self, rows: list[dict[str, Any]]) -> str | None:
         """Restituisce la feature piu' ostica."""

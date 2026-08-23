@@ -73,7 +73,9 @@ class TwistTypeFrequencyPlot(Plot):
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre orizzontali ordinate per frequenza."""
-        return builders.hbar_values(rows, "twist", "regole", "N. regole", reverse=True)
+        return builders.hbar_values(
+            rows, "twist", "regole", "N. regole", reverse=True, accent_value=rows[0]["twist"]
+        )
 
     def evidence(self, rows: list[dict[str, Any]]) -> str | None:
         """Restituisce il twist dominante."""
@@ -100,7 +102,14 @@ class JargonFrequencyPlot(Plot):
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre orizzontali: i termini gergali sono lunghi e restano leggibili."""
-        return builders.hbar_values(rows, "gergo", "occorrenze", "Occorrenze", reverse=True)
+        return builders.hbar_values(
+            rows,
+            "gergo",
+            "occorrenze",
+            "Occorrenze",
+            reverse=True,
+            accent_value=rows[0]["gergo"],
+        )
 
     def evidence(self, rows: list[dict[str, Any]]) -> str | None:
         """Restituisce il termine gergale dominante."""

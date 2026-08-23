@@ -7,6 +7,7 @@ documentazione ufficiale Altair: ``alt.Step`` per l'altezza per categoria,
 heatmap layered con ``alt.when`` per il contrasto del testo.
 """
 
+from collections import Counter
 from typing import Any
 
 import altair as alt
@@ -28,22 +29,51 @@ def hbar_values(
     width: int = 620,
     domain: list[float] | None = None,
     reverse: bool = False,
+    fmt: str = ".0f",
+    accent_value: str | None = None,
+    accent_color: str = theme.ACCENT,
+    order: list[str] | None = None,
 ) -> alt.Chart:
-    """Barre orizzontali ordinate per valore: la forma standard per molte categorie.
+    """Barre orizzontali ordinate per valore con etichetta a fine barra.
 
     Con ``reverse`` il massimo appare in alto (ordinamento decrescente); il
     default mette il minimo in alto, utile per i pass rate (peggio prima).
+    Con ``accent_value`` le barre diventano neutre e solo il dato nominato
+    assume il colore saturo (principio dell'accento). ``order`` impone un
+    ordinamento esplicito delle categorie (es. bucket aggregato in fondo).
     """
     x_scale = alt.Scale(domain=domain) if domain else alt.Scale(zero=True)
-    return (
+    y_sort = order if order is not None else ("-x" if reverse else "x")
+    y_encoding = alt.Y(f"{cat}:N", sort=y_sort, title=None)
+    color_encoding = (
+        alt.condition(
+            f"datum.{cat} === '{accent_value}'",
+            alt.value(accent_color),
+            alt.value(theme.NEUTRAL),
+        )
+        if accent_value is not None
+        else alt.value(theme.ACCENT)
+    )
+    bars = (
         alt.Chart(_data(rows))
-        .mark_bar(color=theme.ACCENT)
+        .mark_bar()
         .encode(
             x=alt.X(f"{val}:Q", title=xlabel, scale=x_scale),
-            y=alt.Y(f"{cat}:N", sort="-x" if reverse else "x", title=None),
+            y=y_encoding,
+            color=color_encoding,
         )
         .properties(width=width, height=alt.Step(22))
     )
+    labels = (
+        alt.Chart(_data(rows))
+        .mark_text(align="left", dx=5, fontSize=11, color=theme.LABEL)
+        .encode(
+            x=alt.X(f"{val}:Q", title=xlabel, scale=x_scale),
+            y=y_encoding,
+            text=alt.Text(f"{val}:Q", format=fmt),
+        )
+    )
+    return bars + labels
 
 
 def bars_discrete(
@@ -55,11 +85,24 @@ def bars_discrete(
     *,
     width: int = 520,
     height: int = 320,
+    accent_value: str | None = None,
 ) -> alt.Chart:
-    """Barre verticali per un piccolo numero di valori ordinali (etichette dritte)."""
-    return (
+    """Barre verticali per pochi valori ordinali, con valore sopra la colonna.
+
+    Con ``accent_value`` solo la colonna nominata assume il colore saturo.
+    """
+    color_encoding = (
+        alt.condition(
+            f"datum.{cat} === '{accent_value}'",
+            alt.value(theme.ACCENT),
+            alt.value(theme.NEUTRAL),
+        )
+        if accent_value is not None
+        else alt.value(theme.ACCENT)
+    )
+    bars = (
         alt.Chart(_data(rows))
-        .mark_bar(color=theme.ACCENT)
+        .mark_bar()
         .encode(
             x=alt.X(
                 f"{cat}:O",
@@ -68,9 +111,24 @@ def bars_discrete(
                 axis=alt.Axis(labelAngle=0),
             ),
             y=alt.Y(f"{val}:Q", title=ylabel),
+            color=color_encoding,
         )
         .properties(width=width, height=height)
     )
+    labels = (
+        alt.Chart(_data(rows))
+        .mark_text(baseline="bottom", dy=-4, fontSize=11, color=theme.LABEL)
+        .encode(
+            x=alt.X(f"{cat}:O", sort="ascending", title=xlabel),
+            y=alt.Y(f"{val}:Q", title=ylabel),
+            text=alt.Text(f"{val}:Q", format=".0f"),
+        )
+    )
+    return bars + labels
+
+
+_INSIDE_LABEL_MIN = 0.08
+"""Quota minima perché l'etichetta entri nel segmento; sotto, va fuori con nota."""
 
 
 def stacked_share(
@@ -91,7 +149,33 @@ def stacked_share(
     e ``colors`` descrivono la scala degli esiti; ``cat_order`` l'ordine delle
     categorie sull'asse (default: alfabetico).
     """
-    return (
+    counts = Counter((row[cat], row[status]) for row in rows)
+    totals = Counter(row[cat] for row in rows)
+    inside_rows, outside_rows = [], []
+    for category in totals:
+        cumulative = 0
+        for status_value in order:
+            segment = counts.get((category, status_value), 0)
+            if not segment:
+                continue
+            share = segment / totals[category]
+            entry = {
+                cat: category,
+                "center": (cumulative + segment / 2) / totals[category],
+                "pct": share,
+            }
+            if share > _INSIDE_LABEL_MIN:
+                inside_rows.append(entry)
+            else:
+                outside_rows.append(
+                    {
+                        **entry,
+                        "nota": f"{status_value} {share:.0%}",
+                        "colore": colors[order.index(status_value)],
+                    }
+                )
+            cumulative += segment
+    bars = (
         alt.Chart(_data(rows))
         .mark_bar()
         .encode(
@@ -105,6 +189,35 @@ def stacked_share(
         )
         .properties(width=width, height=alt.Step(44))
     )
+    inside = (
+        alt.Chart(_data(inside_rows))
+        .mark_text(fontSize=11)
+        .encode(
+            x=alt.X(
+                "center:Q",
+                scale=alt.Scale(domain=[0, 1]),
+                axis=alt.Axis(labels=False, ticks=False, grid=False, domain=False),
+            ),
+            y=alt.Y(f"{cat}:N", sort=cat_order, title=None),
+            text=alt.Text("pct:Q", format=".0%"),
+            color=alt.condition("datum.pct > 0.25", alt.value("#FFFFFF"), alt.value(theme.LABEL)),
+        )
+    )
+    outside = (
+        alt.Chart(_data(outside_rows))
+        .mark_text(baseline="bottom", dy=-16, fontSize=11, fontWeight="bold")
+        .encode(
+            x=alt.X(
+                "center:Q",
+                scale=alt.Scale(domain=[0, 1]),
+                axis=alt.Axis(labels=False, ticks=False, grid=False, domain=False),
+            ),
+            y=alt.Y(f"{cat}:N", sort=cat_order, title=None),
+            text=alt.Text("nota:N"),
+            color=alt.Color("colore:N", scale=None, legend=None),
+        )
+    )
+    return bars + inside + outside
 
 
 def grouped_hbar(
@@ -119,7 +232,7 @@ def grouped_hbar(
     width: int = 620,
 ) -> alt.Chart:
     """Barre orizzontali raggruppate: due serie affiancate per categoria (yOffset)."""
-    return (
+    bars = (
         alt.Chart(_data(rows))
         .mark_bar()
         .encode(
@@ -130,6 +243,17 @@ def grouped_hbar(
         )
         .properties(width=width, height=alt.Step(20))
     )
+    labels = (
+        alt.Chart(_data(rows))
+        .mark_text(align="left", dx=5, fontSize=11, color=theme.LABEL)
+        .encode(
+            x=alt.X(f"{val}:Q", title=xlabel),
+            y=alt.Y(f"{cat}:N", sort="-x", title=None),
+            yOffset=alt.YOffset(f"{color}:N", sort=order, title=None),
+            text=alt.Text(f"{val}:Q", format=".0f"),
+        )
+    )
+    return bars + labels
 
 
 def strip_median(
@@ -157,7 +281,16 @@ def strip_median(
         .mark_tick(color=theme.MEDIAN, thickness=3, size=34)
         .encode(y=alt.Y("median:Q", title=ylabel))
     )
-    return (points + medians).properties(width=width, height=height)
+    median_labels = (
+        points.transform_aggregate(median=f"median({val})", groupby=[cat])
+        .mark_text(align="left", dx=22, dy=4, fontSize=11, color=theme.LABEL)
+        .encode(
+            x=alt.X(f"{cat}:N", sort=order, title=xlabel),
+            y=alt.Y("median:Q", title=ylabel),
+            text=alt.Text("median:Q", format=".1f"),
+        )
+    )
+    return (points + medians + median_labels).properties(width=width, height=height)
 
 
 def heatmap(
@@ -218,12 +351,27 @@ def line_points(
     height: int = 340,
 ) -> alt.Chart:
     """Linea con punti marcati per trend su variabile ordinale piccola."""
-    return (
+    line = (
         alt.Chart(_data(rows))
         .mark_line(point=True, color=theme.ACCENT, strokeWidth=2.5)
         .encode(
-            x=alt.X(f"{cat}:O", sort=order or "ascending", title=xlabel),
+            x=alt.X(
+                f"{cat}:O",
+                sort=order or "ascending",
+                title=xlabel,
+                axis=alt.Axis(labelAngle=0),
+            ),
             y=alt.Y(f"{val}:Q", title=ylabel, scale=alt.Scale(domain=[0, 1.02])),
         )
         .properties(width=width, height=height)
     )
+    labels = (
+        alt.Chart(_data(rows))
+        .mark_text(baseline="bottom", dy=-8, fontSize=11, color=theme.LABEL)
+        .encode(
+            x=alt.X(f"{cat}:O", sort=order or "ascending", title=xlabel),
+            y=alt.Y(f"{val}:Q", title=ylabel, scale=alt.Scale(domain=[0, 1.02])),
+            text=alt.Text(f"{val}:Q", format=".2f"),
+        )
+    )
+    return line + labels

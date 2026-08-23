@@ -129,8 +129,9 @@ class GoldCardinalityPlot(Plot):
                     "cardinalita:O",
                     sort=[row["cardinalita"] for row in rows],
                     title="Righe nel risultato gold",
+                    axis=alt.Axis(labelAngle=0),
                 ),
                 y=alt.Y("task:Q", title="N. task"),
             )
-            .properties(width=560, height=320)
+            .properties(width=620, height=320)
         )

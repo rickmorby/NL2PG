@@ -25,15 +25,34 @@ class SqlFeatureDistributionPlot(Plot):
     title = "Copertura delle feature SQL"
     subtitle = "Numero di task che richiedono ciascun costrutto SQL nella query gold."
 
+    _TOP = 20
+
     def rows(self, tasks: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Conta le feature su una riga per coppia (task, feature)."""
+        """Top 20 feature piu' richieste; la coda e' aggregata in un bucket."""
         rows = feature_rate_rows(tasks)
         counts = Counter(row["feature"] for row in rows)
-        return [{"feature": key, "task": value} for key, value in counts.most_common()]
+        top = counts.most_common(self._TOP)
+        tail = len(counts) - len(top)
+        rows_out = [{"feature": key, "task": value} for key, value in top]
+        if tail > 0:
+            rows_out.append(
+                {
+                    "feature": f"altre ({tail} feature)",
+                    "task": sum(v for _, v in counts.most_common()[self._TOP :]),
+                }
+            )
+        return rows_out
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre orizzontali ordinate: 40+ categorie esigono l'asse Y testuale."""
-        return builders.hbar_values(rows, "feature", "task", "N. task")
+        return builders.hbar_values(
+            rows,
+            "feature",
+            "task",
+            "N. task",
+            accent_value=rows[0]["feature"],
+            order=[row["feature"] for row in rows],
+        )
 
 
 class AstDepthDistributionPlot(Plot):
@@ -61,7 +80,15 @@ class AstDepthDistributionPlot(Plot):
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre verticali: la scala ordinale dei livelli resta leggibile in orizzontale."""
-        return builders.bars_discrete(rows, "profondita", "query", "Profondita' AST", "N. query")
+        modal = max(rows, key=lambda row: row["query"])
+        return builders.bars_discrete(
+            rows,
+            "profondita",
+            "query",
+            "Profondita' AST",
+            "N. query",
+            accent_value=modal["profondita"],
+        )
 
 
 class DomainDistributionPlot(Plot):
@@ -78,7 +105,14 @@ class DomainDistributionPlot(Plot):
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre orizzontali ordinate per frequenza."""
-        return builders.hbar_values(rows, "dominio", "occorrenze", "N. task", reverse=True)
+        return builders.hbar_values(
+            rows,
+            "dominio",
+            "occorrenze",
+            "N. task",
+            reverse=True,
+            accent_value=rows[0]["dominio"],
+        )
 
 
 class SchemaSizeDistributionPlot(Plot):
@@ -96,7 +130,15 @@ class SchemaSizeDistributionPlot(Plot):
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre verticali su scala ordinale: le fasce restano in ordine naturale."""
-        return builders.bars_discrete(rows, "tabelle", "database", "N. tabelle", "N. database")
+        modal = max(rows, key=lambda row: row["database"])
+        return builders.bars_discrete(
+            rows,
+            "tabelle",
+            "database",
+            "N. tabelle",
+            "N. database",
+            accent_value=modal["tabelle"],
+        )
 
 
 class SqlFeatureCooccurrencePlot(Plot):

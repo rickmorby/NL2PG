@@ -13,6 +13,9 @@ import altair as alt
 ACCENT = "#4C78A8"
 """Colore della serie principale (blu Vega, leggibile su bianco)."""
 
+NEUTRAL = "#B8C2CC"
+"""Grigio-azzurro neutro per il contesto: il colore saturo resta all'evidenza."""
+
 SECOND = "#F58518"
 """Colore della serie secondaria (arancio: coppia colorblind-safe con ACCENT)."""
 
@@ -20,6 +23,7 @@ GOOD = "#59A14F"
 BAD = "#E15759"
 PARTIAL = "#F1CE63"
 MEDIAN = "#3D3D3D"
+LABEL = "#1A1A1A"
 GRID = "#E6E6E6"
 
 _TEXT = "#444444"
