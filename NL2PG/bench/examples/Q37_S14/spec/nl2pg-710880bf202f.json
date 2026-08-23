@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "math_funcs"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "movimenti",
+      "obsolete_value": "giornale_liquidita",
+      "description": "La tabella movimenti viene denominata giornale_liquidita nella prosa aziendale. L'agente deve risalire alla tabella reale movimenti per calcolare gli importi, applicando funzioni matematiche come ROUND o ABS sui valori monetari."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "tasso_annuo",
+      "obsolete_value": "TAEG contrattualizzato",
+      "description": "La colonna tasso_annuo della tabella conti è indicata nella documentazione con il gergo finanziario TAEG contrattualizzato. Occorre mappare questo termine tecnico di settore alla colonna reale tasso_annuo quando si eseguono calcoli con POWER o ROUND."
+    }
+  ],
+  "spec_hash": "6e371e7eff5494e8"
+}

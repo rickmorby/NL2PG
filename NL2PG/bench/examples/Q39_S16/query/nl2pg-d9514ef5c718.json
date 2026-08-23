@@ -1,0 +1,598 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    data_nascita DATE\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    ramo TEXT NOT NULL CHECK (ramo IN ('auto', 'casa', 'vita', 'salute')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    data_emissione DATE NOT NULL\n);\n\nCREATE TABLE versioni_polizza (\n    id SERIAL PRIMARY KEY,\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    numero_versione INT NOT NULL,\n    ts_validita TIMESTAMP NOT NULL,\n    data_inizio TIMESTAMP NOT NULL,\n    data_fine TIMESTAMP,\n    premio_versione NUMERIC(10,2) NOT NULL CHECK (premio_versione >= 0),\n    massimale_copertura NUMERIC(12,2) CHECK (massimale_copertura > 0),\n    UNIQUE (polizza_id, numero_versione),\n    CHECK (data_fine IS NULL OR data_fine > data_inizio)\n);\n\nCREATE TABLE garanzie (\n    id SERIAL PRIMARY KEY,\n    versione_polizza_id INT NOT NULL REFERENCES versioni_polizza(id),\n    codice_garanzia TEXT NOT NULL,\n    descrizione TEXT NOT NULL,\n    franchigia NUMERIC(8,2) NOT NULL DEFAULT 0 CHECK (franchigia >= 0),\n    massimale NUMERIC(12,2) CHECK (massimale > 0)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 460,
+        "columns": {
+          "id": {
+            "distinct": 460,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 460
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 460,
+            "sample": [
+              "BNCLAU85M42F205B",
+              "BNCLAU85M42F205C",
+              "BNCLAU85M42F205D",
+              "BNCLAU85M42F205E",
+              "BNCLAU85M42F205F"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 413,
+            "sample": [
+              "1967-04-28",
+              "1967-09-19",
+              "1968-03-11",
+              "1968-04-03",
+              "1968-08-15"
+            ]
+          }
+        }
+      },
+      "polizze": {
+        "row_count": 923,
+        "columns": {
+          "id": {
+            "distinct": 923,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1023
+          },
+          "numero_polizza": {
+            "distinct": 923,
+            "sample": [
+              "POL-2026-000101",
+              "POL-2026-0001011",
+              "POL-2026-00010110",
+              "POL-2026-000101100",
+              "POL-2026-000101101"
+            ]
+          },
+          "cliente_id": {
+            "distinct": 409,
+            "sample": [
+              "10",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 2,
+            "max": 460
+          },
+          "ramo": {
+            "distinct": 4,
+            "sample": [
+              "auto",
+              "casa",
+              "salute",
+              "vita"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 888,
+            "sample": [
+              "1000.33",
+              "1001.69",
+              "1011.0",
+              "1013.21",
+              "1015.58"
+            ],
+            "min": 192.3,
+            "max": 3126.88
+          },
+          "data_emissione": {
+            "distinct": 236,
+            "sample": [
+              "2025-10-17",
+              "2025-10-18",
+              "2025-10-19",
+              "2025-10-20",
+              "2025-10-21"
+            ]
+          }
+        }
+      },
+      "versioni_polizza": {
+        "row_count": 1973,
+        "columns": {
+          "id": {
+            "distinct": 1973,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 201,
+            "max": 2173
+          },
+          "polizza_id": {
+            "distinct": 923,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1023
+          },
+          "numero_versione": {
+            "distinct": 1973,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1973
+          },
+          "ts_validita": {
+            "distinct": 205,
+            "sample": [
+              "2025-12-26 00:00:00",
+              "2025-12-27 00:00:00",
+              "2025-12-28 00:00:00",
+              "2025-12-29 00:00:00",
+              "2025-12-30 00:00:00"
+            ]
+          },
+          "data_inizio": {
+            "distinct": 305,
+            "sample": [
+              "2025-12-16 00:00:00",
+              "2025-12-17 00:00:00",
+              "2025-12-18 00:00:00",
+              "2025-12-19 00:00:00",
+              "2025-12-20 00:00:00"
+            ]
+          },
+          "data_fine": {
+            "distinct": 158,
+            "sample": [
+              "2026-06-15 00:00:00",
+              "2026-06-16 00:00:00",
+              "2026-06-17 00:00:00",
+              "2026-06-18 00:00:00",
+              "2026-06-19 00:00:00"
+            ]
+          },
+          "premio_versione": {
+            "distinct": 1864,
+            "sample": [
+              "1001.88",
+              "1003.05",
+              "1003.99",
+              "1004.75",
+              "1005.09"
+            ],
+            "min": 224.35,
+            "max": 1751.05
+          },
+          "massimale_copertura": {
+            "distinct": 1784,
+            "sample": [
+              "1000000.0",
+              "1002017.06",
+              "1004217.44",
+              "1005925.28",
+              "1009390.05"
+            ],
+            "min": 120000.0,
+            "max": 1500000.0
+          }
+        }
+      },
+      "garanzie": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 301,
+            "max": 3300
+          },
+          "versione_polizza_id": {
+            "distinct": 1508,
+            "sample": [
+              "1000",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 201,
+            "max": 2173
+          },
+          "codice_garanzia": {
+            "distinct": 8,
+            "sample": [
+              "ALLAGAMENTO",
+              "INCENDIO",
+              "INVALIDITA",
+              "KASKO",
+              "MALATTIA"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Capitale in caso di invalidita permanente",
+              "Danni al veicolo assicurato",
+              "Danni da allagamento all'abitazione",
+              "Danni da incendio all'abitazione",
+              "Indennizzo spese sanitarie per malattia"
+            ]
+          },
+          "franchigia": {
+            "distinct": 1779,
+            "sample": [
+              "0.0",
+              "100.0",
+              "100.31",
+              "100.4",
+              "100.46"
+            ],
+            "min": 0.0,
+            "max": 1000.0
+          },
+          "massimale": {
+            "distinct": 2734,
+            "sample": [
+              "100211.73",
+              "100481.14",
+              "100578.21",
+              "100637.75",
+              "100699.56"
+            ],
+            "min": 10500.0,
+            "max": 8000000.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Francesca",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRA80A01H501U",
+          "citta": "Padova",
+          "data_nascita": "1977-02-28"
+        },
+        {
+          "id": 2,
+          "nome": "Marco",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "citta": null,
+          "data_nascita": "1987-11-06"
+        },
+        {
+          "id": 3,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "citta": "Roma",
+          "data_nascita": "1980-01-15"
+        },
+        {
+          "id": 4,
+          "nome": "Chiara",
+          "cognome": "Russo",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "citta": "Roma",
+          "data_nascita": "1969-04-26"
+        },
+        {
+          "id": 5,
+          "nome": "Davide",
+          "cognome": "Russo",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "citta": "Napoli",
+          "data_nascita": "1989-09-19"
+        },
+        {
+          "id": 6,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "citta": "Roma",
+          "data_nascita": "1980-01-15"
+        },
+        {
+          "id": 7,
+          "nome": "Sara",
+          "cognome": "Colombo",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "citta": "Genova",
+          "data_nascita": "1989-01-14"
+        },
+        {
+          "id": 8,
+          "nome": "Giulia",
+          "cognome": "Esposito",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "citta": "Padova",
+          "data_nascita": "1979-11-18"
+        }
+      ],
+      "polizze": [
+        {
+          "id": 101,
+          "numero_polizza": "POL-2026-000101",
+          "cliente_id": 107,
+          "ramo": "auto",
+          "premio_annuo": 415.7,
+          "data_emissione": "2025-12-04"
+        },
+        {
+          "id": 102,
+          "numero_polizza": "POL-2026-0001011",
+          "cliente_id": 397,
+          "ramo": "vita",
+          "premio_annuo": 1071.39,
+          "data_emissione": "2026-03-21"
+        },
+        {
+          "id": 103,
+          "numero_polizza": "POL-2026-0001012",
+          "cliente_id": 139,
+          "ramo": "auto",
+          "premio_annuo": 450.0,
+          "data_emissione": "2026-01-15"
+        },
+        {
+          "id": 104,
+          "numero_polizza": "POL-2026-0001013",
+          "cliente_id": 370,
+          "ramo": "auto",
+          "premio_annuo": 601.31,
+          "data_emissione": "2026-02-23"
+        },
+        {
+          "id": 105,
+          "numero_polizza": "POL-2026-0001014",
+          "cliente_id": 88,
+          "ramo": "salute",
+          "premio_annuo": 817.41,
+          "data_emissione": "2025-12-22"
+        },
+        {
+          "id": 106,
+          "numero_polizza": "POL-2026-0001015",
+          "cliente_id": 10,
+          "ramo": "salute",
+          "premio_annuo": 858.55,
+          "data_emissione": "2026-04-11"
+        },
+        {
+          "id": 107,
+          "numero_polizza": "POL-2026-0001016",
+          "cliente_id": 165,
+          "ramo": "salute",
+          "premio_annuo": 790.57,
+          "data_emissione": "2025-12-13"
+        },
+        {
+          "id": 108,
+          "numero_polizza": "POL-2026-0001017",
+          "cliente_id": 445,
+          "ramo": "auto",
+          "premio_annuo": 712.72,
+          "data_emissione": "2025-10-20"
+        }
+      ],
+      "versioni_polizza": [
+        {
+          "id": 201,
+          "polizza_id": 831,
+          "numero_versione": 1,
+          "ts_validita": "2026-02-01 00:00:00",
+          "data_inizio": "2026-01-31 00:00:00",
+          "data_fine": "2026-07-31 00:00:00",
+          "premio_versione": 404.75,
+          "massimale_copertura": 401664.79
+        },
+        {
+          "id": 202,
+          "polizza_id": 217,
+          "numero_versione": 2,
+          "ts_validita": "2026-02-02 00:00:00",
+          "data_inizio": "2026-01-03 00:00:00",
+          "data_fine": null,
+          "premio_versione": 382.12,
+          "massimale_copertura": 494430.93
+        },
+        {
+          "id": 203,
+          "polizza_id": 436,
+          "numero_versione": 3,
+          "ts_validita": "2026-02-04 00:00:00",
+          "data_inizio": "2025-12-19 00:00:00",
+          "data_fine": null,
+          "premio_versione": 572.69,
+          "massimale_copertura": 722512.69
+        },
+        {
+          "id": 204,
+          "polizza_id": 756,
+          "numero_versione": 4,
+          "ts_validita": "2025-12-29 00:00:00",
+          "data_inizio": "2025-12-23 00:00:00",
+          "data_fine": "2026-06-29 00:00:00",
+          "premio_versione": 365.26,
+          "massimale_copertura": 689441.52
+        },
+        {
+          "id": 205,
+          "polizza_id": 294,
+          "numero_versione": 5,
+          "ts_validita": "2026-02-02 00:00:00",
+          "data_inizio": "2025-12-20 00:00:00",
+          "data_fine": "2026-08-05 00:00:00",
+          "premio_versione": 626.46,
+          "massimale_copertura": 467599.18
+        },
+        {
+          "id": 206,
+          "polizza_id": 847,
+          "numero_versione": 6,
+          "ts_validita": "2026-01-29 00:00:00",
+          "data_inizio": "2026-01-05 00:00:00",
+          "data_fine": "2026-07-10 00:00:00",
+          "premio_versione": 315.73,
+          "massimale_copertura": 587373.84
+        },
+        {
+          "id": 207,
+          "polizza_id": 936,
+          "numero_versione": 7,
+          "ts_validita": "2026-01-24 00:00:00",
+          "data_inizio": "2026-01-19 00:00:00",
+          "data_fine": "2026-08-02 00:00:00",
+          "premio_versione": 371.74,
+          "massimale_copertura": 546023.13
+        },
+        {
+          "id": 208,
+          "polizza_id": 583,
+          "numero_versione": 8,
+          "ts_validita": "2026-01-15 00:00:00",
+          "data_inizio": "2026-01-15 00:00:00",
+          "data_fine": "2026-07-15 00:00:00",
+          "premio_versione": 450.0,
+          "massimale_copertura": 500000.0
+        }
+      ],
+      "garanzie": [
+        {
+          "id": 301,
+          "versione_polizza_id": 661,
+          "codice_garanzia": "RC-AUTO",
+          "descrizione": "Responsabilita civile auto verso terzi",
+          "franchigia": 0.0,
+          "massimale": 4327195.72
+        },
+        {
+          "id": 302,
+          "versione_polizza_id": 2096,
+          "codice_garanzia": "RC-AUTO",
+          "descrizione": "Responsabilita civile auto verso terzi",
+          "franchigia": 0.0,
+          "massimale": 5631973.38
+        },
+        {
+          "id": 303,
+          "versione_polizza_id": 694,
+          "codice_garanzia": "RC-AUTO",
+          "descrizione": "Responsabilita civile auto verso terzi",
+          "franchigia": 0.0,
+          "massimale": 6793497.73
+        },
+        {
+          "id": 304,
+          "versione_polizza_id": 972,
+          "codice_garanzia": "RC-AUTO",
+          "descrizione": "Responsabilita civile auto verso terzi",
+          "franchigia": 0.0,
+          "massimale": 4157979.41
+        },
+        {
+          "id": 305,
+          "versione_polizza_id": 1247,
+          "codice_garanzia": "RC-AUTO",
+          "descrizione": "Responsabilita civile auto verso terzi",
+          "franchigia": 0.0,
+          "massimale": 6683743.57
+        },
+        {
+          "id": 306,
+          "versione_polizza_id": 2167,
+          "codice_garanzia": "RC-AUTO",
+          "descrizione": "Responsabilita civile auto verso terzi",
+          "franchigia": 0.0,
+          "massimale": 3552362.46
+        },
+        {
+          "id": 307,
+          "versione_polizza_id": 1056,
+          "codice_garanzia": "RC-AUTO",
+          "descrizione": "Responsabilita civile auto verso terzi",
+          "franchigia": 0.0,
+          "massimale": 4479726.16
+        },
+        {
+          "id": 308,
+          "versione_polizza_id": 683,
+          "codice_garanzia": "RC-AUTO",
+          "descrizione": "Responsabilita civile auto verso terzi",
+          "franchigia": 0.0,
+          "massimale": 5829378.33
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "between"
+  ],
+  "query": "SELECT c.nome || ' ' || c.cognome AS cliente, c.citta, p.ramo, p.numero_polizza, p.premio_annuo, COUNT(v.id) AS numero_versioni FROM polizze p JOIN clienti c ON c.id = p.cliente_id LEFT JOIN versioni_polizza v ON v.polizza_id = p.id WHERE p.ramo IN ('auto', 'vita') AND p.premio_annuo BETWEEN 800 AND 1500 GROUP BY c.nome, c.cognome, c.citta, p.ramo, p.numero_polizza, p.premio_annuo ORDER BY p.premio_annuo DESC, p.numero_polizza ASC LIMIT 20;"
+}

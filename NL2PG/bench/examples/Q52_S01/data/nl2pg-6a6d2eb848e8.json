@@ -1,0 +1,165 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "offset_fetch"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_assicurativi",
+        "description": "La tabella polizze viene denominata contratti_assicurativi nella documentazione aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "premio_annuo",
+        "obsolete_value": "costo_copertura",
+        "description": "Il campo premio_annuo viene riferito come costo_copertura nei report interni."
+      }
+    ],
+    "spec_hash": "6616b5f7ecd67f24"
+  },
+  "schema_ddl": "CREATE TABLE contratti_assicurativi (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente TEXT NOT NULL,\n    premio_annuo NUMERIC(12,2) NOT NULL CHECK (premio_annuo > 0),\n    data_sottoscrizione DATE NOT NULL,\n    data_scadenza DATE NOT NULL CHECK (data_scadenza > data_sottoscrizione),\n    stato TEXT NOT NULL DEFAULT 'attivo' CHECK (stato IN ('attivo', 'sospeso', 'scaduto', 'annullato')),\n    tipo_copertura TEXT NOT NULL CHECK (tipo_copertura IN ('auto', 'casa', 'salute', 'vita', 'responsabilità civile'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "contratti_assicurativi",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_polizza": "POL-2026-AA001",
+            "cliente": "Mario Rossi",
+            "premio_annuo": 450.0,
+            "data_sottoscrizione": "2026-01-15",
+            "data_scadenza": "2027-01-15",
+            "stato": "attivo",
+            "tipo_copertura": "auto"
+          },
+          {
+            "id": 2,
+            "numero_polizza": "POL-2026-AA002",
+            "cliente": "Laura Bianchi",
+            "premio_annuo": 320.5,
+            "data_sottoscrizione": "2026-02-20",
+            "data_scadenza": "2027-02-20",
+            "stato": "attivo",
+            "tipo_copertura": "casa"
+          },
+          {
+            "id": 3,
+            "numero_polizza": "POL-2026-AA003",
+            "cliente": "Giulia Verdi",
+            "premio_annuo": 280.0,
+            "data_sottoscrizione": "2025-11-10",
+            "data_scadenza": "2026-11-10",
+            "stato": "scaduto",
+            "tipo_copertura": "salute"
+          },
+          {
+            "id": 4,
+            "numero_polizza": "POL-2026-AA004",
+            "cliente": "Paolo Neri",
+            "premio_annuo": 600.0,
+            "data_sottoscrizione": "2026-03-01",
+            "data_scadenza": "2027-03-01",
+            "stato": "sospeso",
+            "tipo_copertura": "vita"
+          },
+          {
+            "id": 5,
+            "numero_polizza": "POL-2026-AA005",
+            "cliente": "Anna Gialli",
+            "premio_annuo": 220.75,
+            "data_sottoscrizione": "2026-01-05",
+            "data_scadenza": "2027-01-05",
+            "stato": "attivo",
+            "tipo_copertura": "responsabilità civile"
+          }
+        ],
+        "variations": {
+          "cliente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Paolo Neri",
+              "Anna Gialli",
+              "Luca Blu",
+              "Sofia Rosa",
+              "Marco Verde"
+            ]
+          },
+          "premio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.5,
+            "pool": []
+          },
+          "data_sottoscrizione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": 365.0,
+            "delta_max": 365.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "attivo",
+              "attivo",
+              "sospeso",
+              "scaduto",
+              "annullato"
+            ]
+          },
+          "tipo_copertura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "auto",
+              "casa",
+              "salute",
+              "vita",
+              "responsabilità civile"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "left_outer_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "044660bb0326bac2"
+  },
+  "schema_ddl": "CREATE TABLE persone (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_nascita DATE NOT NULL\n);\n\nCREATE TABLE studenti (\n    id INT PRIMARY KEY REFERENCES persone(id),\n    matricola TEXT NOT NULL UNIQUE,\n    corso_di_laurea TEXT NOT NULL,\n    anno_corso INT NOT NULL CHECK (anno_corso BETWEEN 1 AND 6),\n    data_immatricolazione DATE NOT NULL,\n    CHECK (data_immatricolazione >= '1950-01-01')\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "persone",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRC02T15H501X",
+            "email": "marco.rossi@example.it",
+            "data_nascita": "2002-07-15"
+          },
+          {
+            "id": 2,
+            "nome": "Giulia",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCGLI03D45H501Y",
+            "email": "giulia.bianchi@example.it",
+            "data_nascita": "2003-04-22"
+          },
+          {
+            "id": 3,
+            "nome": "Luca",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDLCU01A10H501Z",
+            "email": "luca.verdi@example.it",
+            "data_nascita": "2001-06-30"
+          },
+          {
+            "id": 4,
+            "nome": "Sara",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRSRA04C62H501W",
+            "email": "sara.ferrari@example.it",
+            "data_nascita": "2004-01-25"
+          },
+          {
+            "id": 5,
+            "nome": "Andrea",
+            "cognome": "Russo",
+            "codice_fiscale": "RSSNDR02P08H501V",
+            "email": "andrea.russo@example.it",
+            "data_nascita": "2002-09-12"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Giulia",
+              "Luca",
+              "Sara",
+              "Andrea",
+              "Chiara",
+              "Matteo",
+              "Francesca",
+              "Davide",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -600.0,
+            "delta_max": 600.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "studenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.8,
+        "templates": [
+          {
+            "id": 101,
+            "matricola": "VR123456",
+            "corso_di_laurea": "Ingegneria Informatica",
+            "anno_corso": 2,
+            "data_immatricolazione": "2022-09-19"
+          },
+          {
+            "id": 102,
+            "matricola": "VR234567",
+            "corso_di_laurea": "Medicina e Chirurgia",
+            "anno_corso": 3,
+            "data_immatricolazione": "2021-09-20"
+          },
+          {
+            "id": 103,
+            "matricola": "VR345678",
+            "corso_di_laurea": "Economia Aziendale",
+            "anno_corso": 1,
+            "data_immatricolazione": "2024-09-23"
+          },
+          {
+            "id": 104,
+            "matricola": "VR456789",
+            "corso_di_laurea": "Giurisprudenza",
+            "anno_corso": 5,
+            "data_immatricolazione": "2020-09-21"
+          },
+          {
+            "id": 105,
+            "matricola": "VR567890",
+            "corso_di_laurea": "Lettere Moderne",
+            "anno_corso": 4,
+            "data_immatricolazione": "2021-09-27"
+          }
+        ],
+        "variations": {
+          "corso_di_laurea": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ingegneria Informatica",
+              "Medicina e Chirurgia",
+              "Economia Aziendale",
+              "Giurisprudenza",
+              "Lettere Moderne",
+              "Fisica",
+              "Psicologia",
+              "Architettura"
+            ]
+          },
+          "anno_corso": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          },
+          "data_immatricolazione": {
+            "axis": "shift",
+            "delta_min": -250.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

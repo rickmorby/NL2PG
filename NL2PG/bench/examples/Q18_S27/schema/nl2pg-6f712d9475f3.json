@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 4,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "lateral"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fatture",
+        "obsolete_value": "documenti_di_vendita_emessi",
+        "description": "La tabella fisica 'fatture' (con colonne id, cliente_id, data_fattura, importo_totale) viene denominata 'documenti_di_vendita_emessi' nella prosa aziendale. Le relazioni implicite si deducono dalla colonna cliente_id compatibile con clienti.id, senza vincolo REFERENCES dichiarato."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore_complessivo_dovuto",
+        "description": "La colonna 'importo_totale' della tabella fatture è indicata nella prosa aziendale come 'valore_complessivo_dovuto'. Il solver deve riconoscere il sinonimo per aggregare correttamente gli importi nelle subquery LATERAL."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "pagamenti",
+        "obsolete_value": "prima_nota_incassi",
+        "description": "La tabella fisica 'pagamenti' (con colonne id, fattura_id, data_pagamento, importo) è riferita con il gergo contabile 'prima_nota_incassi'. La correlazione con le fatture avviene tramite la colonna fattura_id compatibile con fatture.id, senza chiave esterna dichiarata."
+      }
+    ],
+    "spec_hash": "6c4af032c0331563"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    denominazione TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    partita_iva TEXT UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT\n);\n\nCREATE TABLE fatture (\n    id INT PRIMARY KEY,\n    numero_fattura TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL,\n    data_fattura DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_fattura TEXT NOT NULL DEFAULT 'emessa' CHECK (stato_fattura IN ('emessa', 'pagata', 'parzialmente_pagata', 'annullata'))\n);\n\nCREATE TABLE pagamenti (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL,\n    data_pagamento DATE NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    metodo_pagamento TEXT NOT NULL DEFAULT 'bonifico'\n);\n\nCREATE TABLE rate (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL,\n    numero_rata INT NOT NULL,\n    data_scadenza DATE NOT NULL,\n    importo_rata NUMERIC(12,2) NOT NULL CHECK (importo_rata >= 0),\n    rata_saldata BOOLEAN NOT NULL DEFAULT FALSE\n);"
+}

@@ -1,0 +1,411 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 4,
+    "hierarchy": "flat",
+    "sql_features": [],
+    "twist": [
+      "rephrase",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "synonym",
+        "target_value": "pazienti",
+        "obsolete_value": "assistiti",
+        "description": "La tabella pazienti viene denominata nella prosa aziendale con il sinonimo assistiti, costringendo il risolutore a mappare il termine usato nel testo al nome reale della tabella."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "stato_ricovero",
+        "obsolete_value": "condizione clinica corrente del degente",
+        "description": "La colonna stato_ricovero viene descritta nella prosa aziendale con la perifrasi condizione clinica corrente del degente; i vincoli di dominio impliciti sulla query (es. filtrare solo ricoveri attivi o dimessi) devono essere applicati su questa colonna riconoscendola attraverso la perifrasi."
+      }
+    ],
+    "spec_hash": "84c78ab0108885d8"
+  },
+  "schema_ddl": "CREATE DOMAIN stato_ricovero_dom AS TEXT CHECK (VALUE IN ('attivo', 'dimesso', 'trasferito'));\n\nCREATE DOMAIN codice_fiscale_dom AS TEXT CHECK (char_length(VALUE) = 16);\n\nCREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale codice_fiscale_dom NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    numero_iscrizione_albo TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano INT CHECK (piano >= 0),\n    posti_letto INT NOT NULL CHECK (posti_letto > 0)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    data_ingresso DATE NOT NULL,\n    data_dimissione DATE,\n    stato_ricovero stato_ricovero_dom NOT NULL DEFAULT 'attivo',\n    diagnosi TEXT,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ingresso)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "pazienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA85M01H501Z",
+            "data_nascita": "1985-08-01",
+            "telefono": "0612345678"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA90T42F205X",
+            "data_nascita": "1990-12-02",
+            "telefono": "0234567890"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI78C15L219Y",
+            "data_nascita": "1978-03-15",
+            "telefono": "0119876543"
+          },
+          {
+            "id": 4,
+            "nome": "Antonio",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPSNTN70A20F839W",
+            "data_nascita": "1970-01-20",
+            "telefono": "0811122334"
+          },
+          {
+            "id": 5,
+            "nome": "Chiara",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRCHR95D60D969Q",
+            "data_nascita": "1995-04-20",
+            "telefono": "0554433221"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Antonio",
+              "Chiara",
+              "Francesco",
+              "Alessandra",
+              "Roberto",
+              "Simona",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Esposito",
+              "Ferrari",
+              "Romano",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -1825.0,
+            "delta_max": 1825.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0612345678",
+              "0234567890",
+              "0119876543",
+              "0811122334",
+              "0554433221",
+              "3201234567",
+              "3339876543",
+              "3471122334"
+            ]
+          }
+        }
+      },
+      {
+        "table": "medici",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Paolo",
+            "cognome": "Neri",
+            "specializzazione": "Cardiologia",
+            "numero_iscrizione_albo": "MN001"
+          },
+          {
+            "id": 2,
+            "nome": "Sara",
+            "cognome": "Conti",
+            "specializzazione": "Neurologia",
+            "numero_iscrizione_albo": "CT002"
+          },
+          {
+            "id": 3,
+            "nome": "Luca",
+            "cognome": "Moretti",
+            "specializzazione": "Ortopedia",
+            "numero_iscrizione_albo": "MT003"
+          },
+          {
+            "id": 4,
+            "nome": "Elena",
+            "cognome": "Gallo",
+            "specializzazione": "Medicina Interna",
+            "numero_iscrizione_albo": "GL004"
+          },
+          {
+            "id": 5,
+            "nome": "Marco",
+            "cognome": "Ricci",
+            "specializzazione": "Pediatria",
+            "numero_iscrizione_albo": "RC005"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Paolo",
+              "Sara",
+              "Luca",
+              "Elena",
+              "Marco",
+              "Anna",
+              "Fabio",
+              "Silvia"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Neri",
+              "Conti",
+              "Moretti",
+              "Gallo",
+              "Ricci",
+              "Fontana",
+              "Serra",
+              "Longo"
+            ]
+          },
+          "specializzazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Cardiologia",
+              "Neurologia",
+              "Ortopedia",
+              "Medicina Interna",
+              "Pediatria",
+              "Chirurgia Generale",
+              "Oncologia",
+              "Psichiatria"
+            ]
+          }
+        }
+      },
+      {
+        "table": "reparti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_reparto": "Cardiologia",
+            "piano": 2,
+            "posti_letto": 30
+          },
+          {
+            "id": 2,
+            "nome_reparto": "Neurologia",
+            "piano": 3,
+            "posti_letto": 25
+          },
+          {
+            "id": 3,
+            "nome_reparto": "Ortopedia",
+            "piano": 1,
+            "posti_letto": 40
+          },
+          {
+            "id": 4,
+            "nome_reparto": "Medicina Interna",
+            "piano": 2,
+            "posti_letto": 35
+          },
+          {
+            "id": 5,
+            "nome_reparto": "Pediatria",
+            "piano": 0,
+            "posti_letto": 20
+          },
+          {
+            "id": 6,
+            "nome_reparto": "Chirurgia Generale",
+            "piano": 4,
+            "posti_letto": 28
+          },
+          {
+            "id": 7,
+            "nome_reparto": "Pronto Soccorso",
+            "piano": 0,
+            "posti_letto": 15
+          },
+          {
+            "id": 8,
+            "nome_reparto": "Oncologia",
+            "piano": 3,
+            "posti_letto": 22
+          }
+        ],
+        "variations": {
+          "piano": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          "posti_letto": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ricoveri",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "paziente_id": 1,
+            "medico_id": 1,
+            "reparto_id": 1,
+            "data_ingresso": "2026-01-10",
+            "data_dimissione": "2026-01-18",
+            "stato_ricovero": "dimesso",
+            "diagnosi": "Infarto miocardico acuto"
+          },
+          {
+            "id": 2,
+            "paziente_id": 2,
+            "medico_id": 2,
+            "reparto_id": 2,
+            "data_ingresso": "2026-02-05",
+            "data_dimissione": null,
+            "stato_ricovero": "attivo",
+            "diagnosi": "Emicrania cronica"
+          },
+          {
+            "id": 3,
+            "paziente_id": 3,
+            "medico_id": 3,
+            "reparto_id": 3,
+            "data_ingresso": "2026-01-20",
+            "data_dimissione": "2026-02-02",
+            "stato_ricovero": "dimesso",
+            "diagnosi": "Frattura femore"
+          },
+          {
+            "id": 4,
+            "paziente_id": 4,
+            "medico_id": 4,
+            "reparto_id": 4,
+            "data_ingresso": "2026-03-01",
+            "data_dimissione": null,
+            "stato_ricovero": "attivo",
+            "diagnosi": "Polmonite"
+          },
+          {
+            "id": 5,
+            "paziente_id": 5,
+            "medico_id": 5,
+            "reparto_id": 5,
+            "data_ingresso": "2026-02-15",
+            "data_dimissione": "2026-02-20",
+            "stato_ricovero": "trasferito",
+            "diagnosi": "Bronchiolite"
+          },
+          {
+            "id": 6,
+            "paziente_id": 1,
+            "medico_id": 2,
+            "reparto_id": 6,
+            "data_ingresso": "2026-03-10",
+            "data_dimissione": null,
+            "stato_ricovero": "attivo",
+            "diagnosi": "Appendicite acuta"
+          }
+        ],
+        "variations": {
+          "data_ingresso": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_dimissione": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 15.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

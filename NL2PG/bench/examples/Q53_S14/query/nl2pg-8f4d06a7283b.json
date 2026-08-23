@@ -1,0 +1,770 @@
+{
+  "schema_ddl": "CREATE DOMAIN mmhg AS INT CHECK (VALUE BETWEEN 50 AND 260);\n\nCREATE DOMAIN temperatura_corporea AS NUMERIC(4,1) CHECK (VALUE BETWEEN 30.0 AND 45.0);\n\nCREATE DOMAIN battito_cardiaco AS INT CHECK (VALUE BETWEEN 20 AND 250);\n\nCREATE DOMAIN stato_ricovero AS TEXT CHECK (VALUE IN ('in_corso', 'dimesso', 'trasferito', 'deceduto'));\n\nCREATE TABLE reparti (\n    id SERIAL PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano_edificio INT CHECK (piano_edificio >= 0),\n    posti_letto_totali INT NOT NULL CHECK (posti_letto_totali > 0)\n);\n\nCREATE TABLE medici (\n    id SERIAL PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_iscrizione_albo TEXT NOT NULL UNIQUE,\n    specializzazione TEXT\n);\n\nCREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    sesso CHAR(1) CHECK (sesso IN ('M', 'F')),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE ricoveri (\n    id SERIAL PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    data_ricovero DATE NOT NULL,\n    data_dimissione DATE,\n    stato_ricovero stato_ricovero NOT NULL DEFAULT 'in_corso',\n    motivo_ricovero TEXT,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ricovero)\n);\n\nCREATE TABLE rilevazioni_vitali (\n    id BIGSERIAL PRIMARY KEY,\n    ricovero_id INT NOT NULL REFERENCES ricoveri(id),\n    momento_rilevazione TIMESTAMP NOT NULL,\n    pressione_sistolica_mmhg mmhg NOT NULL,\n    pressione_diastolica_mmhg mmhg NOT NULL,\n    frequenza_cardiaca_bpm battito_cardiaco,\n    temperatura_corporea_celsius temperatura_corporea,\n    saturazione_ossigeno_pct INT CHECK (saturazione_ossigeno_pct BETWEEN 50 AND 100),\n    note_cliniche TEXT,\n    CHECK (pressione_diastolica_mmhg < pressione_sistolica_mmhg)\n);",
+  "data_profile": {
+    "profile": {
+      "reparti": {
+        "row_count": 49,
+        "columns": {
+          "id": {
+            "distinct": 49,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 49
+          },
+          "nome_reparto": {
+            "distinct": 49,
+            "sample": [
+              "Cardiologia",
+              "Cardiologia1",
+              "Cardiologia2",
+              "Cardiologia3",
+              "Cardiologia4"
+            ]
+          },
+          "piano_edificio": {
+            "distinct": 6,
+            "sample": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 0,
+            "max": 1
+          },
+          "posti_letto_totali": {
+            "distinct": 11,
+            "sample": [
+              "10",
+              "12",
+              "15",
+              "18",
+              "20"
+            ],
+            "min": 18,
+            "max": 30
+          }
+        }
+      },
+      "medici": {
+        "row_count": 246,
+        "columns": {
+          "id": {
+            "distinct": 246,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 246
+          },
+          "reparto_id": {
+            "distinct": 49,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 49
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Anna",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Barbieri",
+              "Bianchi",
+              "Costa",
+              "De Luca",
+              "Fontana"
+            ]
+          },
+          "numero_iscrizione_albo": {
+            "distinct": 246,
+            "sample": [
+              "BO005678",
+              "BO0056781",
+              "BO00567810",
+              "BO00567811",
+              "BO00567812"
+            ]
+          },
+          "specializzazione": {
+            "distinct": 10,
+            "sample": [
+              "Anestesia e rianimazione",
+              "Cardiologia",
+              "Chirurgia addominale",
+              "Chirurgia generale",
+              "Medicina interna"
+            ]
+          }
+        }
+      },
+      "pazienti": {
+        "row_count": 277,
+        "columns": {
+          "id": {
+            "distinct": 277,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 277
+          },
+          "codice_fiscale": {
+            "distinct": 277,
+            "sample": [
+              "BNCLGU90C45F205B",
+              "BNCLGU90C45F205C",
+              "BNCLGU90C45F205D",
+              "BNCLGU90C45F205E",
+              "BNCLGU90C45F205F"
+            ]
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Antonio",
+              "Carla",
+              "Franco",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Costa",
+              "Esposito",
+              "Fontana"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 269,
+            "sample": [
+              "1945-12-23",
+              "1946-02-06",
+              "1947-07-12",
+              "1947-07-22",
+              "1948-02-21"
+            ]
+          },
+          "sesso": {
+            "distinct": 2,
+            "sample": [
+              "F",
+              "M"
+            ]
+          },
+          "creato_il": {
+            "distinct": 189,
+            "sample": [
+              "2024-12-22 09:15:00",
+              "2024-12-23 09:15:00",
+              "2024-12-24 14:30:00",
+              "2024-12-25 14:30:00",
+              "2024-12-26 09:15:00"
+            ]
+          }
+        }
+      },
+      "ricoveri": {
+        "row_count": 2780,
+        "columns": {
+          "id": {
+            "distinct": 2780,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2780
+          },
+          "paziente_id": {
+            "distinct": 277,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 277
+          },
+          "medico_id": {
+            "distinct": 246,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 246
+          },
+          "reparto_id": {
+            "distinct": 49,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 49
+          },
+          "data_ricovero": {
+            "distinct": 107,
+            "sample": [
+              "2025-05-04",
+              "2025-05-05",
+              "2025-05-06",
+              "2025-05-07",
+              "2025-05-08"
+            ]
+          },
+          "data_dimissione": {
+            "distinct": 96,
+            "sample": [
+              "2025-06-10",
+              "2025-06-11",
+              "2025-06-12",
+              "2025-06-13",
+              "2025-06-14"
+            ]
+          },
+          "stato_ricovero": {
+            "distinct": 4,
+            "sample": [
+              "deceduto",
+              "dimesso",
+              "in_corso",
+              "trasferito"
+            ]
+          },
+          "motivo_ricovero": {
+            "distinct": 12,
+            "sample": [
+              "Appendicite acuta",
+              "Bronchiolite",
+              "Emorragia digestiva",
+              "Frattura collo del femore",
+              "Frattura femore"
+            ]
+          }
+        }
+      },
+      "rilevazioni_vitali": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "ricovero_id": {
+            "distinct": 1859,
+            "sample": [
+              "10",
+              "100",
+              "1000",
+              "1001",
+              "1003"
+            ],
+            "min": 2,
+            "max": 2780
+          },
+          "momento_rilevazione": {
+            "distinct": 56,
+            "sample": [
+              "2025-06-02 08:00:00",
+              "2025-06-03 08:00:00",
+              "2025-06-04 08:00:00",
+              "2025-06-05 08:00:00",
+              "2025-06-06 08:00:00"
+            ]
+          },
+          "pressione_sistolica_mmhg": {
+            "distinct": 2880,
+            "sample": [
+              "100.0",
+              "100.00505982012484",
+              "100.2016320242135",
+              "100.23541383883979",
+              "100.28783035212118"
+            ],
+            "min": 100.0,
+            "max": 170.0
+          },
+          "pressione_diastolica_mmhg": {
+            "distinct": 2878,
+            "sample": [
+              "100.0",
+              "63.0",
+              "63.02934940918638",
+              "63.08152092185619",
+              "63.11397191043395"
+            ],
+            "min": 63.0,
+            "max": 100.0
+          },
+          "frequenza_cardiaca_bpm": {
+            "distinct": 2274,
+            "sample": [
+              "100.0",
+              "100.02",
+              "100.03",
+              "100.09",
+              "100.11"
+            ],
+            "min": 46.4,
+            "max": 143.0
+          },
+          "temperatura_corporea_celsius": {
+            "distinct": 558,
+            "sample": [
+              "34.75",
+              "34.76",
+              "34.77",
+              "34.78",
+              "34.79"
+            ],
+            "min": 34.75,
+            "max": 40.66
+          },
+          "saturazione_ossigeno_pct": {
+            "distinct": 9,
+            "sample": [
+              "89",
+              "91",
+              "93",
+              "94",
+              "95"
+            ],
+            "min": 91,
+            "max": 99
+          },
+          "note_cliniche": {
+            "distinct": 9,
+            "sample": [
+              "Bradicardia lieve",
+              "Buona risposta alla terapia",
+              "Da rivalutare nelle prossime ore",
+              "Ipertensione in trattamento",
+              "Lievemente febbricolare"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "reparti": [
+        {
+          "id": 1,
+          "nome_reparto": "Cardiologia",
+          "piano_edificio": "1",
+          "posti_letto_totali": "32"
+        },
+        {
+          "id": 2,
+          "nome_reparto": "Cardiologia1",
+          "piano_edificio": "4",
+          "posti_letto_totali": "22"
+        },
+        {
+          "id": 3,
+          "nome_reparto": "Cardiologia2",
+          "piano_edificio": "3",
+          "posti_letto_totali": "28"
+        },
+        {
+          "id": 4,
+          "nome_reparto": "Cardiologia3",
+          "piano_edificio": "2",
+          "posti_letto_totali": "35"
+        },
+        {
+          "id": 5,
+          "nome_reparto": "Cardiologia4",
+          "piano_edificio": "3",
+          "posti_letto_totali": "15"
+        },
+        {
+          "id": 6,
+          "nome_reparto": "Cardiologia5",
+          "piano_edificio": "0",
+          "posti_letto_totali": "20"
+        },
+        {
+          "id": 7,
+          "nome_reparto": "Cardiologia6",
+          "piano_edificio": "4",
+          "posti_letto_totali": "30"
+        },
+        {
+          "id": 8,
+          "nome_reparto": "Chirurgia Generale",
+          "piano_edificio": "0",
+          "posti_letto_totali": "25"
+        }
+      ],
+      "medici": [
+        {
+          "id": 1,
+          "reparto_id": 28,
+          "nome": "Luca",
+          "cognome": "Fontana",
+          "numero_iscrizione_albo": "RM001234",
+          "specializzazione": "Pediatria"
+        },
+        {
+          "id": 2,
+          "reparto_id": 26,
+          "nome": "Martina",
+          "cognome": "Barbieri",
+          "numero_iscrizione_albo": "RM0012341",
+          "specializzazione": "Cardiologia"
+        },
+        {
+          "id": 3,
+          "reparto_id": 38,
+          "nome": "Luca",
+          "cognome": "Fontana",
+          "numero_iscrizione_albo": "RM0012342",
+          "specializzazione": "Anestesia e rianimazione"
+        },
+        {
+          "id": 4,
+          "reparto_id": 12,
+          "nome": "Martina",
+          "cognome": "Villa",
+          "numero_iscrizione_albo": "RM0012343",
+          "specializzazione": "Anestesia e rianimazione"
+        },
+        {
+          "id": 5,
+          "reparto_id": 43,
+          "nome": "Luca",
+          "cognome": "Marino",
+          "numero_iscrizione_albo": "RM0012344",
+          "specializzazione": "Ortopedia"
+        },
+        {
+          "id": 6,
+          "reparto_id": 32,
+          "nome": "Anna",
+          "cognome": "Gallo",
+          "numero_iscrizione_albo": "RM0012345",
+          "specializzazione": "Cardiologia"
+        },
+        {
+          "id": 7,
+          "reparto_id": 31,
+          "nome": "Luca",
+          "cognome": "Costa",
+          "numero_iscrizione_albo": "RM0012346",
+          "specializzazione": "Oncologia medica"
+        },
+        {
+          "id": 8,
+          "reparto_id": 3,
+          "nome": "Valentina",
+          "cognome": "Villa",
+          "numero_iscrizione_albo": "RM0012347",
+          "specializzazione": "Oncologia medica"
+        }
+      ],
+      "pazienti": [
+        {
+          "id": 1,
+          "codice_fiscale": "RSSMRA85M01H501X",
+          "nome": "Giulia",
+          "cognome": "Esposito",
+          "data_nascita": "1988-09-15",
+          "sesso": "M",
+          "creato_il": "2025-01-25 09:15:00"
+        },
+        {
+          "id": 2,
+          "codice_fiscale": "RSSMRA85M01H501B",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "1981-08-03",
+          "sesso": "F",
+          "creato_il": "2025-01-30 09:15:00"
+        },
+        {
+          "id": 3,
+          "codice_fiscale": "RSSMRA85M01H501C",
+          "nome": "Nicola",
+          "cognome": "Esposito",
+          "data_nascita": "1981-01-06",
+          "sesso": "M",
+          "creato_il": "2025-01-27 09:15:00"
+        },
+        {
+          "id": 4,
+          "codice_fiscale": "RSSMRA85M01H501D",
+          "nome": "Antonio",
+          "cognome": "Lombardi",
+          "data_nascita": "1975-02-10",
+          "sesso": "F",
+          "creato_il": "2025-01-24 09:15:00"
+        },
+        {
+          "id": 5,
+          "codice_fiscale": "RSSMRA85M01H501E",
+          "nome": "Laura",
+          "cognome": "Esposito",
+          "data_nascita": "1979-07-29",
+          "sesso": "F",
+          "creato_il": "2025-01-26 09:15:00"
+        },
+        {
+          "id": 6,
+          "codice_fiscale": "RSSMRA85M01H501F",
+          "nome": "Carla",
+          "cognome": "Lombardi",
+          "data_nascita": "1975-05-28",
+          "sesso": "F",
+          "creato_il": "2024-12-22 09:15:00"
+        },
+        {
+          "id": 7,
+          "codice_fiscale": "RSSMRA85M01H501G",
+          "nome": "Franco",
+          "cognome": "Costa",
+          "data_nascita": "1978-07-02",
+          "sesso": "M",
+          "creato_il": "2024-12-23 09:15:00"
+        },
+        {
+          "id": 8,
+          "codice_fiscale": "RSSMRA85M01H501H",
+          "nome": "Nicola",
+          "cognome": "Esposito",
+          "data_nascita": "1976-03-06",
+          "sesso": "F",
+          "creato_il": "2024-12-23 09:15:00"
+        }
+      ],
+      "ricoveri": [
+        {
+          "id": 1,
+          "paziente_id": 246,
+          "medico_id": 57,
+          "reparto_id": 37,
+          "data_ricovero": "2025-05-04",
+          "data_dimissione": "2025-06-24",
+          "stato_ricovero": "in_corso",
+          "motivo_ricovero": "Frattura femore"
+        },
+        {
+          "id": 2,
+          "paziente_id": 124,
+          "medico_id": 234,
+          "reparto_id": 29,
+          "data_ricovero": "2025-05-25",
+          "data_dimissione": "2025-07-09",
+          "stato_ricovero": "dimesso",
+          "motivo_ricovero": "Scompenso diabetico"
+        },
+        {
+          "id": 3,
+          "paziente_id": 40,
+          "medico_id": 37,
+          "reparto_id": 34,
+          "data_ricovero": "2025-05-27",
+          "data_dimissione": "2025-06-30",
+          "stato_ricovero": "dimesso",
+          "motivo_ricovero": "Insufficienza cardiaca"
+        },
+        {
+          "id": 4,
+          "paziente_id": 34,
+          "medico_id": 141,
+          "reparto_id": 21,
+          "data_ricovero": "2025-05-06",
+          "data_dimissione": "2025-06-22",
+          "stato_ricovero": "in_corso",
+          "motivo_ricovero": "Sepsis"
+        },
+        {
+          "id": 5,
+          "paziente_id": 71,
+          "medico_id": 45,
+          "reparto_id": 30,
+          "data_ricovero": "2025-05-17",
+          "data_dimissione": "2025-06-25",
+          "stato_ricovero": "dimesso",
+          "motivo_ricovero": "Ictus ischemico"
+        },
+        {
+          "id": 6,
+          "paziente_id": 196,
+          "medico_id": 183,
+          "reparto_id": 33,
+          "data_ricovero": "2025-05-08",
+          "data_dimissione": "2025-06-21",
+          "stato_ricovero": "trasferito",
+          "motivo_ricovero": "Ictus ischemico"
+        },
+        {
+          "id": 7,
+          "paziente_id": 77,
+          "medico_id": 129,
+          "reparto_id": 24,
+          "data_ricovero": "2025-05-09",
+          "data_dimissione": "2025-06-19",
+          "stato_ricovero": "deceduto",
+          "motivo_ricovero": "Insufficienza cardiaca"
+        },
+        {
+          "id": 8,
+          "paziente_id": 188,
+          "medico_id": 197,
+          "reparto_id": 28,
+          "data_ricovero": "2025-05-18",
+          "data_dimissione": "2025-06-25",
+          "stato_ricovero": "dimesso",
+          "motivo_ricovero": "Insufficienza cardiaca"
+        }
+      ],
+      "rilevazioni_vitali": [
+        {
+          "id": 1,
+          "ricovero_id": 935,
+          "momento_rilevazione": "2025-06-07 08:00:00",
+          "pressione_sistolica_mmhg": 133.77609155584832,
+          "pressione_diastolica_mmhg": 76.18382087617653,
+          "frequenza_cardiaca_bpm": 72.64,
+          "temperatura_corporea_celsius": 36.83,
+          "saturazione_ossigeno_pct": "94",
+          "note_cliniche": "Parametri nei limiti"
+        },
+        {
+          "id": 2,
+          "ricovero_id": 2599,
+          "momento_rilevazione": "2025-06-07 08:00:00",
+          "pressione_sistolica_mmhg": 117.59162488698138,
+          "pressione_diastolica_mmhg": 73.93582555355188,
+          "frequenza_cardiaca_bpm": 79.35,
+          "temperatura_corporea_celsius": 38.26,
+          "saturazione_ossigeno_pct": "91",
+          "note_cliniche": "Parametri nei limiti"
+        },
+        {
+          "id": 3,
+          "ricovero_id": 1443,
+          "momento_rilevazione": "2025-06-05 08:00:00",
+          "pressione_sistolica_mmhg": 125,
+          "pressione_diastolica_mmhg": 78,
+          "frequenza_cardiaca_bpm": 72,
+          "temperatura_corporea_celsius": 36.8,
+          "saturazione_ossigeno_pct": 98,
+          "note_cliniche": "Paziente stabile"
+        },
+        {
+          "id": 4,
+          "ricovero_id": 1311,
+          "momento_rilevazione": "2025-06-05 08:00:00",
+          "pressione_sistolica_mmhg": 118.19377986493218,
+          "pressione_diastolica_mmhg": 75.08426515695369,
+          "frequenza_cardiaca_bpm": 93.25,
+          "temperatura_corporea_celsius": 37.09,
+          "saturazione_ossigeno_pct": "93",
+          "note_cliniche": "Buona risposta alla terapia"
+        },
+        {
+          "id": 5,
+          "ricovero_id": 28,
+          "momento_rilevazione": "2025-06-07 08:00:00",
+          "pressione_sistolica_mmhg": 121.36502500216555,
+          "pressione_diastolica_mmhg": 76.54831684404004,
+          "frequenza_cardiaca_bpm": 67.59,
+          "temperatura_corporea_celsius": 36.38,
+          "saturazione_ossigeno_pct": "99",
+          "note_cliniche": "Buona risposta alla terapia"
+        },
+        {
+          "id": 6,
+          "ricovero_id": 1776,
+          "momento_rilevazione": "2025-06-05 08:00:00",
+          "pressione_sistolica_mmhg": 115.53565044300143,
+          "pressione_diastolica_mmhg": 75.31639234258287,
+          "frequenza_cardiaca_bpm": 90.39,
+          "temperatura_corporea_celsius": 37.39,
+          "saturazione_ossigeno_pct": "98",
+          "note_cliniche": "Monitoraggio intensivo"
+        },
+        {
+          "id": 7,
+          "ricovero_id": 1185,
+          "momento_rilevazione": "2025-06-07 08:00:00",
+          "pressione_sistolica_mmhg": 117.91354478698699,
+          "pressione_diastolica_mmhg": 80.23987466221365,
+          "frequenza_cardiaca_bpm": 86.48,
+          "temperatura_corporea_celsius": 35.55,
+          "saturazione_ossigeno_pct": "95",
+          "note_cliniche": null
+        },
+        {
+          "id": 8,
+          "ricovero_id": 476,
+          "momento_rilevazione": "2025-06-05 08:00:00",
+          "pressione_sistolica_mmhg": 119.13185925214424,
+          "pressione_diastolica_mmhg": 74.32494706487378,
+          "frequenza_cardiaca_bpm": 72.96,
+          "temperatura_corporea_celsius": 35.64,
+          "saturazione_ossigeno_pct": "94",
+          "note_cliniche": "Da rivalutare nelle prossime ore"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "ordered_set_agg"
+  ],
+  "query": "SELECT r.nome_reparto, ROUND((PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY rv.temperatura_corporea_celsius))::numeric, 2) AS temperatura_mediana_celsius, ROUND((PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY rv.frequenza_cardiaca_bpm))::numeric, 1) AS frequenza_cardiaca_mediana_bpm, COUNT(*) AS numero_rilevazioni FROM reparti r JOIN ricoveri ric ON ric.reparto_id = r.id JOIN rilevazioni_vitali rv ON rv.ricovero_id = ric.id WHERE ric.stato_ricovero = 'in_corso' GROUP BY r.nome_reparto HAVING COUNT(*) >= 3 ORDER BY temperatura_mediana_celsius DESC, numero_rilevazioni DESC;"
+}

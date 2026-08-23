@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "anti_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_di_copertura",
+      "description": "La tabella padre polizze (pk: id_polizza) viene denominata contratti_di_copertura nella prosa aziendale. Il solver deve risalire alla tabella fisica polizze per costruire l'anti-join sulle polizze prive di sinistri."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "sinistri",
+      "obsolete_value": "pratiche_di_liquidazione",
+      "description": "La tabella figlia sinistri (fk: polizza_id con ON DELETE SET NULL verso polizze.id_polizza) viene indicata come pratiche_di_liquidazione. Il solver deve riconoscere il sinonimo per formulare correttamente la condizione WHERE NOT EXISTS (SELECT 1 FROM sinistri WHERE sinistri.polizza_id = polizze.id_polizza), tenendo conto che le FK NULL derivanti da ON DELETE SET NULL non producono corrispondenze."
+    }
+  ],
+  "spec_hash": "9049f80da07c84a9"
+}

@@ -1,0 +1,34 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 10,
+  "hierarchy": "snowflake",
+  "sql_features": [
+    "set_op"
+  ],
+  "twist": [
+    "rename",
+    "distractor",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_assicurativi",
+      "description": "La tabella polizze viene denominata contratti_assicurativi nella documentazione aziendale."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "sinistri",
+      "obsolete_value": "sinistri_archivio",
+      "description": "Esiste una tabella sinistri_archivio irrilevante; la query deve utilizzare la tabella sinistri."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "premio",
+      "obsolete_value": "ricompensa",
+      "description": "La colonna premio indica l'importo assicurativo, ma può essere confusa con premio inteso come ricompensa."
+    }
+  ],
+  "spec_hash": "c39ef02b933f663e"
+}

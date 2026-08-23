@@ -1,0 +1,4 @@
+{
+  "story": "Nel reparto commerciale, l'archivio denominato vnd custodisce le schede delle transazioni effettuate. Ogni scheda riporta il codice del cliente, l'importo del fatturato e la data in cui la vendita è stata registrata. Durante una verifica operativa, gli addetti hanno estratto le voci relative ai clienti CL001 e CL002, analizzando i dettagli delle operazioni per questi due soggetti. Tra le date esaminate, sono emerse vendite registrate in giorni come il 2025-11-16, il 2025-11-18 e il 2026-02-06, con importi che variavano da 267.0 a 13502.25. In particolare, per il cliente CL004, una delle schede mostrava un fatturato di 4481.43 in data 2025-12-16, mentre per il cliente CL005 si notava un importo di 2336.26 registrato il 2026-02-06.",
+  "question": "Elenca le operazioni di vendita relative ai clienti con codice CL001 oppure CL002, indicando per ciascuna il codice del cliente e l'importo del fatturato."
+}

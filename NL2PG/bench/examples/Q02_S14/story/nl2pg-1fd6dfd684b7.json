@@ -1,0 +1,501 @@
+{
+  "schema_ddl": "CREATE DOMAIN tipo_operazione AS TEXT CHECK (VALUE IN ('versamento', 'prelievo', 'bonifico_entrata', 'bonifico_uscita', 'commissione', 'accredito'));\n\nCREATE DOMAIN importo_non_negativo AS NUMERIC(14,2) CHECK (VALUE >= 0);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    iban TEXT NOT NULL UNIQUE,\n    saldo_disponibile NUMERIC(14,2) NOT NULL CHECK (saldo_disponibile >= 0),\n    data_apertura DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    tipo_operazione tipo_operazione NOT NULL,\n    importo importo_non_negativo NOT NULL,\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    descrizione TEXT\n);\n\nCREATE TABLE prestiti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    importo_capitale importo_non_negativo NOT NULL,\n    tasso_interesse NUMERIC(5,2) NOT NULL CHECK (tasso_interesse >= 0),\n    data_erogazione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza > data_erogazione)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 224,
+        "columns": {
+          "id": {
+            "distinct": 224,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 224
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Anna Neri",
+              "Chiara Ricci",
+              "Davide Moretti",
+              "Elena Fontana",
+              "Francesca Marino"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 224,
+            "sample": [
+              "BNCLRA90C45F205B",
+              "BNCLRA90C45F205C",
+              "BNCLRA90C45F205D",
+              "BNCLRA90C45F205E",
+              "BNCLRA90C45F205F"
+            ]
+          },
+          "created_at": {
+            "distinct": 202,
+            "sample": [
+              "2023-11-21 09:30:00",
+              "2023-12-14 09:30:00",
+              "2023-12-26 09:30:00",
+              "2024-01-09 09:30:00",
+              "2024-01-11 09:30:00"
+            ]
+          }
+        }
+      },
+      "conti": {
+        "row_count": 407,
+        "columns": {
+          "id": {
+            "distinct": 407,
+            "sample": [
+              "100",
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "min": 100,
+            "max": 506
+          },
+          "cliente_id": {
+            "distinct": 191,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "103",
+              "104"
+            ],
+            "min": 1,
+            "max": 224
+          },
+          "iban": {
+            "distinct": 407,
+            "sample": [
+              "IT60X0542811101000000123456",
+              "IT60X05428111010000001234561",
+              "IT60X054281110100000012345610",
+              "IT60X054281110100000012345611",
+              "IT60X054281110100000012345612"
+            ]
+          },
+          "saldo_disponibile": {
+            "distinct": 397,
+            "sample": [
+              "10026.4",
+              "101.37",
+              "1021.09",
+              "1023.2",
+              "10240.48"
+            ],
+            "min": 25.2,
+            "max": 129600.0
+          },
+          "data_apertura": {
+            "distinct": 324,
+            "sample": [
+              "2022-12-16",
+              "2022-12-29",
+              "2023-01-01",
+              "2023-01-02",
+              "2023-01-31"
+            ]
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 2271,
+        "columns": {
+          "id": {
+            "distinct": 2271,
+            "sample": [
+              "10001",
+              "10002",
+              "10003",
+              "10004",
+              "10005"
+            ],
+            "min": 10001,
+            "max": 12271
+          },
+          "conto_id": {
+            "distinct": 407,
+            "sample": [
+              "100",
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "min": 100,
+            "max": 506
+          },
+          "tipo_operazione": {
+            "distinct": 6,
+            "sample": [
+              "accredito",
+              "bonifico_entrata",
+              "bonifico_uscita",
+              "commissione",
+              "prelievo"
+            ]
+          },
+          "importo": {
+            "distinct": 2107,
+            "sample": [
+              "0.62",
+              "0.64",
+              "0.67",
+              "0.68",
+              "0.72"
+            ],
+            "min": 0.62,
+            "max": 8500.0
+          },
+          "data_transazione": {
+            "distinct": 621,
+            "sample": [
+              "2025-11-21 10:15:00",
+              "2025-11-22 10:15:00",
+              "2025-11-23 10:15:00",
+              "2025-11-24 18:40:00",
+              "2025-11-25 10:15:00"
+            ]
+          },
+          "descrizione": {
+            "distinct": 4,
+            "sample": [
+              "Movimento di conto corrente",
+              "Operazione su conto",
+              "Registrazione movimento",
+              "Voce estratto conto"
+            ]
+          }
+        }
+      },
+      "prestiti": {
+        "row_count": 85,
+        "columns": {
+          "id": {
+            "distinct": 85,
+            "sample": [
+              "500",
+              "501",
+              "502",
+              "503",
+              "504"
+            ],
+            "min": 500,
+            "max": 584
+          },
+          "cliente_id": {
+            "distinct": 73,
+            "sample": [
+              "10",
+              "108",
+              "110",
+              "111",
+              "112"
+            ],
+            "min": 2,
+            "max": 224
+          },
+          "importo_capitale": {
+            "distinct": 85,
+            "sample": [
+              "100756.97",
+              "10586.82",
+              "108918.69",
+              "11365.58",
+              "120000.0"
+            ],
+            "min": 4424.37,
+            "max": 217760.04
+          },
+          "tasso_interesse": {
+            "distinct": 82,
+            "sample": [
+              "10.07",
+              "10.29",
+              "10.31",
+              "10.39",
+              "10.67"
+            ],
+            "min": 2.17,
+            "max": 14.24
+          },
+          "data_erogazione": {
+            "distinct": 80,
+            "sample": [
+              "2022-05-24",
+              "2022-06-10",
+              "2022-06-21",
+              "2022-10-22",
+              "2022-10-31"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 81,
+            "sample": [
+              "2027-09-29",
+              "2027-10-05",
+              "2027-10-10",
+              "2027-10-20",
+              "2027-10-30"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Elena Fontana",
+          "codice_fiscale": "RSSMRA85M01H501Z",
+          "created_at": "2024-06-27 09:30:00"
+        },
+        {
+          "id": 2,
+          "nome": "Francesca Marino",
+          "codice_fiscale": "RSSMRA85M01H501B",
+          "created_at": "2024-07-13 09:30:00"
+        },
+        {
+          "id": 3,
+          "nome": "Sara Colombo",
+          "codice_fiscale": "RSSMRA85M01H501C",
+          "created_at": "2023-11-21 09:30:00"
+        },
+        {
+          "id": 4,
+          "nome": "Laura Bianchi",
+          "codice_fiscale": "RSSMRA85M01H501D",
+          "created_at": "2024-06-23 09:30:00"
+        },
+        {
+          "id": 5,
+          "nome": "Luca Ferrari",
+          "codice_fiscale": "RSSMRA85M01H501E",
+          "created_at": "2024-02-10 09:30:00"
+        },
+        {
+          "id": 6,
+          "nome": "Davide Moretti",
+          "codice_fiscale": "RSSMRA85M01H501F",
+          "created_at": "2024-03-31 09:30:00"
+        },
+        {
+          "id": 7,
+          "nome": "Francesca Marino",
+          "codice_fiscale": "RSSMRA85M01H501G",
+          "created_at": "2024-02-06 09:30:00"
+        },
+        {
+          "id": 8,
+          "nome": "Laura Bianchi",
+          "codice_fiscale": "RSSMRA85M01H501H",
+          "created_at": "2024-06-27 09:30:00"
+        }
+      ],
+      "conti": [
+        {
+          "id": 100,
+          "cliente_id": 192,
+          "iban": "IT60X0542811101000000123456",
+          "saldo_disponibile": 8944.98,
+          "data_apertura": "2024-05-19"
+        },
+        {
+          "id": 101,
+          "cliente_id": 103,
+          "iban": "IT60X05428111010000001234561",
+          "saldo_disponibile": 7703.02,
+          "data_apertura": "2024-03-09"
+        },
+        {
+          "id": 102,
+          "cliente_id": 190,
+          "iban": "IT60X05428111010000001234562",
+          "saldo_disponibile": 4431.41,
+          "data_apertura": "2023-12-12"
+        },
+        {
+          "id": 103,
+          "cliente_id": 82,
+          "iban": "IT60X05428111010000001234563",
+          "saldo_disponibile": 3962.11,
+          "data_apertura": "2023-09-24"
+        },
+        {
+          "id": 104,
+          "cliente_id": 143,
+          "iban": "IT60X05428111010000001234564",
+          "saldo_disponibile": 1121.65,
+          "data_apertura": "2024-07-18"
+        },
+        {
+          "id": 105,
+          "cliente_id": 37,
+          "iban": "IT60X05428111010000001234565",
+          "saldo_disponibile": 9179.97,
+          "data_apertura": "2024-08-17"
+        },
+        {
+          "id": 106,
+          "cliente_id": 82,
+          "iban": "IT60X05428111010000001234566",
+          "saldo_disponibile": 6144.83,
+          "data_apertura": "2024-05-05"
+        },
+        {
+          "id": 107,
+          "cliente_id": 73,
+          "iban": "IT60X05428111010000001234567",
+          "saldo_disponibile": 14170.19,
+          "data_apertura": "2024-09-19"
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 10001,
+          "conto_id": 431,
+          "tipo_operazione": "bonifico_uscita",
+          "importo": 487.53,
+          "data_transazione": "2025-12-31 10:15:00",
+          "descrizione": "Operazione su conto"
+        },
+        {
+          "id": 10002,
+          "conto_id": 398,
+          "tipo_operazione": "commissione",
+          "importo": 1335.9,
+          "data_transazione": "2025-11-25 10:15:00",
+          "descrizione": "Registrazione movimento"
+        },
+        {
+          "id": 10003,
+          "conto_id": 333,
+          "tipo_operazione": "accredito",
+          "importo": 1042.16,
+          "data_transazione": "2025-12-15 10:15:00",
+          "descrizione": "Voce estratto conto"
+        },
+        {
+          "id": 10004,
+          "conto_id": 497,
+          "tipo_operazione": "prelievo",
+          "importo": 439.68,
+          "data_transazione": "2026-01-22 10:15:00",
+          "descrizione": "Voce estratto conto"
+        },
+        {
+          "id": 10005,
+          "conto_id": 501,
+          "tipo_operazione": "versamento",
+          "importo": 1123.95,
+          "data_transazione": "2026-02-16 10:15:00",
+          "descrizione": "Voce estratto conto"
+        },
+        {
+          "id": 10006,
+          "conto_id": 334,
+          "tipo_operazione": "prelievo",
+          "importo": 633.75,
+          "data_transazione": "2026-01-29 10:15:00",
+          "descrizione": "Movimento di conto corrente"
+        },
+        {
+          "id": 10007,
+          "conto_id": 489,
+          "tipo_operazione": "prelievo",
+          "importo": 2902.52,
+          "data_transazione": "2025-12-10 10:15:00",
+          "descrizione": "Operazione su conto"
+        },
+        {
+          "id": 10008,
+          "conto_id": 421,
+          "tipo_operazione": "versamento",
+          "importo": 1432.1,
+          "data_transazione": "2026-01-02 10:15:00",
+          "descrizione": "Registrazione movimento"
+        }
+      ],
+      "prestiti": [
+        {
+          "id": 500,
+          "cliente_id": 144,
+          "importo_capitale": 24950.0,
+          "tasso_interesse": 7.51,
+          "data_erogazione": "2024-09-07",
+          "data_scadenza": "2029-10-23"
+        },
+        {
+          "id": 501,
+          "cliente_id": 40,
+          "importo_capitale": 16157.99,
+          "tasso_interesse": 5.74,
+          "data_erogazione": "2024-04-29",
+          "data_scadenza": "2029-09-05"
+        },
+        {
+          "id": 502,
+          "cliente_id": 165,
+          "importo_capitale": 28686.41,
+          "tasso_interesse": 6.78,
+          "data_erogazione": "2024-07-31",
+          "data_scadenza": "2029-09-05"
+        },
+        {
+          "id": 503,
+          "cliente_id": 217,
+          "importo_capitale": 21557.12,
+          "tasso_interesse": 4.86,
+          "data_erogazione": "2024-02-28",
+          "data_scadenza": "2029-06-29"
+        },
+        {
+          "id": 504,
+          "cliente_id": 19,
+          "importo_capitale": 22659.31,
+          "tasso_interesse": 9.06,
+          "data_erogazione": "2024-09-10",
+          "data_scadenza": "2029-01-31"
+        },
+        {
+          "id": 505,
+          "cliente_id": 198,
+          "importo_capitale": 8902.74,
+          "tasso_interesse": 5.83,
+          "data_erogazione": "2024-07-04",
+          "data_scadenza": "2029-03-16"
+        },
+        {
+          "id": 506,
+          "cliente_id": 98,
+          "importo_capitale": 22029.04,
+          "tasso_interesse": 8.69,
+          "data_erogazione": "2024-09-07",
+          "data_scadenza": "2029-04-15"
+        },
+        {
+          "id": 507,
+          "cliente_id": 31,
+          "importo_capitale": 15807.98,
+          "tasso_interesse": 8.53,
+          "data_erogazione": "2024-01-24",
+          "data_scadenza": "2028-12-01"
+        }
+      ]
+    }
+  },
+  "story": "Nella sede direzionale della Banca Meridiana, l'ufficio Controllo di Gestione ha aperto la revisione trimestrale dei principali archivi patrimoniali. Il lavoro parte dall'archivio denominato clienti, dove sono custodite le schede dei 224 correntisti della rete: per ciascun titolare sono annotati il nome, il codice fiscale e la data in cui la relazione è stata formalizzata, con prime aperture risalenti al 2023-11-21 e altre più recenti registrate nel corso del 2024. Ogni scheda cliente è collegata alle proprie posizioni nell'archivio conti, che conta 407 registri di conto: ciascuno riporta l'IBAN, la data di apertura e la liquidita_immediata, ovvero il saldo disponibile, una cifra sempre non negativa che negli estratti va da un minimo di 25.20 euro fino a punte oltre i 129600 euro. Il cuore dell'indagine è però il registro intitolato registrazioni_movimento, denominato transazioni nei documenti più datati, dove confluiscono tutte le operazioni finanziarie: versamenti, prelievi, bonifici_entrata, bonifici in uscita, commissioni e accrediti. Su un patrimonio di 2271 voci annotate tra il 2025-11-21 e i primi mesi del 2026, con descrizioni quali Voce estratto conto oppure Registrazione movimento, gli analisti hanno isolato le operazioni classificate come bonifico_uscita, ossia i bonifici in uscita, con importo compreso tra 100 e 5000 euro. Per questo sottoinsieme è stato predisposto il prospetto richiesto dalla Direzione: il numero delle operazioni ammesse, il totale complessivo degli importi, l'importo medio e l'importo massimo registrato nella finestra considerata. A completamento del quadro, il team ha incrociato i risultati con l'archivio prestiti, che raccoglie 85 pratiche di finanziamento: per ciascuna sono indicati l'importo del capitale erogato, dai 4424.37 euro delle somme minori ai 217760.04 euro delle esposizioni maggiori, il tasso di interesse applicato, oscillante tra il 2.17 e il 14.24 per cento, la data di erogazione, con la prima pratica attiva dal 2022-05-24, e la data di scadenza, che arriva fino al 2029-10-30. L'incrocio tra i bonifici in uscita selezionati e le scadenze dei finanziamenti permetterà alla Direzione di valutare se i deflussi rilevati rientrino nei limiti prudenziali o se meritino un approfondimento dedicato nella prossima campagna di vigilanza interna."
+}

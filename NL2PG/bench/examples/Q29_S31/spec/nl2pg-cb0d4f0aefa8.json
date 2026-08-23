@@ -1,0 +1,27 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 2,
+  "hierarchy": "flat",
+  "sql_features": [
+    "agg_distinct"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "categoria_immobile",
+      "obsolete_value": "tipologia_di_bene",
+      "description": "La colonna categoria_immobile della tabella denormalizzata immobili viene denominata tipologia_di_bene nella prosa aziendale. La query deve raggruppare per categoria_immobile anche se il testo parla di tipologia_di_bene."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "fornitore_manutenzione",
+      "obsolete_value": "impresa appaltatrice dei lavori",
+      "description": "La colonna fornitore_manutenzione della tabella immobili viene indicata nella documentazione aziendale con il gergo 'impresa appaltatrice dei lavori'. Il conteggio DISTINCT deve essere applicato su fornitore_manutenzione riconoscendo la corrispondenza semantica."
+    }
+  ],
+  "spec_hash": "8da90e4d067ff5e0"
+}

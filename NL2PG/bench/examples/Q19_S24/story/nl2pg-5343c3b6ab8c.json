@@ -1,0 +1,298 @@
+{
+  "schema_ddl": "CREATE TABLE agenzie (\n    id_agenzia INT PRIMARY KEY,\n    nome_rete TEXT NOT NULL,\n    citta_sede TEXT NOT NULL,\n    telefono_contatto TEXT,\n    email_ufficio TEXT UNIQUE\n);\n\nCREATE TABLE immobili (\n    id_immobile INT PRIMARY KEY,\n    agenzia_id INT REFERENCES agenzie(id_agenzia) ON DELETE SET NULL ON UPDATE CASCADE,\n    indirizzo TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato_vendita TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_vendita IN ('disponibile', 'riservato', 'venduto'))\n);",
+  "data_profile": {
+    "profile": {
+      "agenzie": {
+        "row_count": 25,
+        "columns": {
+          "id_agenzia": {
+            "distinct": 25,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 25
+          },
+          "nome_rete": {
+            "distinct": 8,
+            "sample": [
+              "Alba Property Group",
+              "Aurora Immobiliare",
+              "Case & Chiavi",
+              "Domus Italia Network",
+              "Habitat Reale"
+            ]
+          },
+          "citta_sede": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "telefono_contatto": {
+            "distinct": 6,
+            "sample": [
+              "+39 011 5567842",
+              "+39 02 77339014",
+              "+39 051 2298760",
+              "+39 055 6612345",
+              "+39 06 48215501"
+            ]
+          },
+          "email_ufficio": {
+            "distinct": 22,
+            "sample": [
+              "contatti1@puntocasasud.it",
+              "contatti2@puntocasasud.it",
+              "contatti3@puntocasasud.it",
+              "contatti@puntocasasud.it",
+              "info1@auroraimmobiliare.it"
+            ]
+          }
+        }
+      },
+      "immobili": {
+        "row_count": 378,
+        "columns": {
+          "id_immobile": {
+            "distinct": 378,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 378
+          },
+          "agenzia_id": {
+            "distinct": 25,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 25
+          },
+          "indirizzo": {
+            "distinct": 11,
+            "sample": [
+              "Corso Buenos Aires 57",
+              "Largo Argentina 3",
+              "Piazza Dante 5",
+              "Strada Provinciale 45 km 12",
+              "Via Garibaldi 24"
+            ]
+          },
+          "comune": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "tipo_immobile": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "negozio",
+              "terreno",
+              "ufficio",
+              "villa"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 352,
+            "sample": [
+              "100.01",
+              "100.76",
+              "101.92",
+              "102.14",
+              "102.26"
+            ],
+            "min": 35.29,
+            "max": 4320.0
+          },
+          "prezzo_richiesto": {
+            "distinct": 374,
+            "sample": [
+              "113313.3",
+              "116837.25",
+              "117359.23",
+              "118645.75",
+              "118800.0"
+            ],
+            "min": 59779.26,
+            "max": 936000.0
+          },
+          "stato_vendita": {
+            "distinct": 3,
+            "sample": [
+              "disponibile",
+              "riservato",
+              "venduto"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "agenzie": [
+        {
+          "id_agenzia": 1,
+          "nome_rete": "Case & Chiavi",
+          "citta_sede": "Milano",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 2,
+          "nome_rete": "Aurora Immobiliare",
+          "citta_sede": "Firenze",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info1@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 3,
+          "nome_rete": "PuntoCasa Sud",
+          "citta_sede": "Milano",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info2@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 4,
+          "nome_rete": "KeyHouse Consulting",
+          "citta_sede": "Torino",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info3@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 5,
+          "nome_rete": "Case & Chiavi",
+          "citta_sede": "Bologna",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info4@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 6,
+          "nome_rete": "Aurora Immobiliare",
+          "citta_sede": "Torino",
+          "telefono_contatto": "+39 02 77339014",
+          "email_ufficio": "ufficio@domusitalia.it"
+        },
+        {
+          "id_agenzia": 7,
+          "nome_rete": "Habitat Reale",
+          "citta_sede": "Torino",
+          "telefono_contatto": "+39 02 77339014",
+          "email_ufficio": "ufficio1@domusitalia.it"
+        },
+        {
+          "id_agenzia": 8,
+          "nome_rete": "KeyHouse Consulting",
+          "citta_sede": "Verona",
+          "telefono_contatto": "+39 02 77339014",
+          "email_ufficio": "ufficio2@domusitalia.it"
+        }
+      ],
+      "immobili": [
+        {
+          "id_immobile": 1,
+          "agenzia_id": 18,
+          "indirizzo": "Via Toledo 130",
+          "comune": "Milano",
+          "tipo_immobile": "appartamento",
+          "superficie_mq": 124.8,
+          "prezzo_richiesto": 276239.16,
+          "stato_vendita": "riservato"
+        },
+        {
+          "id_immobile": 2,
+          "agenzia_id": 2,
+          "indirizzo": "Corso Buenos Aires 57",
+          "comune": "Roma",
+          "tipo_immobile": "villa",
+          "superficie_mq": 73.77,
+          "prezzo_richiesto": 258469.4,
+          "stato_vendita": "disponibile"
+        },
+        {
+          "id_immobile": 3,
+          "agenzia_id": 5,
+          "indirizzo": "Piazza Dante 5",
+          "comune": "Napoli",
+          "tipo_immobile": "villa",
+          "superficie_mq": 58.89,
+          "prezzo_richiesto": 204925.24,
+          "stato_vendita": "disponibile"
+        },
+        {
+          "id_immobile": 4,
+          "agenzia_id": 24,
+          "indirizzo": "Via Mazzini 18",
+          "comune": "Firenze",
+          "tipo_immobile": "negozio",
+          "superficie_mq": 89.4,
+          "prezzo_richiesto": 154346.89,
+          "stato_vendita": "venduto"
+        },
+        {
+          "id_immobile": 5,
+          "agenzia_id": 12,
+          "indirizzo": "Via Toledo 130",
+          "comune": "Verona",
+          "tipo_immobile": "villa",
+          "superficie_mq": 141.38,
+          "prezzo_richiesto": 154843.94,
+          "stato_vendita": "venduto"
+        },
+        {
+          "id_immobile": 6,
+          "agenzia_id": 2,
+          "indirizzo": "Largo Argentina 3",
+          "comune": "Bologna",
+          "tipo_immobile": "villa",
+          "superficie_mq": 150.61,
+          "prezzo_richiesto": 194064.42,
+          "stato_vendita": "venduto"
+        },
+        {
+          "id_immobile": 7,
+          "agenzia_id": 11,
+          "indirizzo": "Via Veneto 27",
+          "comune": "Bari",
+          "tipo_immobile": "negozio",
+          "superficie_mq": 78.17,
+          "prezzo_richiesto": 338320.74,
+          "stato_vendita": "riservato"
+        },
+        {
+          "id_immobile": 8,
+          "agenzia_id": 13,
+          "indirizzo": "Viale Trieste 89",
+          "comune": "Bologna",
+          "tipo_immobile": "villa",
+          "superficie_mq": 137.64,
+          "prezzo_richiesto": 415947.63,
+          "stato_vendita": "venduto"
+        }
+      ]
+    }
+  },
+  "story": "Presso la direzione commerciale del gruppo operano due archivi gestionali che accompagnano ogni attività di mediazione immobiliare. Il primo è l'archivio denominato reti_intermediazione, nel quale sono custodite le schede delle venticinque filiali riunite nelle otto reti del gruppo: per ciascuna voce sono annotati il codice identificativo della filiale, la ragione sociale della rete, la città in cui insiste la sede, il recapito telefonico di contatto e la casella di posta elettronica dell'ufficio, come nel caso di Aurora Immobiliare con sede a Firenze e raggiungibile tramite l'indirizzo info@auroraimmobiliare.it, oppure di Habitat Reale con sede a Torino. Il secondo è il registro intitolato immobili, un repertorio di 378 schede in cui ogni proposta sul mercato è descritta mediante l'indirizzo, il comune di ubicazione, la destinazione d'uso — appartamento, villa, terreno, ufficio oppure negozio —, la superficie espressa in metri quadrati, il valore di listino richiesto e lo stato della trattativa, che può risultare disponibile, riservato o venduto; le superfici spaziano dai 35,29 metri quadrati di un bilocale compatto fino ai 4.320 metri quadrati di un ampio lotto periurbano, mentre i valori di listino oscillano tra 59.779,26 e 936.000 euro. In occasione della revisione trimestrale del portafoglio, il responsabile analisi ha disposto un incrocio integrale fra i due archivi, allo scopo di fotografare insieme le reti sprovviste di proposte attive e gli immobili disponibili che nessuna filiale ha ancora assunto in gestione. Il perimetro comprende le reti che hanno la propria sede a Milano, Torino o Bologna, nonché quelle la cui ragione sociale contiene la parola Immobiliare. Sul versante degli immobili, l'esame riguarda soltanto le unità nello stato disponibile il cui valore di listino cada nella forbice compresa tra 100.000 e 500.000 euro: ne restano dunque esclusi la villa di Piazza Dante 5 a Napoli, offerta a 204.925,24 euro ma già venduta, l'appartamento di Via Toledo 130 a Milano, riservato a 276.239,16 euro, e il negozio di Via Mazzini 18 a Firenze, ceduto a 154.346,89 euro. Per ciascuna rete rientrante nel perimetro, gli operatori hanno contato gli immobili disponibili, calcolato il valore di listino medio, sommato le superfici complessive e attribuito una classificazione dello stato del portafoglio — ad esempio portafoglio ricco, equilibrato oppure da sviluppare — disponendo infine l'elenco in ordine decrescente per numero di immobili disponibili. L'impostazione volutamente esaustiva dell'incrocio garantisce che nessuna rete priva di proposte venga dimenticata e che alcuna scheda di immobile disponibile rimasta priva di aggancio alla rete di provenienza sfugga alla rilevazione, cosicché la direzione possa ridistribuire i mandati in sospeso e riequilibrare la copertura territoriale fra le piazze del Nord e quelle del Sud."
+}

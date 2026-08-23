@@ -1,0 +1,245 @@
+{
+  "schema_ddl": "CREATE TABLE studenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    matricola TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE registri_valutazioni (\n    id SERIAL PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    voto_text TEXT NOT NULL CHECK (voto_text ~ '^[0-9]+$'),\n    punti_formativi TEXT NOT NULL CHECK (punti_formativi ~ '^[0-9]+$'),\n    indicatore_qualitativo_prestazione TEXT GENERATED ALWAYS AS (ROUND(CAST(voto_text AS NUMERIC) * 1.0)::TEXT) STORED,\n    voto_absoluto TEXT GENERATED ALWAYS AS (ABS(CAST(voto_text AS NUMERIC))::TEXT) STORED,\n    voto_quadrato TEXT GENERATED ALWAYS AS (POWER(CAST(voto_text AS NUMERIC), 2)::TEXT) STORED\n);",
+  "data_profile": {
+    "profile": {
+      "studenti": {
+        "row_count": 219,
+        "columns": {
+          "id": {
+            "distinct": 219,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 219
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Elena",
+              "Francesco",
+              "Giovanni"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Bianco",
+              "Blu",
+              "Gialli",
+              "Giallo"
+            ]
+          },
+          "matricola": {
+            "distinct": 219,
+            "sample": [
+              "S100001",
+              "S100001_1",
+              "S100001_10",
+              "S100001_11",
+              "S100001_12"
+            ]
+          }
+        }
+      },
+      "registri_valutazioni": {
+        "row_count": 827,
+        "columns": {
+          "id": {
+            "distinct": 827,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 827
+          },
+          "studente_id": {
+            "distinct": 215,
+            "sample": [
+              "1",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 219
+          },
+          "voto_text": {
+            "distinct": 13,
+            "sample": [
+              "18",
+              "19",
+              "20",
+              "21",
+              "22"
+            ]
+          },
+          "punti_formativi": {
+            "distinct": 8,
+            "sample": [
+              "10",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          },
+          "indicatore_qualitativo_prestazione": {
+            "distinct": 0,
+            "sample": []
+          },
+          "voto_absoluto": {
+            "distinct": 0,
+            "sample": []
+          },
+          "voto_quadrato": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      }
+    },
+    "preview": {
+      "studenti": [
+        {
+          "id": 1,
+          "nome": "Alessandro",
+          "cognome": "Verdi",
+          "matricola": "S100001"
+        },
+        {
+          "id": 2,
+          "nome": "Elena",
+          "cognome": "Rossi",
+          "matricola": "S100001_1"
+        },
+        {
+          "id": 3,
+          "nome": "Marco",
+          "cognome": "Verdi",
+          "matricola": "S100001_2"
+        },
+        {
+          "id": 4,
+          "nome": "Francesco",
+          "cognome": "Bianchi",
+          "matricola": "S100001_3"
+        },
+        {
+          "id": 5,
+          "nome": "Martina",
+          "cognome": "Nero",
+          "matricola": "S100001_4"
+        },
+        {
+          "id": 6,
+          "nome": "Chiara",
+          "cognome": "Nero",
+          "matricola": "S100001_5"
+        },
+        {
+          "id": 7,
+          "nome": "Luca",
+          "cognome": "Bianchi",
+          "matricola": "S100001_6"
+        },
+        {
+          "id": 8,
+          "nome": "Laura",
+          "cognome": "Neri",
+          "matricola": "S100001_7"
+        }
+      ],
+      "registri_valutazioni": [
+        {
+          "id": 1,
+          "studente_id": 24,
+          "voto_text": "18",
+          "punti_formativi": "5",
+          "indicatore_qualitativo_prestazione": null,
+          "voto_absoluto": null,
+          "voto_quadrato": null
+        },
+        {
+          "id": 2,
+          "studente_id": 37,
+          "voto_text": "28",
+          "punti_formativi": "6",
+          "indicatore_qualitativo_prestazione": null,
+          "voto_absoluto": null,
+          "voto_quadrato": null
+        },
+        {
+          "id": 3,
+          "studente_id": 95,
+          "voto_text": "24",
+          "punti_formativi": "7",
+          "indicatore_qualitativo_prestazione": null,
+          "voto_absoluto": null,
+          "voto_quadrato": null
+        },
+        {
+          "id": 4,
+          "studente_id": 68,
+          "voto_text": "28",
+          "punti_formativi": "3",
+          "indicatore_qualitativo_prestazione": null,
+          "voto_absoluto": null,
+          "voto_quadrato": null
+        },
+        {
+          "id": 5,
+          "studente_id": 70,
+          "voto_text": "28",
+          "punti_formativi": "6",
+          "indicatore_qualitativo_prestazione": null,
+          "voto_absoluto": null,
+          "voto_quadrato": null
+        },
+        {
+          "id": 6,
+          "studente_id": 206,
+          "voto_text": "20",
+          "punti_formativi": "10",
+          "indicatore_qualitativo_prestazione": null,
+          "voto_absoluto": null,
+          "voto_quadrato": null
+        },
+        {
+          "id": 7,
+          "studente_id": 85,
+          "voto_text": "24",
+          "punti_formativi": "10",
+          "indicatore_qualitativo_prestazione": null,
+          "voto_absoluto": null,
+          "voto_quadrato": null
+        },
+        {
+          "id": 8,
+          "studente_id": 217,
+          "voto_text": "18",
+          "punti_formativi": "10",
+          "indicatore_qualitativo_prestazione": null,
+          "voto_absoluto": null,
+          "voto_quadrato": null
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "math_funcs"
+  ],
+  "query": "SELECT s.nome, s.cognome, AVG(CAST(rv.voto_text AS DECIMAL)) AS media_voti, ROUND(CAST(AVG(CAST(rv.voto_text AS DECIMAL)) AS DECIMAL), 2) AS media_voti_arrotondata FROM studenti AS s JOIN registri_valutazioni AS rv ON s.id = rv.studente_id GROUP BY s.nome, s.cognome ORDER BY media_voti_arrotondata DESC, s.nome, s.cognome"
+}

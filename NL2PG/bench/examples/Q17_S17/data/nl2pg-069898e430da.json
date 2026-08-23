@@ -1,0 +1,377 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "visite",
+        "obsolete_value": "consulenze_ambulatoriali",
+        "description": "La tabella visite, che registra gli incontri tra pazienti e medici, viene denominata consulenze_ambulatoriali nella prosa aziendale. Le query devono risolvere il nome perifrastico verso la tabella reale visite."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "deleted_at",
+        "obsolete_value": "data_archiviazione_clinica",
+        "description": "La colonna deleted_at, che implementa la cancellazione logica dei record sulla tabella visite, viene indicata nella documentazione aziendale con il gergo data_archiviazione_clinica. Le righe attive sono quelle con deleted_at IS NULL; le query con funzione finestra ROW_NUMBER() OVER (PARTITION BY paziente_id ORDER BY data_visita DESC) devono escludere i record archiviati (deleted_at IS NOT NULL) prima di selezionare l'ultima visita per paziente."
+      }
+    ],
+    "spec_hash": "ec8228ff78a7824f"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    numero_iscrizione_albo TEXT NOT NULL UNIQUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    data_visita DATE NOT NULL,\n    motivo_visita TEXT,\n    esito_visita TEXT,\n    deleted_at TIMESTAMP,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_visita >= DATE '1900-01-01'),\n    CHECK (deleted_at IS NULL OR deleted_at >= created_at)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "pazienti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 300,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRC85M01H501X",
+            "data_nascita": "1985-08-01",
+            "telefono": "+39 333 1234567",
+            "created_at": "2024-01-15 09:00:00"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA90C45F205Y",
+            "data_nascita": "1990-03-05",
+            "telefono": "+39 347 9876543",
+            "created_at": "2024-02-20 10:30:00"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI78T52L219Z",
+            "data_nascita": "1978-12-12",
+            "telefono": "+39 320 4567890",
+            "created_at": "2024-03-05 14:15:00"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTLSN95R18D963W",
+            "data_nascita": "1995-10-18",
+            "telefono": "+39 348 1122334",
+            "created_at": "2024-05-11 11:00:00"
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Moretti",
+            "codice_fiscale": "MRTFNC88S61E507T",
+            "data_nascita": "1988-11-21",
+            "telefono": "+39 339 5566778",
+            "created_at": "2024-06-30 16:45:00"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Sara",
+              "Davide",
+              "Chiara",
+              "Matteo"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Conti",
+              "Moretti",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Bruno",
+              "Gallo"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -5500.0,
+            "delta_max": 5500.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 333 1234567",
+              "+39 347 9876543",
+              "+39 320 4567890",
+              "+39 348 1122334",
+              "+39 339 5566778",
+              "+39 335 8899001"
+            ]
+          },
+          "created_at": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "medici",
+        "nature": "dimension",
+        "min_rows": 30,
+        "max_rows": 60,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Paolo",
+            "cognome": "Ferrari",
+            "specializzazione": "Cardiologia",
+            "numero_iscrizione_albo": "MI001234",
+            "created_at": "2023-01-10 08:00:00"
+          },
+          {
+            "id": 2,
+            "nome": "Elena",
+            "cognome": "Russo",
+            "specializzazione": "Dermatologia",
+            "numero_iscrizione_albo": "MI005678",
+            "created_at": "2023-02-14 09:30:00"
+          },
+          {
+            "id": 3,
+            "nome": "Giovanni",
+            "cognome": "Esposito",
+            "specializzazione": "Ortopedia",
+            "numero_iscrizione_albo": "MI009012",
+            "created_at": "2023-03-20 10:00:00"
+          },
+          {
+            "id": 4,
+            "nome": "Anna",
+            "cognome": "Ricci",
+            "specializzazione": "Medicina generale",
+            "numero_iscrizione_albo": "MI003456",
+            "created_at": "2023-04-25 11:15:00"
+          },
+          {
+            "id": 5,
+            "nome": "Luigi",
+            "cognome": "Greco",
+            "specializzazione": "Oculistica",
+            "numero_iscrizione_albo": "MI007890",
+            "created_at": "2023-05-30 15:00:00"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Paolo",
+              "Elena",
+              "Giovanni",
+              "Anna",
+              "Luigi",
+              "Roberto",
+              "Silvia",
+              "Andrea",
+              "Monica",
+              "Fabio"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Ricci",
+              "Greco",
+              "Lombardi",
+              "Fontana",
+              "Serra",
+              "Costa",
+              "Villa"
+            ]
+          },
+          "specializzazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Cardiologia",
+              "Dermatologia",
+              "Ortopedia",
+              "Medicina generale",
+              "Oculistica",
+              "Pediatria",
+              "Neurologia",
+              "Ginecologia"
+            ]
+          }
+        }
+      },
+      {
+        "table": "visite",
+        "nature": "fact",
+        "min_rows": 600,
+        "max_rows": 1200,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "paziente_id": 1,
+            "medico_id": 1,
+            "data_visita": "2025-03-10",
+            "motivo_visita": "Controllo periodico",
+            "esito_visita": "Normale",
+            "deleted_at": null,
+            "created_at": "2025-03-01 08:30:00"
+          },
+          {
+            "id": 2,
+            "paziente_id": 2,
+            "medico_id": 2,
+            "data_visita": "2025-04-15",
+            "motivo_visita": "Prima visita",
+            "esito_visita": "Prescrizione terapia",
+            "deleted_at": null,
+            "created_at": "2025-04-10 09:00:00"
+          },
+          {
+            "id": 3,
+            "paziente_id": 3,
+            "medico_id": 3,
+            "data_visita": "2025-05-20",
+            "motivo_visita": "Follow-up post intervento",
+            "esito_visita": "Guarigione in corso",
+            "deleted_at": "2025-08-01 10:15:00",
+            "created_at": "2025-05-18 11:45:00"
+          },
+          {
+            "id": 4,
+            "paziente_id": 4,
+            "medico_id": 1,
+            "data_visita": "2025-06-05",
+            "motivo_visita": "Dolore addominale",
+            "esito_visita": "Esami da approfondire",
+            "deleted_at": null,
+            "created_at": "2025-06-05 07:50:00"
+          },
+          {
+            "id": 5,
+            "paziente_id": 5,
+            "medico_id": 4,
+            "data_visita": "2025-07-12",
+            "motivo_visita": "Certificato medico sportivo",
+            "esito_visita": "Idoneo",
+            "deleted_at": "2025-09-30 16:20:00",
+            "created_at": "2025-07-10 14:10:00"
+          },
+          {
+            "id": 6,
+            "paziente_id": 6,
+            "medico_id": 5,
+            "data_visita": "2025-08-22",
+            "motivo_visita": "Controllo pressione arteriosa",
+            "esito_visita": "Valori nella norma",
+            "deleted_at": null,
+            "created_at": "2025-08-20 10:05:00"
+          }
+        ],
+        "variations": {
+          "data_visita": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "motivo_visita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Controllo periodico",
+              "Prima visita",
+              "Follow-up post intervento",
+              "Dolore addominale",
+              "Certificato medico sportivo",
+              "Controllo pressione arteriosa",
+              "Consulenza specialistica",
+              "Vaccinazione"
+            ]
+          },
+          "esito_visita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Normale",
+              "Prescrizione terapia",
+              "Guarigione in corso",
+              "Esami da approfondire",
+              "Idoneo",
+              "Valori nella norma",
+              "Ricovero consigliato"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

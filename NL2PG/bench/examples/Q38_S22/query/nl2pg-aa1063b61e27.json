@@ -1,0 +1,863 @@
+{
+  "schema_ddl": "CREATE TABLE tempo (\n    id INT PRIMARY KEY,\n    data DATE NOT NULL,\n    giorno_settimana TEXT NOT NULL,\n    mese TEXT NOT NULL,\n    anno INT NOT NULL,\n    trimestre INT NOT NULL CHECK (trimestre BETWEEN 1 AND 4)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    sesso TEXT CHECK (sesso IN ('M', 'F', 'Altro'))\n);\n\nCREATE TABLE veicoli (\n    id INT PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    modello TEXT NOT NULL,\n    marca TEXT NOT NULL,\n    anno_immatricolazione INT CHECK (anno_immatricolazione BETWEEN 1900 AND EXTRACT(YEAR FROM CURRENT_DATE))\n);\n\nCREATE TABLE contratti_assicurativi (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    veicolo_id INT NOT NULL REFERENCES veicoli(id),\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL CHECK (data_fine > data_inizio),\n    costo_copertura NUMERIC(10,2) NOT NULL CHECK (costo_copertura > 0),\n    tipo_copertura TEXT NOT NULL CHECK (tipo_copertura IN ('RC Auto', 'Kasko', 'Furto e Incendio', 'Infortuni', 'Altro'))\n);\n\nCREATE TABLE sinistri (\n    id INT PRIMARY KEY,\n    contratto_id INT NOT NULL REFERENCES contratti_assicurativi(id),\n    data_evento DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    importo_risarcimento NUMERIC(10,2) CHECK (importo_risarcimento >= 0),\n    stato TEXT NOT NULL CHECK (stato IN ('Aperto', 'In Valutazione', 'Chiuso', 'Rifiutato'))\n);\n\nCREATE TABLE fatti_sinistri (\n    id INT PRIMARY KEY,\n    tempo_id INT NOT NULL REFERENCES tempo(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    veicolo_id INT NOT NULL REFERENCES veicoli(id),\n    contratto_id INT NOT NULL REFERENCES contratti_assicurativi(id),\n    sinistro_id INT NOT NULL REFERENCES sinistri(id),\n    conteggio_sinistri INT NOT NULL DEFAULT 1,\n    totale_risarcimenti NUMERIC(12,2) NOT NULL DEFAULT 0,\n    CHECK (conteggio_sinistri >= 0 AND totale_risarcimenti >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "tempo": {
+        "row_count": 9,
+        "columns": {
+          "id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "data": {
+            "distinct": 4,
+            "sample": [
+              "2025-01-01",
+              "2025-04-15",
+              "2025-07-20",
+              "2025-10-30"
+            ]
+          },
+          "giorno_settimana": {
+            "distinct": 5,
+            "sample": [
+              "giovedì",
+              "lunedì",
+              "martedì",
+              "mercoledì",
+              "sabato"
+            ]
+          },
+          "mese": {
+            "distinct": 8,
+            "sample": [
+              "agosto",
+              "aprile",
+              "dicembre",
+              "febbraio",
+              "gennaio"
+            ]
+          },
+          "anno": {
+            "distinct": 1,
+            "sample": [
+              "2025"
+            ],
+            "min": 2025,
+            "max": 2025
+          },
+          "trimestre": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "2",
+              "4"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 189,
+        "columns": {
+          "id": {
+            "distinct": 189,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 189
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Alex",
+              "Elena",
+              "Giulia",
+              "Laura",
+              "Luca"
+            ]
+          },
+          "cognome": {
+            "distinct": 8,
+            "sample": [
+              "Bianchi",
+              "Blu",
+              "Gialli",
+              "Grigi",
+              "Marroni"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 189,
+            "sample": [
+              "BNCLRA90B45L219P",
+              "BNCLRA90B45L219P_1",
+              "BNCLRA90B45L219P_10",
+              "BNCLRA90B45L219P_11",
+              "BNCLRA90B45L219P_12"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 178,
+            "sample": [
+              "1970-01-03",
+              "1970-04-04",
+              "1970-04-15",
+              "1970-07-02",
+              "1970-08-03"
+            ]
+          },
+          "sesso": {
+            "distinct": 3,
+            "sample": [
+              "Altro",
+              "F",
+              "M"
+            ]
+          }
+        }
+      },
+      "veicoli": {
+        "row_count": 773,
+        "columns": {
+          "id": {
+            "distinct": 773,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 773
+          },
+          "targa": {
+            "distinct": 773,
+            "sample": [
+              "AB123CD",
+              "AB123CD_1",
+              "AB123CD_10",
+              "AB123CD_100",
+              "AB123CD_101"
+            ]
+          },
+          "modello": {
+            "distinct": 8,
+            "sample": [
+              "500",
+              "C3",
+              "Clio",
+              "Focus",
+              "Golf"
+            ]
+          },
+          "marca": {
+            "distinct": 7,
+            "sample": [
+              "Citroen",
+              "Fiat",
+              "Ford",
+              "Opel",
+              "Renault"
+            ]
+          },
+          "anno_immatricolazione": {
+            "distinct": 685,
+            "sample": [
+              "2013.0",
+              "2013.001229406018",
+              "2013.007540031983",
+              "2013.010150653912",
+              "2013.0127247413734"
+            ],
+            "min": 2013.0,
+            "max": 2022
+          }
+        }
+      },
+      "contratti_assicurativi": {
+        "row_count": 725,
+        "columns": {
+          "id": {
+            "distinct": 725,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 725
+          },
+          "cliente_id": {
+            "distinct": 185,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 189
+          },
+          "veicolo_id": {
+            "distinct": 467,
+            "sample": [
+              "102",
+              "104",
+              "105",
+              "106",
+              "107"
+            ],
+            "min": 4,
+            "max": 773
+          },
+          "data_inizio": {
+            "distinct": 154,
+            "sample": [
+              "2024-10-03",
+              "2024-10-04",
+              "2024-10-05",
+              "2024-10-06",
+              "2024-10-07"
+            ]
+          },
+          "data_fine": {
+            "distinct": 326,
+            "sample": [
+              "2025-09-10",
+              "2025-12-09",
+              "2025-12-10",
+              "2025-12-12",
+              "2025-12-13"
+            ]
+          },
+          "costo_copertura": {
+            "distinct": 690,
+            "sample": [
+              "1000.0",
+              "1001.2",
+              "1003.06",
+              "1013.0",
+              "1029.99"
+            ],
+            "min": 150.0,
+            "max": 1600.0
+          },
+          "tipo_copertura": {
+            "distinct": 5,
+            "sample": [
+              "Altro",
+              "Furto e Incendio",
+              "Infortuni",
+              "Kasko",
+              "RC Auto"
+            ]
+          }
+        }
+      },
+      "sinistri": {
+        "row_count": 613,
+        "columns": {
+          "id": {
+            "distinct": 613,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 613
+          },
+          "contratto_id": {
+            "distinct": 421,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 3,
+            "max": 725
+          },
+          "data_evento": {
+            "distinct": 156,
+            "sample": [
+              "2025-01-14",
+              "2025-01-15",
+              "2025-01-16",
+              "2025-01-17",
+              "2025-01-19"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Danni da grandine",
+              "Danno al veicolo parcheggiato",
+              "Furto del veicolo",
+              "Incendio del veicolo",
+              "Incidente stradale con danni a terzi"
+            ]
+          },
+          "importo_risarcimento": {
+            "distinct": 376,
+            "sample": [
+              "0.0",
+              "1032.21",
+              "1035.14",
+              "1043.3",
+              "1053.14"
+            ],
+            "min": 0.0,
+            "max": 3586.63
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "Aperto",
+              "Chiuso",
+              "In Valutazione",
+              "Rifiutato"
+            ]
+          }
+        }
+      },
+      "fatti_sinistri": {
+        "row_count": 1566,
+        "columns": {
+          "id": {
+            "distinct": 1566,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1566
+          },
+          "tempo_id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "cliente_id": {
+            "distinct": 189,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 189
+          },
+          "veicolo_id": {
+            "distinct": 678,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 771
+          },
+          "contratto_id": {
+            "distinct": 650,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "103"
+            ],
+            "min": 1,
+            "max": 725
+          },
+          "sinistro_id": {
+            "distinct": 571,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 613
+          },
+          "conteggio_sinistri": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 1
+          },
+          "totale_risarcimenti": {
+            "distinct": 979,
+            "sample": [
+              "0.0",
+              "1000.0",
+              "1000.94",
+              "1001.61",
+              "1005.63"
+            ],
+            "min": 0.0,
+            "max": 3000.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "tempo": [
+        {
+          "id": 1,
+          "data": "2025-01-01",
+          "giorno_settimana": "giovedì",
+          "mese": "agosto",
+          "anno": 2025,
+          "trimestre": "4"
+        },
+        {
+          "id": 2,
+          "data": "2025-01-01",
+          "giorno_settimana": "lunedì",
+          "mese": "dicembre",
+          "anno": 2025,
+          "trimestre": "4"
+        },
+        {
+          "id": 3,
+          "data": "2025-01-01",
+          "giorno_settimana": "martedì",
+          "mese": "gennaio",
+          "anno": 2025,
+          "trimestre": "2"
+        },
+        {
+          "id": 4,
+          "data": "2025-04-15",
+          "giorno_settimana": "giovedì",
+          "mese": "ottobre",
+          "anno": 2025,
+          "trimestre": "1"
+        },
+        {
+          "id": 5,
+          "data": "2025-04-15",
+          "giorno_settimana": "sabato",
+          "mese": "febbraio",
+          "anno": 2025,
+          "trimestre": "2"
+        },
+        {
+          "id": 6,
+          "data": "2025-07-20",
+          "giorno_settimana": "mercoledì",
+          "mese": "giugno",
+          "anno": 2025,
+          "trimestre": "2"
+        },
+        {
+          "id": 7,
+          "data": "2025-07-20",
+          "giorno_settimana": "giovedì",
+          "mese": "febbraio",
+          "anno": 2025,
+          "trimestre": "4"
+        },
+        {
+          "id": 8,
+          "data": "2025-10-30",
+          "giorno_settimana": "mercoledì",
+          "mese": "luglio",
+          "anno": 2025,
+          "trimestre": "1"
+        }
+      ],
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Sofia",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501X",
+          "data_nascita": "1973-01-14",
+          "sesso": null
+        },
+        {
+          "id": 2,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501X_1",
+          "data_nascita": "1973-10-30",
+          "sesso": "M"
+        },
+        {
+          "id": 3,
+          "nome": "Alex",
+          "cognome": "Neri",
+          "codice_fiscale": "RSSMRA80A01H501X_2",
+          "data_nascita": "1974-02-05",
+          "sesso": "Altro"
+        },
+        {
+          "id": 4,
+          "nome": "Luca",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA80A01H501X_3",
+          "data_nascita": "1971-01-27",
+          "sesso": "F"
+        },
+        {
+          "id": 5,
+          "nome": "Sofia",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501X_4",
+          "data_nascita": "1974-03-13",
+          "sesso": "F"
+        },
+        {
+          "id": 6,
+          "nome": "Sofia",
+          "cognome": "Neri",
+          "codice_fiscale": "RSSMRA80A01H501X_5",
+          "data_nascita": "1973-01-03",
+          "sesso": "F"
+        },
+        {
+          "id": 7,
+          "nome": "Luca",
+          "cognome": "Grigi",
+          "codice_fiscale": "RSSMRA80A01H501X_6",
+          "data_nascita": "1971-05-13",
+          "sesso": "F"
+        },
+        {
+          "id": 8,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA80A01H501X_7",
+          "data_nascita": "1973-03-14",
+          "sesso": "Altro"
+        }
+      ],
+      "veicoli": [
+        {
+          "id": 1,
+          "targa": "AB123CD",
+          "modello": "C3",
+          "marca": "Opel",
+          "anno_immatricolazione": 2019.2613241150061
+        },
+        {
+          "id": 2,
+          "targa": "AB123CD_1",
+          "modello": "Focus",
+          "marca": "Renault",
+          "anno_immatricolazione": 2015.235158884041
+        },
+        {
+          "id": 3,
+          "targa": "AB123CD_2",
+          "modello": "Golf",
+          "marca": "Toyota",
+          "anno_immatricolazione": 2018.4211894682292
+        },
+        {
+          "id": 4,
+          "targa": "AB123CD_3",
+          "modello": "Focus",
+          "marca": "Opel",
+          "anno_immatricolazione": 2018.9713053862217
+        },
+        {
+          "id": 5,
+          "targa": "AB123CD_4",
+          "modello": "Golf",
+          "marca": "Opel",
+          "anno_immatricolazione": 2017.969438589738
+        },
+        {
+          "id": 6,
+          "targa": "AB123CD_5",
+          "modello": "500",
+          "marca": "Fiat",
+          "anno_immatricolazione": 2017.9155164577396
+        },
+        {
+          "id": 7,
+          "targa": "AB123CD_6",
+          "modello": "C3",
+          "marca": "Renault",
+          "anno_immatricolazione": 2015.021278587223
+        },
+        {
+          "id": 8,
+          "targa": "AB123CD_7",
+          "modello": "C3",
+          "marca": "Toyota",
+          "anno_immatricolazione": 2020
+        }
+      ],
+      "contratti_assicurativi": [
+        {
+          "id": 1,
+          "cliente_id": 70,
+          "veicolo_id": 202,
+          "data_inizio": "2024-12-27",
+          "data_fine": "2026-09-15",
+          "costo_copertura": 302.48,
+          "tipo_copertura": "Kasko"
+        },
+        {
+          "id": 2,
+          "cliente_id": 83,
+          "veicolo_id": 174,
+          "data_inizio": "2024-12-05",
+          "data_fine": "2026-06-14",
+          "costo_copertura": 891.94,
+          "tipo_copertura": "Altro"
+        },
+        {
+          "id": 3,
+          "cliente_id": 173,
+          "veicolo_id": 365,
+          "data_inizio": "2024-12-29",
+          "data_fine": "2026-11-15",
+          "costo_copertura": 731.31,
+          "tipo_copertura": "Altro"
+        },
+        {
+          "id": 4,
+          "cliente_id": 27,
+          "veicolo_id": 416,
+          "data_inizio": "2025-01-01",
+          "data_fine": "2025-12-31",
+          "costo_copertura": 500.0,
+          "tipo_copertura": "RC Auto"
+        },
+        {
+          "id": 5,
+          "cliente_id": 161,
+          "veicolo_id": 586,
+          "data_inizio": "2024-10-09",
+          "data_fine": "2026-05-07",
+          "costo_copertura": 747.06,
+          "tipo_copertura": "Furto e Incendio"
+        },
+        {
+          "id": 6,
+          "cliente_id": 86,
+          "veicolo_id": 133,
+          "data_inizio": "2024-12-26",
+          "data_fine": "2026-05-27",
+          "costo_copertura": 705.97,
+          "tipo_copertura": "Kasko"
+        },
+        {
+          "id": 7,
+          "cliente_id": 7,
+          "veicolo_id": 655,
+          "data_inizio": "2024-10-21",
+          "data_fine": "2026-07-22",
+          "costo_copertura": 388.21,
+          "tipo_copertura": "Kasko"
+        },
+        {
+          "id": 8,
+          "cliente_id": 68,
+          "veicolo_id": 132,
+          "data_inizio": "2024-12-17",
+          "data_fine": "2026-08-13",
+          "costo_copertura": 972.99,
+          "tipo_copertura": "Kasko"
+        }
+      ],
+      "sinistri": [
+        {
+          "id": 1,
+          "contratto_id": 634,
+          "data_evento": "2025-04-14",
+          "descrizione": "Tamponamento",
+          "importo_risarcimento": 562.16,
+          "stato": "Chiuso"
+        },
+        {
+          "id": 2,
+          "contratto_id": 580,
+          "data_evento": "2025-01-14",
+          "descrizione": "Danno al veicolo parcheggiato",
+          "importo_risarcimento": 1301.75,
+          "stato": "Chiuso"
+        },
+        {
+          "id": 3,
+          "contratto_id": 376,
+          "data_evento": "2025-02-01",
+          "descrizione": "Tamponamento",
+          "importo_risarcimento": 120.0,
+          "stato": "Aperto"
+        },
+        {
+          "id": 4,
+          "contratto_id": 615,
+          "data_evento": "2025-01-27",
+          "descrizione": "Incendio del veicolo",
+          "importo_risarcimento": 1912.02,
+          "stato": "Aperto"
+        },
+        {
+          "id": 5,
+          "contratto_id": 703,
+          "data_evento": "2025-05-07",
+          "descrizione": "Danno al veicolo parcheggiato",
+          "importo_risarcimento": 3575.02,
+          "stato": "Rifiutato"
+        },
+        {
+          "id": 6,
+          "contratto_id": 510,
+          "data_evento": "2025-01-27",
+          "descrizione": "Incidente stradale con danni a terzi",
+          "importo_risarcimento": 898.79,
+          "stato": "Aperto"
+        },
+        {
+          "id": 7,
+          "contratto_id": 544,
+          "data_evento": "2025-04-07",
+          "descrizione": "Incidente stradale con danni a terzi",
+          "importo_risarcimento": null,
+          "stato": "Aperto"
+        },
+        {
+          "id": 8,
+          "contratto_id": 135,
+          "data_evento": "2025-01-25",
+          "descrizione": "Incidente stradale con danni a terzi",
+          "importo_risarcimento": 1792.05,
+          "stato": "Aperto"
+        }
+      ],
+      "fatti_sinistri": [
+        {
+          "id": 1,
+          "tempo_id": 7,
+          "cliente_id": 181,
+          "veicolo_id": 34,
+          "contratto_id": 144,
+          "sinistro_id": 527,
+          "conteggio_sinistri": "2",
+          "totale_risarcimenti": 2849.6
+        },
+        {
+          "id": 2,
+          "tempo_id": 7,
+          "cliente_id": 148,
+          "veicolo_id": 294,
+          "contratto_id": 650,
+          "sinistro_id": 573,
+          "conteggio_sinistri": "3",
+          "totale_risarcimenti": 816.09
+        },
+        {
+          "id": 3,
+          "tempo_id": 7,
+          "cliente_id": 20,
+          "veicolo_id": 731,
+          "contratto_id": 673,
+          "sinistro_id": 10,
+          "conteggio_sinistri": "3",
+          "totale_risarcimenti": 2306.26
+        },
+        {
+          "id": 4,
+          "tempo_id": 9,
+          "cliente_id": 48,
+          "veicolo_id": 114,
+          "contratto_id": 90,
+          "sinistro_id": 73,
+          "conteggio_sinistri": "2",
+          "totale_risarcimenti": 2884.17
+        },
+        {
+          "id": 5,
+          "tempo_id": 9,
+          "cliente_id": 188,
+          "veicolo_id": 352,
+          "contratto_id": 101,
+          "sinistro_id": 214,
+          "conteggio_sinistri": "2",
+          "totale_risarcimenti": 1505.58
+        },
+        {
+          "id": 6,
+          "tempo_id": 3,
+          "cliente_id": 103,
+          "veicolo_id": 744,
+          "contratto_id": 235,
+          "sinistro_id": 344,
+          "conteggio_sinistri": "3",
+          "totale_risarcimenti": 1542.12
+        },
+        {
+          "id": 7,
+          "tempo_id": 4,
+          "cliente_id": 37,
+          "veicolo_id": 612,
+          "contratto_id": 564,
+          "sinistro_id": 277,
+          "conteggio_sinistri": "1",
+          "totale_risarcimenti": 1343.21
+        },
+        {
+          "id": 8,
+          "tempo_id": 6,
+          "cliente_id": 185,
+          "veicolo_id": 568,
+          "contratto_id": 315,
+          "sinistro_id": 348,
+          "conteggio_sinistri": "3",
+          "totale_risarcimenti": 1718.83
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "any_all"
+  ],
+  "query": "SELECT c.nome, c.cognome, ca.tipo_copertura, ca.costo_copertura AS costo_annuo, COUNT(DISTINCT s.id) AS sinistri_registrati FROM clienti c JOIN contratti_assicurativi ca ON c.id = ca.cliente_id LEFT JOIN sinistri s ON ca.id = s.contratto_id WHERE ca.tipo_copertura = ANY(ARRAY['RC Auto', 'Kasko']) AND ca.costo_copertura BETWEEN 300.0 AND 1000.0 GROUP BY c.nome, c.cognome, ca.tipo_copertura, ca.costo_copertura ORDER BY costo_annuo DESC, sinistri_registrati DESC;"
+}

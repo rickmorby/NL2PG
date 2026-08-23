@@ -1,0 +1,698 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    data_nascita DATE,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    matricola TEXT NOT NULL UNIQUE,\n    filiale TEXT NOT NULL,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    agente_id INT REFERENCES agenti(id),\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'responsabilita_civile')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    massimale_garantito NUMERIC(12,2) NOT NULL CHECK (massimale_garantito > 0),\n    franchigia NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (franchigia >= 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id INT PRIMARY KEY,\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    numero_pratica TEXT NOT NULL UNIQUE,\n    data_accadimento DATE NOT NULL,\n    data_denuncia DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    importo_risarcimento NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_risarcimento >= 0),\n    stato_sinistro TEXT NOT NULL DEFAULT 'aperto' CHECK (stato_sinistro IN ('aperto', 'in_istruttoria', 'liquidato', 'respinto')),\n    CHECK (data_denuncia >= data_accadimento)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 695,
+        "columns": {
+          "id": {
+            "distinct": 695,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 695
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Ferrari",
+              "Fontana",
+              "Gallo"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 695,
+            "sample": [
+              "BNCLRA85E54F205B",
+              "BNCLRA85E54F205C",
+              "BNCLRA85E54F205D",
+              "BNCLRA85E54F205E",
+              "BNCLRA85E54F205F"
+            ]
+          },
+          "email": {
+            "distinct": 8,
+            "sample": [
+              "alessandro.conti@tiscali.it",
+              "chiara.gallo@gmail.com",
+              "davide.fontana@libero.it",
+              "francesca.moretti@gmail.com",
+              "giulia.verdi@yahoo.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "+39 011 8876543",
+              "+39 02 3345678",
+              "+39 045 9981123",
+              "+39 051 7712983",
+              "+39 055 6634120"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 602,
+            "sample": [
+              "1968-06-19",
+              "1968-06-25",
+              "1968-07-02",
+              "1968-07-05",
+              "1968-07-11"
+            ]
+          },
+          "creato_il": {
+            "distinct": 532,
+            "sample": [
+              "2023-10-17 09:30:00",
+              "2023-10-18 09:30:00",
+              "2023-10-28 09:30:00",
+              "2023-11-01 09:30:00",
+              "2023-11-02 09:30:00"
+            ]
+          }
+        }
+      },
+      "agenti": {
+        "row_count": 44,
+        "columns": {
+          "id": {
+            "distinct": 44,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 44
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Andrea",
+              "Elena",
+              "Giorgio",
+              "Monica",
+              "Paolo"
+            ]
+          },
+          "cognome": {
+            "distinct": 8,
+            "sample": [
+              "Barbieri",
+              "Costa",
+              "De Luca",
+              "Longo",
+              "Neri"
+            ]
+          },
+          "matricola": {
+            "distinct": 44,
+            "sample": [
+              "AG-0001",
+              "AG-00011",
+              "AG-00012",
+              "AG-00013",
+              "AG-00014"
+            ]
+          },
+          "filiale": {
+            "distinct": 6,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "attivo": {
+            "distinct": 3,
+            "sample": [
+              "True",
+              "false",
+              "true"
+            ],
+            "min": true,
+            "max": true
+          }
+        }
+      },
+      "polizze": {
+        "row_count": 1816,
+        "columns": {
+          "id": {
+            "distinct": 1816,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1816
+          },
+          "numero_polizza": {
+            "distinct": 1816,
+            "sample": [
+              "POL-2024-000003",
+              "POL-2024-0000031",
+              "POL-2024-00000310",
+              "POL-2024-000003100",
+              "POL-2024-000003101"
+            ]
+          },
+          "cliente_id": {
+            "distinct": 638,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 695
+          },
+          "agente_id": {
+            "distinct": 44,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 44
+          },
+          "tipo_polizza": {
+            "distinct": 5,
+            "sample": [
+              "auto",
+              "casa",
+              "responsabilita_civile",
+              "salute",
+              "vita"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 1722,
+            "sample": [
+              "1000.87",
+              "1000.88",
+              "1000.95",
+              "1001.93",
+              "1002.21"
+            ],
+            "min": 238.44,
+            "max": 1840.0
+          },
+          "massimale_garantito": {
+            "distinct": 1744,
+            "sample": [
+              "1000000.0",
+              "1009137.98",
+              "1010258.37",
+              "1010610.3",
+              "1011583.17"
+            ],
+            "min": 120000.0,
+            "max": 9000000.0
+          },
+          "franchigia": {
+            "distinct": 4,
+            "sample": [
+              "0",
+              "150.0",
+              "300.0",
+              "500.0"
+            ],
+            "min": 0,
+            "max": 500.0
+          },
+          "data_emissione": {
+            "distinct": 456,
+            "sample": [
+              "2024-08-12",
+              "2024-08-13",
+              "2024-08-14",
+              "2024-08-15",
+              "2024-08-17"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 6,
+            "sample": [
+              "2026-01-25",
+              "2026-02-10",
+              "2026-03-05",
+              "2026-06-15",
+              "2026-09-30"
+            ]
+          }
+        }
+      },
+      "sinistri": {
+        "row_count": 755,
+        "columns": {
+          "id": {
+            "distinct": 755,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 755
+          },
+          "polizza_id": {
+            "distinct": 624,
+            "sample": [
+              "1003",
+              "1006",
+              "1008",
+              "1010",
+              "1012"
+            ],
+            "min": 8,
+            "max": 1816
+          },
+          "numero_pratica": {
+            "distinct": 755,
+            "sample": [
+              "SIN-2025-000101",
+              "SIN-2025-0001011",
+              "SIN-2025-00010110",
+              "SIN-2025-000101100",
+              "SIN-2025-000101101"
+            ]
+          },
+          "data_accadimento": {
+            "distinct": 180,
+            "sample": [
+              "2025-01-20",
+              "2025-01-21",
+              "2025-01-22",
+              "2025-01-23",
+              "2025-01-24"
+            ]
+          },
+          "data_denuncia": {
+            "distinct": 180,
+            "sample": [
+              "2025-02-20",
+              "2025-02-21",
+              "2025-02-22",
+              "2025-02-23",
+              "2025-02-24"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Collisione posteriore in area urbana con danni al paraurti e al portellone",
+              "Danni a terzi per caduta di vaso dal balcone dell'immobile assicurato",
+              "Danno da furto con scasso nell'abitazione assicurata, escluso da garanzia",
+              "Incidente stradale grave, pratica in valutazione dei documenti medici",
+              "Infiltrazioni d'acqua dal tetto dopo violenta grandinata"
+            ]
+          },
+          "importo_risarcimento": {
+            "distinct": 366,
+            "sample": [
+              "0",
+              "0.0",
+              "1017.95",
+              "1018.21",
+              "1018.22"
+            ],
+            "min": 0.0,
+            "max": 14801.0
+          },
+          "stato_sinistro": {
+            "distinct": 4,
+            "sample": [
+              "aperto",
+              "in_istruttoria",
+              "liquidato",
+              "respinto"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 12,
+          "nome": "Laura",
+          "cognome": "Verdi",
+          "codice_fiscale": "MSSMRA78A21H501M",
+          "email": "laura.verdi1@example.com",
+          "telefono": "+39 06 4521789",
+          "data_nascita": "1977-07-16",
+          "creato_il": "2023-11-12T09:30:00"
+        },
+        {
+          "id": 34,
+          "nome": "Luca",
+          "cognome": "Verdi",
+          "codice_fiscale": "MSSMRA78A21H535I",
+          "email": "luca.verdi1@example.com",
+          "telefono": "+39 06 4521789",
+          "data_nascita": "1978-10-04",
+          "creato_il": "2023-12-10T09:30:00"
+        },
+        {
+          "id": 120,
+          "nome": "Francesca",
+          "cognome": "Fontana",
+          "codice_fiscale": "BNCLRA85E54F238H",
+          "email": "francesca.fontana1@example.com",
+          "telefono": "+39 02 3345678",
+          "data_nascita": "1985-02-24",
+          "creato_il": "2024-01-17T14:12:00"
+        },
+        {
+          "id": 138,
+          "nome": "Laura",
+          "cognome": "Conti",
+          "codice_fiscale": "BNCLRA85E54F256Z",
+          "email": "laura.conti1@example.com",
+          "telefono": "+39 02 3345678",
+          "data_nascita": "1985-01-19",
+          "creato_il": "2024-01-11T14:12:00"
+        },
+        {
+          "id": 135,
+          "nome": "Laura",
+          "cognome": "Marino",
+          "codice_fiscale": "BNCLRA85E54F253W",
+          "email": "laura.marino1@example.com",
+          "telefono": "+39 02 3345678",
+          "data_nascita": "1984-11-16",
+          "creato_il": "2024-03-29T14:12:00"
+        },
+        {
+          "id": 121,
+          "nome": "Laura",
+          "cognome": "Rossi",
+          "codice_fiscale": "BNCLRA85E54F239I",
+          "email": "laura.rossi1@example.com",
+          "telefono": "+39 02 3345678",
+          "data_nascita": "1985-05-22",
+          "creato_il": "2024-02-21T14:12:00"
+        },
+        {
+          "id": 134,
+          "nome": "Marco",
+          "cognome": "Gallo",
+          "codice_fiscale": "BNCLRA85E54F252V",
+          "email": "marco.gallo1@example.com",
+          "telefono": "+39 02 3345678",
+          "data_nascita": "1985-10-14",
+          "creato_il": "2023-12-13T14:12:00"
+        },
+        {
+          "id": 127,
+          "nome": "Mario",
+          "cognome": "Conti",
+          "codice_fiscale": "BNCLRA85E54F245O",
+          "email": "mario.conti1@example.com",
+          "telefono": "+39 02 3345678",
+          "data_nascita": "1984-07-22",
+          "creato_il": "2023-12-26T14:12:00"
+        }
+      ],
+      "agenti": [
+        {
+          "id": 1,
+          "nome": "Paolo",
+          "cognome": "Neri",
+          "matricola": "AG-0001",
+          "filiale": "Bologna",
+          "attivo": "true"
+        },
+        {
+          "id": 2,
+          "nome": "Paolo",
+          "cognome": "Neri",
+          "matricola": "AG-00011",
+          "filiale": "Bologna",
+          "attivo": "false"
+        },
+        {
+          "id": 3,
+          "nome": "Paolo",
+          "cognome": "Neri",
+          "matricola": "AG-00012",
+          "filiale": "Roma",
+          "attivo": "false"
+        },
+        {
+          "id": 4,
+          "nome": "Paolo",
+          "cognome": "Neri",
+          "matricola": "AG-00013",
+          "filiale": "Firenze",
+          "attivo": "true"
+        },
+        {
+          "id": 5,
+          "nome": "Paolo",
+          "cognome": "Neri",
+          "matricola": "AG-00014",
+          "filiale": "Torino",
+          "attivo": "true"
+        },
+        {
+          "id": 6,
+          "nome": "Paolo",
+          "cognome": "Neri",
+          "matricola": "AG-00015",
+          "filiale": "Milano",
+          "attivo": "false"
+        },
+        {
+          "id": 7,
+          "nome": "Elena",
+          "cognome": "Costa",
+          "matricola": "AG-0002",
+          "filiale": "Milano",
+          "attivo": true
+        },
+        {
+          "id": 8,
+          "nome": "Elena",
+          "cognome": "Costa",
+          "matricola": "AG-00021",
+          "filiale": "Napoli",
+          "attivo": "true"
+        }
+      ],
+      "polizze": [
+        {
+          "id": 1,
+          "numero_polizza": "POL-2025-000001",
+          "cliente_id": 504,
+          "agente_id": 7,
+          "tipo_polizza": "auto",
+          "premio_annuo": 364.0,
+          "massimale_garantito": 8821887.68,
+          "franchigia": 300.0,
+          "data_emissione": "2025-03-02",
+          "data_scadenza": "2026-02-10"
+        },
+        {
+          "id": 2,
+          "numero_polizza": "POL-2025-0000011",
+          "cliente_id": 624,
+          "agente_id": 25,
+          "tipo_polizza": "auto",
+          "premio_annuo": 732.15,
+          "massimale_garantito": 8373629.64,
+          "franchigia": 300.0,
+          "data_emissione": "2025-04-18",
+          "data_scadenza": "2026-02-10"
+        },
+        {
+          "id": 3,
+          "numero_polizza": "POL-2025-0000012",
+          "cliente_id": 71,
+          "agente_id": 14,
+          "tipo_polizza": "auto",
+          "premio_annuo": 744.18,
+          "massimale_garantito": 7163582.87,
+          "franchigia": 300.0,
+          "data_emissione": "2025-05-13",
+          "data_scadenza": "2026-02-10"
+        },
+        {
+          "id": 4,
+          "numero_polizza": "POL-2025-0000013",
+          "cliente_id": 456,
+          "agente_id": 11,
+          "tipo_polizza": "auto",
+          "premio_annuo": 605.59,
+          "massimale_garantito": 4811470.56,
+          "franchigia": 300.0,
+          "data_emissione": "2025-02-28",
+          "data_scadenza": "2026-02-10"
+        },
+        {
+          "id": 5,
+          "numero_polizza": "POL-2025-0000014",
+          "cliente_id": 618,
+          "agente_id": 1,
+          "tipo_polizza": "auto",
+          "premio_annuo": 520.0,
+          "massimale_garantito": 6000000.0,
+          "franchigia": 300.0,
+          "data_emissione": "2025-02-10",
+          "data_scadenza": "2026-02-10"
+        },
+        {
+          "id": 6,
+          "numero_polizza": "POL-2025-0000015",
+          "cliente_id": 426,
+          "agente_id": 10,
+          "tipo_polizza": "auto",
+          "premio_annuo": 726.09,
+          "massimale_garantito": 6841537.41,
+          "franchigia": 300.0,
+          "data_emissione": "2024-11-14",
+          "data_scadenza": "2026-02-10"
+        },
+        {
+          "id": 7,
+          "numero_polizza": "POL-2025-0000016",
+          "cliente_id": 404,
+          "agente_id": 12,
+          "tipo_polizza": "auto",
+          "premio_annuo": 520.0,
+          "massimale_garantito": 6000000.0,
+          "franchigia": 300.0,
+          "data_emissione": "2025-02-10",
+          "data_scadenza": "2026-02-10"
+        },
+        {
+          "id": 8,
+          "numero_polizza": "POL-2025-0000017",
+          "cliente_id": 619,
+          "agente_id": null,
+          "tipo_polizza": "auto",
+          "premio_annuo": 427.71,
+          "massimale_garantito": 7849561.6,
+          "franchigia": 300.0,
+          "data_emissione": "2025-05-05",
+          "data_scadenza": "2026-02-10"
+        }
+      ],
+      "sinistri": [
+        {
+          "id": 1,
+          "polizza_id": 1276,
+          "numero_pratica": "SIN-2025-000101",
+          "data_accadimento": "2025-04-07",
+          "data_denuncia": "2025-04-17",
+          "descrizione": "Collisione posteriore in area urbana con danni al paraurti e al portellone",
+          "importo_risarcimento": 5204.25,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id": 2,
+          "polizza_id": 1694,
+          "numero_pratica": "SIN-2025-0001011",
+          "data_accadimento": "2025-03-15",
+          "data_denuncia": "2025-04-17",
+          "descrizione": "Collisione posteriore in area urbana con danni al paraurti e al portellone",
+          "importo_risarcimento": 2880.39,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id": 3,
+          "polizza_id": 600,
+          "numero_pratica": "SIN-2025-0001012",
+          "data_accadimento": "2025-03-19",
+          "data_denuncia": "2025-04-29",
+          "descrizione": "Collisione posteriore in area urbana con danni al paraurti e al portellone",
+          "importo_risarcimento": 4122.06,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id": 4,
+          "polizza_id": 1526,
+          "numero_pratica": "SIN-2025-0001013",
+          "data_accadimento": "2025-04-07",
+          "data_denuncia": "2025-04-15",
+          "descrizione": "Collisione posteriore in area urbana con danni al paraurti e al portellone",
+          "importo_risarcimento": 3036.12,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id": 5,
+          "polizza_id": 1280,
+          "numero_pratica": "SIN-2025-0001014",
+          "data_accadimento": "2025-03-19",
+          "data_denuncia": "2025-04-20",
+          "descrizione": "Collisione posteriore in area urbana con danni al paraurti e al portellone",
+          "importo_risarcimento": 3108.76,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id": 6,
+          "polizza_id": 585,
+          "numero_pratica": "SIN-2025-0001015",
+          "data_accadimento": "2025-04-12",
+          "data_denuncia": "2025-04-25",
+          "descrizione": "Collisione posteriore in area urbana con danni al paraurti e al portellone",
+          "importo_risarcimento": 3843.25,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id": 7,
+          "polizza_id": 1165,
+          "numero_pratica": "SIN-2025-0001016",
+          "data_accadimento": "2025-04-01",
+          "data_denuncia": "2025-05-10",
+          "descrizione": "Collisione posteriore in area urbana con danni al paraurti e al portellone",
+          "importo_risarcimento": 1952.15,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id": 8,
+          "polizza_id": 63,
+          "numero_pratica": "SIN-2025-0001017",
+          "data_accadimento": "2025-04-12",
+          "data_denuncia": "2025-05-04",
+          "descrizione": "Collisione posteriore in area urbana con danni al paraurti e al portellone",
+          "importo_risarcimento": 4647.98,
+          "stato_sinistro": "liquidato"
+        }
+      ]
+    }
+  },
+  "story": "Presso la direzione portafoglio di Meridiana Assicurazioni è partita la revisione annuale del ramo auto, un esercizio che coinvolge tutti gli archivi gestionali della compagnia. Il punto di partenza è l'archivio clienti, che raccoglie 695 schede recanti nome, cognome, codice fiscale, recapiti telefonici ed elettronici, data di nascita e data di inserimento in archivio. Accanto ad esso, il registro agenti elenca i 44 consulenti della rete vendita, ciascuno con la propria matricola, dalla AG-0001 in poi, la filiale di appartenenza tra Milano, Roma, Napoli, Torino, Bologna e Firenze, e l'indicazione se risulti attivo oppure cessato. L'archivio dei contratti_di_copertura conserva invece le 1816 coperture emesse: ogni posizione riporta il proprio numero, nella forma POL-2025-000001 e simili, il cliente intestatario, l'agente proponente, la tipologia di garanzia — auto, casa, vita, salute oppure responsabilità civile — il premio annuo, oscillante tra 238,44 e 1840 euro, il massimale garantito fino a 9.000.000 di euro, l'eventuale franchigia di 150, 300 o 500 euro, nonché la data di emissione e quella di scadenza, quest'ultima concentrata per lo più sul 2026-02-10. Completa il quadro il registro sinistri, che documenta 755 pratiche numerate SIN-2025-..., con data di accadimento e di denuncia, descrizione dell'evento, stato di lavorazione — aperto, in_istruttoria, liquidato oppure respinto — e la liquidazione del danno, ossia l'importo erogato a titolo di risarcimento, che può anche risultare pari a 0 quando la pratica è ancora in corso. Sulla base di questi materiali, gli analisti hanno isolato le coperture di tipo auto e calcolato il premio medio del ramo; hanno quindi selezionato soltanto i contratti il cui premio annuo supera tale media, affiancando a ciascuno il nome e il cognome del cliente intestatario e il numero del contratto, e quantificando lo scostamento percentuale del premio rispetto alla media stessa. L'elenco è stato disposto in ordine decrescente di premio annuo, così che la dirigenza legga subito le posizioni più remunerative, quelle che sfiorano i 1840 euro e stanno circa l'80 per cento sopra la media, prima di incrociare i risultati con le pratiche chiuse come liquidato, verificando che la liquidazione del danno corrisponda agli importi effettivamente pattuiti."
+}

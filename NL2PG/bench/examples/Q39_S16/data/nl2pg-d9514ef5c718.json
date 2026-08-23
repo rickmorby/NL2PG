@@ -1,0 +1,421 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "between"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "versioni_polizza",
+        "obsolete_value": "storico_coperture",
+        "description": "La tabella versioni_polizza, che contiene le versioni storiche delle condizioni di ciascuna polizza con i relativi timestamp di validità, viene denominata storico_coperture nella prosa aziendale. Il richiedente deve mappare la perifrasi al nome reale della tabella per costruire correttamente la clausola WHERE col_ts BETWEEN t1 AND t2."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "ts_validita",
+        "obsolete_value": "decorrenza della garanzia",
+        "description": "La colonna ts_validita della tabella versioni_polizza, che indica l'istante temporale di validità di ciascuna versione della polizza, viene indicata nel linguaggio aziendale con il gergo assicurativo 'decorrenza della garanzia'. Le query di intervallo chiuso devono applicare il filtro BETWEEN proprio su ts_validita, riconoscendo il termine di settore come riferimento alla colonna temporale."
+      }
+    ],
+    "spec_hash": "89879c9eb3c10b2d"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    data_nascita DATE\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    ramo TEXT NOT NULL CHECK (ramo IN ('auto', 'casa', 'vita', 'salute')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    data_emissione DATE NOT NULL\n);\n\nCREATE TABLE versioni_polizza (\n    id SERIAL PRIMARY KEY,\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    numero_versione INT NOT NULL,\n    ts_validita TIMESTAMP NOT NULL,\n    data_inizio TIMESTAMP NOT NULL,\n    data_fine TIMESTAMP,\n    premio_versione NUMERIC(10,2) NOT NULL CHECK (premio_versione >= 0),\n    massimale_copertura NUMERIC(12,2) CHECK (massimale_copertura > 0),\n    UNIQUE (polizza_id, numero_versione),\n    CHECK (data_fine IS NULL OR data_fine > data_inizio)\n);\n\nCREATE TABLE garanzie (\n    id SERIAL PRIMARY KEY,\n    versione_polizza_id INT NOT NULL REFERENCES versioni_polizza(id),\n    codice_garanzia TEXT NOT NULL,\n    descrizione TEXT NOT NULL,\n    franchigia NUMERIC(8,2) NOT NULL DEFAULT 0 CHECK (franchigia >= 0),\n    massimale NUMERIC(12,2) CHECK (massimale > 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 180,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "citta": "Roma",
+            "data_nascita": "1980-01-15"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLAU85M42F205X",
+            "citta": "Milano",
+            "data_nascita": "1985-08-12"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI92C55L219K",
+            "citta": "Torino",
+            "data_nascita": "1992-03-25"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTLSN78D10G224W",
+            "citta": "Napoli",
+            "data_nascita": "1978-04-10"
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Moretti",
+            "codice_fiscale": "MRTFNC90E48H501Z",
+            "citta": "Bologna",
+            "data_nascita": "1990-05-18"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Sara",
+              "Davide",
+              "Chiara",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Conti",
+              "Moretti",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Colombo",
+              "Ricci"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Padova"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -4000.0,
+            "delta_max": 4000.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "polizze",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.0,
+        "templates": [
+          {
+            "id": 101,
+            "numero_polizza": "POL-2026-000101",
+            "cliente_id": 1,
+            "ramo": "auto",
+            "premio_annuo": 450.0,
+            "data_emissione": "2026-01-15"
+          },
+          {
+            "id": 102,
+            "numero_polizza": "POL-2026-000102",
+            "cliente_id": 2,
+            "ramo": "casa",
+            "premio_annuo": 320.5,
+            "data_emissione": "2026-02-03"
+          },
+          {
+            "id": 103,
+            "numero_polizza": "POL-2026-000103",
+            "cliente_id": 3,
+            "ramo": "vita",
+            "premio_annuo": 890.0,
+            "data_emissione": "2026-02-20"
+          },
+          {
+            "id": 104,
+            "numero_polizza": "POL-2026-000104",
+            "cliente_id": 4,
+            "ramo": "salute",
+            "premio_annuo": 1250.75,
+            "data_emissione": "2026-03-11"
+          },
+          {
+            "id": 105,
+            "numero_polizza": "POL-2026-000105",
+            "cliente_id": 5,
+            "ramo": "auto",
+            "premio_annuo": 610.3,
+            "data_emissione": "2026-04-02"
+          }
+        ],
+        "variations": {
+          "ramo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "auto",
+              "auto",
+              "casa",
+              "vita",
+              "salute"
+            ]
+          },
+          "premio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "versioni_polizza",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.0,
+        "templates": [
+          {
+            "id": 201,
+            "polizza_id": 101,
+            "numero_versione": 1,
+            "ts_validita": "2026-01-15 00:00:00",
+            "data_inizio": "2026-01-15 00:00:00",
+            "data_fine": "2026-07-15 00:00:00",
+            "premio_versione": 450.0,
+            "massimale_copertura": 500000.0
+          },
+          {
+            "id": 202,
+            "polizza_id": 101,
+            "numero_versione": 2,
+            "ts_validita": "2026-07-15 08:30:00",
+            "data_inizio": "2026-07-15 00:00:00",
+            "data_fine": null,
+            "premio_versione": 495.0,
+            "massimale_copertura": 550000.0
+          },
+          {
+            "id": 203,
+            "polizza_id": 102,
+            "numero_versione": 1,
+            "ts_validita": "2026-02-03 09:30:00",
+            "data_inizio": "2026-02-03 09:30:00",
+            "data_fine": "2027-02-03 00:00:00",
+            "premio_versione": 320.5,
+            "massimale_copertura": 250000.0
+          },
+          {
+            "id": 204,
+            "polizza_id": 103,
+            "numero_versione": 1,
+            "ts_validita": "2026-02-20 14:15:00",
+            "data_inizio": "2026-02-20 14:15:00",
+            "data_fine": null,
+            "premio_versione": 890.0,
+            "massimale_copertura": 1000000.0
+          },
+          {
+            "id": 205,
+            "polizza_id": 104,
+            "numero_versione": 1,
+            "ts_validita": "2026-03-11 11:00:00",
+            "data_inizio": "2026-03-11 11:00:00",
+            "data_fine": "2027-03-11 00:00:00",
+            "premio_versione": 1250.75,
+            "massimale_copertura": 150000.0
+          }
+        ],
+        "variations": {
+          "ts_validita": {
+            "axis": "shift",
+            "delta_min": -20.0,
+            "delta_max": 20.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_inizio": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_fine": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "premio_versione": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "massimale_copertura": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "garanzie",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 301,
+            "versione_polizza_id": 201,
+            "codice_garanzia": "RC-AUTO",
+            "descrizione": "Responsabilita civile auto verso terzi",
+            "franchigia": 0.0,
+            "massimale": 5000000.0
+          },
+          {
+            "id": 302,
+            "versione_polizza_id": 201,
+            "codice_garanzia": "KASKO",
+            "descrizione": "Danni al veicolo assicurato",
+            "franchigia": 500.0,
+            "massimale": 30000.0
+          },
+          {
+            "id": 303,
+            "versione_polizza_id": 202,
+            "codice_garanzia": "INCENDIO",
+            "descrizione": "Danni da incendio all'abitazione",
+            "franchigia": 250.0,
+            "massimale": 200000.0
+          },
+          {
+            "id": 304,
+            "versione_polizza_id": 203,
+            "codice_garanzia": "RUBO",
+            "descrizione": "Rimborso beni rubati in casa",
+            "franchigia": 150.0,
+            "massimale": 15000.0
+          },
+          {
+            "id": 305,
+            "versione_polizza_id": 204,
+            "codice_garanzia": "MALATTIA",
+            "descrizione": "Indennizzo spese sanitarie per malattia",
+            "franchigia": 0.0,
+            "massimale": 50000.0
+          },
+          {
+            "id": 306,
+            "versione_polizza_id": 205,
+            "codice_garanzia": "OSPEDALE",
+            "descrizione": "Rimborso giornate di ospedalizzazione",
+            "franchigia": 100.0,
+            "massimale": 20000.0
+          },
+          {
+            "id": 307,
+            "versione_polizza_id": 202,
+            "codice_garanzia": "ALLAGAMENTO",
+            "descrizione": "Danni da allagamento all'abitazione",
+            "franchigia": 300.0,
+            "massimale": 80000.0
+          },
+          {
+            "id": 308,
+            "versione_polizza_id": 204,
+            "codice_garanzia": "INVALIDITA",
+            "descrizione": "Capitale in caso di invalidita permanente",
+            "franchigia": 0.0,
+            "massimale": 120000.0
+          }
+        ],
+        "variations": {
+          "franchigia": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "massimale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

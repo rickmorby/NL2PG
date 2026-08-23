@@ -1,0 +1,560 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fornitori",
+        "obsolete_value": "anagrafica_passivo",
+        "description": "La tabella fornitori, che contiene i dati anagrafici dei partner commerciali, viene denominata nella prosa aziendale come anagrafica_passivo. Le relazioni restano deducibili dalla colonna fornitore_id presente nelle tabelle articoli e ordini_acquisto."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "stato_ordine",
+        "obsolete_value": "indicatore avanzamento ciclo passivo",
+        "description": "La colonna stato_ordine della tabella ordini_acquisto e' indicata nel testo aziendale con il gergo ERP 'indicatore avanzamento ciclo passivo'. Le query devono filtrare questa colonna con LIKE su valori testuali quali 'APERTO%' o 'CHIUSO%'."
+      }
+    ],
+    "spec_hash": "2bff6ca104dab716"
+  },
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    codice_fornitore TEXT NOT NULL UNIQUE,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    email_contatto TEXT,\n    telefono_contatto TEXT,\n    indirizzo_sede TEXT,\n    citta_sede TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE articoli (\n    id INT PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    fornitore_id INT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    unita_misura TEXT NOT NULL DEFAULT 'PZ',\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0)\n);\n\nCREATE TABLE ordini_acquisto (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT NOT NULL,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine LIKE 'APERTO%' OR stato_ordine LIKE 'IN_EVASIONE%' OR stato_ordine LIKE 'CHIUSO%'),\n    data_ordine DATE NOT NULL,\n    data_consegna_prevista DATE,\n    note_ordine TEXT\n);\n\nCREATE TABLE righe_ordine_acquisto (\n    id INT PRIMARY KEY,\n    ordine_acquisto_id INT NOT NULL,\n    articolo_id INT NOT NULL,\n    quantita_ordinata INT NOT NULL CHECK (quantita_ordinata > 0),\n    quantita_ricevuta INT NOT NULL DEFAULT 0 CHECK (quantita_ricevuta >= 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "fornitori",
+        "nature": "dimension",
+        "min_rows": 40,
+        "max_rows": 70,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_fornitore": "FORN-00001",
+            "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+            "partita_iva": "IT01234567891",
+            "email_contatto": "acquisti@metalmeccanicalombarda.it",
+            "telefono_contatto": "+39 02 88451234",
+            "indirizzo_sede": "Via dell'Industria 12",
+            "citta_sede": "Milano",
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "codice_fornitore": "FORN-00002",
+            "ragione_sociale": "Plastica Elettronica S.r.l.",
+            "partita_iva": "IT02345678912",
+            "email_contatto": "info@plasticaelettronica.it",
+            "telefono_contatto": "+39 06 55219876",
+            "indirizzo_sede": "Corso Europa 45",
+            "citta_sede": "Roma",
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "codice_fornitore": "FORN-00003",
+            "ragione_sociale": "Ferramenta Piemontese S.n.c.",
+            "partita_iva": "IT03456789123",
+            "email_contatto": "vendite@ferramentapiemontese.it",
+            "telefono_contatto": "+39 011 3344556",
+            "indirizzo_sede": "Via San Secondo 8",
+            "citta_sede": "Torino",
+            "attivo": true
+          },
+          {
+            "id": 4,
+            "codice_fornitore": "FORN-00004",
+            "ragione_sociale": "Lubrificanti Industriali Toscana S.p.A.",
+            "partita_iva": "IT04567891234",
+            "email_contatto": "ordini@lubritoscana.it",
+            "telefono_contatto": "+39 055 7712233",
+            "indirizzo_sede": "Via del Commercio 21",
+            "citta_sede": "Firenze",
+            "attivo": false
+          },
+          {
+            "id": 5,
+            "codice_fornitore": "FORN-00005",
+            "ragione_sociale": "Componenti Meccanici Veneti S.r.l.",
+            "partita_iva": "IT05678912345",
+            "email_contatto": "sales@cmveneti.it",
+            "telefono_contatto": "+39 045 6678899",
+            "indirizzo_sede": "Via dell'Artigianato 3",
+            "citta_sede": "Verona",
+            "attivo": true
+          },
+          {
+            "id": 6,
+            "codice_fornitore": "FORN-00006",
+            "ragione_sociale": "Imballaggi Sud S.r.l.",
+            "partita_iva": "IT06789123456",
+            "email_contatto": "amministrazione@imballaggisud.it",
+            "telefono_contatto": "+39 081 4455667",
+            "indirizzo_sede": "Via Porto 17",
+            "citta_sede": "Napoli",
+            "attivo": true
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Metalmeccanica Lombarda S.p.A.",
+              "Plastica Elettronica S.r.l.",
+              "Ferramenta Piemontese S.n.c.",
+              "Lubrificanti Industriali Toscana S.p.A.",
+              "Componenti Meccanici Veneti S.r.l.",
+              "Imballaggi Sud S.r.l.",
+              "Elettroforniture Centro S.r.l.",
+              "Cartotecnia Emiliana S.p.A.",
+              "Gomme Tecniche Sardegna S.r.l.",
+              "Acciai Speciali Friuli S.p.A."
+            ]
+          },
+          "email_contatto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "acquisti@fornitore-industriale.it",
+              "info@partner-logistics.com",
+              "vendite@supply-chain.it",
+              "ordini@grossisti-riuniti.it",
+              "sales@componenti-pro.it",
+              "amministrazione@forniture-tecniche.it"
+            ]
+          },
+          "telefono_contatto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 02 88451234",
+              "+39 06 55219876",
+              "+39 011 3344556",
+              "+39 055 7712233",
+              "+39 045 6678899",
+              "+39 081 4455667",
+              "+39 010 9988776",
+              "+39 051 2233445"
+            ]
+          },
+          "indirizzo_sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via dell'Industria 12",
+              "Corso Europa 45",
+              "Via San Secondo 8",
+              "Via del Commercio 21",
+              "Via dell'Artigianato 3",
+              "Via Porto 17",
+              "Via Emilia 112",
+              "Via Nazionale 5"
+            ]
+          },
+          "citta_sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Verona",
+              "Bari"
+            ]
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "articoli",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_articolo": "ART-00001",
+            "descrizione": "Vite esagonale M8x40 zincata",
+            "categoria": "Ferramenta",
+            "fornitore_id": 1,
+            "prezzo_unitario": 0.15,
+            "unita_misura": "PZ",
+            "giacenza_magazzino": 12500
+          },
+          {
+            "id": 2,
+            "codice_articolo": "ART-00002",
+            "descrizione": "Cavo elettrico H07V-K 2.5mmq",
+            "categoria": "Elettrico",
+            "fornitore_id": 2,
+            "prezzo_unitario": 1.85,
+            "unita_misura": "MT",
+            "giacenza_magazzino": 3400
+          },
+          {
+            "id": 3,
+            "codice_articolo": "ART-00003",
+            "descrizione": "Guarnizione O-ring 30x3 NBR",
+            "categoria": "Tenute",
+            "fornitore_id": 3,
+            "prezzo_unitario": 0.45,
+            "unita_misura": "PZ",
+            "giacenza_magazzino": 8600
+          },
+          {
+            "id": 4,
+            "codice_articolo": "ART-00004",
+            "descrizione": "Motore elettrico trifase 2.2kW",
+            "categoria": "Componenti meccanici",
+            "fornitore_id": 4,
+            "prezzo_unitario": 289.9,
+            "unita_misura": "PZ",
+            "giacenza_magazzino": 18
+          },
+          {
+            "id": 5,
+            "codice_articolo": "ART-00005",
+            "descrizione": "Olio idraulico ISO VG46 20L",
+            "categoria": "Lubrificanti",
+            "fornitore_id": 5,
+            "prezzo_unitario": 42.5,
+            "unita_misura": "LT",
+            "giacenza_magazzino": 210
+          },
+          {
+            "id": 6,
+            "codice_articolo": "ART-00006",
+            "descrizione": "Film stretch trasparente 50cm",
+            "categoria": "Imballaggi",
+            "fornitore_id": 6,
+            "prezzo_unitario": 6.9,
+            "unita_misura": "CF",
+            "giacenza_magazzino": 480
+          }
+        ],
+        "variations": {
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ricambio originale certificato",
+              "Componente standard di magazzino",
+              "Articolo di consumo industriale",
+              "Materiale di primo impianto",
+              "Ricambio aftermarket omologato",
+              "Fornitura di serie catalogo 2026"
+            ]
+          },
+          "categoria": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ferramenta",
+              "Elettrico",
+              "Tenute",
+              "Componenti meccanici",
+              "Lubrificanti",
+              "Imballaggi",
+              "Utensili",
+              "Sicurezza"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "unita_misura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "PZ",
+              "PZ",
+              "PZ",
+              "MT",
+              "KG",
+              "LT",
+              "CF"
+            ]
+          },
+          "giacenza_magazzino": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.1,
+            "factor_max": 3.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ordini_acquisto",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "numero_ordine": "OC-2026-00101",
+            "fornitore_id": 1,
+            "stato_ordine": "APERTO",
+            "data_ordine": "2026-01-12",
+            "data_consegna_prevista": "2026-02-05",
+            "note_ordine": "Consegna presso magazzino centrale"
+          },
+          {
+            "id": 102,
+            "numero_ordine": "OC-2026-00102",
+            "fornitore_id": 2,
+            "stato_ordine": "IN_EVASIONE",
+            "data_ordine": "2026-01-20",
+            "data_consegna_prevista": "2026-02-09",
+            "note_ordine": "Trasporto incluso nel prezzo"
+          },
+          {
+            "id": 103,
+            "numero_ordine": "OC-2026-00103",
+            "fornitore_id": 3,
+            "stato_ordine": "CHIUSO",
+            "data_ordine": "2026-02-03",
+            "data_consegna_prevista": "2026-02-17",
+            "note_ordine": null
+          },
+          {
+            "id": 104,
+            "numero_ordine": "OC-2026-00104",
+            "fornitore_id": 4,
+            "stato_ordine": "APERTO",
+            "data_ordine": "2026-02-18",
+            "data_consegna_prevista": "2026-03-10",
+            "note_ordine": "Priorità alta - linea di produzione"
+          },
+          {
+            "id": 105,
+            "numero_ordine": "OC-2026-00105",
+            "fornitore_id": 5,
+            "stato_ordine": "IN_EVASIONE",
+            "data_ordine": "2026-03-02",
+            "data_consegna_prevista": "2026-03-23",
+            "note_ordine": "Verificare disponibilità a magazzino"
+          },
+          {
+            "id": 106,
+            "numero_ordine": "OC-2026-00106",
+            "fornitore_id": 6,
+            "stato_ordine": "CHIUSO",
+            "data_ordine": "2026-03-09",
+            "data_consegna_prevista": "2026-03-27",
+            "note_ordine": "Ordine quadro annuale"
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -7.0,
+            "delta_max": 7.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_consegna_prevista": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 21.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "APERTO",
+              "APERTO",
+              "IN_EVASIONE",
+              "IN_EVASIONE",
+              "CHIUSO",
+              "CHIUSO"
+            ]
+          },
+          "note_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Consegna presso magazzino centrale",
+              "Trasporto incluso nel prezzo",
+              "Priorità alta - linea di produzione",
+              "Verificare disponibilità a magazzino",
+              "Ordine quadro annuale",
+              "Contatto logistica interno 214"
+            ]
+          }
+        }
+      },
+      {
+        "table": "righe_ordine_acquisto",
+        "nature": "fact",
+        "min_rows": 600,
+        "max_rows": 900,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ordine_acquisto_id": 101,
+            "articolo_id": 1,
+            "quantita_ordinata": 500,
+            "quantita_ricevuta": 500,
+            "prezzo_unitario": 0.15,
+            "sconto_percentuale": 5.0
+          },
+          {
+            "id": 2,
+            "ordine_acquisto_id": 101,
+            "articolo_id": 2,
+            "quantita_ordinata": 200,
+            "quantita_ricevuta": 200,
+            "prezzo_unitario": 1.85,
+            "sconto_percentuale": 0
+          },
+          {
+            "id": 3,
+            "ordine_acquisto_id": 102,
+            "articolo_id": 3,
+            "quantita_ordinata": 1000,
+            "quantita_ricevuta": 850,
+            "prezzo_unitario": 0.45,
+            "sconto_percentuale": 2.5
+          },
+          {
+            "id": 4,
+            "ordine_acquisto_id": 103,
+            "articolo_id": 4,
+            "quantita_ordinata": 10,
+            "quantita_ricevuta": 10,
+            "prezzo_unitario": 289.9,
+            "sconto_percentuale": 0
+          },
+          {
+            "id": 5,
+            "ordine_acquisto_id": 104,
+            "articolo_id": 5,
+            "quantita_ordinata": 40,
+            "quantita_ricevuta": 0,
+            "prezzo_unitario": 42.5,
+            "sconto_percentuale": 10.0
+          },
+          {
+            "id": 6,
+            "ordine_acquisto_id": 105,
+            "articolo_id": 1,
+            "quantita_ordinata": 750,
+            "quantita_ricevuta": 720,
+            "prezzo_unitario": 0.14,
+            "sconto_percentuale": 3.0
+          }
+        ],
+        "variations": {
+          "quantita_ordinata": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 1.0,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "quantita_ricevuta": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.0,
+            "factor_max": 0.9,
+            "pool": []
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.2,
+            "pool": []
+          },
+          "sconto_percentuale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0",
+              "0",
+              "2.50",
+              "5.00",
+              "7.50",
+              "10.00"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

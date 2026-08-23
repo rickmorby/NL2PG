@@ -1,0 +1,34 @@
+{
+  "domain": "vendite",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "natural_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_acquirenti",
+      "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; il risolutore deve mappare la perifrasi al nome fisico della tabella."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "importo",
+      "obsolete_value": "valore_complessivo",
+      "description": "La colonna importo della tabella ordini è indicata come valore_complessivo nei documenti commerciali; si tratta di un sinonimo puro che non altera la semantica del dato."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "cliente_id IS NULL",
+      "obsolete_value": "scontrini muti",
+      "description": "Gli ordini con la FK opzionale cliente_id a NULL (vendite senza cliente registrato) sono chiamati scontrini muti nel gergo dei punti vendita; le query devono individuarli tramite IS NULL o join esterni, poiché il NATURAL JOIN/USING li escluderebbe implicitamente."
+    }
+  ],
+  "spec_hash": "7b8ef9be4b83f75b"
+}

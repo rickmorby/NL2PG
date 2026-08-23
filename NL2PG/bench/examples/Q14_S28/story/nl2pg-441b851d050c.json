@@ -1,0 +1,266 @@
+{
+  "schema_ddl": "CREATE TABLE dipendenti (\n    matricola INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    id_reparto INT,\n    responsabile_reparto INT REFERENCES dipendenti(matricola)\n);\n\nCREATE TABLE reparti (\n    id_reparto INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL,\n    sede TEXT\n);\n\nCREATE TABLE progetti (\n    id_progetto INT PRIMARY KEY,\n    nome_progetto TEXT NOT NULL,\n    matricola INT REFERENCES dipendenti(matricola)\n);",
+  "data_profile": {
+    "profile": {
+      "reparti": {
+        "row_count": 7,
+        "columns": {
+          "id_reparto": {
+            "distinct": 7,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 7
+          },
+          "nome_reparto": {
+            "distinct": 6,
+            "sample": [
+              "Amministrazione",
+              "Direzione",
+              "IT",
+              "Logistica",
+              "Produzione"
+            ]
+          },
+          "sede": {
+            "distinct": 5,
+            "sample": [
+              "Bologna",
+              "Genova",
+              "Napoli",
+              "Roma",
+              "Torino"
+            ]
+          }
+        }
+      },
+      "emp": {
+        "row_count": 157,
+        "columns": {
+          "matricola": {
+            "distinct": 157,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 157
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Andrea Greco",
+              "Anna Russo",
+              "Davide Ricci",
+              "Elena Marino",
+              "Francesca Colombo"
+            ]
+          },
+          "id_reparto": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 4
+          },
+          "responsabile_reparto": {
+            "distinct": 75,
+            "sample": [
+              "1",
+              "10",
+              "101",
+              "103",
+              "108"
+            ],
+            "min": 1,
+            "max": 154
+          }
+        }
+      },
+      "progetti": {
+        "row_count": 145,
+        "columns": {
+          "id_progetto": {
+            "distinct": 145,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 145
+          },
+          "nome_progetto": {
+            "distinct": 10,
+            "sample": [
+              "Automazione Logistica",
+              "Business Intelligence",
+              "Cruscotto Vendite",
+              "Data Warehouse",
+              "Fatturazione Elettronica"
+            ]
+          },
+          "matricola": {
+            "distinct": 93,
+            "sample": [
+              "10",
+              "100",
+              "101",
+              "104",
+              "106"
+            ],
+            "min": 3,
+            "max": 153
+          }
+        }
+      }
+    },
+    "preview": {
+      "reparti": [
+        {
+          "id_reparto": 1,
+          "nome_reparto": "Direzione",
+          "sede": "Roma"
+        },
+        {
+          "id_reparto": 2,
+          "nome_reparto": "Direzione",
+          "sede": "Genova"
+        },
+        {
+          "id_reparto": 3,
+          "nome_reparto": "Amministrazione",
+          "sede": "Torino"
+        },
+        {
+          "id_reparto": 4,
+          "nome_reparto": "Vendite",
+          "sede": "Napoli"
+        },
+        {
+          "id_reparto": 5,
+          "nome_reparto": "IT",
+          "sede": "Bologna"
+        },
+        {
+          "id_reparto": 6,
+          "nome_reparto": "Produzione",
+          "sede": "Torino"
+        },
+        {
+          "id_reparto": 7,
+          "nome_reparto": "Logistica",
+          "sede": "Bologna"
+        }
+      ],
+      "emp": [
+        {
+          "matricola": 1,
+          "nome": "Laura Bianchi",
+          "id_reparto": "2",
+          "responsabile_reparto": null
+        },
+        {
+          "matricola": 2,
+          "nome": "Laura Bianchi",
+          "id_reparto": "6",
+          "responsabile_reparto": 1
+        },
+        {
+          "matricola": 3,
+          "nome": "Sara Esposito",
+          "id_reparto": "2",
+          "responsabile_reparto": 1
+        },
+        {
+          "matricola": 4,
+          "nome": "Elena Marino",
+          "id_reparto": "3",
+          "responsabile_reparto": 1
+        },
+        {
+          "matricola": 5,
+          "nome": "Mario Rossi",
+          "id_reparto": "4",
+          "responsabile_reparto": 2
+        },
+        {
+          "matricola": 6,
+          "nome": "Sara Esposito",
+          "id_reparto": "6",
+          "responsabile_reparto": 5
+        },
+        {
+          "matricola": 7,
+          "nome": "Davide Ricci",
+          "id_reparto": "2",
+          "responsabile_reparto": 3
+        },
+        {
+          "matricola": 8,
+          "nome": "Giulia Verdi",
+          "id_reparto": "6",
+          "responsabile_reparto": 1
+        }
+      ],
+      "progetti": [
+        {
+          "id_progetto": 1,
+          "nome_progetto": "Sistema Qualità",
+          "matricola": 124
+        },
+        {
+          "id_progetto": 2,
+          "nome_progetto": "Help Desk",
+          "matricola": 38
+        },
+        {
+          "id_progetto": 3,
+          "nome_progetto": "Data Warehouse",
+          "matricola": 28
+        },
+        {
+          "id_progetto": 4,
+          "nome_progetto": "Data Warehouse",
+          "matricola": 136
+        },
+        {
+          "id_progetto": 5,
+          "nome_progetto": "Sistema Qualità",
+          "matricola": 8
+        },
+        {
+          "id_progetto": 6,
+          "nome_progetto": "Manutenzione Impianti",
+          "matricola": 109
+        },
+        {
+          "id_progetto": 7,
+          "nome_progetto": "Data Warehouse",
+          "matricola": 88
+        },
+        {
+          "id_progetto": 8,
+          "nome_progetto": "Business Intelligence",
+          "matricola": 3
+        }
+      ]
+    }
+  },
+  "story": "Nell’ambito della gestione delle risorse umane, l’archivio denominato dipendenti raccoglie le schede personali di tutti i collaboratori, dove per ciascuno sono indicati il nome, il reparto di appartenenza e, ove presente, il responsabile reparto che sovrintende alle attività. Parallelamente, il registro intitolato dept contiene le informazioni relative ai vari reparti aziendali, come il nome del reparto e la sede operativa, tra cui spiccano le località di Bologna, Genova, Napoli, Roma e Torino. Infine, il registro intitolato proj elenca i progetti attivi, associando a ciascuno il nome del progetto e il collaboratore incaricato della sua gestione. Durante un’analisi mirata a identificare tutti i membri del reparto IT, con sede a Bologna, gli operatori hanno esaminato le schede dei dipendenti, verificando anche la presenza o meno di progetti assegnati, come ad esempio il Data Warehouse o il Business Intelligence. I risultati sono stati organizzati in ordine alfabetico per nome del collaboratore e per nome del progetto, al fine di agevolare la consultazione e la pianificazione delle risorse."
+}

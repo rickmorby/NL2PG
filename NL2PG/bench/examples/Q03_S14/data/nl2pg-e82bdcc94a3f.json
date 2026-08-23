@@ -1,0 +1,254 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "top_n"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "9ad50c432e9d86ea"
+  },
+  "schema_ddl": "CREATE DOMAIN codice_stato_spedizione AS TEXT CHECK (VALUE IN ('in_preparazione', 'in_transito', 'consegnata', 'restituita'));\n\nCREATE DOMAIN peso_chilogrammi AS NUMERIC(10,2) CHECK (VALUE > 0);\n\nCREATE DOMAIN cap_postale AS TEXT CHECK (VALUE ~ '^[0-9]{5}$');\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    cap cap_postale NOT NULL\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    destinatario TEXT NOT NULL,\n    indirizzo_destinazione TEXT NOT NULL,\n    peso_kg peso_chilogrammi NOT NULL,\n    stato codice_stato_spedizione NOT NULL DEFAULT 'in_preparazione',\n    data_spedizione DATE NOT NULL,\n    data_consegna DATE,\n    CHECK (data_consegna IS NULL OR data_consegna >= data_spedizione)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "magazzini",
+        "nature": "lookup",
+        "min_rows": 24,
+        "max_rows": 28,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Hub Milano Nord",
+            "citta": "Milano",
+            "cap": "20121"
+          },
+          {
+            "id": 2,
+            "nome": "Deposito Roma Est",
+            "citta": "Roma",
+            "cap": "00184"
+          },
+          {
+            "id": 3,
+            "nome": "Hub Torino Sud",
+            "citta": "Torino",
+            "cap": "10121"
+          },
+          {
+            "id": 4,
+            "nome": "Deposito Napoli Centro",
+            "citta": "Napoli",
+            "cap": "80121"
+          },
+          {
+            "id": 5,
+            "nome": "Hub Bologna Ovest",
+            "citta": "Bologna",
+            "cap": "40121"
+          },
+          {
+            "id": 6,
+            "nome": "Deposito Firenze Scandicci",
+            "citta": "Firenze",
+            "cap": "50143"
+          },
+          {
+            "id": 7,
+            "nome": "Hub Genova Porto",
+            "citta": "Genova",
+            "cap": "16121"
+          },
+          {
+            "id": 8,
+            "nome": "Deposito Padova Est",
+            "citta": "Padova",
+            "cap": "35121"
+          }
+        ],
+        "variations": {
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Padova"
+            ]
+          },
+          "cap": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "20121",
+              "00184",
+              "10121",
+              "80121",
+              "40121",
+              "50143",
+              "16121",
+              "35121"
+            ]
+          }
+        }
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 15.0,
+        "templates": [
+          {
+            "id": 1001,
+            "magazzino_id": 1,
+            "destinatario": "Mario Rossi",
+            "indirizzo_destinazione": "Via Garibaldi 12",
+            "peso_kg": 2.4,
+            "stato": "consegnata",
+            "data_spedizione": "2026-01-10",
+            "data_consegna": "2026-01-13"
+          },
+          {
+            "id": 1002,
+            "magazzino_id": 2,
+            "destinatario": "Laura Bianchi",
+            "indirizzo_destinazione": "Corso Vittorio Emanuele II 45",
+            "peso_kg": 8.75,
+            "stato": "consegnata",
+            "data_spedizione": "2026-01-12",
+            "data_consegna": "2026-01-16"
+          },
+          {
+            "id": 1003,
+            "magazzino_id": 3,
+            "destinatario": "Giulia Ferrari",
+            "indirizzo_destinazione": "Via Po 8",
+            "peso_kg": 0.9,
+            "stato": "consegnata",
+            "data_spedizione": "2026-01-15",
+            "data_consegna": "2026-01-18"
+          },
+          {
+            "id": 1004,
+            "magazzino_id": 1,
+            "destinatario": "Alessandro Conti",
+            "indirizzo_destinazione": "Viale Trieste 77",
+            "peso_kg": 15.3,
+            "stato": "in_transito",
+            "data_spedizione": "2026-02-02",
+            "data_consegna": null
+          },
+          {
+            "id": 1005,
+            "magazzino_id": 4,
+            "destinatario": "Chiara Moretti",
+            "indirizzo_destinazione": "Via Toledo 120",
+            "peso_kg": 4.1,
+            "stato": "in_preparazione",
+            "data_spedizione": "2026-02-05",
+            "data_consegna": null
+          },
+          {
+            "id": 1006,
+            "magazzino_id": 5,
+            "destinatario": "Luca Esposito",
+            "indirizzo_destinazione": "Via dell'Indipendenza 33",
+            "peso_kg": 22.0,
+            "stato": "restituita",
+            "data_spedizione": "2026-01-20",
+            "data_consegna": null
+          },
+          {
+            "id": 1007,
+            "magazzino_id": 6,
+            "destinatario": "Sara Ricci",
+            "indirizzo_destinazione": "Piazza della Repubblica 5",
+            "peso_kg": 1.25,
+            "stato": "consegnata",
+            "data_spedizione": "2026-01-25",
+            "data_consegna": "2026-01-29"
+          }
+        ],
+        "variations": {
+          "destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Ferrari",
+              "Alessandro Conti",
+              "Chiara Moretti",
+              "Luca Esposito",
+              "Sara Ricci",
+              "Davide Greco",
+              "Elena Marchetti",
+              "Fabio De Luca"
+            ]
+          },
+          "indirizzo_destinazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Garibaldi 12",
+              "Corso Vittorio Emanuele II 45",
+              "Via Po 8",
+              "Viale Trieste 77",
+              "Via Toledo 120",
+              "Via dell'Indipendenza 33",
+              "Piazza della Repubblica 5",
+              "Via Dante Alighieri 21",
+              "Corso Buenos Aires 88",
+              "Via Nazionale 140"
+            ]
+          },
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "data_spedizione": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_consegna": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 7.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

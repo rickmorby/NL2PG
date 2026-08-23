@@ -1,0 +1,514 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 5,
+    "hierarchy": "denormalized",
+    "sql_features": [
+      "ordered_set_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "vendite_flat",
+        "obsolete_value": "registro_transazioni_commerciali",
+        "description": "La tabella piatta denormalizzata vendite_flat, che incorpora gli attributi ridondanti category_name e supplier_name, viene denominata registro_transazioni_commerciali nella prosa aziendale. Il solver deve mappare la perifrasi sulla tabella dei fatti denormalizzata su cui eseguire direttamente l'aggregato ordered-set."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "percentile_cont",
+        "obsolete_value": "soglia distributiva P90",
+        "description": "Il requisito di calcolare percentile_cont(0.9) WITHIN GROUP (ORDER BY importo) direttamente sulla tabella denormalizzata viene espresso nella prosa aziendale con il gergo 'soglia distributiva P90'. Il solver deve riconoscere che si tratta di un aggregato ordered-set con PERCENTILE_CONT e non di un semplice filtro o aggregazione standard."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "supplier_name",
+        "obsolete_value": "ragione_sociale_partner",
+        "description": "La colonna denormalizzata supplier_name, incorporata ridondantemente nella tabella vendite_flat, viene indicata nella prosa aziendale come 'ragione_sociale_partner'. Il solver deve risolvere il sinonimo per raggruppare o ordinare correttamente i percentile per fornitore senza join aggiuntivi."
+      }
+    ],
+    "spec_hash": "bea5c462385ab78c"
+  },
+  "schema_ddl": "CREATE TABLE categorie_prodotti (\n    id SERIAL PRIMARY KEY,\n    nome_categoria TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL UNIQUE,\n    paese TEXT NOT NULL DEFAULT 'Italia'\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    categoria_id INT NOT NULL REFERENCES categorie_prodotti(id),\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    nome_prodotto TEXT NOT NULL,\n    prezzo_listino NUMERIC(10,2) NOT NULL CHECK (prezzo_listino >= 0)\n);\n\nCREATE TABLE punti_vendita (\n    id SERIAL PRIMARY KEY,\n    nome_negozio TEXT NOT NULL,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE vendite_flat (\n    id BIGINT PRIMARY KEY,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    punto_vendita_id INT NOT NULL REFERENCES punti_vendita(id),\n    data_vendita DATE NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo >= 0),\n    nome_categoria TEXT NOT NULL,\n    nome_fornitore TEXT NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "categorie_prodotti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_categoria": "Elettronica"
+          },
+          {
+            "id": 2,
+            "nome_categoria": "Informatica"
+          },
+          {
+            "id": 3,
+            "nome_categoria": "Telefonia"
+          },
+          {
+            "id": 4,
+            "nome_categoria": "Audio & Video"
+          },
+          {
+            "id": 5,
+            "nome_categoria": "Elettrodomestici"
+          },
+          {
+            "id": 6,
+            "nome_categoria": "Gaming"
+          },
+          {
+            "id": 7,
+            "nome_categoria": "Accessori"
+          },
+          {
+            "id": 8,
+            "nome_categoria": "Casa & Ufficio"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "fornitori",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "TechDistribution S.r.l.",
+            "paese": "Italia"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "NordElettronica GmbH",
+            "paese": "Germania"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Componenti Precisione S.p.A.",
+            "paese": "Italia"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "GlobalParts Ltd",
+            "paese": "Regno Unito"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Shenzhen Electronics Co.",
+            "paese": "Cina"
+          },
+          {
+            "id": 6,
+            "ragione_sociale": "AudioPro France SAS",
+            "paese": "Francia"
+          },
+          {
+            "id": 7,
+            "ragione_sociale": "Mediterranea Import Export",
+            "paese": "Italia"
+          },
+          {
+            "id": 8,
+            "ragione_sociale": "AlpenTech AG",
+            "paese": "Svizzera"
+          },
+          {
+            "id": 9,
+            "ragione_sociale": "IberiaComponentes SL",
+            "paese": "Spagna"
+          },
+          {
+            "id": 10,
+            "ragione_sociale": "PixelWorks B.V.",
+            "paese": "Paesi Bassi"
+          },
+          {
+            "id": 11,
+            "ragione_sociale": "Forniture Ufficio Italia S.r.l.",
+            "paese": "Italia"
+          },
+          {
+            "id": 12,
+            "ragione_sociale": "ElectroMarket Polska",
+            "paese": "Polonia"
+          }
+        ],
+        "variations": {
+          "paese": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Italia",
+              "Italia",
+              "Italia",
+              "Germania",
+              "Francia",
+              "Cina",
+              "Spagna"
+            ]
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 180,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "categoria_id": 1,
+            "fornitore_id": 1,
+            "nome_prodotto": "Smart TV LED 43 pollici",
+            "prezzo_listino": 299.99
+          },
+          {
+            "id": 2,
+            "categoria_id": 2,
+            "fornitore_id": 3,
+            "nome_prodotto": "Notebook Ultraleggero 14 pollici",
+            "prezzo_listino": 749.0
+          },
+          {
+            "id": 3,
+            "categoria_id": 3,
+            "fornitore_id": 5,
+            "nome_prodotto": "Smartphone Gamma Media 128GB",
+            "prezzo_listino": 349.9
+          },
+          {
+            "id": 4,
+            "categoria_id": 4,
+            "fornitore_id": 6,
+            "nome_prodotto": "Cuffie Wireless Noise Cancelling",
+            "prezzo_listino": 129.5
+          },
+          {
+            "id": 5,
+            "categoria_id": 5,
+            "fornitore_id": 7,
+            "nome_prodotto": "Macchina Caffe Espresso",
+            "prezzo_listino": 189.0
+          },
+          {
+            "id": 6,
+            "categoria_id": 6,
+            "fornitore_id": 12,
+            "nome_prodotto": "Controller Wireless Pro",
+            "prezzo_listino": 59.99
+          },
+          {
+            "id": 7,
+            "categoria_id": 7,
+            "fornitore_id": 11,
+            "nome_prodotto": "Mouse Ottico Ergonomico",
+            "prezzo_listino": 24.9
+          },
+          {
+            "id": 8,
+            "categoria_id": 8,
+            "fornitore_id": 2,
+            "nome_prodotto": "Lampada LED da Scrivania",
+            "prezzo_listino": 39.9
+          }
+        ],
+        "variations": {
+          "nome_prodotto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Smart TV LED 55 pollici",
+              "Smartphone Gamma Alta 256GB",
+              "Cuffie Bluetooth Sport",
+              "Speaker Portatile Impermeabile",
+              "Notebook Gaming 15 pollici",
+              "Monitor Curvo 32 pollici",
+              "Smartwatch Fitness GPS",
+              "Tablet 11 pollici LTE",
+              "Router Wi-Fi 6 Mesh",
+              "Webcam Full HD Autofocus",
+              "Barra Audio Soundbar 2.1",
+              "Tastiera Meccanica RGB",
+              "SSD Esterno 1TB",
+              "Power Bank 20000mAh"
+            ]
+          },
+          "prezzo_listino": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.4,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "punti_vendita",
+        "nature": "dimension",
+        "min_rows": 30,
+        "max_rows": 48,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_negozio": "TechStore Milano Centrale",
+            "citta": "Milano"
+          },
+          {
+            "id": 2,
+            "nome_negozio": "Elettronica Roma Termini",
+            "citta": "Roma"
+          },
+          {
+            "id": 3,
+            "nome_negozio": "DigitalPoint Torino Porta Susa",
+            "citta": "Torino"
+          },
+          {
+            "id": 4,
+            "nome_negozio": "TechStore Napoli Vomero",
+            "citta": "Napoli"
+          },
+          {
+            "id": 5,
+            "nome_negozio": "Elettronica Bologna Fiera",
+            "citta": "Bologna"
+          },
+          {
+            "id": 6,
+            "nome_negozio": "DigitalPoint Firenze Novoli",
+            "citta": "Firenze"
+          }
+        ],
+        "variations": {
+          "nome_negozio": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "TechStore Verona Borgo Roma",
+              "Elettronica Genova Sampierdarena",
+              "TechStore Padova Centro",
+              "DigitalPoint Brescia Due",
+              "MegaTech Outlet Roma EUR",
+              "HiFi Store Milano Isola",
+              "TechStore Palermo Libertà",
+              "Elettronica Catania Centro"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Verona",
+              "Genova"
+            ]
+          }
+        }
+      },
+      {
+        "table": "vendite_flat",
+        "nature": "fact",
+        "min_rows": 700,
+        "max_rows": 1000,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 100001,
+            "prodotto_id": 1,
+            "punto_vendita_id": 1,
+            "data_vendita": "2026-01-08",
+            "quantita": 2,
+            "prezzo_unitario": 279.0,
+            "importo": 558.0,
+            "nome_categoria": "Elettronica",
+            "nome_fornitore": "TechDistribution S.r.l."
+          },
+          {
+            "id": 100002,
+            "prodotto_id": 3,
+            "punto_vendita_id": 2,
+            "data_vendita": "2026-01-19",
+            "quantita": 1,
+            "prezzo_unitario": 329.9,
+            "importo": 329.9,
+            "nome_categoria": "Telefonia",
+            "nome_fornitore": "Shenzhen Electronics Co."
+          },
+          {
+            "id": 100003,
+            "prodotto_id": 4,
+            "punto_vendita_id": 3,
+            "data_vendita": "2026-02-04",
+            "quantita": 3,
+            "prezzo_unitario": 119.0,
+            "importo": 357.0,
+            "nome_categoria": "Audio & Video",
+            "nome_fornitore": "AudioPro France SAS"
+          },
+          {
+            "id": 100004,
+            "prodotto_id": 2,
+            "punto_vendita_id": 1,
+            "data_vendita": "2026-02-17",
+            "quantita": 1,
+            "prezzo_unitario": 719.0,
+            "importo": 719.0,
+            "nome_categoria": "Informatica",
+            "nome_fornitore": "Componenti Precisione S.p.A."
+          },
+          {
+            "id": 100005,
+            "prodotto_id": 7,
+            "punto_vendita_id": 4,
+            "data_vendita": "2026-03-02",
+            "quantita": 5,
+            "prezzo_unitario": 22.9,
+            "importo": 114.5,
+            "nome_categoria": "Accessori",
+            "nome_fornitore": "Forniture Ufficio Italia S.r.l."
+          },
+          {
+            "id": 100006,
+            "prodotto_id": 5,
+            "punto_vendita_id": 5,
+            "data_vendita": "2026-03-18",
+            "quantita": 2,
+            "prezzo_unitario": 179.0,
+            "importo": 358.0,
+            "nome_categoria": "Elettrodomestici",
+            "nome_fornitore": "Mediterranea Import Export"
+          },
+          {
+            "id": 100007,
+            "prodotto_id": 6,
+            "punto_vendita_id": 6,
+            "data_vendita": "2026-01-28",
+            "quantita": 4,
+            "prezzo_unitario": 54.9,
+            "importo": 219.6,
+            "nome_categoria": "Gaming",
+            "nome_fornitore": "ElectroMarket Polska"
+          },
+          {
+            "id": 100008,
+            "prodotto_id": 8,
+            "punto_vendita_id": 2,
+            "data_vendita": "2026-02-26",
+            "quantita": 2,
+            "prezzo_unitario": 36.5,
+            "importo": 73.0,
+            "nome_categoria": "Casa & Ufficio",
+            "nome_fornitore": "NordElettronica GmbH"
+          }
+        ],
+        "variations": {
+          "data_vendita": {
+            "axis": "shift",
+            "delta_min": -25.0,
+            "delta_max": 25.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.05,
+            "pool": []
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "nome_categoria": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Elettronica",
+              "Informatica",
+              "Telefonia",
+              "Audio & Video",
+              "Elettrodomestici",
+              "Gaming",
+              "Accessori",
+              "Casa & Ufficio"
+            ]
+          },
+          "nome_fornitore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "TechDistribution S.r.l.",
+              "NordElettronica GmbH",
+              "Componenti Precisione S.p.A.",
+              "Shenzhen Electronics Co.",
+              "AudioPro France SAS",
+              "Mediterranea Import Export",
+              "AlpenTech AG",
+              "ElectroMarket Polska"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

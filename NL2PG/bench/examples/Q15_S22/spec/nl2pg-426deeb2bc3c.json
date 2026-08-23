@@ -1,0 +1,34 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 6,
+  "hierarchy": "star",
+  "sql_features": [
+    "cte"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "sinistri",
+      "obsolete_value": "pratiche_liquidazione",
+      "description": "La tabella dei fatti centrale 'sinistri' viene denominata 'pratiche_liquidazione' nella prosa aziendale. Le query devono risolvere la perifrasi verso la tabella dei fatti dello star schema."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "assicurati",
+      "description": "La tabella dimensionale 'clienti' viene indicata con il sinonimo 'assicurati' nella documentazione aziendale. Il mapping sinonimo-tabella deve essere dedotto dal contesto."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_risarcimento",
+      "obsolete_value": "indennizzo erogato",
+      "description": "La misura 'importo_risarcimento' nella tabella dei fatti è riferita con il gergo assicurativo 'indennizzo erogato'. Gli aggregati richiesti (somme, medie) vanno calcolati su tale colonna dei fatti."
+    }
+  ],
+  "spec_hash": "770192eeb4bfb7e6"
+}

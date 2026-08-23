@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 4,
+    "hierarchy": "flat",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti_contabili",
+        "obsolete_value": "registrazioni",
+        "description": "La tabella movimenti_contabili viene comunemente chiamata registrazioni nel linguaggio aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "category_name",
+        "obsolete_value": "natura_contabile",
+        "description": "Il campo category_name è riferito come natura_contabile nei documenti interni."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "supplier_name",
+        "obsolete_value": "fornitore",
+        "description": "Il campo supplier_name è spesso sostituito dal termine fornitore nelle query informali."
+      }
+    ],
+    "spec_hash": "6d86e8c750e4e29b"
+  },
+  "schema_ddl": "CREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    data_movimento DATE NOT NULL,\n    importo NUMERIC(15,2) NOT NULL CHECK (importo != 0),\n    nome_categoria TEXT NOT NULL,\n    nome_fornitore TEXT,\n    totale_per_categoria NUMERIC(15,2) GENERATED ALWAYS AS (importo) STORED,\n    conteggio_per_fornitore INT GENERATED ALWAYS AS (1) STORED\n);\n\nCREATE TABLE categorie_contabili (\n    id SERIAL PRIMARY KEY,\n    nome_categoria TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    totale_movimenti NUMERIC(15,2) DEFAULT 0,\n    n_movimenti INT DEFAULT 0\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    nome_fornitore TEXT NOT NULL UNIQUE,\n    codice_fiscale TEXT UNIQUE,\n    totale_speso NUMERIC(15,2) DEFAULT 0,\n    n_fatture INT DEFAULT 0\n);\n\nCREATE TABLE riepilogo_annuale (\n    id SERIAL PRIMARY KEY,\n    anno INT NOT NULL UNIQUE,\n    totale_movimenti_annuali NUMERIC(15,2) DEFAULT 0,\n    n_movimenti_annuali INT DEFAULT 0,\n    n_categorie_attive INT DEFAULT 0,\n    n_fornitori_attivi INT DEFAULT 0\n);"
+}

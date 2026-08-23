@@ -1,0 +1,365 @@
+{
+  "schema_ddl": "CREATE TABLE facolta (id INT PRIMARY KEY, nome_facolta TEXT NOT NULL);\n\nCREATE TABLE studenti (id INT PRIMARY KEY, nome TEXT NOT NULL, cognome TEXT NOT NULL, facolta_id INT);\n\nCREATE TABLE corsi (id INT PRIMARY KEY, titolo_corso TEXT NOT NULL, crediti INT CHECK (crediti > 0));\n\nCREATE TABLE esami (id INT PRIMARY KEY, studente_id INT, corso_id INT, voto_esame INT CHECK (voto_esame BETWEEN 18 AND 30), data_appello DATE NOT NULL);",
+  "data_profile": {
+    "profile": {
+      "facolta": {
+        "row_count": 37,
+        "columns": {
+          "id": {
+            "distinct": 37,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 37
+          },
+          "nome_facolta": {
+            "distinct": 5,
+            "sample": [
+              "Economia",
+              "Giurisprudenza",
+              "Ingegneria",
+              "Lettere",
+              "Scienze"
+            ]
+          }
+        }
+      },
+      "studenti": {
+        "row_count": 431,
+        "columns": {
+          "id": {
+            "distinct": 431,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 431
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Anna",
+              "Elena",
+              "Luca",
+              "Marco",
+              "Mario"
+            ]
+          },
+          "cognome": {
+            "distinct": 5,
+            "sample": [
+              "Bianchi",
+              "Esposito",
+              "Neri",
+              "Rossi",
+              "Verdi"
+            ]
+          },
+          "facolta_id": {
+            "distinct": 2,
+            "sample": [
+              "1",
+              "2"
+            ],
+            "min": 1,
+            "max": 2
+          }
+        }
+      },
+      "corsi": {
+        "row_count": 481,
+        "columns": {
+          "id": {
+            "distinct": 481,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 481
+          },
+          "titolo_corso": {
+            "distinct": 5,
+            "sample": [
+              "Analisi I",
+              "Diritto Privato",
+              "Economia Politica",
+              "Fisica",
+              "Letteratura Italiana"
+            ]
+          },
+          "crediti": {
+            "distinct": 3,
+            "sample": [
+              "12",
+              "6",
+              "9"
+            ],
+            "min": 6,
+            "max": 12
+          }
+        }
+      },
+      "esami": {
+        "row_count": 2738,
+        "columns": {
+          "id": {
+            "distinct": 2738,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2738
+          },
+          "studente_id": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "corso_id": {
+            "distinct": 2,
+            "sample": [
+              "1",
+              "2"
+            ],
+            "min": 1,
+            "max": 2
+          },
+          "voto_esame": {
+            "distinct": 7,
+            "sample": [
+              "18",
+              "20",
+              "22",
+              "24",
+              "26"
+            ],
+            "min": 18,
+            "max": 28
+          },
+          "data_appello": {
+            "distinct": 63,
+            "sample": [
+              "2025-01-16",
+              "2025-01-17",
+              "2025-01-18",
+              "2025-01-19",
+              "2025-01-20"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "facolta": [
+        {
+          "id": 1,
+          "nome_facolta": "Lettere"
+        },
+        {
+          "id": 2,
+          "nome_facolta": "Ingegneria"
+        },
+        {
+          "id": 3,
+          "nome_facolta": "Lettere"
+        },
+        {
+          "id": 4,
+          "nome_facolta": "Lettere"
+        },
+        {
+          "id": 5,
+          "nome_facolta": "Ingegneria"
+        },
+        {
+          "id": 6,
+          "nome_facolta": "Giurisprudenza"
+        },
+        {
+          "id": 7,
+          "nome_facolta": "Ingegneria"
+        },
+        {
+          "id": 8,
+          "nome_facolta": "Giurisprudenza"
+        }
+      ],
+      "studenti": [
+        {
+          "id": 1,
+          "nome": "Elena",
+          "cognome": "Esposito",
+          "facolta_id": 1
+        },
+        {
+          "id": 2,
+          "nome": "Elena",
+          "cognome": "Neri",
+          "facolta_id": 1
+        },
+        {
+          "id": 3,
+          "nome": "Luca",
+          "cognome": "Rossi",
+          "facolta_id": 1
+        },
+        {
+          "id": 4,
+          "nome": "Elena",
+          "cognome": "Esposito",
+          "facolta_id": 1
+        },
+        {
+          "id": 5,
+          "nome": "Luca",
+          "cognome": "Verdi",
+          "facolta_id": 1
+        },
+        {
+          "id": 6,
+          "nome": "Mario",
+          "cognome": "Bianchi",
+          "facolta_id": 1
+        },
+        {
+          "id": 7,
+          "nome": "Luca",
+          "cognome": "Neri",
+          "facolta_id": 1
+        },
+        {
+          "id": 8,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "facolta_id": 1
+        }
+      ],
+      "corsi": [
+        {
+          "id": 1,
+          "titolo_corso": "Fisica",
+          "crediti": "12"
+        },
+        {
+          "id": 2,
+          "titolo_corso": "Letteratura Italiana",
+          "crediti": "12"
+        },
+        {
+          "id": 3,
+          "titolo_corso": "Analisi I",
+          "crediti": "6"
+        },
+        {
+          "id": 4,
+          "titolo_corso": "Economia Politica",
+          "crediti": null
+        },
+        {
+          "id": 5,
+          "titolo_corso": "Economia Politica",
+          "crediti": "12"
+        },
+        {
+          "id": 6,
+          "titolo_corso": "Analisi I",
+          "crediti": "12"
+        },
+        {
+          "id": 7,
+          "titolo_corso": "Analisi I",
+          "crediti": "12"
+        },
+        {
+          "id": 8,
+          "titolo_corso": "Analisi I",
+          "crediti": 12
+        }
+      ],
+      "esami": [
+        {
+          "id": 1,
+          "studente_id": 1,
+          "corso_id": 1,
+          "voto_esame": "24",
+          "data_appello": "2025-01-31"
+        },
+        {
+          "id": 2,
+          "studente_id": 1,
+          "corso_id": 1,
+          "voto_esame": "22",
+          "data_appello": "2025-01-26"
+        },
+        {
+          "id": 3,
+          "studente_id": 1,
+          "corso_id": 1,
+          "voto_esame": null,
+          "data_appello": "2025-03-10"
+        },
+        {
+          "id": 4,
+          "studente_id": 1,
+          "corso_id": 1,
+          "voto_esame": null,
+          "data_appello": "2025-01-19"
+        },
+        {
+          "id": 5,
+          "studente_id": 1,
+          "corso_id": 1,
+          "voto_esame": "30",
+          "data_appello": "2025-03-07"
+        },
+        {
+          "id": 6,
+          "studente_id": 1,
+          "corso_id": 1,
+          "voto_esame": "26",
+          "data_appello": "2025-03-16"
+        },
+        {
+          "id": 7,
+          "studente_id": 1,
+          "corso_id": null,
+          "voto_esame": "28",
+          "data_appello": "2025-01-21"
+        },
+        {
+          "id": 8,
+          "studente_id": 1,
+          "corso_id": 1,
+          "voto_esame": "28",
+          "data_appello": "2025-01-30"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "distinct_on"
+  ],
+  "query": "SELECT DISTINCT ON (s.nome, s.cognome) s.nome, s.cognome, e.voto_esame, e.data_appello FROM studenti s JOIN esami e ON s.id = e.studente_id WHERE e.voto_esame IS NOT NULL AND (e.voto_esame BETWEEN 24 AND 30 OR e.data_appello >= DATE '2025-03-20' - INTERVAL '30 days') ORDER BY s.nome, s.cognome, e.data_appello DESC, e.id DESC;"
+}

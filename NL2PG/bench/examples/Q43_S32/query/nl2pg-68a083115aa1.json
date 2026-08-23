@@ -1,0 +1,205 @@
+{
+  "schema_ddl": "CREATE TABLE prenotazioni (\n    id BIGSERIAL PRIMARY KEY,\n    paziente_id INT NOT NULL,\n    medico_id INT NOT NULL,\n    ambulatorio_id INT NOT NULL,\n    data_ora_prenotazione TIMESTAMP NOT NULL,\n    motivo_visita TEXT NOT NULL,\n    stato_prenotazione TEXT NOT NULL CHECK (stato_prenotazione IN ('prenotata', 'confermata', 'annullata', 'completata')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_ora_prenotazione > CURRENT_TIMESTAMP - INTERVAL '5 years'),\n    CHECK (data_ora_prenotazione < CURRENT_TIMESTAMP + INTERVAL '1 year')\n);",
+  "data_profile": {
+    "profile": {
+      "prenotazioni": {
+        "row_count": 1001,
+        "columns": {
+          "id": {
+            "distinct": 1001,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1001
+          },
+          "paziente_id": {
+            "distinct": 971,
+            "sample": [
+              "101",
+              "102",
+              "102.04168301418697",
+              "102.51480602574058",
+              "102.68621675845168"
+            ],
+            "min": 101,
+            "max": 310.0
+          },
+          "medico_id": {
+            "distinct": 959,
+            "sample": [
+              "201",
+              "201.1154435291824",
+              "201.13374824793277",
+              "201.27142166885824",
+              "201.68441716535463"
+            ],
+            "min": 201,
+            "max": 255.0
+          },
+          "ambulatorio_id": {
+            "distinct": 5,
+            "sample": [
+              "301",
+              "302",
+              "303",
+              "304",
+              "305"
+            ],
+            "min": 301,
+            "max": 303
+          },
+          "data_ora_prenotazione": {
+            "distinct": 485,
+            "sample": [
+              "2026-02-14 10:00:00",
+              "2026-02-15 10:00:00",
+              "2026-02-15 11:30:00",
+              "2026-02-16 09:45:00",
+              "2026-02-16 10:00:00"
+            ]
+          },
+          "motivo_visita": {
+            "distinct": 14,
+            "sample": [
+              "Controllo glicemia",
+              "Controllo pressione arteriosa",
+              "Controllo tiroide",
+              "Dolore addominale ricorrente",
+              "Ecografia addominale"
+            ]
+          },
+          "stato_prenotazione": {
+            "distinct": 4,
+            "sample": [
+              "annullata",
+              "completata",
+              "confermata",
+              "prenotata"
+            ]
+          },
+          "created_at": {
+            "distinct": 156,
+            "sample": [
+              "2026-02-18 16:20:33",
+              "2026-02-19 16:20:33",
+              "2026-02-20 16:20:33",
+              "2026-02-21 16:20:33",
+              "2026-02-22 16:20:33"
+            ]
+          },
+          "updated_at": {
+            "distinct": 152,
+            "sample": [
+              "2026-03-02 08:45:10",
+              "2026-03-02 14:30:45",
+              "2026-03-03 08:45:10",
+              "2026-03-03 14:30:45",
+              "2026-03-04 08:45:10"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "prenotazioni": [
+        {
+          "id": 1,
+          "paziente_id": 136.46561277531916,
+          "medico_id": 245.76294166387584,
+          "ambulatorio_id": "301",
+          "data_ora_prenotazione": "2026-03-06 10:00:00",
+          "motivo_visita": "Dolore addominale ricorrente",
+          "stato_prenotazione": "confermata",
+          "created_at": "2026-03-04 09:15:22",
+          "updated_at": "2026-03-12 14:30:45"
+        },
+        {
+          "id": 2,
+          "paziente_id": 289.8593838879315,
+          "medico_id": 202.060801250677,
+          "ambulatorio_id": "303",
+          "data_ora_prenotazione": "2026-03-30 10:00:00",
+          "motivo_visita": "Controllo glicemia",
+          "stato_prenotazione": "annullata",
+          "created_at": "2026-02-25 09:15:22",
+          "updated_at": "2026-03-15 14:30:45"
+        },
+        {
+          "id": 3,
+          "paziente_id": 144.0676707772379,
+          "medico_id": 226.1609563768322,
+          "ambulatorio_id": "301",
+          "data_ora_prenotazione": "2026-04-08 10:00:00",
+          "motivo_visita": "Radiografia torace",
+          "stato_prenotazione": "prenotata",
+          "created_at": "2026-02-24 09:15:22",
+          "updated_at": "2026-03-15 14:30:45"
+        },
+        {
+          "id": 4,
+          "paziente_id": 266.70029152227755,
+          "medico_id": 208.9413522812962,
+          "ambulatorio_id": "305",
+          "data_ora_prenotazione": "2026-04-11 10:00:00",
+          "motivo_visita": "Visita di controllo annuale",
+          "stato_prenotazione": "confermata",
+          "created_at": "2026-03-08 09:15:22",
+          "updated_at": "2026-03-04 14:30:45"
+        },
+        {
+          "id": 5,
+          "paziente_id": 101,
+          "medico_id": 201,
+          "ambulatorio_id": 301,
+          "data_ora_prenotazione": "2026-04-14 10:00:00",
+          "motivo_visita": "Visita di controllo annuale",
+          "stato_prenotazione": "confermata",
+          "created_at": "2026-03-10 09:15:22",
+          "updated_at": "2026-03-12 14:30:45"
+        },
+        {
+          "id": 6,
+          "paziente_id": 175.40880429993035,
+          "medico_id": 213.45843366877028,
+          "ambulatorio_id": "305",
+          "data_ora_prenotazione": "2026-02-28 10:00:00",
+          "motivo_visita": "Dolore addominale ricorrente",
+          "stato_prenotazione": "prenotata",
+          "created_at": "2026-02-24 09:15:22",
+          "updated_at": "2026-03-15 14:30:45"
+        },
+        {
+          "id": 7,
+          "paziente_id": 180.5203786640749,
+          "medico_id": 234.53200777817602,
+          "ambulatorio_id": "305",
+          "data_ora_prenotazione": "2026-04-08 10:00:00",
+          "motivo_visita": "Radiografia torace",
+          "stato_prenotazione": "prenotata",
+          "created_at": "2026-03-01 09:15:22",
+          "updated_at": "2026-03-12 14:30:45"
+        },
+        {
+          "id": 8,
+          "paziente_id": 158.41868960825434,
+          "medico_id": 223.59621054329736,
+          "ambulatorio_id": "303",
+          "data_ora_prenotazione": "2026-02-25 10:00:00",
+          "motivo_visita": "Controllo glicemia",
+          "stato_prenotazione": "confermata",
+          "created_at": "2026-03-07 09:15:22",
+          "updated_at": "2026-03-09 14:30:45"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "sorting"
+  ],
+  "query": "SELECT motivo_visita, COUNT(*) AS numero_prenotazioni, SUM(CASE WHEN stato_prenotazione = 'confermata' THEN 1 ELSE 0 END) AS confermate, SUM(CASE WHEN stato_prenotazione = 'completata' THEN 1 ELSE 0 END) AS completate FROM prenotazioni WHERE stato_prenotazione IN ('confermata', 'completata') AND data_ora_prenotazione BETWEEN '2026-02-25' AND '2026-04-14' GROUP BY motivo_visita ORDER BY numero_prenotazioni DESC;"
+}

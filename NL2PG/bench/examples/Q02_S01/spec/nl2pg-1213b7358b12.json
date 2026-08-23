@@ -1,0 +1,11 @@
+{
+  "domain": "vendite",
+  "n_tables": 1,
+  "hierarchy": "single_table",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "3cb05c0a881cca32"
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "erp",
+  "n_tables": 1,
+  "hierarchy": "single_entity",
+  "sql_features": [
+    "conjunctive"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "86ff67219f986a9b"
+}

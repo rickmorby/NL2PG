@@ -1,0 +1,261 @@
+{
+  "schema_ddl": "CREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    responsabile_id INT\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    data_assunzione DATE,\n    stipendio NUMERIC(10,2) CHECK (stipendio >= 0),\n    manager_id INT REFERENCES dipendenti(id),\n    reparto_id INT REFERENCES reparti(id)\n);",
+  "data_profile": {
+    "profile": {
+      "reparti": {
+        "row_count": 41,
+        "columns": {
+          "id": {
+            "distinct": 41,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 41
+          },
+          "nome": {
+            "distinct": 41,
+            "sample": [
+              "Amministrazione",
+              "Amministrazione_1",
+              "Amministrazione_2",
+              "Amministrazione_3",
+              "Amministrazione_4"
+            ]
+          },
+          "responsabile_id": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      },
+      "dipendenti": {
+        "row_count": 171,
+        "columns": {
+          "id": {
+            "distinct": 171,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 171
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Anna",
+              "Davide",
+              "Elena",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Ferrari",
+              "Gialli",
+              "Neri"
+            ]
+          },
+          "email": {
+            "distinct": 161,
+            "sample": [
+              "anna.gialli@example.com",
+              "anna.gialli@example.com_1",
+              "anna.gialli@example.com_10",
+              "anna.gialli@example.com_11",
+              "anna.gialli@example.com_12"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 154,
+            "sample": [
+              "2018-12-03",
+              "2018-12-13",
+              "2018-12-19",
+              "2018-12-24",
+              "2018-12-25"
+            ]
+          },
+          "stipendio": {
+            "distinct": 162,
+            "sample": [
+              "2243.56",
+              "2297.64",
+              "2304.61",
+              "2376.56",
+              "2408.33"
+            ],
+            "min": 2243.56,
+            "max": 4442.18
+          },
+          "manager_id": {
+            "distinct": 77,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "105",
+              "109"
+            ],
+            "min": 1,
+            "max": 147
+          },
+          "reparto_id": {
+            "distinct": 39,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 41
+          }
+        }
+      }
+    },
+    "preview": {
+      "reparti": [
+        {
+          "id": 1,
+          "nome": "Amministrazione",
+          "responsabile_id": null
+        },
+        {
+          "id": 2,
+          "nome": "Amministrazione_1",
+          "responsabile_id": null
+        },
+        {
+          "id": 3,
+          "nome": "Amministrazione_2",
+          "responsabile_id": null
+        },
+        {
+          "id": 4,
+          "nome": "Amministrazione_3",
+          "responsabile_id": null
+        },
+        {
+          "id": 5,
+          "nome": "Amministrazione_4",
+          "responsabile_id": null
+        },
+        {
+          "id": 6,
+          "nome": "Amministrazione_5",
+          "responsabile_id": null
+        },
+        {
+          "id": 7,
+          "nome": "Amministrazione_6",
+          "responsabile_id": null
+        },
+        {
+          "id": 8,
+          "nome": "Amministrazione_7",
+          "responsabile_id": null
+        }
+      ],
+      "dipendenti": [
+        {
+          "id": 12,
+          "nome": "Anna",
+          "cognome": "Romano",
+          "email": "anna.romano1@example.com",
+          "data_assunzione": "2020-02-13",
+          "stipendio": 3460.57,
+          "manager_id": 6,
+          "reparto_id": 26
+        },
+        {
+          "id": 14,
+          "nome": "Davide",
+          "cognome": "Neri",
+          "email": "davide.neri1@example.com",
+          "data_assunzione": "2019-10-26",
+          "stipendio": 3325.41,
+          "manager_id": 3,
+          "reparto_id": 21
+        },
+        {
+          "id": 66,
+          "nome": "Elena",
+          "cognome": "Romano",
+          "email": "elena.romano1@example.com",
+          "data_assunzione": "2021-05-03",
+          "stipendio": 3475.54,
+          "manager_id": 33,
+          "reparto_id": 12
+        },
+        {
+          "id": 26,
+          "nome": "Laura",
+          "cognome": "Colombo",
+          "email": "laura.colombo1@example.com",
+          "data_assunzione": "2019-09-03",
+          "stipendio": 3560.54,
+          "manager_id": 8,
+          "reparto_id": 40
+        },
+        {
+          "id": 60,
+          "nome": "Laura",
+          "cognome": "Romano",
+          "email": "laura.romano1@example.com",
+          "data_assunzione": "2020-09-28",
+          "stipendio": 3508.18,
+          "manager_id": 35,
+          "reparto_id": 23
+        },
+        {
+          "id": 19,
+          "nome": "Luca",
+          "cognome": "Verdi",
+          "email": "luca.verdi1@example.com",
+          "data_assunzione": "2019-08-08",
+          "stipendio": 3638.52,
+          "manager_id": 6,
+          "reparto_id": 9
+        },
+        {
+          "id": 28,
+          "nome": "Sara",
+          "cognome": "Gialli",
+          "email": "sara.gialli1@example.com",
+          "data_assunzione": "2020-05-31",
+          "stipendio": 3746.76,
+          "manager_id": 5,
+          "reparto_id": 19
+        },
+        {
+          "id": 4,
+          "nome": "Anna",
+          "cognome": "Gialli",
+          "email": "anna.gialli1@example.com",
+          "data_assunzione": null,
+          "stipendio": 3951.81,
+          "manager_id": 2,
+          "reparto_id": 30
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "self_join"
+  ],
+  "query": "SELECT d.nome AS nome_dipendente, d.cognome AS cognome_dipendente, m.nome AS nome_manager, m.cognome AS cognome_manager FROM dipendenti d JOIN dipendenti m ON d.manager_id = m.id;"
+}

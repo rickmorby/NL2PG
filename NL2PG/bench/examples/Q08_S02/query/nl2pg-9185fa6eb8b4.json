@@ -1,0 +1,485 @@
+{
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    edificio TEXT NOT NULL\n);\n\nCREATE TABLE studenti (\n    id SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_immatricolazione DATE NOT NULL,\n    tutor_id INT REFERENCES studenti(id) ON DELETE SET NULL,\n    CHECK (tutor_id IS NULL OR tutor_id <> id)\n);\n\nCREATE TABLE corsi (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    titolo TEXT NOT NULL,\n    cfu INT NOT NULL CHECK (cfu BETWEEN 1 AND 30),\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id) ON DELETE RESTRICT\n);\n\nCREATE TABLE esami (\n    id SERIAL PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id) ON DELETE CASCADE,\n    corso_id INT NOT NULL REFERENCES corsi(id) ON DELETE CASCADE,\n    data_esame DATE NOT NULL,\n    voto INT NOT NULL CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_profile": {
+    "profile": {
+      "dipartimenti": {
+        "row_count": 44,
+        "columns": {
+          "id": {
+            "distinct": 44,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 44
+          },
+          "nome": {
+            "distinct": 44,
+            "sample": [
+              "Biologia",
+              "Biologia1",
+              "Biologia2",
+              "Biologia3",
+              "Biologia4"
+            ]
+          },
+          "edificio": {
+            "distinct": 4,
+            "sample": [
+              "Edificio A",
+              "Edificio B",
+              "Edificio C",
+              "Edificio D"
+            ]
+          }
+        }
+      },
+      "studenti": {
+        "row_count": 479,
+        "columns": {
+          "id": {
+            "distinct": 479,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 479
+          },
+          "matricola": {
+            "distinct": 479,
+            "sample": [
+              "BN234567",
+              "BN2345671",
+              "BN23456710",
+              "BN23456711",
+              "BN23456712"
+            ]
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Costa",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "data_immatricolazione": {
+            "distinct": 202,
+            "sample": [
+              "2022-08-06",
+              "2022-08-07",
+              "2022-08-08",
+              "2022-08-09",
+              "2022-08-10"
+            ]
+          },
+          "tutor_id": {
+            "distinct": 233,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 440
+          }
+        }
+      },
+      "corsi": {
+        "row_count": 125,
+        "columns": {
+          "id": {
+            "distinct": 125,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 225
+          },
+          "codice": {
+            "distinct": 125,
+            "sample": [
+              "ECO1301",
+              "ECO13011",
+              "ECO130110",
+              "ECO130111",
+              "ECO130112"
+            ]
+          },
+          "titolo": {
+            "distinct": 10,
+            "sample": [
+              "Algoritmi e Strutture Dati",
+              "Analisi Matematica I",
+              "Basi di Dati",
+              "Chimica Organica",
+              "Fisica Generale I"
+            ]
+          },
+          "cfu": {
+            "distinct": 6,
+            "sample": [
+              "10",
+              "12",
+              "15",
+              "6",
+              "8"
+            ],
+            "min": 8,
+            "max": 12
+          },
+          "dipartimento_id": {
+            "distinct": 43,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 44
+          }
+        }
+      },
+      "esami": {
+        "row_count": 2321,
+        "columns": {
+          "id": {
+            "distinct": 2321,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3321
+          },
+          "studente_id": {
+            "distinct": 472,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 479
+          },
+          "corso_id": {
+            "distinct": 125,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 225
+          },
+          "data_esame": {
+            "distinct": 508,
+            "sample": [
+              "2022-10-22",
+              "2022-10-23",
+              "2022-10-24",
+              "2022-10-25",
+              "2022-10-26"
+            ]
+          },
+          "voto": {
+            "distinct": 13,
+            "sample": [
+              "18",
+              "19",
+              "20",
+              "21",
+              "22"
+            ],
+            "min": 22,
+            "max": 30
+          },
+          "lode": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "dipartimenti": [
+        {
+          "id": 1,
+          "nome": "Informatica",
+          "edificio": "Edificio B"
+        },
+        {
+          "id": 2,
+          "nome": "Informatica1",
+          "edificio": "Edificio B"
+        },
+        {
+          "id": 3,
+          "nome": "Informatica2",
+          "edificio": "Edificio C"
+        },
+        {
+          "id": 4,
+          "nome": "Informatica3",
+          "edificio": "Edificio A"
+        },
+        {
+          "id": 5,
+          "nome": "Informatica4",
+          "edificio": "Edificio D"
+        },
+        {
+          "id": 6,
+          "nome": "Informatica5",
+          "edificio": "Edificio D"
+        },
+        {
+          "id": 7,
+          "nome": "Informatica6",
+          "edificio": "Edificio D"
+        },
+        {
+          "id": 8,
+          "nome": "Informatica7",
+          "edificio": "Edificio D"
+        }
+      ],
+      "studenti": [
+        {
+          "id": 1,
+          "matricola": "VR123456",
+          "nome": "Alessandro",
+          "cognome": "Russo",
+          "data_immatricolazione": "2022-09-30",
+          "tutor_id": null
+        },
+        {
+          "id": 2,
+          "matricola": "VR1234561",
+          "nome": "Mario",
+          "cognome": "Russo",
+          "data_immatricolazione": "2022-08-29",
+          "tutor_id": 1
+        },
+        {
+          "id": 3,
+          "matricola": "VR1234562",
+          "nome": "Marco",
+          "cognome": "Costa",
+          "data_immatricolazione": "2022-10-06",
+          "tutor_id": 2
+        },
+        {
+          "id": 4,
+          "matricola": "VR1234563",
+          "nome": "Mario",
+          "cognome": "Romano",
+          "data_immatricolazione": "2022-10-07",
+          "tutor_id": 1
+        },
+        {
+          "id": 5,
+          "matricola": "VR1234564",
+          "nome": "Sara",
+          "cognome": "Romano",
+          "data_immatricolazione": "2022-08-25",
+          "tutor_id": 4
+        },
+        {
+          "id": 6,
+          "matricola": "VR1234565",
+          "nome": "Chiara",
+          "cognome": "Verdi",
+          "data_immatricolazione": "2022-08-07",
+          "tutor_id": 2
+        },
+        {
+          "id": 7,
+          "matricola": "VR1234566",
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "data_immatricolazione": "2022-08-31",
+          "tutor_id": 2
+        },
+        {
+          "id": 8,
+          "matricola": "VR1234567",
+          "nome": "Alessandro",
+          "cognome": "Gallo",
+          "data_immatricolazione": "2022-08-29",
+          "tutor_id": 3
+        }
+      ],
+      "corsi": [
+        {
+          "id": 101,
+          "codice": "INF2101",
+          "titolo": "Fisica Generale I",
+          "cfu": "6",
+          "dipartimento_id": 3
+        },
+        {
+          "id": 102,
+          "codice": "INF21011",
+          "titolo": "Analisi Matematica I",
+          "cfu": "12",
+          "dipartimento_id": 1
+        },
+        {
+          "id": 103,
+          "codice": "INF21012",
+          "titolo": "Programmazione I",
+          "cfu": "12",
+          "dipartimento_id": 14
+        },
+        {
+          "id": 104,
+          "codice": "INF21013",
+          "titolo": "Reti di Calcolatori",
+          "cfu": "15",
+          "dipartimento_id": 11
+        },
+        {
+          "id": 105,
+          "codice": "INF21014",
+          "titolo": "Chimica Organica",
+          "cfu": "12",
+          "dipartimento_id": 5
+        },
+        {
+          "id": 106,
+          "codice": "INF21015",
+          "titolo": "Programmazione I",
+          "cfu": "6",
+          "dipartimento_id": 21
+        },
+        {
+          "id": 107,
+          "codice": "INF21016",
+          "titolo": "Geometria",
+          "cfu": "6",
+          "dipartimento_id": 25
+        },
+        {
+          "id": 108,
+          "codice": "INF21017",
+          "titolo": "Statistica",
+          "cfu": "12",
+          "dipartimento_id": 19
+        }
+      ],
+      "esami": [
+        {
+          "id": 1001,
+          "studente_id": 447,
+          "corso_id": 214,
+          "data_esame": "2023-02-02",
+          "voto": "22",
+          "lode": "false"
+        },
+        {
+          "id": 1002,
+          "studente_id": 405,
+          "corso_id": 180,
+          "data_esame": "2023-04-03",
+          "voto": "28",
+          "lode": "false"
+        },
+        {
+          "id": 1003,
+          "studente_id": 39,
+          "corso_id": 109,
+          "data_esame": "2022-11-11",
+          "voto": "20",
+          "lode": "true"
+        },
+        {
+          "id": 1004,
+          "studente_id": 446,
+          "corso_id": 153,
+          "data_esame": "2022-11-22",
+          "voto": "28",
+          "lode": "false"
+        },
+        {
+          "id": 1005,
+          "studente_id": 451,
+          "corso_id": 173,
+          "data_esame": "2022-12-15",
+          "voto": "24",
+          "lode": "false"
+        },
+        {
+          "id": 1006,
+          "studente_id": 196,
+          "corso_id": 187,
+          "data_esame": "2023-02-10",
+          "voto": "22",
+          "lode": "false"
+        },
+        {
+          "id": 1007,
+          "studente_id": 57,
+          "corso_id": 171,
+          "data_esame": "2023-02-17",
+          "voto": "28",
+          "lode": "false"
+        },
+        {
+          "id": 1008,
+          "studente_id": 353,
+          "corso_id": 106,
+          "data_esame": "2023-01-20",
+          "voto": 27,
+          "lode": false
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "self_join"
+  ],
+  "query": "SELECT s.matricola AS matricola_studente, s.nome AS nome_studente, s.cognome AS cognome_studente, t.matricola AS matricola_tutor, t.nome AS nome_tutor, t.cognome AS cognome_tutor FROM studenti s JOIN studenti t ON s.tutor_id = t.id WHERE s.data_immatricolazione BETWEEN '2022-08-01' AND '2022-09-30' ORDER BY t.cognome, s.cognome, s.nome, s.matricola;"
+}

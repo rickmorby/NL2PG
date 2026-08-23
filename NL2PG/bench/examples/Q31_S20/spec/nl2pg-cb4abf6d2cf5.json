@@ -1,0 +1,25 @@
+{
+  "domain": "erp",
+  "n_tables": 2,
+  "hierarchy": "enum",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini_produzione",
+      "obsolete_value": "lanci_di_lavoro",
+      "description": "La tabella ordini_produzione viene denominata lanci_di_lavoro nella prosa aziendale; il solver deve risalire al nome reale della tabella per costruire correttamente le query di filtro e ordinamento."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_ordine",
+      "obsolete_value": "stato avanzamento MRP",
+      "description": "La colonna ENUM nativa stato_ordine (valori dichiarati e mutuamente esclusivi: 'pianificato', 'in_lavorazione', 'completato', 'annullato') viene indicata con il gergo ERP 'stato avanzamento MRP'; le query devono filtrare con WHERE stato_ordine = 'valore_dichiarato' e ordinare con ORDER BY stato_ordine sfruttando l'ordine di definizione del tipo ENUM."
+    }
+  ],
+  "spec_hash": "8d9a2dfcd20bc3e3"
+}

@@ -1,0 +1,961 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    citta TEXT NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE depositi (\n    id SERIAL PRIMARY KEY,\n    nome_deposito TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capienza_massima_colli INT NOT NULL CHECK (capienza_massima_colli > 0)\n);\n\nCREATE TABLE corrieri (\n    id SERIAL PRIMARY KEY,\n    nome_completo TEXT NOT NULL,\n    telefono TEXT,\n    veicolo TEXT NOT NULL,\n    patente TEXT NOT NULL\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    deposito_partenza_id INT NOT NULL REFERENCES depositi(id),\n    corriere_id INT REFERENCES corrieri(id),\n    peso_totale_kg NUMERIC(8,2) NOT NULL CHECK (peso_totale_kg > 0),\n    costo_totale NUMERIC(10,2) NOT NULL CHECK (costo_totale >= 0),\n    data_spedizione DATE NOT NULL,\n    data_consegna_prevista DATE NOT NULL,\n    stato_spedizione TEXT NOT NULL CHECK (stato_spedizione IN ('in_preparazione', 'in_transito', 'consegnata', 'fallita')),\n    deleted_at TIMESTAMP,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_consegna_prevista >= data_spedizione)\n);\n\nCREATE TABLE pacchi (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    descrizione_contenuto TEXT NOT NULL,\n    peso_kg NUMERIC(6,2) NOT NULL CHECK (peso_kg > 0),\n    altezza_cm INT NOT NULL CHECK (altezza_cm > 0),\n    larghezza_cm INT NOT NULL CHECK (larghezza_cm > 0),\n    profondita_cm INT NOT NULL CHECK (profondita_cm > 0),\n    fragile BOOLEAN NOT NULL DEFAULT FALSE,\n    deleted_at TIMESTAMP,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE eventi_tracking (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    data_evento TIMESTAMP NOT NULL,\n    luogo TEXT NOT NULL,\n    descrizione_evento TEXT NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 250,
+        "columns": {
+          "id": {
+            "distinct": 250,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 250
+          },
+          "ragione_sociale": {
+            "distinct": 6,
+            "sample": [
+              "Bianchi Alimentari SPA",
+              "Carta & Ufficio Toscana",
+              "Elettronica Veneta SRL",
+              "Ferramenta Partenopea SAS",
+              "Rossi Distribuzione SRL"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 250,
+            "sample": [
+              "BNCNLA75T45F205B",
+              "BNCNLA75T45F205C",
+              "BNCNLA75T45F205D",
+              "BNCNLA75T45F205E",
+              "BNCNLA75T45F205F"
+            ]
+          },
+          "email": {
+            "distinct": 250,
+            "sample": [
+              "acquisti10@elettronicaveneta.it",
+              "acquisti11@elettronicaveneta.it",
+              "acquisti12@elettronicaveneta.it",
+              "acquisti13@elettronicaveneta.it",
+              "acquisti14@elettronicaveneta.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "010 2233 4455",
+              "011 5566 7788",
+              "02 7788 4412",
+              "041 9988 1122",
+              "051 8877 6655"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "created_at": {
+            "distinct": 190,
+            "sample": [
+              "2025-02-01 09:30:00",
+              "2025-02-10 09:30:00",
+              "2025-02-13 09:30:00",
+              "2025-02-16 09:30:00",
+              "2025-02-17 09:30:00"
+            ]
+          }
+        }
+      },
+      "depositi": {
+        "row_count": 33,
+        "columns": {
+          "id": {
+            "distinct": 33,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 33
+          },
+          "nome_deposito": {
+            "distinct": 33,
+            "sample": [
+              "Deposito Veneto",
+              "Deposito Veneto1",
+              "Deposito Veneto2",
+              "Deposito Veneto3",
+              "Deposito Veneto4"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 6,
+            "sample": [
+              "Corso Francia 210",
+              "Via Campania 78",
+              "Via Emilia 45",
+              "Via Salaria 1024",
+              "Via dell'Industria 12"
+            ]
+          },
+          "citta": {
+            "distinct": 6,
+            "sample": [
+              "Milano",
+              "Napoli",
+              "Padova",
+              "Roma",
+              "Torino"
+            ]
+          },
+          "capienza_massima_colli": {
+            "distinct": 33,
+            "sample": [
+              "15721.76",
+              "21700.0",
+              "22083.01",
+              "22129.18",
+              "22591.29"
+            ],
+            "min": 15721.76,
+            "max": 73823.54
+          }
+        }
+      },
+      "corrieri": {
+        "row_count": 695,
+        "columns": {
+          "id": {
+            "distinct": 695,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 695
+          },
+          "nome_completo": {
+            "distinct": 10,
+            "sample": [
+              "Andrea Villa",
+              "Chiara Marino",
+              "Davide Rinaldi",
+              "Elena Fontana",
+              "Francesca Longo"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "320 4567890",
+              "331 8765432",
+              "333 1234567",
+              "335 5678123",
+              "339 3456789"
+            ]
+          },
+          "veicolo": {
+            "distinct": 6,
+            "sample": [
+              "Camion DAF LF",
+              "Camion Scania P-series",
+              "Furgone Fiat Ducato",
+              "Furgone Iveco Daily",
+              "Furgone Mercedes Sprinter"
+            ]
+          },
+          "patente": {
+            "distinct": 3,
+            "sample": [
+              "B",
+              "C",
+              "CE"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 2921,
+        "columns": {
+          "id": {
+            "distinct": 2921,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3921
+          },
+          "codice_spedizione": {
+            "distinct": 2921,
+            "sample": [
+              "SPD-2026-000001",
+              "SPD-2026-0000011",
+              "SPD-2026-00000110",
+              "SPD-2026-000001100",
+              "SPD-2026-000001101"
+            ]
+          },
+          "cliente_id": {
+            "distinct": 250,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 250
+          },
+          "deposito_partenza_id": {
+            "distinct": 33,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 33
+          },
+          "corriere_id": {
+            "distinct": 683,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 695
+          },
+          "peso_totale_kg": {
+            "distinct": 2716,
+            "sample": [
+              "100.1",
+              "100.21",
+              "100.27",
+              "100.29",
+              "100.37"
+            ],
+            "min": 32.2,
+            "max": 705.65
+          },
+          "costo_totale": {
+            "distinct": 2596,
+            "sample": [
+              "100.06",
+              "100.1",
+              "100.28",
+              "100.39",
+              "100.45"
+            ],
+            "min": 28.74,
+            "max": 293.17
+          },
+          "data_spedizione": {
+            "distinct": 78,
+            "sample": [
+              "2025-12-31",
+              "2026-01-01",
+              "2026-01-02",
+              "2026-01-03",
+              "2026-01-04"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 90,
+            "sample": [
+              "2026-01-16",
+              "2026-01-17",
+              "2026-01-18",
+              "2026-01-19",
+              "2026-01-20"
+            ]
+          },
+          "stato_spedizione": {
+            "distinct": 4,
+            "sample": [
+              "consegnata",
+              "fallita",
+              "in_preparazione",
+              "in_transito"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 2,
+            "sample": [
+              "2026-04-02 17:45:00",
+              "2026-06-28 10:15:00"
+            ]
+          },
+          "created_at": {
+            "distinct": 6,
+            "sample": [
+              "2026-01-11 08:30:00",
+              "2026-02-07 09:10:00",
+              "2026-03-14 15:00:00",
+              "2026-04-21 11:25:00",
+              "2026-05-29 13:40:00"
+            ]
+          }
+        }
+      },
+      "pacchi": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "5001",
+              "5002",
+              "5003",
+              "5004",
+              "5005"
+            ],
+            "min": 5001,
+            "max": 8000
+          },
+          "spedizione_id": {
+            "distinct": 1884,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1006"
+            ],
+            "min": 1001,
+            "max": 3921
+          },
+          "descrizione_contenuto": {
+            "distinct": 8,
+            "sample": [
+              "Abbigliamento su grucce",
+              "Attrezzi da ferramenta",
+              "Cartoni alimentari",
+              "Componenti elettronici",
+              "Libri e cancelleria"
+            ]
+          },
+          "peso_kg": {
+            "distinct": 2424,
+            "sample": [
+              "10.02",
+              "10.05",
+              "10.06",
+              "10.07",
+              "10.09"
+            ],
+            "min": 3.34,
+            "max": 130.0
+          },
+          "altezza_cm": {
+            "distinct": 2873,
+            "sample": [
+              "100.0",
+              "110.0",
+              "110.23837950239441",
+              "110.3813235548964",
+              "110.41615434558125"
+            ],
+            "min": 15.0,
+            "max": 160.0
+          },
+          "larghezza_cm": {
+            "distinct": 2880,
+            "sample": [
+              "100.04473914439211",
+              "100.09628659424452",
+              "100.32097395350013",
+              "100.34416329798657",
+              "100.35149138239868"
+            ],
+            "min": 12.0,
+            "max": 110.0
+          },
+          "profondita_cm": {
+            "distinct": 2885,
+            "sample": [
+              "10.004051890516983",
+              "10.015236076537661",
+              "10.02587233799354",
+              "10.029809564295181",
+              "10.051549405267416"
+            ],
+            "min": 9.0,
+            "max": 75.0
+          },
+          "fragile": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          },
+          "deleted_at": {
+            "distinct": 0,
+            "sample": []
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "eventi_tracking": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "10000",
+              "10001",
+              "10002",
+              "10003",
+              "10004"
+            ],
+            "min": 9001,
+            "max": 12000
+          },
+          "spedizione_id": {
+            "distinct": 1850,
+            "sample": [
+              "1004",
+              "1005",
+              "1006",
+              "1007",
+              "1009"
+            ],
+            "min": 1004,
+            "max": 3921
+          },
+          "data_evento": {
+            "distinct": 135,
+            "sample": [
+              "2026-01-06 09:15:00",
+              "2026-01-07 09:15:00",
+              "2026-01-08 09:15:00",
+              "2026-01-09 09:15:00",
+              "2026-01-10 09:15:00"
+            ]
+          },
+          "luogo": {
+            "distinct": 8,
+            "sample": [
+              "Bologna - Centro Smistamento",
+              "Firenze - Centro Smistamento",
+              "Milano - Hub Lombardia",
+              "Napoli - Hub Sud",
+              "Padova - Deposito Veneto"
+            ]
+          },
+          "descrizione_evento": {
+            "distinct": 7,
+            "sample": [
+              "Arrivo presso centro di smistamento",
+              "Colli caricati sul veicolo",
+              "Collo in giacenza presso filiale",
+              "Consegna effettuata al destinatario",
+              "In transito verso il deposito di destinazione"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Rossi Distribuzione SRL",
+          "codice_fiscale": "RSSMRA80A01H501X",
+          "email": "info@rossidistribuzione.it",
+          "telefono": "011 5566 7788",
+          "citta": "Torino",
+          "created_at": "2025-03-19 09:30:00"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Rossi Distribuzione SRL",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "email": "info1@rossidistribuzione.it",
+          "telefono": "055 6677 8899",
+          "citta": "Torino",
+          "created_at": "2025-03-12 09:30:00"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Rossi Distribuzione SRL",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "email": "info2@rossidistribuzione.it",
+          "telefono": "081 3344 5566",
+          "citta": "Roma",
+          "created_at": "2025-04-06 09:30:00"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Rossi Distribuzione SRL",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "email": "info3@rossidistribuzione.it",
+          "telefono": "02 7788 4412",
+          "citta": "Genova",
+          "created_at": "2025-03-01 09:30:00"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Rossi Distribuzione SRL",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "email": "info4@rossidistribuzione.it",
+          "telefono": "055 6677 8899",
+          "citta": "Genova",
+          "created_at": "2025-02-28 09:30:00"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Rossi Distribuzione SRL",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "email": "info5@rossidistribuzione.it",
+          "telefono": "055 6677 8899",
+          "citta": "Torino",
+          "created_at": "2025-02-23 09:30:00"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Rossi Distribuzione SRL",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "email": "info6@rossidistribuzione.it",
+          "telefono": "081 3344 5566",
+          "citta": "Bologna",
+          "created_at": "2025-04-02 09:30:00"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Rossi Distribuzione SRL",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "email": "info7@rossidistribuzione.it",
+          "telefono": "081 3344 5566",
+          "citta": "Bologna",
+          "created_at": "2025-02-17 09:30:00"
+        }
+      ],
+      "depositi": [
+        {
+          "id": 1,
+          "nome_deposito": "Hub Centro Italia",
+          "indirizzo": "Via Salaria 1024",
+          "citta": "Roma",
+          "capienza_massima_colli": 43904.44
+        },
+        {
+          "id": 2,
+          "nome_deposito": "Hub Centro Italia1",
+          "indirizzo": "Via Salaria 1024",
+          "citta": "Roma",
+          "capienza_massima_colli": 62165.39
+        },
+        {
+          "id": 3,
+          "nome_deposito": "Hub Centro Italia2",
+          "indirizzo": "Via Salaria 1024",
+          "citta": "Roma",
+          "capienza_massima_colli": 45318.69
+        },
+        {
+          "id": 4,
+          "nome_deposito": "Hub Centro Italia3",
+          "indirizzo": "Via Salaria 1024",
+          "citta": "Roma",
+          "capienza_massima_colli": 41891.73
+        },
+        {
+          "id": 5,
+          "nome_deposito": "Hub Centro Italia4",
+          "indirizzo": "Via Salaria 1024",
+          "citta": "Roma",
+          "capienza_massima_colli": 45629.41
+        },
+        {
+          "id": 6,
+          "nome_deposito": "Hub Centro Italia5",
+          "indirizzo": "Via Salaria 1024",
+          "citta": "Roma",
+          "capienza_massima_colli": 39921.9
+        },
+        {
+          "id": 7,
+          "nome_deposito": "Hub Nord Ovest",
+          "indirizzo": "Corso Francia 210",
+          "citta": "Torino",
+          "capienza_massima_colli": 27046.43
+        },
+        {
+          "id": 8,
+          "nome_deposito": "Hub Nord Ovest1",
+          "indirizzo": "Corso Francia 210",
+          "citta": "Torino",
+          "capienza_massima_colli": 35689.71
+        }
+      ],
+      "corrieri": [
+        {
+          "id": 1,
+          "nome_completo": "Luca Moretti",
+          "telefono": "320 4567890",
+          "veicolo": "Furgone Mercedes Sprinter",
+          "patente": "CE"
+        },
+        {
+          "id": 2,
+          "nome_completo": "Sara Colombo",
+          "telefono": "348 2345678",
+          "veicolo": "Furgone Renault Master",
+          "patente": "CE"
+        },
+        {
+          "id": 3,
+          "nome_completo": "Luca Moretti",
+          "telefono": null,
+          "veicolo": "Furgone Iveco Daily",
+          "patente": "C"
+        },
+        {
+          "id": 4,
+          "nome_completo": "Marco Greco",
+          "telefono": "331 8765432",
+          "veicolo": "Camion Scania P-series",
+          "patente": "B"
+        },
+        {
+          "id": 5,
+          "nome_completo": "Sara Colombo",
+          "telefono": "320 4567890",
+          "veicolo": "Camion Scania P-series",
+          "patente": "CE"
+        },
+        {
+          "id": 6,
+          "nome_completo": "Luca Moretti",
+          "telefono": "333 1234567",
+          "veicolo": "Camion DAF LF",
+          "patente": "C"
+        },
+        {
+          "id": 7,
+          "nome_completo": "Francesca Longo",
+          "telefono": "348 2345678",
+          "veicolo": "Camion Scania P-series",
+          "patente": "C"
+        },
+        {
+          "id": 8,
+          "nome_completo": "Sara Colombo",
+          "telefono": "335 5678123",
+          "veicolo": "Furgone Fiat Ducato",
+          "patente": "B"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 1001,
+          "codice_spedizione": "SPD-2026-000001",
+          "cliente_id": 52,
+          "deposito_partenza_id": 11,
+          "corriere_id": 255,
+          "peso_totale_kg": 176.4,
+          "costo_totale": 123.92,
+          "data_spedizione": "2026-01-05",
+          "data_consegna_prevista": "2026-01-17",
+          "stato_spedizione": "consegnata",
+          "deleted_at": null,
+          "created_at": "2026-01-11 08:30:00"
+        },
+        {
+          "id": 1002,
+          "codice_spedizione": "SPD-2026-0000011",
+          "cliente_id": 114,
+          "deposito_partenza_id": 7,
+          "corriere_id": 297,
+          "peso_totale_kg": 158.69,
+          "costo_totale": 162.41,
+          "data_spedizione": "2026-01-11",
+          "data_consegna_prevista": "2026-01-24",
+          "stato_spedizione": "consegnata",
+          "deleted_at": null,
+          "created_at": "2026-01-11 08:30:00"
+        },
+        {
+          "id": 1003,
+          "codice_spedizione": "SPD-2026-0000012",
+          "cliente_id": 19,
+          "deposito_partenza_id": 4,
+          "corriere_id": 148,
+          "peso_totale_kg": 182.93,
+          "costo_totale": 135.69,
+          "data_spedizione": "2026-01-11",
+          "data_consegna_prevista": "2026-01-19",
+          "stato_spedizione": "in_preparazione",
+          "deleted_at": null,
+          "created_at": "2026-01-11 08:30:00"
+        },
+        {
+          "id": 1004,
+          "codice_spedizione": "SPD-2026-0000013",
+          "cliente_id": 65,
+          "deposito_partenza_id": 6,
+          "corriere_id": null,
+          "peso_totale_kg": 185.95,
+          "costo_totale": 110.04,
+          "data_spedizione": "2026-01-01",
+          "data_consegna_prevista": "2026-01-20",
+          "stato_spedizione": "consegnata",
+          "deleted_at": null,
+          "created_at": "2026-01-11 08:30:00"
+        },
+        {
+          "id": 1005,
+          "codice_spedizione": "SPD-2026-0000014",
+          "cliente_id": 182,
+          "deposito_partenza_id": 10,
+          "corriere_id": 498,
+          "peso_totale_kg": 231.51,
+          "costo_totale": 91.64,
+          "data_spedizione": "2026-01-05",
+          "data_consegna_prevista": "2026-01-22",
+          "stato_spedizione": "in_preparazione",
+          "deleted_at": null,
+          "created_at": "2026-01-11 08:30:00"
+        },
+        {
+          "id": 1006,
+          "codice_spedizione": "SPD-2026-0000015",
+          "cliente_id": 185,
+          "deposito_partenza_id": 8,
+          "corriere_id": 38,
+          "peso_totale_kg": 123.32,
+          "costo_totale": 127.93,
+          "data_spedizione": "2026-01-09",
+          "data_consegna_prevista": "2026-01-30",
+          "stato_spedizione": "consegnata",
+          "deleted_at": null,
+          "created_at": "2026-01-11 08:30:00"
+        },
+        {
+          "id": 1007,
+          "codice_spedizione": "SPD-2026-0000016",
+          "cliente_id": 17,
+          "deposito_partenza_id": 32,
+          "corriere_id": 557,
+          "peso_totale_kg": 276.95,
+          "costo_totale": 116.95,
+          "data_spedizione": "2026-01-05",
+          "data_consegna_prevista": "2026-01-18",
+          "stato_spedizione": "in_transito",
+          "deleted_at": null,
+          "created_at": "2026-01-11 08:30:00"
+        },
+        {
+          "id": 1008,
+          "codice_spedizione": "SPD-2026-0000017",
+          "cliente_id": 217,
+          "deposito_partenza_id": 5,
+          "corriere_id": 573,
+          "peso_totale_kg": 258.52,
+          "costo_totale": 120.32,
+          "data_spedizione": "2026-01-04",
+          "data_consegna_prevista": "2026-01-25",
+          "stato_spedizione": "fallita",
+          "deleted_at": null,
+          "created_at": "2026-01-11 08:30:00"
+        }
+      ],
+      "pacchi": [
+        {
+          "id": 5001,
+          "spedizione_id": 1571,
+          "descrizione_contenuto": "Libri e cancelleria",
+          "peso_kg": 29.92,
+          "altezza_cm": 42.74039715037399,
+          "larghezza_cm": 43.25052417178838,
+          "profondita_cm": 29.39239172655264,
+          "fragile": "true",
+          "deleted_at": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5002,
+          "spedizione_id": 2369,
+          "descrizione_contenuto": "Risme di carta A4",
+          "peso_kg": 45.89,
+          "altezza_cm": 54.395208305056784,
+          "larghezza_cm": 46.54659321700332,
+          "profondita_cm": 46.01681467934475,
+          "fragile": "false",
+          "deleted_at": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5003,
+          "spedizione_id": 3524,
+          "descrizione_contenuto": "Risme di carta A4",
+          "peso_kg": 59.69,
+          "altezza_cm": 42.4221927347222,
+          "larghezza_cm": 39.10679680938347,
+          "profondita_cm": 46.18171038442737,
+          "fragile": "false",
+          "deleted_at": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5004,
+          "spedizione_id": 1075,
+          "descrizione_contenuto": "Libri e cancelleria",
+          "peso_kg": 38.66,
+          "altezza_cm": 64.93740851974312,
+          "larghezza_cm": 63.31292110064628,
+          "profondita_cm": 45.91270049118854,
+          "fragile": "false",
+          "deleted_at": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5005,
+          "spedizione_id": 2048,
+          "descrizione_contenuto": "Cartoni alimentari",
+          "peso_kg": 51.72,
+          "altezza_cm": 43.26249423980748,
+          "larghezza_cm": 44.23741598153198,
+          "profondita_cm": 50.230384890865174,
+          "fragile": "false",
+          "deleted_at": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5006,
+          "spedizione_id": 2033,
+          "descrizione_contenuto": "Cartoni alimentari",
+          "peso_kg": 32.69,
+          "altezza_cm": 56.8765029418109,
+          "larghezza_cm": 33.864539151893986,
+          "profondita_cm": 46.084015209360956,
+          "fragile": "false",
+          "deleted_at": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5007,
+          "spedizione_id": 1853,
+          "descrizione_contenuto": "Componenti elettronici",
+          "peso_kg": 58.04,
+          "altezza_cm": 38.87828777294126,
+          "larghezza_cm": 34.292472148867546,
+          "profondita_cm": 54.23379348679039,
+          "fragile": "false",
+          "deleted_at": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5008,
+          "spedizione_id": 2395,
+          "descrizione_contenuto": "Libri e cancelleria",
+          "peso_kg": 42.75,
+          "altezza_cm": 73.82290643903026,
+          "larghezza_cm": 51.143867124487215,
+          "profondita_cm": 29.225854559090738,
+          "fragile": "true",
+          "deleted_at": null,
+          "created_at": "2000-01-01"
+        }
+      ],
+      "eventi_tracking": [
+        {
+          "id": 9001,
+          "spedizione_id": 2842,
+          "data_evento": "2026-01-28 09:15:00",
+          "luogo": "Verona - Hub Nord Est",
+          "descrizione_evento": "In transito verso il deposito di destinazione"
+        },
+        {
+          "id": 9002,
+          "spedizione_id": 2344,
+          "data_evento": "2026-01-26 09:15:00",
+          "luogo": "Milano - Hub Lombardia",
+          "descrizione_evento": "Consegna effettuata al destinatario"
+        },
+        {
+          "id": 9003,
+          "spedizione_id": 2370,
+          "data_evento": "2026-01-23 09:15:00",
+          "luogo": "Napoli - Hub Sud",
+          "descrizione_evento": "Arrivo presso centro di smistamento"
+        },
+        {
+          "id": 9004,
+          "spedizione_id": 1899,
+          "data_evento": "2026-01-18 09:15:00",
+          "luogo": "Firenze - Centro Smistamento",
+          "descrizione_evento": "Consegna effettuata al destinatario"
+        },
+        {
+          "id": 9005,
+          "spedizione_id": 3871,
+          "data_evento": "2026-01-12 09:15:00",
+          "luogo": "Napoli - Hub Sud",
+          "descrizione_evento": "Spedizione registrata al deposito"
+        },
+        {
+          "id": 9006,
+          "spedizione_id": 1393,
+          "data_evento": "2026-01-14 09:15:00",
+          "luogo": "Firenze - Centro Smistamento",
+          "descrizione_evento": "In transito verso il deposito di destinazione"
+        },
+        {
+          "id": 9007,
+          "spedizione_id": 3535,
+          "data_evento": "2026-01-15 09:15:00",
+          "luogo": "Torino - Hub Nord Ovest",
+          "descrizione_evento": "Arrivo presso centro di smistamento"
+        },
+        {
+          "id": 9008,
+          "spedizione_id": 2496,
+          "data_evento": "2026-01-10 09:15:00",
+          "luogo": "Bologna - Centro Smistamento",
+          "descrizione_evento": "Consegna effettuata al destinatario"
+        }
+      ]
+    }
+  },
+  "story": "Nella rete logistica di Meridiana Trasporti, l'archivio denominato clienti conserva le schede dei committenti abituali: per ognuno sono annotati la ragione sociale, il codice fiscale, l'indirizzo di posta elettronica, il numero di telefono e la città di riferimento operativo, da Milano a Napoli, da Torino a Bologna. Il registro depositi descrive invece i magazzini di partenza con indirizzo completo, città e capienza massima espressa in colli, mentre il registro corrieri raccoglie le generalità degli autisti, il veicolo loro affidato — furgoni Mercedes Sprinter o camion Scania P-series — e la patente posseduta. Il cuore dell'ufficio operazioni è il registro intitolato pratiche_di_trasporto, che nella nuova nomenclatura aziendale ha preso il posto delle tradizionali spedizioni: ogni pratica riporta il codice univoco della spedizione, il committente, il deposito di partenza, il corriere incaricato, il peso complessivo in kg, il costo totale, la data di partenza, la data di consegna prevista e lo stato d'avanzamento, che può essere in preparazione, in transito, consegnata oppure fallita. Le pratiche contrassegnate da una data di archiviazione sono dette archiviate e gli analisti le escludono sistematicamente da ogni conteggio, concentrandosi solo sulle pratiche ancora pienamente visibili. Ciascuna pratica si compone di uno o più colli, descritti nell'archivio pacchi: per ogni collo figurano la descrizione del contenuto — cartoni alimentari, componenti elettronici, libri e cancelleria — il peso in kg, le misure di altezza, larghezza e profondità in centimetri e l'indicazione della merce fragile. A completare il quadro, il registro eventi_tracking annota ogni tappa del percorso con data e ora, luogo — come il Milano - Hub Lombardia o il Napoli - Hub Sud — e descrizione dell'evento, dall'arrivo presso il centro di smistamento fino alla consegna effettuata al destinatario. Alla chiusura del mese, il responsabile commerciale ha commissionato la consueta verifica del fatturato: prendendo in esame soltanto le pratiche nello stato consegnata, con consegna ricompresa tra il 2026-01-01 e il 2026-01-31 e sprovviste di data di archiviazione, gli operatori hanno raggruppato i risultati per città dei clienti, determinando per ciascuna piazza il numero di spedizioni consegnate, il fatturato totale e il peso medio in kg, per poi disporre l'elenco in ordine di fatturato decrescente, dalla città più remunerativa alla meno redditizia."
+}

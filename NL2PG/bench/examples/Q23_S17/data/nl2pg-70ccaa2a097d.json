@@ -1,0 +1,474 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "filtered_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "transazioni_di_vendita",
+        "description": "La tabella ordini, che contiene i record di acquisto con la colonna di cancellazione logica deleted_at, viene denominata transazioni_di_vendita nella prosa aziendale. Il solver deve mappare correttamente il nome perifrastico alla tabella reale prima di applicare GROUP BY e COUNT(*) FILTER."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "deleted_at",
+        "obsolete_value": "timestamp di archiviazione del record",
+        "description": "La colonna deleted_at, che marca la cancellazione logica delle righe, viene indicata nel testo aziendale con il gergo 'timestamp di archiviazione del record'. Le query richieste devono contare solo le righe attive tramite COUNT(*) FILTER (WHERE deleted_at IS NULL) oppure isolare quelle eliminate logicamente con COUNT(*) FILTER (WHERE deleted_at IS NOT NULL), all'interno del GROUP BY sulla colonna di raggruppamento."
+      }
+    ],
+    "spec_hash": "61e4e3da3f94e3d3"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0),\n    indirizzo_spedizione TEXT NOT NULL,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE righe_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    subtotale_riga NUMERIC(12,2) GENERATED ALWAYS AS (ROUND(quantita * prezzo_unitario, 2)) STORED\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 250,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "email": "marco.rossi@example.com",
+            "telefono": "+39 333 1234567",
+            "creato_il": "2025-07-01 09:00:00",
+            "deleted_at": "2026-01-15 10:00:00"
+          },
+          {
+            "id": 2,
+            "nome": "Giulia",
+            "cognome": "Bianchi",
+            "email": "giulia.bianchi@example.com",
+            "telefono": "+39 340 9876543",
+            "creato_il": "2025-06-10 14:30:00",
+            "deleted_at": "2026-02-01 11:15:00"
+          },
+          {
+            "id": 3,
+            "nome": "Luca",
+            "cognome": "Ferrari",
+            "email": "luca.ferrari@example.com",
+            "telefono": "+39 349 5558899",
+            "creato_il": "2025-08-20 10:45:00",
+            "deleted_at": "2026-01-28 16:20:00"
+          },
+          {
+            "id": 4,
+            "nome": "Sara",
+            "cognome": "Esposito",
+            "email": "sara.esposito@example.com",
+            "telefono": "+39 331 4477882",
+            "creato_il": "2025-05-25 17:10:00",
+            "deleted_at": null
+          },
+          {
+            "id": 5,
+            "nome": "Matteo",
+            "cognome": "Ricci",
+            "email": "matteo.ricci@example.com",
+            "telefono": "+39 348 2201145",
+            "creato_il": "2025-09-05 08:55:00",
+            "deleted_at": null
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Luca",
+              "Giulia",
+              "Sara",
+              "Alessandro",
+              "Chiara",
+              "Matteo",
+              "Elena",
+              "Davide",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Conti"
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 333 1234567",
+              "+39 340 9876543",
+              "+39 349 5558899",
+              "+39 331 4477882",
+              "+39 348 2201145",
+              "+39 320 7766554"
+            ]
+          },
+          "creato_il": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "deleted_at": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": 80,
+        "max_rows": 120,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "sku": "SKU-ELC-0001",
+            "nome": "Cuffie Wireless ANC",
+            "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+            "prezzo_unitario": 129.99,
+            "giacenza_magazzino": 120,
+            "creato_il": "2025-05-15 08:30:00",
+            "deleted_at": "2026-02-01 09:00:00"
+          },
+          {
+            "id": 2,
+            "sku": "SKU-ELC-0002",
+            "nome": "Mouse Ottico USB",
+            "descrizione": "Mouse ergonomico 1600 DPI con cavo USB",
+            "prezzo_unitario": 19.9,
+            "giacenza_magazzino": 300,
+            "creato_il": "2025-04-20 11:00:00",
+            "deleted_at": "2026-01-20 14:30:00"
+          },
+          {
+            "id": 3,
+            "sku": "SKU-ELC-0003",
+            "nome": "Tastiera Meccanica RGB",
+            "descrizione": "Tastiera gaming switch rosso retroilluminata",
+            "prezzo_unitario": 89.5,
+            "giacenza_magazzino": 85,
+            "creato_il": "2025-06-30 15:20:00",
+            "deleted_at": null
+          },
+          {
+            "id": 4,
+            "sku": "SKU-ELC-0004",
+            "nome": "Webcam Full HD",
+            "descrizione": "Webcam 1080p con microfono integrato",
+            "prezzo_unitario": 45.0,
+            "giacenza_magazzino": 210,
+            "creato_il": "2025-07-12 09:40:00",
+            "deleted_at": null
+          },
+          {
+            "id": 5,
+            "sku": "SKU-ELC-0005",
+            "nome": "SSD NVMe 1TB",
+            "descrizione": "Unità a stato solido NVMe PCIe Gen4",
+            "prezzo_unitario": 109.9,
+            "giacenza_magazzino": 65,
+            "creato_il": "2025-05-02 13:15:00",
+            "deleted_at": null
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Cuffie Wireless ANC",
+              "Mouse Ottico USB",
+              "Tastiera Meccanica RGB",
+              "Monitor 27 pollici 4K",
+              "Webcam Full HD",
+              "SSD NVMe 1TB",
+              "Power Bank 20000mAh",
+              "Hub USB-C 7 porte"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "giacenza_magazzino": {
+            "axis": "shift",
+            "delta_min": -40.0,
+            "delta_max": 150.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "creato_il": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "deleted_at": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "numero_ordine": "ORD-2026-0001",
+            "cliente_id": 1,
+            "data_ordine": "2026-01-20 11:00:00",
+            "stato_ordine": "consegnato",
+            "totale_ordine": 189.9,
+            "indirizzo_spedizione": "Via Roma 12, 00184 Roma",
+            "creato_il": "2026-01-20 11:05:00",
+            "deleted_at": "2026-02-15 10:00:00"
+          },
+          {
+            "id": 2,
+            "numero_ordine": "ORD-2026-0002",
+            "cliente_id": 2,
+            "data_ordine": "2026-01-22 15:30:00",
+            "stato_ordine": "spedito",
+            "totale_ordine": 89.9,
+            "indirizzo_spedizione": "Corso Buenos Aires 45, 20124 Milano",
+            "creato_il": "2026-01-22 15:35:00",
+            "deleted_at": "2026-02-20 09:30:00"
+          },
+          {
+            "id": 3,
+            "numero_ordine": "ORD-2026-0003",
+            "cliente_id": 3,
+            "data_ordine": "2026-02-01 09:15:00",
+            "stato_ordine": "confermato",
+            "totale_ordine": 1240.0,
+            "indirizzo_spedizione": "Via Torino 8, 10123 Torino",
+            "creato_il": "2026-02-01 09:20:00",
+            "deleted_at": null
+          },
+          {
+            "id": 4,
+            "numero_ordine": "ORD-2026-0004",
+            "cliente_id": 4,
+            "data_ordine": "2026-02-10 18:45:00",
+            "stato_ordine": "in_attesa",
+            "totale_ordine": 320.5,
+            "indirizzo_spedizione": "Via Toledo 112, 80134 Napoli",
+            "creato_il": "2026-02-10 18:50:00",
+            "deleted_at": null
+          },
+          {
+            "id": 5,
+            "numero_ordine": "ORD-2026-0005",
+            "cliente_id": 5,
+            "data_ordine": "2026-02-14 12:00:00",
+            "stato_ordine": "annullato",
+            "totale_ordine": 74.99,
+            "indirizzo_spedizione": "Piazza Duomo 3, 27100 Pavia",
+            "creato_il": "2026-02-14 12:05:00",
+            "deleted_at": null
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -75.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnato",
+              "consegnato",
+              "consegnato",
+              "spedito",
+              "spedito",
+              "confermato",
+              "in_attesa",
+              "annullato"
+            ]
+          },
+          "totale_ordine": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "indirizzo_spedizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Roma 12, 00184 Roma",
+              "Corso Buenos Aires 45, 20124 Milano",
+              "Via Torino 8, 10123 Torino",
+              "Via Toledo 112, 80134 Napoli",
+              "Piazza Duomo 3, 27100 Pavia",
+              "Viale Trieste 78, 35121 Padova"
+            ]
+          },
+          "creato_il": {
+            "axis": "shift",
+            "delta_min": -75.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "deleted_at": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "righe_ordine",
+        "nature": "fact",
+        "min_rows": 900,
+        "max_rows": 1600,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ordine_id": 1,
+            "prodotto_id": 1,
+            "quantita": 2,
+            "prezzo_unitario": 129.99
+          },
+          {
+            "id": 2,
+            "ordine_id": 2,
+            "prodotto_id": 2,
+            "quantita": 1,
+            "prezzo_unitario": 19.9
+          },
+          {
+            "id": 3,
+            "ordine_id": 3,
+            "prodotto_id": 3,
+            "quantita": 3,
+            "prezzo_unitario": 89.5
+          },
+          {
+            "id": 4,
+            "ordine_id": 1,
+            "prodotto_id": 4,
+            "quantita": 5,
+            "prezzo_unitario": 45.0
+          },
+          {
+            "id": 5,
+            "ordine_id": 4,
+            "prodotto_id": 5,
+            "quantita": 2,
+            "prezzo_unitario": 109.9
+          },
+          {
+            "id": 6,
+            "ordine_id": 5,
+            "prodotto_id": 1,
+            "quantita": 4,
+            "prezzo_unitario": 129.99
+          }
+        ],
+        "variations": {
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

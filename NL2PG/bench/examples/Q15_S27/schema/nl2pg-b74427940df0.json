@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 4,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "cte"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobili",
+        "obsolete_value": "schede_catastali",
+        "description": "La tabella immobili viene denominata schede_catastali nella prosa aziendale. Le relazioni implicite restano deducibili dalla colonna immobile_id presente nelle tabelle collegate."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "acquirenti",
+        "description": "La tabella clienti viene indicata come acquirenti nella documentazione aziendale. Il collegamento implicito si deduce dalla colonna cliente_id nella tabella dei contratti."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "contratti",
+        "obsolete_value": "compromessi",
+        "description": "La tabella contratti viene riferita con il gergo del settore immobiliare come compromessi (contratti preliminari). Le colonne immobile_id e cliente_id permettono di associarla concettualmente alle altre tabelle senza vincoli dichiarati."
+      }
+    ],
+    "spec_hash": "a94ac0e8d9ae791f"
+  },
+  "schema_ddl": "CREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT,\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani > 0),\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato IN ('disponibile', 'riservato', 'venduto', 'ritirato')),\n    data_inserimento DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    budget_massimo NUMERIC(12,2) CHECK (budget_massimo >= 0),\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE agenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    agenzia TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    quota_commissione NUMERIC(5,2) NOT NULL DEFAULT 3.00 CHECK (quota_commissione BETWEEN 0 AND 100)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    immobile_id INT NOT NULL,\n    cliente_id INT NOT NULL,\n    agente_id INT,\n    data_firma DATE NOT NULL,\n    data_scadenza DATE,\n    prezzo_concordato NUMERIC(12,2) NOT NULL CHECK (prezzo_concordato >= 0),\n    acconto NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (acconto >= 0),\n    stato TEXT NOT NULL DEFAULT 'proposta' CHECK (stato IN ('proposta', 'accettato', 'rogito', 'annullato')),\n    CHECK (data_scadenza IS NULL OR data_scadenza >= data_firma)\n);"
+}

@@ -1,0 +1,240 @@
+{
+  "schema_ddl": "CREATE TABLE negozi (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE transazioni (\n    id INT PRIMARY KEY,\n    negozio_id INT NOT NULL REFERENCES negozi(id),\n    data_transazione TEXT NOT NULL,\n    importo NUMERIC(12,2) NOT NULL,\n    regione TEXT NOT NULL,\n    canale TEXT NOT NULL,\n    CHECK (data_transazione ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'),\n    CHECK (canale IN ('online', 'store', 'rivenditori'))\n);",
+  "data_profile": {
+    "profile": {
+      "negozi": {
+        "row_count": 170,
+        "columns": {
+          "id": {
+            "distinct": 170,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 170
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Bottega Moderna",
+              "Emporio Aurora",
+              "Emporio del Centro",
+              "Grandi Magazzini Aurora",
+              "Il Mercatino"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "+39 320 771 5890",
+              "+39 339 664 0027",
+              "+39 340 118 2233",
+              "+39 347 552 9081",
+              "+39 348 220 1174"
+            ]
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 2791,
+        "columns": {
+          "id": {
+            "distinct": 2791,
+            "sample": [
+              "5001",
+              "5002",
+              "5003",
+              "5004",
+              "5005"
+            ],
+            "min": 5001,
+            "max": 7791
+          },
+          "negozio_id": {
+            "distinct": 170,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 170
+          },
+          "data_transazione": {
+            "distinct": 6,
+            "sample": [
+              "2026-01-05",
+              "2026-01-19",
+              "2026-02-03",
+              "2026-02-21",
+              "2026-03-08"
+            ]
+          },
+          "importo": {
+            "distinct": 6,
+            "sample": [
+              "120.50",
+              "15.90",
+              "245",
+              "310.75",
+              "67.40"
+            ]
+          },
+          "regione": {
+            "distinct": 8,
+            "sample": [
+              "Campania",
+              "Emilia-Romagna",
+              "Lazio",
+              "Lombardia",
+              "Piemonte"
+            ]
+          },
+          "canale": {
+            "distinct": 3,
+            "sample": [
+              "online",
+              "rivenditori",
+              "store"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "negozi": [
+        {
+          "id": 1,
+          "nome": "Mercato Nuovo",
+          "citta": "Verona",
+          "telefono": "+39 339 664 0027"
+        },
+        {
+          "id": 2,
+          "nome": "Il Punto Vendita",
+          "citta": "Torino",
+          "telefono": "+39 347 552 9081"
+        },
+        {
+          "id": 3,
+          "nome": "Il Punto Vendita",
+          "citta": "Bologna",
+          "telefono": "+39 351 903 4468"
+        },
+        {
+          "id": 4,
+          "nome": "Bottega Moderna",
+          "citta": "Napoli",
+          "telefono": "+39 348 220 1174"
+        },
+        {
+          "id": 5,
+          "nome": "Punto Casa",
+          "citta": "Roma",
+          "telefono": "+39 388 209 6641"
+        },
+        {
+          "id": 6,
+          "nome": "Mercato Centrale",
+          "citta": "Verona",
+          "telefono": "+39 347 552 9081"
+        },
+        {
+          "id": 7,
+          "nome": "La Bottega Nuova",
+          "citta": "Genova",
+          "telefono": "+39 347 552 9081"
+        },
+        {
+          "id": 8,
+          "nome": "Mercato Centrale",
+          "citta": "Roma",
+          "telefono": "+39 340 118 2233"
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 5001,
+          "negozio_id": 28,
+          "data_transazione": "2026-01-05",
+          "importo": "120.50",
+          "regione": "Toscana",
+          "canale": "store"
+        },
+        {
+          "id": 5002,
+          "negozio_id": 151,
+          "data_transazione": "2026-01-05",
+          "importo": "120.50",
+          "regione": "Lazio",
+          "canale": "store"
+        },
+        {
+          "id": 5003,
+          "negozio_id": 55,
+          "data_transazione": "2026-01-05",
+          "importo": "120.50",
+          "regione": "Lombardia",
+          "canale": "store"
+        },
+        {
+          "id": 5004,
+          "negozio_id": 141,
+          "data_transazione": "2026-01-05",
+          "importo": "120.50",
+          "regione": "Lazio",
+          "canale": "online"
+        },
+        {
+          "id": 5005,
+          "negozio_id": 135,
+          "data_transazione": "2026-01-05",
+          "importo": "120.50",
+          "regione": "Emilia-Romagna",
+          "canale": "online"
+        },
+        {
+          "id": 5006,
+          "negozio_id": 164,
+          "data_transazione": "2026-01-05",
+          "importo": "120.50",
+          "regione": "Campania",
+          "canale": "store"
+        },
+        {
+          "id": 5007,
+          "negozio_id": 18,
+          "data_transazione": "2026-01-05",
+          "importo": "120.50",
+          "regione": "Lombardia",
+          "canale": "store"
+        },
+        {
+          "id": 5008,
+          "negozio_id": 117,
+          "data_transazione": "2026-01-05",
+          "importo": "120.50",
+          "regione": "Sicilia",
+          "canale": "rivenditori"
+        }
+      ]
+    }
+  },
+  "story": "Presso la Direzione Commerciale della catena di distribuzione, l'archivio denominato negozi custodisce le schede dei punti vendita attivi sul territorio nazionale: per ciascun punto vendita sono annotati il nome dell'insegna, la città di ubicazione e il numero di telefono del referente. Accanto ad esso, il registro movimenti_cassa traccia giorno per giorno tutte le operazioni di vendita, riportando per ciascuna voce la data dell'operazione, il controvalore incassato, la regione di competenza e il canale attraverso cui la vendita è stata conclusa. In occasione della revisione del primo trimestre, gli analisti hanno esaminato tutti i movimenti compresi tra il 2026-01-19 e il 2026-03-08, restringendo il perimetro alle quattro regioni strategiche individuate dal piano commerciale: Lombardia, Lazio, Emilia-Romagna e Campania. Il prospetto predisposto per la direzione articola l'analisi su tre livelli: innanzitutto il dettaglio per ogni combinazione di regione e canale — online, store oppure rivenditori — con il numero di operazioni effettuate, il controvalore complessivo arrotondato all'euro e lo scontrino medio; poi i subtotali per ciascuna singola regione; infine il totale complessivo dell'intero periodo. Grazie a questa impostazione multi-livello, il management può confrontare tanto la performance aggregata delle quattro aree quanto il contributo granulare di ciascun canale, individuando rapidamente dove concentrare le prossime azioni commerciali."
+}

@@ -1,0 +1,34 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "is_distinct_from"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_assicurativi",
+      "description": "La tabella polizze viene denominata contratti_assicurativi nel testo della richiesta."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "sinistri",
+      "obsolete_value": "denunce_danno",
+      "description": "La tabella sinistri è indicata come denunce_danno."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "premio_annuale",
+      "obsolete_value": "rata_assicurativa",
+      "description": "La colonna premio_annuale viene chiamata rata_assicurativa nel gergo aziendale."
+    }
+  ],
+  "spec_hash": "0b814f42d7cfc135"
+}

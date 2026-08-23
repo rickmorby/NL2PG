@@ -1,0 +1,34 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 5,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatto_ordini",
+      "obsolete_value": "registro_transazioni",
+      "description": "La tabella dei fatti centrale dello star schema, denominata fisicamente fatto_ordini, viene indicata nella prosa aziendale come registro_transazioni. Le query devono risolvere il nome reale della tabella per calcolare gli aggregati di vendita."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_totale",
+      "obsolete_value": "GMV lordo",
+      "description": "La colonna importo_totale nella tabella dei fatti viene descritta nei documenti aziendali con il gergo finanziario 'GMV lordo' (Gross Merchandise Value). Il solver deve mappare il termine tecnico di settore alla colonna reale per filtrare o aggregare correttamente."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "dim_clienti",
+      "obsolete_value": "anagrafica_acquirenti",
+      "description": "La tabella dimensionale dim_clienti viene riferita nella prosa come anagrafica_acquirenti. La subquery interna (SELECT cliente_id FROM ...) deve puntare alla chiave reale della dimensione clienti per costruire la condizione WHERE ... IN (...)."
+    }
+  ],
+  "spec_hash": "0d256db56894d4b0"
+}

@@ -1,0 +1,278 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 3,
+    "hierarchy": "isa",
+    "sql_features": [
+      "correlated_subquery"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "operazioni",
+        "obsolete_value": "registro_movimenti",
+        "description": "La tabella base 'operazioni' (entita' generica della gerarchia ISA che contiene pk, importo, data e discriminatore) viene denominata 'registro_movimenti' nella prosa aziendale. Il solver deve riconoscere che 'registro_movimenti' corrisponde alla tabella fisica 'operazioni'."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "tipo_operazione",
+        "obsolete_value": "classificazione_flusso",
+        "description": "La colonna discriminatore 'tipo_operazione' della tabella base 'operazioni', usata per distinguere i sottotipi (bonifici vs investimenti), viene indicata nella documentazione con il gergo finanziario 'classificazione_flusso'. Il solver deve mappare tale termine al discriminatore reale."
+      }
+    ],
+    "spec_hash": "38ba750217de812e"
+  },
+  "schema_ddl": "CREATE TABLE operazioni (\n    id INT PRIMARY KEY,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    data_operazione DATE NOT NULL,\n    tipo_operazione TEXT NOT NULL CHECK (tipo_operazione IN ('bonifico', 'investimento'))\n);\n\nCREATE TABLE bonifici (\n    id INT PRIMARY KEY REFERENCES operazioni(id) ON DELETE CASCADE,\n    iban_destinatario TEXT NOT NULL,\n    nome_beneficiario TEXT NOT NULL,\n    causale TEXT\n);\n\nCREATE TABLE investimenti (\n    id INT PRIMARY KEY REFERENCES operazioni(id) ON DELETE CASCADE,\n    strumento_finanziario TEXT NOT NULL,\n    quantita NUMERIC(14,4) NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(12,4) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "operazioni",
+        "nature": "fact",
+        "min_rows": 400,
+        "max_rows": 600,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "importo": 1250.0,
+            "data_operazione": "2026-01-05",
+            "tipo_operazione": "bonifico"
+          },
+          {
+            "id": 2,
+            "importo": 3400.5,
+            "data_operazione": "2026-01-12",
+            "tipo_operazione": "bonifico"
+          },
+          {
+            "id": 3,
+            "importo": 875.25,
+            "data_operazione": "2026-01-20",
+            "tipo_operazione": "investimento"
+          },
+          {
+            "id": 4,
+            "importo": 15200.0,
+            "data_operazione": "2026-02-03",
+            "tipo_operazione": "investimento"
+          },
+          {
+            "id": 5,
+            "importo": 430.75,
+            "data_operazione": "2026-02-14",
+            "tipo_operazione": "bonifico"
+          },
+          {
+            "id": 6,
+            "importo": 2780.1,
+            "data_operazione": "2026-02-28",
+            "tipo_operazione": "investimento"
+          },
+          {
+            "id": 7,
+            "importo": 99.99,
+            "data_operazione": "2026-03-08",
+            "tipo_operazione": "bonifico"
+          }
+        ],
+        "variations": {
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "data_operazione": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "tipo_operazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "bonifico",
+              "bonifico",
+              "investimento"
+            ]
+          }
+        }
+      },
+      {
+        "table": "bonifici",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.6,
+        "templates": [
+          {
+            "id": 1,
+            "iban_destinatario": "IT60X0542811101000000123456",
+            "nome_beneficiario": "Mario Rossi",
+            "causale": "Pagamento fattura 2026/001"
+          },
+          {
+            "id": 2,
+            "iban_destinatario": "IT02L1234567890123456789012",
+            "nome_beneficiario": "Laura Bianchi",
+            "causale": "Affitto mensile gennaio"
+          },
+          {
+            "id": 3,
+            "iban_destinatario": "DE89370400440532013000",
+            "nome_beneficiario": "Handels GmbH",
+            "causale": "Bonifico estero fornitore"
+          },
+          {
+            "id": 4,
+            "iban_destinatario": "IT40S0542811101000000987654",
+            "nome_beneficiario": "Giulia Verdi",
+            "causale": "Rimborso spese trasferta"
+          },
+          {
+            "id": 5,
+            "iban_destinatario": "IT21A0301503200000001234567",
+            "nome_beneficiario": "Studio Legale Conti",
+            "causale": "Parcella professionale"
+          }
+        ],
+        "variations": {
+          "iban_destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "IT60X0542811101000000123456",
+              "IT02L1234567890123456789012",
+              "IT40S0542811101000000987654",
+              "IT21A0301503200000001234567",
+              "IT15M0322801601000028358491",
+              "DE89370400440532013000",
+              "FR1420041010050500013M02606"
+            ]
+          },
+          "nome_beneficiario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Alessandro Neri",
+              "Studio Legale Conti",
+              "Handels GmbH",
+              "Ferramenta Lombardi SRL"
+            ]
+          },
+          "causale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Pagamento fattura",
+              "Affitto mensile",
+              "Bonifico istantaneo",
+              "Rimborso spese",
+              "Stipendio dipendente",
+              "Acquisto merce",
+              "Versamento conto arredo"
+            ]
+          }
+        }
+      },
+      {
+        "table": "investimenti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.4,
+        "templates": [
+          {
+            "id": 1,
+            "strumento_finanziario": "Azioni Enel",
+            "quantita": 500.0,
+            "prezzo_unitario": 6.85
+          },
+          {
+            "id": 2,
+            "strumento_finanziario": "BTP Italia 2028",
+            "quantita": 20.0,
+            "prezzo_unitario": 98.45
+          },
+          {
+            "id": 3,
+            "strumento_finanziario": "ETF MSCI World",
+            "quantita": 120.0,
+            "prezzo_unitario": 82.3
+          },
+          {
+            "id": 4,
+            "strumento_finanziario": "Fondo Arca Azionario",
+            "quantita": 350.0,
+            "prezzo_unitario": 15.72
+          },
+          {
+            "id": 5,
+            "strumento_finanziario": "Azioni Intesa Sanpaolo",
+            "quantita": 2000.0,
+            "prezzo_unitario": 3.95
+          }
+        ],
+        "variations": {
+          "strumento_finanziario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Azioni Enel",
+              "Azioni Intesa Sanpaolo",
+              "Azioni UniCredit",
+              "BTP Italia 2028",
+              "BTP Valore 2030",
+              "ETF MSCI World",
+              "Fondo Arca Azionario",
+              "Fondo PIMCO Obbligazionario"
+            ]
+          },
+          "quantita": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

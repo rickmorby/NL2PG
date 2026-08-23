@@ -1,0 +1,23 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 10,
+    "hierarchy": "path_routing",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [
+      "distractor"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "distractor",
+        "target_value": "iscrizioni_esami",
+        "obsolete_value": "registro_partecipazioni_verifiche",
+        "description": "La prosa aziendale descrive i dati richiesti come 'registro_partecipazioni_verifiche', suggerendo erroneamente tabelle distrattori plausibili ma irrilevanti presenti nello schema ampio (come 'presenze_lezioni', 'aule' o 'laboratori') che condividono colonne con nome comune (es. studente_id, corso_id, data). L'entità corretta è la tabella iscrizioni_esami, raggiungibile solo tramite il percorso di NATURAL JOIN studenti -> corsi -> appelli -> iscrizioni_esami, ignorando le tabelle esca poste lungo percorsi alternativi."
+      }
+    ],
+    "spec_hash": "80457aadd2a0f0df"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE docenti (\n    id INT PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE studenti (\n    id INT PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_immatricolazione DATE NOT NULL,\n    email TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE corsi (\n    id INT PRIMARY KEY,\n    docente_id INT NOT NULL REFERENCES docenti(id),\n    codice TEXT NOT NULL UNIQUE,\n    titolo TEXT NOT NULL,\n    cfu INT NOT NULL CHECK (cfu BETWEEN 1 AND 30),\n    anno_corso INT NOT NULL CHECK (anno_corso BETWEEN 1 AND 3)\n);\n\nCREATE TABLE aule (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    edificio TEXT NOT NULL,\n    capienza INT NOT NULL CHECK (capienza > 0)\n);\n\nCREATE TABLE laboratori (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    edificio TEXT NOT NULL,\n    capienza INT NOT NULL CHECK (capienza > 0),\n    responsabile_id INT REFERENCES docenti(id)\n);\n\nCREATE TABLE appelli (\n    id INT PRIMARY KEY,\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    aula_id INT REFERENCES aule(id),\n    data_appello DATE NOT NULL,\n    ora_inizio TIME NOT NULL,\n    tipo TEXT NOT NULL CHECK (tipo IN ('scritto', 'orale', 'laboratorio'))\n);\n\nCREATE TABLE iscrizioni_esami (\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    appello_id INT NOT NULL REFERENCES appelli(id),\n    data_iscrizione DATE NOT NULL,\n    voto INT CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN NOT NULL DEFAULT FALSE,\n    PRIMARY KEY (studente_id, appello_id)\n);\n\nCREATE TABLE presenze_lezioni (\n    id INT PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    data DATE NOT NULL,\n    presente BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE piani_di_studio (\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    anno_accademico TEXT NOT NULL,\n    PRIMARY KEY (studente_id, corso_id, anno_accademico)\n);"
+}

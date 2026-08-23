@@ -1,0 +1,165 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [
+      "agg_distinct"
+    ],
+    "twist": [
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "dept_mgr",
+        "obsolete_value": "DR (Direttore di Reparto)",
+        "description": "La colonna dept_mgr, che memorizza il codice identificativo del responsabile di reparto, viene indicata nella prosa aziendale esclusivamente con il gergo interno 'DR' (Direttore di Reparto). Il solutore deve riconoscere che l'acronimo gergale DR corrisponde alla colonna dept_mgr dello schema, sulla quale va effettuato il GROUP BY."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "emp_no",
+        "obsolete_value": "matricola",
+        "description": "Nella documentazione aziendale gli impiegati sono identificati tramite il termine sinonimo 'matricola', mai con il nome reale della colonna. Il solutore deve mappare 'matricola' sulla colonna emp_no della tabella, applicando su di essa la funzione COUNT(DISTINCT) richiesta dalla query."
+      }
+    ],
+    "spec_hash": "d555ede595f86286"
+  },
+  "schema_ddl": "CREATE TABLE emp (\n    emp_no INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_reparto INT NOT NULL,\n    responsabile_reparto INT,\n    salario NUMERIC(10,2) CHECK (salario >= 0),\n    data_assunzione DATE NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "emp",
+        "nature": "dimension",
+        "min_rows": 200,
+        "max_rows": 400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "emp_no": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "numero_reparto": 10,
+            "responsabile_reparto": 1,
+            "salario": 58500.0,
+            "data_assunzione": "2012-03-05"
+          },
+          {
+            "emp_no": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "numero_reparto": 20,
+            "responsabile_reparto": 2,
+            "salario": 61200.0,
+            "data_assunzione": "2011-09-12"
+          },
+          {
+            "emp_no": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "numero_reparto": 30,
+            "responsabile_reparto": 3,
+            "salario": 59800.0,
+            "data_assunzione": "2013-01-21"
+          },
+          {
+            "emp_no": 4,
+            "nome": "Alessandro",
+            "cognome": "Neri",
+            "numero_reparto": 40,
+            "responsabile_reparto": 4,
+            "salario": 57400.0,
+            "data_assunzione": "2014-06-02"
+          },
+          {
+            "emp_no": 5,
+            "nome": "Francesca",
+            "cognome": "Gallo",
+            "numero_reparto": 50,
+            "responsabile_reparto": 5,
+            "salario": 62500.0,
+            "data_assunzione": "2010-11-15"
+          },
+          {
+            "emp_no": 6,
+            "nome": "Davide",
+            "cognome": "Conti",
+            "numero_reparto": 60,
+            "responsabile_reparto": 6,
+            "salario": 56900.0,
+            "data_assunzione": "2015-04-27"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Davide",
+              "Sara",
+              "Luca",
+              "Elena",
+              "Matteo",
+              "Chiara",
+              "Andrea",
+              "Paolo",
+              "Anna",
+              "Simone",
+              "Valentina"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Gallo",
+              "Conti",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Bruno",
+              "Ferrari",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Fontana",
+              "Moretti"
+            ]
+          },
+          "salario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -400.0,
+            "delta_max": 400.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

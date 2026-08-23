@@ -1,0 +1,27 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 4,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "immobili",
+      "obsolete_value": "schede_catastali",
+      "description": "La tabella immobili viene denominata schede_catastali nella prosa aziendale. Lo schema non dichiara vincoli REFERENCES, quindi la relazione tra schede_catastali e le altre tabelle deve essere dedotta solo dai nomi di colonna compatibili (es. contratti.immobile_id = immobili.id)."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "contratti",
+      "obsolete_value": "compromessi stipulati",
+      "description": "La tabella contratti è indicata nel testo aziendale con il gergo del settore immobiliare come compromessi stipulati. Il risolutore deve riconoscere che si tratta della stessa entità per costruire correttamente la subquery non correlata del tipo WHERE immobile_id IN (SELECT id FROM immobili WHERE condizione)."
+    }
+  ],
+  "spec_hash": "239194b92d093df8"
+}

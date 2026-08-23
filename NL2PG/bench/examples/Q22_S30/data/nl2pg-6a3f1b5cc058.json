@@ -1,0 +1,711 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 7,
+    "hierarchy": "multi_level_one_to_many",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "distractor",
+      "polysemy",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_contatti_commerciali",
+        "description": "La tabella che contiene i dati dei clienti è denominata 'anagrafica_contatti_commerciali' nel database, ma nel linguaggio aziendale viene spesso chiamata semplicemente 'clienti'."
+      },
+      {
+        "twist_type": "distractor",
+        "target_value": "ordini",
+        "obsolete_value": "transazioni_storiche",
+        "description": "Esiste una tabella 'transazioni_storiche' che contiene dati di vendite obsolete o annullate, ma non è rilevante per la query corrente. La tabella pertinente è 'ordini'."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "valore_totale",
+        "obsolete_value": "importo",
+        "description": "La colonna 'valore_totale' nella tabella 'ordini' rappresenta l'importo complessivo dell'ordine, ma nel linguaggio aziendale viene spesso chiamata genericamente 'importo', che può riferirsi anche ad altri campi come 'importo_sconto' o 'importo_spedizione'."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "priorità_spedizione",
+        "obsolete_value": "SLA tier",
+        "description": "La colonna 'priorità_spedizione' nella tabella 'ordini' è indicata nel database come un valore numerico (1-3), ma nel linguaggio aziendale viene chiamata 'SLA tier' (Service Level Agreement tier)."
+      }
+    ],
+    "spec_hash": "d352401df5864c87"
+  },
+  "schema_ddl": "CREATE TABLE anagrafica_contatti_commerciali (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_registrazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    is_attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE categorie_prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10, 2) NOT NULL CHECK (prezzo_unitario >= 0),\n    categoria_id INT NOT NULL REFERENCES categorie_prodotti(id),\n    codice_articolo TEXT NOT NULL UNIQUE,\n    quantita_disponibile INT NOT NULL DEFAULT 0 CHECK (quantita_disponibile >= 0)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES anagrafica_contatti_commerciali(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valore_totale NUMERIC(12, 2) NOT NULL CHECK (valore_totale >= 0),\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    priorità_spedizione INT CHECK (priorità_spedizione BETWEEN 1 AND 3),\n    importo_sconto NUMERIC(10, 2) DEFAULT 0 CHECK (importo_sconto >= 0),\n    importo_spedizione NUMERIC(10, 2) DEFAULT 0 CHECK (importo_spedizione >= 0)\n);\n\nCREATE TABLE dettagli_ordini (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario_ordine NUMERIC(10, 2) NOT NULL CHECK (prezzo_unitario_ordine >= 0),\n    totale_riga NUMERIC(12, 2) GENERATED ALWAYS AS (quantita * prezzo_unitario_ordine) STORED\n);\n\nCREATE TABLE indirizzi_spedizione (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES anagrafica_contatti_commerciali(id),\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    nazione TEXT NOT NULL DEFAULT 'Italia',\n    is_predefinito BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE transazioni_storiche (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT REFERENCES ordini(id),\n    tipo_transazione TEXT NOT NULL CHECK (tipo_transazione IN ('pagamento', 'rimborso', 'storno')),\n    importo NUMERIC(10, 2) NOT NULL CHECK (importo >= 0),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    note TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "anagrafica_contatti_commerciali",
+        "nature": "dimension",
+        "min_rows": 180,
+        "max_rows": 220,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "email": "mario.rossi@example.com",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "data_registrazione": "2025-01-10 09:30:00",
+            "is_attivo": true
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@example.com",
+            "codice_fiscale": "BNCLRA85B45F205X",
+            "data_registrazione": "2025-02-14 14:20:00",
+            "is_attivo": true
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "email": "giulia.verdi@example.com",
+            "codice_fiscale": "VRDGLI90C50L736Y",
+            "data_registrazione": "2025-03-20 11:00:00",
+            "is_attivo": true
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Neri",
+            "email": "alessandro.neri@example.com",
+            "codice_fiscale": "NRILSN82D10H501Z",
+            "data_registrazione": "2025-04-05 16:45:00",
+            "is_attivo": false
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Ferrari",
+            "email": "francesca.ferrari@example.com",
+            "codice_fiscale": "FRRFNC87E41F205W",
+            "data_registrazione": "2025-05-11 10:10:00",
+            "is_attivo": true
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Andrea",
+              "Sara",
+              "Luca"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Ferrari",
+              "Romano",
+              "Colombo",
+              "Greco"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -365.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "is_attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "categorie_prodotti",
+        "nature": "lookup",
+        "min_rows": 6,
+        "max_rows": 10,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Arredamento",
+            "descrizione": "Mobili e complementi",
+            "created_at": "2025-01-01 08:00:00"
+          },
+          {
+            "id": 2,
+            "nome": "Informatica",
+            "descrizione": "Hardware e accessori",
+            "created_at": "2025-01-01 08:05:00"
+          },
+          {
+            "id": 3,
+            "nome": "Illuminazione",
+            "descrizione": "Lampade e sistemi luce",
+            "created_at": "2025-01-05 09:00:00"
+          },
+          {
+            "id": 4,
+            "nome": "Tessile",
+            "descrizione": "Tende e tessuti per la casa",
+            "created_at": "2025-01-08 10:30:00"
+          },
+          {
+            "id": 5,
+            "nome": "Complementi",
+            "descrizione": "Oggetti decorativi",
+            "created_at": "2025-01-10 11:15:00"
+          },
+          {
+            "id": 6,
+            "nome": "Giardinaggio",
+            "descrizione": "Arredo esterno e piante",
+            "created_at": "2025-01-12 12:00:00"
+          }
+        ],
+        "variations": {
+          "created_at": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 18.0,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Tavolo da pranzo in legno",
+            "descrizione": "Tavolo massello 6 posti",
+            "prezzo_unitario": 450.0,
+            "categoria_id": 1,
+            "codice_articolo": "ARR001",
+            "quantita_disponibile": 25
+          },
+          {
+            "id": 2,
+            "nome": "Laptop 16GB RAM",
+            "descrizione": "Notebook 16GB SSD 512GB",
+            "prezzo_unitario": 899.0,
+            "categoria_id": 2,
+            "codice_articolo": "INF002",
+            "quantita_disponibile": 40
+          },
+          {
+            "id": 3,
+            "nome": "Lampada da terra LED",
+            "descrizione": "Lampada con regolazione intensita",
+            "prezzo_unitario": 120.5,
+            "categoria_id": 3,
+            "codice_articolo": "ILL003",
+            "quantita_disponibile": 60
+          },
+          {
+            "id": 4,
+            "nome": "Tenda veneziana",
+            "descrizione": "Tenda in tessuto bianco",
+            "prezzo_unitario": 75.0,
+            "categoria_id": 4,
+            "codice_articolo": "TES004",
+            "quantita_disponibile": 0
+          },
+          {
+            "id": 5,
+            "nome": "Vaso in ceramica",
+            "descrizione": "Vaso decorativo h30",
+            "prezzo_unitario": 35.9,
+            "categoria_id": 5,
+            "codice_articolo": "COM005",
+            "quantita_disponibile": 15
+          },
+          {
+            "id": 6,
+            "nome": "Set poltrona giardino",
+            "descrizione": "Poltrona per esterno in teak",
+            "prezzo_unitario": 320.0,
+            "categoria_id": 6,
+            "codice_articolo": "GIA006",
+            "quantita_disponibile": 8
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Tavolo da pranzo in legno",
+              "Scrivania ergonomica",
+              "Laptop 16GB RAM",
+              "Monitor 27 pollici 4K",
+              "Lampada da terra LED",
+              "Plafoniera LED",
+              "Tenda veneziana",
+              "Tappeto in lana",
+              "Vaso in ceramica",
+              "Set poltrona giardino"
+            ]
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Modello standard",
+              "Modello premium",
+              "Versione base",
+              "Versione con accessori",
+              "Articolo disponibile"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.3,
+            "pool": []
+          },
+          "quantita_disponibile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0",
+              "5",
+              "12",
+              "25",
+              "40",
+              "80",
+              "150"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 4.0,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "data_ordine": "2026-01-15 10:30:00",
+            "valore_totale": 250.5,
+            "stato_ordine": "consegnato",
+            "priorità_spedizione": 2,
+            "importo_sconto": 10.0,
+            "importo_spedizione": 9.9
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "data_ordine": "2026-01-16 12:00:00",
+            "valore_totale": 89.9,
+            "stato_ordine": "spedito",
+            "priorità_spedizione": 1,
+            "importo_sconto": 0.0,
+            "importo_spedizione": 4.9
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "data_ordine": "2026-02-01 18:45:00",
+            "valore_totale": 420.0,
+            "stato_ordine": "confermato",
+            "priorità_spedizione": 3,
+            "importo_sconto": 20.0,
+            "importo_spedizione": 0.0
+          },
+          {
+            "id": 104,
+            "cliente_id": 4,
+            "data_ordine": "2026-02-10 09:00:00",
+            "valore_totale": 60.0,
+            "stato_ordine": "annullato",
+            "priorità_spedizione": 2,
+            "importo_sconto": 5.0,
+            "importo_spedizione": 4.9
+          },
+          {
+            "id": 105,
+            "cliente_id": 5,
+            "data_ordine": "2026-02-14 15:20:00",
+            "valore_totale": 310.75,
+            "stato_ordine": "in_attesa",
+            "priorità_spedizione": 1,
+            "importo_sconto": 0.0,
+            "importo_spedizione": 9.9
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "valore_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.3,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "in_attesa",
+              "confermato",
+              "spedito",
+              "consegnato",
+              "consegnato",
+              "annullato"
+            ]
+          },
+          "priorità_spedizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          "importo_sconto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0.00",
+              "5.00",
+              "10.00",
+              "20.00"
+            ]
+          },
+          "importo_spedizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0.00",
+              "4.90",
+              "9.90",
+              "12.50"
+            ]
+          }
+        }
+      },
+      {
+        "table": "dettagli_ordini",
+        "nature": "fact",
+        "min_rows": 1600,
+        "max_rows": 2400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ordine_id": 1,
+            "prodotto_id": 10,
+            "quantita": 2,
+            "prezzo_unitario_ordine": 450.0
+          },
+          {
+            "id": 2,
+            "ordine_id": 2,
+            "prodotto_id": 20,
+            "quantita": 1,
+            "prezzo_unitario_ordine": 899.0
+          },
+          {
+            "id": 3,
+            "ordine_id": 3,
+            "prodotto_id": 30,
+            "quantita": 3,
+            "prezzo_unitario_ordine": 120.5
+          },
+          {
+            "id": 4,
+            "ordine_id": 4,
+            "prodotto_id": 40,
+            "quantita": 1,
+            "prezzo_unitario_ordine": 75.0
+          },
+          {
+            "id": 5,
+            "ordine_id": 5,
+            "prodotto_id": 50,
+            "quantita": 2,
+            "prezzo_unitario_ordine": 35.9
+          }
+        ],
+        "variations": {
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "2"
+            ]
+          },
+          "prezzo_unitario_ordine": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "indirizzi_spedizione",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.5,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "via": "Via Roma 1",
+            "citta": "Roma",
+            "cap": "00184",
+            "provincia": "RM",
+            "nazione": "Italia",
+            "is_predefinito": true
+          },
+          {
+            "id": 2,
+            "cliente_id": 2,
+            "via": "Corso Italia 25",
+            "citta": "Milano",
+            "cap": "20121",
+            "provincia": "MI",
+            "nazione": "Italia",
+            "is_predefinito": true
+          },
+          {
+            "id": 3,
+            "cliente_id": 3,
+            "via": "Via Garibaldi 10",
+            "citta": "Torino",
+            "cap": "10123",
+            "provincia": "TO",
+            "nazione": "Italia",
+            "is_predefinito": false
+          },
+          {
+            "id": 4,
+            "cliente_id": 4,
+            "via": "Via Cavour 8",
+            "citta": "Napoli",
+            "cap": "80133",
+            "provincia": "NA",
+            "nazione": "Italia",
+            "is_predefinito": false
+          }
+        ],
+        "variations": {
+          "via": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Roma 1",
+              "Corso Italia 25",
+              "Via Garibaldi 10",
+              "Piazza Dante 3",
+              "Viale Europa 40",
+              "Via Cavour 8"
+            ]
+          },
+          "is_predefinito": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "false",
+              "false",
+              "false",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "transazioni_storiche",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.0,
+        "templates": [
+          {
+            "id": 1,
+            "ordine_id": 1,
+            "tipo_transazione": "pagamento",
+            "importo": 250.5,
+            "data_transazione": "2026-04-01 09:00:00",
+            "note": "Pagamento ricevuto"
+          },
+          {
+            "id": 2,
+            "ordine_id": 2,
+            "tipo_transazione": "pagamento",
+            "importo": 89.9,
+            "data_transazione": "2026-04-01 10:30:00",
+            "note": "Transazione con carta"
+          },
+          {
+            "id": 3,
+            "ordine_id": 3,
+            "tipo_transazione": "pagamento",
+            "importo": 420.0,
+            "data_transazione": "2026-04-02 11:15:00",
+            "note": "Copia fattura"
+          },
+          {
+            "id": 4,
+            "ordine_id": 4,
+            "tipo_transazione": "storno",
+            "importo": 5.0,
+            "data_transazione": "2026-04-03 14:00:00",
+            "note": "Storno sconto"
+          },
+          {
+            "id": 5,
+            "ordine_id": 5,
+            "tipo_transazione": "rimborso",
+            "importo": 310.75,
+            "data_transazione": "2026-04-04 16:45:00",
+            "note": "Rimborso totale"
+          }
+        ],
+        "variations": {
+          "tipo_transazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "pagamento",
+              "pagamento",
+              "pagamento",
+              "rimborso",
+              "storno"
+            ]
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 1.5,
+            "pool": []
+          },
+          "data_transazione": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 20.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Pagamento ricevuto",
+              "Transazione con carta",
+              "Rimborso totale",
+              "Storno sconto",
+              "Copia fattura"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

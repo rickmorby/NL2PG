@@ -1,0 +1,517 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 4,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "subquery"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobili",
+        "obsolete_value": "schede_catastali",
+        "description": "La tabella immobili viene denominata schede_catastali nella prosa aziendale. Lo schema non dichiara vincoli REFERENCES, quindi la relazione tra schede_catastali e le altre tabelle deve essere dedotta solo dai nomi di colonna compatibili (es. contratti.immobile_id = immobili.id)."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "contratti",
+        "obsolete_value": "compromessi stipulati",
+        "description": "La tabella contratti è indicata nel testo aziendale con il gergo del settore immobiliare come compromessi stipulati. Il risolutore deve riconoscere che si tratta della stessa entità per costruire correttamente la subquery non correlata del tipo WHERE immobile_id IN (SELECT id FROM immobili WHERE condizione)."
+      }
+    ],
+    "spec_hash": "239194b92d093df8"
+  },
+  "schema_ddl": "CREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    provincia TEXT,\n    cap TEXT,\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    numero_vani INT CHECK (numero_vani > 0),\n    tipologia TEXT NOT NULL CHECK (tipologia IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    stato TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato IN ('disponibile', 'riservato', 'venduto')),\n    prezzo_richiesto NUMERIC(12,2) CHECK (prezzo_richiesto >= 0),\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE agenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    matricola TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    immobile_id INT NOT NULL,\n    cliente_id INT NOT NULL,\n    agente_id INT,\n    data_stipula DATE NOT NULL,\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('compromesso', 'definitivo', 'opzione')),\n    prezzo_concordato NUMERIC(12,2) CHECK (prezzo_concordato >= 0),\n    note TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "immobili",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 260,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "indirizzo": "Via Torino 12",
+            "comune": "Milano",
+            "provincia": "MI",
+            "cap": "20123",
+            "superficie_mq": 68.0,
+            "numero_vani": 3,
+            "tipologia": "appartamento",
+            "stato": "venduto",
+            "prezzo_richiesto": 315000.0,
+            "created_at": "2025-03-14 09:30:00"
+          },
+          {
+            "id": 2,
+            "indirizzo": "Corso Buenos Aires 88",
+            "comune": "Milano",
+            "provincia": "MI",
+            "cap": "20124",
+            "superficie_mq": 95.5,
+            "numero_vani": 4,
+            "tipologia": "appartamento",
+            "stato": "riservato",
+            "prezzo_richiesto": 468000.0,
+            "created_at": "2025-05-02 15:45:00"
+          },
+          {
+            "id": 3,
+            "indirizzo": "Via Appia Nuova 145",
+            "comune": "Roma",
+            "provincia": "RM",
+            "cap": "00181",
+            "superficie_mq": 82.0,
+            "numero_vani": 3,
+            "tipologia": "appartamento",
+            "stato": "disponibile",
+            "prezzo_richiesto": 265000.0,
+            "created_at": "2025-04-19 11:20:00"
+          },
+          {
+            "id": 4,
+            "indirizzo": "Via Aurelia Antica 8",
+            "comune": "Roma",
+            "provincia": "RM",
+            "cap": "00165",
+            "superficie_mq": 190.0,
+            "numero_vani": 7,
+            "tipologia": "villa",
+            "stato": "venduto",
+            "prezzo_richiesto": 720000.0,
+            "created_at": "2025-02-08 10:05:00"
+          },
+          {
+            "id": 5,
+            "indirizzo": "Corso Francia 210",
+            "comune": "Torino",
+            "provincia": "TO",
+            "cap": "10146",
+            "superficie_mq": 74.0,
+            "numero_vani": 3,
+            "tipologia": "appartamento",
+            "stato": "disponibile",
+            "prezzo_richiesto": 189000.0,
+            "created_at": "2025-06-27 16:40:00"
+          },
+          {
+            "id": 6,
+            "indirizzo": "Via Chiaia 55",
+            "comune": "Napoli",
+            "provincia": "NA",
+            "cap": "80121",
+            "superficie_mq": 58.0,
+            "numero_vani": 2,
+            "tipologia": "appartamento",
+            "stato": "riservato",
+            "prezzo_richiesto": 172000.0,
+            "created_at": "2025-07-15 09:15:00"
+          },
+          {
+            "id": 7,
+            "indirizzo": "Via della Vite 22",
+            "comune": "Firenze",
+            "provincia": "FI",
+            "cap": "50123",
+            "superficie_mq": 120.0,
+            "numero_vani": 5,
+            "tipologia": "ufficio",
+            "stato": "disponibile",
+            "prezzo_richiesto": 340000.0,
+            "created_at": "2025-08-03 14:25:00"
+          },
+          {
+            "id": 8,
+            "indirizzo": "Via Indipendenza 41",
+            "comune": "Bologna",
+            "provincia": "BO",
+            "cap": "40121",
+            "superficie_mq": 45.0,
+            "numero_vani": 1,
+            "tipologia": "negozio",
+            "stato": "disponibile",
+            "prezzo_richiesto": 230000.0,
+            "created_at": "2025-09-12 12:00:00"
+          },
+          {
+            "id": 9,
+            "indirizzo": "Strada Vicinale dei Boschi 3",
+            "comune": "Siena",
+            "provincia": "SI",
+            "cap": "53100",
+            "superficie_mq": 1250.0,
+            "numero_vani": 1,
+            "tipologia": "terreno",
+            "stato": "disponibile",
+            "prezzo_richiesto": 145000.0,
+            "created_at": "2025-10-01 08:50:00"
+          }
+        ],
+        "variations": {
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Garibaldi 14",
+              "Via Roma 27",
+              "Corso Italia 9",
+              "Piazza Dante 5",
+              "Via Verdi 31",
+              "Viale Trieste 18",
+              "Via Mazzini 44",
+              "Via Dante Alighieri 12"
+            ]
+          },
+          "superficie_mq": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.35,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "disponibile",
+              "disponibile",
+              "disponibile",
+              "riservato",
+              "venduto"
+            ]
+          },
+          "prezzo_richiesto": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "created_at": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 240,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRC80A01F205X",
+            "email": "marco.rossi80@gmail.com",
+            "telefono": "333 1234567"
+          },
+          {
+            "id": 2,
+            "nome": "Giulia",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCGLA85C43H501Z",
+            "email": "giulia.bianchi85@libero.it",
+            "telefono": "347 2345678"
+          },
+          {
+            "id": 3,
+            "nome": "Alessandro",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRLSN79D12M052Y",
+            "email": "alessandro.ferrari79@tiscali.it",
+            "telefono": "320 3456789"
+          },
+          {
+            "id": 4,
+            "nome": "Sara",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPSRSA92E55F839K",
+            "email": "sara.esposito92@gmail.com",
+            "telefono": "339 4567890"
+          },
+          {
+            "id": 5,
+            "nome": "Luca",
+            "cognome": "Russo",
+            "codice_fiscale": "RSSLCU77F03G273J",
+            "email": "luca.russo77@virgilio.it",
+            "telefono": "328 5678901"
+          },
+          {
+            "id": 6,
+            "nome": "Chiara",
+            "cognome": "Colombo",
+            "codice_fiscale": "CLMCHR88G21B157T",
+            "email": "chiara.colombo88@outlook.com",
+            "telefono": "346 6789012"
+          },
+          {
+            "id": 7,
+            "nome": "Davide",
+            "cognome": "Ricci",
+            "codice_fiscale": "RCCDVD91H07D963P",
+            "email": "davide.ricci91@gmail.com",
+            "telefono": "331 7890123"
+          },
+          {
+            "id": 8,
+            "nome": "Elena",
+            "cognome": "Marino",
+            "codice_fiscale": "MRNLNE83L29E624D",
+            "email": "elena.marino83@yahoo.it",
+            "telefono": "335 8901234"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Giulia",
+              "Alessandro",
+              "Sara",
+              "Luca",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesca",
+              "Matteo",
+              "Anna",
+              "Simone"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Bruno",
+              "Gallo",
+              "Conti"
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "333 1122334",
+              "347 2233445",
+              "320 3344556",
+              "339 4455667",
+              "328 5566778",
+              "346 6677889",
+              "331 7788990",
+              "335 8899001"
+            ]
+          }
+        }
+      },
+      {
+        "table": "agenti",
+        "nature": "lookup",
+        "min_rows": 8,
+        "max_rows": 14,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Paolo",
+            "cognome": "Moretti",
+            "matricola": "AG-001",
+            "telefono": "348 1111222"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Galli",
+            "matricola": "AG-002",
+            "telefono": "349 2222333"
+          },
+          {
+            "id": 3,
+            "nome": "Stefano",
+            "cognome": "Fontana",
+            "matricola": "AG-003",
+            "telefono": "340 3333444"
+          },
+          {
+            "id": 4,
+            "nome": "Valentina",
+            "cognome": "Rinaldi",
+            "matricola": "AG-004",
+            "telefono": "366 4444555"
+          },
+          {
+            "id": 5,
+            "nome": "Fabio",
+            "cognome": "Lombardi",
+            "matricola": "AG-005",
+            "telefono": "334 5555666"
+          },
+          {
+            "id": 6,
+            "nome": "Silvia",
+            "cognome": "Costa",
+            "matricola": "AG-006",
+            "telefono": "337 6666777"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "contratti",
+        "nature": "fact",
+        "min_rows": 400,
+        "max_rows": 800,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "immobile_id": 1,
+            "cliente_id": 1,
+            "agente_id": 1,
+            "data_stipula": "2026-01-20",
+            "tipo_contratto": "compromesso",
+            "prezzo_concordato": 298000.0,
+            "note": "Acconto del 10% versato"
+          },
+          {
+            "id": 2,
+            "immobile_id": 2,
+            "cliente_id": 2,
+            "agente_id": 2,
+            "data_stipula": "2026-02-11",
+            "tipo_contratto": "definitivo",
+            "prezzo_concordato": 455000.0,
+            "note": "Mutuo approvato, rogito entro 60 giorni"
+          },
+          {
+            "id": 3,
+            "immobile_id": 3,
+            "cliente_id": 3,
+            "agente_id": 3,
+            "data_stipula": "2026-03-05",
+            "tipo_contratto": "opzione",
+            "prezzo_concordato": 175000.0,
+            "note": "Opzione esclusiva di 30 giorni"
+          },
+          {
+            "id": 4,
+            "immobile_id": 4,
+            "cliente_id": 4,
+            "agente_id": 4,
+            "data_stipula": "2026-04-18",
+            "tipo_contratto": "definitivo",
+            "prezzo_concordato": 690000.0,
+            "note": "Pagamento dilazionato in due tranche"
+          },
+          {
+            "id": 5,
+            "immobile_id": 5,
+            "cliente_id": 5,
+            "data_stipula": "2026-05-09",
+            "tipo_contratto": "compromesso",
+            "prezzo_concordato": 182000.0
+          },
+          {
+            "id": 6,
+            "immobile_id": 6,
+            "cliente_id": 6,
+            "agente_id": 5,
+            "data_stipula": "2026-06-02",
+            "tipo_contratto": "definitivo",
+            "prezzo_concordato": 168000.0,
+            "note": "Compratore prima casa"
+          }
+        ],
+        "variations": {
+          "data_stipula": {
+            "axis": "shift",
+            "delta_min": -75.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "tipo_contratto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "compromesso",
+              "definitivo",
+              "definitivo",
+              "definitivo",
+              "opzione"
+            ]
+          },
+          "prezzo_concordato": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.85,
+            "factor_max": 1.15,
+            "pool": []
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Acconto versato",
+              "Mutuo in approvazione",
+              "Rogito fissato presso il notaio",
+              "Trattativa in corso",
+              "Prima casa",
+              "Nessuna nota particolare"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

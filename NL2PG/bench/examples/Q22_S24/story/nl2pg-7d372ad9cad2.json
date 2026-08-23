@@ -1,0 +1,769 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE corrieri (\n    id INT PRIMARY KEY,\n    nome_completo TEXT NOT NULL,\n    numero_patente TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id) ON DELETE RESTRICT ON UPDATE CASCADE,\n    corriere_id INT REFERENCES corrieri(id) ON DELETE SET NULL,\n    peso_totale_kg NUMERIC(8,2) NOT NULL CHECK (peso_totale_kg > 0),\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    data_spedizione DATE NOT NULL,\n    indirizzo_destinazione TEXT NOT NULL\n);\n\nCREATE TABLE pacchi (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    larghezza_cm INT NOT NULL CHECK (larghezza_cm > 0),\n    altezza_cm INT NOT NULL CHECK (altezza_cm > 0),\n    profondita_cm INT NOT NULL CHECK (profondita_cm > 0),\n    fragile BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE eventi_tracciamento (\n    id INT PRIMARY KEY,\n    spedizione_id INT REFERENCES spedizioni(id) ON DELETE SET NULL,\n    stato TEXT NOT NULL,\n    luogo TEXT NOT NULL,\n    registrato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE consegne (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL UNIQUE REFERENCES spedizioni(id) ON DELETE CASCADE,\n    corriere_id INT REFERENCES corrieri(id) ON DELETE SET NULL,\n    data_consegna_effettiva TIMESTAMP,\n    firma_ricevente TEXT,\n    note_consegna TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 565,
+        "columns": {
+          "id": {
+            "distinct": 565,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 565
+          },
+          "ragione_sociale": {
+            "distinct": 10,
+            "sample": [
+              "Alimenti Iota SpA",
+              "Cartotecnica Beta SpA",
+              "Chimica Theta SRL",
+              "Elettronica Epsilon SpA",
+              "Forniture Gamma SAS"
+            ]
+          },
+          "email": {
+            "distinct": 565,
+            "sample": [
+              "acquisti10@epsilonelettronica.it",
+              "acquisti11@epsilonelettronica.it",
+              "acquisti12@epsilonelettronica.it",
+              "acquisti13@epsilonelettronica.it",
+              "acquisti14@epsilonelettronica.it"
+            ]
+          },
+          "citta": {
+            "distinct": 11,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          }
+        }
+      },
+      "corrieri": {
+        "row_count": 7,
+        "columns": {
+          "id": {
+            "distinct": 7,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 7
+          },
+          "nome_completo": {
+            "distinct": 5,
+            "sample": [
+              "Chiara De Luca",
+              "Davide Rinaldi",
+              "Elena Moretti",
+              "Paolo Ricci",
+              "Sara Conti"
+            ]
+          },
+          "numero_patente": {
+            "distinct": 7,
+            "sample": [
+              "BO5519028",
+              "FI8837465",
+              "GE7712390",
+              "MI8392014",
+              "NA6625341"
+            ]
+          },
+          "telefono": {
+            "distinct": 4,
+            "sample": [
+              "+39 331 6543210",
+              "+39 339 7766554",
+              "+39 345 8877665",
+              "+39 347 5566778"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 2302,
+        "columns": {
+          "id": {
+            "distinct": 2302,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3302
+          },
+          "cliente_id": {
+            "distinct": 558,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 565
+          },
+          "corriere_id": {
+            "distinct": 7,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 7
+          },
+          "peso_totale_kg": {
+            "distinct": 1740,
+            "sample": [
+              "0.24",
+              "0.25",
+              "0.26",
+              "0.27",
+              "0.28"
+            ],
+            "min": 0.24,
+            "max": 361.5
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "consegnata",
+              "in_preparazione",
+              "in_transito",
+              "rimandata"
+            ]
+          },
+          "data_spedizione": {
+            "distinct": 142,
+            "sample": [
+              "2025-11-09",
+              "2025-11-10",
+              "2025-11-11",
+              "2025-11-12",
+              "2025-11-13"
+            ]
+          },
+          "indirizzo_destinazione": {
+            "distinct": 8,
+            "sample": [
+              "Corso Vittorio Emanuele II 88, 00186 Roma",
+              "Piazza Bra 4, 37121 Verona",
+              "Via Garibaldi 5, 10122 Torino",
+              "Via Indipendenza 41, 40121 Bologna",
+              "Via San Lorenzo 23, 16123 Genova"
+            ]
+          }
+        }
+      },
+      "pacchi": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "20001",
+              "20002",
+              "20003",
+              "20004",
+              "20005"
+            ],
+            "min": 20001,
+            "max": 23000
+          },
+          "spedizione_id": {
+            "distinct": 1668,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1005",
+              "1006"
+            ],
+            "min": 1001,
+            "max": 3302
+          },
+          "peso_kg": {
+            "distinct": 1591,
+            "sample": [
+              "0.32",
+              "0.33",
+              "0.34",
+              "0.35",
+              "0.36"
+            ],
+            "min": 0.32,
+            "max": 56.25
+          },
+          "larghezza_cm": {
+            "distinct": 2858,
+            "sample": [
+              "10.0",
+              "10.08370221280617",
+              "10.09511651222946",
+              "10.179882119199782",
+              "10.201485218779684"
+            ],
+            "min": 10.0,
+            "max": 100.0
+          },
+          "altezza_cm": {
+            "distinct": 2867,
+            "sample": [
+              "10",
+              "10.039991755600335",
+              "10.117901869309708",
+              "10.118910030446166",
+              "10.14411332530255"
+            ],
+            "min": 2.0,
+            "max": 75.0
+          },
+          "profondita_cm": {
+            "distinct": 2851,
+            "sample": [
+              "1.0",
+              "1.0021043352603538",
+              "1.0096837232592506",
+              "1.0113828261204105",
+              "1.0377157974754496"
+            ],
+            "min": 1.0,
+            "max": 62.0
+          },
+          "fragile": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "eventi_tracciamento": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "300001",
+              "300002",
+              "300003",
+              "300004",
+              "300005"
+            ],
+            "min": 300001,
+            "max": 303000
+          },
+          "spedizione_id": {
+            "distinct": 1635,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1005",
+              "1007"
+            ],
+            "min": 1001,
+            "max": 3302
+          },
+          "stato": {
+            "distinct": 6,
+            "sample": [
+              "consegnata",
+              "etichetta_generata",
+              "in_arrivo_hub",
+              "in_transito",
+              "ritiro_effettuato"
+            ]
+          },
+          "luogo": {
+            "distinct": 9,
+            "sample": [
+              "Centro Smistamento Firenze",
+              "Deposito Roma Tuscolana",
+              "Hub Bologna Interporto",
+              "Hub Genova Pra'",
+              "Hub Milano Rogoredo"
+            ]
+          },
+          "registrato_il": {
+            "distinct": 66,
+            "sample": [
+              "2026-01-04 09:15:00",
+              "2026-01-05 04:40:00",
+              "2026-01-05 09:15:00",
+              "2026-01-06 04:40:00",
+              "2026-01-06 09:15:00"
+            ]
+          }
+        }
+      },
+      "consegne": {
+        "row_count": 465,
+        "columns": {
+          "id": {
+            "distinct": 465,
+            "sample": [
+              "4001",
+              "4002",
+              "4003",
+              "4004",
+              "4005"
+            ],
+            "min": 4001,
+            "max": 4465
+          },
+          "spedizione_id": {
+            "distinct": 465,
+            "sample": [
+              "1002",
+              "1004",
+              "1005",
+              "1009",
+              "1010"
+            ],
+            "min": 1002,
+            "max": 3300
+          },
+          "corriere_id": {
+            "distinct": 7,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 7
+          },
+          "data_consegna_effettiva": {
+            "distinct": 26,
+            "sample": [
+              "2026-01-08 11:05:00",
+              "2026-01-09 11:05:00",
+              "2026-01-10 11:05:00",
+              "2026-01-11 11:05:00",
+              "2026-01-12 11:05:00"
+            ]
+          },
+          "firma_ricevente": {
+            "distinct": 8,
+            "sample": [
+              "A. Colombo",
+              "D. Longo",
+              "F. Villa",
+              "G. Esposito",
+              "L. Ferri"
+            ]
+          },
+          "note_consegna": {
+            "distinct": 8,
+            "sample": [
+              "Consegna a magazzino cliente",
+              "Consegna effettuata in reception",
+              "Consegnato al portinaio",
+              "Depositato in punto di ritiro",
+              "Destinatario assente: secondo tentativo programmato"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Cartotecnica Beta SpA",
+          "email": "info@tecnologiealfa.it",
+          "citta": "Firenze"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Elettronica Epsilon SpA",
+          "email": "info1@tecnologiealfa.it",
+          "citta": "Napoli"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Mobili Kappa SRL",
+          "email": "info2@tecnologiealfa.it",
+          "citta": "Roma"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Alimenti Iota SpA",
+          "email": "info3@tecnologiealfa.it",
+          "citta": "Padova"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Alimenti Iota SpA",
+          "email": "info4@tecnologiealfa.it",
+          "citta": "Bologna"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Forniture Gamma SAS",
+          "email": "info5@tecnologiealfa.it",
+          "citta": "Napoli"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Elettronica Epsilon SpA",
+          "email": "info6@tecnologiealfa.it",
+          "citta": "Bologna"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Tecnologie Alfa SRL",
+          "email": "info7@tecnologiealfa.it",
+          "citta": "Napoli"
+        }
+      ],
+      "corrieri": [
+        {
+          "id": 1,
+          "nome_completo": "Sara Conti",
+          "numero_patente": "MI8392014",
+          "telefono": "+39 347 5566778"
+        },
+        {
+          "id": 2,
+          "nome_completo": "Chiara De Luca",
+          "numero_patente": "RM7481920",
+          "telefono": "+39 339 7766554"
+        },
+        {
+          "id": 3,
+          "nome_completo": "Paolo Ricci",
+          "numero_patente": "TO9182736",
+          "telefono": "+39 331 6543210"
+        },
+        {
+          "id": 4,
+          "nome_completo": "Elena Moretti",
+          "numero_patente": "NA6625341",
+          "telefono": "+39 345 8877665"
+        },
+        {
+          "id": 5,
+          "nome_completo": "Davide Rinaldi",
+          "numero_patente": "BO5519028",
+          "telefono": "+39 331 6543210"
+        },
+        {
+          "id": 6,
+          "nome_completo": "Sara Conti",
+          "numero_patente": "FI8837465",
+          "telefono": "+39 331 6543210"
+        },
+        {
+          "id": 7,
+          "nome_completo": "Davide Rinaldi",
+          "numero_patente": "GE7712390",
+          "telefono": "+39 345 8877665"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 1001,
+          "cliente_id": 358,
+          "corriere_id": 4,
+          "peso_totale_kg": 8.89,
+          "stato": "rimandata",
+          "data_spedizione": "2026-01-17",
+          "indirizzo_destinazione": "Piazza Bra 4, 37121 Verona"
+        },
+        {
+          "id": 1002,
+          "cliente_id": 112,
+          "corriere_id": 5,
+          "peso_totale_kg": 35.37,
+          "stato": "consegnata",
+          "data_spedizione": "2026-01-18",
+          "indirizzo_destinazione": "Via Garibaldi 5, 10122 Torino"
+        },
+        {
+          "id": 1003,
+          "cliente_id": 127,
+          "corriere_id": 3,
+          "peso_totale_kg": 9.11,
+          "stato": "in_preparazione",
+          "data_spedizione": "2026-01-08",
+          "indirizzo_destinazione": "Via Garibaldi 5, 10122 Torino"
+        },
+        {
+          "id": 1004,
+          "cliente_id": 389,
+          "corriere_id": null,
+          "peso_totale_kg": 34.67,
+          "stato": "consegnata",
+          "data_spedizione": "2025-12-12",
+          "indirizzo_destinazione": "Via Torino 12, 20123 Milano"
+        },
+        {
+          "id": 1005,
+          "cliente_id": 68,
+          "corriere_id": 5,
+          "peso_totale_kg": 18.14,
+          "stato": "in_preparazione",
+          "data_spedizione": "2026-01-24",
+          "indirizzo_destinazione": "Via Indipendenza 41, 40121 Bologna"
+        },
+        {
+          "id": 1006,
+          "cliente_id": 218,
+          "corriere_id": 1,
+          "peso_totale_kg": 20.38,
+          "stato": "in_preparazione",
+          "data_spedizione": "2025-11-15",
+          "indirizzo_destinazione": "Via San Lorenzo 23, 16123 Genova"
+        },
+        {
+          "id": 1007,
+          "cliente_id": 492,
+          "corriere_id": null,
+          "peso_totale_kg": 11.51,
+          "stato": "consegnata",
+          "data_spedizione": "2026-01-21",
+          "indirizzo_destinazione": "Via Torino 12, 20123 Milano"
+        },
+        {
+          "id": 1008,
+          "cliente_id": 206,
+          "corriere_id": 4,
+          "peso_totale_kg": 31.77,
+          "stato": "in_preparazione",
+          "data_spedizione": "2026-01-11",
+          "indirizzo_destinazione": "Corso Vittorio Emanuele II 88, 00186 Roma"
+        }
+      ],
+      "pacchi": [
+        {
+          "id": 20001,
+          "spedizione_id": 2785,
+          "peso_kg": 8.01,
+          "larghezza_cm": 35.85785646556896,
+          "altezza_cm": 31.82992824838975,
+          "profondita_cm": 31.98529691717927,
+          "fragile": "false"
+        },
+        {
+          "id": 20002,
+          "spedizione_id": 2057,
+          "peso_kg": 8.65,
+          "larghezza_cm": 33.83916828960612,
+          "altezza_cm": 22.0,
+          "profondita_cm": 31.86032118130497,
+          "fragile": "false"
+        },
+        {
+          "id": 20003,
+          "spedizione_id": 1340,
+          "peso_kg": 13.19,
+          "larghezza_cm": 36.96480443880286,
+          "altezza_cm": 32.36791426486063,
+          "profondita_cm": 29.823599677622163,
+          "fragile": "false"
+        },
+        {
+          "id": 20004,
+          "spedizione_id": 2452,
+          "peso_kg": 13.71,
+          "larghezza_cm": 43.15137644862628,
+          "altezza_cm": 42.53653138746125,
+          "profondita_cm": 32.565518721392436,
+          "fragile": "true"
+        },
+        {
+          "id": 20005,
+          "spedizione_id": 2290,
+          "peso_kg": 3.04,
+          "larghezza_cm": 57.7712477226891,
+          "altezza_cm": 29.9159095209126,
+          "profondita_cm": 21.95505014500952,
+          "fragile": "false"
+        },
+        {
+          "id": 20006,
+          "spedizione_id": 2748,
+          "peso_kg": 8.39,
+          "larghezza_cm": 45.25940051629041,
+          "altezza_cm": 26.31968790287438,
+          "profondita_cm": 35.55609972733025,
+          "fragile": "false"
+        },
+        {
+          "id": 20007,
+          "spedizione_id": 1238,
+          "peso_kg": 2.98,
+          "larghezza_cm": 41.48286811121467,
+          "altezza_cm": 39.0305023513732,
+          "profondita_cm": 23.855337251893253,
+          "fragile": "true"
+        },
+        {
+          "id": 20008,
+          "spedizione_id": 1847,
+          "peso_kg": 4.63,
+          "larghezza_cm": 50.885408123618234,
+          "altezza_cm": 28.145739109961752,
+          "profondita_cm": 23.425264706250545,
+          "fragile": "true"
+        }
+      ],
+      "eventi_tracciamento": [
+        {
+          "id": 300001,
+          "spedizione_id": 1247,
+          "stato": "ritiro_effettuato",
+          "luogo": "Hub Padova Est",
+          "registrato_il": "2026-01-08 09:15:00"
+        },
+        {
+          "id": 300002,
+          "spedizione_id": 2757,
+          "stato": "etichetta_generata",
+          "luogo": "Hub Milano Rogoredo",
+          "registrato_il": "2026-01-12 09:15:00"
+        },
+        {
+          "id": 300003,
+          "spedizione_id": 2135,
+          "stato": "consegnata",
+          "luogo": "Hub Bologna Interporto",
+          "registrato_il": "2026-01-06 09:15:00"
+        },
+        {
+          "id": 300004,
+          "spedizione_id": 1009,
+          "stato": "in_transito",
+          "luogo": "Hub Milano Rogoredo",
+          "registrato_il": "2026-01-05 09:15:00"
+        },
+        {
+          "id": 300005,
+          "spedizione_id": 2070,
+          "stato": "in_arrivo_hub",
+          "luogo": "Hub Genova Pra'",
+          "registrato_il": "2026-01-06 09:15:00"
+        },
+        {
+          "id": 300006,
+          "spedizione_id": 1331,
+          "stato": "in_transito",
+          "luogo": "Centro Smistamento Firenze",
+          "registrato_il": "2026-01-07 09:15:00"
+        },
+        {
+          "id": 300007,
+          "spedizione_id": 1537,
+          "stato": "tentativo_fallito",
+          "luogo": "Hub Napoli Nola",
+          "registrato_il": "2026-01-09 09:15:00"
+        },
+        {
+          "id": 300008,
+          "spedizione_id": 3090,
+          "stato": "in_transito",
+          "luogo": "Hub Napoli Nola",
+          "registrato_il": "2026-01-13 09:15:00"
+        }
+      ],
+      "consegne": [
+        {
+          "id": 4001,
+          "spedizione_id": 2648,
+          "corriere_id": 3,
+          "data_consegna_effettiva": "2026-01-10 11:05:00",
+          "firma_ricevente": "G. Esposito",
+          "note_consegna": "Consegna effettuata in reception"
+        },
+        {
+          "id": 4002,
+          "spedizione_id": 2516,
+          "corriere_id": 7,
+          "data_consegna_effettiva": "2026-01-13 11:05:00",
+          "firma_ricevente": "R. Marino",
+          "note_consegna": "Consegna a magazzino cliente"
+        },
+        {
+          "id": 4003,
+          "spedizione_id": 1768,
+          "corriere_id": null,
+          "data_consegna_effettiva": "2026-01-09 11:05:00",
+          "firma_ricevente": "F. Villa",
+          "note_consegna": "Firmato direttamente dal destinatario"
+        },
+        {
+          "id": 4004,
+          "spedizione_id": 3148,
+          "corriere_id": null,
+          "data_consegna_effettiva": "2026-01-08 11:05:00",
+          "firma_ricevente": "D. Longo",
+          "note_consegna": "Consegnato al portinaio"
+        },
+        {
+          "id": 4005,
+          "spedizione_id": 1511,
+          "corriere_id": 6,
+          "data_consegna_effettiva": "2026-01-12 11:05:00",
+          "firma_ricevente": "D. Longo",
+          "note_consegna": "Consegna effettuata in reception"
+        },
+        {
+          "id": 4006,
+          "spedizione_id": 1615,
+          "corriere_id": 5,
+          "data_consegna_effettiva": "2026-01-13 11:05:00",
+          "firma_ricevente": "F. Villa",
+          "note_consegna": "Destinatario assente: secondo tentativo programmato"
+        },
+        {
+          "id": 4007,
+          "spedizione_id": 2721,
+          "corriere_id": 1,
+          "data_consegna_effettiva": "2026-01-10 11:05:00",
+          "firma_ricevente": "G. Esposito",
+          "note_consegna": "Consegna a magazzino cliente"
+        },
+        {
+          "id": 4008,
+          "spedizione_id": 1558,
+          "corriere_id": 3,
+          "data_consegna_effettiva": "2026-01-08 11:05:00",
+          "firma_ricevente": "A. Colombo",
+          "note_consegna": "Consegna a magazzino cliente"
+        }
+      ]
+    }
+  },
+  "story": "Alla direzione operativa di Meridiana Logistica, la revisione trimestrale dei flussi di consegna è ormai un appuntamento fisso. Il cuore documentale dell'azienda è l'archivio clienti, l'anagrafica che raccoglie le 565 imprese assistite su scala nazionale: vi figurano Cartotecnica Beta SpA di Firenze, Elettronica Epsilon SpA con presidi a Napoli e Bologna, Alimenti Iota SpA, Forniture Gamma SAS, Mobili Kappa SRL e Tecnologie Alfa SRL. Per ciascuna impresa sono annotati la ragione sociale, la casella di posta elettronica degli uffici acquisti e la città di riferimento, in un elenco che spazia da Milano a Firenze, da Bologna a Roma, fino a Verona, Genova, Napoli, Padova, Torino e Bari. Accanto all'anagrafica è custodito il registro corrieri, dedicato ai sette conducenti abilitati: Sara Conti, presente due volte con le patenti MI8392014 e FI8837465, Chiara De Luca con RM7481920, Paolo Ricci con TO9182736, Elena Moretti con NA6625341 e Davide Rinaldi con BO5519028 e GE7712390, ciascuno con il proprio recapito, come il +39 347 5566778. Il registro più sfogliato dagli addetti resta però quello delle movimentazioni_merce, l'archivio un tempo intitolato semplicemente spedizioni: ogni invio riceve un numero progressivo da 1001 in avanti e viene descritto tramite il committente, il corriere incaricato, il peso complessivo in chilogrammi, lo stato di avanzamento, la data di partenza e l'indirizzo di destinazione. Gli stati ammessi sono quattro — in_preparazione, in_transito, consegnata e rimandata — e le partenze coprono un arco iniziato il 2025-11-09, con pesi da minimi di 0.24 chilogrammi a punte di 361.5 e indirizzi ricorrenti come Corso Vittorio Emanuele II 88, 00186 Roma, Piazza Bra 4, 37121 Verona, Via Garibaldi 5, 10122 Torino, Via Indipendenza 41, 40121 Bologna, Via San Lorenzo 23, 16123 Genova e Via Torino 12, 20123 Milano. Ogni movimento si articola poi nel registro pacchi, dove ciascun collo — 3000 in totale, numerati da 20001 a 23000 — è descritto con il proprio peso, compreso tra 0.32 e 56.25 chilogrammi, le misure di larghezza da 10 a 100 centimetri, di altezza da 2 a 75 e di profondità da 1 a 62, oltre alla dicitura true o false sulla natura fragile. Il diario operativo prosegue nell'archivio eventi_tracciamento, che annota in sequenza gli avvicendamenti di ogni invio: etichetta_generata all'Hub Milano Rogoredo, ritiro_effettuato all'Hub Padova Est, in_arrivo_hub all'Hub Genova Pra', in_transito presso il Centro Smistamento Firenze, fino al tentativo_fallito rilevato all'Hub Napoli Nola e ai transiti dal Deposito Roma Tuscolana e dall'Hub Bologna Interporto. Ogni voce riporta luogo e istante preciso, come il 2026-01-05 04:40:00 del giro notturno o il consueto passaggio delle 09:15:00. Quando tutto procede bene, la pratica confluisce nel registro consegne, che conta 465 numerazioni da 4001 a 4465. Qui trova posto il timestamp POD, cioè la prova di consegna con data e ora effettive — l'ultima in ordine di tempo risale al 2026-01-13 11:05:00 — insieme alla firma del ricevente, con sottoscrizioni come G. Esposito, R. Marino, F. Villa, D. Longo, A. Colombo e L. Ferri, e alle note che raccontano le sfumature del mestiere: Consegna a magazzino cliente, Consegna effettuata in reception, Consegnato al portinaio, Depositato in punto di ritiro, Firmato direttamente dal destinatario oppure Destinatario assente: secondo tentativo programmato. Il controllo richiesto dalla direzione è circoscritto e rigoroso: per ciascuna città cliente occorre individuare l'invio consegnato più recente che abbia un corriere effettivamente assegnato, scartando quindi tanto le pratiche ferme in_preparazione o in_transito quanto quelle prive di conducente. Per ciascuna città emergono così la ragione sociale del committente, la data di partenza, il peso e l'indirizzo di destinazione: a Torino spicca l'invio del 2026-01-18 da 35.37 chilogrammi arrivato in Via Garibaldi 5, 10122 Torino, mentre per Milano il confronto tra le prove di consegna consente di risalire alla movimentazione più recente giunta in Via Torino 12, 20123 Milano. Le regole di conservazione tutelano la coerenza dell'insieme: quando un conducente lascia l'organico, il suo nome viene azzerato anche nelle consegne già archiviate, e se una movimentazione viene rettificata, i suoi colli e i relativi riscontri di percorso vengono rimossi di conseguenza, così che nessuna voce rimanga priva di riferimenti."
+}

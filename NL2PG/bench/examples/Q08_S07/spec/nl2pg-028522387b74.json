@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 2,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "forza_lavoro",
+      "description": "La tabella dei dipendenti viene indicata nel testo aziendale come forza_lavoro."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "manager_id",
+      "obsolete_value": "superior_node",
+      "description": "La chiave esterna auto-referente per la gerarchia aziendale viene definita con il gergo tecnico superior_node."
+    }
+  ],
+  "spec_hash": "612d768505bf0767"
+}

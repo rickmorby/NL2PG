@@ -1,0 +1,126 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [
+      "case"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "emp_no",
+        "obsolete_value": "id_dipendente",
+        "description": "La colonna emp_no (sigla aziendale) viene denominata id_dipendente nella documentazione."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "dept_mgr",
+        "obsolete_value": "responsabile_reparto",
+        "description": "La colonna dept_mgr (acronimo aziendale) viene riferita come responsabile_reparto nei report."
+      }
+    ],
+    "spec_hash": "1969969ca2b293f5"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    emp_no INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    responsabile_reparto INT,\n    stipendio NUMERIC(10,2) CHECK (stipendio >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "emp_no": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "responsabile_reparto": null,
+            "stipendio": 45000.0
+          },
+          {
+            "emp_no": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "responsabile_reparto": 1,
+            "stipendio": 52000.0
+          },
+          {
+            "emp_no": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "responsabile_reparto": 1,
+            "stipendio": 48000.0
+          },
+          {
+            "emp_no": 4,
+            "nome": "Marco",
+            "cognome": "Neri",
+            "responsabile_reparto": 2,
+            "stipendio": 50000.0
+          },
+          {
+            "emp_no": 5,
+            "nome": "Alessandro",
+            "cognome": "Gialli",
+            "responsabile_reparto": 2,
+            "stipendio": 47000.0
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Marco",
+              "Alessandro",
+              "Sofia",
+              "Luca",
+              "Elena",
+              "Paolo",
+              "Chiara"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Gialli",
+              "Ferrari",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci"
+            ]
+          },
+          "stipendio": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.2,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

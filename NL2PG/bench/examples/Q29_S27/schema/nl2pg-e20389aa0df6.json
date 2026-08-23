@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 4,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "agg_distinct"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "registro_consegne",
+        "description": "La tabella spedizioni (tabella figlio contenente le colonne cliente_id, corriere_id e magazzino_id deducibili dai nomi, senza REFERENCES dichiarate) viene denominata registro_consegne nella prosa aziendale. La query COUNT(DISTINCT spedizioni.cliente_id) con GROUP BY deve quindi risolvere il riferimento registro_consegne verso la tabella spedizioni."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "corrieri",
+        "obsolete_value": "vettori",
+        "description": "La tabella corrieri, referenziata implicitamente dalla colonna corriere_id nella tabella spedizioni, viene indicata nella documentazione aziendale con il sinonimo vettori. Le richieste di conteggio dei clienti distinti per vettore devono mappare vettori alla tabella corrieri."
+      }
+    ],
+    "spec_hash": "d84311f99968dcf2"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    cap TEXT CHECK (cap ~ '^[0-9]{5}$')\n);\n\nCREATE TABLE corrieri (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    telefono TEXT,\n    tipo_veicolo TEXT NOT NULL CHECK (tipo_veicolo IN ('furgone', 'camion', 'van', 'moto'))\n);\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    denominazione TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_pallet INT NOT NULL CHECK (capacita_pallet > 0)\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    corriere_id INT NOT NULL,\n    magazzino_id INT NOT NULL,\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    stato_consegna TEXT NOT NULL CHECK (stato_consegna IN ('in_preparazione', 'in_transito', 'consegnata', 'fallita')),\n    data_spedizione DATE NOT NULL,\n    data_consegna DATE\n);"
+}

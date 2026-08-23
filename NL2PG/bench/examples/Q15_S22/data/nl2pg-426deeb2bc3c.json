@@ -1,0 +1,699 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 6,
+    "hierarchy": "star",
+    "sql_features": [
+      "cte"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sinistri",
+        "obsolete_value": "pratiche_liquidazione",
+        "description": "La tabella dei fatti centrale 'sinistri' viene denominata 'pratiche_liquidazione' nella prosa aziendale. Le query devono risolvere la perifrasi verso la tabella dei fatti dello star schema."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "assicurati",
+        "description": "La tabella dimensionale 'clienti' viene indicata con il sinonimo 'assicurati' nella documentazione aziendale. Il mapping sinonimo-tabella deve essere dedotto dal contesto."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_risarcimento",
+        "obsolete_value": "indennizzo erogato",
+        "description": "La misura 'importo_risarcimento' nella tabella dei fatti è riferita con il gergo assicurativo 'indennizzo erogato'. Gli aggregati richiesti (somme, medie) vanno calcolati su tale colonna dei fatti."
+      }
+    ],
+    "spec_hash": "770192eeb4bfb7e6"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    provincia TEXT,\n    data_nascita DATE,\n    fascia_eta TEXT NOT NULL CHECK (fascia_eta IN ('18-30', '31-45', '46-60', '61-75', '76+'))\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'responsabilita_civile')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    data_decorrenza DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza >= data_decorrenza)\n);\n\nCREATE TABLE tipi_sinistro (\n    id INT PRIMARY KEY,\n    descrizione TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    livello_gravita TEXT NOT NULL CHECK (livello_gravita IN ('bassa', 'media', 'alta'))\n);\n\nCREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    agenzia TEXT NOT NULL,\n    regione TEXT NOT NULL\n);\n\nCREATE TABLE tempo (\n    id INT PRIMARY KEY,\n    data_completa DATE NOT NULL UNIQUE,\n    anno INT NOT NULL CHECK (anno BETWEEN 1900 AND 2100),\n    mese INT NOT NULL CHECK (mese BETWEEN 1 AND 12),\n    trimestre INT NOT NULL CHECK (trimestre BETWEEN 1 AND 4),\n    giorno_settimana TEXT NOT NULL\n);\n\nCREATE TABLE sinistri (\n    id BIGINT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    tipo_sinistro_id INT NOT NULL REFERENCES tipi_sinistro(id),\n    agente_id INT NOT NULL REFERENCES agenti(id),\n    tempo_id INT NOT NULL REFERENCES tempo(id),\n    importo_risarcimento NUMERIC(12,2) NOT NULL CHECK (importo_risarcimento >= 0),\n    importo_riserva NUMERIC(12,2) CHECK (importo_riserva >= 0),\n    stato_pratica TEXT NOT NULL DEFAULT 'aperta' CHECK (stato_pratica IN ('aperta', 'istruttoria', 'liquidata', 'respinta'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 250,
+        "max_rows": 350,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Ferrari",
+            "codice_fiscale": "RSSMRA85A01H501X",
+            "citta": "Roma",
+            "provincia": "RM",
+            "data_nascita": "1985-04-12",
+            "fascia_eta": "31-45"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BRLAUR90C55F205Y",
+            "citta": "Milano",
+            "provincia": "MI",
+            "data_nascita": "1990-08-23",
+            "fascia_eta": "31-45"
+          },
+          {
+            "id": 3,
+            "nome": "Giuseppe",
+            "cognome": "Russo",
+            "codice_fiscale": "RSSGPP78E15H501W",
+            "citta": "Napoli",
+            "provincia": "NA",
+            "data_nascita": "1978-11-30",
+            "fascia_eta": "46-60"
+          },
+          {
+            "id": 4,
+            "nome": "Anna",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPANNA92D62H501V",
+            "citta": "Torino",
+            "provincia": "TO",
+            "data_nascita": "1992-05-17",
+            "fascia_eta": "31-45"
+          },
+          {
+            "id": 5,
+            "nome": "Antonio",
+            "cognome": "Romano",
+            "codice_fiscale": "RMNANT70L20F839K",
+            "citta": "Palermo",
+            "provincia": "PA",
+            "data_nascita": "1970-02-10",
+            "fascia_eta": "46-60"
+          },
+          {
+            "id": 6,
+            "nome": "Chiara",
+            "cognome": "Colombo",
+            "codice_fiscale": "CLMCHR95B44E509T",
+            "citta": "Bologna",
+            "provincia": "BO",
+            "data_nascita": "1995-09-05",
+            "fascia_eta": "18-30"
+          },
+          {
+            "id": 7,
+            "nome": "Franco",
+            "cognome": "Moretti",
+            "codice_fiscale": "MRTFNC68R05G273S",
+            "citta": "Firenze",
+            "provincia": "FI",
+            "data_nascita": "1968-06-21",
+            "fascia_eta": "46-60"
+          },
+          {
+            "id": 8,
+            "nome": "Elena",
+            "cognome": "Greco",
+            "codice_fiscale": "GRCELN88A63H501R",
+            "citta": "Genova",
+            "provincia": "GE",
+            "data_nascita": "1988-03-08",
+            "fascia_eta": "31-45"
+          },
+          {
+            "id": 9,
+            "nome": "Vincenzo",
+            "cognome": "Ricci",
+            "codice_fiscale": "RCCVCN52M29D969Q",
+            "citta": "Verona",
+            "provincia": "VR",
+            "data_nascita": "1952-12-14",
+            "fascia_eta": "61-75"
+          },
+          {
+            "id": 10,
+            "nome": "Simona",
+            "cognome": "Marino",
+            "codice_fiscale": "MRNSMN99J51H501P",
+            "citta": "Bari",
+            "provincia": "BA",
+            "data_nascita": "1999-04-25",
+            "fascia_eta": "18-30"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giuseppe",
+              "Anna",
+              "Antonio",
+              "Chiara",
+              "Franco",
+              "Elena",
+              "Vincenzo",
+              "Simona",
+              "Andrea",
+              "Sara"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ferrari",
+              "Bianchi",
+              "Russo",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Moretti",
+              "Greco",
+              "Ricci",
+              "Marino",
+              "Gallo",
+              "Costa"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -150.0,
+            "delta_max": 150.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "polizze",
+        "nature": "dimension",
+        "min_rows": 300,
+        "max_rows": 450,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_polizza": "POL-2023-000001",
+            "tipo_polizza": "auto",
+            "premio_annuo": 450.0,
+            "data_decorrenza": "2023-03-01",
+            "data_scadenza": "2026-03-01"
+          },
+          {
+            "id": 2,
+            "numero_polizza": "POL-2023-000002",
+            "tipo_polizza": "casa",
+            "premio_annuo": 320.5,
+            "data_decorrenza": "2023-06-15",
+            "data_scadenza": "2026-06-15"
+          },
+          {
+            "id": 3,
+            "numero_polizza": "POL-2024-000003",
+            "tipo_polizza": "vita",
+            "premio_annuo": 890.0,
+            "data_decorrenza": "2024-01-10",
+            "data_scadenza": "2034-01-10"
+          },
+          {
+            "id": 4,
+            "numero_polizza": "POL-2024-000004",
+            "tipo_polizza": "salute",
+            "premio_annuo": 1250.75,
+            "data_decorrenza": "2024-05-20",
+            "data_scadenza": "2026-05-20"
+          },
+          {
+            "id": 5,
+            "numero_polizza": "POL-2024-000005",
+            "tipo_polizza": "responsabilita_civile",
+            "premio_annuo": 275.0,
+            "data_decorrenza": "2024-09-01",
+            "data_scadenza": "2026-09-01"
+          },
+          {
+            "id": 6,
+            "numero_polizza": "POL-2025-000006",
+            "tipo_polizza": "auto",
+            "premio_annuo": 520.3,
+            "data_decorrenza": "2025-02-11",
+            "data_scadenza": "2028-02-11"
+          }
+        ],
+        "variations": {
+          "tipo_polizza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "auto",
+              "auto",
+              "auto",
+              "casa",
+              "casa",
+              "vita",
+              "salute",
+              "responsabilita_civile"
+            ]
+          },
+          "premio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "data_decorrenza": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "tipi_sinistro",
+        "nature": "lookup",
+        "min_rows": 10,
+        "max_rows": 10,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "descrizione": "Incidente stradale con veicolo fermo",
+            "categoria": "RCA Auto",
+            "livello_gravita": "media"
+          },
+          {
+            "id": 2,
+            "descrizione": "Collisione frontale tra veicoli",
+            "categoria": "RCA Auto",
+            "livello_gravita": "alta"
+          },
+          {
+            "id": 3,
+            "descrizione": "Danni da grandine al veicolo",
+            "categoria": "Kasko Auto",
+            "livello_gravita": "bassa"
+          },
+          {
+            "id": 4,
+            "descrizione": "Infiltrazioni d'acqua in abitazione",
+            "categoria": "Casa Fabbricato",
+            "livello_gravita": "media"
+          },
+          {
+            "id": 5,
+            "descrizione": "Incendio in appartamento",
+            "categoria": "Casa Contenuti",
+            "livello_gravita": "alta"
+          },
+          {
+            "id": 6,
+            "descrizione": "Furto con scasso in abitazione",
+            "categoria": "Casa Furto",
+            "livello_gravita": "media"
+          },
+          {
+            "id": 7,
+            "descrizione": "Frattura da incidente domestico",
+            "categoria": "Infortuni Salute",
+            "livello_gravita": "bassa"
+          },
+          {
+            "id": 8,
+            "descrizione": "Ricovero ospedaliero programmato",
+            "categoria": "Spese Mediche Salute",
+            "livello_gravita": "alta"
+          },
+          {
+            "id": 9,
+            "descrizione": "Danno a terzi da attivita' professionale",
+            "categoria": "RC Professionale",
+            "livello_gravita": "media"
+          },
+          {
+            "id": 10,
+            "descrizione": "Responsabilita' civile verso terzi in condominio",
+            "categoria": "RC Condominiale",
+            "livello_gravita": "bassa"
+          }
+        ],
+        "variations": {
+          "livello_gravita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "bassa",
+              "bassa",
+              "media",
+              "media",
+              "alta"
+            ]
+          }
+        }
+      },
+      {
+        "table": "agenti",
+        "nature": "dimension",
+        "min_rows": 40,
+        "max_rows": 60,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "agenzia": "Agenzia Centrale Milano",
+            "regione": "Lombardia"
+          },
+          {
+            "id": 2,
+            "nome": "Francesca",
+            "cognome": "De Luca",
+            "agenzia": "Agenzia Vesuvio Napoli",
+            "regione": "Campania"
+          },
+          {
+            "id": 3,
+            "nome": "Roberto",
+            "cognome": "Fabbri",
+            "agenzia": "Agenzia Tiberina Roma",
+            "regione": "Lazio"
+          },
+          {
+            "id": 4,
+            "nome": "Silvia",
+            "cognome": "Marchetti",
+            "agenzia": "Agenzia Po Torino",
+            "regione": "Piemonte"
+          },
+          {
+            "id": 5,
+            "nome": "Davide",
+            "cognome": "Rinaldi",
+            "agenzia": "Agenzia Etnea Catania",
+            "regione": "Sicilia"
+          },
+          {
+            "id": 6,
+            "nome": "Paola",
+            "cognome": "Vitale",
+            "agenzia": "Agenzia Arno Firenze",
+            "regione": "Toscana"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Alessandro",
+              "Francesca",
+              "Roberto",
+              "Silvia",
+              "Davide",
+              "Paola",
+              "Matteo",
+              "Valentina",
+              "Luca",
+              "Giorgia"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Conti",
+              "De Luca",
+              "Fabbri",
+              "Marchetti",
+              "Rinaldi",
+              "Vitale",
+              "Barbieri",
+              "Fontana",
+              "Serra",
+              "Lombardi"
+            ]
+          }
+        }
+      },
+      {
+        "table": "tempo",
+        "nature": "explicit",
+        "min_rows": 365,
+        "max_rows": 365,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "data_completa": "2025-01-01",
+            "anno": 2025,
+            "mese": 1,
+            "trimestre": 1,
+            "giorno_settimana": "mercoledi'"
+          },
+          {
+            "id": 2,
+            "data_completa": "2025-02-15",
+            "anno": 2025,
+            "mese": 2,
+            "trimestre": 1,
+            "giorno_settimana": "sabato"
+          },
+          {
+            "id": 3,
+            "data_completa": "2025-03-21",
+            "anno": 2025,
+            "mese": 3,
+            "trimestre": 1,
+            "giorno_settimana": "venerdi'"
+          },
+          {
+            "id": 4,
+            "data_completa": "2025-04-05",
+            "anno": 2025,
+            "mese": 4,
+            "trimestre": 2,
+            "giorno_settimana": "sabato"
+          },
+          {
+            "id": 5,
+            "data_completa": "2025-05-18",
+            "anno": 2025,
+            "mese": 5,
+            "trimestre": 2,
+            "giorno_settimana": "domenica"
+          },
+          {
+            "id": 6,
+            "data_completa": "2025-06-30",
+            "anno": 2025,
+            "mese": 6,
+            "trimestre": 2,
+            "giorno_settimana": "lunedi'"
+          },
+          {
+            "id": 7,
+            "data_completa": "2025-07-14",
+            "anno": 2025,
+            "mese": 7,
+            "trimestre": 3,
+            "giorno_settimana": "lunedi'"
+          },
+          {
+            "id": 8,
+            "data_completa": "2025-08-23",
+            "anno": 2025,
+            "mese": 8,
+            "trimestre": 3,
+            "giorno_settimana": "sabato"
+          },
+          {
+            "id": 9,
+            "data_completa": "2025-10-02",
+            "anno": 2025,
+            "mese": 10,
+            "trimestre": 4,
+            "giorno_settimana": "giovedi'"
+          },
+          {
+            "id": 10,
+            "data_completa": "2025-12-25",
+            "anno": 2025,
+            "mese": 12,
+            "trimestre": 4,
+            "giorno_settimana": "giovedi'"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "sinistri",
+        "nature": "fact",
+        "min_rows": 900,
+        "max_rows": 1400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "polizza_id": 1,
+            "tipo_sinistro_id": 1,
+            "agente_id": 1,
+            "tempo_id": 1,
+            "importo_risarcimento": 2450.0,
+            "importo_riserva": 0.0,
+            "stato_pratica": "liquidata"
+          },
+          {
+            "id": 2,
+            "cliente_id": 2,
+            "polizza_id": 2,
+            "tipo_sinistro_id": 4,
+            "agente_id": 2,
+            "tempo_id": 2,
+            "importo_risarcimento": 18700.5,
+            "importo_riserva": 5200.0,
+            "stato_pratica": "istruttoria"
+          },
+          {
+            "id": 3,
+            "cliente_id": 3,
+            "polizza_id": 3,
+            "tipo_sinistro_id": 2,
+            "agente_id": 3,
+            "tempo_id": 3,
+            "importo_risarcimento": 0.0,
+            "importo_riserva": 0.0,
+            "stato_pratica": "respinta"
+          },
+          {
+            "id": 4,
+            "cliente_id": 4,
+            "polizza_id": 4,
+            "tipo_sinistro_id": 7,
+            "agente_id": 4,
+            "tempo_id": 4,
+            "importo_risarcimento": 890.25,
+            "importo_riserva": 890.25,
+            "stato_pratica": "aperta"
+          },
+          {
+            "id": 5,
+            "cliente_id": 5,
+            "polizza_id": 5,
+            "tipo_sinistro_id": 5,
+            "agente_id": 5,
+            "tempo_id": 5,
+            "importo_risarcimento": 15300.0,
+            "importo_riserva": 0.0,
+            "stato_pratica": "liquidata"
+          },
+          {
+            "id": 6,
+            "cliente_id": 6,
+            "polizza_id": 6,
+            "tipo_sinistro_id": 3,
+            "agente_id": 6,
+            "tempo_id": 6,
+            "importo_risarcimento": 4300.8,
+            "importo_riserva": 1500.0,
+            "stato_pratica": "istruttoria"
+          },
+          {
+            "id": 7,
+            "cliente_id": 7,
+            "polizza_id": 1,
+            "tipo_sinistro_id": 2,
+            "agente_id": 1,
+            "tempo_id": 7,
+            "importo_risarcimento": 125000.0,
+            "importo_riserva": 45000.0,
+            "stato_pratica": "aperta"
+          },
+          {
+            "id": 8,
+            "cliente_id": 8,
+            "polizza_id": 2,
+            "tipo_sinistro_id": 6,
+            "agente_id": 2,
+            "tempo_id": 8,
+            "importo_risarcimento": 620.0,
+            "importo_riserva": 620.0,
+            "stato_pratica": "aperta"
+          }
+        ],
+        "variations": {
+          "importo_risarcimento": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "importo_riserva": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "stato_pratica": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "aperta",
+              "aperta",
+              "istruttoria",
+              "istruttoria",
+              "liquidata",
+              "liquidata",
+              "respinta"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

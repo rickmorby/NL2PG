@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "string_funcs"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "conti_correnti",
+      "obsolete_value": "posizioni_cliente",
+      "description": "La tabella conti_correnti, che contiene PK id_conto e attributi base come intestatario, iban, saldo e filiale, viene denominata posizioni_cliente nella prosa aziendale. Le query devono risolvere il nome reale della tabella."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "saldo",
+      "obsolete_value": "giacenza",
+      "description": "La colonna saldo della tabella conti_correnti viene indicata con il sinonimo giacenza nella documentazione aziendale. Le query che manipolano stringhe (UPPER, CONCAT, SUBSTRING) su intestatario o filiale devono comunque riferirsi alle colonne reali dello schema."
+    }
+  ],
+  "spec_hash": "a8cfbc0c4b8a72dd"
+}

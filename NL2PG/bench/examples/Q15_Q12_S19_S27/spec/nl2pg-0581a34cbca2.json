@@ -1,0 +1,28 @@
+{
+  "domain": "sanità",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "cte",
+    "subquery"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ricoveri",
+      "obsolete_value": "episodi_ospedalieri",
+      "description": "La tabella ricoveri viene denominata episodi_ospedalieri nella prosa aziendale; il modello deve risalire alla tabella fisica corretta tramite la chiave esterna implicita verso pazienti."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "costo_totale",
+      "obsolete_value": "onere complessivo della degenza",
+      "description": "La colonna costo_totale della tabella ricoveri viene indicata nei requisiti come 'onere complessivo della degenza'; la CTE deve filtrare i ricoveri il cui costo supera la media calcolata tramite subquery scalare annidata sullo stesso dataset."
+    }
+  ],
+  "spec_hash": "883d81b72c1e0135"
+}

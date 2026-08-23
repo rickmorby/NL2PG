@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 5,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "contratti",
+        "obsolete_value": "atti di compravendita stipulati",
+        "description": "La tabella contratti viene denominata nella prosa aziendale 'atti di compravendita stipulati'. Il solver deve mappare tale perifrasi alla tabella reale contratti per costruire le SELECT da combinare con UNION/INTERSECT/EXCEPT."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "agenti",
+        "obsolete_value": "consulenti immobiliari abilitati",
+        "description": "La tabella agenti viene indicata nel testo aziendale con il gergo del settore 'consulenti immobiliari abilitati'. Il solver deve riconoscere che il termine tecnico si riferisce alla tabella agenti quando associa le colonne compatibili (es. contratti.agente_id = agenti.id) senza vincoli REFERENCES dichiarati."
+      }
+    ],
+    "spec_hash": "e693c4c36206160a"
+  },
+  "schema_ddl": "CREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_abilitazione TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    data_abilitazione DATE NOT NULL\n);\n\nCREATE TABLE immobili (\n    id INT PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia CHAR(2),\n    cap TEXT,\n    tipologia TEXT NOT NULL CHECK (tipologia IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato IN ('disponibile', 'riservato', 'venduto'))\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    tipo_cliente TEXT NOT NULL DEFAULT 'privato' CHECK (tipo_cliente IN ('privato', 'azienda'))\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL,\n    cliente_id INT NOT NULL,\n    agente_id INT NOT NULL,\n    data_stipula DATE NOT NULL,\n    prezzo_finale NUMERIC(12,2) NOT NULL CHECK (prezzo_finale >= 0),\n    provvigione_agente NUMERIC(10,2) CHECK (provvigione_agente >= 0),\n    notaio TEXT\n);\n\nCREATE TABLE offerte (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL,\n    cliente_id INT NOT NULL,\n    agente_id INT,\n    data_presentazione DATE NOT NULL,\n    importo_offerto NUMERIC(12,2) NOT NULL CHECK (importo_offerto >= 0),\n    esito TEXT NOT NULL DEFAULT 'in_attesa' CHECK (esito IN ('in_attesa', 'accettata', 'rifiutata'))\n);"
+}

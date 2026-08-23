@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "conjunctive"
+  ],
+  "twist": [
+    "synonym",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_acquirenti",
+      "description": "La tabella clienti viene denominata nella prosa aziendale come anagrafica_acquirenti. Il risolutore deve mappare il termine sinonimo alla tabella reale clienti."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "flag_eliminato",
+      "obsolete_value": "registrazioni archiviate",
+      "description": "La colonna flag_eliminato che marca i record logicamente cancellati viene descritta nella prosa come registrazioni archiviate. La query congiuntiva deve includere la condizione WHERE flag_eliminato = 0 per escludere i record eliminati logicamente."
+    }
+  ],
+  "spec_hash": "36d9801a8fc1ce98"
+}

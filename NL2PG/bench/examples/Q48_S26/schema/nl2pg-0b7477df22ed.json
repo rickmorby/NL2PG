@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "distinct"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fatture",
+        "obsolete_value": "registrazioni di addebito emesse",
+        "description": "La tabella fatture viene denominata 'registrazioni di addebito emesse' nella prosa aziendale, costringendo il solver a mappare la perifrasi sulla tabella fisica corretta."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "esposizione contabile lorda",
+        "description": "La colonna importo, fisicamente definita come TEXT ma contenente valori logicamente numerici da castare con CAST(importo AS NUMERIC) prima del confronto, viene indicata nella documentazione con il gergo contabile 'esposizione contabile lorda'."
+      }
+    ],
+    "spec_hash": "4a0ddc97140f37aa"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE fatture (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_fattura TEXT NOT NULL UNIQUE,\n    data_emissione DATE NOT NULL,\n    importo NUMERIC(12,2) NOT NULL,\n    stato_fattura TEXT NOT NULL DEFAULT 'emessa' CHECK (stato_fattura IN ('emessa', 'pagata', 'annullata')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE righe_fattura (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL REFERENCES fatture(id),\n    descrizione TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    aliquota_iva NUMERIC(5,2) NOT NULL DEFAULT 22.00 CHECK (aliquota_iva >= 0)\n);"
+}

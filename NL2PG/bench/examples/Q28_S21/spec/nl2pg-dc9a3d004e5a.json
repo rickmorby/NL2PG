@@ -1,0 +1,9 @@
+{
+  "domain": "università",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "ecb0ed0d4f727a13"
+}

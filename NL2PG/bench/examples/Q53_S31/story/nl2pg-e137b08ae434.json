@@ -1,0 +1,547 @@
+{
+  "schema_ddl": "CREATE TABLE categorie_prodotti (\n    id SERIAL PRIMARY KEY,\n    nome_categoria TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL UNIQUE,\n    paese TEXT NOT NULL DEFAULT 'Italia'\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    categoria_id INT NOT NULL REFERENCES categorie_prodotti(id),\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    nome_prodotto TEXT NOT NULL,\n    prezzo_listino NUMERIC(10,2) NOT NULL CHECK (prezzo_listino >= 0)\n);\n\nCREATE TABLE punti_vendita (\n    id SERIAL PRIMARY KEY,\n    nome_negozio TEXT NOT NULL,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE vendite_flat (\n    id BIGINT PRIMARY KEY,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    punto_vendita_id INT NOT NULL REFERENCES punti_vendita(id),\n    data_vendita DATE NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo >= 0),\n    nome_categoria TEXT NOT NULL,\n    nome_fornitore TEXT NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "categorie_prodotti": {
+        "row_count": 33,
+        "columns": {
+          "id": {
+            "distinct": 33,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 33
+          },
+          "nome_categoria": {
+            "distinct": 33,
+            "sample": [
+              "Accessori",
+              "Accessori1",
+              "Accessori2",
+              "Accessori3",
+              "Audio & Video"
+            ]
+          }
+        }
+      },
+      "fornitori": {
+        "row_count": 38,
+        "columns": {
+          "id": {
+            "distinct": 38,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 38
+          },
+          "ragione_sociale": {
+            "distinct": 38,
+            "sample": [
+              "AlpenTech AG",
+              "AlpenTech AG1",
+              "AlpenTech AG2",
+              "AudioPro France SAS",
+              "AudioPro France SAS1"
+            ]
+          },
+          "paese": {
+            "distinct": 5,
+            "sample": [
+              "Cina",
+              "Francia",
+              "Germania",
+              "Italia",
+              "Spagna"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 548,
+        "columns": {
+          "id": {
+            "distinct": 548,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 548
+          },
+          "categoria_id": {
+            "distinct": 33,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 33
+          },
+          "fornitore_id": {
+            "distinct": 38,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 38
+          },
+          "nome_prodotto": {
+            "distinct": 20,
+            "sample": [
+              "Barra Audio Soundbar 2.1",
+              "Controller Wireless Pro",
+              "Cuffie Bluetooth Sport",
+              "Cuffie Wireless Noise Cancelling",
+              "Macchina Caffe Espresso"
+            ]
+          },
+          "prezzo_listino": {
+            "distinct": 529,
+            "sample": [
+              "1006.0",
+              "1007.35",
+              "1017.38",
+              "102.12",
+              "1029.85"
+            ],
+            "min": 17.74,
+            "max": 1033.21
+          }
+        }
+      },
+      "punti_vendita": {
+        "row_count": 452,
+        "columns": {
+          "id": {
+            "distinct": 452,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 452
+          },
+          "nome_negozio": {
+            "distinct": 14,
+            "sample": [
+              "DigitalPoint Brescia Due",
+              "DigitalPoint Firenze Novoli",
+              "DigitalPoint Torino Porta Susa",
+              "Elettronica Bologna Fiera",
+              "Elettronica Catania Centro"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      "vendite_flat": {
+        "row_count": 690,
+        "columns": {
+          "id": {
+            "distinct": 690,
+            "sample": [
+              "100001",
+              "100002",
+              "100003",
+              "100004",
+              "100005"
+            ],
+            "min": 100001,
+            "max": 100690
+          },
+          "prodotto_id": {
+            "distinct": 382,
+            "sample": [
+              "1",
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "min": 1,
+            "max": 548
+          },
+          "punto_vendita_id": {
+            "distinct": 359,
+            "sample": [
+              "1",
+              "100",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 1,
+            "max": 450
+          },
+          "data_vendita": {
+            "distinct": 113,
+            "sample": [
+              "2025-12-15",
+              "2025-12-16",
+              "2025-12-17",
+              "2025-12-19",
+              "2025-12-20"
+            ]
+          },
+          "quantita": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "prezzo_unitario": {
+            "distinct": 664,
+            "sample": [
+              "100.11",
+              "100.16",
+              "100.58",
+              "100.81",
+              "100.82"
+            ],
+            "min": 17.26,
+            "max": 754.95
+          },
+          "importo": {
+            "distinct": 674,
+            "sample": [
+              "100.24",
+              "101.8",
+              "1015.23",
+              "102.91",
+              "102.92"
+            ],
+            "min": 36.5,
+            "max": 1787.64
+          },
+          "nome_categoria": {
+            "distinct": 8,
+            "sample": [
+              "Accessori",
+              "Audio & Video",
+              "Casa & Ufficio",
+              "Elettrodomestici",
+              "Elettronica"
+            ]
+          },
+          "nome_fornitore": {
+            "distinct": 9,
+            "sample": [
+              "AlpenTech AG",
+              "AudioPro France SAS",
+              "Componenti Precisione S.p.A.",
+              "ElectroMarket Polska",
+              "Forniture Ufficio Italia S.r.l."
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "categorie_prodotti": [
+        {
+          "id": 1,
+          "nome_categoria": "Elettronica"
+        },
+        {
+          "id": 2,
+          "nome_categoria": "Elettronica1"
+        },
+        {
+          "id": 3,
+          "nome_categoria": "Elettronica2"
+        },
+        {
+          "id": 4,
+          "nome_categoria": "Elettronica3"
+        },
+        {
+          "id": 5,
+          "nome_categoria": "Elettronica4"
+        },
+        {
+          "id": 6,
+          "nome_categoria": "Informatica"
+        },
+        {
+          "id": 7,
+          "nome_categoria": "Informatica1"
+        },
+        {
+          "id": 8,
+          "nome_categoria": "Informatica2"
+        }
+      ],
+      "fornitori": [
+        {
+          "id": 1,
+          "ragione_sociale": "TechDistribution S.r.l.",
+          "paese": "Cina"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "TechDistribution S.r.l.1",
+          "paese": "Italia"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "TechDistribution S.r.l.2",
+          "paese": "Spagna"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "TechDistribution S.r.l.3",
+          "paese": "Spagna"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "NordElettronica GmbH",
+          "paese": "Italia"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "NordElettronica GmbH1",
+          "paese": "Cina"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "NordElettronica GmbH2",
+          "paese": "Spagna"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "NordElettronica GmbH3",
+          "paese": "Francia"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "categoria_id": 10,
+          "fornitore_id": 3,
+          "nome_prodotto": "Tastiera Meccanica RGB",
+          "prezzo_listino": 228.52
+        },
+        {
+          "id": 2,
+          "categoria_id": 19,
+          "fornitore_id": 9,
+          "nome_prodotto": "SSD Esterno 1TB",
+          "prezzo_listino": 385.53
+        },
+        {
+          "id": 3,
+          "categoria_id": 9,
+          "fornitore_id": 24,
+          "nome_prodotto": "Cuffie Bluetooth Sport",
+          "prezzo_listino": 404.37
+        },
+        {
+          "id": 4,
+          "categoria_id": 21,
+          "fornitore_id": 14,
+          "nome_prodotto": "Power Bank 20000mAh",
+          "prezzo_listino": 328.88
+        },
+        {
+          "id": 5,
+          "categoria_id": 24,
+          "fornitore_id": 17,
+          "nome_prodotto": "Tastiera Meccanica RGB",
+          "prezzo_listino": 313.74
+        },
+        {
+          "id": 6,
+          "categoria_id": 29,
+          "fornitore_id": 12,
+          "nome_prodotto": "Tablet 11 pollici LTE",
+          "prezzo_listino": 375.83
+        },
+        {
+          "id": 7,
+          "categoria_id": 4,
+          "fornitore_id": 33,
+          "nome_prodotto": "Smartphone Gamma Alta 256GB",
+          "prezzo_listino": 347.18
+        },
+        {
+          "id": 8,
+          "categoria_id": 12,
+          "fornitore_id": 21,
+          "nome_prodotto": "Speaker Portatile Impermeabile",
+          "prezzo_listino": 244.29
+        }
+      ],
+      "punti_vendita": [
+        {
+          "id": 1,
+          "nome_negozio": "TechStore Padova Centro",
+          "citta": "Roma"
+        },
+        {
+          "id": 2,
+          "nome_negozio": "MegaTech Outlet Roma EUR",
+          "citta": "Milano"
+        },
+        {
+          "id": 3,
+          "nome_negozio": "TechStore Palermo Libertà",
+          "citta": "Verona"
+        },
+        {
+          "id": 4,
+          "nome_negozio": "Elettronica Catania Centro",
+          "citta": "Torino"
+        },
+        {
+          "id": 5,
+          "nome_negozio": "Elettronica Catania Centro",
+          "citta": "Genova"
+        },
+        {
+          "id": 6,
+          "nome_negozio": "TechStore Padova Centro",
+          "citta": "Verona"
+        },
+        {
+          "id": 7,
+          "nome_negozio": "TechStore Verona Borgo Roma",
+          "citta": "Torino"
+        },
+        {
+          "id": 8,
+          "nome_negozio": "MegaTech Outlet Roma EUR",
+          "citta": "Verona"
+        }
+      ],
+      "vendite_flat": [
+        {
+          "id": 100001,
+          "prodotto_id": 413,
+          "punto_vendita_id": 123,
+          "data_vendita": "2025-12-21",
+          "quantita": "1",
+          "prezzo_unitario": 274.18,
+          "importo": 669.37,
+          "nome_categoria": "Audio & Video",
+          "nome_fornitore": "AlpenTech AG"
+        },
+        {
+          "id": 100002,
+          "prodotto_id": 230,
+          "punto_vendita_id": 131,
+          "data_vendita": "2025-12-25",
+          "quantita": "3",
+          "prezzo_unitario": 270.46,
+          "importo": 1077.62,
+          "nome_categoria": "Elettronica",
+          "nome_fornitore": "AudioPro France SAS"
+        },
+        {
+          "id": 100003,
+          "prodotto_id": 207,
+          "punto_vendita_id": 174,
+          "data_vendita": "2025-12-17",
+          "quantita": "4",
+          "prezzo_unitario": 236.59,
+          "importo": 707.19,
+          "nome_categoria": "Elettrodomestici",
+          "nome_fornitore": "Mediterranea Import Export"
+        },
+        {
+          "id": 100004,
+          "prodotto_id": 448,
+          "punto_vendita_id": 8,
+          "data_vendita": "2025-12-16",
+          "quantita": "1",
+          "prezzo_unitario": 226.33,
+          "importo": 836.07,
+          "nome_categoria": "Accessori",
+          "nome_fornitore": "Mediterranea Import Export"
+        },
+        {
+          "id": 100005,
+          "prodotto_id": 356,
+          "punto_vendita_id": 5,
+          "data_vendita": "2026-01-02",
+          "quantita": "5",
+          "prezzo_unitario": 287.0,
+          "importo": 1352.13,
+          "nome_categoria": "Accessori",
+          "nome_fornitore": "AlpenTech AG"
+        },
+        {
+          "id": 100006,
+          "prodotto_id": 410,
+          "punto_vendita_id": 55,
+          "data_vendita": "2026-01-04",
+          "quantita": "1",
+          "prezzo_unitario": 216.15,
+          "importo": 1335.24,
+          "nome_categoria": "Telefonia",
+          "nome_fornitore": "AlpenTech AG"
+        },
+        {
+          "id": 100007,
+          "prodotto_id": 376,
+          "punto_vendita_id": 78,
+          "data_vendita": "2025-12-26",
+          "quantita": "2",
+          "prezzo_unitario": 264.08,
+          "importo": 1201.08,
+          "nome_categoria": "Informatica",
+          "nome_fornitore": "AlpenTech AG"
+        },
+        {
+          "id": 100008,
+          "prodotto_id": 364,
+          "punto_vendita_id": 356,
+          "data_vendita": "2026-01-15",
+          "quantita": "1",
+          "prezzo_unitario": 224.78,
+          "importo": 1287.65,
+          "nome_categoria": "Casa & Ufficio",
+          "nome_fornitore": "AudioPro France SAS"
+        }
+      ]
+    }
+  },
+  "story": "Nella direzione commerciale del gruppo DigitalPoint, il consuntivo di fine stagione si apre con la revisione degli archivi gestionali della rete di negozi di elettronica di consumo. Il catalogo merceologico è custodito nell'archivio denominato categorie_prodotti, dove ogni voce individua una famiglia di articoli, dalle Accessori alle sezioni Audio & Video, passando per Informatica ed Elettronica; accanto ad esso, l'anagrafica fornitori raccoglie le ragioni sociali dei partner internazionali con l'indicazione del paese di provenienza, che spazia tra Italia, Francia, Germania, Spagna e Cina. L'archivio prodotti descrive invece ciascun articolo con il nome commerciale, come la Tastiera Meccanica RGB o le Cuffie Bluetooth Sport, il prezzo di listino e i riferimenti alla famiglia merceologica e al fornitore di appartenenza. La rete distributiva è mappata nell'archivio punti_vendita, che elenca le insegne attive, dal TechStore Padova Centro al MegaTech Outlet Roma EUR, con la città in cui ciascun negozio opera, da Milano a Napoli, da Bologna a Genova fino a Verona e Torino. Il cuore del controllo è tuttavia il registro intitolato registro_transazioni_commerciali, noto negli archivi anche con la sigla vendite_flat: si tratta del prospetto riepilogativo dei movimenti di cassa, in cui ogni vendita riporta la data dell'operazione, la quantità di pezzi, generalmente compresa tra 1 e 5 unità, il prezzo unitario praticato e l'importo complessivo incassato, insieme alla denominazione della categoria e alla ragione_sociale_partner già trascritte direttamente sul documento di vendita, senza dover risalire agli altri archivi. Il responsabile analisi ha impartito precise istruzioni: considerare esclusivamente le famiglie Elettronica, Informatica, Telefonia e Audio & Video, esaminando soltanto le operazioni effettuate nel periodo che va dal 2025-12-15 al 2026-01-15, finestra che copre le promozioni natalizie e il ripartenza di gennaio. Per ciascuna famiglia occorre determinare l'importo mediano delle vendite, ossia il percentile 50 della distribuzione degli importi, che divide esattamente a metà le operazioni registrate, affiancandovi l'importo medio, il numero complessivo di vendite e il fatturato totale incassato. Gli auditor hanno inoltre richiesto la cosiddetta soglia distributiva P90, vale a dire il livello di importo al di sotto del quale ricade il novanta percento delle transazioni, da calcolare direttamente sul registro delle transazioni commerciali senza alcun passaggio intermediario. A titolo di verifica, il team ha confrontato alcuni movimenti campione: la vendita numero 100001 del 2025-12-21 con un importo di 669.37 euro, quella numero 100005 del 2026-01-02 per 1352.13 euro su cinque pezzi, fino al movimento più oneroso da 1787.64 euro, tenendo presente che gli importi oscillano tra un minimo di 36.5 euro e punte stagionali rilevanti. Il prospetto finale dovrà presentare le quattro categorie ordinate per importo mediano decrescente, così da far emergere immediatamente le fasce merceologiche con i biglietti medi più alti e supportare le decisioni di assortimento per la prossima campagna commerciale."
+}

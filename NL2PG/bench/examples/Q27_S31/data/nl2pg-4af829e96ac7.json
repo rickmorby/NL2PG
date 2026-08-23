@@ -1,0 +1,294 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 4,
+    "hierarchy": "denormalized",
+    "sql_features": [
+      "grouping_sets"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti_contabili",
+        "obsolete_value": "registrazioni",
+        "description": "La tabella movimenti_contabili viene denominata registrazioni nel linguaggio aziendale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "category_name",
+        "obsolete_value": "tipo_voce",
+        "description": "La colonna category_name viene riferita come tipo_voce nei documenti aziendali."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "supplier_name",
+        "obsolete_value": "fornitore",
+        "description": "Il termine supplier_name viene sostituito con fornitore nel gergo contabile interno."
+      }
+    ],
+    "spec_hash": "3fab9c37f4ed55f0"
+  },
+  "schema_ddl": "CREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    data_registrazione DATE NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo != 0),\n    tipo_voce TEXT NOT NULL,\n    fornitore TEXT,\n    totale_per_fornitore NUMERIC(12,2) GENERATED ALWAYS AS (\n        CASE WHEN fornitore IS NOT NULL THEN importo ELSE NULL END\n    ) STORED,\n    totale_per_tipo NUMERIC(12,2) GENERATED ALWAYS AS (\n        CASE WHEN tipo_voce IS NOT NULL THEN importo ELSE NULL END\n    ) STORED,\n    totale_generale NUMERIC(12,2) GENERATED ALWAYS AS (importo) STORED\n);\n\nCREATE TABLE categorie_contabili (\n    id SERIAL PRIMARY KEY,\n    nome_categoria TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    nome_fornitore TEXT NOT NULL UNIQUE,\n    partiva_iva TEXT CHECK (partiva_iva ~ '^[A-Z]{2}[0-9]{11}$|^$'),\n    data_inserimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE riepiloghi (\n    id SERIAL PRIMARY KEY,\n    periodo DATE NOT NULL,\n    somma_totale NUMERIC(12,2) NOT NULL DEFAULT 0,\n    conteggio_registrazioni INT NOT NULL DEFAULT 0,\n    CHECK (somma_totale >= 0 AND conteggio_registrazioni >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "categorie_contabili",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_categoria": "Costi di produzione",
+            "descrizione": "Spese per materiali e manodopera"
+          },
+          {
+            "id": 2,
+            "nome_categoria": "Ricavi vendite",
+            "descrizione": "Entrate da vendita prodotti/servizi"
+          },
+          {
+            "id": 3,
+            "nome_categoria": "Amortamenti",
+            "descrizione": "Deprezzamento beni strumentali"
+          },
+          {
+            "id": 4,
+            "nome_categoria": "Spese generali",
+            "descrizione": "Costi amministrativi e generici"
+          },
+          {
+            "id": 5,
+            "nome_categoria": "Rimborsi",
+            "descrizione": "Rimborsi spese e crediti"
+          }
+        ],
+        "variations": {
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Spese per materiali e manodopera",
+              "Entrate da vendita prodotti/servizi",
+              "Deprezzamento beni strumentali",
+              "Costi amministrativi e generici",
+              "Rimborsi spese e crediti",
+              "Costi logistici",
+              "Entrate finanziarie"
+            ]
+          }
+        }
+      },
+      {
+        "table": "fornitori",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_fornitore": "Fornitore Alpha Srl",
+            "partiva_iva": "IT12345678901"
+          },
+          {
+            "id": 2,
+            "nome_fornitore": "Beta SpA",
+            "partiva_iva": "IT09876543210"
+          },
+          {
+            "id": 3,
+            "nome_fornitore": "Gamma & Co.",
+            "partiva_iva": ""
+          },
+          {
+            "id": 4,
+            "nome_fornitore": "Delta Logistics",
+            "partiva_iva": "IT11223344556"
+          },
+          {
+            "id": 5,
+            "nome_fornitore": "Epsilon Tech",
+            "partiva_iva": "IT66778899001"
+          }
+        ],
+        "variations": {
+          "partiva_iva": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "IT12345678901",
+              "IT09876543210",
+              "IT11223344556",
+              "IT66778899001",
+              "IT55544433322",
+              ""
+            ]
+          }
+        }
+      },
+      {
+        "table": "registrazioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "data_registrazione": "2026-01-10",
+            "importo": 1500.0,
+            "tipo_voce": "Costi di produzione",
+            "fornitore": "Fornitore Alpha Srl"
+          },
+          {
+            "id": 2,
+            "data_registrazione": "2026-01-12",
+            "importo": 2300.5,
+            "tipo_voce": "Ricavi vendite",
+            "fornitore": null
+          },
+          {
+            "id": 3,
+            "data_registrazione": "2026-01-15",
+            "importo": 800.0,
+            "tipo_voce": "Spese generali",
+            "fornitore": "Beta SpA"
+          },
+          {
+            "id": 4,
+            "data_registrazione": "2026-02-01",
+            "importo": 5000.0,
+            "tipo_voce": "Ricavi vendite",
+            "fornitore": null
+          },
+          {
+            "id": 5,
+            "data_registrazione": "2026-02-05",
+            "importo": 1200.75,
+            "tipo_voce": "Amortamenti",
+            "fornitore": null
+          }
+        ],
+        "variations": {
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "tipo_voce": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Costi di produzione",
+              "Ricavi vendite",
+              "Amortamenti",
+              "Spese generali",
+              "Rimborsi"
+            ]
+          },
+          "fornitore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Fornitore Alpha Srl",
+              "Beta SpA",
+              "Gamma & Co.",
+              "Delta Logistics",
+              "Epsilon Tech",
+              ""
+            ]
+          }
+        }
+      },
+      {
+        "table": "riepiloghi",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "periodo": "2026-01-01",
+            "somma_totale": 15000.0,
+            "conteggio_registrazioni": 45
+          },
+          {
+            "id": 2,
+            "periodo": "2026-02-01",
+            "somma_totale": 22000.5,
+            "conteggio_registrazioni": 60
+          },
+          {
+            "id": 3,
+            "periodo": "2026-03-01",
+            "somma_totale": 18000.75,
+            "conteggio_registrazioni": 55
+          },
+          {
+            "id": 4,
+            "periodo": "2026-04-01",
+            "somma_totale": 25000.0,
+            "conteggio_registrazioni": 70
+          }
+        ],
+        "variations": {
+          "periodo": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "somma_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.5,
+            "pool": []
+          },
+          "conteggio_registrazioni": {
+            "axis": "shift",
+            "delta_min": -10.0,
+            "delta_max": 10.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

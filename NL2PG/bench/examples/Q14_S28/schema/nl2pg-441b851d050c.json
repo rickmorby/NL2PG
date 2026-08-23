@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 3,
+    "hierarchy": "flat",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "emp",
+        "obsolete_value": "dipendenti",
+        "description": "La tabella 'emp' (abbreviazione di employee) viene denominata 'dipendenti' nel linguaggio aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "dept_mgr",
+        "obsolete_value": "responsabile_reparto",
+        "description": "La colonna 'dept_mgr' (department manager) viene riferita come 'responsabile_reparto' nella documentazione aziendale."
+      }
+    ],
+    "spec_hash": "b8ab3bc67aa29f87"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    matricola INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    id_reparto INT,\n    responsabile_reparto INT REFERENCES dipendenti(matricola)\n);\n\nCREATE TABLE reparti (\n    id_reparto INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL,\n    sede TEXT\n);\n\nCREATE TABLE progetti (\n    id_progetto INT PRIMARY KEY,\n    nome_progetto TEXT NOT NULL,\n    matricola INT REFERENCES dipendenti(matricola)\n);"
+}

@@ -1,0 +1,383 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "full_outer_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_collaboratori",
+        "description": "La tabella dipendenti viene denominata anagrafica_collaboratori nella prosa aziendale: le query devono risolvere il riferimento alla tabella fisica dipendenti, che contiene la chiave primaria id_dipendente e la foreign key nullable id_dipartimento verso i dipartimenti."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "retribuzione_lorda_annua",
+        "obsolete_value": "RAL",
+        "description": "La colonna retribuzione_lorda_annua della tabella dipendenti è indicata nei documenti HR con l'acronimo di gergo settoriale RAL (Retribuzione Annua Lorda): le richieste che menzionano la RAL vanno mappate sulla colonna retribuzione_lorda_annua."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato_contrattuale",
+        "obsolete_value": "stato",
+        "description": "Il termine ambiguo 'stato' usato nella prosa si riferisce alla colonna stato_contrattuale della tabella dipendenti (valori come attivo, sospeso, cessato) e non allo stato civile presente nell'anagrafica: occorre disambiguare correttamente quando la richiesta parla dello 'stato' di un collaboratore."
+      }
+    ],
+    "spec_hash": "360ca85691caa62d"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id_dipartimento SERIAL PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL UNIQUE,\n    sede TEXT,\n    budget_annuo NUMERIC(12,2) CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id_dipendente SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    stato_civile TEXT,\n    retribuzione_lorda_annua NUMERIC(12,2) NOT NULL CHECK (retribuzione_lorda_annua > 0),\n    stato_contrattuale TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_contrattuale IN ('attivo', 'sospeso', 'cessato')),\n    data_assunzione DATE NOT NULL,\n    id_dipartimento INT REFERENCES dipartimenti(id_dipartimento) ON DELETE SET NULL ON UPDATE CASCADE\n);\n\nCREATE TABLE contratti (\n    id_contratto SERIAL PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id_dipendente) ON DELETE CASCADE ON UPDATE CASCADE,\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('indeterminato', 'determinato', 'apprendistato', 'part_time')),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    livello_inquadramento TEXT,\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dipartimenti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_dipartimento": 1,
+            "nome_dipartimento": "Risorse Umane",
+            "sede": "Roma",
+            "budget_annuo": 320000.0
+          },
+          {
+            "id_dipartimento": 2,
+            "nome_dipartimento": "Finanza e Controllo",
+            "sede": "Milano",
+            "budget_annuo": 450000.0
+          },
+          {
+            "id_dipartimento": 3,
+            "nome_dipartimento": "Sviluppo Software",
+            "sede": "Torino",
+            "budget_annuo": 780000.0
+          },
+          {
+            "id_dipartimento": 4,
+            "nome_dipartimento": "Infrastrutture IT",
+            "sede": "Milano",
+            "budget_annuo": 610000.0
+          },
+          {
+            "id_dipartimento": 5,
+            "nome_dipartimento": "Vendite Italia",
+            "sede": "Napoli",
+            "budget_annuo": 520000.0
+          },
+          {
+            "id_dipartimento": 6,
+            "nome_dipartimento": "Marketing",
+            "sede": "Roma",
+            "budget_annuo": 290000.0
+          },
+          {
+            "id_dipartimento": 7,
+            "nome_dipartimento": "Legale e Conformita",
+            "sede": "Bologna",
+            "budget_annuo": 180000.0
+          },
+          {
+            "id_dipartimento": 8,
+            "nome_dipartimento": "Logistica",
+            "sede": "Padova",
+            "budget_annuo": 240000.0
+          }
+        ],
+        "variations": {
+          "sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Padova"
+            ]
+          },
+          "budget_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 8.0,
+        "templates": [
+          {
+            "id_dipendente": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRC85M01H501X",
+            "stato_civile": "celibe",
+            "retribuzione_lorda_annua": 38500.0,
+            "stato_contrattuale": "attivo",
+            "data_assunzione": "2019-03-04",
+            "id_dipartimento": 3
+          },
+          {
+            "id_dipendente": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA88T42F205Y",
+            "stato_civile": "coniugata",
+            "retribuzione_lorda_annua": 52000.0,
+            "stato_contrattuale": "attivo",
+            "data_assunzione": "2017-09-18",
+            "id_dipartimento": 2
+          },
+          {
+            "id_dipendente": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI92C55G224Z",
+            "stato_civile": "nubile",
+            "retribuzione_lorda_annua": 27500.0,
+            "stato_contrattuale": "attivo",
+            "data_assunzione": "2022-01-10",
+            "id_dipartimento": 1
+          },
+          {
+            "id_dipendente": 4,
+            "nome": "Alessandro",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRLSN79A15L219W",
+            "stato_civile": "divorziato",
+            "retribuzione_lorda_annua": 64500.0,
+            "stato_contrattuale": "sospeso",
+            "data_assunzione": "2015-06-01",
+            "id_dipartimento": 4
+          },
+          {
+            "id_dipendente": 5,
+            "nome": "Francesca",
+            "cognome": "Russo",
+            "codice_fiscale": "RSSFNC90D63H501K",
+            "stato_civile": "celibe",
+            "retribuzione_lorda_annua": 31000.0,
+            "stato_contrattuale": "cessato",
+            "data_assunzione": "2020-11-23",
+            "id_dipartimento": 5
+          },
+          {
+            "id_dipendente": 6,
+            "nome": "Davide",
+            "cognome": "Colombo",
+            "codice_fiscale": "CLMDVD87E20Z352Q",
+            "stato_civile": "coniugato",
+            "retribuzione_lorda_annua": 47800.0,
+            "stato_contrattuale": "attivo",
+            "data_assunzione": "2018-04-16",
+            "id_dipartimento": 3
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Davide",
+              "Chiara",
+              "Luca",
+              "Sara",
+              "Andrea"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Fontana"
+            ]
+          },
+          "stato_civile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "celibe",
+              "nubile",
+              "coniugato",
+              "coniugata",
+              "divorziato",
+              "vedovo"
+            ]
+          },
+          "retribuzione_lorda_annua": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.6,
+            "pool": []
+          },
+          "stato_contrattuale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "attivo",
+              "attivo",
+              "attivo",
+              "attivo",
+              "sospeso",
+              "cessato"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -400.0,
+            "delta_max": 300.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "contratti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.4,
+        "templates": [
+          {
+            "id_contratto": 1,
+            "dipendente_id": 1,
+            "tipo_contratto": "indeterminato",
+            "data_inizio": "2019-03-04",
+            "data_fine": null,
+            "livello_inquadramento": "B3"
+          },
+          {
+            "id_contratto": 2,
+            "dipendente_id": 2,
+            "tipo_contratto": "determinato",
+            "data_inizio": "2023-01-16",
+            "data_fine": "2024-06-30",
+            "livello_inquadramento": "A2"
+          },
+          {
+            "id_contratto": 3,
+            "dipendente_id": 3,
+            "tipo_contratto": "part_time",
+            "data_inizio": "2022-09-01",
+            "data_fine": "2024-08-31",
+            "livello_inquadramento": "C1"
+          },
+          {
+            "id_contratto": 4,
+            "dipendente_id": 4,
+            "tipo_contratto": "apprendistato",
+            "data_inizio": "2024-05-06",
+            "data_fine": "2026-05-05",
+            "livello_inquadramento": "A1"
+          },
+          {
+            "id_contratto": 5,
+            "dipendente_id": 5,
+            "tipo_contratto": "indeterminato",
+            "data_inizio": "2020-11-23",
+            "data_fine": null,
+            "livello_inquadramento": "B1"
+          },
+          {
+            "id_contratto": 6,
+            "dipendente_id": 6,
+            "tipo_contratto": "determinato",
+            "data_inizio": "2021-02-15",
+            "data_fine": "2023-02-14",
+            "livello_inquadramento": "A3"
+          }
+        ],
+        "variations": {
+          "tipo_contratto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "indeterminato",
+              "indeterminato",
+              "determinato",
+              "part_time",
+              "apprendistato"
+            ]
+          },
+          "data_inizio": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "livello_inquadramento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "A1",
+              "A2",
+              "A3",
+              "B1",
+              "B2",
+              "B3",
+              "C1",
+              "D"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

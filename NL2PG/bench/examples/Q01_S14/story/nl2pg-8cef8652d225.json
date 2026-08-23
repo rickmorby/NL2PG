@@ -1,0 +1,532 @@
+{
+  "schema_ddl": "CREATE DOMAIN stato_ricovero_dom AS TEXT CHECK (VALUE IN ('attivo', 'dimesso', 'trasferito'));\n\nCREATE DOMAIN codice_fiscale_dom AS TEXT CHECK (char_length(VALUE) = 16);\n\nCREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale codice_fiscale_dom NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    numero_iscrizione_albo TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano INT CHECK (piano >= 0),\n    posti_letto INT NOT NULL CHECK (posti_letto > 0)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    data_ingresso DATE NOT NULL,\n    data_dimissione DATE,\n    stato_ricovero stato_ricovero_dom NOT NULL DEFAULT 'attivo',\n    diagnosi TEXT,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ingresso)\n);",
+  "data_profile": {
+    "profile": {
+      "pazienti": {
+        "row_count": 382,
+        "columns": {
+          "id": {
+            "distinct": 382,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 382
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandra",
+              "Antonio",
+              "Chiara",
+              "Davide",
+              "Francesco"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Esposito",
+              "Ferrari",
+              "Greco"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 382,
+            "sample": [
+              "BNCLRA90T42F205B",
+              "BNCLRA90T42F205C",
+              "BNCLRA90T42F205D",
+              "BNCLRA90T42F205E",
+              "BNCLRA90T42F205F"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 371,
+            "sample": [
+              "1965-01-21",
+              "1965-01-24",
+              "1965-03-07",
+              "1965-04-14",
+              "1965-05-09"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "0119876543",
+              "0234567890",
+              "0554433221",
+              "0612345678",
+              "0811122334"
+            ]
+          }
+        }
+      },
+      "medici": {
+        "row_count": 552,
+        "columns": {
+          "id": {
+            "distinct": 552,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 552
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Anna",
+              "Elena",
+              "Fabio",
+              "Luca",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "distinct": 8,
+            "sample": [
+              "Conti",
+              "Fontana",
+              "Gallo",
+              "Longo",
+              "Moretti"
+            ]
+          },
+          "specializzazione": {
+            "distinct": 8,
+            "sample": [
+              "Cardiologia",
+              "Chirurgia Generale",
+              "Medicina Interna",
+              "Neurologia",
+              "Oncologia"
+            ]
+          },
+          "numero_iscrizione_albo": {
+            "distinct": 552,
+            "sample": [
+              "CT002",
+              "CT0021",
+              "CT00210",
+              "CT002100",
+              "CT002101"
+            ]
+          }
+        }
+      },
+      "reparti": {
+        "row_count": 27,
+        "columns": {
+          "id": {
+            "distinct": 27,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 27
+          },
+          "nome_reparto": {
+            "distinct": 27,
+            "sample": [
+              "Cardiologia",
+              "Cardiologia1",
+              "Cardiologia2",
+              "Cardiologia3",
+              "Chirurgia Generale"
+            ]
+          },
+          "piano": {
+            "distinct": 5,
+            "sample": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 0,
+            "max": 0
+          },
+          "posti_letto": {
+            "distinct": 27,
+            "sample": [
+              "11.34",
+              "15",
+              "16.37",
+              "16.77",
+              "16.84"
+            ],
+            "min": 7.58,
+            "max": 71.47
+          }
+        }
+      },
+      "ricoveri": {
+        "row_count": 1478,
+        "columns": {
+          "id": {
+            "distinct": 1478,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1478
+          },
+          "paziente_id": {
+            "distinct": 375,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 382
+          },
+          "medico_id": {
+            "distinct": 517,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 552
+          },
+          "reparto_id": {
+            "distinct": 27,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 27
+          },
+          "data_ingresso": {
+            "distinct": 90,
+            "sample": [
+              "2025-12-11",
+              "2025-12-12",
+              "2025-12-13",
+              "2025-12-14",
+              "2025-12-15"
+            ]
+          },
+          "data_dimissione": {
+            "distinct": 47,
+            "sample": [
+              "2026-01-18",
+              "2026-01-19",
+              "2026-01-20",
+              "2026-01-21",
+              "2026-01-22"
+            ]
+          },
+          "stato_ricovero": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "dimesso",
+              "trasferito"
+            ]
+          },
+          "diagnosi": {
+            "distinct": 6,
+            "sample": [
+              "Appendicite acuta",
+              "Bronchiolite",
+              "Emicrania cronica",
+              "Frattura femore",
+              "Infarto miocardico acuto"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "pazienti": [
+        {
+          "id": 1,
+          "nome": "Francesco",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501Z",
+          "data_nascita": "1986-01-09",
+          "telefono": "0119876543"
+        },
+        {
+          "id": 2,
+          "nome": "Francesco",
+          "cognome": "Verdi",
+          "codice_fiscale": "RSSMRA85M01H501B",
+          "data_nascita": "1983-07-25",
+          "telefono": "3339876543"
+        },
+        {
+          "id": 3,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501C",
+          "data_nascita": "1986-02-11",
+          "telefono": "3201234567"
+        },
+        {
+          "id": 4,
+          "nome": "Chiara",
+          "cognome": "Greco",
+          "codice_fiscale": "RSSMRA85M01H501D",
+          "data_nascita": "1984-12-13",
+          "telefono": "0119876543"
+        },
+        {
+          "id": 5,
+          "nome": "Giulia",
+          "cognome": "Romano",
+          "codice_fiscale": "RSSMRA85M01H501E",
+          "data_nascita": "1985-10-17",
+          "telefono": "3339876543"
+        },
+        {
+          "id": 6,
+          "nome": "Laura",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA85M01H501F",
+          "data_nascita": "1985-03-15",
+          "telefono": "0554433221"
+        },
+        {
+          "id": 7,
+          "nome": "Simona",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRA85M01H501G",
+          "data_nascita": "1988-06-02",
+          "telefono": "0554433221"
+        },
+        {
+          "id": 8,
+          "nome": "Simona",
+          "cognome": "Esposito",
+          "codice_fiscale": "RSSMRA85M01H501H",
+          "data_nascita": "1986-06-28",
+          "telefono": "0234567890"
+        }
+      ],
+      "medici": [
+        {
+          "id": 1,
+          "nome": "Marco",
+          "cognome": "Moretti",
+          "specializzazione": "Oncologia",
+          "numero_iscrizione_albo": "MN001"
+        },
+        {
+          "id": 2,
+          "nome": "Elena",
+          "cognome": "Gallo",
+          "specializzazione": "Ortopedia",
+          "numero_iscrizione_albo": "MN0011"
+        },
+        {
+          "id": 3,
+          "nome": "Sara",
+          "cognome": "Conti",
+          "specializzazione": "Ortopedia",
+          "numero_iscrizione_albo": "MN0012"
+        },
+        {
+          "id": 4,
+          "nome": "Sara",
+          "cognome": "Longo",
+          "specializzazione": "Neurologia",
+          "numero_iscrizione_albo": "MN0013"
+        },
+        {
+          "id": 5,
+          "nome": "Paolo",
+          "cognome": "Fontana",
+          "specializzazione": "Ortopedia",
+          "numero_iscrizione_albo": "MN0014"
+        },
+        {
+          "id": 6,
+          "nome": "Silvia",
+          "cognome": "Serra",
+          "specializzazione": "Pediatria",
+          "numero_iscrizione_albo": "MN0015"
+        },
+        {
+          "id": 7,
+          "nome": "Sara",
+          "cognome": "Conti",
+          "specializzazione": "Psichiatria",
+          "numero_iscrizione_albo": "MN0016"
+        },
+        {
+          "id": 8,
+          "nome": "Anna",
+          "cognome": "Neri",
+          "specializzazione": "Ortopedia",
+          "numero_iscrizione_albo": "MN0017"
+        }
+      ],
+      "reparti": [
+        {
+          "id": 1,
+          "nome_reparto": "Cardiologia",
+          "piano": "1",
+          "posti_letto": 43.41
+        },
+        {
+          "id": 2,
+          "nome_reparto": "Cardiologia1",
+          "piano": "3",
+          "posti_letto": 57.02
+        },
+        {
+          "id": 3,
+          "nome_reparto": "Cardiologia2",
+          "piano": "1",
+          "posti_letto": 59.17
+        },
+        {
+          "id": 4,
+          "nome_reparto": "Cardiologia3",
+          "piano": null,
+          "posti_letto": 21.75
+        },
+        {
+          "id": 5,
+          "nome_reparto": "Neurologia",
+          "piano": null,
+          "posti_letto": 16.37
+        },
+        {
+          "id": 6,
+          "nome_reparto": "Neurologia1",
+          "piano": "1",
+          "posti_letto": 27.96
+        },
+        {
+          "id": 7,
+          "nome_reparto": "Neurologia2",
+          "piano": "3",
+          "posti_letto": 39.24
+        },
+        {
+          "id": 8,
+          "nome_reparto": "Neurologia3",
+          "piano": "3",
+          "posti_letto": 37.97
+        }
+      ],
+      "ricoveri": [
+        {
+          "id": 1,
+          "paziente_id": 244,
+          "medico_id": 375,
+          "reparto_id": 13,
+          "data_ingresso": "2025-12-30",
+          "data_dimissione": "2026-01-22",
+          "stato_ricovero": "dimesso",
+          "diagnosi": "Infarto miocardico acuto"
+        },
+        {
+          "id": 2,
+          "paziente_id": 233,
+          "medico_id": 259,
+          "reparto_id": 17,
+          "data_ingresso": "2026-01-06",
+          "data_dimissione": "2026-01-31",
+          "stato_ricovero": "dimesso",
+          "diagnosi": "Infarto miocardico acuto"
+        },
+        {
+          "id": 3,
+          "paziente_id": 365,
+          "medico_id": 317,
+          "reparto_id": 21,
+          "data_ingresso": "2025-12-15",
+          "data_dimissione": "2026-01-20",
+          "stato_ricovero": "dimesso",
+          "diagnosi": "Infarto miocardico acuto"
+        },
+        {
+          "id": 4,
+          "paziente_id": 293,
+          "medico_id": 16,
+          "reparto_id": 11,
+          "data_ingresso": "2025-12-22",
+          "data_dimissione": "2026-01-19",
+          "stato_ricovero": "dimesso",
+          "diagnosi": "Infarto miocardico acuto"
+        },
+        {
+          "id": 5,
+          "paziente_id": 326,
+          "medico_id": 331,
+          "reparto_id": 25,
+          "data_ingresso": "2025-12-28",
+          "data_dimissione": "2026-01-18",
+          "stato_ricovero": "dimesso",
+          "diagnosi": "Infarto miocardico acuto"
+        },
+        {
+          "id": 6,
+          "paziente_id": 183,
+          "medico_id": 304,
+          "reparto_id": 27,
+          "data_ingresso": "2025-12-16",
+          "data_dimissione": "2026-01-19",
+          "stato_ricovero": "dimesso",
+          "diagnosi": "Infarto miocardico acuto"
+        },
+        {
+          "id": 7,
+          "paziente_id": 225,
+          "medico_id": 432,
+          "reparto_id": 26,
+          "data_ingresso": "2025-12-21",
+          "data_dimissione": "2026-01-28",
+          "stato_ricovero": "dimesso",
+          "diagnosi": "Infarto miocardico acuto"
+        },
+        {
+          "id": 8,
+          "paziente_id": 58,
+          "medico_id": 149,
+          "reparto_id": 11,
+          "data_ingresso": "2025-12-18",
+          "data_dimissione": "2026-01-27",
+          "stato_ricovero": "dimesso",
+          "diagnosi": "Infarto miocardico acuto"
+        }
+      ]
+    }
+  },
+  "story": "Nell'autunno amministrativo della Casa di Cura Villa Serena, la Direzione Sanitaria ha avviato un ciclo di verifiche sulla gestione dei degenti. Tutto parte dall'archivio denominato assistiti, dove sono custodite le schede anagrafiche delle persone accolte in struttura: 382 schede recanti nome, cognome, codice fiscale di sedici caratteri, data di nascita e recapito telefonico. A fianco, il registro medici censisce i curanti — 552 professionisti con la propria specializzazione, dalla Cardiologia alla Neurologia, e il numero di iscrizione all'albo — mentre il registro reparti descrive le 27 unità operative dell'ospedale, indicando per ciascuna il piano di ubicazione, dal piano terra al quarto piano, e i posti letto disponibili. Il cuore del controllo è il registro ricoveri, che annota ogni episodio di degenza con la data di ingresso, la data di dimissione quando intervenuta, la condizione clinica corrente del degente — che può risultare attivo, dimesso oppure trasferito — e la diagnosi formulata, come un infarto miocardico acuto o una frattura del femore. Gli ispettori hanno notato che gli ingressi si concentrano nelle settimane a cavallo delle festività, a partire dal 2025-12-11, mentre numerose dimissioni si collocano intorno al 2026-01-20. L'incarico affidato agli analisti è circoscritto ma delicato: considerando esclusivamente gli assistiti che portano il nome Alessandra, occorre determinare, per ciascun reparto, quanti ricoveri complessivi vi sono stati annotati e quanti di questi risultano ancora nello stato attivo, riportando anche il piano su cui il reparto sorge. L'elenco dovrà essere disposto dal numero maggiore al numero minore di ricoveri complessivi, così che la direzione comprenda quali reparti — dalla Cardiologia alla Chirurgia Generale — assorbono maggiormente l'impegno assistenziale verso queste ospiti e possano pianificare al meglio i turni del personale."
+}

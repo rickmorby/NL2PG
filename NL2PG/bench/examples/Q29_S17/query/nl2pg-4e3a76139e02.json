@@ -1,0 +1,404 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    email TEXT\n);\n\nCREATE TABLE piani_tariffari (\n    id SERIAL PRIMARY KEY,\n    nome_piano TEXT NOT NULL UNIQUE,\n    canone_mensile NUMERIC(8,2) NOT NULL CHECK (canone_mensile >= 0),\n    giga_inclusi INT NOT NULL DEFAULT 0 CHECK (giga_inclusi >= 0),\n    minuti_inclusi INT NOT NULL DEFAULT 0 CHECK (minuti_inclusi >= 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    piano_id INT NOT NULL REFERENCES piani_tariffari(id),\n    numero_linea TEXT NOT NULL UNIQUE,\n    data_attivazione DATE NOT NULL,\n    deleted_at TIMESTAMP,\n    CONSTRAINT chk_dismissione_coerente CHECK (deleted_at IS NULL OR deleted_at >= data_attivazione)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 467,
+        "columns": {
+          "id": {
+            "distinct": 467,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 467
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro",
+              "Anna",
+              "Chiara",
+              "Davide",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 467,
+            "sample": [
+              "BNCLRA85C15F205B",
+              "BNCLRA85C15F205C",
+              "BNCLRA85C15F205D",
+              "BNCLRA85C15F205E",
+              "BNCLRA85C15F205F"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "email": {
+            "distinct": 9,
+            "sample": [
+              "alessandro.conti@outlook.com",
+              "chiara.gallo@gmail.com",
+              "giulia.verdi@yahoo.it",
+              "laura.bianchi@libero.it",
+              "luca.ricci@fastwebnet.it"
+            ]
+          }
+        }
+      },
+      "piani_tariffari": {
+        "row_count": 14,
+        "columns": {
+          "id": {
+            "distinct": 14,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 14
+          },
+          "nome_piano": {
+            "distinct": 14,
+            "sample": [
+              "Basic Mobile",
+              "Basic Mobile1",
+              "Business Pro",
+              "Business Pro1",
+              "Family Condiviso"
+            ]
+          },
+          "canone_mensile": {
+            "distinct": 8,
+            "sample": [
+              "0.0",
+              "14.5",
+              "19.99",
+              "34.9",
+              "39.99"
+            ],
+            "min": 0.0,
+            "max": 59.0
+          },
+          "giga_inclusi": {
+            "distinct": 8,
+            "sample": [
+              "0",
+              "10",
+              "100",
+              "150",
+              "20"
+            ],
+            "min": 0,
+            "max": 200
+          },
+          "minuti_inclusi": {
+            "distinct": 8,
+            "sample": [
+              "0",
+              "100",
+              "1000",
+              "200",
+              "300"
+            ],
+            "min": 0,
+            "max": 1000
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 2387,
+        "columns": {
+          "id": {
+            "distinct": 2387,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 2487
+          },
+          "cliente_id": {
+            "distinct": 465,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 467
+          },
+          "piano_id": {
+            "distinct": 14,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 14
+          },
+          "numero_linea": {
+            "distinct": 2387,
+            "sample": [
+              "+39010234573",
+              "+390102345731",
+              "+3901023457310",
+              "+39010234573100",
+              "+39010234573101"
+            ]
+          },
+          "data_attivazione": {
+            "distinct": 947,
+            "sample": [
+              "2021-11-18",
+              "2021-11-19",
+              "2021-11-20",
+              "2021-11-21",
+              "2021-11-25"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 493,
+            "sample": [
+              "2024-07-01 11:15:00",
+              "2024-07-03 11:15:00",
+              "2024-07-04 11:15:00",
+              "2024-07-06 11:15:00",
+              "2024-07-07 11:15:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 13,
+          "nome": "Davide",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA80A01H501M",
+          "citta": "Genova",
+          "email": "davide.bianchi1@example.com"
+        },
+        {
+          "id": 11,
+          "nome": "Giulia",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRA80A01H501K",
+          "citta": "Bari",
+          "email": "giulia.ferrari1@example.com"
+        },
+        {
+          "id": 26,
+          "nome": "Marco",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRA80A01H527A",
+          "citta": "Milano",
+          "email": "marco.conti1@example.com"
+        },
+        {
+          "id": 41,
+          "nome": "Stefano",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRA80A01H542P",
+          "citta": "Firenze",
+          "email": "stefano.marino1@example.com"
+        },
+        {
+          "id": 98,
+          "nome": "Anna",
+          "cognome": "Gallo",
+          "codice_fiscale": "BNCLRA85C15F244N",
+          "citta": "Torino",
+          "email": "anna.gallo1@example.com"
+        },
+        {
+          "id": 169,
+          "nome": "Giulia",
+          "cognome": "Verdi",
+          "codice_fiscale": "VRDGLU90D22L270Z",
+          "citta": "Torino",
+          "email": "giulia.verdi1@example.com"
+        },
+        {
+          "id": 166,
+          "nome": "Luca",
+          "cognome": "Ricci",
+          "codice_fiscale": "VRDGLU90D22L267W",
+          "citta": "Firenze",
+          "email": "luca.ricci1@example.com"
+        },
+        {
+          "id": 165,
+          "nome": "Luca",
+          "cognome": "Verdi",
+          "codice_fiscale": "VRDGLU90D22L266V",
+          "citta": "Genova",
+          "email": "luca.verdi1@example.com"
+        }
+      ],
+      "piani_tariffari": [
+        {
+          "id": 1,
+          "nome_piano": "Basic Mobile",
+          "canone_mensile": 9.99,
+          "giga_inclusi": 5,
+          "minuti_inclusi": 100
+        },
+        {
+          "id": 2,
+          "nome_piano": "Basic Mobile1",
+          "canone_mensile": 9.99,
+          "giga_inclusi": 5,
+          "minuti_inclusi": 100
+        },
+        {
+          "id": 3,
+          "nome_piano": "Smart Unlimited",
+          "canone_mensile": 19.99,
+          "giga_inclusi": 50,
+          "minuti_inclusi": 300
+        },
+        {
+          "id": 4,
+          "nome_piano": "Smart Unlimited1",
+          "canone_mensile": 19.99,
+          "giga_inclusi": 50,
+          "minuti_inclusi": 300
+        },
+        {
+          "id": 5,
+          "nome_piano": "Premium Fibra+Mobile",
+          "canone_mensile": 39.99,
+          "giga_inclusi": 100,
+          "minuti_inclusi": 600
+        },
+        {
+          "id": 6,
+          "nome_piano": "Premium Fibra+Mobile1",
+          "canone_mensile": 39.99,
+          "giga_inclusi": 100,
+          "minuti_inclusi": 600
+        },
+        {
+          "id": 7,
+          "nome_piano": "Senior Facile",
+          "canone_mensile": 14.5,
+          "giga_inclusi": 10,
+          "minuti_inclusi": 500
+        },
+        {
+          "id": 8,
+          "nome_piano": "Senior Facile1",
+          "canone_mensile": 14.5,
+          "giga_inclusi": 10,
+          "minuti_inclusi": 500
+        }
+      ],
+      "contratti": [
+        {
+          "id": 101,
+          "cliente_id": 228,
+          "piano_id": 3,
+          "numero_linea": "+39061234567",
+          "data_attivazione": "2023-08-24",
+          "deleted_at": null
+        },
+        {
+          "id": 102,
+          "cliente_id": 461,
+          "piano_id": 1,
+          "numero_linea": "+390612345671",
+          "data_attivazione": "2023-12-20",
+          "deleted_at": null
+        },
+        {
+          "id": 103,
+          "cliente_id": 366,
+          "piano_id": 11,
+          "numero_linea": "+390612345672",
+          "data_attivazione": "2022-11-10",
+          "deleted_at": null
+        },
+        {
+          "id": 104,
+          "cliente_id": 264,
+          "piano_id": 12,
+          "numero_linea": "+390612345673",
+          "data_attivazione": "2022-11-17",
+          "deleted_at": null
+        },
+        {
+          "id": 105,
+          "cliente_id": 293,
+          "piano_id": 11,
+          "numero_linea": "+390612345674",
+          "data_attivazione": "2022-11-28",
+          "deleted_at": null
+        },
+        {
+          "id": 106,
+          "cliente_id": 315,
+          "piano_id": 10,
+          "numero_linea": "+390612345675",
+          "data_attivazione": "2023-03-07",
+          "deleted_at": null
+        },
+        {
+          "id": 107,
+          "cliente_id": 269,
+          "piano_id": 4,
+          "numero_linea": "+390612345676",
+          "data_attivazione": "2022-11-23",
+          "deleted_at": null
+        },
+        {
+          "id": 108,
+          "cliente_id": 289,
+          "piano_id": 9,
+          "numero_linea": "+390612345677",
+          "data_attivazione": "2023-03-16",
+          "deleted_at": null
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "agg_distinct"
+  ],
+  "query": "SELECT c.nome AS nome_cliente, c.cognome AS cognome_cliente, c.codice_fiscale AS codice_fiscale, c.citta AS citta_residenza, COUNT(DISTINCT co.piano_id) AS piani_distinti_attivi, ROUND(SUM(p.canone_mensile), 2) AS spesa_mensile_totale FROM clienti c JOIN contratti co ON co.cliente_id = c.id JOIN piani_tariffari p ON p.id = co.piano_id WHERE co.deleted_at IS NULL AND c.citta IN ('Milano', 'Roma', 'Genova') GROUP BY c.nome, c.cognome, c.codice_fiscale, c.citta HAVING COUNT(DISTINCT co.piano_id) >= 2 ORDER BY piani_distinti_attivi DESC, spesa_mensile_totale DESC, codice_fiscale ASC;"
+}

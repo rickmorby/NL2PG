@@ -1,0 +1,170 @@
+{
+  "schema_ddl": "CREATE TABLE emp (\n    emp_no INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_reparto INT NOT NULL,\n    responsabile_reparto INT,\n    salario NUMERIC(10,2) CHECK (salario >= 0),\n    data_assunzione DATE NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "emp": {
+        "row_count": 107,
+        "columns": {
+          "emp_no": {
+            "distinct": 107,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 107
+          },
+          "nome": {
+            "distinct": 16,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Anna",
+              "Chiara",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "distinct": 16,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Colombo",
+              "Conti",
+              "Esposito"
+            ]
+          },
+          "numero_reparto": {
+            "distinct": 6,
+            "sample": [
+              "10",
+              "20",
+              "30",
+              "40",
+              "50"
+            ],
+            "min": 10,
+            "max": 60
+          },
+          "responsabile_reparto": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "salario": {
+            "distinct": 100,
+            "sample": [
+              "39830.0",
+              "40590.22",
+              "40761.84",
+              "41879.07",
+              "42203.96"
+            ],
+            "min": 39830.0,
+            "max": 83214.11
+          },
+          "data_assunzione": {
+            "distinct": 101,
+            "sample": [
+              "2009-10-11",
+              "2009-10-19",
+              "2009-11-07",
+              "2009-11-27",
+              "2009-11-30"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "emp": [
+        {
+          "emp_no": 1,
+          "nome": "Laura",
+          "cognome": "Verdi",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": null,
+          "data_assunzione": "2011-12-05"
+        },
+        {
+          "emp_no": 2,
+          "nome": "Luca",
+          "cognome": "Fontana",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 42948.59,
+          "data_assunzione": "2012-02-10"
+        },
+        {
+          "emp_no": 3,
+          "nome": "Sara",
+          "cognome": "Marino",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 50468.21,
+          "data_assunzione": "2012-10-23"
+        },
+        {
+          "emp_no": 4,
+          "nome": "Marco",
+          "cognome": "Marino",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 81792.39,
+          "data_assunzione": "2012-11-18"
+        },
+        {
+          "emp_no": 5,
+          "nome": "Francesca",
+          "cognome": "Colombo",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 53880.55,
+          "data_assunzione": "2011-08-07"
+        },
+        {
+          "emp_no": 6,
+          "nome": "Alessandro",
+          "cognome": "Neri",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 49521.01,
+          "data_assunzione": "2011-04-13"
+        },
+        {
+          "emp_no": 7,
+          "nome": "Elena",
+          "cognome": "Verdi",
+          "numero_reparto": 10,
+          "responsabile_reparto": null,
+          "salario": 52795.75,
+          "data_assunzione": "2011-08-05"
+        },
+        {
+          "emp_no": 8,
+          "nome": "Elena",
+          "cognome": "Marino",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 65772.63,
+          "data_assunzione": "2012-09-20"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "agg_distinct"
+  ],
+  "query": "WITH statistiche_reparto AS (\n    SELECT numero_reparto,\n           COUNT(DISTINCT nome) AS nomi_distinti,\n           COUNT(DISTINCT cognome) AS cognomi_distinti,\n           ROUND(AVG(salario), 2) AS salario_medio\n    FROM emp\n    WHERE salario IS NOT NULL\n    GROUP BY numero_reparto\n)\nSELECT e.nome,\n       e.cognome,\n       sr.nomi_distinti,\n       sr.cognomi_distinti,\n       sr.salario_medio,\n       RANK() OVER (PARTITION BY e.numero_reparto ORDER BY e.salario DESC) AS posizione_salario_reparto\nFROM emp e\nJOIN statistiche_reparto sr ON sr.numero_reparto = e.numero_reparto\nWHERE e.salario BETWEEN 40000 AND 80000\n  AND e.nome IN ('Alessandro', 'Andrea', 'Anna', 'Chiara', 'Davide')\nORDER BY posizione_salario_reparto ASC, e.salario DESC, e.emp_no ASC;"
+}

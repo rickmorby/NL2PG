@@ -1,0 +1,499 @@
+{
+  "schema_ddl": "CREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    codice_hub TEXT NOT NULL UNIQUE,\n    nome_impianto TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capienza_massima_colli INT NOT NULL CHECK (capienza_massima_colli > 0)\n);\n\nCREATE TABLE corrieri (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    magazzino_partenza_id INT NOT NULL REFERENCES magazzini(id),\n    magazzino_arrivo_id INT NOT NULL REFERENCES magazzini(id),\n    corriere_id INT REFERENCES corrieri(id),\n    data_spedizione DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    CHECK (data_consegna_prevista IS NULL OR data_consegna_prevista >= data_spedizione)\n);\n\nCREATE TABLE colli (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    volume_litri NUMERIC(8,2) CHECK (volume_litri >= 0),\n    descrizione_contenuto TEXT NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "magazzini": {
+        "row_count": 15,
+        "columns": {
+          "id": {
+            "distinct": 15,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 15
+          },
+          "codice_hub": {
+            "distinct": 15,
+            "sample": [
+              "HUB-BOL-01",
+              "HUB-BOL-011",
+              "HUB-MIL-01",
+              "HUB-MIL-011",
+              "HUB-MIL-012"
+            ]
+          },
+          "nome_impianto": {
+            "distinct": 6,
+            "sample": [
+              "Centro Distribuzione Nazionale",
+              "Cross-docking Intermodale",
+              "Deposito Avanzato del Sud",
+              "Hub Smistamento Zona Industriale",
+              "Nodo Logistico dell'Appennino"
+            ]
+          },
+          "citta": {
+            "distinct": 5,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Napoli",
+              "Roma",
+              "Torino"
+            ]
+          },
+          "capienza_massima_colli": {
+            "distinct": 15,
+            "sample": [
+              "13710.56",
+              "17540.4",
+              "22792.95",
+              "23035.57",
+              "24617.3"
+            ],
+            "min": 13710.56,
+            "max": 74803.19
+          }
+        }
+      },
+      "corrieri": {
+        "row_count": 42,
+        "columns": {
+          "id": {
+            "distinct": 42,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 42
+          },
+          "ragione_sociale": {
+            "distinct": 5,
+            "sample": [
+              "Corriere Espresso Velox S.r.l.",
+              "Logistica Mediterranea S.p.A.",
+              "Meridiana Trasporti S.c.a r.l.",
+              "RapidCargo Italia S.r.l.",
+              "Trasporti Alpina S.p.A."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 42,
+            "sample": [
+              "IT02345678901",
+              "IT023456789011",
+              "IT023456789012",
+              "IT023456789013",
+              "IT023456789014"
+            ]
+          },
+          "telefono_contatto": {
+            "distinct": 4,
+            "sample": [
+              "+39 02 1234567",
+              "+39 055 4433221",
+              "+39 06 9876543",
+              "+39 081 5566778"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 1752,
+        "columns": {
+          "id": {
+            "distinct": 1752,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1852
+          },
+          "magazzino_partenza_id": {
+            "distinct": 15,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 15
+          },
+          "magazzino_arrivo_id": {
+            "distinct": 15,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 15
+          },
+          "corriere_id": {
+            "distinct": 42,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 42
+          },
+          "data_spedizione": {
+            "distinct": 78,
+            "sample": [
+              "2025-12-03",
+              "2025-12-04",
+              "2025-12-05",
+              "2025-12-06",
+              "2025-12-07"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 4,
+            "sample": [
+              "2026-01-16",
+              "2026-01-24",
+              "2026-02-07",
+              "2026-02-21"
+            ]
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "consegnata",
+              "in_preparazione",
+              "in_transito",
+              "rimandata"
+            ]
+          }
+        }
+      },
+      "colli": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 4000
+          },
+          "spedizione_id": {
+            "distinct": 1454,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1852
+          },
+          "peso_kg": {
+            "distinct": 2170,
+            "sample": [
+              "0.27",
+              "0.28",
+              "0.29",
+              "0.3",
+              "0.31"
+            ],
+            "min": 0.27,
+            "max": 195.0
+          },
+          "volume_litri": {
+            "distinct": 1894,
+            "sample": [
+              "0.64",
+              "0.69",
+              "0.7",
+              "0.74",
+              "0.77"
+            ],
+            "min": 0.64,
+            "max": 540.0
+          },
+          "descrizione_contenuto": {
+            "distinct": 8,
+            "sample": [
+              "Abbigliamento e calzature",
+              "Attrezzatura sportiva",
+              "Componenti elettronici",
+              "Cosmetici e prodotti per la persona",
+              "Documentazione e cancelleria"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "magazzini": [
+        {
+          "id": 1,
+          "codice_hub": "HUB-MIL-01",
+          "nome_impianto": "Hub Smistamento Zona Industriale",
+          "citta": "Napoli",
+          "capienza_massima_colli": 35295.54
+        },
+        {
+          "id": 2,
+          "codice_hub": "HUB-MIL-011",
+          "nome_impianto": "Hub Smistamento Zona Industriale",
+          "citta": "Firenze",
+          "capienza_massima_colli": 28617.22
+        },
+        {
+          "id": 3,
+          "codice_hub": "HUB-MIL-012",
+          "nome_impianto": "Hub Smistamento Zona Industriale",
+          "citta": "Bologna",
+          "capienza_massima_colli": 45968.31
+        },
+        {
+          "id": 4,
+          "codice_hub": "HUB-ROM-01",
+          "nome_impianto": "Centro Distribuzione Nazionale",
+          "citta": "Bologna",
+          "capienza_massima_colli": 74803.19
+        },
+        {
+          "id": 5,
+          "codice_hub": "HUB-ROM-011",
+          "nome_impianto": "Centro Distribuzione Nazionale",
+          "citta": "Napoli",
+          "capienza_massima_colli": 74714.37
+        },
+        {
+          "id": 6,
+          "codice_hub": "HUB-ROM-012",
+          "nome_impianto": "Centro Distribuzione Nazionale",
+          "citta": "Napoli",
+          "capienza_massima_colli": 47474.63
+        },
+        {
+          "id": 7,
+          "codice_hub": "HUB-NAP-01",
+          "nome_impianto": "Cross-docking Intermodale",
+          "citta": "Firenze",
+          "capienza_massima_colli": 24617.3
+        },
+        {
+          "id": 8,
+          "codice_hub": "HUB-NAP-011",
+          "nome_impianto": "Cross-docking Intermodale",
+          "citta": "Torino",
+          "capienza_massima_colli": 36478.81
+        }
+      ],
+      "corrieri": [
+        {
+          "id": 1,
+          "ragione_sociale": "Trasporti Alpina S.p.A.",
+          "partita_iva": "IT02345678901",
+          "telefono_contatto": null
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Trasporti Alpina S.p.A.",
+          "partita_iva": "IT023456789011",
+          "telefono_contatto": "+39 02 1234567"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Trasporti Alpina S.p.A.",
+          "partita_iva": "IT023456789012",
+          "telefono_contatto": "+39 02 1234567"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Trasporti Alpina S.p.A.",
+          "partita_iva": "IT023456789013",
+          "telefono_contatto": "+39 02 1234567"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Trasporti Alpina S.p.A.",
+          "partita_iva": "IT023456789014",
+          "telefono_contatto": "+39 02 1234567"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Trasporti Alpina S.p.A.",
+          "partita_iva": "IT023456789015",
+          "telefono_contatto": "+39 02 1234567"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Trasporti Alpina S.p.A.",
+          "partita_iva": "IT023456789016",
+          "telefono_contatto": "+39 02 1234567"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Trasporti Alpina S.p.A.",
+          "partita_iva": "IT023456789017",
+          "telefono_contatto": "+39 02 1234567"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 101,
+          "magazzino_partenza_id": 12,
+          "magazzino_arrivo_id": 4,
+          "corriere_id": 5,
+          "data_spedizione": "2025-12-28",
+          "data_consegna_prevista": "2026-01-16",
+          "stato": "consegnata"
+        },
+        {
+          "id": 102,
+          "magazzino_partenza_id": 6,
+          "magazzino_arrivo_id": 14,
+          "corriere_id": 5,
+          "data_spedizione": "2025-12-09",
+          "data_consegna_prevista": "2026-01-16",
+          "stato": "in_transito"
+        },
+        {
+          "id": 103,
+          "magazzino_partenza_id": 12,
+          "magazzino_arrivo_id": 12,
+          "corriere_id": 11,
+          "data_spedizione": "2026-01-12",
+          "data_consegna_prevista": "2026-01-16",
+          "stato": "consegnata"
+        },
+        {
+          "id": 104,
+          "magazzino_partenza_id": 14,
+          "magazzino_arrivo_id": 2,
+          "corriere_id": 22,
+          "data_spedizione": "2025-12-13",
+          "data_consegna_prevista": "2026-01-16",
+          "stato": "rimandata"
+        },
+        {
+          "id": 105,
+          "magazzino_partenza_id": 7,
+          "magazzino_arrivo_id": 13,
+          "corriere_id": 11,
+          "data_spedizione": "2025-12-22",
+          "data_consegna_prevista": "2026-01-16",
+          "stato": "in_preparazione"
+        },
+        {
+          "id": 106,
+          "magazzino_partenza_id": 15,
+          "magazzino_arrivo_id": 2,
+          "corriere_id": 28,
+          "data_spedizione": "2026-01-12",
+          "data_consegna_prevista": "2026-01-16",
+          "stato": "in_preparazione"
+        },
+        {
+          "id": 107,
+          "magazzino_partenza_id": 3,
+          "magazzino_arrivo_id": 5,
+          "corriere_id": 40,
+          "data_spedizione": "2026-01-12",
+          "data_consegna_prevista": "2026-01-16",
+          "stato": "consegnata"
+        },
+        {
+          "id": 108,
+          "magazzino_partenza_id": 9,
+          "magazzino_arrivo_id": 12,
+          "corriere_id": 3,
+          "data_spedizione": "2025-12-07",
+          "data_consegna_prevista": "2026-01-16",
+          "stato": "in_transito"
+        }
+      ],
+      "colli": [
+        {
+          "id": 1001,
+          "spedizione_id": 1097,
+          "peso_kg": 27.27,
+          "volume_litri": 100.67,
+          "descrizione_contenuto": "Libri e materiale editoriale"
+        },
+        {
+          "id": 1002,
+          "spedizione_id": 253,
+          "peso_kg": 44.71,
+          "volume_litri": null,
+          "descrizione_contenuto": "Abbigliamento e calzature"
+        },
+        {
+          "id": 1003,
+          "spedizione_id": 470,
+          "peso_kg": 38.24,
+          "volume_litri": 10.07,
+          "descrizione_contenuto": "Componenti elettronici"
+        },
+        {
+          "id": 1004,
+          "spedizione_id": 1707,
+          "peso_kg": 24.66,
+          "volume_litri": 89.17,
+          "descrizione_contenuto": "Pezzi di ricambio industriali"
+        },
+        {
+          "id": 1005,
+          "spedizione_id": 463,
+          "peso_kg": 21.89,
+          "volume_litri": null,
+          "descrizione_contenuto": "Libri e materiale editoriale"
+        },
+        {
+          "id": 1006,
+          "spedizione_id": 445,
+          "peso_kg": 11.76,
+          "volume_litri": 9.75,
+          "descrizione_contenuto": "Attrezzatura sportiva"
+        },
+        {
+          "id": 1007,
+          "spedizione_id": 1173,
+          "peso_kg": 10.83,
+          "volume_litri": 69.82,
+          "descrizione_contenuto": "Componenti elettronici"
+        },
+        {
+          "id": 1008,
+          "spedizione_id": 1736,
+          "peso_kg": 42.61,
+          "volume_litri": null,
+          "descrizione_contenuto": "Documentazione e cancelleria"
+        }
+      ]
+    }
+  },
+  "story": "Nella rete logistica della società, l'archivio denominato magazzini — che i responsabili operativi chiamano abitualmente gli hub di smistamento — conserva le schede dei depositi: per ciascun impianto sono annotati il codice identificativo dell'hub, la denominazione dello stabilimento, la città in cui sorge e la capienza massima espressa in numero di colli ospitabili, come i 74803.19 colli del Centro Distribuzione Nazionale di Bologna. Accanto ad esso, l'albo dei corrieri raccoglie le ragioni sociali dei vettori convenzionati, con le rispettive partite iva e i numeri telefonici da contattare per le urgenze. Il registro movimenti_di_merce, ossia l'archivio storico delle spedizioni, traccia ogni invio della rete: indica il deposito di partenza e quello di arrivo, il corriere incaricato del trasporto, la data di spedizione, la data di consegna prevista e lo stato dell'invio, che può risultare in preparazione, in transito, consegnata oppure rimandata. Ogni movimento viene poi scomposto nei singoli colli, descritti nell'apposito registro dei colli mediante la massa del carico espressa in chilogrammi, il volume in litri e la descrizione del contenuto: dai 0.27 chilogrammi delle buste più leggere fino ai 195 chilogrammi delle casse più pesanti. In occasione della revisione trimestrale, l'ufficio pianificazione ha condotto un controllo dedicato ai colli contenenti Componenti elettronici e Attrezzatura sportiva. Avvalendosi di una lista interna di soglie concordata con la direzione, gli analisti hanno ripartito tali colli nelle tre fasce di peso aziendali — leggero, medio e pesante — confrontando la massa del carico di ciascun collo con i limiti previsti dalla lista. Per ciascuna fascia è stato conteggiato il numero di colli, calcolato il peso medio e individuato il peso massimo registrato; l'elenco risultante è stato ordinato per peso medio decrescente, così da far emergere subito la categoria più gravosa sotto il profilo dei costi di trasporto. Il capo deposito ha infine utilizzato questi dati per riequilibrare i flussi tra gli hub di smistamento e per rinegoziare le tariffe con alcuni corrieri in vista delle prossime finestre di consegna."
+}

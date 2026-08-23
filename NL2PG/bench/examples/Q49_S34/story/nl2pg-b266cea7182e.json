@@ -1,0 +1,316 @@
+{
+  "schema_ddl": "CREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'responsabilita_civile')),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    stato_polizza TEXT NOT NULL CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta', 'annullata')),\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id INT PRIMARY KEY,\n    polizza_id INT REFERENCES polizze(id) ON DELETE SET NULL,\n    data_sinistro DATE NOT NULL,\n    data_denuncia DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    importo_danno NUMERIC(12,2) NOT NULL CHECK (importo_danno >= 0),\n    stato_sinistro TEXT NOT NULL CHECK (stato_sinistro IN ('aperto', 'in_valutazione', 'liquidato', 'respinto')),\n    CHECK (data_denuncia >= data_sinistro)\n);",
+  "data_profile": {
+    "profile": {
+      "polizze": {
+        "row_count": 299,
+        "columns": {
+          "id": {
+            "distinct": 299,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 299
+          },
+          "numero_polizza": {
+            "distinct": 299,
+            "sample": [
+              "POL-2024-000004",
+              "POL-2024-0000041",
+              "POL-2024-00000410",
+              "POL-2024-00000411",
+              "POL-2024-00000412"
+            ]
+          },
+          "tipo_polizza": {
+            "distinct": 5,
+            "sample": [
+              "auto",
+              "casa",
+              "responsabilita_civile",
+              "salute",
+              "vita"
+            ]
+          },
+          "data_emissione": {
+            "distinct": 187,
+            "sample": [
+              "2024-03-04",
+              "2024-03-05",
+              "2024-03-06",
+              "2024-03-07",
+              "2024-03-10"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 181,
+            "sample": [
+              "2025-04-19",
+              "2025-04-21",
+              "2025-04-24",
+              "2025-04-25",
+              "2025-04-26"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 295,
+            "sample": [
+              "1023.84",
+              "1028.32",
+              "1028.78",
+              "1039.35",
+              "1042.76"
+            ],
+            "min": 185.31,
+            "max": 2348.53
+          },
+          "stato_polizza": {
+            "distinct": 4,
+            "sample": [
+              "annullata",
+              "attiva",
+              "scaduta",
+              "sospesa"
+            ]
+          }
+        }
+      },
+      "sinistri": {
+        "row_count": 829,
+        "columns": {
+          "id": {
+            "distinct": 829,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 829
+          },
+          "polizza_id": {
+            "distinct": 277,
+            "sample": [
+              "1",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 299
+          },
+          "data_sinistro": {
+            "distinct": 353,
+            "sample": [
+              "2024-06-12",
+              "2024-06-15",
+              "2024-06-16",
+              "2024-06-18",
+              "2024-06-19"
+            ]
+          },
+          "data_denuncia": {
+            "distinct": 108,
+            "sample": [
+              "2024-12-15",
+              "2024-12-16",
+              "2024-12-17",
+              "2024-12-18",
+              "2024-12-19"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Danni a terzi da caduta di rami durante tempesta",
+              "Frattura al polso durante attivita' sportiva amatoriale",
+              "Incendio in cantina causato da cortocircuito impianto elettrico",
+              "Infiltrazione acqua dal tetto dopo forte grandinata",
+              "Rottura tubatura con allagamento della cucina"
+            ]
+          },
+          "importo_danno": {
+            "distinct": 812,
+            "sample": [
+              "10028.7",
+              "1004.89",
+              "10044.39",
+              "10071.79",
+              "1011.78"
+            ],
+            "min": 256.0,
+            "max": 13000.0
+          },
+          "stato_sinistro": {
+            "distinct": 4,
+            "sample": [
+              "aperto",
+              "in_valutazione",
+              "liquidato",
+              "respinto"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "polizze": [
+        {
+          "id": 1,
+          "numero_polizza": "POL-2025-000001",
+          "tipo_polizza": "casa",
+          "data_emissione": "2024-12-20",
+          "data_scadenza": "2026-02-05",
+          "premio_annuo": 508.4,
+          "stato_polizza": "attiva"
+        },
+        {
+          "id": 2,
+          "numero_polizza": "POL-2025-0000011",
+          "tipo_polizza": "salute",
+          "data_emissione": "2024-12-09",
+          "data_scadenza": "2026-02-04",
+          "premio_annuo": 473.1,
+          "stato_polizza": "attiva"
+        },
+        {
+          "id": 3,
+          "numero_polizza": "POL-2025-0000012",
+          "tipo_polizza": "casa",
+          "data_emissione": "2024-12-08",
+          "data_scadenza": "2026-02-09",
+          "premio_annuo": 734.31,
+          "stato_polizza": "annullata"
+        },
+        {
+          "id": 4,
+          "numero_polizza": "POL-2025-0000013",
+          "tipo_polizza": "auto",
+          "data_emissione": "2025-01-10",
+          "data_scadenza": "2026-02-09",
+          "premio_annuo": 584.32,
+          "stato_polizza": "attiva"
+        },
+        {
+          "id": 5,
+          "numero_polizza": "POL-2025-0000014",
+          "tipo_polizza": "casa",
+          "data_emissione": "2025-01-12",
+          "data_scadenza": "2026-01-22",
+          "premio_annuo": 839.44,
+          "stato_polizza": "attiva"
+        },
+        {
+          "id": 6,
+          "numero_polizza": "POL-2025-0000015",
+          "tipo_polizza": "auto",
+          "data_emissione": "2024-12-21",
+          "data_scadenza": "2026-01-21",
+          "premio_annuo": 645.58,
+          "stato_polizza": "scaduta"
+        },
+        {
+          "id": 7,
+          "numero_polizza": "POL-2025-0000016",
+          "tipo_polizza": "vita",
+          "data_emissione": "2025-01-09",
+          "data_scadenza": "2026-02-27",
+          "premio_annuo": 919.22,
+          "stato_polizza": "attiva"
+        },
+        {
+          "id": 8,
+          "numero_polizza": "POL-2025-0000017",
+          "tipo_polizza": "auto",
+          "data_emissione": "2024-12-13",
+          "data_scadenza": "2026-01-23",
+          "premio_annuo": 681.67,
+          "stato_polizza": "attiva"
+        }
+      ],
+      "sinistri": [
+        {
+          "id": 1,
+          "polizza_id": 123,
+          "data_sinistro": "2024-08-29",
+          "data_denuncia": "2025-02-20",
+          "descrizione": "Incendio in cantina causato da cortocircuito impianto elettrico",
+          "importo_danno": 930.08,
+          "stato_sinistro": "in_valutazione"
+        },
+        {
+          "id": 2,
+          "polizza_id": 243,
+          "data_sinistro": "2024-08-14",
+          "data_denuncia": "2025-02-26",
+          "descrizione": "Danni a terzi da caduta di rami durante tempesta",
+          "importo_danno": 550.66,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id": 3,
+          "polizza_id": 60,
+          "data_sinistro": "2024-10-03",
+          "data_denuncia": "2025-02-20",
+          "descrizione": "Incendio in cantina causato da cortocircuito impianto elettrico",
+          "importo_danno": 2846.63,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id": 4,
+          "polizza_id": 156,
+          "data_sinistro": "2024-12-14",
+          "data_denuncia": "2025-02-14",
+          "descrizione": "Danni a terzi da caduta di rami durante tempesta",
+          "importo_danno": 1170.2,
+          "stato_sinistro": "in_valutazione"
+        },
+        {
+          "id": 5,
+          "polizza_id": 195,
+          "data_sinistro": "2024-12-29",
+          "data_denuncia": "2025-02-13",
+          "descrizione": "Frattura al polso durante attivita' sportiva amatoriale",
+          "importo_danno": 3074.06,
+          "stato_sinistro": "respinto"
+        },
+        {
+          "id": 6,
+          "polizza_id": 16,
+          "data_sinistro": "2024-09-16",
+          "data_denuncia": "2025-02-14",
+          "descrizione": "Rottura tubatura con allagamento della cucina",
+          "importo_danno": 1116.72,
+          "stato_sinistro": "in_valutazione"
+        },
+        {
+          "id": 7,
+          "polizza_id": 43,
+          "data_sinistro": "2025-01-01",
+          "data_denuncia": "2025-02-26",
+          "descrizione": "Danni a terzi da caduta di rami durante tempesta",
+          "importo_danno": 792.68,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id": 8,
+          "polizza_id": 211,
+          "data_sinistro": "2024-12-24",
+          "data_denuncia": "2025-02-13",
+          "descrizione": "Sinistro stradale con coinvolgimento di terzo veicolo in sosta",
+          "importo_danno": 1914.43,
+          "stato_sinistro": "liquidato"
+        }
+      ]
+    }
+  },
+  "story": "Presso l'ufficio risarcimenti di una compagnia assicurativa, l'archivio denominato polizze custodisce le schede contrattuali dei clienti: per ciascuna copertura sono annotati il numero di polizza, ad esempio POL-2025-000001, la tipologia scelta tra auto, casa, vita, salute e responsabilita_civile, le date di emissione e di scadenza, il premio annuo e lo stato della garanzia, che può risultare attiva, sospesa, scaduta o annullata. Accanto ad esso, il registro intitolato pratiche_liquidazione raccoglie gli eventi dannosi denunciati dagli assicurati: ogni voce riporta la data in cui l'evento si è verificato, quella della denuncia, una descrizione sintetica del danno, dall'incendio in cantina causato da cortocircuito impianto elettrico ai danni a terzi da caduta di rami durante tempesta, l'importo stimato e lo stato della pratica, che attraversa le fasi aperto, in_valutazione, liquidato e respinto. In occasione della revisione trimestrale del portafoglio, gli analisti hanno predisposto una classifica delle coperture attive che abbiano registrato almeno un evento dannoso. L'aggancio tra le due sedi documentali è stato condotto mediante il riferimento contrattuale annotato su ciascuna pratica: gli operatori hanno verificato che tale riferimento coincidesse esattamente con l'identificativo progressivo della copertura, adottando un criterio di confronto puntuale che considera come casi distinti anche le situazioni in cui il riferimento risulta assente, come accade per gli eventi non ancora ricondotti ad alcuna garanzia sottoscritta. Per ogni copertura attiva sono stati così conteggiati gli eventi registrati, sommati gli importi dei danni, che nell'archivio reale oscillano da un minimo di 256 euro fino a punte di 13000 euro, e calcolato il danno medio, disponendo infine la classifica dal totale dei danni più alto al più basso. Tra i fascicoli esaminati spiccano, a titolo di esempio, la pratica riferita alla copertura numero 123, con incendio in cantina denunciato il 2025-02-20 per un danno di 930.08 euro ancora in corso di valutazione, e l'evento occorso il 2024-10-03, liquidato per 2846.63 euro. Il quadro ottenuto ha consentito alla direzione di individuare le garanzie più esposte al rischio, di rinegoziare i premi in scadenza e di accelerare la chiusura delle pratiche rimaste ferme più a lungo."
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 5,
+  "hierarchy": "denormalized",
+  "sql_features": [
+    "like"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "cartelle_cliniche",
+      "obsolete_value": "registro_storico_pazienti",
+      "description": "La tabella principale contenente i dati sanitari è denominata nel linguaggio aziendale come registro_storico_pazienti."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "category_name",
+      "obsolete_value": "codifica_nosologica_reparto",
+      "description": "Il campo category_name che identifica il reparto di cura viene indicato internamente con il termine tecnico codifica_nosologica_reparto."
+    }
+  ],
+  "spec_hash": "b9fd76258365e1f8"
+}

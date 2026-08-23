@@ -1,0 +1,21 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 2,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "cte",
+    "recursive_cte"
+  ],
+  "twist": [
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rephrase",
+      "target_value": "agenzia_subordinata",
+      "obsolete_value": "struttura_di_affiliazione_discendente",
+      "description": "La relazione gerarchica tra le agenzie immobiliari viene espressa come struttura di affiliazione discendente nella descrizione testuale del requisito."
+    }
+  ],
+  "spec_hash": "64972213ae55fd3c"
+}

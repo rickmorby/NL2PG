@@ -1,0 +1,317 @@
+{
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    citta TEXT,\n    email TEXT,\n    telefono TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE ordini_acquisto (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT REFERENCES fornitori(id) ON DELETE SET NULL,\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('bozza', 'confermato', 'in_lavorazione', 'evaso', 'annullato'))\n);",
+  "data_profile": {
+    "profile": {
+      "fornitori": {
+        "row_count": 602,
+        "columns": {
+          "id": {
+            "distinct": 602,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 602
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Acciai Pugliesi S.r.l.",
+              "Cartotecnica Emiliana S.r.l.",
+              "Chimica Adriatica S.r.l.",
+              "Elettronica Piemontese S.p.A.",
+              "Forniture Industriali Venete S.r.l."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 602,
+            "sample": [
+              "IT01234567890",
+              "IT012345678901",
+              "IT0123456789010",
+              "IT01234567890100",
+              "IT01234567890101"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 8,
+            "sample": [
+              "Corso Italia 12",
+              "Piazza Garibaldi 33",
+              "Via Dante 7",
+              "Via Emilia 128",
+              "Via Napoli 210"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Ancona",
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova"
+            ]
+          },
+          "email": {
+            "distinct": 8,
+            "sample": [
+              "acquisti@elettronica-piemontese.it",
+              "amministrazione@tessile-toscana.it",
+              "contatti@forniture-venete.it",
+              "info@acciai-pugliesi.it",
+              "info@cartotecnica-emiliana.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "+39 011 3456789",
+              "+39 02 1234567",
+              "+39 041 5678901",
+              "+39 051 7654321",
+              "+39 055 6789012"
+            ]
+          },
+          "attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "ordini_acquisto": {
+        "row_count": 2468,
+        "columns": {
+          "id": {
+            "distinct": 2468,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3468
+          },
+          "numero_ordine": {
+            "distinct": 2468,
+            "sample": [
+              "PO-2026-0001",
+              "PO-2026-00011",
+              "PO-2026-000110",
+              "PO-2026-0001100",
+              "PO-2026-0001101"
+            ]
+          },
+          "fornitore_id": {
+            "distinct": 595,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 602
+          },
+          "data_ordine": {
+            "distinct": 190,
+            "sample": [
+              "2025-10-10",
+              "2025-10-11",
+              "2025-10-12",
+              "2025-10-13",
+              "2025-10-14"
+            ]
+          },
+          "importo_totale": {
+            "distinct": 2370,
+            "sample": [
+              "10002.62",
+              "10003.53",
+              "1001.42",
+              "10036.31",
+              "1004.34"
+            ],
+            "min": 202.77,
+            "max": 55250.75
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "bozza",
+              "confermato",
+              "evaso",
+              "in_lavorazione"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "fornitori": [
+        {
+          "id": 1,
+          "ragione_sociale": "Tessile Toscana S.p.A.",
+          "partita_iva": "IT01234567890",
+          "indirizzo": null,
+          "citta": "Napoli",
+          "email": "amministrazione@tessile-toscana.it",
+          "telefono": "+39 055 6789012",
+          "attivo": "true"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Elettronica Piemontese S.p.A.",
+          "partita_iva": "IT012345678901",
+          "indirizzo": "Via Emilia 128",
+          "citta": "Torino",
+          "email": "info@cartotecnica-emiliana.it",
+          "telefono": "+39 081 4567890",
+          "attivo": "true"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Acciai Pugliesi S.r.l.",
+          "partita_iva": "IT012345678902",
+          "indirizzo": "Via Stazione 56",
+          "citta": "Verona",
+          "email": "amministrazione@tessile-toscana.it",
+          "telefono": "+39 080 7890123",
+          "attivo": "false"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Forniture Industriali Venete S.r.l.",
+          "partita_iva": "IT012345678903",
+          "indirizzo": "Via Stazione 56",
+          "citta": "Bologna",
+          "email": "contatti@forniture-venete.it",
+          "telefono": "+39 011 3456789",
+          "attivo": "true"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Tessile Toscana S.p.A.",
+          "partita_iva": "IT012345678904",
+          "indirizzo": "Via Emilia 128",
+          "citta": "Torino",
+          "email": null,
+          "telefono": "+39 041 5678901",
+          "attivo": "false"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Acciai Pugliesi S.r.l.",
+          "partita_iva": "IT012345678905",
+          "indirizzo": "Via Stazione 56",
+          "citta": "Padova",
+          "email": "amministrazione@tessile-toscana.it",
+          "telefono": "+39 071 2345678",
+          "attivo": "true"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Forniture Industriali Venete S.r.l.",
+          "partita_iva": "IT012345678906",
+          "indirizzo": "Via Stazione 56",
+          "citta": "Milano",
+          "email": "ordini@metalmeccanica-lombarda.it",
+          "telefono": "+39 041 5678901",
+          "attivo": "true"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Tessile Toscana S.p.A.",
+          "partita_iva": "IT012345678907",
+          "indirizzo": "Piazza Garibaldi 33",
+          "citta": "Genova",
+          "email": "ufficio@plastica-meridionale.it",
+          "telefono": "+39 041 5678901",
+          "attivo": "false"
+        }
+      ],
+      "ordini_acquisto": [
+        {
+          "id": 1001,
+          "numero_ordine": "PO-2026-0001",
+          "fornitore_id": 567,
+          "data_ordine": "2025-10-14",
+          "importo_totale": 28354.64,
+          "stato_ordine": "evaso"
+        },
+        {
+          "id": 1002,
+          "numero_ordine": "PO-2026-00011",
+          "fornitore_id": null,
+          "data_ordine": "2025-10-25",
+          "importo_totale": 9199.37,
+          "stato_ordine": "evaso"
+        },
+        {
+          "id": 1003,
+          "numero_ordine": "PO-2026-00012",
+          "fornitore_id": 112,
+          "data_ordine": "2026-02-05",
+          "importo_totale": 31126.88,
+          "stato_ordine": "evaso"
+        },
+        {
+          "id": 1004,
+          "numero_ordine": "PO-2026-00013",
+          "fornitore_id": 539,
+          "data_ordine": "2025-12-23",
+          "importo_totale": 14878.7,
+          "stato_ordine": "in_lavorazione"
+        },
+        {
+          "id": 1005,
+          "numero_ordine": "PO-2026-00014",
+          "fornitore_id": 539,
+          "data_ordine": "2025-12-21",
+          "importo_totale": 10938.67,
+          "stato_ordine": "evaso"
+        },
+        {
+          "id": 1006,
+          "numero_ordine": "PO-2026-00015",
+          "fornitore_id": 470,
+          "data_ordine": "2026-01-08",
+          "importo_totale": 19825.76,
+          "stato_ordine": "evaso"
+        },
+        {
+          "id": 1007,
+          "numero_ordine": "PO-2026-00016",
+          "fornitore_id": 553,
+          "data_ordine": "2025-11-19",
+          "importo_totale": 4872.69,
+          "stato_ordine": "bozza"
+        },
+        {
+          "id": 1008,
+          "numero_ordine": "PO-2026-00017",
+          "fornitore_id": 533,
+          "data_ordine": "2026-02-21",
+          "importo_totale": 21337.92,
+          "stato_ordine": "evaso"
+        }
+      ]
+    }
+  },
+  "story": "Presso la Direzione Approvvigionamenti del gruppo industriale, l'archivio denominato anagrafica_partner raccoglie le schede dei partner di fornitura abituali: in ciascuna scheda sono annotati la ragione sociale, la partita IVA, l'indirizzo della sede, la città, gli indirizzi di posta elettronica, i numeri di telefono e il contrassegno che indica se il partner risulta attivo oppure dismesso. L'archivio conta 602 schede e comprende realtà come Tessile Toscana S.p.A. con sede a Napoli oppure Elettronica Piemontese S.p.A. insediata a Torino. Accanto all'anagrafica_partner, il registro ordini_acquisto tiene traccia di ogni commessa di acquisto emessa dagli uffici: 2468 voci complessive, ciascuna corredata dal proprio numero d'ordine, dal formato PO-2026-0001 in avanti, dal riferimento al partner interessato, dalla data di emissione, dal valore economico complessivo dell'ordine e dallo stato di avanzamento, che può essere bozza, confermato, in lavorazione, evaso oppure annullato. In occasione della revisione trimestrale degli impegni di spesa, il responsabile ha disposto un controllo mirato: occorre considerare esclusivamente i partner attivi la cui sede risulta a Torino oppure a Bologna e, per ciascuno di essi, determinare il totale del valore economico complessivo dell'ordine limitatamente alle commesse in stato confermato. Gli addetti hanno quindi percorso il registro ordini_acquisto voce per voce e, con un riscontro correlato commessa per commessa, hanno verificato se ciascuna commessa fosse collegata a un partner dell'anagrafica_partner risultato attivo e con sede a Torino o a Bologna; solo in tal caso hanno accumulato l'importo della commessa confermata, scartando dal computo le voci in bozza, in lavorazione, evase o annullate, come la commessa del 14 ottobre 2025 da 28354.64 euro già evasa. Il prospetto finale è stato disposto in ordine decrescente di valore confermato, così da far emergere in testa i partner torinesi e bolognesi che impegnano le maggiori risorse e consentire alla direzione di avviare per primi i tavoli di rinegoziazione con le controparti più gravose."
+}

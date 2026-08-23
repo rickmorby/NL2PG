@@ -1,0 +1,34 @@
+{
+  "domain": "logistica",
+  "n_tables": 6,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "math_funcs"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatti_spedizioni",
+      "obsolete_value": "registro_movimenti_di_flotta",
+      "description": "La tabella dei fatti centrale fatti_spedizioni, che contiene le misure quantitative come peso_kg, costo_trasporto e distanza_km, viene denominata nella prosa aziendale registro_movimenti_di_flotta. Le query devono riconoscere che ogni riga del registro corrisponde a una singola spedizione registrata nel data warehouse."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "giorni_transito",
+      "obsolete_value": "lead time di consegna",
+      "description": "La colonna giorni_transito presente nella tabella dei fatti viene espressa nella documentazione aziendale con il gergo logistico lead time di consegna. I calcoli con ROUND o ABS su questa misura devono riferirsi alla colonna reale giorni_transito, joinando le dimensioni sulle chiavi esterne."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "dim_vettori",
+      "obsolete_value": "anagrafica_partner_di_trasporto",
+      "description": "La tabella dimensionale dim_vettori, che descrive i corrieri incaricati delle spedizioni, viene indicata nella prosa aziendale come anagrafica_partner_di_trasporto. Le query che aggregano o filtrano per vettore devono risalire alla tabella dim_vettori tramite la chiave esterna id_vettore della tabella dei fatti."
+    }
+  ],
+  "spec_hash": "3b02df5124ed77c1"
+}

@@ -1,0 +1,363 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "is_null"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "agenzie",
+        "obsolete_value": "filiali",
+        "description": "La tabella agenzie (padre nella relazione 1:N) viene denominata filiali nella prosa aziendale. Le query dovranno risolvere la corrispondenza tra filiali e la tabella fisica agenzie."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "immobili",
+        "obsolete_value": "unità abitative",
+        "description": "La tabella immobili (figlia con FK nullable agenzia_id) viene indicata con il sinonimo unità abitative nella documentazione aziendale. Le query IS NULL / IS NOT NULL sulla FK dovranno riferirsi agli immobili tramite questa perifrasi."
+      }
+    ],
+    "spec_hash": "79a0c028b69fdb7b"
+  },
+  "schema_ddl": "CREATE TABLE agenzie (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    telefono TEXT,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE agenti (\n    id SERIAL PRIMARY KEY,\n    agenzia_id INT NOT NULL REFERENCES agenzie(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    CHECK (nome <> '' AND cognome <> '')\n);\n\nCREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    agenzia_id INT REFERENCES agenzie(id),\n    indirizzo TEXT NOT NULL,\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'attico', 'loft', 'terreno')),\n    metri_quadri INT NOT NULL CHECK (metri_quadri > 0),\n    prezzo NUMERIC(12,2) NOT NULL CHECK (prezzo >= 0),\n    stato TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato IN ('disponibile', 'riservato', 'venduto'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "agenzie",
+        "nature": "dimension",
+        "min_rows": 24,
+        "max_rows": 36,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Immobiliare Aurora",
+            "citta": "Milano",
+            "indirizzo": "Via Torino 12",
+            "telefono": "+39 02 88451234",
+            "email": "info@auroraimmobiliare.it"
+          },
+          {
+            "id": 2,
+            "nome": "CasaNova Agenzia",
+            "citta": "Roma",
+            "indirizzo": "Via Flaminia 88",
+            "telefono": "+39 06 55219876",
+            "email": "info@casanova.it"
+          },
+          {
+            "id": 3,
+            "nome": "Habitat Group",
+            "citta": "Torino",
+            "indirizzo": "Corso Francia 145",
+            "telefono": "+39 011 3347890",
+            "email": "contatti@habitatgroup.it"
+          },
+          {
+            "id": 4,
+            "nome": "Domus Fidele",
+            "citta": "Napoli",
+            "indirizzo": "Via Toledo 210",
+            "telefono": "+39 081 4423651",
+            "email": "info@domusfidele.it"
+          },
+          {
+            "id": 5,
+            "nome": "KeyHouse Consulting",
+            "citta": "Firenze",
+            "indirizzo": "Viale Gramsci 17",
+            "telefono": "+39 055 6612043",
+            "email": "info@keyhouse.it"
+          },
+          {
+            "id": 6,
+            "nome": "Punto Casa Srl",
+            "citta": "Bologna",
+            "indirizzo": "Via Indipendenza 56",
+            "telefono": "+39 051 2209874",
+            "email": "info@puntocasa.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Immobiliare Aurora",
+              "CasaNova Agenzia",
+              "Habitat Group",
+              "Domus Fidele",
+              "KeyHouse Consulting",
+              "Punto Casa Srl",
+              "Meridian Case",
+              "Agenzia Il Tetto"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Firenze",
+              "Bologna",
+              "Verona",
+              "Genova"
+            ]
+          },
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Torino 12",
+              "Via Flaminia 88",
+              "Corso Francia 145",
+              "Via Toledo 210",
+              "Viale Gramsci 17",
+              "Via Indipendenza 56",
+              "Corso Buenos Aires 34",
+              "Via Nazionale 71"
+            ]
+          }
+        }
+      },
+      {
+        "table": "agenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "agenzia_id": 1,
+            "nome": "Marco",
+            "cognome": "Bellini",
+            "email": "marco.bellini@auroraimmobiliare.it"
+          },
+          {
+            "id": 2,
+            "agenzia_id": 1,
+            "nome": "Sara",
+            "cognome": "Conti",
+            "email": "sara.conti@auroraimmobiliare.it"
+          },
+          {
+            "id": 3,
+            "agenzia_id": 2,
+            "nome": "Luca",
+            "cognome": "Moretti",
+            "email": "luca.moretti@casanova.it"
+          },
+          {
+            "id": 4,
+            "agenzia_id": 3,
+            "nome": "Elena",
+            "cognome": "Ferraro",
+            "email": "elena.ferraro@habitatgroup.it"
+          },
+          {
+            "id": 5,
+            "agenzia_id": 4,
+            "nome": "Davide",
+            "cognome": "Esposito",
+            "email": "davide.esposito@domusfidele.it"
+          },
+          {
+            "id": 6,
+            "agenzia_id": 5,
+            "nome": "Chiara",
+            "cognome": "Lombardi",
+            "email": "chiara.lombardi@keyhouse.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Sara",
+              "Luca",
+              "Elena",
+              "Davide",
+              "Chiara",
+              "Andrea",
+              "Francesca",
+              "Matteo",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Russo",
+              "Gallo",
+              "Costa",
+              "Fontana",
+              "Marino",
+              "Greco",
+              "Bruno"
+            ]
+          }
+        }
+      },
+      {
+        "table": "immobili",
+        "nature": "fact",
+        "min_rows": 260,
+        "max_rows": 420,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "agenzia_id": 1,
+            "indirizzo": "Via Solferino 22, Milano",
+            "tipo_immobile": "appartamento",
+            "metri_quadri": 85,
+            "prezzo": 320000.0,
+            "stato": "disponibile"
+          },
+          {
+            "id": 102,
+            "agenzia_id": 1,
+            "indirizzo": "Via Brera 8, Milano",
+            "tipo_immobile": "attico",
+            "metri_quadri": 140,
+            "prezzo": 890000.0,
+            "stato": "riservato"
+          },
+          {
+            "id": 103,
+            "agenzia_id": 2,
+            "indirizzo": "Via Appia 130, Roma",
+            "tipo_immobile": "villa",
+            "metri_quadri": 220,
+            "prezzo": 650000.0,
+            "stato": "venduto"
+          },
+          {
+            "id": 104,
+            "agenzia_id": 3,
+            "indirizzo": "Corso Vittorio Emanuele II 45, Torino",
+            "tipo_immobile": "loft",
+            "metri_quadri": 110,
+            "prezzo": 410000.0,
+            "stato": "disponibile"
+          },
+          {
+            "id": 105,
+            "indirizzo": "Strada Vicinale dei Pini 4, Perugia",
+            "tipo_immobile": "terreno",
+            "metri_quadri": 1500,
+            "prezzo": 75000.0,
+            "stato": "disponibile"
+          },
+          {
+            "id": 106,
+            "indirizzo": "Via del Mare 19, Sabaudia",
+            "tipo_immobile": "villa",
+            "metri_quadri": 180,
+            "prezzo": 520000.0,
+            "stato": "disponibile"
+          }
+        ],
+        "variations": {
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Solferino 22, Milano",
+              "Via Brera 8, Milano",
+              "Via Appia 130, Roma",
+              "Corso Vittorio Emanuele II 45, Torino",
+              "Via Toledo 77, Napoli",
+              "Borgo La Croce 12, Firenze",
+              "Via Zamboni 31, Bologna",
+              "Strada Vicinale dei Pini 4, Perugia",
+              "Via del Mare 19, Sabaudia",
+              "Via Garibaldi 5, Genova"
+            ]
+          },
+          "tipo_immobile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "appartamento",
+              "appartamento",
+              "appartamento",
+              "villa",
+              "attico",
+              "loft",
+              "terreno"
+            ]
+          },
+          "metri_quadri": {
+            "axis": "shift",
+            "delta_min": -25.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "prezzo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "disponibile",
+              "disponibile",
+              "disponibile",
+              "riservato",
+              "venduto"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

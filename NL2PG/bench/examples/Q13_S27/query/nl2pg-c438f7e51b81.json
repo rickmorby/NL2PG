@@ -1,0 +1,479 @@
+{
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    CHECK (LENGTH(codice_fiscale) = 16)\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL,\n    data_visita DATE NOT NULL,\n    motivo_visita TEXT,\n    esito TEXT,\n    CHECK (paziente_id > 0)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL,\n    data_ingresso DATE NOT NULL,\n    data_dimissione DATE,\n    reparto TEXT NOT NULL,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ingresso)\n);\n\nCREATE TABLE referti (\n    id INT PRIMARY KEY,\n    visita_id INT NOT NULL,\n    data_referto DATE NOT NULL,\n    contenuto TEXT NOT NULL,\n    medico_redattore TEXT NOT NULL,\n    CHECK (visita_id > 0)\n);",
+  "data_profile": {
+    "profile": {
+      "pazienti": {
+        "row_count": 254,
+        "columns": {
+          "id": {
+            "distinct": 254,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 254
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Anna",
+              "Davide",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Esposito",
+              "Ferrari",
+              "Marino"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 254,
+            "sample": [
+              "BNCLRA85C45F205B",
+              "BNCLRA85C45F205C",
+              "BNCLRA85C45F205D",
+              "BNCLRA85C45F205E",
+              "BNCLRA85C45F205F"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 243,
+            "sample": [
+              "1960-07-16",
+              "1960-11-13",
+              "1961-11-11",
+              "1962-03-22",
+              "1962-04-20"
+            ]
+          }
+        }
+      },
+      "visite": {
+        "row_count": 2016,
+        "columns": {
+          "id": {
+            "distinct": 2016,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 2116
+          },
+          "paziente_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "data_visita": {
+            "distinct": 65,
+            "sample": [
+              "2025-10-31",
+              "2025-11-01",
+              "2025-11-02",
+              "2025-11-03",
+              "2025-11-04"
+            ]
+          },
+          "motivo_visita": {
+            "distinct": 8,
+            "sample": [
+              "cefalea ricorrente",
+              "controllo periodico",
+              "controllo post-operatorio",
+              "dolore addominale",
+              "febbre alta persistente"
+            ]
+          },
+          "esito": {
+            "distinct": 5,
+            "sample": [
+              "invio esami approfonditi",
+              "normale",
+              "patologia lieve",
+              "prescrizione terapia",
+              "ricovero consigliato"
+            ]
+          }
+        }
+      },
+      "ricoveri": {
+        "row_count": 2262,
+        "columns": {
+          "id": {
+            "distinct": 2262,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 201,
+            "max": 2462
+          },
+          "paziente_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "6"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "data_ingresso": {
+            "distinct": 178,
+            "sample": [
+              "2025-08-27",
+              "2025-08-28",
+              "2025-08-29",
+              "2025-08-30",
+              "2025-08-31"
+            ]
+          },
+          "data_dimissione": {
+            "distinct": 138,
+            "sample": [
+              "2025-10-30",
+              "2025-10-31",
+              "2025-11-01",
+              "2025-11-02",
+              "2025-11-03"
+            ]
+          },
+          "reparto": {
+            "distinct": 6,
+            "sample": [
+              "Cardiologia",
+              "Chirurgia Generale",
+              "Medicina Interna",
+              "Neurologia",
+              "Ortopedia"
+            ]
+          }
+        }
+      },
+      "referti": {
+        "row_count": 2616,
+        "columns": {
+          "id": {
+            "distinct": 2616,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 301,
+            "max": 2916
+          },
+          "visita_id": {
+            "distinct": 6,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 106
+          },
+          "data_referto": {
+            "distinct": 90,
+            "sample": [
+              "2025-11-10",
+              "2025-11-11",
+              "2025-11-12",
+              "2025-11-13",
+              "2025-11-14"
+            ]
+          },
+          "contenuto": {
+            "distinct": 8,
+            "sample": [
+              "ECG: ritmo sinusale, normale funzione ventricolare.",
+              "Ecografia addome completo: reperto negativo.",
+              "Esame emocromo: valori nei limiti della norma.",
+              "Esame urine: lieve leucocituria, consigliata terapia antibiotica.",
+              "Radiografia ginocchio destro: frattura non spostata del plateau tibiale."
+            ]
+          },
+          "medico_redattore": {
+            "distinct": 5,
+            "sample": [
+              "Dr. Alessandro Ferri",
+              "Dr. Marco Vitale",
+              "Dr. Paolo Neri",
+              "Dr.ssa Chiara Lombardi",
+              "Dr.ssa Elena Marchetti"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "pazienti": [
+        {
+          "id": 1,
+          "nome": "Laura",
+          "cognome": "Esposito",
+          "codice_fiscale": "RSSMRA80A01H501U",
+          "data_nascita": "1977-08-22"
+        },
+        {
+          "id": 2,
+          "nome": "Marco",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "data_nascita": "1979-03-20"
+        },
+        {
+          "id": 3,
+          "nome": "Francesca",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "data_nascita": "1977-06-29"
+        },
+        {
+          "id": 4,
+          "nome": "Sara",
+          "cognome": "Romano",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "data_nascita": "1972-10-24"
+        },
+        {
+          "id": 5,
+          "nome": "Marco",
+          "cognome": "Verdi",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "data_nascita": "1982-12-25"
+        },
+        {
+          "id": 6,
+          "nome": "Mario",
+          "cognome": "Esposito",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "data_nascita": "1971-06-24"
+        },
+        {
+          "id": 7,
+          "nome": "Mario",
+          "cognome": "Russo",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "data_nascita": "1977-11-26"
+        },
+        {
+          "id": 8,
+          "nome": "Luca",
+          "cognome": "Esposito",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "data_nascita": "1975-07-17"
+        }
+      ],
+      "visite": [
+        {
+          "id": 101,
+          "paziente_id": 1,
+          "data_visita": "2025-11-09",
+          "motivo_visita": "dolore addominale",
+          "esito": "prescrizione terapia"
+        },
+        {
+          "id": 102,
+          "paziente_id": 1,
+          "data_visita": "2025-11-07",
+          "motivo_visita": "vaccinazione antinfluenzale",
+          "esito": "invio esami approfonditi"
+        },
+        {
+          "id": 103,
+          "paziente_id": 1,
+          "data_visita": "2025-11-02",
+          "motivo_visita": "controllo periodico",
+          "esito": "invio esami approfonditi"
+        },
+        {
+          "id": 104,
+          "paziente_id": 1,
+          "data_visita": "2025-11-01",
+          "motivo_visita": "vaccinazione antinfluenzale",
+          "esito": "ricovero consigliato"
+        },
+        {
+          "id": 105,
+          "paziente_id": 1,
+          "data_visita": "2025-11-09",
+          "motivo_visita": null,
+          "esito": "prescrizione terapia"
+        },
+        {
+          "id": 106,
+          "paziente_id": 1,
+          "data_visita": "2025-11-01",
+          "motivo_visita": "visita cardiologica",
+          "esito": "ricovero consigliato"
+        },
+        {
+          "id": 107,
+          "paziente_id": 1,
+          "data_visita": "2025-11-07",
+          "motivo_visita": "vaccinazione antinfluenzale",
+          "esito": "normale"
+        },
+        {
+          "id": 108,
+          "paziente_id": 1,
+          "data_visita": "2025-11-02",
+          "motivo_visita": "controllo periodico",
+          "esito": "normale"
+        }
+      ],
+      "ricoveri": [
+        {
+          "id": 201,
+          "paziente_id": 2,
+          "data_ingresso": "2025-11-13",
+          "data_dimissione": "2026-01-15",
+          "reparto": "Neurologia"
+        },
+        {
+          "id": 202,
+          "paziente_id": 2,
+          "data_ingresso": "2025-11-03",
+          "data_dimissione": "2026-01-04",
+          "reparto": "Chirurgia Generale"
+        },
+        {
+          "id": 203,
+          "paziente_id": 2,
+          "data_ingresso": "2025-12-01",
+          "data_dimissione": "2025-12-19",
+          "reparto": "Ortopedia"
+        },
+        {
+          "id": 204,
+          "paziente_id": 2,
+          "data_ingresso": "2025-11-28",
+          "data_dimissione": "2025-12-30",
+          "reparto": "Cardiologia"
+        },
+        {
+          "id": 205,
+          "paziente_id": 2,
+          "data_ingresso": "2025-11-18",
+          "data_dimissione": "2026-01-25",
+          "reparto": "Chirurgia Generale"
+        },
+        {
+          "id": 206,
+          "paziente_id": 2,
+          "data_ingresso": "2025-11-28",
+          "data_dimissione": "2026-01-05",
+          "reparto": "Cardiologia"
+        },
+        {
+          "id": 207,
+          "paziente_id": 2,
+          "data_ingresso": "2025-10-26",
+          "data_dimissione": "2026-01-01",
+          "reparto": "Pediatria"
+        },
+        {
+          "id": 208,
+          "paziente_id": 2,
+          "data_ingresso": "2025-11-05",
+          "data_dimissione": "2026-01-09",
+          "reparto": "Pediatria"
+        }
+      ],
+      "referti": [
+        {
+          "id": 301,
+          "visita_id": 101,
+          "data_referto": "2025-11-19",
+          "contenuto": "ECG: ritmo sinusale, normale funzione ventricolare.",
+          "medico_redattore": "Dr. Paolo Neri"
+        },
+        {
+          "id": 302,
+          "visita_id": 101,
+          "data_referto": "2025-11-14",
+          "contenuto": "Esame urine: lieve leucocituria, consigliata terapia antibiotica.",
+          "medico_redattore": "Dr.ssa Elena Marchetti"
+        },
+        {
+          "id": 303,
+          "visita_id": 101,
+          "data_referto": "2025-11-10",
+          "contenuto": "Esame emocromo: valori nei limiti della norma.",
+          "medico_redattore": "Dr. Alessandro Ferri"
+        },
+        {
+          "id": 304,
+          "visita_id": 101,
+          "data_referto": "2025-11-24",
+          "contenuto": "Radiografia torace: assenza di lesioni significative.",
+          "medico_redattore": "Dr.ssa Chiara Lombardi"
+        },
+        {
+          "id": 305,
+          "visita_id": 101,
+          "data_referto": "2025-11-14",
+          "contenuto": "Radiografia torace: assenza di lesioni significative.",
+          "medico_redattore": "Dr. Paolo Neri"
+        },
+        {
+          "id": 306,
+          "visita_id": 101,
+          "data_referto": "2025-11-10",
+          "contenuto": "Esame emocromo: valori nei limiti della norma.",
+          "medico_redattore": "Dr.ssa Elena Marchetti"
+        },
+        {
+          "id": 307,
+          "visita_id": 101,
+          "data_referto": "2025-11-10",
+          "contenuto": "Esame emocromo: valori nei limiti della norma.",
+          "medico_redattore": "Dr. Alessandro Ferri"
+        },
+        {
+          "id": 308,
+          "visita_id": 101,
+          "data_referto": "2025-11-13",
+          "contenuto": "TAC encefalo senza contrasto: nessun reperto patologico acuto.",
+          "medico_redattore": "Dr. Paolo Neri"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "exists"
+  ],
+  "query": "SELECT DISTINCT p.nome, p.cognome, p.codice_fiscale FROM pazienti p WHERE EXISTS (SELECT 1 FROM visite v WHERE v.paziente_id = p.id AND v.esito = 'ricovero consigliato') ORDER BY p.cognome, p.nome;"
+}

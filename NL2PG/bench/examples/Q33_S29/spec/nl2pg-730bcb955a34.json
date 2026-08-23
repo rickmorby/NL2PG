@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "like"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_risorse_aziendali",
+      "description": "La tabella dipendenti, che contiene i dati anagrafici spezzati nelle colonne first_name e last_name, viene denominata nella prosa aziendale come anagrafica_risorse_aziendali."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "last_name",
+      "obsolete_value": "denominazione familiare",
+      "description": "La colonna last_name della tabella dipendenti viene indicata nella documentazione aziendale con il sinonimo 'denominazione familiare', obbligando a riconoscere che il dato logico del cognome è archiviato su una colonna separata rispetto al nome."
+    }
+  ],
+  "spec_hash": "22b44c63dd806862"
+}

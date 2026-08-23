@@ -1,0 +1,25 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [],
+  "twist": [
+    "rephrase",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rephrase",
+      "target_value": "valido_dal",
+      "obsolete_value": "apertura della finestra tariffaria",
+      "description": "Nella prosa aziendale l'istante di inizio validità del prezzo, memorizzato nella colonna valido_dal della tabella dei listini storici, viene descritto con la perifrasi 'apertura della finestra tariffaria'. Il solver deve ricondurre questa espressione indiretta alla colonna reale valido_dal per calcolare correttamente gli intervalli temporali e le sovrapposizioni tra periodi di prezzo."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "ordini",
+      "obsolete_value": "transazioni",
+      "description": "Nei documenti e nelle richieste aziendali la tabella ordini è costantemente indicata con il sinonimo 'transazioni'. Il solver deve mappare il termine sinonimo presente nel testo sulla tabella fisica ordini per collegare correttamente le righe d'ordine ai prezzi storicizzati vigenti nel periodo."
+    }
+  ],
+  "spec_hash": "d36082fcb772722c"
+}

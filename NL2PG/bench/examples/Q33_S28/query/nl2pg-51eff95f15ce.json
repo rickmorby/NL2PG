@@ -1,0 +1,265 @@
+{
+  "schema_ddl": "CREATE TABLE clt_mstr (\n    cod_cli TEXT PRIMARY KEY,\n    rag_soc TEXT NOT NULL,\n    ind_cli TEXT,\n    cap_cli TEXT,\n    citta_cli TEXT NOT NULL\n);\n\nCREATE TABLE dettagli_ordini (\n    ord_no INT NOT NULL,\n    riga_no INT NOT NULL,\n    cod_cli TEXT NOT NULL REFERENCES clt_mstr(cod_cli),\n    art_desc TEXT NOT NULL,\n    qta_ord INT NOT NULL CHECK (qta_ord > 0),\n    prz_unit NUMERIC(10,2) NOT NULL CHECK (prz_unit >= 0),\n    PRIMARY KEY (ord_no, riga_no)\n);",
+  "data_profile": {
+    "profile": {
+      "clt_mstr": {
+        "row_count": 429,
+        "columns": {
+          "cod_cli": {
+            "distinct": 429,
+            "sample": [
+              "C1001",
+              "C10011",
+              "C100110",
+              "C100111",
+              "C100112"
+            ]
+          },
+          "rag_soc": {
+            "distinct": 10,
+            "sample": [
+              "Alimentari Rossi SRL",
+              "Bar Centrale SAS",
+              "Distribuzione Alimentare Nord SRL",
+              "Enoteca Bottiglia d'Oro",
+              "Gastronomia Bella Napoli"
+            ]
+          },
+          "ind_cli": {
+            "distinct": 8,
+            "sample": [
+              "Corso Vittorio Emanuele 45",
+              "Piazza Duomo 5",
+              "Via Dante 14",
+              "Via Garibaldi 33",
+              "Via Mazzini 21"
+            ]
+          },
+          "cap_cli": {
+            "distinct": 5,
+            "sample": [
+              "00184",
+              "10124",
+              "20121",
+              "35121",
+              "80134"
+            ]
+          },
+          "citta_cli": {
+            "distinct": 5,
+            "sample": [
+              "Milano",
+              "Napoli",
+              "Padova",
+              "Roma",
+              "Torino"
+            ]
+          }
+        }
+      },
+      "ord_dtl": {
+        "row_count": 1742,
+        "columns": {
+          "ord_no": {
+            "distinct": 1742,
+            "sample": [
+              "10001",
+              "10002",
+              "10003",
+              "10004",
+              "10005"
+            ],
+            "min": 10001,
+            "max": 11742
+          },
+          "riga_no": {
+            "distinct": 1742,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1742
+          },
+          "cod_cli": {
+            "distinct": 420,
+            "sample": [
+              "C1001",
+              "C10011",
+              "C100110",
+              "C100111",
+              "C100112"
+            ]
+          },
+          "art_desc": {
+            "distinct": 10,
+            "sample": [
+              "ACETO Balsamico 250ml",
+              "CAFFE Arabica 500g",
+              "CAFFE Decaffeinato 250g",
+              "CAFFE Miscela Espresso 1kg",
+              "OLIO EVO Toscano 750ml"
+            ]
+          },
+          "qta_ord": {
+            "distinct": 1668,
+            "sample": [
+              "10",
+              "10.03357068803917",
+              "10.085378268739639",
+              "10.18308920415677",
+              "10.212203773057357"
+            ],
+            "min": 6,
+            "max": 70.0
+          },
+          "prz_unit": {
+            "distinct": 995,
+            "sample": [
+              "0.88",
+              "0.89",
+              "0.9",
+              "0.91",
+              "0.92"
+            ],
+            "min": 0.88,
+            "max": 27.75
+          }
+        }
+      }
+    },
+    "preview": {
+      "clt_mstr": [
+        {
+          "cod_cli": "C1001",
+          "rag_soc": "Gastronomia Bella Napoli",
+          "ind_cli": "Via Toledo 88",
+          "cap_cli": null,
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10011",
+          "rag_soc": "Hotel Belvedere SPA",
+          "ind_cli": null,
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10012",
+          "rag_soc": "Ristorante Da Gennaro",
+          "ind_cli": "Via Mazzini 21",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10013",
+          "rag_soc": "Pizzeria La Margherita",
+          "ind_cli": "Via Garibaldi 33",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10014",
+          "rag_soc": "Distribuzione Alimentare Nord SRL",
+          "ind_cli": "Piazza Duomo 5",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10015",
+          "rag_soc": "Gastronomia Bella Napoli",
+          "ind_cli": "Via Po 7",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10016",
+          "rag_soc": "Enoteca Bottiglia d'Oro",
+          "ind_cli": "Corso Vittorio Emanuele 45",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10017",
+          "rag_soc": "Alimentari Rossi SRL",
+          "ind_cli": null,
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        }
+      ],
+      "ord_dtl": [
+        {
+          "ord_no": 10001,
+          "riga_no": 1,
+          "cod_cli": "C200168",
+          "art_desc": "PASTA Penne Rigate 500g",
+          "qta_ord": 22.50610297746558,
+          "prz_unit": 23.05
+        },
+        {
+          "ord_no": 10002,
+          "riga_no": 2,
+          "cod_cli": "C100118",
+          "art_desc": "VINO Chianti DOCG 750ml",
+          "qta_ord": 14.019018184895707,
+          "prz_unit": 20.24
+        },
+        {
+          "ord_no": 10003,
+          "riga_no": 3,
+          "cod_cli": "C10022",
+          "art_desc": "VINO Chianti DOCG 750ml",
+          "qta_ord": 28.364839635023774,
+          "prz_unit": 20.32
+        },
+        {
+          "ord_no": 10004,
+          "riga_no": 4,
+          "cod_cli": "C100233",
+          "art_desc": "PASTA Spaghetti 500g",
+          "qta_ord": 37.78809326196264,
+          "prz_unit": 18.35
+        },
+        {
+          "ord_no": 10005,
+          "riga_no": 5,
+          "cod_cli": "C100213",
+          "art_desc": "PASTA Spaghetti 500g",
+          "qta_ord": 26.414090579861973,
+          "prz_unit": 25.19
+        },
+        {
+          "ord_no": 10006,
+          "riga_no": 6,
+          "cod_cli": "C100384",
+          "art_desc": "PASTA Penne Rigate 500g",
+          "qta_ord": 31.32079615763118,
+          "prz_unit": 14.8
+        },
+        {
+          "ord_no": 10007,
+          "riga_no": 7,
+          "cod_cli": "C100353",
+          "art_desc": "PASTA Penne Rigate 500g",
+          "qta_ord": 15.172366423499355,
+          "prz_unit": 24.19
+        },
+        {
+          "ord_no": 10008,
+          "riga_no": 8,
+          "cod_cli": "C200161",
+          "art_desc": "CAFFE Arabica 500g",
+          "qta_ord": 36.586860657182044,
+          "prz_unit": 15.27
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "like"
+  ],
+  "query": "SELECT c.rag_soc, c.citta_cli, SUM(o.qta_ord) AS quantita_totale, ROUND(SUM(o.qta_ord * o.prz_unit), 2) AS valore_totale_ordini, RANK() OVER (ORDER BY SUM(o.qta_ord * o.prz_unit) DESC) AS posizione FROM clt_mstr c JOIN dettagli_ordini o ON c.cod_cli = o.cod_cli WHERE c.citta_cli = 'Roma' AND o.art_desc LIKE 'CAFFE%' GROUP BY c.rag_soc, c.citta_cli ORDER BY posizione, valore_totale_ordini DESC LIMIT 10;"
+}

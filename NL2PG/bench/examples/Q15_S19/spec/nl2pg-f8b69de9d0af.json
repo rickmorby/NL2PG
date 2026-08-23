@@ -1,0 +1,34 @@
+{
+  "domain": "vendite",
+  "n_tables": 5,
+  "hierarchy": "mixed",
+  "sql_features": [
+    "cte"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_acquirenti",
+      "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; il solver deve mappare la perifrasi al nome reale della tabella nel database."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "importo_totale",
+      "obsolete_value": "valore_complessivo",
+      "description": "La colonna importo_totale della tabella ordini viene indicata come valore_complessivo nei documenti aziendali; occorre riconoscere il sinonimo per riferirsi alla colonna corretta."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "venditori",
+      "obsolete_value": "rete_commerciale",
+      "description": "La tabella venditori viene indicata con il gergo aziendale rete_commerciale; il termine tecnico interno deve essere tradotto nel nome effettivo della tabella durante la formulazione della query CTE."
+    }
+  ],
+  "spec_hash": "c90c028dc963bf2e"
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "disjunctive"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_acquirenti",
+      "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; le query devono risalire al nome reale della tabella nel database."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "sconto",
+      "obsolete_value": "leva_commerciale",
+      "description": "La colonna sconto della tabella ordini viene indicata nei documenti commerciali con il gergo di settore 'leva_commerciale'; occorre mappare tale termine gergale alla colonna reale per formulare correttamente le condizioni disgiuntive sulla WHERE."
+    }
+  ],
+  "spec_hash": "2b97dc312da27e0f"
+}

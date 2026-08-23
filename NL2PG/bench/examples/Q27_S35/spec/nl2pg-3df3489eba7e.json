@@ -1,0 +1,27 @@
+{
+  "domain": "università",
+  "n_tables": 6,
+  "hierarchy": "partitioned",
+  "sql_features": [
+    "grouping_sets"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "esami",
+      "obsolete_value": "verbali_di_profitto",
+      "description": "La tabella fattuale 'esami' (unica grande tabella partizionata con PARTITION BY RANGE sulla chiave data_esame, affiancata dalle tabelle di supporto studenti, docenti, corsi, dipartimenti, sessioni) viene denominata 'verbali_di_profitto' nella prosa aziendale. Il solver deve risolvere la perifrasi verso la tabella logica partizionata senza menzionare esplicitamente le partizioni nel SQL."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "voto",
+      "obsolete_value": "esito_decimale_ponderato",
+      "description": "La colonna numerica 'voto' della tabella esami viene descritta nella documentazione con il gergo amministrativo 'esito_decimale_ponderato', riferendosi al giudizio registrato in trentesimi. Nessuna trasformazione aritmetica o normalizzazione è richiesta: si tratta di un semplice alias terminologico da usare nei raggruppamenti e nelle aggregazioni con GROUPING SETS ((dipartimento), (anno_accademico), ())."
+    }
+  ],
+  "spec_hash": "db207cbe15a88ad1"
+}

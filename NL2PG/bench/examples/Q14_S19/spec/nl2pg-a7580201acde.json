@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 4,
+  "hierarchy": "multi_entity",
+  "sql_features": [
+    "set_op"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "richieste_acquisto",
+      "description": "La tabella 'ordini' viene denominata 'richieste_acquisto' nei documenti aziendali, creando ambiguità con il processo di approvvigionamento."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "magazzino",
+      "obsolete_value": "centro_logistico",
+      "description": "La tabella 'magazzino' è indicata come 'centro_logistico' nei report interni, utilizzando un termine più tecnico e meno intuitivo."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "quantita",
+      "obsolete_value": "unita",
+      "description": "La colonna 'quantita' nelle tabelle di inventario e ordini viene chiamata 'unita', che può riferirsi sia a unità di misura che a quantità effettive, generando confusione."
+    }
+  ],
+  "spec_hash": "1606e86eae48d0c8"
+}

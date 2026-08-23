@@ -1,0 +1,34 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "lateral"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "contratti",
+      "obsolete_value": "piani_attivati",
+      "description": "La tabella contratti viene denominata piani_attivati nella prosa aziendale. Le query devono risolvere il nome obsoleto verso la tabella reale contratti, che è la tabella figlia di clienti con ON DELETE CASCADE sulle righe di dettaglio."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "data_disdetta",
+      "obsolete_value": "data_churn",
+      "description": "Il termine gergale churn usato nei documenti commerciali indica la disdetta del contratto, registrata nella colonna data_disdetta della tabella contratti. I NULL su questa colonna derivano anche dall'azione referenziale ON DELETE SET NULL applicata alle SIM collegate ai contratti cessati."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "offerte_promo",
+      "obsolete_value": "campagne_promozionali_attive",
+      "description": "La tabella offerte_promo viene citata nella prosa come campagne_promozionali_attive, suggerendo un collegamento con i contratti, ma non è necessaria per rispondere alla richiesta: agisce da distrattore relazionale che non va incluso nei JOIN LATERAL."
+    }
+  ],
+  "spec_hash": "b8eee65d85e74cb1"
+}

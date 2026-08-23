@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 6,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "lateral"
+    ],
+    "twist": [
+      "distractor",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "distractor",
+        "target_value": "sinistri",
+        "obsolete_value": "pratiche_liquidazione",
+        "description": "La prosa aziendale denomina i sinistri 'pratiche_liquidazione'. Lo schema contiene inoltre una tabella distrattrice 'pratiche_amministrative' con colonne omonime (id_pratica, importo, data_apertura) che non è correlata ai sinistri e non deve essere utilizzata nella query: occorre selezionare solo la tabella sinistri ignorando l'omonimia."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "contraenti",
+        "description": "La tabella clienti, che contiene i dati anagrafici degli assicurati, viene indicata nella prosa aziendale con il sinonimo 'contraenti'. Il mapping richiesto è clienti = contraenti."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "premio_annuo",
+        "obsolete_value": "carico_premiale",
+        "description": "La colonna premio_annuo della tabella polizze è indicata nella documentazione con il gergo assicurativo 'carico premiale'. Le query che chiedono il 'carico premiale' devono leggere la colonna premio_annuo."
+      }
+    ],
+    "spec_hash": "0e257eb7eb429a0c"
+  },
+  "schema_ddl": "CREATE TABLE compagnie (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    sede_legale TEXT\n);\n\nCREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    compagnia_id INT NOT NULL REFERENCES compagnie(id),\n    data_assunzione DATE,\n    numero_licenza TEXT UNIQUE\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    email TEXT UNIQUE,\n    citta_residenza TEXT,\n    agente_id INT REFERENCES agenti(id)\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    compagnia_id INT NOT NULL REFERENCES compagnie(id),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo > 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    ramo_assicurativo TEXT NOT NULL,\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id INT PRIMARY KEY,\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    importo_risarcito NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_risarcito >= 0),\n    data_accadimento DATE NOT NULL,\n    data_denuncia DATE NOT NULL,\n    stato_sinistro TEXT NOT NULL CHECK (stato_sinistro IN ('aperto', 'in_valutazione', 'liquidato', 'respinto')),\n    descrizione TEXT\n);\n\nCREATE TABLE pratiche_amministrative (\n    id_pratica INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    importo NUMERIC(10,2) CHECK (importo >= 0),\n    data_apertura DATE NOT NULL,\n    oggetto TEXT NOT NULL,\n    stato_pratica TEXT NOT NULL DEFAULT 'in_corso'\n);"
+}

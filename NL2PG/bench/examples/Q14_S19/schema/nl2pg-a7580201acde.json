@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 4,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "richieste_acquisto",
+        "description": "La tabella 'ordini' viene denominata 'richieste_acquisto' nei documenti aziendali, creando ambiguità con il processo di approvvigionamento."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "magazzino",
+        "obsolete_value": "centro_logistico",
+        "description": "La tabella 'magazzino' è indicata come 'centro_logistico' nei report interni, utilizzando un termine più tecnico e meno intuitivo."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "quantita",
+        "obsolete_value": "unita",
+        "description": "La colonna 'quantita' nelle tabelle di inventario e ordini viene chiamata 'unita', che può riferirsi sia a unità di misura che a quantità effettive, generando confusione."
+      }
+    ],
+    "spec_hash": "1606e86eae48d0c8"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT CHECK (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$')\n);\n\nCREATE TABLE richieste_acquisto (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_richiesta TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato TEXT NOT NULL CHECK (stato IN ('pendente', 'confermato', 'evaso', 'annullato')),\n    totale DECIMAL(10, 2) NOT NULL CHECK (totale >= 0)\n);\n\nCREATE TABLE centro_logistico (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_max INT NOT NULL CHECK (capacita_max > 0)\n);\n\nCREATE TABLE inventario (\n    id SERIAL PRIMARY KEY,\n    centro_logistico_id INT NOT NULL REFERENCES centro_logistico(id),\n    prodotto_id INT NOT NULL,\n    unita INT NOT NULL CHECK (unita >= 0),\n    prezzo_unitario DECIMAL(10, 2) NOT NULL CHECK (prezzo_unitario >= 0),\n    valore_totale DECIMAL(10, 2) GENERATED ALWAYS AS (unita * prezzo_unitario) STORED\n);"
+}

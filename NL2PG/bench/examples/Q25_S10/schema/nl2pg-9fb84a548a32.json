@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "a604a00a08431fba"
+  },
+  "schema_ddl": "CREATE TABLE operatori (\n    operatore_id INT PRIMARY KEY,\n    nome_operatore TEXT NOT NULL UNIQUE,\n    paese_sede TEXT NOT NULL,\n    data_fondazione DATE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE piani_tariffari (\n    piano_id INT PRIMARY KEY,\n    operatore_id INT NOT NULL REFERENCES operatori(operatore_id),\n    nome_piano TEXT NOT NULL,\n    prezzo_mensile NUMERIC(8,2) NOT NULL CHECK (prezzo_mensile >= 0),\n    giga_inclusi INT NOT NULL CHECK (giga_inclusi >= 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE contratti (\n    contratto_id INT PRIMARY KEY,\n    piano_id INT NOT NULL REFERENCES piani_tariffari(piano_id),\n    numero_telefono TEXT NOT NULL UNIQUE,\n    data_attivazione DATE NOT NULL,\n    stato_contratto TEXT NOT NULL CHECK (stato_contratto IN ('attivo', 'sospeso', 'disattivato')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);"
+}

@@ -1,0 +1,335 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "129098acf6937754"
+  },
+  "schema_ddl": "CREATE TABLE vettori (\n    codice_vettore TEXT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT,\n    citta_operativa TEXT NOT NULL\n);\n\nCREATE TABLE spedizioni (\n    numero_spedizione TEXT PRIMARY KEY,\n    codice_vettore TEXT NOT NULL REFERENCES vettori(codice_vettore),\n    destinatario TEXT NOT NULL,\n    indirizzo_destinazione TEXT NOT NULL,\n    data_partenza DATE NOT NULL,\n    data_consegna_prevista DATE NOT NULL,\n    stato_spedizione TEXT NOT NULL DEFAULT 'in_preparazione' CHECK (stato_spedizione IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    costo_spedizione NUMERIC(10,2) NOT NULL CHECK (costo_spedizione >= 0),\n    CHECK (data_consegna_prevista >= data_partenza)\n);\n\nCREATE TABLE colli (\n    numero_spedizione TEXT NOT NULL REFERENCES spedizioni(numero_spedizione) ON DELETE CASCADE,\n    progressivo_collo INT NOT NULL CHECK (progressivo_collo > 0),\n    descrizione_contenuto TEXT NOT NULL,\n    peso_kg NUMERIC(7,2) NOT NULL CHECK (peso_kg > 0),\n    fragile BOOLEAN NOT NULL DEFAULT FALSE,\n    PRIMARY KEY (numero_spedizione, progressivo_collo)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "vettori",
+        "nature": "lookup",
+        "min_rows": 8,
+        "max_rows": 12,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "codice_vettore": "VET-001",
+            "ragione_sociale": "TransItalia Logistica S.p.A.",
+            "partita_iva": "IT02345678901",
+            "telefono_contatto": "+39 02 4455667",
+            "citta_operativa": "Milano"
+          },
+          {
+            "codice_vettore": "VET-002",
+            "ragione_sociale": "Corriere Espresso Nazionale S.r.l.",
+            "partita_iva": "IT03456789012",
+            "telefono_contatto": "+39 06 5566778",
+            "citta_operativa": "Roma"
+          },
+          {
+            "codice_vettore": "VET-003",
+            "ragione_sociale": "Piemonte Trasporti S.p.A.",
+            "partita_iva": "IT04567890123",
+            "telefono_contatto": "+39 011 6677889",
+            "citta_operativa": "Torino"
+          },
+          {
+            "codice_vettore": "VET-004",
+            "ragione_sociale": "Emilia Cargo Service S.r.l.",
+            "partita_iva": "IT05678901234",
+            "telefono_contatto": "+39 051 7788990",
+            "citta_operativa": "Bologna"
+          },
+          {
+            "codice_vettore": "VET-005",
+            "ragione_sociale": "Veneto Express S.p.A.",
+            "partita_iva": "IT06789012345",
+            "telefono_contatto": "+39 049 8899001",
+            "citta_operativa": "Padova"
+          },
+          {
+            "codice_vettore": "VET-006",
+            "ragione_sociale": "Tirrenia Distribuzione S.r.l.",
+            "partita_iva": "IT07890123456",
+            "telefono_contatto": "+39 081 9900112",
+            "citta_operativa": "Napoli"
+          },
+          {
+            "codice_vettore": "VET-007",
+            "ragione_sociale": "Toscana Logistica Integrata S.p.A.",
+            "partita_iva": "IT08901234567",
+            "telefono_contatto": "+39 055 0011223",
+            "citta_operativa": "Firenze"
+          },
+          {
+            "codice_vettore": "VET-008",
+            "ragione_sociale": "Alpine Freight Italia S.r.l.",
+            "partita_iva": "IT09012345678",
+            "telefono_contatto": "+39 045 1122334",
+            "citta_operativa": "Verona"
+          }
+        ],
+        "variations": {
+          "citta_operativa": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Bologna",
+              "Padova",
+              "Napoli",
+              "Firenze",
+              "Verona"
+            ]
+          }
+        }
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 25.0,
+        "templates": [
+          {
+            "numero_spedizione": "SP-2026-00001",
+            "codice_vettore": "VET-001",
+            "destinatario": "Rossi Distribuzione S.r.l.",
+            "indirizzo_destinazione": "Via Torino 45, 20123 Milano",
+            "data_partenza": "2026-01-12",
+            "data_consegna_prevista": "2026-01-26",
+            "stato_spedizione": "consegnata",
+            "costo_spedizione": 24.9
+          },
+          {
+            "numero_spedizione": "SP-2026-00002",
+            "codice_vettore": "VET-002",
+            "destinatario": "Mario Bianchi",
+            "indirizzo_destinazione": "Corso Vittorio Emanuele II 112, 00186 Roma",
+            "data_partenza": "2026-01-20",
+            "data_consegna_prevista": "2026-01-30",
+            "stato_spedizione": "consegnata",
+            "costo_spedizione": 12.5
+          },
+          {
+            "numero_spedizione": "SP-2026-00003",
+            "codice_vettore": "VET-003",
+            "destinatario": "Ferramenta Centrale di Colombo",
+            "indirizzo_destinazione": "Via Garibaldi 8, 10122 Torino",
+            "data_partenza": "2026-02-03",
+            "data_consegna_prevista": "2026-02-17",
+            "stato_spedizione": "in_transito",
+            "costo_spedizione": 45.0
+          },
+          {
+            "numero_spedizione": "SP-2026-00004",
+            "codice_vettore": "VET-004",
+            "destinatario": "Alimentari Da Vinci S.n.c.",
+            "indirizzo_destinazione": "Via Indipendenza 27, 40121 Bologna",
+            "data_partenza": "2026-02-18",
+            "data_consegna_prevista": "2026-02-28",
+            "stato_spedizione": "consegnata",
+            "costo_spedizione": 18.75
+          },
+          {
+            "numero_spedizione": "SP-2026-00005",
+            "codice_vettore": "VET-005",
+            "destinatario": "TechStore Italia S.p.A.",
+            "indirizzo_destinazione": "Via dell'Artigianato 3, 35127 Padova",
+            "data_partenza": "2026-03-05",
+            "data_consegna_prevista": "2026-03-19",
+            "stato_spedizione": "in_preparazione",
+            "costo_spedizione": 67.3
+          },
+          {
+            "numero_spedizione": "SP-2026-00006",
+            "codice_vettore": "VET-006",
+            "destinatario": "Farmacia San Paolo",
+            "indirizzo_destinazione": "Via Toledo 156, 80134 Napoli",
+            "data_partenza": "2026-03-12",
+            "data_consegna_prevista": "2026-03-24",
+            "stato_spedizione": "rimandata",
+            "costo_spedizione": 9.8
+          }
+        ],
+        "variations": {
+          "destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi Distribuzione S.r.l.",
+              "Mario Bianchi",
+              "Ferramenta Centrale di Colombo",
+              "Alimentari Da Vinci S.n.c.",
+              "TechStore Italia S.p.A.",
+              "Farmacia San Paolo",
+              "Cartoleria Moderna",
+              "Edilizia Piu S.r.l."
+            ]
+          },
+          "indirizzo_destinazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Torino 45, 20123 Milano",
+              "Corso Vittorio Emanuele II 112, 00186 Roma",
+              "Via Garibaldi 8, 10122 Torino",
+              "Via Indipendenza 27, 40121 Bologna",
+              "Via dell'Artigianato 3, 35127 Padova",
+              "Via Toledo 156, 80134 Napoli",
+              "Via dei Neri 22, 50122 Firenze",
+              "Via Mazzini 74, 37121 Verona"
+            ]
+          },
+          "data_partenza": {
+            "axis": "shift",
+            "delta_min": -4.0,
+            "delta_max": 4.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_consegna_prevista": {
+            "axis": "shift",
+            "delta_min": -4.0,
+            "delta_max": 4.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_spedizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnata",
+              "consegnata",
+              "consegnata",
+              "consegnata",
+              "in_transito",
+              "in_transito",
+              "in_preparazione",
+              "rimandata"
+            ]
+          },
+          "costo_spedizione": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "colli",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.5,
+        "templates": [
+          {
+            "numero_spedizione": "SP-2026-00001",
+            "progressivo_collo": 1,
+            "descrizione_contenuto": "Componenti elettronici",
+            "peso_kg": 2.4,
+            "fragile": true
+          },
+          {
+            "numero_spedizione": "SP-2026-00002",
+            "progressivo_collo": 1,
+            "descrizione_contenuto": "Abbigliamento",
+            "peso_kg": 5.6,
+            "fragile": false
+          },
+          {
+            "numero_spedizione": "SP-2026-00003",
+            "progressivo_collo": 1,
+            "descrizione_contenuto": "Pezzi di ricambio auto",
+            "peso_kg": 18.25,
+            "fragile": false
+          },
+          {
+            "numero_spedizione": "SP-2026-00004",
+            "progressivo_collo": 2,
+            "descrizione_contenuto": "Prodotti alimentari",
+            "peso_kg": 12.8,
+            "fragile": false
+          },
+          {
+            "numero_spedizione": "SP-2026-00005",
+            "progressivo_collo": 1,
+            "descrizione_contenuto": "Attrezzatura sportiva",
+            "peso_kg": 7.15,
+            "fragile": true
+          }
+        ],
+        "variations": {
+          "descrizione_contenuto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Componenti elettronici",
+              "Abbigliamento",
+              "Libri e cancelleria",
+              "Pezzi di ricambio auto",
+              "Prodotti alimentari",
+              "Attrezzatura sportiva",
+              "Cosmetici",
+              "Materiale da ufficio",
+              "Giocattoli",
+              "Attrezzi da giardino"
+            ]
+          },
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "fragile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "false",
+              "false",
+              "false"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

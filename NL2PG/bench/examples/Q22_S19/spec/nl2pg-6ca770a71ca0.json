@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 4,
+  "hierarchy": "multi_entity",
+  "sql_features": [
+    "distinct_on"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatture_vendita",
+      "obsolete_value": "registro_documenti_attivi",
+      "description": "La tabella fisica fatture_vendita viene denominata registro_documenti_attivi nella prosa aziendale. Il solver deve risalire al nome reale della tabella per costruire correttamente il percorso di join PK/FK verso righe_fattura e movimenti_contabili."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_totale",
+      "obsolete_value": "imponibile consolidato",
+      "description": "La colonna importo_totale della tabella righe_fattura è indicata nella narrativa con il gergo contabile 'imponibile consolidato'. Il solver deve mappare il termine tecnico-contabile alla colonna reale quando ordina le righe per selezionare la prima voce per gruppo con DISTINCT ON."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "data_emissione",
+      "obsolete_value": "data di registrazione documentale",
+      "description": "La colonna data_emissione della tabella fatture_vendita è descritta nella prosa come 'data di registrazione documentale'. Il solver deve riconoscere il sinonimo e utilizzarlo come chiave di ordinamento coerente all'interno di DISTINCT ON per determinare quale riga vince in ciascun gruppo."
+    }
+  ],
+  "spec_hash": "6e8a39dec48f2d21"
+}

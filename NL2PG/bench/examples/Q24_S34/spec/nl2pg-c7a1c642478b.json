@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 3,
+  "hierarchy": "one_to_many_optional_fk",
+  "sql_features": [
+    "left_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "portafogli",
+      "obsolete_value": "contenitori_asset",
+      "description": "La tabella principale dei portafogli finanziari è denominata nel linguaggio aziendale come contenitori_asset."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "investimenti",
+      "obsolete_value": "posizioni_aperte_a_rischio",
+      "description": "La tabella degli investimenti, che contiene una FK opzionale verso i portafogli, viene definita internamente come posizioni_aperte_a_rischio."
+    }
+  ],
+  "spec_hash": "a4ed99ca62e3e320"
+}

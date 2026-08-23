@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "boolean_predicate"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "personale_aziendale",
+      "description": "La tabella dipendenti viene denominata personale_aziendale nella documentazione aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "is_attivo",
+      "obsolete_value": "in_servizio",
+      "description": "La colonna booleana generata is_attivo (GENERATED ALWAYS AS ...) viene riferita come in_servizio nel linguaggio aziendale."
+    }
+  ],
+  "spec_hash": "5181649328ceaae2"
+}

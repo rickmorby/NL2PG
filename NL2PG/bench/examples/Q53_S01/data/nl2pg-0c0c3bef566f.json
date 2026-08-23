@@ -1,0 +1,126 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "ordered_set_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "esami",
+        "obsolete_value": "verbali_prova_finale",
+        "description": "La tabella esami viene denominata verbali_prova_finale nella prosa aziendale. Il progettista deve riconoscere che i verbali delle prove finali corrispondono alla tabella esami, unica entità dello schema, contenente PK id_esame e attributi come matricola_studente, corso, voto, cfu, docente e data_esame."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "voto",
+        "obsolete_value": "esito trentesimale",
+        "description": "La colonna voto della tabella esami viene indicata con il gergo accademico 'esito trentesimale' nella documentazione aziendale. Le query che calcolano percentile_cont o mode sulla colonna voto devono riferirsi a tale perifrasi per identificare correttamente l'attributo numerico su cui applicare l'aggregazione ordered-set."
+      }
+    ],
+    "spec_hash": "cbe654a5d162540b"
+  },
+  "schema_ddl": "CREATE TABLE esami (\n    id_esame INT PRIMARY KEY,\n    matricola_studente TEXT NOT NULL,\n    corso TEXT NOT NULL,\n    voto NUMERIC(4,1) NOT NULL CHECK (voto >= 0 AND voto <= 30),\n    cfu INT NOT NULL CHECK (cfu > 0 AND cfu <= 30),\n    docente TEXT NOT NULL,\n    data_esame DATE NOT NULL,\n    UNIQUE (matricola_studente, corso, data_esame)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "esami",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_esame": 1,
+            "matricola_studente": "VR100001",
+            "corso": "Analisi Matematica I",
+            "voto": 22.0,
+            "cfu": 9,
+            "docente": "Prof.ssa Elena Marchetti",
+            "data_esame": "2026-01-20"
+          },
+          {
+            "id_esame": 2,
+            "matricola_studente": "MI100002",
+            "corso": "Fisica Generale",
+            "voto": 18.5,
+            "cfu": 12,
+            "docente": "Prof. Carlo Fontana",
+            "data_esame": "2026-01-28"
+          },
+          {
+            "id_esame": 3,
+            "matricola_studente": "RM100003",
+            "corso": "Programmazione",
+            "voto": 24.0,
+            "cfu": 6,
+            "docente": "Prof. Luca Bianchi",
+            "data_esame": "2026-02-05"
+          },
+          {
+            "id_esame": 4,
+            "matricola_studente": "TO100004",
+            "corso": "Chimica Organica",
+            "voto": 19.5,
+            "cfu": 6,
+            "docente": "Prof.ssa Sara Colombo",
+            "data_esame": "2026-06-15"
+          },
+          {
+            "id_esame": 5,
+            "matricola_studente": "BO100005",
+            "corso": "Economia Politica",
+            "voto": 23.5,
+            "cfu": 9,
+            "docente": "Prof. Marco Rinaldi",
+            "data_esame": "2026-07-03"
+          }
+        ],
+        "variations": {
+          "voto": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.25,
+            "pool": []
+          },
+          "cfu": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "6",
+              "9",
+              "12",
+              "15"
+            ]
+          },
+          "docente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Prof.ssa Elena Marchetti",
+              "Prof. Carlo Fontana",
+              "Prof. Luca Bianchi",
+              "Prof.ssa Sara Colombo",
+              "Prof. Marco Rinaldi",
+              "Prof.ssa Giulia Ferri"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

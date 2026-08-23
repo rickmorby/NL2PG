@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 1,
+  "hierarchy": "single_table",
+  "sql_features": [
+    "set_op"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "movimenti_contabili",
+      "obsolete_value": "registro_scritture",
+      "description": "La tabella legacy movimenti_contabili, unica tabella dello schema con colonne fisiche di tipo TEXT, viene denominata registro_scritture nella prosa aziendale. Il solver deve risalire alla tabella reale tramite la perifrasi."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo",
+      "obsolete_value": "controvalore della scrittura",
+      "description": "La colonna importo, fisicamente dichiarata TEXT ma logicamente numerica, viene descritta nella prosa con il gergo contabile 'controvalore della scrittura'. Le query che confrontano o aggregano tale valore richiedono CAST(importo AS NUMERIC) prima dell'operazione set (UNION/INTERSECT/EXCEPT)."
+    }
+  ],
+  "spec_hash": "0f86fe77cf6dde72"
+}

@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 7,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "recursive_cte"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "percorsi",
+        "obsolete_value": "tratte_di_collegamento",
+        "description": "La tabella percorsi, che registra i collegamenti diretti tra gli hub con le colonne origine_id e destinazione_id, viene denominata tratte_di_collegamento nella prosa aziendale. Le query ricorsive devono risalire al nome reale percorsi per calcolare la chiusura transitiva della rete."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "hub_logistici",
+        "obsolete_value": "piattaforme_distributive",
+        "description": "La tabella hub_logistici, che contiene la gerarchia autoreferenziale dei centri operativi tramite la colonna hub_padre_id, viene indicata nelle richieste aziendali come piattaforme_distributive. Il sinonimo deve essere mappato alla tabella reale per percorrere l'albero gerarchico con la CTE ricorsiva."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "peso_kg",
+        "obsolete_value": "massa_complessiva_spedizione",
+        "description": "La colonna peso_kg della tabella spedizioni viene indicata nel gergo operativo come massa_complessiva_spedizione, poiché include imballo e pallet oltre alla merce netta. Il gergo deve essere ricondotto alla colonna reale peso_kg durante l'aggregazione sui percorsi transitivamente raggiunti."
+      }
+    ],
+    "spec_hash": "1bdf72fc9e003948"
+  },
+  "schema_ddl": "CREATE TABLE hub_logistici (\n    id INT PRIMARY KEY,\n    codice_hub TEXT NOT NULL UNIQUE,\n    nome_hub TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    tipo_hub TEXT NOT NULL CHECK (tipo_hub IN ('centrale', 'regionale', 'locale')),\n    superficie_mq INT CHECK (superficie_mq > 0),\n    hub_padre_id INT REFERENCES hub_logistici(id)\n);\n\nCREATE TABLE vettori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE conducenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_patente TEXT NOT NULL UNIQUE,\n    vettore_id INT NOT NULL REFERENCES vettori(id)\n);\n\nCREATE TABLE mezzi (\n    id INT PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    tipo_mezzo TEXT NOT NULL CHECK (tipo_mezzo IN ('furgone', 'camion', 'semirimorchio')),\n    capacita_kg NUMERIC(10,2) CHECK (capacita_kg > 0),\n    vettore_id INT NOT NULL REFERENCES vettori(id)\n);\n\nCREATE TABLE percorsi (\n    id INT PRIMARY KEY,\n    origine_id INT NOT NULL REFERENCES hub_logistici(id),\n    destinazione_id INT NOT NULL REFERENCES hub_logistici(id),\n    distanza_km NUMERIC(8,2) CHECK (distanza_km > 0),\n    durata_ore NUMERIC(5,2) CHECK (durata_ore > 0),\n    CHECK (origine_id <> destinazione_id)\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    peso_kg NUMERIC(10,2) NOT NULL CHECK (peso_kg > 0),\n    volume_m3 NUMERIC(8,3) CHECK (volume_m3 > 0),\n    stato_spedizione TEXT NOT NULL CHECK (stato_spedizione IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    data_spedizione DATE NOT NULL,\n    data_consegna DATE,\n    hub_partenza_id INT NOT NULL REFERENCES hub_logistici(id),\n    hub_arrivo_id INT NOT NULL REFERENCES hub_logistici(id),\n    mezzo_id INT REFERENCES mezzi(id),\n    conducente_id INT REFERENCES conducenti(id)\n);\n\nCREATE TABLE fermate (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    hub_id INT NOT NULL REFERENCES hub_logistici(id),\n    sequenza INT NOT NULL CHECK (sequenza > 0),\n    data_arrivo TIMESTAMP,\n    UNIQUE (spedizione_id, sequenza)\n);"
+}

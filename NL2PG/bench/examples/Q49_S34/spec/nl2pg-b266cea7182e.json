@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "is_distinct_from"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "sinistri",
+      "obsolete_value": "pratiche_liquidazione",
+      "description": "La tabella sinistri viene denominata pratiche_liquidazione nella prosa aziendale. Lo schema contiene le tabelle polizze (padre) e sinistri (figlio), dove la FK nullable polizza_id su sinistri puo' essere NULL per i sinistri non ancora associati ad alcuna polizza."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "polizza_id",
+      "obsolete_value": "riferimento contrattuale",
+      "description": "La colonna FK polizza_id della tabella sinistri e' indicata nel linguaggio di business come 'riferimento contrattuale'. I valori NULL di tale colonna rappresentano sinistri privi di copertura contrattuale individuata, e il confronto con la chiave primaria id di polizze deve essere eseguito in modo NULL-safe tramite IS DISTINCT FROM."
+    }
+  ],
+  "spec_hash": "3ee26c5eb79f4413"
+}

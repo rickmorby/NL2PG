@@ -1,0 +1,512 @@
+{
+  "schema_ddl": "CREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_albo TEXT NOT NULL UNIQUE,\n    specializzazione TEXT NOT NULL,\n    email TEXT UNIQUE,\n    deleted_at TIMESTAMPTZ\n);\n\nCREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT,\n    deleted_at TIMESTAMPTZ\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    data_visita DATE NOT NULL,\n    ora_visita TIME NOT NULL DEFAULT '09:00',\n    tipo_visita TEXT NOT NULL CHECK (tipo_visita IN ('prima_visita', 'controllo', 'urgenza', 'follow_up')),\n    diagnosi TEXT,\n    costo NUMERIC(10,2) NOT NULL CHECK (costo >= 0),\n    durata_minuti INT CHECK (durata_minuti > 0),\n    deleted_at TIMESTAMPTZ\n);",
+  "data_profile": {
+    "profile": {
+      "medici": {
+        "row_count": 375,
+        "columns": {
+          "id": {
+            "distinct": 375,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 375
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Chiara",
+              "Elena",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Fontana",
+              "Gallo",
+              "Greco"
+            ]
+          },
+          "numero_albo": {
+            "distinct": 375,
+            "sample": [
+              "BO006789",
+              "BO0067891",
+              "BO00678910",
+              "BO00678911",
+              "BO00678912"
+            ]
+          },
+          "specializzazione": {
+            "distinct": 8,
+            "sample": [
+              "Cardiologia",
+              "Dermatologia",
+              "Ginecologia",
+              "Medicina Generale",
+              "Neurologia"
+            ]
+          },
+          "email": {
+            "distinct": 358,
+            "sample": [
+              "a.bianchi10@clinicasantanna.it",
+              "a.bianchi11@clinicasantanna.it",
+              "a.bianchi12@clinicasantanna.it",
+              "a.bianchi13@clinicasantanna.it",
+              "a.bianchi14@clinicasantanna.it"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 1,
+            "sample": [
+              "2025-09-30 18:00:00+02"
+            ]
+          }
+        }
+      },
+      "pazienti": {
+        "row_count": 594,
+        "columns": {
+          "id": {
+            "distinct": 594,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 594
+          },
+          "nome": {
+            "distinct": 13,
+            "sample": [
+              "Anna",
+              "Antonio",
+              "Chiara",
+              "Davide",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Barbieri",
+              "Bianchi",
+              "Caruso",
+              "Colombo",
+              "Esposito"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 594,
+            "sample": [
+              "BNCLRA75C42F205B",
+              "BNCLRA75C42F205C",
+              "BNCLRA75C42F205D",
+              "BNCLRA75C42F205E",
+              "BNCLRA75C42F205F"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 551,
+            "sample": [
+              "1954-09-30",
+              "1954-10-05",
+              "1954-10-17",
+              "1954-11-01",
+              "1954-11-12"
+            ]
+          },
+          "telefono": {
+            "distinct": 7,
+            "sample": [
+              "+39 320 4567890",
+              "+39 328 8765432",
+              "+39 331 3456789",
+              "+39 333 1234567",
+              "+39 339 2345678"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 1,
+            "sample": [
+              "2025-08-15 12:00:00+02"
+            ]
+          }
+        }
+      },
+      "visite": {
+        "row_count": 863,
+        "columns": {
+          "id": {
+            "distinct": 863,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 863
+          },
+          "paziente_id": {
+            "distinct": 453,
+            "sample": [
+              "1",
+              "10",
+              "102",
+              "104",
+              "105"
+            ],
+            "min": 1,
+            "max": 594
+          },
+          "medico_id": {
+            "distinct": 339,
+            "sample": [
+              "100",
+              "101",
+              "102",
+              "104",
+              "106"
+            ],
+            "min": 2,
+            "max": 375
+          },
+          "data_visita": {
+            "distinct": 326,
+            "sample": [
+              "2025-06-04",
+              "2025-06-09",
+              "2025-06-11",
+              "2025-06-14",
+              "2025-06-17"
+            ]
+          },
+          "ora_visita": {
+            "distinct": 8,
+            "sample": [
+              "08:30",
+              "09:00",
+              "09:45",
+              "10:30",
+              "11:15"
+            ]
+          },
+          "tipo_visita": {
+            "distinct": 4,
+            "sample": [
+              "controllo",
+              "follow_up",
+              "prima_visita",
+              "urgenza"
+            ]
+          },
+          "diagnosi": {
+            "distinct": 10,
+            "sample": [
+              "Bronchite acuta",
+              "Cefalea tensiva ricorrente",
+              "Controllo post-operatorio in esito positivo",
+              "Dermatite atopica in miglioramento",
+              "Diabete tipo 2 in compenso"
+            ]
+          },
+          "costo": {
+            "distinct": 820,
+            "sample": [
+              "100.08",
+              "100.13",
+              "100.18",
+              "100.2",
+              "100.24"
+            ],
+            "min": 36.21,
+            "max": 270.0
+          },
+          "durata_minuti": {
+            "distinct": 803,
+            "sample": [
+              "10.0",
+              "10.021598626342477",
+              "10.197341967075445",
+              "10.264838014056561",
+              "10.661552316612152"
+            ],
+            "min": 5.110683325387958,
+            "max": 79.80235121768953
+          },
+          "deleted_at": {
+            "distinct": 1,
+            "sample": [
+              "2025-10-10 08:00:00+01"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "medici": [
+        {
+          "id": 75,
+          "nome": "Andrea",
+          "cognome": "Bianchi",
+          "numero_albo": "MI00234511",
+          "specializzazione": "Neurologia",
+          "email": "andrea.bianchi1@example.com",
+          "deleted_at": null
+        },
+        {
+          "id": 21,
+          "nome": "Andrea",
+          "cognome": "Rinaldi",
+          "numero_albo": "RM00123420",
+          "specializzazione": "Neurologia",
+          "email": "andrea.rinaldi1@example.com",
+          "deleted_at": null
+        },
+        {
+          "id": 61,
+          "nome": "Francesca",
+          "cognome": "Rinaldi",
+          "numero_albo": "RM00123460",
+          "specializzazione": "Pediatria",
+          "email": "francesca.rinaldi1@example.com",
+          "deleted_at": null
+        },
+        {
+          "id": 80,
+          "nome": "Alessandro",
+          "cognome": "Moretti",
+          "numero_albo": "MI00234516",
+          "specializzazione": "Pediatria",
+          "email": "alessandro.moretti1@example.com",
+          "deleted_at": null
+        },
+        {
+          "id": 132,
+          "nome": "Chiara",
+          "cognome": "Bianchi",
+          "numero_albo": "TO0034565",
+          "specializzazione": "Ginecologia",
+          "email": "chiara.bianchi1@example.com",
+          "deleted_at": null
+        },
+        {
+          "id": 110,
+          "nome": "Elena",
+          "cognome": "Bianchi",
+          "numero_albo": "MI00234546",
+          "specializzazione": "Medicina Generale",
+          "email": "elena.bianchi1@example.com",
+          "deleted_at": null
+        },
+        {
+          "id": 126,
+          "nome": "Elena",
+          "cognome": "Rinaldi",
+          "numero_albo": "MI00234562",
+          "specializzazione": "Medicina Generale",
+          "email": "elena.rinaldi1@example.com",
+          "deleted_at": null
+        },
+        {
+          "id": 93,
+          "nome": "Francesca",
+          "cognome": "Marino",
+          "numero_albo": "MI00234529",
+          "specializzazione": "Pediatria",
+          "email": "francesca.marino1@example.com",
+          "deleted_at": null
+        }
+      ],
+      "pazienti": [
+        {
+          "id": 1,
+          "nome": "Mario",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA80A01H501U",
+          "data_nascita": "1979-03-13",
+          "telefono": "+39 328 8765432",
+          "deleted_at": null
+        },
+        {
+          "id": 2,
+          "nome": "Giulia",
+          "cognome": "Colombo",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "data_nascita": "1979-12-06",
+          "telefono": "+39 333 1234567",
+          "deleted_at": null
+        },
+        {
+          "id": 3,
+          "nome": "Anna",
+          "cognome": "Verdi",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "data_nascita": "1980-05-04",
+          "telefono": "+39 347 9876543",
+          "deleted_at": null
+        },
+        {
+          "id": 4,
+          "nome": "Anna",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "data_nascita": "1978-12-20",
+          "telefono": "+39 340 5678901",
+          "deleted_at": null
+        },
+        {
+          "id": 5,
+          "nome": "Valentina",
+          "cognome": "Caruso",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "data_nascita": "1980-12-19",
+          "telefono": "+39 331 3456789",
+          "deleted_at": null
+        },
+        {
+          "id": 6,
+          "nome": "Antonio",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "data_nascita": "1979-01-21",
+          "telefono": "+39 320 4567890",
+          "deleted_at": null
+        },
+        {
+          "id": 7,
+          "nome": "Laura",
+          "cognome": "Lombardi",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "data_nascita": "1980-07-09",
+          "telefono": "+39 340 5678901",
+          "deleted_at": null
+        },
+        {
+          "id": 8,
+          "nome": "Laura",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "data_nascita": "1981-02-17",
+          "telefono": "+39 333 1234567",
+          "deleted_at": null
+        }
+      ],
+      "visite": [
+        {
+          "id": 1,
+          "paziente_id": 49,
+          "medico_id": 171,
+          "data_visita": "2025-08-29",
+          "ora_visita": "09:45",
+          "tipo_visita": "urgenza",
+          "diagnosi": "Lombalgia meccanica",
+          "costo": 121.01,
+          "durata_minuti": 63.11395781502841,
+          "deleted_at": null
+        },
+        {
+          "id": 2,
+          "paziente_id": 421,
+          "medico_id": 185,
+          "data_visita": "2026-01-02",
+          "ora_visita": "08:30",
+          "tipo_visita": "follow_up",
+          "diagnosi": "Controllo post-operatorio in esito positivo",
+          "costo": 123.53,
+          "durata_minuti": 54.44567041906244,
+          "deleted_at": null
+        },
+        {
+          "id": 3,
+          "paziente_id": 517,
+          "medico_id": 9,
+          "data_visita": "2025-10-26",
+          "ora_visita": "11:15",
+          "tipo_visita": "follow_up",
+          "diagnosi": "Diabete tipo 2 in compenso",
+          "costo": 173.02,
+          "durata_minuti": 39.646859018317635,
+          "deleted_at": null
+        },
+        {
+          "id": 4,
+          "paziente_id": 350,
+          "medico_id": 24,
+          "data_visita": "2025-08-23",
+          "ora_visita": "16:45",
+          "tipo_visita": "follow_up",
+          "diagnosi": "Controllo post-operatorio in esito positivo",
+          "costo": 180.15,
+          "durata_minuti": 51.540842227940544,
+          "deleted_at": null
+        },
+        {
+          "id": 5,
+          "paziente_id": 556,
+          "medico_id": 160,
+          "data_visita": "2026-01-02",
+          "ora_visita": "10:30",
+          "tipo_visita": "follow_up",
+          "diagnosi": "Diabete tipo 2 in compenso",
+          "costo": 183.4,
+          "durata_minuti": 56.25111847465839,
+          "deleted_at": null
+        },
+        {
+          "id": 6,
+          "paziente_id": 589,
+          "medico_id": 78,
+          "data_visita": "2025-09-22",
+          "ora_visita": "15:30",
+          "tipo_visita": "prima_visita",
+          "diagnosi": "Lombalgia meccanica",
+          "costo": 150.2,
+          "durata_minuti": 42.5339565235851,
+          "deleted_at": null
+        },
+        {
+          "id": 7,
+          "paziente_id": 578,
+          "medico_id": 139,
+          "data_visita": "2025-11-04",
+          "ora_visita": "10:30",
+          "tipo_visita": "controllo",
+          "diagnosi": "Rinofaringite virale",
+          "costo": 205.56,
+          "durata_minuti": 56.87869060729835,
+          "deleted_at": null
+        },
+        {
+          "id": 8,
+          "paziente_id": 590,
+          "medico_id": 301,
+          "data_visita": "2025-10-19",
+          "ora_visita": "15:30",
+          "tipo_visita": "controllo",
+          "diagnosi": "Diabete tipo 2 in compenso",
+          "costo": 185.58,
+          "durata_minuti": 49.79390712940044,
+          "deleted_at": null
+        }
+      ]
+    }
+  },
+  "story": "Presso la Clinica Sant'Anna, la direzione amministrativa ha recentemente avviato un ciclo ordinario di verifiche sui propri archivi gestionali, con particolare attenzione alla redditività delle prestazioni erogate in regime di urgenza. Il primo archivio esaminato è quello denominato medici, nel quale sono custodite le schede professionali dei 375 dottori convenzionati: per ciascuno sono annotati il nome, il cognome, il numero di iscrizione all'albo, la specializzazione di competenza e l'indirizzo di posta elettronica istituzionale; quando un professionista cessa la collaborazione, la relativa scheda non viene rimossa ma contrassegnata con una data di dismissione, così da preservarne la tracciabilità storica. Accanto ad esso trova posto l'archivio intitolato pazienti, che raccoglie le anagrafiche dei 594 assistiti, complete di codice fiscale, data di nascita e recapito telefonico, anch'esse soggette allo stesso criterio di chiusura documentale. Il fulcro delle operazioni quotidiane è però l'archivio visite: ogni accesso ambulatoriale vi viene annotato con la data e l'ora dell'appuntamento, la tipologia della prestazione — prima visita, controllo, urgenza o follow_up — la diagnosi formulata dal curante, il costo applicato e la durata espressa in minuti. Le voci spaziano da quadri clinici come «Diabete tipo 2 in compenso» o «Lombalgia meccanica» fino ai controlli post-operatori, con importi che oscillano tra i 36,21 euro della prestazione più economica e i 270 euro di quella più onerosa. Nel corso dell'ultimo riesame, l'ufficio controllo di gestione ha concentrato l'attenzione sulle prestazioni classificate come urgenza erogate tra giugno e dicembre del 2025. Per ciascuna specializzazione medica presente nell'archivio medici — dalla Cardiologia alla Neurologia, dalla Dermatologia alla Medicina Generale — gli analisti hanno conteggiato gli accessi urgenti registrati nel semestre, sommando i relativi corrispettivi per determinare il ricavo complessivo e rapportando tale ammontare al numero di prestazioni al fine di ottenere il costo medio per visita urgente. Affinché il confronto risultasse statisticamente affidabile, sono state ammesse alla graduatoria soltanto le specializzazioni che potevano vantare più di 5 interventi urgenti nel periodo osservato; le restanti, prive di massa critica sufficiente, sono state escluse dal consuntivo. Infine, l'elenco è stato disposto in ordine decrescente di ricavo totale, così da far emergere immediatamente le discipline cliniche che, in emergenza, generano il maggior incasso e consentire alla direzione di orientare le future pianificazioni dei turni di guardia e delle dotazioni di personale."
+}

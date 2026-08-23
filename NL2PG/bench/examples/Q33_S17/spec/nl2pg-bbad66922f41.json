@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "like"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "registro_operazioni",
+      "description": "La tabella transazioni viene denominata registro_operazioni nella prosa aziendale. Le query devono risolvere la perifrasi verso la tabella reale transazioni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "deleted_at",
+      "obsolete_value": "data_di_stralcio",
+      "description": "La colonna di cancellazione logica deleted_at è indicata con il gergo finanziario data_di_stralcio. Le operazioni ancora valide sono descritte come 'in essere' o 'non stralciate': le query devono applicare il predicato di visibilità WHERE deleted_at IS NULL per escludere i record logicamente eliminati."
+    }
+  ],
+  "spec_hash": "ebbc60cf30f0d45d"
+}

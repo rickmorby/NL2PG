@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 4,
+  "hierarchy": "isa_specialization",
+  "sql_features": [
+    "full_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "soggetti",
+      "obsolete_value": "registro_controparti",
+      "description": "La tabella base 'soggetti' (entita' generica specializzata nei sottotipi) viene denominata 'registro_controparti' nella prosa aziendale. Il solver deve riconoscere che il registro controparti corrisponde alla tabella padre della gerarchia ISA."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "tipo_soggetto",
+      "obsolete_value": "classificazione master data",
+      "description": "La colonna discriminatore 'tipo_soggetto' della tabella base viene indicata con il gergo ERP 'classificazione master data'. Il solver deve mappare il termine tecnico di settore alla colonna discriminatore usata per instradare verso i sottotipi."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "fornitori",
+      "obsolete_value": "fonti di approvvigionamento",
+      "description": "La tabella sottotipo 'fornitori' viene indicata nella prosa come 'fonti di approvvigionamento'. Il solver deve risolvere il sinonimo aziendale per identificare correttamente la tabella del sottotipo da joinare con FULL OUTER JOIN, preservando gli orfani di entrambi i lati tramite COALESCE o IS NULL."
+    }
+  ],
+  "spec_hash": "55de69abdec4dd9b"
+}

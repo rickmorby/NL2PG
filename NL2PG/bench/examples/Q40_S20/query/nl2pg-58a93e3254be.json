@@ -1,0 +1,315 @@
+{
+  "schema_ddl": "CREATE TYPE livello_priorita AS ENUM ('verde', 'gialla', 'rossa');\n\nCREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    telefono TEXT\n);\n\nCREATE TABLE visite_mediche (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    data_visita DATE NOT NULL,\n    ora_visita TIME,\n    motivo TEXT,\n    priorita livello_priorita NOT NULL DEFAULT 'verde',\n    medico TEXT,\n    esito TEXT,\n    CHECK (data_visita >= DATE '1950-01-01')\n);",
+  "data_profile": {
+    "profile": {
+      "pazienti": {
+        "row_count": 435,
+        "columns": {
+          "id": {
+            "distinct": 435,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 435
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandra",
+              "Antonio",
+              "Chiara",
+              "Davide",
+              "Francesco"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Esposito",
+              "Ferrari",
+              "Gallo"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 435,
+            "sample": [
+              "BNCLRA75T42F205B",
+              "BNCLRA75T42F205C",
+              "BNCLRA75T42F205D",
+              "BNCLRA75T42F205E",
+              "BNCLRA75T42F205F"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 403,
+            "sample": [
+              "1957-08-28",
+              "1957-09-18",
+              "1957-12-22",
+              "1958-02-09",
+              "1958-03-12"
+            ]
+          },
+          "telefono": {
+            "distinct": 6,
+            "sample": [
+              "+39 010 9988776",
+              "+39 011 3344556",
+              "+39 02 9876543",
+              "+39 055 1122334",
+              "+39 06 1234567"
+            ]
+          }
+        }
+      },
+      "visite_mediche": {
+        "row_count": 1292,
+        "columns": {
+          "id": {
+            "distinct": 1292,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1392
+          },
+          "paziente_id": {
+            "distinct": 413,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 435
+          },
+          "data_visita": {
+            "distinct": 242,
+            "sample": [
+              "2025-08-15",
+              "2025-08-17",
+              "2025-08-18",
+              "2025-08-20",
+              "2025-08-21"
+            ]
+          },
+          "ora_visita": {
+            "distinct": 11,
+            "sample": [
+              "08:30:00",
+              "09:15:00",
+              "09:30:00",
+              "10:20:00",
+              "10:40:00"
+            ]
+          },
+          "motivo": {
+            "distinct": 7,
+            "sample": [
+              "Consegna referto analisi del sangue",
+              "Controllo di routine",
+              "Difficoltà respiratorie acute",
+              "Dolore addominale persistente",
+              "Follow-up post-operatorio"
+            ]
+          },
+          "priorita": {
+            "distinct": 3,
+            "sample": [
+              "gialla",
+              "rossa",
+              "verde"
+            ]
+          },
+          "medico": {
+            "distinct": 5,
+            "sample": [
+              "Dr. Ferrari",
+              "Dr. Moretti",
+              "Dr. Rinaldi",
+              "Dr.ssa Conti",
+              "Dr.ssa Gallo"
+            ]
+          },
+          "esito": {
+            "distinct": 7,
+            "sample": [
+              "Ecografia prescritta",
+              "Esami approfonditi richiesti",
+              "Nuova visita programmata",
+              "Ricovero in reparto",
+              "Terapia prescritta"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "pazienti": [
+        {
+          "id": 1,
+          "nome": "Antonio",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA80A01H501U",
+          "data_nascita": "1978-05-03",
+          "telefono": "+39 010 9988776"
+        },
+        {
+          "id": 2,
+          "nome": "Mario",
+          "cognome": "Moretti",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "data_nascita": "1970-09-23",
+          "telefono": "+39 010 9988776"
+        },
+        {
+          "id": 3,
+          "nome": "Luca",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "data_nascita": "1976-02-09",
+          "telefono": "+39 055 1122334"
+        },
+        {
+          "id": 4,
+          "nome": "Sara",
+          "cognome": "Verdi",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "data_nascita": "1971-09-23",
+          "telefono": "+39 055 1122334"
+        },
+        {
+          "id": 5,
+          "nome": "Laura",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "data_nascita": "1973-01-14",
+          "telefono": "+39 06 1234567"
+        },
+        {
+          "id": 6,
+          "nome": "Mario",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "data_nascita": "1974-01-04",
+          "telefono": "+39 010 9988776"
+        },
+        {
+          "id": 7,
+          "nome": "Antonio",
+          "cognome": "Rinaldi",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "data_nascita": "1977-02-12",
+          "telefono": "+39 010 9988776"
+        },
+        {
+          "id": 8,
+          "nome": "Francesco",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "data_nascita": "1977-02-13",
+          "telefono": "+39 011 3344556"
+        }
+      ],
+      "visite_mediche": [
+        {
+          "id": 101,
+          "paziente_id": 411,
+          "data_visita": "2025-08-26",
+          "ora_visita": "11:50:00",
+          "motivo": "Dolore addominale persistente",
+          "priorita": "rossa",
+          "medico": "Dr.ssa Conti",
+          "esito": "Terapia prescritta"
+        },
+        {
+          "id": 102,
+          "paziente_id": 6,
+          "data_visita": "2025-12-05",
+          "ora_visita": "10:40:00",
+          "motivo": "Follow-up post-operatorio",
+          "priorita": "rossa",
+          "medico": "Dr.ssa Gallo",
+          "esito": null
+        },
+        {
+          "id": 103,
+          "paziente_id": 268,
+          "data_visita": "2026-02-13",
+          "ora_visita": "10:40:00",
+          "motivo": "Controllo di routine",
+          "priorita": "verde",
+          "medico": "Dr.ssa Conti",
+          "esito": "Esami approfonditi richiesti"
+        },
+        {
+          "id": 104,
+          "paziente_id": 232,
+          "data_visita": "2025-11-21",
+          "ora_visita": null,
+          "motivo": "Vertigini ricorrenti",
+          "priorita": "verde",
+          "medico": "Dr. Ferrari",
+          "esito": "Tutto normale"
+        },
+        {
+          "id": 105,
+          "paziente_id": 93,
+          "data_visita": "2026-01-14",
+          "ora_visita": "14:20:00",
+          "motivo": "Difficoltà respiratorie acute",
+          "priorita": "verde",
+          "medico": "Dr. Rinaldi",
+          "esito": "Valori nei limiti"
+        },
+        {
+          "id": 106,
+          "paziente_id": 271,
+          "data_visita": "2025-09-08",
+          "ora_visita": "08:30:00",
+          "motivo": "Controllo di routine",
+          "priorita": "verde",
+          "medico": "Dr. Moretti",
+          "esito": "Nuova visita programmata"
+        },
+        {
+          "id": 107,
+          "paziente_id": 425,
+          "data_visita": "2025-10-19",
+          "ora_visita": "16:05:00",
+          "motivo": "Dolore addominale persistente",
+          "priorita": "verde",
+          "medico": "Dr. Moretti",
+          "esito": "Terapia prescritta"
+        },
+        {
+          "id": 108,
+          "paziente_id": 264,
+          "data_visita": "2025-12-16",
+          "ora_visita": null,
+          "motivo": "Dolore addominale persistente",
+          "priorita": "rossa",
+          "medico": "Dr.ssa Gallo",
+          "esito": "Ricovero in reparto"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "in_condition"
+  ],
+  "query": "SELECT p.nome, p.cognome, p.codice_fiscale, v.data_visita, v.motivo, v.priorita, v.esito FROM pazienti p JOIN visite_mediche v ON v.paziente_id = p.id WHERE v.priorita IN ('rossa', 'gialla') AND v.data_visita BETWEEN DATE '2025-09-01' AND DATE '2026-01-31' AND v.esito IS NOT NULL ORDER BY v.data_visita ASC, p.cognome ASC, p.codice_fiscale ASC;"
+}

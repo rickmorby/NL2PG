@@ -1,0 +1,860 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    provincia TEXT,\n    data_nascita DATE,\n    fascia_eta TEXT NOT NULL CHECK (fascia_eta IN ('18-30', '31-45', '46-60', '61-75', '76+'))\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'responsabilita_civile')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    data_decorrenza DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza >= data_decorrenza)\n);\n\nCREATE TABLE tipi_sinistro (\n    id INT PRIMARY KEY,\n    descrizione TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    livello_gravita TEXT NOT NULL CHECK (livello_gravita IN ('bassa', 'media', 'alta'))\n);\n\nCREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    agenzia TEXT NOT NULL,\n    regione TEXT NOT NULL\n);\n\nCREATE TABLE tempo (\n    id INT PRIMARY KEY,\n    data_completa DATE NOT NULL UNIQUE,\n    anno INT NOT NULL CHECK (anno BETWEEN 1900 AND 2100),\n    mese INT NOT NULL CHECK (mese BETWEEN 1 AND 12),\n    trimestre INT NOT NULL CHECK (trimestre BETWEEN 1 AND 4),\n    giorno_settimana TEXT NOT NULL\n);\n\nCREATE TABLE sinistri (\n    id BIGINT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    tipo_sinistro_id INT NOT NULL REFERENCES tipi_sinistro(id),\n    agente_id INT NOT NULL REFERENCES agenti(id),\n    tempo_id INT NOT NULL REFERENCES tempo(id),\n    importo_risarcimento NUMERIC(12,2) NOT NULL CHECK (importo_risarcimento >= 0),\n    importo_riserva NUMERIC(12,2) CHECK (importo_riserva >= 0),\n    stato_pratica TEXT NOT NULL DEFAULT 'aperta' CHECK (stato_pratica IN ('aperta', 'istruttoria', 'liquidata', 'respinta'))\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 652,
+        "columns": {
+          "id": {
+            "distinct": 652,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 652
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Andrea",
+              "Anna",
+              "Antonio",
+              "Chiara",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Costa",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 652,
+            "sample": [
+              "BRLAUR90C55F205B",
+              "BRLAUR90C55F205C",
+              "BRLAUR90C55F205D",
+              "BRLAUR90C55F205E",
+              "BRLAUR90C55F205F"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "provincia": {
+            "distinct": 10,
+            "sample": [
+              "BA",
+              "BO",
+              "FI",
+              "GE",
+              "MI"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 542,
+            "sample": [
+              "1952-07-23",
+              "1952-07-29",
+              "1952-08-15",
+              "1952-08-17",
+              "1952-08-19"
+            ]
+          },
+          "fascia_eta": {
+            "distinct": 4,
+            "sample": [
+              "18-30",
+              "31-45",
+              "46-60",
+              "61-75"
+            ]
+          }
+        }
+      },
+      "polizze": {
+        "row_count": 594,
+        "columns": {
+          "id": {
+            "distinct": 594,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 594
+          },
+          "numero_polizza": {
+            "distinct": 594,
+            "sample": [
+              "POL-2023-000001",
+              "POL-2023-0000011",
+              "POL-2023-00000110",
+              "POL-2023-00000111",
+              "POL-2023-00000112"
+            ]
+          },
+          "tipo_polizza": {
+            "distinct": 5,
+            "sample": [
+              "auto",
+              "casa",
+              "responsabilita_civile",
+              "salute",
+              "vita"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 581,
+            "sample": [
+              "1004.74",
+              "1005.79",
+              "1014.99",
+              "1021.37",
+              "1032.52"
+            ],
+            "min": 166.56,
+            "max": 2247.86
+          },
+          "data_decorrenza": {
+            "distinct": 280,
+            "sample": [
+              "2023-02-02",
+              "2023-02-03",
+              "2023-02-05",
+              "2023-02-07",
+              "2023-02-08"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 263,
+            "sample": [
+              "2026-01-31",
+              "2026-02-01",
+              "2026-02-02",
+              "2026-02-03",
+              "2026-02-04"
+            ]
+          }
+        }
+      },
+      "tipi_sinistro": {
+        "row_count": 30,
+        "columns": {
+          "id": {
+            "distinct": 30,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 30
+          },
+          "descrizione": {
+            "distinct": 10,
+            "sample": [
+              "Collisione frontale tra veicoli",
+              "Danni da grandine al veicolo",
+              "Danno a terzi da attivita' professionale",
+              "Frattura da incidente domestico",
+              "Furto con scasso in abitazione"
+            ]
+          },
+          "categoria": {
+            "distinct": 9,
+            "sample": [
+              "Casa Contenuti",
+              "Casa Fabbricato",
+              "Casa Furto",
+              "Infortuni Salute",
+              "Kasko Auto"
+            ]
+          },
+          "livello_gravita": {
+            "distinct": 3,
+            "sample": [
+              "alta",
+              "bassa",
+              "media"
+            ]
+          }
+        }
+      },
+      "agenti": {
+        "row_count": 303,
+        "columns": {
+          "id": {
+            "distinct": 303,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 303
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Davide",
+              "Francesca",
+              "Giorgia",
+              "Luca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Barbieri",
+              "Conti",
+              "De Luca",
+              "Fabbri",
+              "Fontana"
+            ]
+          },
+          "agenzia": {
+            "distinct": 6,
+            "sample": [
+              "Agenzia Arno Firenze",
+              "Agenzia Centrale Milano",
+              "Agenzia Etnea Catania",
+              "Agenzia Po Torino",
+              "Agenzia Tiberina Roma"
+            ]
+          },
+          "regione": {
+            "distinct": 6,
+            "sample": [
+              "Campania",
+              "Lazio",
+              "Lombardia",
+              "Piemonte",
+              "Sicilia"
+            ]
+          }
+        }
+      },
+      "tempo": {
+        "row_count": 365,
+        "columns": {
+          "id": {
+            "distinct": 365,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 365
+          },
+          "data_completa": {
+            "distinct": 365,
+            "sample": [
+              "2025-01-01",
+              "2025-01-02",
+              "2025-01-03",
+              "2025-01-04",
+              "2025-01-05"
+            ]
+          },
+          "anno": {
+            "distinct": 1,
+            "sample": [
+              "2025"
+            ],
+            "min": 2025,
+            "max": 2025
+          },
+          "mese": {
+            "distinct": 10,
+            "sample": [
+              "1",
+              "10",
+              "12",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 12
+          },
+          "trimestre": {
+            "distinct": 4,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 4
+          },
+          "giorno_settimana": {
+            "distinct": 6,
+            "sample": [
+              "domenica",
+              "giovedi'",
+              "lunedi'",
+              "mercoledi'",
+              "sabato"
+            ]
+          }
+        }
+      },
+      "sinistri": {
+        "row_count": 2605,
+        "columns": {
+          "id": {
+            "distinct": 2605,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2605
+          },
+          "cliente_id": {
+            "distinct": 641,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 652
+          },
+          "polizza_id": {
+            "distinct": 586,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 594
+          },
+          "tipo_sinistro_id": {
+            "distinct": 30,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 30
+          },
+          "agente_id": {
+            "distinct": 303,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 303
+          },
+          "tempo_id": {
+            "distinct": 365,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 365
+          },
+          "importo_risarcimento": {
+            "distinct": 2191,
+            "sample": [
+              "0.0",
+              "10003.57",
+              "1001.98",
+              "10020.68",
+              "1003.81"
+            ],
+            "min": 0.0,
+            "max": 312500.0
+          },
+          "importo_riserva": {
+            "distinct": 1472,
+            "sample": [
+              "0.0",
+              "10001.86",
+              "1002.7",
+              "1003.28",
+              "1003.72"
+            ],
+            "min": 0.0,
+            "max": 90000.0
+          },
+          "stato_pratica": {
+            "distinct": 4,
+            "sample": [
+              "aperta",
+              "istruttoria",
+              "liquidata",
+              "respinta"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Anna",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA85A01H501X",
+          "citta": "Roma",
+          "provincia": "RM",
+          "data_nascita": "1985-01-14",
+          "fascia_eta": "31-45"
+        },
+        {
+          "id": 2,
+          "nome": "Giuseppe",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRA85A01H501B",
+          "citta": "Roma",
+          "provincia": "RM",
+          "data_nascita": "1985-07-08",
+          "fascia_eta": "31-45"
+        },
+        {
+          "id": 3,
+          "nome": "Simona",
+          "cognome": "Colombo",
+          "codice_fiscale": "RSSMRA85A01H501C",
+          "citta": "Roma",
+          "provincia": "RM",
+          "data_nascita": "1984-12-27",
+          "fascia_eta": "31-45"
+        },
+        {
+          "id": 4,
+          "nome": "Sara",
+          "cognome": "Romano",
+          "codice_fiscale": "RSSMRA85A01H501D",
+          "citta": "Roma",
+          "provincia": null,
+          "data_nascita": null,
+          "fascia_eta": "31-45"
+        },
+        {
+          "id": 5,
+          "nome": "Simona",
+          "cognome": "Russo",
+          "codice_fiscale": "RSSMRA85A01H501E",
+          "citta": "Roma",
+          "provincia": "RM",
+          "data_nascita": "1985-06-13",
+          "fascia_eta": "31-45"
+        },
+        {
+          "id": 6,
+          "nome": "Giuseppe",
+          "cognome": "Costa",
+          "codice_fiscale": "RSSMRA85A01H501F",
+          "citta": "Roma",
+          "provincia": "RM",
+          "data_nascita": "1985-08-19",
+          "fascia_eta": "31-45"
+        },
+        {
+          "id": 7,
+          "nome": "Vincenzo",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA85A01H501G",
+          "citta": "Roma",
+          "provincia": "RM",
+          "data_nascita": "1985-05-20",
+          "fascia_eta": "31-45"
+        },
+        {
+          "id": 8,
+          "nome": "Anna",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA85A01H501H",
+          "citta": "Roma",
+          "provincia": "RM",
+          "data_nascita": "1985-07-05",
+          "fascia_eta": "31-45"
+        }
+      ],
+      "polizze": [
+        {
+          "id": 1,
+          "numero_polizza": "POL-2023-000001",
+          "tipo_polizza": "salute",
+          "premio_annuo": 447.42,
+          "data_decorrenza": "2023-02-28",
+          "data_scadenza": "2026-02-24"
+        },
+        {
+          "id": 2,
+          "numero_polizza": "POL-2023-0000011",
+          "tipo_polizza": "auto",
+          "premio_annuo": 723.38,
+          "data_decorrenza": "2023-03-08",
+          "data_scadenza": "2026-02-16"
+        },
+        {
+          "id": 3,
+          "numero_polizza": "POL-2023-0000012",
+          "tipo_polizza": "casa",
+          "premio_annuo": 270.0,
+          "data_decorrenza": "2023-03-19",
+          "data_scadenza": "2026-02-26"
+        },
+        {
+          "id": 4,
+          "numero_polizza": "POL-2023-0000013",
+          "tipo_polizza": "casa",
+          "premio_annuo": 404.22,
+          "data_decorrenza": "2023-02-18",
+          "data_scadenza": "2026-03-10"
+        },
+        {
+          "id": 5,
+          "numero_polizza": "POL-2023-0000014",
+          "tipo_polizza": "salute",
+          "premio_annuo": 515.88,
+          "data_decorrenza": "2023-03-29",
+          "data_scadenza": "2026-03-11"
+        },
+        {
+          "id": 6,
+          "numero_polizza": "POL-2023-0000015",
+          "tipo_polizza": "responsabilita_civile",
+          "premio_annuo": 430.34,
+          "data_decorrenza": "2023-02-19",
+          "data_scadenza": "2026-03-08"
+        },
+        {
+          "id": 7,
+          "numero_polizza": "POL-2023-0000016",
+          "tipo_polizza": "auto",
+          "premio_annuo": 741.89,
+          "data_decorrenza": "2023-03-15",
+          "data_scadenza": "2026-03-19"
+        },
+        {
+          "id": 8,
+          "numero_polizza": "POL-2023-0000017",
+          "tipo_polizza": "salute",
+          "premio_annuo": 415.98,
+          "data_decorrenza": "2023-03-06",
+          "data_scadenza": "2026-02-06"
+        }
+      ],
+      "tipi_sinistro": [
+        {
+          "id": 1,
+          "descrizione": "Incidente stradale con veicolo fermo",
+          "categoria": "RCA Auto",
+          "livello_gravita": "media"
+        },
+        {
+          "id": 2,
+          "descrizione": "Incidente stradale con veicolo fermo",
+          "categoria": "RCA Auto",
+          "livello_gravita": "alta"
+        },
+        {
+          "id": 3,
+          "descrizione": "Incidente stradale con veicolo fermo",
+          "categoria": "RCA Auto",
+          "livello_gravita": "bassa"
+        },
+        {
+          "id": 4,
+          "descrizione": "Collisione frontale tra veicoli",
+          "categoria": "RCA Auto",
+          "livello_gravita": "bassa"
+        },
+        {
+          "id": 5,
+          "descrizione": "Collisione frontale tra veicoli",
+          "categoria": "RCA Auto",
+          "livello_gravita": "alta"
+        },
+        {
+          "id": 6,
+          "descrizione": "Collisione frontale tra veicoli",
+          "categoria": "RCA Auto",
+          "livello_gravita": "media"
+        },
+        {
+          "id": 7,
+          "descrizione": "Danni da grandine al veicolo",
+          "categoria": "Kasko Auto",
+          "livello_gravita": "media"
+        },
+        {
+          "id": 8,
+          "descrizione": "Danni da grandine al veicolo",
+          "categoria": "Kasko Auto",
+          "livello_gravita": "alta"
+        }
+      ],
+      "agenti": [
+        {
+          "id": 1,
+          "nome": "Giorgia",
+          "cognome": "Rinaldi",
+          "agenzia": "Agenzia Centrale Milano",
+          "regione": "Lombardia"
+        },
+        {
+          "id": 2,
+          "nome": "Giorgia",
+          "cognome": "Marchetti",
+          "agenzia": "Agenzia Centrale Milano",
+          "regione": "Lombardia"
+        },
+        {
+          "id": 3,
+          "nome": "Luca",
+          "cognome": "Conti",
+          "agenzia": "Agenzia Centrale Milano",
+          "regione": "Lombardia"
+        },
+        {
+          "id": 4,
+          "nome": "Alessandro",
+          "cognome": "Vitale",
+          "agenzia": "Agenzia Centrale Milano",
+          "regione": "Lombardia"
+        },
+        {
+          "id": 5,
+          "nome": "Luca",
+          "cognome": "Serra",
+          "agenzia": "Agenzia Centrale Milano",
+          "regione": "Lombardia"
+        },
+        {
+          "id": 6,
+          "nome": "Luca",
+          "cognome": "Rinaldi",
+          "agenzia": "Agenzia Centrale Milano",
+          "regione": "Lombardia"
+        },
+        {
+          "id": 7,
+          "nome": "Roberto",
+          "cognome": "Lombardi",
+          "agenzia": "Agenzia Centrale Milano",
+          "regione": "Lombardia"
+        },
+        {
+          "id": 8,
+          "nome": "Alessandro",
+          "cognome": "Vitale",
+          "agenzia": "Agenzia Centrale Milano",
+          "regione": "Lombardia"
+        }
+      ],
+      "tempo": [
+        {
+          "id": 1,
+          "data_completa": "2025-01-01",
+          "anno": 2025,
+          "mese": 1,
+          "trimestre": 1,
+          "giorno_settimana": "mercoledi'"
+        },
+        {
+          "id": 2,
+          "data_completa": "2025-01-02",
+          "anno": 2025,
+          "mese": 1,
+          "trimestre": 1,
+          "giorno_settimana": "mercoledi'"
+        },
+        {
+          "id": 3,
+          "data_completa": "2025-01-03",
+          "anno": 2025,
+          "mese": 1,
+          "trimestre": 1,
+          "giorno_settimana": "mercoledi'"
+        },
+        {
+          "id": 4,
+          "data_completa": "2025-01-04",
+          "anno": 2025,
+          "mese": 1,
+          "trimestre": 1,
+          "giorno_settimana": "mercoledi'"
+        },
+        {
+          "id": 5,
+          "data_completa": "2025-01-05",
+          "anno": 2025,
+          "mese": 1,
+          "trimestre": 1,
+          "giorno_settimana": "mercoledi'"
+        },
+        {
+          "id": 6,
+          "data_completa": "2025-01-06",
+          "anno": 2025,
+          "mese": 1,
+          "trimestre": 1,
+          "giorno_settimana": "mercoledi'"
+        },
+        {
+          "id": 7,
+          "data_completa": "2025-01-07",
+          "anno": 2025,
+          "mese": 1,
+          "trimestre": 1,
+          "giorno_settimana": "mercoledi'"
+        },
+        {
+          "id": 8,
+          "data_completa": "2025-01-08",
+          "anno": 2025,
+          "mese": 1,
+          "trimestre": 1,
+          "giorno_settimana": "mercoledi'"
+        }
+      ],
+      "sinistri": [
+        {
+          "id": 1,
+          "cliente_id": 639,
+          "polizza_id": 63,
+          "tipo_sinistro_id": 15,
+          "agente_id": 261,
+          "tempo_id": 57,
+          "importo_risarcimento": 4804.17,
+          "importo_riserva": 0.0,
+          "stato_pratica": "istruttoria"
+        },
+        {
+          "id": 2,
+          "cliente_id": 252,
+          "polizza_id": 400,
+          "tipo_sinistro_id": 16,
+          "agente_id": 165,
+          "tempo_id": 2,
+          "importo_risarcimento": 3821.73,
+          "importo_riserva": 0.0,
+          "stato_pratica": "istruttoria"
+        },
+        {
+          "id": 3,
+          "cliente_id": 206,
+          "polizza_id": 451,
+          "tipo_sinistro_id": 10,
+          "agente_id": 68,
+          "tempo_id": 132,
+          "importo_risarcimento": 1509.41,
+          "importo_riserva": 0.0,
+          "stato_pratica": "istruttoria"
+        },
+        {
+          "id": 4,
+          "cliente_id": 495,
+          "polizza_id": 436,
+          "tipo_sinistro_id": 8,
+          "agente_id": 149,
+          "tempo_id": 346,
+          "importo_risarcimento": 4072.15,
+          "importo_riserva": 0.0,
+          "stato_pratica": "aperta"
+        },
+        {
+          "id": 5,
+          "cliente_id": 306,
+          "polizza_id": 369,
+          "tipo_sinistro_id": 1,
+          "agente_id": 119,
+          "tempo_id": 261,
+          "importo_risarcimento": 5236.07,
+          "importo_riserva": null,
+          "stato_pratica": "aperta"
+        },
+        {
+          "id": 6,
+          "cliente_id": 135,
+          "polizza_id": 561,
+          "tipo_sinistro_id": 7,
+          "agente_id": 117,
+          "tempo_id": 50,
+          "importo_risarcimento": 2565.54,
+          "importo_riserva": null,
+          "stato_pratica": "liquidata"
+        },
+        {
+          "id": 7,
+          "cliente_id": 153,
+          "polizza_id": 346,
+          "tipo_sinistro_id": 28,
+          "agente_id": 196,
+          "tempo_id": 311,
+          "importo_risarcimento": 4985.47,
+          "importo_riserva": 0.0,
+          "stato_pratica": "aperta"
+        },
+        {
+          "id": 8,
+          "cliente_id": 290,
+          "polizza_id": 504,
+          "tipo_sinistro_id": 25,
+          "agente_id": 15,
+          "tempo_id": 241,
+          "importo_risarcimento": 2450.0,
+          "importo_riserva": 0.0,
+          "stato_pratica": "liquidata"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "cte"
+  ],
+  "query": "WITH sinistri_liquidati AS (SELECT ts.categoria, s.importo_risarcimento FROM sinistri s JOIN tipi_sinistro ts ON s.tipo_sinistro_id = ts.id WHERE s.stato_pratica = 'liquidata' AND s.importo_risarcimento > 0) SELECT categoria, COUNT(*) AS numero_pratiche_liquidate, ROUND(SUM(importo_risarcimento), 2) AS totale_risarcito, ROUND(AVG(importo_risarcimento), 2) AS risarcimento_medio FROM sinistri_liquidati GROUP BY categoria ORDER BY totale_risarcito DESC;"
+}

@@ -1,0 +1,321 @@
+{
+  "schema_ddl": "CREATE DOMAIN importo_monetario AS NUMERIC(14,2) CHECK (VALUE >= 0);\n\nCREATE DOMAIN tasso_percentuale AS NUMERIC(7,4) CHECK (VALUE >= 0 AND VALUE <= 100);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    iban TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    tasso_annuo tasso_percentuale NOT NULL,\n    saldo_iniziale importo_monetario NOT NULL DEFAULT 0,\n    stato_conto TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_conto IN ('attivo', 'sospeso', 'chiuso')),\n    aperto_il DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE movimenti (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('versamento', 'prelievo', 'bonifico_entrata', 'bonifico_uscita', 'interessi_maturati', 'commissione')),\n    importo importo_monetario NOT NULL,\n    data_movimento DATE NOT NULL,\n    descrizione TEXT,\n    registrato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_profile": {
+    "profile": {
+      "conti": {
+        "row_count": 667,
+        "columns": {
+          "id": {
+            "distinct": 667,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 667
+          },
+          "iban": {
+            "distinct": 667,
+            "sample": [
+              "IT02L1234567890123456789012",
+              "IT02L12345678901234567890121",
+              "IT02L123456789012345678901210",
+              "IT02L1234567890123456789012100",
+              "IT02L1234567890123456789012101"
+            ]
+          },
+          "intestatario": {
+            "distinct": 14,
+            "sample": [
+              "Bar Tramonto di P. Gialli",
+              "Cooperativa Aurora",
+              "Elena Ferrari",
+              "Francesca Moretti",
+              "Giovanni Conti"
+            ]
+          },
+          "tasso_annuo": {
+            "distinct": 359,
+            "sample": [
+              "0.01",
+              "0.02",
+              "0.03",
+              "0.44",
+              "0.47"
+            ],
+            "min": 0.01,
+            "max": 9.52
+          },
+          "saldo_iniziale": {
+            "distinct": 648,
+            "sample": [
+              "1000.26",
+              "1004.27",
+              "1008.51",
+              "101.2",
+              "1011.06"
+            ],
+            "min": 94.9,
+            "max": 500000.0
+          },
+          "stato_conto": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "chiuso",
+              "sospeso"
+            ]
+          },
+          "aperto_il": {
+            "distinct": 522,
+            "sample": [
+              "2020-05-08",
+              "2020-05-20",
+              "2020-06-11",
+              "2020-06-19",
+              "2020-06-24"
+            ]
+          }
+        }
+      },
+      "movimenti": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 4000
+          },
+          "conto_id": {
+            "distinct": 659,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 667
+          },
+          "tipo_movimento": {
+            "distinct": 6,
+            "sample": [
+              "bonifico_entrata",
+              "bonifico_uscita",
+              "commissione",
+              "interessi_maturati",
+              "prelievo"
+            ]
+          },
+          "importo": {
+            "distinct": 2692,
+            "sample": [
+              "0.75",
+              "0.76",
+              "0.8",
+              "0.81",
+              "0.83"
+            ],
+            "min": 0.75,
+            "max": 11901.75
+          },
+          "data_movimento": {
+            "distinct": 96,
+            "sample": [
+              "2025-11-22",
+              "2025-11-23",
+              "2025-11-24",
+              "2025-11-25",
+              "2025-11-26"
+            ]
+          },
+          "descrizione": {
+            "distinct": 5,
+            "sample": [
+              "Movimento di tesoreria",
+              "Operazione bancaria",
+              "Operazione su conto",
+              "Registrazione operazione",
+              "Voce movimento conto"
+            ]
+          },
+          "registrato_il": {
+            "distinct": 6,
+            "sample": [
+              "2026-01-01 00:05:00",
+              "2026-01-08 10:15:00",
+              "2026-01-12 18:42:00",
+              "2026-01-20 09:05:00",
+              "2026-02-03 11:30:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "conti": [
+        {
+          "id": 1,
+          "iban": "IT60X0542811101000000012345",
+          "intestatario": "Francesca Moretti",
+          "tasso_annuo": 2.78,
+          "saldo_iniziale": 18351.67,
+          "stato_conto": "chiuso",
+          "aperto_il": "2022-07-07"
+        },
+        {
+          "id": 2,
+          "iban": "IT60X05428111010000000123451",
+          "intestatario": "Tecnologie Alfa SRL",
+          "tasso_annuo": 1.78,
+          "saldo_iniziale": 19483.82,
+          "stato_conto": "sospeso",
+          "aperto_il": "2022-11-01"
+        },
+        {
+          "id": 3,
+          "iban": "IT60X05428111010000000123452",
+          "intestatario": "Giovanni Conti",
+          "tasso_annuo": 3.3,
+          "saldo_iniziale": 4082.04,
+          "stato_conto": "attivo",
+          "aperto_il": "2023-01-17"
+        },
+        {
+          "id": 4,
+          "iban": "IT60X05428111010000000123453",
+          "intestatario": "Bar Tramonto di P. Gialli",
+          "tasso_annuo": 1.33,
+          "saldo_iniziale": 3892.16,
+          "stato_conto": "attivo",
+          "aperto_il": "2022-01-31"
+        },
+        {
+          "id": 5,
+          "iban": "IT60X05428111010000000123454",
+          "intestatario": "Elena Ferrari",
+          "tasso_annuo": 1.37,
+          "saldo_iniziale": 7030.86,
+          "stato_conto": "attivo",
+          "aperto_il": "2022-07-27"
+        },
+        {
+          "id": 6,
+          "iban": "IT60X05428111010000000123455",
+          "intestatario": "Marco Bianchi",
+          "tasso_annuo": 1.81,
+          "saldo_iniziale": 14524.73,
+          "stato_conto": "attivo",
+          "aperto_il": "2022-11-24"
+        },
+        {
+          "id": 7,
+          "iban": "IT60X05428111010000000123456",
+          "intestatario": "Giovanni Conti",
+          "tasso_annuo": 3.08,
+          "saldo_iniziale": 13929.26,
+          "stato_conto": "chiuso",
+          "aperto_il": "2022-06-07"
+        },
+        {
+          "id": 8,
+          "iban": "IT60X05428111010000000123457",
+          "intestatario": "Giovanni Conti",
+          "tasso_annuo": 3.15,
+          "saldo_iniziale": 18926.94,
+          "stato_conto": "chiuso",
+          "aperto_il": "2022-10-12"
+        }
+      ],
+      "movimenti": [
+        {
+          "id": 1001,
+          "conto_id": 124,
+          "tipo_movimento": "versamento",
+          "importo": 2727.48,
+          "data_movimento": "2026-01-08",
+          "descrizione": "Voce movimento conto",
+          "registrato_il": "2026-01-08 10:15:00"
+        },
+        {
+          "id": 1002,
+          "conto_id": 553,
+          "tipo_movimento": "bonifico_uscita",
+          "importo": 2484.72,
+          "data_movimento": "2025-12-22",
+          "descrizione": "Voce movimento conto",
+          "registrato_il": "2026-01-08 10:15:00"
+        },
+        {
+          "id": 1003,
+          "conto_id": 182,
+          "tipo_movimento": "bonifico_entrata",
+          "importo": 2110.74,
+          "data_movimento": "2025-12-17",
+          "descrizione": "Operazione bancaria",
+          "registrato_il": "2026-01-08 10:15:00"
+        },
+        {
+          "id": 1004,
+          "conto_id": 625,
+          "tipo_movimento": "bonifico_uscita",
+          "importo": 2545.44,
+          "data_movimento": "2025-12-17",
+          "descrizione": "Registrazione operazione",
+          "registrato_il": "2026-01-08 10:15:00"
+        },
+        {
+          "id": 1005,
+          "conto_id": 659,
+          "tipo_movimento": "bonifico_uscita",
+          "importo": 2117.92,
+          "data_movimento": "2026-01-17",
+          "descrizione": "Voce movimento conto",
+          "registrato_il": "2026-01-08 10:15:00"
+        },
+        {
+          "id": 1006,
+          "conto_id": 515,
+          "tipo_movimento": "interessi_maturati",
+          "importo": 4116.21,
+          "data_movimento": "2025-12-23",
+          "descrizione": "Movimento di tesoreria",
+          "registrato_il": "2026-01-08 10:15:00"
+        },
+        {
+          "id": 1007,
+          "conto_id": 311,
+          "tipo_movimento": "versamento",
+          "importo": 1029.74,
+          "data_movimento": "2025-12-02",
+          "descrizione": "Operazione bancaria",
+          "registrato_il": "2026-01-08 10:15:00"
+        },
+        {
+          "id": 1008,
+          "conto_id": 267,
+          "tipo_movimento": "versamento",
+          "importo": 2452.12,
+          "data_movimento": "2026-01-11",
+          "descrizione": "Operazione su conto",
+          "registrato_il": "2026-01-08 10:15:00"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "math_funcs"
+  ],
+  "query": "SELECT c.intestatario, ROUND(AVG(c.saldo_iniziale), 2) AS saldo_medio, MAX(c.tasso_annuo) AS tasso_annuo_massimo, COUNT(*) AS numero_conti FROM conti c WHERE c.stato_conto = 'attivo' GROUP BY c.intestatario ORDER BY saldo_medio DESC;"
+}

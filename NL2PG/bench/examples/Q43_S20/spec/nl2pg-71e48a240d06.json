@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "sorting"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_personale",
+      "description": "La tabella dipendenti viene denominata anagrafica_personale nella prosa aziendale: i requisiti si riferiscono sempre all'anagrafica personale, costringendo a risalire alla tabella fisica dipendenti per costruire l'ordinamento ORDER BY su cognome, nome ed attributi enumerati."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_impiego",
+      "obsolete_value": "regime contrattuale CCNL",
+      "description": "La colonna enumerata stato_impiego (ENUM('in_prova','attivo','sospeso','cessato'), con ordine di definizione rilevante per l'ordinamento) viene indicata nei documenti aziendali con il gergo sindacale 'regime contrattuale CCNL': la query deve ordinare i dipendenti per questo campo sfruttando l'ordine dichiarativo del tipo ENUM, senza LIMIT."
+    }
+  ],
+  "spec_hash": "31b6e77c1439fae5"
+}

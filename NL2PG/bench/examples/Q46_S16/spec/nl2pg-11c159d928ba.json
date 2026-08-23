@@ -1,0 +1,34 @@
+{
+  "domain": "università",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "relative_time"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "storico_modifiche",
+      "obsolete_value": "registro_variazioni",
+      "description": "La tabella storico_modifiche viene denominata registro_variazioni nella prosa aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "data_modifica",
+      "obsolete_value": "timestamp_aggiornamento",
+      "description": "La colonna data_modifica è indicata come timestamp_aggiornamento."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "studenti",
+      "obsolete_value": "matricole",
+      "description": "Il termine studenti viene sostituito dal gergo universitario matricole."
+    }
+  ],
+  "spec_hash": "ee2de052cfa24563"
+}

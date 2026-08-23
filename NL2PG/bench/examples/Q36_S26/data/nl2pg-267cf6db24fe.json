@@ -1,0 +1,218 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "string_funcs"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "esami",
+        "obsolete_value": "verbali_d_esame",
+        "description": "L'unica tabella dello schema, fisicamente denominata esami, viene indicata nella prosa aziendale come verbali_d_esame. Il risolutore deve mappare la perifrasi sulla tabella reale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "voto",
+        "obsolete_value": "esito_in_trentesimi",
+        "description": "La colonna voto è fisicamente di tipo TEXT pur contenente valori logicamente numerici (es. '28', '30L'). Nella prosa viene indicata con il gergo accademico esito_in_trentesimi. Le query devono manipolare la colonna con funzioni stringa (UPPER/SUBSTRING) e convertire la parte numerica tramite CAST(voto AS NUMERIC), gestendo anche eventuali suffissi alfanumerici come la lode ('30L')."
+      }
+    ],
+    "spec_hash": "ad2b22aa03c4d0f4"
+  },
+  "schema_ddl": "CREATE TABLE esami (\n    id INT PRIMARY KEY,\n    matricola_studente TEXT NOT NULL,\n    cognome_studente TEXT NOT NULL,\n    nome_studente TEXT NOT NULL,\n    denominazione_corso TEXT NOT NULL,\n    docente_presidente TEXT NOT NULL,\n    data_appello DATE NOT NULL,\n    voto TEXT NOT NULL CHECK (voto ~ '^(1[8-9]|2[0-9]|30)L?$'),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "esami",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "matricola_studente": "VR102345",
+            "cognome_studente": "Rossi",
+            "nome_studente": "Marco",
+            "denominazione_corso": "Analisi Matematica I",
+            "docente_presidente": "Prof.ssa Elena Marchetti",
+            "data_appello": "2026-03-16",
+            "voto": "27",
+            "created_at": "2026-07-01 12:00:00"
+          },
+          {
+            "id": 2,
+            "matricola_studente": "MI113578",
+            "cognome_studente": "Bianchi",
+            "nome_studente": "Giulia",
+            "denominazione_corso": "Fisica Generale",
+            "docente_presidente": "Prof. Alberto Fontana",
+            "data_appello": "2026-04-08",
+            "voto": "30L",
+            "created_at": "2026-07-01 12:00:00"
+          },
+          {
+            "id": 3,
+            "matricola_studente": "TO109921",
+            "cognome_studente": "Ferrari",
+            "nome_studente": "Luca",
+            "denominazione_corso": "Programmazione e Laboratorio",
+            "docente_presidente": "Prof. Giovanni Rinaldi",
+            "data_appello": "2026-03-27",
+            "voto": "18",
+            "created_at": "2026-07-01 12:00:00"
+          },
+          {
+            "id": 4,
+            "matricola_studente": "BO107654",
+            "cognome_studente": "Russo",
+            "nome_studente": "Sara",
+            "denominazione_corso": "Chimica Organica",
+            "docente_presidente": "Prof.ssa Chiara Lombardi",
+            "data_appello": "2026-05-11",
+            "voto": "24",
+            "created_at": "2026-07-01 12:00:00"
+          },
+          {
+            "id": 5,
+            "matricola_studente": "NA104382",
+            "cognome_studente": "Esposito",
+            "nome_studente": "Andrea",
+            "denominazione_corso": "Economia Politica",
+            "docente_presidente": "Prof. Stefano Galli",
+            "data_appello": "2026-04-22",
+            "voto": "30",
+            "created_at": "2026-07-01 12:00:00"
+          }
+        ],
+        "variations": {
+          "matricola_studente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "VR102345",
+              "MI113578",
+              "TO109921",
+              "BO107654",
+              "NA104382",
+              "RM108733",
+              "PA106290",
+              "FI105147"
+            ]
+          },
+          "cognome_studente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Bruno"
+            ]
+          },
+          "nome_studente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Giulia",
+              "Luca",
+              "Sara",
+              "Andrea",
+              "Chiara",
+              "Francesco",
+              "Alessia",
+              "Davide",
+              "Martina"
+            ]
+          },
+          "denominazione_corso": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Analisi Matematica I",
+              "Fisica Generale",
+              "Programmazione e Laboratorio",
+              "Chimica Organica",
+              "Diritto Privato",
+              "Economia Politica",
+              "Storia Contemporanea",
+              "Anatomia Umana"
+            ]
+          },
+          "docente_presidente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Prof.ssa Elena Marchetti",
+              "Prof. Alberto Fontana",
+              "Prof. Giovanni Rinaldi",
+              "Prof.ssa Chiara Lombardi",
+              "Prof. Stefano Galli",
+              "Prof.ssa Laura De Santis"
+            ]
+          },
+          "data_appello": {
+            "axis": "shift",
+            "delta_min": -40.0,
+            "delta_max": 40.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "voto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+              "26",
+              "27",
+              "28",
+              "29",
+              "30",
+              "30L"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

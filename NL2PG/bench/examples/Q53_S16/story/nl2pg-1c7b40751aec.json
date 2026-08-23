@@ -1,0 +1,746 @@
+{
+  "schema_ddl": "CREATE TYPE stato_movimento AS ENUM ('bozza', 'confermato', 'annullato', 'archiviato');\n\nCREATE TABLE conti (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'patrimoniale')),\n    valid_from DATE NOT NULL,\n    valid_to DATE,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(15, 2) NOT NULL,\n    segno CHAR(1) NOT NULL CHECK (segno IN ('D', 'A')),\n    descrizione TEXT,\n    stato stato_movimento NOT NULL DEFAULT 'bozza',\n    data_validita TIMESTAMP NOT NULL,\n    valid_from TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valid_to TIMESTAMP,\n    CHECK (valid_to IS NULL OR valid_to > valid_from),\n    CHECK (importo > 0)\n);\n\nCREATE TABLE causali (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    tipo TEXT NOT NULL CHECK (tipo IN ('ricavo', 'costo', 'patrimoniale')),\n    valid_from DATE NOT NULL,\n    valid_to DATE,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE documenti (\n    id SERIAL PRIMARY KEY,\n    numero TEXT NOT NULL,\n    tipo TEXT NOT NULL CHECK (tipo IN ('fattura', 'nota_credito', 'nota_debito', 'ricevuta')),\n    data_emissione DATE NOT NULL,\n    fornitore_cliente TEXT NOT NULL,\n    valid_from DATE NOT NULL,\n    valid_to DATE,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE collegamenti (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    causale_id INT NOT NULL REFERENCES causali(id),\n    documento_id INT REFERENCES documenti(id),\n    note TEXT,\n    valid_from TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valid_to TIMESTAMP,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);",
+  "data_profile": {
+    "profile": {
+      "conti": {
+        "row_count": 353,
+        "columns": {
+          "id": {
+            "distinct": 353,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 353
+          },
+          "codice": {
+            "distinct": 353,
+            "sample": [
+              "BANCA",
+              "BANCA_1",
+              "BANCA_10",
+              "BANCA_11",
+              "BANCA_12"
+            ]
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Banca Intesa",
+              "Capitale Sociale",
+              "Cassa contante",
+              "Crediti vs Clienti",
+              "Debiti vs Fornitori"
+            ]
+          },
+          "tipo_conto": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "passivo",
+              "patrimoniale"
+            ]
+          },
+          "valid_from": {
+            "distinct": 219,
+            "sample": [
+              "2019-01-01",
+              "2019-01-02",
+              "2019-01-04",
+              "2019-01-06",
+              "2019-01-08"
+            ]
+          },
+          "valid_to": {
+            "distinct": 1,
+            "sample": [
+              "2025-12-31"
+            ]
+          }
+        }
+      },
+      "causali": {
+        "row_count": 15,
+        "columns": {
+          "id": {
+            "distinct": 15,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 15
+          },
+          "codice": {
+            "distinct": 15,
+            "sample": [
+              "COS001",
+              "COS001_1",
+              "COS001_2",
+              "COS002",
+              "COS002_1"
+            ]
+          },
+          "nome": {
+            "distinct": 6,
+            "sample": [
+              "Acquisto merci",
+              "Ammortamento immobili",
+              "Ammortamento macchinari",
+              "Servizi professionali",
+              "Spese generali"
+            ]
+          },
+          "tipo": {
+            "distinct": 3,
+            "sample": [
+              "costo",
+              "patrimoniale",
+              "ricavo"
+            ]
+          },
+          "valid_from": {
+            "distinct": 15,
+            "sample": [
+              "2018-02-08",
+              "2018-03-10",
+              "2018-05-18",
+              "2018-06-02",
+              "2018-08-25"
+            ]
+          },
+          "valid_to": {
+            "distinct": 1,
+            "sample": [
+              "2025-12-31"
+            ]
+          }
+        }
+      },
+      "documenti": {
+        "row_count": 631,
+        "columns": {
+          "id": {
+            "distinct": 631,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 631
+          },
+          "numero": {
+            "distinct": 5,
+            "sample": [
+              "FATT-2026-001",
+              "FATT-2026-002",
+              "NC-2026-001",
+              "ND-2026-001",
+              "RICEV-2026-001"
+            ]
+          },
+          "tipo": {
+            "distinct": 4,
+            "sample": [
+              "fattura",
+              "nota_credito",
+              "nota_debito",
+              "ricevuta"
+            ]
+          },
+          "data_emissione": {
+            "distinct": 114,
+            "sample": [
+              "2025-10-17",
+              "2025-10-18",
+              "2025-10-20",
+              "2025-10-21",
+              "2025-10-22"
+            ]
+          },
+          "fornitore_cliente": {
+            "distinct": 5,
+            "sample": [
+              "Clienti S.p.A.",
+              "Ditta Gamma",
+              "Fornitori S.r.l.",
+              "Privato Mario Rossi",
+              "Società Beta"
+            ]
+          },
+          "valid_from": {
+            "distinct": 112,
+            "sample": [
+              "2025-10-17",
+              "2025-10-18",
+              "2025-10-19",
+              "2025-10-20",
+              "2025-10-23"
+            ]
+          },
+          "valid_to": {
+            "distinct": 1,
+            "sample": [
+              "2026-12-31"
+            ]
+          }
+        }
+      },
+      "registrazioni": {
+        "row_count": 1629,
+        "columns": {
+          "id": {
+            "distinct": 1629,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1629
+          },
+          "conto_id": {
+            "distinct": 352,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 353
+          },
+          "importo": {
+            "distinct": 1563,
+            "sample": [
+              "100.0",
+              "100.14",
+              "1000.0",
+              "10000.0",
+              "1003.49"
+            ],
+            "min": 50.05,
+            "max": 10000.0
+          },
+          "segno": {
+            "distinct": 2,
+            "sample": [
+              "A",
+              "D"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Acquisto merci",
+              "Ammortamento annuale",
+              "Incasso da cliente",
+              "Pagamento fattura fornitore",
+              "Storno errore"
+            ]
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "annullato",
+              "archiviato",
+              "bozza",
+              "confermato"
+            ]
+          },
+          "data_validita": {
+            "distinct": 244,
+            "sample": [
+              "2025-11-11 11:00:00",
+              "2025-11-12 11:00:00",
+              "2025-11-13 11:00:00",
+              "2025-11-14 11:00:00",
+              "2025-11-15 11:00:00"
+            ]
+          },
+          "valid_from": {
+            "distinct": 243,
+            "sample": [
+              "2025-11-11 11:00:00",
+              "2025-11-12 11:00:00",
+              "2025-11-13 11:00:00",
+              "2025-11-14 11:00:00",
+              "2025-11-15 11:00:00"
+            ]
+          },
+          "valid_to": {
+            "distinct": 1,
+            "sample": [
+              "2026-02-02 09:00:00"
+            ]
+          }
+        }
+      },
+      "collegamenti": {
+        "row_count": 731,
+        "columns": {
+          "id": {
+            "distinct": 731,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 731
+          },
+          "registrazione_id": {
+            "distinct": 604,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1001",
+              "1005"
+            ],
+            "min": 1,
+            "max": 1627
+          },
+          "causale_id": {
+            "distinct": 15,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 15
+          },
+          "documento_id": {
+            "distinct": 415,
+            "sample": [
+              "1",
+              "10",
+              "102",
+              "103",
+              "105"
+            ],
+            "min": 1,
+            "max": 631
+          },
+          "note": {
+            "distinct": 6,
+            "sample": [
+              "Collegato a fattura fornitore",
+              "Collegato a incasso cliente",
+              "Collegato a nota credito",
+              "Nessun documento associato",
+              "Riferimento interno"
+            ]
+          },
+          "valid_from": {
+            "distinct": 229,
+            "sample": [
+              "2025-11-11 11:00:00",
+              "2025-11-12 11:00:00",
+              "2025-11-13 11:00:00",
+              "2025-11-14 11:00:00",
+              "2025-11-15 11:00:00"
+            ]
+          },
+          "valid_to": {
+            "distinct": 1,
+            "sample": [
+              "2026-02-02 09:00:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "conti": [
+        {
+          "id": 1,
+          "codice": "CASSA",
+          "nome": "Capitale Sociale",
+          "tipo_conto": "passivo",
+          "valid_from": "2019-04-28",
+          "valid_to": null
+        },
+        {
+          "id": 2,
+          "codice": "CASSA_1",
+          "nome": "Crediti vs Clienti",
+          "tipo_conto": "passivo",
+          "valid_from": "2019-10-05",
+          "valid_to": null
+        },
+        {
+          "id": 3,
+          "codice": "CASSA_2",
+          "nome": "Cassa contante",
+          "tipo_conto": "patrimoniale",
+          "valid_from": "2019-07-09",
+          "valid_to": null
+        },
+        {
+          "id": 4,
+          "codice": "CASSA_3",
+          "nome": "Immobilizzazioni Materiali",
+          "tipo_conto": "attivo",
+          "valid_from": "2019-10-01",
+          "valid_to": null
+        },
+        {
+          "id": 5,
+          "codice": "CASSA_4",
+          "nome": "Cassa contante",
+          "tipo_conto": "patrimoniale",
+          "valid_from": "2019-03-20",
+          "valid_to": null
+        },
+        {
+          "id": 6,
+          "codice": "CASSA_5",
+          "nome": "Capitale Sociale",
+          "tipo_conto": "attivo",
+          "valid_from": "2019-04-30",
+          "valid_to": null
+        },
+        {
+          "id": 7,
+          "codice": "CASSA_6",
+          "nome": "Debiti vs Fornitori",
+          "tipo_conto": "passivo",
+          "valid_from": "2019-06-21",
+          "valid_to": null
+        },
+        {
+          "id": 8,
+          "codice": "CASSA_7",
+          "nome": "Banca Intesa",
+          "tipo_conto": "passivo",
+          "valid_from": "2019-08-24",
+          "valid_to": null
+        }
+      ],
+      "causali": [
+        {
+          "id": 1,
+          "codice": "RIC001",
+          "nome": "Vendita merci",
+          "tipo": "patrimoniale",
+          "valid_from": "2018-03-10",
+          "valid_to": null
+        },
+        {
+          "id": 2,
+          "codice": "RIC001_1",
+          "nome": "Spese generali",
+          "tipo": "costo",
+          "valid_from": "2019-11-08",
+          "valid_to": null
+        },
+        {
+          "id": 3,
+          "codice": "RIC001_2",
+          "nome": "Servizi professionali",
+          "tipo": "ricavo",
+          "valid_from": "2019-01-08",
+          "valid_to": null
+        },
+        {
+          "id": 4,
+          "codice": "COS001",
+          "nome": "Ammortamento macchinari",
+          "tipo": "ricavo",
+          "valid_from": "2019-04-15",
+          "valid_to": null
+        },
+        {
+          "id": 5,
+          "codice": "COS001_1",
+          "nome": "Servizi professionali",
+          "tipo": "costo",
+          "valid_from": "2019-08-14",
+          "valid_to": null
+        },
+        {
+          "id": 6,
+          "codice": "COS001_2",
+          "nome": "Vendita merci",
+          "tipo": "costo",
+          "valid_from": "2018-06-02",
+          "valid_to": null
+        },
+        {
+          "id": 7,
+          "codice": "PAT001",
+          "nome": "Servizi professionali",
+          "tipo": "ricavo",
+          "valid_from": "2018-12-06",
+          "valid_to": null
+        },
+        {
+          "id": 8,
+          "codice": "PAT001_1",
+          "nome": "Ammortamento macchinari",
+          "tipo": "ricavo",
+          "valid_from": "2018-02-08",
+          "valid_to": null
+        }
+      ],
+      "documenti": [
+        {
+          "id": 1,
+          "numero": "FATT-2026-001",
+          "tipo": "fattura",
+          "data_emissione": "2025-10-24",
+          "fornitore_cliente": "Fornitori S.r.l.",
+          "valid_from": "2025-11-23",
+          "valid_to": null
+        },
+        {
+          "id": 2,
+          "numero": "ND-2026-001",
+          "tipo": "ricevuta",
+          "data_emissione": "2025-11-27",
+          "fornitore_cliente": "Fornitori S.r.l.",
+          "valid_from": "2026-01-04",
+          "valid_to": null
+        },
+        {
+          "id": 3,
+          "numero": "FATT-2026-001",
+          "tipo": "nota_debito",
+          "data_emissione": "2025-12-14",
+          "fornitore_cliente": "Ditta Gamma",
+          "valid_from": "2025-12-10",
+          "valid_to": null
+        },
+        {
+          "id": 4,
+          "numero": "RICEV-2026-001",
+          "tipo": "ricevuta",
+          "data_emissione": "2025-12-21",
+          "fornitore_cliente": "Fornitori S.r.l.",
+          "valid_from": "2026-01-05",
+          "valid_to": null
+        },
+        {
+          "id": 5,
+          "numero": "FATT-2026-001",
+          "tipo": "nota_credito",
+          "data_emissione": "2025-11-20",
+          "fornitore_cliente": "Fornitori S.r.l.",
+          "valid_from": "2026-01-06",
+          "valid_to": null
+        },
+        {
+          "id": 6,
+          "numero": "ND-2026-001",
+          "tipo": "nota_credito",
+          "data_emissione": "2025-11-20",
+          "fornitore_cliente": "Clienti S.p.A.",
+          "valid_from": "2025-12-21",
+          "valid_to": null
+        },
+        {
+          "id": 7,
+          "numero": "FATT-2026-001",
+          "tipo": "fattura",
+          "data_emissione": "2025-12-08",
+          "fornitore_cliente": "Ditta Gamma",
+          "valid_from": "2025-12-04",
+          "valid_to": null
+        },
+        {
+          "id": 8,
+          "numero": "FATT-2026-001",
+          "tipo": "nota_debito",
+          "data_emissione": "2025-12-10",
+          "fornitore_cliente": "Privato Mario Rossi",
+          "valid_from": "2025-12-11",
+          "valid_to": null
+        }
+      ],
+      "registrazioni": [
+        {
+          "id": 1,
+          "conto_id": 189,
+          "importo": 3775.02,
+          "segno": "A",
+          "descrizione": "Incasso da cliente",
+          "stato": "confermato",
+          "data_validita": "2026-01-03 10:00:00",
+          "valid_from": "2025-12-01 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 2,
+          "conto_id": 248,
+          "importo": 843.82,
+          "segno": "D",
+          "descrizione": "Incasso da cliente",
+          "stato": "archiviato",
+          "data_validita": "2026-01-11 10:00:00",
+          "valid_from": "2026-01-08 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 3,
+          "conto_id": 138,
+          "importo": 4385.2,
+          "segno": "A",
+          "descrizione": "Vendita merci",
+          "stato": "archiviato",
+          "data_validita": "2026-01-14 10:00:00",
+          "valid_from": "2026-01-14 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 4,
+          "conto_id": 82,
+          "importo": 100.0,
+          "segno": "D",
+          "descrizione": "Vendita merci",
+          "stato": "confermato",
+          "data_validita": "2025-12-08 10:00:00",
+          "valid_from": "2025-12-21 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 5,
+          "conto_id": 295,
+          "importo": 1092.89,
+          "segno": "A",
+          "descrizione": "Ammortamento annuale",
+          "stato": "confermato",
+          "data_validita": "2025-12-15 10:00:00",
+          "valid_from": "2025-11-22 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 6,
+          "conto_id": 289,
+          "importo": 1508.52,
+          "segno": "D",
+          "descrizione": "Ammortamento annuale",
+          "stato": "archiviato",
+          "data_validita": "2025-12-20 10:00:00",
+          "valid_from": "2025-11-17 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 7,
+          "conto_id": 264,
+          "importo": 4727.6,
+          "segno": "A",
+          "descrizione": "Vendita merci",
+          "stato": "bozza",
+          "data_validita": "2025-11-21 10:00:00",
+          "valid_from": "2025-11-26 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 8,
+          "conto_id": 184,
+          "importo": 2284.56,
+          "segno": "A",
+          "descrizione": "Pagamento fattura fornitore",
+          "stato": "archiviato",
+          "data_validita": "2025-11-28 10:00:00",
+          "valid_from": "2026-01-06 10:00:00",
+          "valid_to": null
+        }
+      ],
+      "collegamenti": [
+        {
+          "id": 1,
+          "registrazione_id": 809,
+          "causale_id": 7,
+          "documento_id": 69,
+          "note": "Nessun documento associato",
+          "valid_from": "2025-12-08 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 2,
+          "registrazione_id": 734,
+          "causale_id": 5,
+          "documento_id": 525,
+          "note": "Collegato a incasso cliente",
+          "valid_from": "2025-12-02 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 3,
+          "registrazione_id": 893,
+          "causale_id": 2,
+          "documento_id": 530,
+          "note": "Riferimento interno",
+          "valid_from": "2025-12-16 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 4,
+          "registrazione_id": 389,
+          "causale_id": 3,
+          "documento_id": 333,
+          "note": "Collegato a incasso cliente",
+          "valid_from": "2026-01-08 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 5,
+          "registrazione_id": 1596,
+          "causale_id": 14,
+          "documento_id": 260,
+          "note": "Nessun documento associato",
+          "valid_from": "2025-12-23 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 6,
+          "registrazione_id": 952,
+          "causale_id": 11,
+          "documento_id": 195,
+          "note": "Storno parziale",
+          "valid_from": "2026-01-09 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 7,
+          "registrazione_id": 294,
+          "causale_id": 14,
+          "documento_id": 560,
+          "note": null,
+          "valid_from": "2025-12-26 10:00:00",
+          "valid_to": null
+        },
+        {
+          "id": 8,
+          "registrazione_id": 1193,
+          "causale_id": 8,
+          "documento_id": 488,
+          "note": "Collegato a nota credito",
+          "valid_from": "2025-11-23 10:00:00",
+          "valid_to": null
+        }
+      ]
+    }
+  },
+  "story": "Presso l'ufficio amministrativo dell'azienda, gli addetti alla contabilità consultano quotidianamente l'archivio denominato conti, che raccoglie le schede dei diversi conti aziendali, ciascuno con la propria natura: attivo, passivo o patrimoniale. Parallelamente, il registro intitolato registrazioni contiene le singole movimentazioni contabili, ognuna con il proprio importo, il segno dare o avere, e lo stato che può essere bozza, confermato, annullato o archiviato. Per classificare ogni movimento, si utilizza l'archivio causali, dove sono elencate le motivazioni economiche come ricavo, costo o patrimoniale. I documenti giustificativi, come fatture, note di credito, note di debito e ricevute, sono custoditi nel registro documenti. Infine, l'archivio collegamenti tiene traccia dei legami tra le registrazioni, le causali e i documenti, con eventuali note esplicative.\n\nDurante una verifica periodica, gli analisti hanno deciso di calcolare la mediana degli importi delle registrazioni confermate per ogni tipo di conto attivo o passivo. Hanno quindi esaminato tutte le registrazioni con stato confermato, escludendo quelle in bozza, annullate o archiviate, e le hanno raggruppate in base alla natura del conto di riferimento, considerando solo i conti di tipo attivo e quelli di tipo passivo. Per ciascun gruppo, hanno ordinato gli importi e individuato il valore centrale, ottenendo così la mediana. Questo indicatore ha permesso di comprendere la distribuzione tipica dei movimenti confermati, distinguendo tra conti attivi e passivi, e di confrontare i risultati con le aspettative gestionali."
+}

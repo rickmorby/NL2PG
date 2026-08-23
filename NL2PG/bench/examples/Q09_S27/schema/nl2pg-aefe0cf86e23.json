@@ -1,0 +1,38 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "giornale_movimenti",
+        "description": "La tabella fisica 'transazioni' viene denominata 'giornale_movimenti' nella prosa aziendale. Le query devono aggregare le righe di questa tabella raggruppando per conto o cliente, senza che il nome originale compaia nel testo del task."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo",
+        "obsolete_value": "controvalore",
+        "description": "La colonna 'importo' della tabella transazioni è indicata nei documenti aziendali come 'controvalore'. Le clausole SUM(importo) e i confronti numerici in HAVING devono riferirsi alla colonna reale 'importo'."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "fido_concesso",
+        "obsolete_value": "massimale di credito accordato dalla banca",
+        "description": "La colonna 'fido_concesso' della tabella conti è descritta con la perifrasi 'massimale di credito accordato dalla banca'. Il filtro HAVING richiesto (es. confrontare aggregati sul fido) deve essere ricondotto semanticamente alla colonna reale."
+      }
+    ],
+    "spec_hash": "fc58d59b20496cee"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_apertura_relazione DATE NOT NULL\n);\n\nCREATE TABLE filiali (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    codice_abi TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    filiale_id INT NOT NULL,\n    iban TEXT NOT NULL UNIQUE,\n    fido_concesso NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (fido_concesso >= 0),\n    saldo NUMERIC(12,2) NOT NULL DEFAULT 0,\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL,\n    data_transazione DATE NOT NULL,\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('accredito', 'addebito')),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    descrizione TEXT\n);"
+}

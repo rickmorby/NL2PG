@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 3,
+  "hierarchy": "flat_denormalized",
+  "sql_features": [
+    "math_funcs"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "registrazioni_contabili",
+      "obsolete_value": "movimenti_finanziari",
+      "description": "La tabella principale contenente le transazioni contabili è denominata 'movimenti_finanziari' nella documentazione aziendale, mentre nel database è 'registrazioni_contabili'."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "ammortamento",
+      "obsolete_value": "deprezzamento_annuale",
+      "description": "Il campo che rappresenta l'ammortamento di un cespite viene indicato come 'deprezzamento_annuale' nei report interni, mentre nel database è 'ammortamento'."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "saldo",
+      "obsolete_value": "disponibilità",
+      "description": "Il termine 'saldo' nel database indica il valore contabile netto, mentre nella prosa aziendale viene spesso usato 'disponibilità' per riferirsi allo stesso concetto, creando ambiguità semantica."
+    }
+  ],
+  "spec_hash": "15dec6a6ce960fa1"
+}

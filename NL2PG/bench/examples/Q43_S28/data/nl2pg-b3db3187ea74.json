@@ -1,0 +1,178 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "sorting"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dip",
+        "obsolete_value": "anagrafica_collaboratori",
+        "description": "La tabella dip, che rappresenta l'archivio dei dipendenti finanziari, viene chiamata anagrafica_collaboratori nella prosa aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "emp_no",
+        "obsolete_value": "matricola_operatore",
+        "description": "La colonna emp_no viene indicata con il gergo aziendale matricola_operatore, pur rimanendo il campo tecnico da usare per l'ordinamento."
+      }
+    ],
+    "spec_hash": "04e513520a52c30d"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id_reparto INT PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL,\n    budget_annuale NUMERIC(15, 2) CHECK (budget_annuale >= 0)\n);\n\nCREATE TABLE dip (\n    emp_no INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    id_reparto INT NOT NULL REFERENCES dipartimenti(id_reparto),\n    data_assunzione DATE NOT NULL DEFAULT CURRENT_DATE,\n    stipendio_base NUMERIC(12, 2) CHECK (stipendio_base > 0)\n);\n\nCREATE INDEX idx_emp_sorting ON dip (emp_no, data_assunzione);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dipartimenti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_reparto": 1,
+            "nome_dipartimento": "Risk Management",
+            "budget_annuale": 500000.0
+          },
+          {
+            "id_reparto": 2,
+            "nome_dipartimento": "Compliance",
+            "budget_annuale": 350000.0
+          },
+          {
+            "id_reparto": 3,
+            "nome_dipartimento": "Trading Desk",
+            "budget_annuale": 1200000.0
+          },
+          {
+            "id_reparto": 4,
+            "nome_dipartimento": "Audit Interno",
+            "budget_annuale": 250000.0
+          }
+        ],
+        "variations": {
+          "nome_dipartimento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Risk Management",
+              "Compliance",
+              "Trading Desk",
+              "Audit Interno",
+              "Investment Banking",
+              "Retail Banking"
+            ]
+          },
+          "budget_annuale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "dip",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 15.0,
+        "templates": [
+          {
+            "emp_no": 1001,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "id_reparto": 1,
+            "data_assunzione": "2020-01-15",
+            "stipendio_base": 45000.0
+          },
+          {
+            "emp_no": 1002,
+            "nome": "Elena",
+            "cognome": "Bianchi",
+            "id_reparto": 2,
+            "data_assunzione": "2021-03-10",
+            "stipendio_base": 42000.0
+          },
+          {
+            "emp_no": 1003,
+            "nome": "Luca",
+            "cognome": "Verdi",
+            "id_reparto": 3,
+            "data_assunzione": "2019-11-22",
+            "stipendio_base": 65000.0
+          },
+          {
+            "emp_no": 1004,
+            "nome": "Sara",
+            "cognome": "Neri",
+            "id_reparto": 1,
+            "data_assunzione": "2022-06-01",
+            "stipendio_base": 48000.0
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Elena",
+              "Luca",
+              "Sara",
+              "Giulia",
+              "Andrea",
+              "Paolo"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Esposito",
+              "Romano"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -365.0,
+            "delta_max": 365.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stipendio_base": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.9,
+            "factor_max": 1.2,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

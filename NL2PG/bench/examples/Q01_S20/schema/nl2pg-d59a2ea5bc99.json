@@ -1,0 +1,12 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "33e7faa8b0221e72"
+  },
+  "schema_ddl": "CREATE TYPE tipo_movimento AS ENUM ('entrata', 'uscita', 'rettifica');\n\nCREATE TYPE stato_documento AS ENUM ('bozza', 'registrato', 'verificato', 'chiuso', 'annullato');\n\nCREATE TABLE movimenti_contabili (\n    id INT PRIMARY KEY,\n    numero_protocollo BIGINT NOT NULL UNIQUE,\n    data_registrazione DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    tipo tipo_movimento NOT NULL,\n    stato stato_documento NOT NULL DEFAULT 'bozza',\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    conto TEXT NOT NULL,\n    causale TEXT\n);"
+}

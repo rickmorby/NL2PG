@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 4,
+  "hierarchy": "mixed",
+  "sql_features": [
+    "subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "registrazione_movimenti",
+      "description": "La tabella transazioni viene denominata registrazione_movimenti nella prosa aziendale. Il progettista deve riconoscere che ogni menzione a registrazione_movimenti si riferisce alla tabella fisica transazioni, che registra i movimenti di denaro sui conti."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "saldo_disponibile",
+      "obsolete_value": "liquidita_operativa_netta",
+      "description": "La colonna saldo_disponibile della tabella conti viene indicata nella documentazione aziendale con il gergo finanziario liquidita_operativa_netta. Il progettista deve mappare tale termine tecnico alla colonna reale saldo_disponibile quando formula le condizioni di filtro o selezione."
+    }
+  ],
+  "spec_hash": "bb796e3a7f0aaacd"
+}

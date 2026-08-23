@@ -1,0 +1,27 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "filtered_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "immobili",
+      "obsolete_value": "schede_catastali",
+      "description": "La tabella immobili viene denominata schede_catastali nella prosa aziendale; il solver deve risalire alla tabella reale immobili."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "contratti",
+      "obsolete_value": "atti di compravendita",
+      "description": "La tabella contratti viene indicata con il gergo notarile 'atti di compravendita'; i vincoli impliciti di dominio (es. importo positivo, data stipula NOT NULL) vanno tradotti in condizioni WHERE esplicite."
+    }
+  ],
+  "spec_hash": "3e4e733a77bdced4"
+}

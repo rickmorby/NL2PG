@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 5,
+    "hierarchy": "exclusive_arc",
+    "sql_features": [
+      "boolean_predicate"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "candidati",
+        "obsolete_value": "talent_pool_esterno",
+        "description": "La tabella candidati, che partecipa all'arco esclusivo della tabella documenti insieme a dipendenti, viene denominata talent_pool_esterno nella prosa aziendale. Il nome reale nel database resta candidati."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "attivo",
+        "obsolete_value": "in forza",
+        "description": "Il flag booleano attivo della tabella dipendenti viene espresso con il gergo HR 'in forza'. Le query richieste dovranno tradurre questa espressione nel predicato WHERE dipendenti.attivo IS TRUE."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "superata",
+        "obsolete_value": "verdetto favorevole",
+        "description": "La colonna booleana superata della tabella valutazioni è descritta nei documenti aziendali con il sinonimo 'verdetto favorevole'. Le query dovranno mappare tale perifrasi sul predicato WHERE valutazioni.superata IS TRUE."
+      }
+    ],
+    "spec_hash": "c9029e80594ea393"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_annuo NUMERIC(10,2) CHECK (stipendio_annuo > 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE candidati (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    fonte_reclutamento TEXT,\n    data_candidatura DATE NOT NULL\n);\n\nCREATE TABLE colloqui (\n    id INT PRIMARY KEY,\n    candidato_id INT NOT NULL REFERENCES candidati(id),\n    data_colloquio TIMESTAMP NOT NULL,\n    modalita TEXT NOT NULL,\n    esito TEXT CHECK (esito IN ('positivo', 'negativo', 'da_definire'))\n);\n\nCREATE TABLE valutazioni (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    periodo TEXT NOT NULL,\n    punteggio NUMERIC(4,1) CHECK (punteggio BETWEEN 0 AND 100),\n    superata BOOLEAN NOT NULL DEFAULT FALSE,\n    note TEXT\n);\n\nCREATE TABLE documenti (\n    id INT PRIMARY KEY,\n    nome_file TEXT NOT NULL,\n    tipo_documento TEXT NOT NULL,\n    dimensione_byte BIGINT CHECK (dimensione_byte >= 0),\n    data_caricamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    dipendente_id INT REFERENCES dipendenti(id),\n    candidato_id INT REFERENCES candidati(id),\n    CHECK ((dipendente_id IS NULL) <> (candidato_id IS NULL))\n);"
+}

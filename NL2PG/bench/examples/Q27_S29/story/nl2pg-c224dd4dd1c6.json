@@ -1,0 +1,360 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_ordine TEXT NOT NULL UNIQUE,\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) NOT NULL CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    codice_tracciamento TEXT NOT NULL UNIQUE,\n    indirizzo_consegna TEXT NOT NULL,\n    data_spedizione DATE NOT NULL,\n    stato_spedizione TEXT NOT NULL CHECK (stato_spedizione IN ('in_preparazione', 'in_transito', 'consegnato', 'annullato'))\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 743,
+        "columns": {
+          "id": {
+            "distinct": 743,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 743
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Anna",
+              "Elena",
+              "Giulia",
+              "Laura",
+              "Luca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Bianco",
+              "Blu",
+              "Gialli",
+              "Giallo"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 8,
+            "sample": [
+              "Corso Buenos Aires 45, 20124 Milano",
+              "Corso Vittorio Emanuele II 70, 10121 Torino",
+              "Piazza San Carlo 156, 10121 Torino",
+              "Piazza del Popolo 18, 00186 Roma",
+              "Via Dante 22, 20121 Milano"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 3100
+          },
+          "cliente_id": {
+            "distinct": 726,
+            "sample": [
+              "1",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 743
+          },
+          "numero_ordine": {
+            "distinct": 3000,
+            "sample": [
+              "ORD-2026-001",
+              "ORD-2026-001_1",
+              "ORD-2026-001_10",
+              "ORD-2026-001_100",
+              "ORD-2026-001_101"
+            ]
+          },
+          "data_ordine": {
+            "distinct": 110,
+            "sample": [
+              "2025-12-16",
+              "2025-12-17",
+              "2025-12-18",
+              "2025-12-19",
+              "2025-12-20"
+            ]
+          },
+          "importo_totale": {
+            "distinct": 2742,
+            "sample": [
+              "100.09",
+              "100.27",
+              "100.28",
+              "100.36",
+              "100.56"
+            ],
+            "min": 44.5,
+            "max": 641.5
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 2930,
+        "columns": {
+          "id": {
+            "distinct": 2930,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 201,
+            "max": 3130
+          },
+          "ordine_id": {
+            "distinct": 1898,
+            "sample": [
+              "1000",
+              "1002",
+              "1003",
+              "1004",
+              "1006"
+            ],
+            "min": 101,
+            "max": 3100
+          },
+          "codice_tracciamento": {
+            "distinct": 2930,
+            "sample": [
+              "TRK-2026-001",
+              "TRK-2026-001_1",
+              "TRK-2026-001_10",
+              "TRK-2026-001_100",
+              "TRK-2026-001_101"
+            ]
+          },
+          "indirizzo_consegna": {
+            "distinct": 5,
+            "sample": [
+              "Corso Buenos Aires 45, 20124 Milano",
+              "Piazza San Carlo 156, 10121 Torino",
+              "Via Farini 10, 40124 Bologna",
+              "Via Roma 12, 00100 Roma",
+              "Via Toledo 314, 80132 Napoli"
+            ]
+          },
+          "data_spedizione": {
+            "distinct": 25,
+            "sample": [
+              "2026-01-16",
+              "2026-01-17",
+              "2026-01-18",
+              "2026-01-19",
+              "2026-01-20"
+            ]
+          },
+          "stato_spedizione": {
+            "distinct": 4,
+            "sample": [
+              "annullato",
+              "consegnato",
+              "in_preparazione",
+              "in_transito"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Riccarda",
+          "cognome": "Rossi",
+          "indirizzo": "Via Roma 12, 00100 Roma"
+        },
+        {
+          "id": 2,
+          "nome": "Giulia",
+          "cognome": "Gialli",
+          "indirizzo": "Via Toledo 314, 80132 Napoli"
+        },
+        {
+          "id": 3,
+          "nome": "Riccarda",
+          "cognome": "Rosso",
+          "indirizzo": "Via Dante 22, 20121 Milano"
+        },
+        {
+          "id": 4,
+          "nome": "Paolo",
+          "cognome": "Bianchi",
+          "indirizzo": "Via Toledo 314, 80132 Napoli"
+        },
+        {
+          "id": 5,
+          "nome": "Anna",
+          "cognome": "Nero",
+          "indirizzo": "Via Roma 12, 00100 Roma"
+        },
+        {
+          "id": 6,
+          "nome": "Luca",
+          "cognome": "Giallo",
+          "indirizzo": "Via Toledo 314, 80132 Napoli"
+        },
+        {
+          "id": 7,
+          "nome": "Luca",
+          "cognome": "Bianco",
+          "indirizzo": "Via Toledo 314, 80132 Napoli"
+        },
+        {
+          "id": 8,
+          "nome": "Paolo",
+          "cognome": "Rosso",
+          "indirizzo": "Via Toledo 314, 80132 Napoli"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 101,
+          "cliente_id": 519,
+          "numero_ordine": "ORD-2026-001",
+          "data_ordine": "2026-02-02",
+          "importo_totale": 161.87
+        },
+        {
+          "id": 102,
+          "cliente_id": 681,
+          "numero_ordine": "ORD-2026-001_1",
+          "data_ordine": "2026-02-08",
+          "importo_totale": 286.18
+        },
+        {
+          "id": 103,
+          "cliente_id": 150,
+          "numero_ordine": "ORD-2026-001_2",
+          "data_ordine": "2026-02-01",
+          "importo_totale": 284.57
+        },
+        {
+          "id": 104,
+          "cliente_id": 175,
+          "numero_ordine": "ORD-2026-001_3",
+          "data_ordine": "2026-01-07",
+          "importo_totale": 204.03
+        },
+        {
+          "id": 105,
+          "cliente_id": 58,
+          "numero_ordine": "ORD-2026-001_4",
+          "data_ordine": "2025-12-28",
+          "importo_totale": 301.0
+        },
+        {
+          "id": 106,
+          "cliente_id": 521,
+          "numero_ordine": "ORD-2026-001_5",
+          "data_ordine": "2026-02-11",
+          "importo_totale": 140.14
+        },
+        {
+          "id": 107,
+          "cliente_id": 356,
+          "numero_ordine": "ORD-2026-001_6",
+          "data_ordine": "2025-12-21",
+          "importo_totale": 84.35
+        },
+        {
+          "id": 108,
+          "cliente_id": 480,
+          "numero_ordine": "ORD-2026-001_7",
+          "data_ordine": "2025-12-28",
+          "importo_totale": 121.36
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 201,
+          "ordine_id": 1147,
+          "codice_tracciamento": "TRK-2026-001",
+          "indirizzo_consegna": "Via Farini 10, 40124 Bologna",
+          "data_spedizione": "2026-01-21",
+          "stato_spedizione": "consegnato"
+        },
+        {
+          "id": 202,
+          "ordine_id": 548,
+          "codice_tracciamento": "TRK-2026-001_1",
+          "indirizzo_consegna": "Via Toledo 314, 80132 Napoli",
+          "data_spedizione": "2026-01-17",
+          "stato_spedizione": "annullato"
+        },
+        {
+          "id": 203,
+          "ordine_id": 1729,
+          "codice_tracciamento": "TRK-2026-001_2",
+          "indirizzo_consegna": "Via Roma 12, 00100 Roma",
+          "data_spedizione": "2026-01-20",
+          "stato_spedizione": "in_preparazione"
+        },
+        {
+          "id": 204,
+          "ordine_id": 1312,
+          "codice_tracciamento": "TRK-2026-001_3",
+          "indirizzo_consegna": "Via Roma 12, 00100 Roma",
+          "data_spedizione": "2026-01-18",
+          "stato_spedizione": "consegnato"
+        },
+        {
+          "id": 205,
+          "ordine_id": 728,
+          "codice_tracciamento": "TRK-2026-001_4",
+          "indirizzo_consegna": "Via Farini 10, 40124 Bologna",
+          "data_spedizione": "2026-01-19",
+          "stato_spedizione": "in_preparazione"
+        },
+        {
+          "id": 206,
+          "ordine_id": 2848,
+          "codice_tracciamento": "TRK-2026-001_5",
+          "indirizzo_consegna": "Via Toledo 314, 80132 Napoli",
+          "data_spedizione": "2026-01-19",
+          "stato_spedizione": "annullato"
+        },
+        {
+          "id": 207,
+          "ordine_id": 2798,
+          "codice_tracciamento": "TRK-2026-001_6",
+          "indirizzo_consegna": "Via Farini 10, 40124 Bologna",
+          "data_spedizione": "2026-01-17",
+          "stato_spedizione": "in_transito"
+        },
+        {
+          "id": 208,
+          "ordine_id": 2391,
+          "codice_tracciamento": "TRK-2026-001_7",
+          "indirizzo_consegna": "Via Farini 10, 40124 Bologna",
+          "data_spedizione": "2026-01-18",
+          "stato_spedizione": "in_transito"
+        }
+      ]
+    }
+  },
+  "story": "Nell’ambito della logistica aziendale, l’archivio denominato clienti raccoglie le informazioni anagrafiche di ogni acquirente, mentre il registro intitolato ordini traccia ogni richiesta di acquisto con il relativo numero, la data e l’importo. Parallelamente, il registro denominato movimentazioni merci documenta le fasi di distribuzione, includendo il riferimento spedizione univoco, la destinazione logistica e lo stato aggiornato di ogni consegna, che può essere in_preparazione, in_transito, consegnato o annullato. Durante un’analisi multi-livello condotta a inizio 2026, il team commerciale ha esaminato gli ordini emessi tra il 2025-12-16 e il 2026-02-11, raggruppandoli per cliente e per stato di spedizione. In particolare, sono stati presi in considerazione gli ordini con numero ORD-2026-001, ORD-2026-001_1 e ORD-2026-001_2, associati a importi che variavano da 84.35 a 301.0. Le spedizioni collegate, identificate dai codici TRK-2026-001, TRK-2026-001_1 e TRK-2026-001_2, sono state monitorate per verificare che le destinazioni_logistiche come Via Farini 10, 40124 Bologna o Via Roma 12, 00100 Roma fossero correttamente allineate agli indirizzi registrati nell’archivio clienti. L’obiettivo era ottenere una visione aggregata sia per singolo cliente, sia per stato di consegna, sia a livello generale, al fine di ottimizzare i processi di evasione e tracciare eventuali ritardi o anomalie nelle date di spedizione, come il 2026-01-17 o il 2026-01-20."
+}

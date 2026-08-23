@@ -1,0 +1,236 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 4,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "studenti",
+        "obsolete_value": "anagrafica_iscritti",
+        "description": "La tabella contenente i dati anagrafici degli studenti viene indicata nei documenti di business come anagrafica_iscritti."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "voto_esame",
+        "obsolete_value": "valutazione_acquisita_in_sede_di_appello",
+        "description": "Il campo numerico del voto viene espresso nel gergo accademico burocratico come valutazione_acquisita_in_sede_di_appello."
+      }
+    ],
+    "spec_hash": "f248ac56741521af"
+  },
+  "schema_ddl": "CREATE TABLE facolta (id INT PRIMARY KEY, nome_facolta TEXT NOT NULL);\n\nCREATE TABLE studenti (id INT PRIMARY KEY, nome TEXT NOT NULL, cognome TEXT NOT NULL, facolta_id INT);\n\nCREATE TABLE corsi (id INT PRIMARY KEY, titolo_corso TEXT NOT NULL, crediti INT CHECK (crediti > 0));\n\nCREATE TABLE esami (id INT PRIMARY KEY, studente_id INT, corso_id INT, voto_esame INT CHECK (voto_esame BETWEEN 18 AND 30), data_appello DATE NOT NULL);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "facolta",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_facolta": "Ingegneria"
+          },
+          {
+            "id": 2,
+            "nome_facolta": "Economia"
+          },
+          {
+            "id": 3,
+            "nome_facolta": "Lettere"
+          }
+        ],
+        "variations": {
+          "nome_facolta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ingegneria",
+              "Economia",
+              "Lettere",
+              "Scienze",
+              "Giurisprudenza"
+            ]
+          }
+        }
+      },
+      {
+        "table": "studenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "facolta_id": 1
+          },
+          {
+            "id": 2,
+            "nome": "Anna",
+            "cognome": "Verdi",
+            "facolta_id": 2
+          },
+          {
+            "id": 3,
+            "nome": "Luca",
+            "cognome": "Bianchi",
+            "facolta_id": 1
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Anna",
+              "Luca",
+              "Elena",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Verdi",
+              "Bianchi",
+              "Neri",
+              "Esposito"
+            ]
+          }
+        }
+      },
+      {
+        "table": "corsi",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "titolo_corso": "Analisi I",
+            "crediti": 12
+          },
+          {
+            "id": 2,
+            "titolo_corso": "Economia Politica",
+            "crediti": 9
+          },
+          {
+            "id": 3,
+            "titolo_corso": "Letteratura Italiana",
+            "crediti": 6
+          }
+        ],
+        "variations": {
+          "titolo_corso": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Analisi I",
+              "Economia Politica",
+              "Letteratura Italiana",
+              "Fisica",
+              "Diritto Privato"
+            ]
+          },
+          "crediti": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "6",
+              "9",
+              "12"
+            ]
+          }
+        }
+      },
+      {
+        "table": "esami",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "studente_id": 1,
+            "corso_id": 1,
+            "voto_esame": 24,
+            "data_appello": "2025-02-15"
+          },
+          {
+            "id": 2,
+            "studente_id": 2,
+            "corso_id": 2,
+            "voto_esame": 28,
+            "data_appello": "2025-02-16"
+          },
+          {
+            "id": 3,
+            "studente_id": 3,
+            "corso_id": 1,
+            "voto_esame": 18,
+            "data_appello": "2025-02-17"
+          }
+        ],
+        "variations": {
+          "voto_esame": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "18",
+              "20",
+              "22",
+              "24",
+              "26",
+              "28",
+              "30"
+            ]
+          },
+          "data_appello": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

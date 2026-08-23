@@ -1,0 +1,34 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 5,
+  "hierarchy": "one_to_many_con_cancellazione_logica",
+  "sql_features": [
+    "grouping_sets"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "registro_transazioni",
+      "description": "La tabella ordini, che contiene i riferimenti ai clienti con importo_totale, stato e la colonna di cancellazione logica deleted_at, viene denominata registro_transazioni nella prosa aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "deleted_at",
+      "obsolete_value": "data_dismissione",
+      "description": "La colonna deleted_at della tabella ordini, usata per la cancellazione logica dei record, viene indicata nella documentazione come data_dismissione; le query devono filtrare con deleted_at IS NULL o IS NOT NULL per includere o escludere gli ordini dismessi."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_totale",
+      "obsolete_value": "GMV",
+      "description": "La metrica importo_totale degli ordini viene espressa nella prosa aziendale con il gergo finanziario GMV (Gross Merchandise Value); le aggregazioni richieste con GROUPING SETS ((cliente_id), (stato), ()) vanno calcolate su tale colonna."
+    }
+  ],
+  "spec_hash": "68453fe20eec6492"
+}

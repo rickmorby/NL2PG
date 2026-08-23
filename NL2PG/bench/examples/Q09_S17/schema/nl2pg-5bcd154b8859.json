@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "2707a59f4d344de0"
+  },
+  "schema_ddl": "CREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_albo TEXT NOT NULL UNIQUE,\n    specializzazione TEXT NOT NULL,\n    email TEXT UNIQUE,\n    deleted_at TIMESTAMPTZ\n);\n\nCREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT,\n    deleted_at TIMESTAMPTZ\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    data_visita DATE NOT NULL,\n    ora_visita TIME NOT NULL DEFAULT '09:00',\n    tipo_visita TEXT NOT NULL CHECK (tipo_visita IN ('prima_visita', 'controllo', 'urgenza', 'follow_up')),\n    diagnosi TEXT,\n    costo NUMERIC(10,2) NOT NULL CHECK (costo >= 0),\n    durata_minuti INT CHECK (durata_minuti > 0),\n    deleted_at TIMESTAMPTZ\n);"
+}

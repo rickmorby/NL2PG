@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 6,
+    "hierarchy": "flat",
+    "sql_features": [
+      "case"
+    ],
+    "twist": [
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "category_name",
+        "obsolete_value": "classe merceologica di bilancio",
+        "description": "La colonna category_name della tabella piatta articoli_magazzino viene indicata nella prosa aziendale con il gergo contabile 'classe merceologica di bilancio'. Le query devono applicare CASE WHEN category_name = 'valore' THEN etichetta ELSE altro END riconoscendo che il valore letterale da confrontare è 'valore', pur essendo la colonna descritta solo tramite terminologia settoriale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "supplier_name",
+        "obsolete_value": "anagrafica del partner di fornitura",
+        "description": "La colonna ridondante supplier_name incorporata nella tabella piatta viene denominata nella documentazione aziendale come 'anagrafica del partner di fornitura'. Le query devono usare COALESCE(supplier_name, 'N/D') per gestire i valori NULLI, identificando correttamente la colonna nonostante la perifrasi sinonimica impiegata nei requisiti."
+      }
+    ],
+    "spec_hash": "d99fe971cadbdec9"
+  },
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    email TEXT\n);\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    codice_magazzino TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_massima INT NOT NULL CHECK (capacita_massima > 0)\n);\n\nCREATE TABLE articoli_magazzino (\n    id INT PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    nome_categoria TEXT NOT NULL,\n    unita_misura TEXT NOT NULL DEFAULT 'PZ',\n    costo_unitario NUMERIC(10,2) NOT NULL CHECK (costo_unitario >= 0),\n    prezzo_vendita NUMERIC(10,2) NOT NULL CHECK (prezzo_vendita >= 0),\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    nome_fornitore TEXT,\n    giacenza_disponibile INT NOT NULL DEFAULT 0 CHECK (giacenza_disponibile >= 0),\n    valore_totale_giacenza NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (valore_totale_giacenza >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0)\n);\n\nCREATE TABLE ordini_acquisto (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    data_ordine DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato_ordine TEXT NOT NULL DEFAULT 'aperto' CHECK (stato_ordine IN ('aperto', 'confermato', 'evaso', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0)\n);\n\nCREATE TABLE righe_ordine_acquisto (\n    ordine_id INT NOT NULL REFERENCES ordini_acquisto(id) ON DELETE CASCADE,\n    numero_riga INT NOT NULL CHECK (numero_riga > 0),\n    articolo_id INT NOT NULL REFERENCES articoli_magazzino(id),\n    quantita_ordinata INT NOT NULL CHECK (quantita_ordinata > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    subtotale_riga NUMERIC(12,2) NOT NULL CHECK (subtotale_riga >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);\n\nCREATE TABLE movimenti_magazzino (\n    id INT PRIMARY KEY,\n    articolo_id INT NOT NULL REFERENCES articoli_magazzino(id),\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    data_movimento TIMESTAMP NOT NULL,\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('carico', 'scarico', 'rettifica')),\n    quantita_mossa INT NOT NULL CHECK (quantita_mossa <> 0),\n    causale TEXT\n);"
+}

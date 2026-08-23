@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "overlaps"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "storico_contratti",
+      "obsolete_value": "registro_versioni_commerciali",
+      "description": "La tabella storico_contratti, che conserva le versioni temporali dei contratti di vendita con i relativi intervalli di validità, viene denominata registro_versioni_commerciali nella prosa aziendale. Il solver deve risalire al nome reale della tabella per interrogare lo storico."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "valido_dal, valido_al",
+      "obsolete_value": "finestra di vigore dell'offerta",
+      "description": "Le colonne valido_dal e valido_al, che delimitano l'intervallo di validità di ciascuna versione del contratto, sono indicate nei documenti aziendali con il gergo 'finestra di vigore dell'offerta'. Le query richieste devono verificare la sovrapposizione degli intervalli tramite WHERE (inizio_a, fine_a) OVERLAPS (inizio_b, fine_b) applicato a queste colonne dello storico."
+    }
+  ],
+  "spec_hash": "162cb74862cb50d2"
+}

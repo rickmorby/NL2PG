@@ -1,0 +1,696 @@
+{
+  "schema_ddl": "CREATE TYPE stato_conto AS ENUM ('ATTIVO', 'SOSPESO', 'CHIUSO');\n\nCREATE TYPE stato_prestito AS ENUM ('RICHIESTO', 'APPROVATO', 'EROGATO', 'ESTINTO', 'MOROSO');\n\nCREATE TYPE tipo_transazione AS ENUM ('VERSAMENTO', 'PRELIEVO', 'BONIFICO_USCITA', 'BONIFICO_INGRESSO', 'COMMISSIONE');\n\nCREATE TYPE stato_rata AS ENUM ('IN_ATTESA', 'PAGATA', 'INSOLUTA');\n\nCREATE TABLE clienti (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE conti_correnti (\n    id BIGSERIAL PRIMARY KEY,\n    cliente_id BIGINT NOT NULL REFERENCES clienti(id),\n    iban TEXT NOT NULL UNIQUE,\n    saldo NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    stato_conto stato_conto NOT NULL DEFAULT 'ATTIVO',\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE prestiti (\n    id BIGSERIAL PRIMARY KEY,\n    cliente_id BIGINT NOT NULL REFERENCES clienti(id),\n    capitale_erogato NUMERIC(14,2) NOT NULL CHECK (capitale_erogato > 0),\n    tasso_interesse NUMERIC(5,2) NOT NULL CHECK (tasso_interesse BETWEEN 0 AND 100),\n    durata_mesi INT NOT NULL CHECK (durata_mesi > 0),\n    stato_prestito stato_prestito NOT NULL DEFAULT 'RICHIESTO',\n    data_erogazione DATE\n);\n\nCREATE TABLE transazioni (\n    id BIGSERIAL PRIMARY KEY,\n    conto_id BIGINT NOT NULL REFERENCES conti_correnti(id),\n    tipo_transazione tipo_transazione NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo <> 0),\n    data_transazione TIMESTAMP NOT NULL,\n    descrizione TEXT\n);\n\nCREATE TABLE rate_prestito (\n    id BIGSERIAL PRIMARY KEY,\n    prestito_id BIGINT NOT NULL REFERENCES prestiti(id),\n    numero_rata INT NOT NULL CHECK (numero_rata > 0),\n    importo_rata NUMERIC(12,2) NOT NULL CHECK (importo_rata > 0),\n    data_scadenza DATE NOT NULL,\n    stato_rata stato_rata NOT NULL DEFAULT 'IN_ATTESA',\n    UNIQUE (prestito_id, numero_rata)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 346,
+        "columns": {
+          "id": {
+            "distinct": 346,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 346
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Davide",
+              "Elena",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Conti",
+              "Gallo",
+              "Greco"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 346,
+            "sample": [
+              "BNCLRA90C45F205B",
+              "BNCLRA90C45F205C",
+              "BNCLRA90C45F205D",
+              "BNCLRA90C45F205E",
+              "BNCLRA90C45F205F"
+            ]
+          },
+          "email": {
+            "distinct": 325,
+            "sample": [
+              "alessandro.conti10@example.com",
+              "alessandro.conti11@example.com",
+              "alessandro.conti13@example.com",
+              "alessandro.conti14@example.com",
+              "alessandro.conti15@example.com"
+            ]
+          }
+        }
+      },
+      "conti_correnti": {
+        "row_count": 543,
+        "columns": {
+          "id": {
+            "distinct": 543,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 643
+          },
+          "cliente_id": {
+            "distinct": 270,
+            "sample": [
+              "1",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 346
+          },
+          "iban": {
+            "distinct": 543,
+            "sample": [
+              "IT60X0542811101000000123456",
+              "IT60X05428111010000001234561",
+              "IT60X054281110100000012345610",
+              "IT60X054281110100000012345611",
+              "IT60X054281110100000012345612"
+            ]
+          },
+          "saldo": {
+            "distinct": 448,
+            "sample": [
+              "0.0",
+              "1000.41",
+              "10118.82",
+              "1013.85",
+              "10137.06"
+            ],
+            "min": 0.0,
+            "max": 56250.0
+          },
+          "stato_conto": {
+            "distinct": 3,
+            "sample": [
+              "ATTIVO",
+              "CHIUSO",
+              "SOSPESO"
+            ]
+          },
+          "data_apertura": {
+            "distinct": 481,
+            "sample": [
+              "2014-03-12",
+              "2014-03-14",
+              "2014-04-05",
+              "2014-05-01",
+              "2014-05-13"
+            ]
+          }
+        }
+      },
+      "prestiti": {
+        "row_count": 138,
+        "columns": {
+          "id": {
+            "distinct": 138,
+            "sample": [
+              "201",
+              "202",
+              "203",
+              "204",
+              "205"
+            ],
+            "min": 201,
+            "max": 338
+          },
+          "cliente_id": {
+            "distinct": 114,
+            "sample": [
+              "1",
+              "10",
+              "104",
+              "107",
+              "109"
+            ],
+            "min": 1,
+            "max": 346
+          },
+          "capitale_erogato": {
+            "distinct": 135,
+            "sample": [
+              "10051.11",
+              "10187.14",
+              "11092.84",
+              "11093.58",
+              "11103.45"
+            ],
+            "min": 2733.1,
+            "max": 79783.76
+          },
+          "tasso_interesse": {
+            "distinct": 126,
+            "sample": [
+              "10.26",
+              "10.39",
+              "10.41",
+              "10.91",
+              "11.5"
+            ],
+            "min": 3.53,
+            "max": 11.97
+          },
+          "durata_mesi": {
+            "distinct": 7,
+            "sample": [
+              "12",
+              "120",
+              "24",
+              "36",
+              "48"
+            ],
+            "min": 12,
+            "max": 84
+          },
+          "stato_prestito": {
+            "distinct": 5,
+            "sample": [
+              "APPROVATO",
+              "EROGATO",
+              "ESTINTO",
+              "MOROSO",
+              "RICHIESTO"
+            ]
+          },
+          "data_erogazione": {
+            "distinct": 87,
+            "sample": [
+              "2019-03-18",
+              "2019-03-21",
+              "2019-06-01",
+              "2019-06-19",
+              "2019-07-04"
+            ]
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 301,
+            "max": 3300
+          },
+          "conto_id": {
+            "distinct": 542,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 643
+          },
+          "tipo_transazione": {
+            "distinct": 5,
+            "sample": [
+              "BONIFICO_INGRESSO",
+              "BONIFICO_USCITA",
+              "COMMISSIONE",
+              "PRELIEVO",
+              "VERSAMENTO"
+            ]
+          },
+          "importo": {
+            "distinct": 2696,
+            "sample": [
+              "-1.25",
+              "-1.26",
+              "-1.28",
+              "-1.29",
+              "-1.31"
+            ],
+            "min": -2226.25,
+            "max": 5750.0
+          },
+          "data_transazione": {
+            "distinct": 1920,
+            "sample": [
+              "2023-04-10 10:30:00",
+              "2023-04-11 10:30:00",
+              "2023-04-12 10:30:00",
+              "2023-04-12 18:45:00",
+              "2023-04-14 18:45:00"
+            ]
+          },
+          "descrizione": {
+            "distinct": 13,
+            "sample": [
+              "Abbonamento servizi",
+              "Bollette utenze",
+              "Bonifico da fornitore",
+              "Bonifico fornitore",
+              "Canone conto"
+            ]
+          }
+        }
+      },
+      "rate_prestito": {
+        "row_count": 906,
+        "columns": {
+          "id": {
+            "distinct": 906,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 401,
+            "max": 1306
+          },
+          "prestito_id": {
+            "distinct": 138,
+            "sample": [
+              "201",
+              "202",
+              "203",
+              "204",
+              "205"
+            ],
+            "min": 201,
+            "max": 338
+          },
+          "numero_rata": {
+            "distinct": 906,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 906
+          },
+          "importo_rata": {
+            "distinct": 857,
+            "sample": [
+              "273.68",
+              "275.68",
+              "276.41",
+              "276.68",
+              "278.45"
+            ],
+            "min": 273.68,
+            "max": 666.12
+          },
+          "data_scadenza": {
+            "distinct": 123,
+            "sample": [
+              "2020-03-10",
+              "2020-03-11",
+              "2020-03-12",
+              "2020-03-13",
+              "2020-03-14"
+            ]
+          },
+          "stato_rata": {
+            "distinct": 3,
+            "sample": [
+              "INSOLUTA",
+              "IN_ATTESA",
+              "PAGATA"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 8,
+          "nome": "Davide",
+          "cognome": "Gallo",
+          "codice_fiscale": "RSSMRA85M01H501H",
+          "email": "davide.gallo1@example.com"
+        },
+        {
+          "id": 39,
+          "nome": "Elena",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRA85M01H540N",
+          "email": "elena.conti1@example.com"
+        },
+        {
+          "id": 40,
+          "nome": "Elena",
+          "cognome": "Greco",
+          "codice_fiscale": "RSSMRA85M01H541O",
+          "email": "elena.greco1@example.com"
+        },
+        {
+          "id": 86,
+          "nome": "Francesca",
+          "cognome": "Moretti",
+          "codice_fiscale": "BNCLRA90C45F233C",
+          "email": "francesca.moretti1@example.com"
+        },
+        {
+          "id": 80,
+          "nome": "Laura",
+          "cognome": "Bianchi",
+          "codice_fiscale": "BNCLRA90C45F205V",
+          "email": "laura.bianchi1@example.com"
+        },
+        {
+          "id": 66,
+          "nome": "Laura",
+          "cognome": "Bruno",
+          "codice_fiscale": "BNCLRA90C45F205H",
+          "email": "laura.bruno1@example.com"
+        },
+        {
+          "id": 71,
+          "nome": "Luca",
+          "cognome": "Bruno",
+          "codice_fiscale": "BNCLRA90C45F205M",
+          "email": "luca.bruno1@example.com"
+        },
+        {
+          "id": 91,
+          "nome": "Davide",
+          "cognome": "Conti",
+          "codice_fiscale": "BNCLRA90C45F238H",
+          "email": "davide.conti1@example.com"
+        }
+      ],
+      "conti_correnti": [
+        {
+          "id": 101,
+          "cliente_id": 230,
+          "iban": "IT60X0542811101000000123456",
+          "saldo": 15580.6,
+          "stato_conto": "ATTIVO",
+          "data_apertura": "2019-12-31"
+        },
+        {
+          "id": 102,
+          "cliente_id": 156,
+          "iban": "IT60X05428111010000001234561",
+          "saldo": 5597.53,
+          "stato_conto": "ATTIVO",
+          "data_apertura": "2020-08-12"
+        },
+        {
+          "id": 103,
+          "cliente_id": 175,
+          "iban": "IT60X05428111010000001234562",
+          "saldo": 2841.19,
+          "stato_conto": "CHIUSO",
+          "data_apertura": "2017-06-25"
+        },
+        {
+          "id": 104,
+          "cliente_id": 257,
+          "iban": "IT60X05428111010000001234563",
+          "saldo": 15689.36,
+          "stato_conto": "ATTIVO",
+          "data_apertura": "2020-01-03"
+        },
+        {
+          "id": 105,
+          "cliente_id": 228,
+          "iban": "IT60X05428111010000001234564",
+          "saldo": 3436.4,
+          "stato_conto": "ATTIVO",
+          "data_apertura": "2018-10-20"
+        },
+        {
+          "id": 106,
+          "cliente_id": 234,
+          "iban": "IT60X05428111010000001234565",
+          "saldo": 5921.34,
+          "stato_conto": "ATTIVO",
+          "data_apertura": "2017-06-06"
+        },
+        {
+          "id": 107,
+          "cliente_id": 266,
+          "iban": "IT60X05428111010000001234566",
+          "saldo": 10608.66,
+          "stato_conto": "ATTIVO",
+          "data_apertura": "2020-10-29"
+        },
+        {
+          "id": 108,
+          "cliente_id": 175,
+          "iban": "IT60X05428111010000001234567",
+          "saldo": 11148.28,
+          "stato_conto": "ATTIVO",
+          "data_apertura": "2019-02-12"
+        }
+      ],
+      "prestiti": [
+        {
+          "id": 201,
+          "cliente_id": 279,
+          "capitale_erogato": 31154.67,
+          "tasso_interesse": 6.02,
+          "durata_mesi": "84",
+          "stato_prestito": "ESTINTO",
+          "data_erogazione": "2022-09-18"
+        },
+        {
+          "id": 202,
+          "cliente_id": 183,
+          "capitale_erogato": 15000.0,
+          "tasso_interesse": 6.5,
+          "durata_mesi": 48,
+          "stato_prestito": "EROGATO",
+          "data_erogazione": "2022-04-10"
+        },
+        {
+          "id": 203,
+          "cliente_id": 275,
+          "capitale_erogato": 25765.81,
+          "tasso_interesse": 6.13,
+          "durata_mesi": "48",
+          "stato_prestito": "EROGATO",
+          "data_erogazione": "2021-11-19"
+        },
+        {
+          "id": 204,
+          "cliente_id": 237,
+          "capitale_erogato": 21555.39,
+          "tasso_interesse": 5.31,
+          "durata_mesi": "84",
+          "stato_prestito": "EROGATO",
+          "data_erogazione": "2021-04-14"
+        },
+        {
+          "id": 205,
+          "cliente_id": 26,
+          "capitale_erogato": 16548.6,
+          "tasso_interesse": 5.27,
+          "durata_mesi": "48",
+          "stato_prestito": "MOROSO",
+          "data_erogazione": "2022-07-19"
+        },
+        {
+          "id": 206,
+          "cliente_id": 68,
+          "capitale_erogato": 8895.91,
+          "tasso_interesse": 5.69,
+          "durata_mesi": "84",
+          "stato_prestito": "EROGATO",
+          "data_erogazione": "2021-08-15"
+        },
+        {
+          "id": 207,
+          "cliente_id": 332,
+          "capitale_erogato": 13310.16,
+          "tasso_interesse": 8.73,
+          "durata_mesi": "48",
+          "stato_prestito": "EROGATO",
+          "data_erogazione": "2021-08-14"
+        },
+        {
+          "id": 208,
+          "cliente_id": 256,
+          "capitale_erogato": 20904.62,
+          "tasso_interesse": 7.43,
+          "durata_mesi": "48",
+          "stato_prestito": "RICHIESTO",
+          "data_erogazione": "2021-05-17"
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 301,
+          "conto_id": 547,
+          "tipo_transazione": "VERSAMENTO",
+          "importo": 2666.45,
+          "data_transazione": "2023-11-12 10:30:00",
+          "descrizione": "Pagamento affitto"
+        },
+        {
+          "id": 302,
+          "conto_id": 631,
+          "tipo_transazione": "VERSAMENTO",
+          "importo": 1229.35,
+          "data_transazione": "2023-07-11 10:30:00",
+          "descrizione": "Stipendio mensile"
+        },
+        {
+          "id": 303,
+          "conto_id": 335,
+          "tipo_transazione": "VERSAMENTO",
+          "importo": 761.31,
+          "data_transazione": "2023-10-27 10:30:00",
+          "descrizione": "Bonifico fornitore"
+        },
+        {
+          "id": 304,
+          "conto_id": 611,
+          "tipo_transazione": "VERSAMENTO",
+          "importo": 1994.06,
+          "data_transazione": "2023-09-13 10:30:00",
+          "descrizione": "Bonifico fornitore"
+        },
+        {
+          "id": 305,
+          "conto_id": 109,
+          "tipo_transazione": "VERSAMENTO",
+          "importo": 2822.38,
+          "data_transazione": "2024-01-05 10:30:00",
+          "descrizione": "Rimborso spese"
+        },
+        {
+          "id": 306,
+          "conto_id": 157,
+          "tipo_transazione": "VERSAMENTO",
+          "importo": 2292.89,
+          "data_transazione": "2024-03-29 10:30:00",
+          "descrizione": "Pagamento affitto"
+        },
+        {
+          "id": 307,
+          "conto_id": 300,
+          "tipo_transazione": "VERSAMENTO",
+          "importo": 1135.33,
+          "data_transazione": "2023-05-31 10:30:00",
+          "descrizione": "Rata prestito"
+        },
+        {
+          "id": 308,
+          "conto_id": 168,
+          "tipo_transazione": "VERSAMENTO",
+          "importo": 2639.78,
+          "data_transazione": "2023-09-06 10:30:00",
+          "descrizione": "Rimborso spese"
+        }
+      ],
+      "rate_prestito": [
+        {
+          "id": 401,
+          "prestito_id": 260,
+          "numero_rata": 1,
+          "importo_rata": 432.39,
+          "data_scadenza": "2022-05-03",
+          "stato_rata": "IN_ATTESA"
+        },
+        {
+          "id": 402,
+          "prestito_id": 262,
+          "numero_rata": 2,
+          "importo_rata": 412.19,
+          "data_scadenza": "2022-05-01",
+          "stato_rata": "PAGATA"
+        },
+        {
+          "id": 403,
+          "prestito_id": 228,
+          "numero_rata": 3,
+          "importo_rata": 290.61,
+          "data_scadenza": "2022-05-13",
+          "stato_rata": "INSOLUTA"
+        },
+        {
+          "id": 404,
+          "prestito_id": 239,
+          "numero_rata": 4,
+          "importo_rata": 336.42,
+          "data_scadenza": "2022-05-14",
+          "stato_rata": "PAGATA"
+        },
+        {
+          "id": 405,
+          "prestito_id": 299,
+          "numero_rata": 5,
+          "importo_rata": 373.75,
+          "data_scadenza": "2022-05-15",
+          "stato_rata": "PAGATA"
+        },
+        {
+          "id": 406,
+          "prestito_id": 287,
+          "numero_rata": 6,
+          "importo_rata": 378.77,
+          "data_scadenza": "2022-05-10",
+          "stato_rata": "PAGATA"
+        },
+        {
+          "id": 407,
+          "prestito_id": 261,
+          "numero_rata": 7,
+          "importo_rata": 390.23,
+          "data_scadenza": "2022-05-12",
+          "stato_rata": "IN_ATTESA"
+        },
+        {
+          "id": 408,
+          "prestito_id": 227,
+          "numero_rata": 8,
+          "importo_rata": 393.54,
+          "data_scadenza": "2022-05-09",
+          "stato_rata": "PAGATA"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "conjunctive"
+  ],
+  "query": "SELECT c.nome, c.cognome, cc.iban, cc.saldo AS saldo_attuale, cc.data_apertura FROM conti_correnti cc JOIN clienti c ON cc.cliente_id = c.id WHERE cc.stato_conto = 'ATTIVO' AND c.nome = 'Alessandro' AND cc.saldo >= 1000 ORDER BY cc.saldo DESC;"
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 4,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "filtered_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "forza_lavoro_attiva",
+      "description": "La tabella dimensionale dipendenti è denominata forza_lavoro_attiva nei report aziendali."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stipendio",
+      "obsolete_value": "emolumento_base_retributivo",
+      "description": "Il campo stipendio viene indicato con il termine tecnico emolumento_base_retributivo."
+    }
+  ],
+  "spec_hash": "8b8aab980b3ca96d"
+}

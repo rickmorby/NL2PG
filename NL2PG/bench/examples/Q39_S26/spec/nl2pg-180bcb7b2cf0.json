@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "between"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "codice_spedizione",
+      "obsolete_value": "identificativo_logistico_univoco",
+      "description": "La colonna contenente il codice numerico della spedizione è etichettata nel sistema legacy come identificativo_logistico_univoco."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "peso_netto",
+      "obsolete_value": "carico_effettivo_di_stiva",
+      "description": "Il termine tecnico aziendale 'carico_effettivo_di_stiva' si riferisce alla colonna fisica 'peso_netto', memorizzata come TEXT e soggetta a cast numerico."
+    }
+  ],
+  "spec_hash": "a771f5f9e881b9f7"
+}

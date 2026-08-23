@@ -1,0 +1,41 @@
+{
+  "domain": "finanza",
+  "n_tables": 9,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "group_agg"
+  ],
+  "twist": [
+    "rename",
+    "distractor",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "operazioni_di_cassa",
+      "description": "La tabella transazioni, contenente i movimenti finanziari da aggregare con GROUP BY e COUNT(*), viene denominata operazioni_di_cassa nella prosa aziendale."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "movimenti_contabili",
+      "obsolete_value": "operazioni_registrate",
+      "description": "La tabella movimenti_contabili è una tabella distrattrice con nome simile a transazioni; la perifrasi operazioni_registrate usata nella prosa aziendale rimanda a movimenti_contabili e deve essere ignorata per individuare la tabella corretta su cui eseguire l'aggregazione."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "correntisti",
+      "description": "La tabella clienti viene indicata con il sinonimo correntisti nella documentazione aziendale, richiedendo un corretto schema linking per risalire alla tabella reale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "tipo_transazione",
+      "obsolete_value": "natura_operativa",
+      "description": "La colonna tipo_transazione, utilizzata come chiave di raggruppamento GROUP BY nella query, viene indicata con il gergo finanziario natura_operativa nella prosa aziendale."
+    }
+  ],
+  "spec_hash": "cef8c84bdb6919f4"
+}

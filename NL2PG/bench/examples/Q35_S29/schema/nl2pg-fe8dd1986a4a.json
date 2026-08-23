@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "case"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "schede_anagrafiche_personale",
+        "description": "La tabella fisica 'dipendenti' viene indicata nella prosa aziendale come 'schede_anagrafiche_personale'. Contiene le colonne id_dipendente, nome e cognome, dove il dato anagrafico unico è spezzato su due colonne separate."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "cognome",
+        "obsolete_value": "nome_di_famiglia",
+        "description": "La colonna 'cognome' della tabella dipendenti viene riferita nei documenti come 'nome_di_famiglia'. Le query devono riconoscere il sinonimo per ricostruire il nome completo con COALESCE(CONCAT(nome, ' ', cognome), 'sconosciuto')."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "reparti",
+        "obsolete_value": "centri di costo",
+        "description": "La tabella 'reparti' viene denominata con il gergo ERP 'centri di costo'. Ogni dipendente appartiene a un solo reparto tramite la chiave esterna id_reparto, mantenendo una gerarchia uno-a-molti tra reparti e dipendenti."
+      }
+    ],
+    "spec_hash": "9ee7d31aed6cff06"
+  },
+  "schema_ddl": "CREATE TABLE reparti (\n    id_reparto INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    codice_centro_costo TEXT NOT NULL UNIQUE,\n    budget_annuo NUMERIC(12,2) CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id_dipendente INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile > 0),\n    id_reparto INT NOT NULL REFERENCES reparti(id_reparto) ON DELETE RESTRICT\n);\n\nCREATE TABLE buste_paga (\n    id_busta_paga BIGINT PRIMARY KEY,\n    id_dipendente INT NOT NULL REFERENCES dipendenti(id_dipendente) ON DELETE CASCADE,\n    periodo_riferimento DATE NOT NULL,\n    importo_lordo NUMERIC(10,2) NOT NULL CHECK (importo_lordo >= 0),\n    importo_netto NUMERIC(10,2) NOT NULL CHECK (importo_netto >= 0),\n    CHECK (importo_netto <= importo_lordo),\n    UNIQUE (id_dipendente, periodo_riferimento)\n);"
+}

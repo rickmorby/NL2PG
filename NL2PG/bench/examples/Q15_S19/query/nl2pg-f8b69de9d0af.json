@@ -1,0 +1,624 @@
+{
+  "schema_ddl": "CREATE TABLE venditori (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    regione TEXT NOT NULL,\n    data_assunzione DATE NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0)\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    venditore_id INT NOT NULL REFERENCES venditori(id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    numero_riga INT NOT NULL,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);",
+  "data_profile": {
+    "profile": {
+      "venditori": {
+        "row_count": 358,
+        "columns": {
+          "id": {
+            "distinct": 358,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 358
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Conti",
+              "Ferrari",
+              "Fontana"
+            ]
+          },
+          "regione": {
+            "distinct": 10,
+            "sample": [
+              "Calabria",
+              "Campania",
+              "Emilia-Romagna",
+              "Lazio",
+              "Lombardia"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 326,
+            "sample": [
+              "2015-12-19",
+              "2015-12-27",
+              "2015-12-31",
+              "2016-01-01",
+              "2016-01-10"
+            ]
+          },
+          "email": {
+            "distinct": 340,
+            "sample": [
+              "elena.moretti10@azienda.it",
+              "elena.moretti11@azienda.it",
+              "elena.moretti12@azienda.it",
+              "elena.moretti13@azienda.it",
+              "elena.moretti14@azienda.it"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 315,
+        "columns": {
+          "id": {
+            "distinct": 315,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 315
+          },
+          "ragione_sociale": {
+            "distinct": 10,
+            "sample": [
+              "Alfa Distribuzione SRL",
+              "Beta Retail SpA",
+              "Delta Servizi SRL",
+              "Epsilon Trading SpA",
+              "Gamma Food SNC"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 315,
+            "sample": [
+              "ALFDST75M12H501B",
+              "ALFDST75M12H501C",
+              "ALFDST75M12H501D",
+              "ALFDST75M12H501E",
+              "ALFDST75M12H501F"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+39 02 1234567",
+              "+39 051 3344556",
+              "+39 055 2233445",
+              "+39 06 9876543",
+              "+39 081 5566778"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 589,
+        "columns": {
+          "id": {
+            "distinct": 589,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 589
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Acqua Minerale 6x1.5L",
+              "Biscotti Assortiti 700g",
+              "Caffe Macinato 250g",
+              "Carta Igienica 12 rotoli",
+              "Detergente Pavimenti 2L"
+            ]
+          },
+          "categoria": {
+            "distinct": 5,
+            "sample": [
+              "Alimentari",
+              "Bevande",
+              "Cura Personale",
+              "Igiene",
+              "Pulizia"
+            ]
+          },
+          "prezzo_unitario": {
+            "distinct": 448,
+            "sample": [
+              "0.88",
+              "0.89",
+              "0.91",
+              "0.95",
+              "0.97"
+            ],
+            "min": 0.88,
+            "max": 21.1
+          },
+          "giacenza_magazzino": {
+            "distinct": 578,
+            "sample": [
+              "1002.41",
+              "1003.0",
+              "1004.68",
+              "1010.19",
+              "1010.78"
+            ],
+            "min": 63.0,
+            "max": 2974.31
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1098,
+        "columns": {
+          "id": {
+            "distinct": 1098,
+            "sample": [
+              "5001",
+              "5002",
+              "5003",
+              "5004",
+              "5005"
+            ],
+            "min": 5001,
+            "max": 6098
+          },
+          "cliente_id": {
+            "distinct": 307,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 315
+          },
+          "venditore_id": {
+            "distinct": 347,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 358
+          },
+          "data_ordine": {
+            "distinct": 187,
+            "sample": [
+              "2025-11-11",
+              "2025-11-12",
+              "2025-11-13",
+              "2025-11-14",
+              "2025-11-16"
+            ]
+          },
+          "importo_totale": {
+            "distinct": 1061,
+            "sample": [
+              "100.42",
+              "100.53",
+              "100.81",
+              "100.9",
+              "101.1"
+            ],
+            "min": 30.5,
+            "max": 1281.0
+          }
+        }
+      },
+      "righe_ordine": {
+        "row_count": 1098,
+        "columns": {
+          "ordine_id": {
+            "distinct": 686,
+            "sample": [
+              "5001",
+              "5003",
+              "5004",
+              "5005",
+              "5006"
+            ],
+            "min": 5001,
+            "max": 6097
+          },
+          "numero_riga": {
+            "distinct": 1098,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1098
+          },
+          "prodotto_id": {
+            "distinct": 506,
+            "sample": [
+              "10",
+              "101",
+              "103",
+              "104",
+              "107"
+            ],
+            "min": 2,
+            "max": 589
+          },
+          "quantita": {
+            "distinct": 10,
+            "sample": [
+              "1",
+              "10",
+              "12",
+              "2",
+              "24"
+            ],
+            "min": 3,
+            "max": 24
+          },
+          "prezzo_unitario": {
+            "distinct": 661,
+            "sample": [
+              "1.01",
+              "1.02",
+              "1.04",
+              "1.05",
+              "1.06"
+            ],
+            "min": 1.01,
+            "max": 17.94
+          }
+        }
+      }
+    },
+    "preview": {
+      "venditori": [
+        {
+          "id": 33,
+          "nome": "Chiara",
+          "cognome": "Ferrari",
+          "regione": "Campania",
+          "data_assunzione": "2018-10-26",
+          "email": "chiara.ferrari1@example.com"
+        },
+        {
+          "id": 3,
+          "nome": "Davide",
+          "cognome": "Fontana",
+          "regione": "Lazio",
+          "data_assunzione": "2019-08-01",
+          "email": "davide.fontana1@example.com"
+        },
+        {
+          "id": 38,
+          "nome": "Marco",
+          "cognome": "Ferrari",
+          "regione": "Sicilia",
+          "data_assunzione": "2018-04-02",
+          "email": "marco.ferrari1@example.com"
+        },
+        {
+          "id": 56,
+          "nome": "Sara",
+          "cognome": "Moretti",
+          "regione": "Toscana",
+          "data_assunzione": "2019-08-17",
+          "email": "sara.moretti1@example.com"
+        },
+        {
+          "id": 144,
+          "nome": "Andrea",
+          "cognome": "Ferrari",
+          "regione": "Campania",
+          "data_assunzione": "2017-05-28",
+          "email": "andrea.ferrari1@example.com"
+        },
+        {
+          "id": 182,
+          "nome": "Chiara",
+          "cognome": "Gallo",
+          "regione": "Veneto",
+          "data_assunzione": "2021-12-30",
+          "email": "chiara.gallo1@example.com"
+        },
+        {
+          "id": 172,
+          "nome": "Chiara",
+          "cognome": "Marino",
+          "regione": "Campania",
+          "data_assunzione": "2017-12-31",
+          "email": "chiara.marino1@example.com"
+        },
+        {
+          "id": 156,
+          "nome": "Elena",
+          "cognome": "Fontana",
+          "regione": "Lombardia",
+          "data_assunzione": "2018-06-06",
+          "email": "elena.fontana1@example.com"
+        }
+      ],
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Gamma Food SNC",
+          "codice_fiscale": "ALFDST75M12H501X",
+          "citta": "Roma",
+          "telefono": null
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Alfa Distribuzione SRL",
+          "codice_fiscale": "ALFDST75M12H501B",
+          "citta": "Verona",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Zeta Grossisti SRL",
+          "codice_fiscale": "ALFDST75M12H501C",
+          "citta": "Bari",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Kappa Logistica SRL",
+          "codice_fiscale": "ALFDST75M12H501D",
+          "citta": "Verona",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Gamma Food SNC",
+          "codice_fiscale": "ALFDST75M12H501E",
+          "citta": "Napoli",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Alfa Distribuzione SRL",
+          "codice_fiscale": "ALFDST75M12H501F",
+          "citta": "Bologna",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Kappa Logistica SRL",
+          "codice_fiscale": "ALFDST75M12H501G",
+          "citta": "Torino",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Alfa Distribuzione SRL",
+          "codice_fiscale": "ALFDST75M12H501H",
+          "citta": "Palermo",
+          "telefono": "+39 02 1234567"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "nome": "Vino Rosso DOC 750ml",
+          "categoria": "Cura Personale",
+          "prezzo_unitario": 14.63,
+          "giacenza_magazzino": 612.51
+        },
+        {
+          "id": 2,
+          "nome": "Olio EVO 1L",
+          "categoria": "Cura Personale",
+          "prezzo_unitario": 15.64,
+          "giacenza_magazzino": 847.38
+        },
+        {
+          "id": 3,
+          "nome": "Shampoo Capelli 400ml",
+          "categoria": "Cura Personale",
+          "prezzo_unitario": 10.2,
+          "giacenza_magazzino": 274.61
+        },
+        {
+          "id": 4,
+          "nome": "Acqua Minerale 6x1.5L",
+          "categoria": "Igiene",
+          "prezzo_unitario": 8.6,
+          "giacenza_magazzino": 141.47
+        },
+        {
+          "id": 5,
+          "nome": "Shampoo Capelli 400ml",
+          "categoria": "Alimentari",
+          "prezzo_unitario": 7.59,
+          "giacenza_magazzino": 613.84
+        },
+        {
+          "id": 6,
+          "nome": "Sapone Mani 300ml",
+          "categoria": "Pulizia",
+          "prezzo_unitario": 5.42,
+          "giacenza_magazzino": 845.78
+        },
+        {
+          "id": 7,
+          "nome": "Shampoo Capelli 400ml",
+          "categoria": "Pulizia",
+          "prezzo_unitario": 15.85,
+          "giacenza_magazzino": 582.32
+        },
+        {
+          "id": 8,
+          "nome": "Vino Rosso DOC 750ml",
+          "categoria": "Cura Personale",
+          "prezzo_unitario": 7.6,
+          "giacenza_magazzino": 576.93
+        }
+      ],
+      "ordini": [
+        {
+          "id": 5001,
+          "cliente_id": 69,
+          "venditore_id": 208,
+          "data_ordine": "2026-03-04",
+          "importo_totale": 316.32
+        },
+        {
+          "id": 5002,
+          "cliente_id": 23,
+          "venditore_id": 217,
+          "data_ordine": "2025-12-12",
+          "importo_totale": 569.95
+        },
+        {
+          "id": 5003,
+          "cliente_id": 230,
+          "venditore_id": 145,
+          "data_ordine": "2026-01-01",
+          "importo_totale": 247.39
+        },
+        {
+          "id": 5004,
+          "cliente_id": 48,
+          "venditore_id": 196,
+          "data_ordine": "2025-11-27",
+          "importo_totale": 413.55
+        },
+        {
+          "id": 5005,
+          "cliente_id": 159,
+          "venditore_id": 349,
+          "data_ordine": "2025-11-12",
+          "importo_totale": 140.63
+        },
+        {
+          "id": 5006,
+          "cliente_id": 193,
+          "venditore_id": 21,
+          "data_ordine": "2026-03-06",
+          "importo_totale": 257.57
+        },
+        {
+          "id": 5007,
+          "cliente_id": 246,
+          "venditore_id": 187,
+          "data_ordine": "2026-02-16",
+          "importo_totale": 197.61
+        },
+        {
+          "id": 5008,
+          "cliente_id": 244,
+          "venditore_id": 45,
+          "data_ordine": "2025-12-07",
+          "importo_totale": 417.95
+        }
+      ],
+      "righe_ordine": [
+        {
+          "ordine_id": 6080,
+          "numero_riga": 1,
+          "prodotto_id": 132,
+          "quantita": "2",
+          "prezzo_unitario": 10.79
+        },
+        {
+          "ordine_id": 5691,
+          "numero_riga": 2,
+          "prodotto_id": 30,
+          "quantita": "8",
+          "prezzo_unitario": 6.23
+        },
+        {
+          "ordine_id": 5555,
+          "numero_riga": 3,
+          "prodotto_id": 475,
+          "quantita": "1",
+          "prezzo_unitario": 9.59
+        },
+        {
+          "ordine_id": 5372,
+          "numero_riga": 4,
+          "prodotto_id": 54,
+          "quantita": "8",
+          "prezzo_unitario": 11.03
+        },
+        {
+          "ordine_id": 5394,
+          "numero_riga": 5,
+          "prodotto_id": 64,
+          "quantita": "12",
+          "prezzo_unitario": 9.25
+        },
+        {
+          "ordine_id": 5167,
+          "numero_riga": 6,
+          "prodotto_id": 218,
+          "quantita": "24",
+          "prezzo_unitario": 13.31
+        },
+        {
+          "ordine_id": 5615,
+          "numero_riga": 7,
+          "prodotto_id": 43,
+          "quantita": "3",
+          "prezzo_unitario": 12.84
+        },
+        {
+          "ordine_id": 5639,
+          "numero_riga": 8,
+          "prodotto_id": 482,
+          "quantita": "12",
+          "prezzo_unitario": 7.22
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "cte"
+  ],
+  "query": "WITH spesa_per_cliente AS (SELECT c.ragione_sociale, c.citta, COUNT(o.id) AS numero_ordini, SUM(o.importo_totale) AS totale_speso FROM clienti c JOIN ordini o ON o.cliente_id = c.id WHERE o.data_ordine BETWEEN DATE '2025-11-01' AND DATE '2026-03-31' GROUP BY c.ragione_sociale, c.citta) SELECT ragione_sociale, citta, numero_ordini, ROUND(totale_speso, 2) AS totale_speso FROM spesa_per_cliente WHERE citta IN ('Milano', 'Roma', 'Torino') ORDER BY totale_speso DESC;"
+}

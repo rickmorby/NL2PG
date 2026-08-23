@@ -1,0 +1,161 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "row_types"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "registro_movimenti_commerciali",
+        "description": "La singola tabella autonoma ordini viene denominata registro_movimenti_commerciali nella prosa aziendale. L'utente deve risalire alla tabella fisica ordini per costruire i confronti di tuple ROW(c1,c2) = ROW(v1,v2) tramite WHERE o gli ordinamenti ORDER BY (col).campo."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_totale",
+        "obsolete_value": "controvalore della chiusura d'ordine",
+        "description": "La colonna importo_totale della tabella ordini è indicata nel linguaggio aziendale con il gergo commerciale 'controvalore della chiusura d'ordine'. Le query che filtrano con ROW(data_ordine, importo_totale) = ROW(v1, v2) devono mappare tale perifrasi sulla colonna reale importo_totale."
+      }
+    ],
+    "spec_hash": "6a293ba826e00607"
+  },
+  "schema_ddl": "CREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    cliente_nome TEXT NOT NULL,\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa',\n    note TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_ordine": "ORD-2026-0001",
+            "cliente_nome": "Mario Rossi",
+            "data_ordine": "2026-01-15",
+            "importo_totale": 1250.0,
+            "stato_ordine": "in_attesa",
+            "note": null
+          },
+          {
+            "id": 2,
+            "numero_ordine": "ORD-2026-0002",
+            "cliente_nome": "Laura Bianchi",
+            "data_ordine": "2026-01-22",
+            "importo_totale": 340.5,
+            "stato_ordine": "confermato",
+            "note": "Consegna urgente richiesta dal cliente"
+          },
+          {
+            "id": 3,
+            "numero_ordine": "ORD-2026-0003",
+            "cliente_nome": "Giulia Verdi",
+            "data_ordine": "2026-02-03",
+            "importo_totale": 2890.75,
+            "stato_ordine": "spedito",
+            "note": null
+          },
+          {
+            "id": 4,
+            "numero_ordine": "ORD-2026-0004",
+            "cliente_nome": "Alessandro Neri",
+            "data_ordine": "2026-02-18",
+            "importo_totale": 760.0,
+            "stato_ordine": "evaso",
+            "note": "Pagamento concordato a rate"
+          },
+          {
+            "id": 5,
+            "numero_ordine": "ORD-2026-0005",
+            "cliente_nome": "Chiara Moretti",
+            "data_ordine": "2026-03-05",
+            "importo_totale": 95.9,
+            "stato_ordine": "annullato",
+            "note": "Ordine annullato prima della spedizione"
+          },
+          {
+            "id": 6,
+            "numero_ordine": "ORD-2026-0006",
+            "cliente_nome": "Luca Ferrari",
+            "data_ordine": "2026-03-12",
+            "importo_totale": 1540.25,
+            "stato_ordine": "in_attesa",
+            "note": null
+          }
+        ],
+        "variations": {
+          "cliente_nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Alessandro Neri",
+              "Chiara Moretti",
+              "Luca Ferrari",
+              "Sara Conti",
+              "Paolo Gatti"
+            ]
+          },
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "in_attesa",
+              "in_attesa",
+              "confermato",
+              "confermato",
+              "spedito",
+              "evaso",
+              "annullato"
+            ]
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Consegna urgente richiesta dal cliente",
+              "Pagamento concordato a rate",
+              "Sconto fedelta' applicato",
+              ""
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

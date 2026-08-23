@@ -1,0 +1,34 @@
+{
+  "domain": "università",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "overlaps"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "iscrizioni_corsi",
+      "obsolete_value": "fogli_di_registro",
+      "description": "La tabella iscrizioni_corsi, che registra l'associazione studente-corso con un intervallo di validità modellato tramite daterange (colonna periodo_validita), viene denominata nei documenti aziendali fogli_di_registro."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "periodo_validita",
+      "obsolete_value": "arco temporale attivo",
+      "description": "La colonna periodo_validita di tipo daterange, presente nelle tabelle iscrizioni_corsi e docenze, viene indicata nella prosa come 'arco temporale attivo'. Le query di sovrapposizione devono usare WHERE (inizio_a, fine_a) OVERLAPS (inizio_b, fine_b) oppure l'operatore && sui range nativi riferendosi a tale colonna."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "appelli",
+      "obsolete_value": "sedute d'esame",
+      "description": "La tabella appelli, che contiene le sessioni d'esame con slot temporali modellati tramite tsrange (colonna finestra_svolgimento), viene indicata nel gergo accademico dei documenti come 'sedute d'esame'. Le richieste di individuazione di conflitti o coincidenze temporali tra sedute e prenotazioni delle aule richiedono il confronto OVERLAPS tra gli intervalli."
+    }
+  ],
+  "spec_hash": "96a9e488a7be7956"
+}

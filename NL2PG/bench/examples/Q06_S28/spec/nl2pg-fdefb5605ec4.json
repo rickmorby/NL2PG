@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "conjunctive"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "paz",
+      "obsolete_value": "schede_assistito",
+      "description": "La tabella paz (archivio abbreviato dei pazienti) viene denominata schede_assistito nella prosa aziendale; il solver deve mappare la perifrasi al nome abbreviato reale dello schema."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "esito",
+      "obsolete_value": "outcome clinico",
+      "description": "La colonna esito della tabella vis (visite) è indicata nella narrativa con il gergo clinico outcome clinico; la query congiuntiva richiede di riconoscere il termine tecnico come riferimento alla colonna abbreviata esito."
+    }
+  ],
+  "spec_hash": "86eae1234459f209"
+}

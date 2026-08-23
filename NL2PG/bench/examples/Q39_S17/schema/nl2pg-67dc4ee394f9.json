@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 6,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "between"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "pratiche_di_trasporto",
+        "description": "La tabella spedizioni viene denominata pratiche_di_trasporto nella prosa aziendale. Le query devono risolvere la perifrasi verso la tabella reale spedizioni."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "pacchi",
+        "obsolete_value": "colli",
+        "description": "La tabella pacchi viene indicata con il sinonimo colli nella documentazione aziendale. Le query devono mappare il termine colli alla tabella pacchi."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "deleted_at",
+        "obsolete_value": "data_di_archiviazione",
+        "description": "La colonna di cancellazione logica deleted_at viene descritta con il gergo aziendale data_di_archiviazione: le righe con deleted_at valorizzato sono dette 'archiviate' anziché eliminate. Le query devono applicare il predicato di visibilità deleted_at IS NULL per escludere i record soft-deleted, combinato con il filtro di intervallo BETWEEN richiesto."
+      }
+    ],
+    "spec_hash": "06983c29e98dfc64"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    citta TEXT NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE depositi (\n    id SERIAL PRIMARY KEY,\n    nome_deposito TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capienza_massima_colli INT NOT NULL CHECK (capienza_massima_colli > 0)\n);\n\nCREATE TABLE corrieri (\n    id SERIAL PRIMARY KEY,\n    nome_completo TEXT NOT NULL,\n    telefono TEXT,\n    veicolo TEXT NOT NULL,\n    patente TEXT NOT NULL\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    deposito_partenza_id INT NOT NULL REFERENCES depositi(id),\n    corriere_id INT REFERENCES corrieri(id),\n    peso_totale_kg NUMERIC(8,2) NOT NULL CHECK (peso_totale_kg > 0),\n    costo_totale NUMERIC(10,2) NOT NULL CHECK (costo_totale >= 0),\n    data_spedizione DATE NOT NULL,\n    data_consegna_prevista DATE NOT NULL,\n    stato_spedizione TEXT NOT NULL CHECK (stato_spedizione IN ('in_preparazione', 'in_transito', 'consegnata', 'fallita')),\n    deleted_at TIMESTAMP,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_consegna_prevista >= data_spedizione)\n);\n\nCREATE TABLE pacchi (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    descrizione_contenuto TEXT NOT NULL,\n    peso_kg NUMERIC(6,2) NOT NULL CHECK (peso_kg > 0),\n    altezza_cm INT NOT NULL CHECK (altezza_cm > 0),\n    larghezza_cm INT NOT NULL CHECK (larghezza_cm > 0),\n    profondita_cm INT NOT NULL CHECK (profondita_cm > 0),\n    fragile BOOLEAN NOT NULL DEFAULT FALSE,\n    deleted_at TIMESTAMP,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE eventi_tracking (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    data_evento TIMESTAMP NOT NULL,\n    luogo TEXT NOT NULL,\n    descrizione_evento TEXT NOT NULL\n);"
+}

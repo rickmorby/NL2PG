@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "is_null"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sinistri",
+        "obsolete_value": "pratiche_danno",
+        "description": "La tabella sinistri viene denominata pratiche_danno nella prosa aziendale. Il collegamento con la tabella polizze non è dichiarato tramite REFERENCES ma si deduce dalla colonna polizza_id presente in sinistri; le query richiedono predicati IS NULL / IS NOT NULL su colonne come data_chiusura o liquidazione_id per identificare le pratiche aperte o chiuse."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "contraenti",
+        "description": "Nella prosa aziendale i clienti sono indicati come contraenti. La tabella clienti espone la colonna id, referenziata implicitamente da polizze.cliente_id senza vincolo dichiarato; l'associazione va dedotta dai nomi delle colonne per individuare ad esempio i contraenti senza polizze attive tramite IS NULL."
+      }
+    ],
+    "spec_hash": "0a2bd90d2e824e17"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    email TEXT,\n    telefono TEXT,\n    citta_residenza TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'viaggio')),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    massimale_copertura NUMERIC(12,2) CHECK (massimale_copertura > 0),\n    polizza_attiva BOOLEAN NOT NULL DEFAULT TRUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id SERIAL PRIMARY KEY,\n    polizza_id INT NOT NULL,\n    data_apertura DATE NOT NULL,\n    data_chiusura DATE,\n    liquidazione_id INT,\n    descrizione_danno TEXT NOT NULL,\n    importo_danno NUMERIC(12,2) NOT NULL CHECK (importo_danno >= 0),\n    stato_pratica TEXT NOT NULL DEFAULT 'aperta' CHECK (stato_pratica IN ('aperta', 'in_istruttoria', 'liquidato', 'respinto')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_chiusura IS NULL OR data_chiusura >= data_apertura)\n);\n\nCREATE TABLE liquidazioni (\n    id SERIAL PRIMARY KEY,\n    sinistro_id INT NOT NULL,\n    importo_liquidato NUMERIC(12,2) NOT NULL CHECK (importo_liquidato >= 0),\n    data_liquidazione DATE NOT NULL,\n    modalita_pagamento TEXT NOT NULL CHECK (modalita_pagamento IN ('bonifico', 'assegno', 'accredito')),\n    iban_beneficiario TEXT,\n    note TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);"
+}

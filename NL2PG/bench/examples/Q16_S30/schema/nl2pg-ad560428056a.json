@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 10,
+    "hierarchy": "recursive_tree",
+    "sql_features": [
+      "recursive_cte"
+    ],
+    "twist": [
+      "rename",
+      "distractor",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "struttura_gerarchica_dipartimenti",
+        "obsolete_value": "albero_organizzativo_interno",
+        "description": "La tabella che definisce la gerarchia dei dipartimenti è denominata internamente come albero_organizzativo_interno."
+      },
+      {
+        "twist_type": "distractor",
+        "target_value": "tabella_log_accessi",
+        "obsolete_value": "storico_eventi_sistema",
+        "description": "Inserimento di una tabella di log irrilevante per la query ricorsiva, progettata per confondere il modello durante lo schema linking."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "id_nodo",
+        "obsolete_value": "codice_identificativo",
+        "description": "Il termine 'codice_identificativo' viene utilizzato sia per i dipartimenti che per le aule, richiedendo disambiguazione contestuale."
+      }
+    ],
+    "spec_hash": "fffeafbc8ad046ce"
+  },
+  "schema_ddl": "CREATE TABLE albero_organizzativo_interno (\n    id_nodo SERIAL PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL,\n    id_nodo_padre INT REFERENCES albero_organizzativo_interno(id_nodo),\n    livello INT CHECK (livello >= 0),\n    attivo BOOLEAN DEFAULT TRUE\n);\n\nCREATE TABLE facolta (\n    id_facolta SERIAL PRIMARY KEY,\n    nome_facolta TEXT NOT NULL UNIQUE,\n    id_nodo_dipartimento INT REFERENCES albero_organizzativo_interno(id_nodo)\n);\n\nCREATE TABLE corsi_di_studio (\n    id_corso SERIAL PRIMARY KEY,\n    nome_corso TEXT NOT NULL,\n    id_facolta INT NOT NULL REFERENCES facolta(id_facolta),\n    id_nodo_dipartimento INT REFERENCES albero_organizzativo_interno(id_nodo),\n    crediti_totali INT CHECK (crediti_totali > 0)\n);\n\nCREATE TABLE studenti (\n    id_studente SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE,\n    id_corso INT REFERENCES corsi_di_studio(id_corso)\n);\n\nCREATE TABLE docenti (\n    id_docente SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    id_nodo_dipartimento INT REFERENCES albero_organizzativo_interno(id_nodo)\n);\n\nCREATE TABLE aule (\n    id_nodo SERIAL PRIMARY KEY,\n    nome_aula TEXT NOT NULL,\n    edificio TEXT,\n    capienza INT CHECK (capienza > 0)\n);\n\nCREATE TABLE insegnamenti (\n    id_insegnamento SERIAL PRIMARY KEY,\n    nome_insegnamento TEXT NOT NULL,\n    id_docente INT REFERENCES docenti(id_docente),\n    id_corso INT REFERENCES corsi_di_studio(id_corso),\n    cfu INT CHECK (cfu > 0)\n);\n\nCREATE TABLE esami (\n    id_esame SERIAL PRIMARY KEY,\n    id_insegnamento INT NOT NULL REFERENCES insegnamenti(id_insegnamento),\n    data_esame DATE NOT NULL,\n    id_nodo_aula INT REFERENCES aule(id_nodo)\n);\n\nCREATE TABLE iscrizioni_esami (\n    id_studente INT NOT NULL REFERENCES studenti(id_studente),\n    id_esame INT NOT NULL REFERENCES esami(id_esame),\n    voto INT CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN DEFAULT FALSE,\n    PRIMARY KEY (id_studente, id_esame)\n);\n\nCREATE TABLE tabella_log_accessi (\n    id_log SERIAL PRIMARY KEY,\n    utente TEXT,\n    azione TEXT,\n    data_evento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    dettagli TEXT\n);"
+}

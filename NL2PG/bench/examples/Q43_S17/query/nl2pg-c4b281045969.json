@@ -1,0 +1,388 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id) ON DELETE CASCADE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('vita', 'auto', 'casa', 'salute', 'viaggio')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    capitale_assicurato NUMERIC(12,2) NOT NULL CHECK (capitale_assicurato > 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_polizza TEXT NOT NULL DEFAULT 'attiva' CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta')),\n    deleted_at TIMESTAMP,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    modificato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_scadenza >= data_emissione)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 582,
+        "columns": {
+          "id": {
+            "distinct": 582,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 582
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Antonio",
+              "Chiara",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 582,
+            "sample": [
+              "BNCLRA90C45F205B",
+              "BNCLRA90C45F205C",
+              "BNCLRA90C45F205D",
+              "BNCLRA90C45F205E",
+              "BNCLRA90C45F205F"
+            ]
+          },
+          "email": {
+            "distinct": 6,
+            "sample": [
+              "antonio.esposito@email.it",
+              "chiara.ferrari@email.it",
+              "laura.bianchi@email.it",
+              "luca.russo@email.it",
+              "marco.ricci@email.it"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      "polizze": {
+        "row_count": 1508,
+        "columns": {
+          "id": {
+            "distinct": 1508,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1608
+          },
+          "numero_polizza": {
+            "distinct": 1508,
+            "sample": [
+              "POL-2022-000109",
+              "POL-2022-0001091",
+              "POL-2022-00010910",
+              "POL-2022-000109100",
+              "POL-2022-000109101"
+            ]
+          },
+          "cliente_id": {
+            "distinct": 533,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 582
+          },
+          "tipo_polizza": {
+            "distinct": 5,
+            "sample": [
+              "auto",
+              "casa",
+              "salute",
+              "viaggio",
+              "vita"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 1450,
+            "sample": [
+              "1000.73",
+              "1003.06",
+              "1007.62",
+              "1009.81",
+              "1009.97"
+            ],
+            "min": 87.0,
+            "max": 2700.0
+          },
+          "capitale_assicurato": {
+            "distinct": 1453,
+            "sample": [
+              "10000.0",
+              "100000.0",
+              "100313.77",
+              "100607.13",
+              "100609.8"
+            ],
+            "min": 10000.0,
+            "max": 625000.0
+          },
+          "data_emissione": {
+            "distinct": 623,
+            "sample": [
+              "2022-08-21",
+              "2022-08-22",
+              "2022-08-23",
+              "2022-08-24",
+              "2022-08-25"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 655,
+            "sample": [
+              "2024-06-01",
+              "2024-06-02",
+              "2024-06-04",
+              "2024-06-05",
+              "2024-06-07"
+            ]
+          },
+          "stato_polizza": {
+            "distinct": 3,
+            "sample": [
+              "attiva",
+              "scaduta",
+              "sospesa"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 2,
+            "sample": [
+              "2025-06-15 10:30:00",
+              "2025-09-30 17:45:00"
+            ]
+          },
+          "creato_il": {
+            "distinct": 517,
+            "sample": [
+              "2022-09-05 09:30:00",
+              "2022-09-06 09:30:00",
+              "2022-09-07 09:30:00",
+              "2022-09-08 09:30:00",
+              "2022-09-09 09:30:00"
+            ]
+          },
+          "modificato_il": {
+            "distinct": 276,
+            "sample": [
+              "2023-01-05 09:30:00",
+              "2023-01-06 09:30:00",
+              "2023-01-07 09:30:00",
+              "2023-01-08 09:30:00",
+              "2023-01-09 09:30:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 22,
+          "nome": "Alessandro",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRA85M01H501V",
+          "email": "alessandro.ferrari1@example.com",
+          "citta": "Genova"
+        },
+        {
+          "id": 67,
+          "nome": "Francesca",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRA85M01H568P",
+          "email": "francesca.conti1@example.com",
+          "citta": "Milano"
+        },
+        {
+          "id": 48,
+          "nome": "Francesca",
+          "cognome": "Verdi",
+          "codice_fiscale": "RSSMRA85M01H549W",
+          "email": "francesca.verdi1@example.com",
+          "citta": "Napoli"
+        },
+        {
+          "id": 9,
+          "nome": "Laura",
+          "cognome": "Greco",
+          "codice_fiscale": "RSSMRA85M01H501I",
+          "email": "laura.greco1@example.com",
+          "citta": "Torino"
+        },
+        {
+          "id": 6,
+          "nome": "Laura",
+          "cognome": "Russo",
+          "codice_fiscale": "RSSMRA85M01H501F",
+          "email": "laura.russo1@example.com",
+          "citta": "Genova"
+        },
+        {
+          "id": 181,
+          "nome": "Mario",
+          "cognome": "Conti",
+          "codice_fiscale": "VRDGLI78A62L254J",
+          "email": "mario.conti1@example.com",
+          "citta": "Milano"
+        },
+        {
+          "id": 3,
+          "nome": "Sara",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRA85M01H501C",
+          "email": "sara.ferrari1@example.com",
+          "citta": "Milano"
+        },
+        {
+          "id": 163,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "codice_fiscale": "VRDGLI78A62L219Q",
+          "email": "alessandro.bianchi1@example.com",
+          "citta": "Torino"
+        }
+      ],
+      "polizze": [
+        {
+          "id": 101,
+          "numero_polizza": "POL-2024-000101",
+          "cliente_id": 480,
+          "tipo_polizza": "viaggio",
+          "premio_annuo": 599.48,
+          "capitale_assicurato": 158703.8,
+          "data_emissione": "2024-02-06",
+          "data_scadenza": "2034-02-02",
+          "stato_polizza": "attiva",
+          "deleted_at": null,
+          "creato_il": "2023-12-20 09:00:00",
+          "modificato_il": "2024-04-27 09:00:00"
+        },
+        {
+          "id": 102,
+          "numero_polizza": "POL-2024-0001011",
+          "cliente_id": 201,
+          "tipo_polizza": "salute",
+          "premio_annuo": 958.08,
+          "capitale_assicurato": 154107.52,
+          "data_emissione": "2024-02-21",
+          "data_scadenza": "2034-01-15",
+          "stato_polizza": "attiva",
+          "deleted_at": null,
+          "creato_il": "2024-02-08 09:00:00",
+          "modificato_il": "2024-04-22 09:00:00"
+        },
+        {
+          "id": 103,
+          "numero_polizza": "POL-2024-0001012",
+          "cliente_id": 544,
+          "tipo_polizza": "salute",
+          "premio_annuo": 902.86,
+          "capitale_assicurato": 70298.44,
+          "data_emissione": "2024-02-12",
+          "data_scadenza": "2034-01-16",
+          "stato_polizza": "attiva",
+          "deleted_at": null,
+          "creato_il": "2024-01-01 09:00:00",
+          "modificato_il": "2024-05-05 09:00:00"
+        },
+        {
+          "id": 104,
+          "numero_polizza": "POL-2024-0001013",
+          "cliente_id": 247,
+          "tipo_polizza": "vita",
+          "premio_annuo": 970.22,
+          "capitale_assicurato": 182125.32,
+          "data_emissione": "2024-02-04",
+          "data_scadenza": "2034-02-19",
+          "stato_polizza": "attiva",
+          "deleted_at": null,
+          "creato_il": "2024-02-04 09:00:00",
+          "modificato_il": "2024-05-09 09:00:00"
+        },
+        {
+          "id": 105,
+          "numero_polizza": "POL-2024-0001014",
+          "cliente_id": 203,
+          "tipo_polizza": "salute",
+          "premio_annuo": 844.77,
+          "capitale_assicurato": 126255.85,
+          "data_emissione": "2024-01-23",
+          "data_scadenza": "2034-01-23",
+          "stato_polizza": "attiva",
+          "deleted_at": null,
+          "creato_il": "2024-01-29 09:00:00",
+          "modificato_il": "2024-05-04 09:00:00"
+        },
+        {
+          "id": 106,
+          "numero_polizza": "POL-2024-0001015",
+          "cliente_id": 283,
+          "tipo_polizza": "auto",
+          "premio_annuo": 767.98,
+          "capitale_assicurato": 109002.27,
+          "data_emissione": "2024-02-02",
+          "data_scadenza": "2034-01-27",
+          "stato_polizza": "attiva",
+          "deleted_at": null,
+          "creato_il": "2024-01-30 09:00:00",
+          "modificato_il": "2024-04-24 09:00:00"
+        },
+        {
+          "id": 107,
+          "numero_polizza": "POL-2024-0001016",
+          "cliente_id": 55,
+          "tipo_polizza": "casa",
+          "premio_annuo": 1314.78,
+          "capitale_assicurato": 239961.54,
+          "data_emissione": "2024-01-15",
+          "data_scadenza": "2034-02-02",
+          "stato_polizza": "attiva",
+          "deleted_at": null,
+          "creato_il": "2024-01-10 09:00:00",
+          "modificato_il": "2024-05-09 09:00:00"
+        },
+        {
+          "id": 108,
+          "numero_polizza": "POL-2024-0001017",
+          "cliente_id": 332,
+          "tipo_polizza": "auto",
+          "premio_annuo": 962.5,
+          "capitale_assicurato": 95997.55,
+          "data_emissione": "2024-01-29",
+          "data_scadenza": "2034-03-13",
+          "stato_polizza": "attiva",
+          "deleted_at": null,
+          "creato_il": "2023-12-18 09:00:00",
+          "modificato_il": "2024-04-20 09:00:00"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "sorting"
+  ],
+  "query": "SELECT c.nome AS nome_cliente, c.cognome AS cognome_cliente, c.citta AS citta_cliente, p.numero_polizza, p.tipo_polizza, p.premio_annuo, p.capitale_assicurato FROM polizze p JOIN clienti c ON c.id = p.cliente_id WHERE p.stato_polizza = 'attiva' AND p.deleted_at IS NULL AND p.tipo_polizza IN ('vita', 'casa') ORDER BY p.premio_annuo DESC, p.numero_polizza ASC;"
+}

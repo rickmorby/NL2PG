@@ -1,0 +1,880 @@
+{
+  "schema_ddl": "CREATE TABLE compagnie (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    sede_legale TEXT\n);\n\nCREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    compagnia_id INT NOT NULL REFERENCES compagnie(id),\n    data_assunzione DATE,\n    numero_licenza TEXT UNIQUE\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    email TEXT UNIQUE,\n    citta_residenza TEXT,\n    agente_id INT REFERENCES agenti(id)\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    compagnia_id INT NOT NULL REFERENCES compagnie(id),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo > 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    ramo_assicurativo TEXT NOT NULL,\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id INT PRIMARY KEY,\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    importo_risarcito NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_risarcito >= 0),\n    data_accadimento DATE NOT NULL,\n    data_denuncia DATE NOT NULL,\n    stato_sinistro TEXT NOT NULL CHECK (stato_sinistro IN ('aperto', 'in_valutazione', 'liquidato', 'respinto')),\n    descrizione TEXT\n);\n\nCREATE TABLE pratiche_amministrative (\n    id_pratica INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    importo NUMERIC(10,2) CHECK (importo >= 0),\n    data_apertura DATE NOT NULL,\n    oggetto TEXT NOT NULL,\n    stato_pratica TEXT NOT NULL DEFAULT 'in_corso'\n);",
+  "data_profile": {
+    "profile": {
+      "compagnie": {
+        "row_count": 30,
+        "columns": {
+          "id": {
+            "distinct": 30,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 30
+          },
+          "ragione_sociale": {
+            "distinct": 6,
+            "sample": [
+              "Adriatica Assicurazioni S.r.l.",
+              "Assicurazioni Alpi S.p.A.",
+              "Fideisure Assicurazioni S.p.A.",
+              "Meridiana Assicurazioni S.r.l.",
+              "NordAssicura S.p.A."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 30,
+            "sample": [
+              "IT01234567890",
+              "IT012345678901",
+              "IT012345678902",
+              "IT012345678903",
+              "IT012345678904"
+            ]
+          },
+          "sede_legale": {
+            "distinct": 7,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      "agenti": {
+        "row_count": 399,
+        "columns": {
+          "id": {
+            "distinct": 399,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 399
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Andrea",
+              "Chiara",
+              "Elena",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 11,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Costa",
+              "Ferrari",
+              "Fontana"
+            ]
+          },
+          "compagnia_id": {
+            "distinct": 30,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 30
+          },
+          "data_assunzione": {
+            "distinct": 346,
+            "sample": [
+              "2008-10-22",
+              "2008-12-29",
+              "2009-01-06",
+              "2009-01-22",
+              "2009-03-03"
+            ]
+          },
+          "numero_licenza": {
+            "distinct": 382,
+            "sample": [
+              "AG-0001",
+              "AG-00011",
+              "AG-000110",
+              "AG-000111",
+              "AG-000112"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 397,
+        "columns": {
+          "id": {
+            "distinct": 397,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 397
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Anna",
+              "Chiara",
+              "Davide",
+              "Federico"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Barbieri",
+              "Bruno",
+              "Esposito",
+              "Ferri",
+              "Giordano"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 397,
+            "sample": [
+              "BRNSTF80D22A662B",
+              "BRNSTF80D22A662C",
+              "BRNSTF80D22A662D",
+              "BRNSTF80D22A662E",
+              "BRNSTF80D22A662F"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 357,
+            "sample": [
+              "1973-02-16",
+              "1973-03-24",
+              "1973-03-31",
+              "1973-05-29",
+              "1973-07-04"
+            ]
+          },
+          "email": {
+            "distinct": 366,
+            "sample": [
+              "alessandro.rossi10@example.com",
+              "alessandro.rossi11@example.com",
+              "alessandro.rossi12@example.com",
+              "alessandro.rossi13@example.com",
+              "alessandro.rossi14@example.com"
+            ]
+          },
+          "citta_residenza": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "agente_id": {
+            "distinct": 249,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "105",
+              "106"
+            ],
+            "min": 1,
+            "max": 397
+          }
+        }
+      },
+      "polizze": {
+        "row_count": 2049,
+        "columns": {
+          "id": {
+            "distinct": 2049,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2049
+          },
+          "numero_polizza": {
+            "distinct": 2049,
+            "sample": [
+              "POL-2025-000001",
+              "POL-2025-0000011",
+              "POL-2025-00000110",
+              "POL-2025-000001100",
+              "POL-2025-000001101"
+            ]
+          },
+          "cliente_id": {
+            "distinct": 396,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 397
+          },
+          "compagnia_id": {
+            "distinct": 30,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 30
+          },
+          "premio_annuo": {
+            "distinct": 1932,
+            "sample": [
+              "1000.4",
+              "1001.03",
+              "1001.45",
+              "1002.09",
+              "1004.11"
+            ],
+            "min": 132.95,
+            "max": 1560.0
+          },
+          "data_emissione": {
+            "distinct": 310,
+            "sample": [
+              "2024-10-17",
+              "2024-10-18",
+              "2024-10-19",
+              "2024-10-20",
+              "2024-10-21"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 259,
+            "sample": [
+              "2026-01-15",
+              "2026-01-16",
+              "2026-01-17",
+              "2026-01-18",
+              "2026-01-19"
+            ]
+          },
+          "ramo_assicurativo": {
+            "distinct": 6,
+            "sample": [
+              "auto",
+              "casa",
+              "responsabilita_civile",
+              "salute",
+              "viaggio"
+            ]
+          }
+        }
+      },
+      "sinistri": {
+        "row_count": 751,
+        "columns": {
+          "id": {
+            "distinct": 751,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 751
+          },
+          "polizza_id": {
+            "distinct": 638,
+            "sample": [
+              "10",
+              "100",
+              "1010",
+              "1014",
+              "1015"
+            ],
+            "min": 2,
+            "max": 2046
+          },
+          "importo_risarcito": {
+            "distinct": 609,
+            "sample": [
+              "0.0",
+              "1005.37",
+              "1009.64",
+              "1009.92",
+              "1014.99"
+            ],
+            "min": 0.0,
+            "max": 31875.0
+          },
+          "data_accadimento": {
+            "distinct": 267,
+            "sample": [
+              "2024-10-02",
+              "2024-10-03",
+              "2024-10-04",
+              "2024-10-05",
+              "2024-10-07"
+            ]
+          },
+          "data_denuncia": {
+            "distinct": 202,
+            "sample": [
+              "2024-12-15",
+              "2024-12-16",
+              "2024-12-17",
+              "2024-12-18",
+              "2024-12-19"
+            ]
+          },
+          "stato_sinistro": {
+            "distinct": 4,
+            "sample": [
+              "aperto",
+              "in_valutazione",
+              "liquidato",
+              "respinto"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Collisione posteriore in area urbana",
+              "Danno da rottura tubatura idrica",
+              "Danno rientrante nelle esclusioni contrattuali",
+              "Grandinata che ha danneggiato la carrozzeria",
+              "Incendio sviluppatosi nel garage"
+            ]
+          }
+        }
+      },
+      "pratiche_amministrative": {
+        "row_count": 214,
+        "columns": {
+          "id_pratica": {
+            "distinct": 214,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 214
+          },
+          "cliente_id": {
+            "distinct": 163,
+            "sample": [
+              "1",
+              "103",
+              "107",
+              "11",
+              "113"
+            ],
+            "min": 1,
+            "max": 397
+          },
+          "importo": {
+            "distinct": 173,
+            "sample": [
+              "0.0",
+              "101.28",
+              "101.98",
+              "104.31",
+              "106.5"
+            ],
+            "min": 0.0,
+            "max": 420.0
+          },
+          "data_apertura": {
+            "distinct": 164,
+            "sample": [
+              "2024-10-13",
+              "2024-10-15",
+              "2024-10-22",
+              "2024-10-26",
+              "2024-10-31"
+            ]
+          },
+          "oggetto": {
+            "distinct": 7,
+            "sample": [
+              "Aggiornamento indirizzo di residenza",
+              "Pratica di subentro dell'intestatario",
+              "Richiesta copertura aggiuntiva contro eventi atmosferici",
+              "Richiesta duplicato delle condizioni contrattuali",
+              "Rimborso premio versato per errore amministrativo"
+            ]
+          },
+          "stato_pratica": {
+            "distinct": 3,
+            "sample": [
+              "completata",
+              "in_corso",
+              "sospesa"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "compagnie": [
+        {
+          "id": 1,
+          "ragione_sociale": "Assicurazioni Alpi S.p.A.",
+          "partita_iva": "IT01234567890",
+          "sede_legale": "Bologna"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Assicurazioni Alpi S.p.A.",
+          "partita_iva": "IT012345678901",
+          "sede_legale": "Milano"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Assicurazioni Alpi S.p.A.",
+          "partita_iva": "IT012345678902",
+          "sede_legale": "Roma"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Assicurazioni Alpi S.p.A.",
+          "partita_iva": "IT012345678903",
+          "sede_legale": "Napoli"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Assicurazioni Alpi S.p.A.",
+          "partita_iva": "IT012345678904",
+          "sede_legale": "Roma"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Fideisure Assicurazioni S.p.A.",
+          "partita_iva": "IT09876543210",
+          "sede_legale": "Roma"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Fideisure Assicurazioni S.p.A.",
+          "partita_iva": "IT098765432101",
+          "sede_legale": "Torino"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Fideisure Assicurazioni S.p.A.",
+          "partita_iva": "IT098765432102",
+          "sede_legale": "Genova"
+        }
+      ],
+      "agenti": [
+        {
+          "id": 1,
+          "nome": "Giulia",
+          "cognome": "Marino",
+          "compagnia_id": 12,
+          "data_assunzione": "2013-11-27",
+          "numero_licenza": "AG-0001"
+        },
+        {
+          "id": 2,
+          "nome": "Marco",
+          "cognome": "Fontana",
+          "compagnia_id": 23,
+          "data_assunzione": "2013-02-15",
+          "numero_licenza": "AG-00011"
+        },
+        {
+          "id": 3,
+          "nome": "Andrea",
+          "cognome": "Ricci",
+          "compagnia_id": 23,
+          "data_assunzione": "2014-03-05",
+          "numero_licenza": "AG-00012"
+        },
+        {
+          "id": 4,
+          "nome": "Andrea",
+          "cognome": "Russo",
+          "compagnia_id": 20,
+          "data_assunzione": "2013-10-02",
+          "numero_licenza": "AG-00013"
+        },
+        {
+          "id": 5,
+          "nome": "Andrea",
+          "cognome": "Costa",
+          "compagnia_id": 9,
+          "data_assunzione": "2013-04-26",
+          "numero_licenza": "AG-00014"
+        },
+        {
+          "id": 6,
+          "nome": "Matteo",
+          "cognome": "Ricci",
+          "compagnia_id": 24,
+          "data_assunzione": "2012-04-26",
+          "numero_licenza": "AG-00015"
+        },
+        {
+          "id": 7,
+          "nome": "Sara",
+          "cognome": "Romano",
+          "compagnia_id": 14,
+          "data_assunzione": "2013-02-13",
+          "numero_licenza": "AG-00016"
+        },
+        {
+          "id": 8,
+          "nome": "Sara",
+          "cognome": "Russo",
+          "compagnia_id": 23,
+          "data_assunzione": "2014-01-05",
+          "numero_licenza": "AG-00017"
+        }
+      ],
+      "clienti": [
+        {
+          "id": 10,
+          "nome": "Alessandro",
+          "cognome": "Bruno",
+          "codice_fiscale": "RSSLSM85M01H501J",
+          "data_nascita": "1987-02-08",
+          "email": "alessandro.bruno1@example.com",
+          "citta_residenza": "Genova",
+          "agente_id": 168
+        },
+        {
+          "id": 5,
+          "nome": "Alessandro",
+          "cognome": "Ferri",
+          "codice_fiscale": "RSSLSM85M01H501E",
+          "data_nascita": "1985-12-13",
+          "email": "alessandro.ferri1@example.com",
+          "citta_residenza": "Torino",
+          "agente_id": 200
+        },
+        {
+          "id": 60,
+          "nome": "Anna",
+          "cognome": "Bruno",
+          "codice_fiscale": "RSSLSM85M01H561I",
+          "data_nascita": "1980-10-07",
+          "email": "anna.bruno1@example.com",
+          "citta_residenza": "Torino",
+          "agente_id": 388
+        },
+        {
+          "id": 52,
+          "nome": "Martina",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSLSM85M01H553A",
+          "data_nascita": "1981-12-24",
+          "email": "martina.rossi1@example.com",
+          "citta_residenza": "Torino",
+          "agente_id": 27
+        },
+        {
+          "id": 43,
+          "nome": "Simone",
+          "cognome": "Bruno",
+          "codice_fiscale": "RSSLSM85M01H544R",
+          "data_nascita": "1986-10-03",
+          "email": "simone.bruno1@example.com",
+          "citta_residenza": "Torino",
+          "agente_id": 79
+        },
+        {
+          "id": 72,
+          "nome": "Simone",
+          "cognome": "Giordano",
+          "codice_fiscale": "SPSFNC90T44F205E",
+          "data_nascita": "1994-05-07",
+          "email": "simone.giordano1@example.com",
+          "citta_residenza": "Milano",
+          "agente_id": 78
+        },
+        {
+          "id": 83,
+          "nome": "Davide",
+          "cognome": "Rinaldi",
+          "codice_fiscale": "SPSFNC90T44F205P",
+          "data_nascita": "1993-02-11",
+          "email": "davide.rinaldi1@example.com",
+          "citta_residenza": "Milano",
+          "agente_id": 217
+        },
+        {
+          "id": 139,
+          "nome": "Davide",
+          "cognome": "Rossi",
+          "codice_fiscale": "GRCDVD78B15L219F",
+          "data_nascita": null,
+          "email": "davide.rossi1@example.com",
+          "citta_residenza": "Verona",
+          "agente_id": null
+        }
+      ],
+      "polizze": [
+        {
+          "id": 1,
+          "numero_polizza": "POL-2025-000001",
+          "cliente_id": 139,
+          "compagnia_id": 30,
+          "premio_annuo": 364.2,
+          "data_emissione": "2025-03-25",
+          "data_scadenza": "2026-01-15",
+          "ramo_assicurativo": "salute"
+        },
+        {
+          "id": 2,
+          "numero_polizza": "POL-2025-0000011",
+          "cliente_id": 209,
+          "compagnia_id": 7,
+          "premio_annuo": 415.61,
+          "data_emissione": "2025-01-07",
+          "data_scadenza": "2026-01-23",
+          "ramo_assicurativo": "vita"
+        },
+        {
+          "id": 3,
+          "numero_polizza": "POL-2025-0000012",
+          "cliente_id": 324,
+          "compagnia_id": 30,
+          "premio_annuo": 661.76,
+          "data_emissione": "2025-01-21",
+          "data_scadenza": "2026-04-14",
+          "ramo_assicurativo": "viaggio"
+        },
+        {
+          "id": 4,
+          "numero_polizza": "POL-2025-0000013",
+          "cliente_id": 60,
+          "compagnia_id": 13,
+          "premio_annuo": 704.27,
+          "data_emissione": "2025-01-16",
+          "data_scadenza": "2026-03-25",
+          "ramo_assicurativo": "viaggio"
+        },
+        {
+          "id": 5,
+          "numero_polizza": "POL-2025-0000014",
+          "cliente_id": 61,
+          "compagnia_id": 6,
+          "premio_annuo": 248.04,
+          "data_emissione": "2024-10-30",
+          "data_scadenza": "2026-04-01",
+          "ramo_assicurativo": "salute"
+        },
+        {
+          "id": 6,
+          "numero_polizza": "POL-2025-0000015",
+          "cliente_id": 343,
+          "compagnia_id": 17,
+          "premio_annuo": 508.07,
+          "data_emissione": "2024-11-20",
+          "data_scadenza": "2026-03-27",
+          "ramo_assicurativo": "auto"
+        },
+        {
+          "id": 7,
+          "numero_polizza": "POL-2025-0000016",
+          "cliente_id": 350,
+          "compagnia_id": 20,
+          "premio_annuo": 430.93,
+          "data_emissione": "2025-03-02",
+          "data_scadenza": "2026-03-12",
+          "ramo_assicurativo": "auto"
+        },
+        {
+          "id": 8,
+          "numero_polizza": "POL-2025-0000017",
+          "cliente_id": 56,
+          "compagnia_id": 8,
+          "premio_annuo": 304.53,
+          "data_emissione": "2024-12-08",
+          "data_scadenza": "2026-01-15",
+          "ramo_assicurativo": "casa"
+        }
+      ],
+      "sinistri": [
+        {
+          "id": 1,
+          "polizza_id": 294,
+          "importo_risarcito": 3795.12,
+          "data_accadimento": "2025-01-14",
+          "data_denuncia": "2025-03-23",
+          "stato_sinistro": "aperto",
+          "descrizione": "Danno da rottura tubatura idrica"
+        },
+        {
+          "id": 2,
+          "polizza_id": 2043,
+          "importo_risarcito": 2319.97,
+          "data_accadimento": "2025-02-17",
+          "data_denuncia": "2025-05-01",
+          "stato_sinistro": "liquidato",
+          "descrizione": null
+        },
+        {
+          "id": 3,
+          "polizza_id": 561,
+          "importo_risarcito": 3135.97,
+          "data_accadimento": "2025-01-26",
+          "data_denuncia": "2025-04-14",
+          "stato_sinistro": "in_valutazione",
+          "descrizione": "Tentato furto con scasso nell'abitazione assicurata"
+        },
+        {
+          "id": 4,
+          "polizza_id": 737,
+          "importo_risarcito": 615.13,
+          "data_accadimento": "2025-02-04",
+          "data_denuncia": "2025-04-27",
+          "stato_sinistro": "respinto",
+          "descrizione": "Incidente stradale con lesioni ai conducenti"
+        },
+        {
+          "id": 5,
+          "polizza_id": 396,
+          "importo_risarcito": 2449.28,
+          "data_accadimento": "2025-01-15",
+          "data_denuncia": "2025-04-13",
+          "stato_sinistro": "aperto",
+          "descrizione": "Infiltrazione d'acqua dal tetto dopo forte pioggia"
+        },
+        {
+          "id": 6,
+          "polizza_id": 1142,
+          "importo_risarcito": 2287.06,
+          "data_accadimento": "2025-01-21",
+          "data_denuncia": "2025-04-12",
+          "stato_sinistro": "aperto",
+          "descrizione": "Danno da rottura tubatura idrica"
+        },
+        {
+          "id": 7,
+          "polizza_id": 195,
+          "importo_risarcito": 3722.32,
+          "data_accadimento": "2025-01-15",
+          "data_denuncia": "2025-04-23",
+          "stato_sinistro": "respinto",
+          "descrizione": null
+        },
+        {
+          "id": 8,
+          "polizza_id": 429,
+          "importo_risarcito": 1117.63,
+          "data_accadimento": "2025-01-16",
+          "data_denuncia": "2025-03-25",
+          "stato_sinistro": "liquidato",
+          "descrizione": "Incendio sviluppatosi nel garage"
+        }
+      ],
+      "pratiche_amministrative": [
+        {
+          "id_pratica": 1,
+          "cliente_id": 29,
+          "importo": 90.64,
+          "data_apertura": "2025-01-19",
+          "oggetto": "Richiesta copertura aggiuntiva contro eventi atmosferici",
+          "stato_pratica": "in_corso"
+        },
+        {
+          "id_pratica": 2,
+          "cliente_id": 280,
+          "importo": 71.94,
+          "data_apertura": "2024-12-31",
+          "oggetto": "Richiesta copertura aggiuntiva contro eventi atmosferici",
+          "stato_pratica": "in_corso"
+        },
+        {
+          "id_pratica": 3,
+          "cliente_id": 393,
+          "importo": 40.21,
+          "data_apertura": "2024-10-22",
+          "oggetto": "Rimborso premio versato per errore amministrativo",
+          "stato_pratica": "completata"
+        },
+        {
+          "id_pratica": 4,
+          "cliente_id": 167,
+          "importo": 54.35,
+          "data_apertura": "2025-03-12",
+          "oggetto": "Verifica documentazione anagrafica",
+          "stato_pratica": "completata"
+        },
+        {
+          "id_pratica": 5,
+          "cliente_id": 179,
+          "importo": 119.32,
+          "data_apertura": "2025-01-28",
+          "oggetto": "Richiesta copertura aggiuntiva contro eventi atmosferici",
+          "stato_pratica": "completata"
+        },
+        {
+          "id_pratica": 6,
+          "cliente_id": 214,
+          "importo": 65.88,
+          "data_apertura": "2025-03-16",
+          "oggetto": "Pratica di subentro dell'intestatario",
+          "stato_pratica": "in_corso"
+        },
+        {
+          "id_pratica": 7,
+          "cliente_id": 350,
+          "importo": 77.66,
+          "data_apertura": "2024-11-23",
+          "oggetto": "Richiesta duplicato delle condizioni contrattuali",
+          "stato_pratica": "completata"
+        },
+        {
+          "id_pratica": 8,
+          "cliente_id": 354,
+          "importo": 48.24,
+          "data_apertura": "2025-02-03",
+          "oggetto": "Variazione beneficiario della polizza vita",
+          "stato_pratica": "in_corso"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "lateral"
+  ],
+  "query": "SELECT cp.ragione_sociale,\n       cl.nome || ' ' || cl.cognome AS cliente_intestatario,\n       tp.numero_polizza,\n       tp.premio_annuo AS premio_annuo_massimo\nFROM compagnie cp\nLEFT JOIN LATERAL (\n    SELECT po.numero_polizza, po.premio_annuo, po.cliente_id\n    FROM polizze po\n    WHERE po.compagnia_id = cp.id\n      AND po.ramo_assicurativo = 'auto'\n    ORDER BY po.premio_annuo DESC\n    LIMIT 1\n) tp ON TRUE\nLEFT JOIN clienti cl ON cl.id = tp.cliente_id\nWHERE cp.sede_legale IN ('Milano', 'Roma')\nORDER BY premio_annuo_massimo DESC;"
+}

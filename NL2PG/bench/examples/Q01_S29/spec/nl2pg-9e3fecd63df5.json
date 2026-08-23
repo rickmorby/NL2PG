@@ -1,0 +1,25 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "indirizzo_spedizione",
+      "obsolete_value": "recapito_logistico",
+      "description": "La colonna dell'indirizzo di spedizione viene indicata nei requisiti aziendali come recapito_logistico."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "nome_cliente",
+      "obsolete_value": "denominazione_acquirente",
+      "description": "Il nome del cliente viene riferito nel testo descrittivo tramite il sinonimo denominazione_acquirente."
+    }
+  ],
+  "spec_hash": "dd811bc8fd26cd41"
+}

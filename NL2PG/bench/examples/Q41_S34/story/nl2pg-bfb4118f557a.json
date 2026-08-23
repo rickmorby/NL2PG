@@ -1,0 +1,415 @@
+{
+  "schema_ddl": "CREATE TABLE agenzie (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    telefono TEXT,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE agenti (\n    id SERIAL PRIMARY KEY,\n    agenzia_id INT NOT NULL REFERENCES agenzie(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    CHECK (nome <> '' AND cognome <> '')\n);\n\nCREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    agenzia_id INT REFERENCES agenzie(id),\n    indirizzo TEXT NOT NULL,\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'attico', 'loft', 'terreno')),\n    metri_quadri INT NOT NULL CHECK (metri_quadri > 0),\n    prezzo NUMERIC(12,2) NOT NULL CHECK (prezzo >= 0),\n    stato TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato IN ('disponibile', 'riservato', 'venduto'))\n);",
+  "data_profile": {
+    "profile": {
+      "agenzie": {
+        "row_count": 741,
+        "columns": {
+          "id": {
+            "distinct": 741,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 741
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Agenzia Il Tetto",
+              "CasaNova Agenzia",
+              "Domus Fidele",
+              "Habitat Group",
+              "Immobiliare Aurora"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 8,
+            "sample": [
+              "Corso Buenos Aires 34",
+              "Corso Francia 145",
+              "Via Flaminia 88",
+              "Via Indipendenza 56",
+              "Via Nazionale 71"
+            ]
+          },
+          "telefono": {
+            "distinct": 6,
+            "sample": [
+              "+39 011 3347890",
+              "+39 02 88451234",
+              "+39 051 2209874",
+              "+39 055 6612043",
+              "+39 06 55219876"
+            ]
+          },
+          "email": {
+            "distinct": 710,
+            "sample": [
+              "contatti100@habitatgroup.it",
+              "contatti101@habitatgroup.it",
+              "contatti102@habitatgroup.it",
+              "contatti103@habitatgroup.it",
+              "contatti104@habitatgroup.it"
+            ]
+          }
+        }
+      },
+      "agenti": {
+        "row_count": 2379,
+        "columns": {
+          "id": {
+            "distinct": 2379,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2379
+          },
+          "agenzia_id": {
+            "distinct": 716,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 741
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 16,
+            "sample": [
+              "Bellini",
+              "Bianchi",
+              "Bruno",
+              "Conti",
+              "Costa"
+            ]
+          },
+          "email": {
+            "distinct": 2239,
+            "sample": [
+              "chiara.lombardi100@keyhouse.it",
+              "chiara.lombardi102@keyhouse.it",
+              "chiara.lombardi103@keyhouse.it",
+              "chiara.lombardi104@keyhouse.it",
+              "chiara.lombardi105@keyhouse.it"
+            ]
+          }
+        }
+      },
+      "immobili": {
+        "row_count": 541,
+        "columns": {
+          "id": {
+            "distinct": 541,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 641
+          },
+          "agenzia_id": {
+            "distinct": 368,
+            "sample": [
+              "1",
+              "10",
+              "102",
+              "103",
+              "105"
+            ],
+            "min": 1,
+            "max": 740
+          },
+          "indirizzo": {
+            "distinct": 10,
+            "sample": [
+              "Borgo La Croce 12, Firenze",
+              "Corso Vittorio Emanuele II 45, Torino",
+              "Strada Vicinale dei Pini 4, Perugia",
+              "Via Appia 130, Roma",
+              "Via Brera 8, Milano"
+            ]
+          },
+          "tipo_immobile": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "attico",
+              "loft",
+              "terreno",
+              "villa"
+            ]
+          },
+          "metri_quadri": {
+            "distinct": 529,
+            "sample": [
+              "100.20661783090614",
+              "100.4617010849129",
+              "101.81251447294312",
+              "102.0949556998253",
+              "102.31712574434978"
+            ],
+            "min": 60.0,
+            "max": 1560.0
+          },
+          "prezzo": {
+            "distinct": 534,
+            "sample": [
+              "1012868.83",
+              "1015759.16",
+              "102059.69",
+              "1023421.43",
+              "1023497.07"
+            ],
+            "min": 45000.0,
+            "max": 1602000.0
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "disponibile",
+              "riservato",
+              "venduto"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "agenzie": [
+        {
+          "id": 1,
+          "nome": "Agenzia Il Tetto",
+          "citta": "Bologna",
+          "indirizzo": "Via Flaminia 88",
+          "telefono": "+39 02 88451234",
+          "email": "info@auroraimmobiliare.it"
+        },
+        {
+          "id": 2,
+          "nome": "Punto Casa Srl",
+          "citta": "Milano",
+          "indirizzo": "Via Indipendenza 56",
+          "telefono": "+39 02 88451234",
+          "email": "info1@auroraimmobiliare.it"
+        },
+        {
+          "id": 3,
+          "nome": "Domus Fidele",
+          "citta": "Genova",
+          "indirizzo": "Viale Gramsci 17",
+          "telefono": "+39 02 88451234",
+          "email": "info2@auroraimmobiliare.it"
+        },
+        {
+          "id": 4,
+          "nome": "Domus Fidele",
+          "citta": "Milano",
+          "indirizzo": "Via Torino 12",
+          "telefono": "+39 02 88451234",
+          "email": "info3@auroraimmobiliare.it"
+        },
+        {
+          "id": 5,
+          "nome": "CasaNova Agenzia",
+          "citta": "Torino",
+          "indirizzo": "Via Indipendenza 56",
+          "telefono": "+39 02 88451234",
+          "email": "info4@auroraimmobiliare.it"
+        },
+        {
+          "id": 6,
+          "nome": "Punto Casa Srl",
+          "citta": "Genova",
+          "indirizzo": "Via Toledo 210",
+          "telefono": "+39 02 88451234",
+          "email": "info5@auroraimmobiliare.it"
+        },
+        {
+          "id": 7,
+          "nome": "Agenzia Il Tetto",
+          "citta": "Bologna",
+          "indirizzo": "Via Toledo 210",
+          "telefono": "+39 02 88451234",
+          "email": "info6@auroraimmobiliare.it"
+        },
+        {
+          "id": 8,
+          "nome": "CasaNova Agenzia",
+          "citta": "Firenze",
+          "indirizzo": "Corso Buenos Aires 34",
+          "telefono": null,
+          "email": "info7@auroraimmobiliare.it"
+        }
+      ],
+      "agenti": [
+        {
+          "id": 28,
+          "agenzia_id": 603,
+          "nome": "Andrea",
+          "cognome": "Bianchi",
+          "email": "andrea.bianchi1@example.com"
+        },
+        {
+          "id": 20,
+          "agenzia_id": 270,
+          "nome": "Andrea",
+          "cognome": "Gallo",
+          "email": "andrea.gallo1@example.com"
+        },
+        {
+          "id": 86,
+          "agenzia_id": 106,
+          "nome": "Elena",
+          "cognome": "Gallo",
+          "email": "elena.gallo1@example.com"
+        },
+        {
+          "id": 64,
+          "agenzia_id": 147,
+          "nome": "Francesca",
+          "cognome": "Gallo",
+          "email": "francesca.gallo1@example.com"
+        },
+        {
+          "id": 6,
+          "agenzia_id": 90,
+          "nome": "Luca",
+          "cognome": "Bruno",
+          "email": "luca.bruno1@example.com"
+        },
+        {
+          "id": 45,
+          "agenzia_id": 592,
+          "nome": "Marco",
+          "cognome": "Bellini",
+          "email": "marco.bellini1@example.com"
+        },
+        {
+          "id": 120,
+          "agenzia_id": 547,
+          "nome": "Andrea",
+          "cognome": "Russo",
+          "email": "andrea.russo1@example.com"
+        },
+        {
+          "id": 178,
+          "agenzia_id": 413,
+          "nome": "Chiara",
+          "cognome": "Greco",
+          "email": "chiara.greco1@example.com"
+        }
+      ],
+      "immobili": [
+        {
+          "id": 101,
+          "agenzia_id": 699,
+          "indirizzo": "Via Garibaldi 5, Genova",
+          "tipo_immobile": "attico",
+          "metri_quadri": 84.4415367789923,
+          "prezzo": 269669.15,
+          "stato": "riservato"
+        },
+        {
+          "id": 102,
+          "agenzia_id": 501,
+          "indirizzo": "Via Solferino 22, Milano",
+          "tipo_immobile": "attico",
+          "metri_quadri": 60.0,
+          "prezzo": 402323.59,
+          "stato": "disponibile"
+        },
+        {
+          "id": 103,
+          "agenzia_id": 490,
+          "indirizzo": "Strada Vicinale dei Pini 4, Perugia",
+          "tipo_immobile": "appartamento",
+          "metri_quadri": 81.1748292364701,
+          "prezzo": 502190.36,
+          "stato": "disponibile"
+        },
+        {
+          "id": 104,
+          "agenzia_id": 412,
+          "indirizzo": "Via Appia 130, Roma",
+          "tipo_immobile": "attico",
+          "metri_quadri": 65.99468121413858,
+          "prezzo": 302703.22,
+          "stato": "disponibile"
+        },
+        {
+          "id": 105,
+          "agenzia_id": 365,
+          "indirizzo": "Strada Vicinale dei Pini 4, Perugia",
+          "tipo_immobile": "appartamento",
+          "metri_quadri": 126.31160732854927,
+          "prezzo": 331763.42,
+          "stato": "venduto"
+        },
+        {
+          "id": 106,
+          "agenzia_id": 45,
+          "indirizzo": "Via Garibaldi 5, Genova",
+          "tipo_immobile": "appartamento",
+          "metri_quadri": 145.0,
+          "prezzo": 551085.17,
+          "stato": "disponibile"
+        },
+        {
+          "id": 107,
+          "agenzia_id": 578,
+          "indirizzo": "Via Appia 130, Roma",
+          "tipo_immobile": "attico",
+          "metri_quadri": 121.49896653698745,
+          "prezzo": 261364.93,
+          "stato": "venduto"
+        },
+        {
+          "id": 108,
+          "agenzia_id": 393,
+          "indirizzo": "Via Zamboni 31, Bologna",
+          "tipo_immobile": "appartamento",
+          "metri_quadri": 109.21830627367993,
+          "prezzo": 239328.18,
+          "stato": "disponibile"
+        }
+      ]
+    }
+  },
+  "story": "Alla direzione commerciale del gruppo immobiliare è giunto il momento della revisione semestrale degli archivi gestionali. Il punto di partenza è l'archivio denominato filiali, storicamente noto anche come agenzie, nel quale sono custodite le schede delle sedi operative: per ciascuna sede sono annotati la denominazione commerciale, la città in cui insiste l'ufficio, l'indirizzo completo, il recapito telefonico e l'indirizzo di posta elettronica di contatto. L'archivio conta 741 schede complessive, distribuite tra piazze quali Bologna, Firenze, Genova, Milano e Napoli, con insegne ricorrenti come Agenzia Il Tetto, CasaNova Agenzia, Domus Fidele, Habitat Group e Immobiliare Aurora. Il capo ufficio ha chiesto ai collaboratori di predisporre l'elenco delle sedi situate a Milano che risultano prive di un numero di telefono registrato: per ciascuna di esse occorre riportare la denominazione dell'agenzia, l'indirizzo della sede e l'email di contatto, così che il servizio amministrazione possa completare i recapiti mancanti prima dell'avvio della campagna promozionale. La verifica nasce dal rilievo che diverse comunicazioni inviate alle filiali milanesi sono tornate indietro, proprio perché il numero del centralino non era mai stato aggiornato dopo il trasferimento di alcune sedi. Per dare contesto al controllo, gli operatori hanno consultato anche il registro degli agenti, dove ogni consulente immobiliare è legato alla propria sede di appartenenza mediante il riferimento numerico dell'ufficio; ciascuna posizione riporta nome e cognome del professionista — si incontrano Andrea, Chiara, Davide, Elena e Francesca con cognomi quali Bellini, Bianchi, Bruno, Conti e Costa — oltre all'eventuale email aziendale. Nel registro figurano 2379 posizioni di collaboratori, alcune delle quali ancora sprovviste di indirizzo di posta elettronica. Completa il quadro l'archivio delle unità abitative, un tempo intitolato immobili, che descrive ogni unità seguita dalla rete secondo la tipologia: appartamento, villa, attico, loft oppure terreno. Per ciascuna unità sono indicati l'indirizzo dell'immobile, i metri quadri, il prezzo richiesto e lo stato di avanzamento della trattativa, che può essere disponibile, riservato oppure venduto. Le unità censite sono 541, con superfici da 60 fino a 1560 metri quadri e richieste comprese tra 45000 e 1602000 euro; tra gli esempi citati nel verbale spiccano un attico di circa 84 metri quadri in Via Garibaldi 5 a Genova offerto a 269669.15 euro e attualmente riservato, nonché un appartamento di circa 126 metri quadri in Strada Vicinale dei Pini 4 a Perugia già venduto a 331763.42 euro. Saranno inoltre sottoposti a sopralluogo le unità abitative prive di aggancio a una filiale, cioè quelle il cui riferimento di sede risulta vuoto, mentre l'elenco delle sedi milanesi senza recapito telefonico sarà trasmesso entro fine mese alla segreteria per l'aggiornamento dei contatti."
+}

@@ -1,0 +1,20 @@
+{
+  "domain": "logistica",
+  "n_tables": 7,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "join"
+  ],
+  "twist": [
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "spedizioni",
+      "obsolete_value": "movimenti_merci",
+      "description": "La tabella 'spedizioni' è l'unica rilevante per il join, ma lo schema include 5 tabelle distrattori (es. 'magazzini', 'fornitori', 'trasportatori', 'resi', 'giacenze') che non partecipano alla query. Il termine 'movimenti_merci' viene usato in documentazione per riferirsi a 'spedizioni', ma non corrisponde a nessuna tabella reale."
+    }
+  ],
+  "spec_hash": "c4ef1097e78a40f8"
+}

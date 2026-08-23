@@ -1,0 +1,198 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "cf2f1fb6fc2bfd37"
+  },
+  "schema_ddl": "CREATE TYPE stato_transazione AS ENUM ('in_attesa', 'elaborata', 'annullata', 'fallita', 'rimborsata');\n\nCREATE TABLE transazioni_finanziarie (\n    id BIGSERIAL PRIMARY KEY,\n    codice_transazione TEXT NOT NULL UNIQUE,\n    importo NUMERIC(15, 2) NOT NULL CHECK (importo > 0),\n    valuta TEXT NOT NULL CHECK (valuta ~ '^[A-Z]{3}$'),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_transazione stato_transazione NOT NULL,\n    descrizione TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_transazione <= CURRENT_TIMESTAMP)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "transazioni_finanziarie",
+        "nature": "fact",
+        "min_rows": 500,
+        "max_rows": 2000,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_transazione": "TXN2026010001",
+            "importo": 1250.5,
+            "valuta": "EUR",
+            "data_transazione": "2026-01-10 14:30:00",
+            "stato_transazione": "elaborata",
+            "descrizione": "Pagamento fattura #INV-2025-1234"
+          },
+          {
+            "id": 2,
+            "codice_transazione": "TXN2026010002",
+            "importo": 89.99,
+            "valuta": "USD",
+            "data_transazione": "2026-01-11 09:15:00",
+            "stato_transazione": "elaborata",
+            "descrizione": "Acquisto software"
+          },
+          {
+            "id": 3,
+            "codice_transazione": "TXN2026010003",
+            "importo": 2500.0,
+            "valuta": "EUR",
+            "data_transazione": "2026-01-12 16:45:00",
+            "stato_transazione": "in_attesa",
+            "descrizione": "Bonifico internazionale"
+          },
+          {
+            "id": 4,
+            "codice_transazione": "TXN2026010004",
+            "importo": 45.6,
+            "valuta": "GBP",
+            "data_transazione": "2026-01-13 11:20:00",
+            "stato_transazione": "annullata",
+            "descrizione": "Storno prenotazione hotel"
+          },
+          {
+            "id": 5,
+            "codice_transazione": "TXN2026010005",
+            "importo": 150.75,
+            "valuta": "EUR",
+            "data_transazione": "2026-01-14 08:00:00",
+            "stato_transazione": "fallita",
+            "descrizione": "Pagamento carta di credito rifiutato"
+          },
+          {
+            "id": 6,
+            "codice_transazione": "TXN2026010006",
+            "importo": 320.0,
+            "valuta": "USD",
+            "data_transazione": "2026-01-15 13:30:00",
+            "stato_transazione": "rimborsata",
+            "descrizione": "Rimborso acquisto online"
+          },
+          {
+            "id": 7,
+            "codice_transazione": "TXN2026010007",
+            "importo": 999.99,
+            "valuta": "EUR",
+            "data_transazione": "2026-01-16 10:10:00",
+            "stato_transazione": "elaborata",
+            "descrizione": "Pagamento affitto"
+          },
+          {
+            "id": 8,
+            "codice_transazione": "TXN2026010008",
+            "importo": 20.5,
+            "valuta": "EUR",
+            "data_transazione": "2026-01-17 17:45:00",
+            "stato_transazione": "elaborata",
+            "descrizione": "Ricarica telefonica"
+          },
+          {
+            "id": 9,
+            "codice_transazione": "TXN2026010009",
+            "importo": 750.0,
+            "valuta": "USD",
+            "data_transazione": "2026-01-18 12:00:00",
+            "stato_transazione": "in_attesa",
+            "descrizione": "Trasferimento fondi"
+          },
+          {
+            "id": 10,
+            "codice_transazione": "TXN2026010010",
+            "importo": 12.3,
+            "valuta": "EUR",
+            "data_transazione": "2026-01-19 09:30:00",
+            "stato_transazione": "elaborata",
+            "descrizione": "Acquisto libro"
+          }
+        ],
+        "variations": {
+          "codice_transazione": {
+            "axis": "fixed",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.1,
+            "factor_max": 5.0,
+            "pool": []
+          },
+          "valuta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "EUR",
+              "USD",
+              "GBP",
+              "JPY",
+              "CHF"
+            ]
+          },
+          "data_transazione": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_transazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "elaborata",
+              "elaborata",
+              "elaborata",
+              "elaborata",
+              "in_attesa",
+              "in_attesa",
+              "annullata",
+              "fallita",
+              "rimborsata"
+            ]
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Pagamento fattura #INV-2025-1234",
+              "Acquisto software",
+              "Bonifico internazionale",
+              "Storno prenotazione hotel",
+              "Pagamento carta di credito rifiutato",
+              "Rimborso acquisto online",
+              "Pagamento affitto",
+              "Ricarica telefonica",
+              "Trasferimento fondi",
+              "Acquisto libro",
+              "Pagamento bolletta",
+              "Donazione",
+              "Prelievo ATM",
+              "Deposito contanti"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

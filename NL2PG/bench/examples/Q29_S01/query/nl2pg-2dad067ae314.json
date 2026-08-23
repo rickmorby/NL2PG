@@ -1,0 +1,163 @@
+{
+  "schema_ddl": "CREATE TABLE chiamate (\n    id_chiamata BIGINT PRIMARY KEY,\n    numero_mittente TEXT NOT NULL,\n    numero_destinatario TEXT NOT NULL,\n    data_ora TIMESTAMP NOT NULL,\n    durata_secondi INT NOT NULL CHECK (durata_secondi >= 0),\n    tipo_chiamata TEXT NOT NULL CHECK (tipo_chiamata IN ('voce', 'video', 'internazionale', 'roaming')),\n    stato_chiamata TEXT NOT NULL DEFAULT 'completata' CHECK (stato_chiamata IN ('completata', 'persa', 'inoltrata'))\n);\n\nCREATE INDEX idx_chiamate_mittente ON chiamate (numero_mittente);\n\nCREATE INDEX idx_chiamate_data_ora ON chiamate (data_ora);",
+  "data_profile": {
+    "profile": {
+      "chiamate": {
+        "row_count": 1624,
+        "columns": {
+          "id_chiamata": {
+            "distinct": 1624,
+            "sample": [
+              "100001",
+              "100002",
+              "100003",
+              "100004",
+              "100005"
+            ],
+            "min": 100001,
+            "max": 101624
+          },
+          "numero_mittente": {
+            "distinct": 6,
+            "sample": [
+              "+393201234098",
+              "+393331234567",
+              "+393355556677",
+              "+393402223344",
+              "+393456667788"
+            ]
+          },
+          "numero_destinatario": {
+            "distinct": 7,
+            "sample": [
+              "+393281112233",
+              "+393297778899",
+              "+393384445566",
+              "+393478889900",
+              "+393479876543"
+            ]
+          },
+          "data_ora": {
+            "distinct": 508,
+            "sample": [
+              "2025-11-26 08:15:00",
+              "2025-11-27 08:15:00",
+              "2025-11-28 08:15:00",
+              "2025-11-28 19:42:00",
+              "2025-11-29 08:15:00"
+            ]
+          },
+          "durata_secondi": {
+            "distinct": 1301,
+            "sample": [
+              "0",
+              "0.0",
+              "100.62",
+              "100.93",
+              "100.99"
+            ],
+            "min": 0.0,
+            "max": 3990.0
+          },
+          "tipo_chiamata": {
+            "distinct": 4,
+            "sample": [
+              "internazionale",
+              "roaming",
+              "video",
+              "voce"
+            ]
+          },
+          "stato_chiamata": {
+            "distinct": 3,
+            "sample": [
+              "completata",
+              "inoltrata",
+              "persa"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "chiamate": [
+        {
+          "id_chiamata": 100001,
+          "numero_mittente": "+393201234098",
+          "numero_destinatario": "+393281112233",
+          "data_ora": "2025-12-27 08:15:00",
+          "durata_secondi": 327.84,
+          "tipo_chiamata": "internazionale",
+          "stato_chiamata": "persa"
+        },
+        {
+          "id_chiamata": 100002,
+          "numero_mittente": "+393331234567",
+          "numero_destinatario": "+441632960111",
+          "data_ora": "2026-02-20 08:15:00",
+          "durata_secondi": 165.63,
+          "tipo_chiamata": "internazionale",
+          "stato_chiamata": "completata"
+        },
+        {
+          "id_chiamata": 100003,
+          "numero_mittente": "+393456667788",
+          "numero_destinatario": "+393478889900",
+          "data_ora": "2025-12-27 08:15:00",
+          "durata_secondi": 532.67,
+          "tipo_chiamata": "voce",
+          "stato_chiamata": "completata"
+        },
+        {
+          "id_chiamata": 100004,
+          "numero_mittente": "+393402223344",
+          "numero_destinatario": "+393281112233",
+          "data_ora": "2026-01-14 08:15:00",
+          "durata_secondi": 500.89,
+          "tipo_chiamata": "voce",
+          "stato_chiamata": "completata"
+        },
+        {
+          "id_chiamata": 100005,
+          "numero_mittente": "+393331234567",
+          "numero_destinatario": "+393384445566",
+          "data_ora": "2026-02-03 08:15:00",
+          "durata_secondi": 205.34,
+          "tipo_chiamata": "voce",
+          "stato_chiamata": "completata"
+        },
+        {
+          "id_chiamata": 100006,
+          "numero_mittente": "+393331234567",
+          "numero_destinatario": "+393479876543",
+          "data_ora": "2026-01-10 08:15:00",
+          "durata_secondi": 245,
+          "tipo_chiamata": "voce",
+          "stato_chiamata": "completata"
+        },
+        {
+          "id_chiamata": 100007,
+          "numero_mittente": "+393456667788",
+          "numero_destinatario": "+393281112233",
+          "data_ora": "2025-12-30 08:15:00",
+          "durata_secondi": 408.19,
+          "tipo_chiamata": "roaming",
+          "stato_chiamata": "completata"
+        },
+        {
+          "id_chiamata": 100008,
+          "numero_mittente": "+393456667788",
+          "numero_destinatario": "+441632960111",
+          "data_ora": "2026-01-03 08:15:00",
+          "durata_secondi": 165.24,
+          "tipo_chiamata": "internazionale",
+          "stato_chiamata": "completata"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "agg_distinct"
+  ],
+  "query": "SELECT c.numero_mittente, c.numero_destinatario, c.data_ora, ROUND(c.durata_secondi::numeric / 60, 2) AS durata_minuti, (SELECT COUNT(DISTINCT x.numero_destinatario) FROM chiamate x WHERE x.numero_mittente = c.numero_mittente AND x.stato_chiamata = 'completata') AS destinatari_unici_mittente FROM chiamate c WHERE c.stato_chiamata = 'completata' AND c.tipo_chiamata IN ('voce', 'video') ORDER BY c.durata_secondi DESC, c.id_chiamata ASC LIMIT 15;"
+}

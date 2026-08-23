@@ -1,0 +1,966 @@
+{
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    email TEXT\n);\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    codice_magazzino TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_massima INT NOT NULL CHECK (capacita_massima > 0)\n);\n\nCREATE TABLE articoli_magazzino (\n    id INT PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    nome_categoria TEXT NOT NULL,\n    unita_misura TEXT NOT NULL DEFAULT 'PZ',\n    costo_unitario NUMERIC(10,2) NOT NULL CHECK (costo_unitario >= 0),\n    prezzo_vendita NUMERIC(10,2) NOT NULL CHECK (prezzo_vendita >= 0),\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    nome_fornitore TEXT,\n    giacenza_disponibile INT NOT NULL DEFAULT 0 CHECK (giacenza_disponibile >= 0),\n    valore_totale_giacenza NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (valore_totale_giacenza >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0)\n);\n\nCREATE TABLE ordini_acquisto (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    data_ordine DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato_ordine TEXT NOT NULL DEFAULT 'aperto' CHECK (stato_ordine IN ('aperto', 'confermato', 'evaso', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0)\n);\n\nCREATE TABLE righe_ordine_acquisto (\n    ordine_id INT NOT NULL REFERENCES ordini_acquisto(id) ON DELETE CASCADE,\n    numero_riga INT NOT NULL CHECK (numero_riga > 0),\n    articolo_id INT NOT NULL REFERENCES articoli_magazzino(id),\n    quantita_ordinata INT NOT NULL CHECK (quantita_ordinata > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    subtotale_riga NUMERIC(12,2) NOT NULL CHECK (subtotale_riga >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);\n\nCREATE TABLE movimenti_magazzino (\n    id INT PRIMARY KEY,\n    articolo_id INT NOT NULL REFERENCES articoli_magazzino(id),\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    data_movimento TIMESTAMP NOT NULL,\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('carico', 'scarico', 'rettifica')),\n    quantita_mossa INT NOT NULL CHECK (quantita_mossa <> 0),\n    causale TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "fornitori": {
+        "row_count": 14,
+        "columns": {
+          "id": {
+            "distinct": 14,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 14
+          },
+          "ragione_sociale": {
+            "distinct": 5,
+            "sample": [
+              "Arredo Design Srl",
+              "ElettroHouse",
+              "Fornitori Alimentari Sud",
+              "TecnoComponenti Spa",
+              "Textile International"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 14,
+            "sample": [
+              "12345678901",
+              "12345678902",
+              "12345678903",
+              "32165498700",
+              "32165498701"
+            ]
+          },
+          "citta": {
+            "distinct": 7,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Palermo"
+            ]
+          },
+          "email": {
+            "distinct": 5,
+            "sample": [
+              "acquisti@textileinternational.it",
+              "info@elettrohouse.it",
+              "info@fornitorialimentarisud.it",
+              "ordini@tecnocomponenti.it",
+              "vendite@arredodesign.it"
+            ]
+          }
+        }
+      },
+      "magazzini": {
+        "row_count": 9,
+        "columns": {
+          "id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "codice_magazzino": {
+            "distinct": 9,
+            "sample": [
+              "BO-001",
+              "MI-001",
+              "MI-0011",
+              "NA-001",
+              "NA-0011"
+            ]
+          },
+          "denominazione": {
+            "distinct": 5,
+            "sample": [
+              "Magazzino Bologna Fiera",
+              "Magazzino Milano Centrale",
+              "Magazzino Napoli Porto",
+              "Magazzino Roma Nord",
+              "Magazzino Torino Est"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 5,
+            "sample": [
+              "Corso Torino 25, Torino",
+              "Via Milano 1, Milano",
+              "Via Napoli 5, Napoli",
+              "Via Roma 10, Roma",
+              "Viale Bologna 12, Bologna"
+            ]
+          },
+          "capacita_massima": {
+            "distinct": 6,
+            "sample": [
+              "10000",
+              "15000",
+              "2000",
+              "4000",
+              "5000"
+            ],
+            "min": 4000,
+            "max": 4000
+          }
+        }
+      },
+      "articoli_magazzino": {
+        "row_count": 75,
+        "columns": {
+          "id": {
+            "distinct": 75,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 75
+          },
+          "codice_articolo": {
+            "distinct": 75,
+            "sample": [
+              "ART-001",
+              "ART-0011",
+              "ART-00110",
+              "ART-00111",
+              "ART-00112"
+            ]
+          },
+          "descrizione": {
+            "distinct": 5,
+            "sample": [
+              "Cavo HDMI 2m",
+              "Lampada da tavolo LED",
+              "Laptop 15 pollici i7",
+              "Pacco pasta 1kg",
+              "T-shirt cotone taglia M"
+            ]
+          },
+          "nome_categoria": {
+            "distinct": 8,
+            "sample": [
+              "Abbigliamento",
+              "Alimentari",
+              "Arredamento",
+              "Bellezza",
+              "Cancelleria"
+            ]
+          },
+          "unita_misura": {
+            "distinct": 6,
+            "sample": [
+              "KG",
+              "LT",
+              "M",
+              "PACK",
+              "PZ"
+            ]
+          },
+          "costo_unitario": {
+            "distinct": 73,
+            "sample": [
+              "1.22",
+              "1.27",
+              "1.36",
+              "1.5",
+              "1.59"
+            ],
+            "min": 1.22,
+            "max": 1200.0
+          },
+          "prezzo_vendita": {
+            "distinct": 74,
+            "sample": [
+              "10.8",
+              "102.34",
+              "11.85",
+              "1110.5",
+              "1166.68"
+            ],
+            "min": 2.2,
+            "max": 2082.74
+          },
+          "fornitore_id": {
+            "distinct": 14,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 14
+          },
+          "nome_fornitore": {
+            "distinct": 5,
+            "sample": [
+              "Arredo Design Srl",
+              "ElettroHouse",
+              "Fornitori Alimentari Sud",
+              "TecnoComponenti Spa",
+              "Textile International"
+            ]
+          },
+          "giacenza_disponibile": {
+            "distinct": 8,
+            "sample": [
+              "0",
+              "10",
+              "100",
+              "1000",
+              "20"
+            ],
+            "min": 500,
+            "max": 500
+          },
+          "valore_totale_giacenza": {
+            "distinct": 4,
+            "sample": [
+              "1050.0",
+              "2000.0",
+              "40000.0",
+              "750.0"
+            ],
+            "min": 750.0,
+            "max": 40000.0
+          },
+          "scorta_minima": {
+            "distinct": 6,
+            "sample": [
+              "0",
+              "10",
+              "100",
+              "20",
+              "5"
+            ],
+            "min": 100,
+            "max": 100
+          }
+        }
+      },
+      "ordini_acquisto": {
+        "row_count": 2246,
+        "columns": {
+          "id": {
+            "distinct": 2246,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2246
+          },
+          "numero_ordine": {
+            "distinct": 2246,
+            "sample": [
+              "ORD-2026-001",
+              "ORD-2026-0011",
+              "ORD-2026-00110",
+              "ORD-2026-001100",
+              "ORD-2026-001101"
+            ]
+          },
+          "fornitore_id": {
+            "distinct": 14,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 14
+          },
+          "magazzino_id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "data_ordine": {
+            "distinct": 106,
+            "sample": [
+              "2025-12-16",
+              "2025-12-17",
+              "2025-12-18",
+              "2025-12-19",
+              "2025-12-20"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 75,
+            "sample": [
+              "2026-01-25",
+              "2026-01-30",
+              "2026-01-31",
+              "2026-02-01",
+              "2026-02-02"
+            ]
+          },
+          "stato_ordine": {
+            "distinct": 4,
+            "sample": [
+              "annullato",
+              "aperto",
+              "confermato",
+              "evaso"
+            ]
+          },
+          "totale_ordine": {
+            "distinct": 1715,
+            "sample": [
+              "0.0",
+              "1000.73",
+              "1000.94",
+              "1001.19",
+              "1002.11"
+            ],
+            "min": 0.0,
+            "max": 9001.5
+          }
+        }
+      },
+      "righe_ordine_acquisto": {
+        "row_count": 1818,
+        "columns": {
+          "ordine_id": {
+            "distinct": 1276,
+            "sample": [
+              "100",
+              "1000",
+              "1002",
+              "1005",
+              "1006"
+            ],
+            "min": 3,
+            "max": 2244
+          },
+          "numero_riga": {
+            "distinct": 1818,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1818
+          },
+          "articolo_id": {
+            "distinct": 75,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 75
+          },
+          "quantita_ordinata": {
+            "distinct": 8,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "2",
+              "20"
+            ],
+            "min": 5,
+            "max": 100
+          },
+          "prezzo_unitario": {
+            "distinct": 1275,
+            "sample": [
+              "1.2",
+              "1.22",
+              "1.23",
+              "1.24",
+              "1.25"
+            ],
+            "min": 1.2,
+            "max": 1200.0
+          },
+          "subtotale_riga": {
+            "distinct": 1713,
+            "sample": [
+              "100.0",
+              "100.16",
+              "100.17",
+              "100.2",
+              "100.32"
+            ],
+            "min": 80.0,
+            "max": 12000.0
+          }
+        }
+      },
+      "movimenti_magazzino": {
+        "row_count": 2379,
+        "columns": {
+          "id": {
+            "distinct": 2379,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2379
+          },
+          "articolo_id": {
+            "distinct": 75,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 75
+          },
+          "magazzino_id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "data_movimento": {
+            "distinct": 594,
+            "sample": [
+              "2025-11-11 09:00:00",
+              "2025-11-12 09:00:00",
+              "2025-11-13 14:30:00",
+              "2025-11-14 09:00:00",
+              "2025-11-14 14:30:00"
+            ]
+          },
+          "tipo_movimento": {
+            "distinct": 3,
+            "sample": [
+              "carico",
+              "rettifica",
+              "scarico"
+            ]
+          },
+          "quantita_mossa": {
+            "distinct": 10,
+            "sample": [
+              "-10",
+              "-100",
+              "-20",
+              "-50",
+              "10"
+            ],
+            "min": -20,
+            "max": 200
+          },
+          "causale": {
+            "distinct": 7,
+            "sample": [
+              "Danneggiamento merce",
+              "Reso da cliente",
+              "Rettifica inventariale",
+              "Rettifica inventariale positiva",
+              "Ricevimento merce da fornitore"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "fornitori": [
+        {
+          "id": 1,
+          "ragione_sociale": "Fornitori Alimentari Sud",
+          "partita_iva": "12345678901",
+          "citta": "Roma",
+          "email": "info@fornitorialimentarisud.it"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Fornitori Alimentari Sud",
+          "partita_iva": "12345678902",
+          "citta": "Milano",
+          "email": "info@fornitorialimentarisud.it"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Fornitori Alimentari Sud",
+          "partita_iva": "12345678903",
+          "citta": "Torino",
+          "email": "info@fornitorialimentarisud.it"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "TecnoComponenti Spa",
+          "partita_iva": "98765432109",
+          "citta": "Firenze",
+          "email": "ordini@tecnocomponenti.it"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "TecnoComponenti Spa",
+          "partita_iva": "98765432110",
+          "citta": null,
+          "email": "ordini@tecnocomponenti.it"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "TecnoComponenti Spa",
+          "partita_iva": "98765432111",
+          "citta": "Roma",
+          "email": "ordini@tecnocomponenti.it"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Arredo Design Srl",
+          "partita_iva": "45678912345",
+          "citta": "Palermo",
+          "email": "vendite@arredodesign.it"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Arredo Design Srl",
+          "partita_iva": "45678912346",
+          "citta": "Palermo",
+          "email": "vendite@arredodesign.it"
+        }
+      ],
+      "magazzini": [
+        {
+          "id": 1,
+          "codice_magazzino": "MI-001",
+          "denominazione": "Magazzino Milano Centrale",
+          "indirizzo": "Via Milano 1, Milano",
+          "capacita_massima": "8000"
+        },
+        {
+          "id": 2,
+          "codice_magazzino": "MI-0011",
+          "denominazione": "Magazzino Milano Centrale",
+          "indirizzo": "Via Milano 1, Milano",
+          "capacita_massima": "4000"
+        },
+        {
+          "id": 3,
+          "codice_magazzino": "RM-001",
+          "denominazione": "Magazzino Roma Nord",
+          "indirizzo": "Via Roma 10, Roma",
+          "capacita_massima": "10000"
+        },
+        {
+          "id": 4,
+          "codice_magazzino": "RM-0011",
+          "denominazione": "Magazzino Roma Nord",
+          "indirizzo": "Via Roma 10, Roma",
+          "capacita_massima": "5000"
+        },
+        {
+          "id": 5,
+          "codice_magazzino": "TO-001",
+          "denominazione": "Magazzino Torino Est",
+          "indirizzo": "Corso Torino 25, Torino",
+          "capacita_massima": "4000"
+        },
+        {
+          "id": 6,
+          "codice_magazzino": "TO-0011",
+          "denominazione": "Magazzino Torino Est",
+          "indirizzo": "Corso Torino 25, Torino",
+          "capacita_massima": "2000"
+        },
+        {
+          "id": 7,
+          "codice_magazzino": "NA-001",
+          "denominazione": "Magazzino Napoli Porto",
+          "indirizzo": "Via Napoli 5, Napoli",
+          "capacita_massima": "8000"
+        },
+        {
+          "id": 8,
+          "codice_magazzino": "NA-0011",
+          "denominazione": "Magazzino Napoli Porto",
+          "indirizzo": "Via Napoli 5, Napoli",
+          "capacita_massima": 4000
+        }
+      ],
+      "articoli_magazzino": [
+        {
+          "id": 1,
+          "codice_articolo": "ART-001",
+          "descrizione": "Laptop 15 pollici i7",
+          "nome_categoria": "Giardinaggio",
+          "unita_misura": "PACK",
+          "costo_unitario": 901.33,
+          "prezzo_vendita": 1559.69,
+          "fornitore_id": 13,
+          "nome_fornitore": "Fornitori Alimentari Sud",
+          "giacenza_disponibile": "100",
+          "valore_totale_giacenza": 40000.0,
+          "scorta_minima": "10"
+        },
+        {
+          "id": 2,
+          "codice_articolo": "ART-0011",
+          "descrizione": "Laptop 15 pollici i7",
+          "nome_categoria": "Alimentari",
+          "unita_misura": "SCATOLA",
+          "costo_unitario": 1196.23,
+          "prezzo_vendita": 1975.81,
+          "fornitore_id": 4,
+          "nome_fornitore": "TecnoComponenti Spa",
+          "giacenza_disponibile": "20",
+          "valore_totale_giacenza": 40000.0,
+          "scorta_minima": "5"
+        },
+        {
+          "id": 3,
+          "codice_articolo": "ART-0012",
+          "descrizione": "Laptop 15 pollici i7",
+          "nome_categoria": "Sport",
+          "unita_misura": "PACK",
+          "costo_unitario": 1061.3,
+          "prezzo_vendita": 1987.44,
+          "fornitore_id": 10,
+          "nome_fornitore": "Textile International",
+          "giacenza_disponibile": "200",
+          "valore_totale_giacenza": 40000.0,
+          "scorta_minima": "5"
+        },
+        {
+          "id": 4,
+          "codice_articolo": "ART-0013",
+          "descrizione": "Laptop 15 pollici i7",
+          "nome_categoria": "Bellezza",
+          "unita_misura": "M",
+          "costo_unitario": 1036.98,
+          "prezzo_vendita": 1445.2,
+          "fornitore_id": 1,
+          "nome_fornitore": "Textile International",
+          "giacenza_disponibile": "0",
+          "valore_totale_giacenza": 40000.0,
+          "scorta_minima": "0"
+        },
+        {
+          "id": 5,
+          "codice_articolo": "ART-0014",
+          "descrizione": "Laptop 15 pollici i7",
+          "nome_categoria": "Abbigliamento",
+          "unita_misura": "KG",
+          "costo_unitario": 743.9,
+          "prezzo_vendita": 1388.37,
+          "fornitore_id": 11,
+          "nome_fornitore": "Arredo Design Srl",
+          "giacenza_disponibile": "20",
+          "valore_totale_giacenza": 40000.0,
+          "scorta_minima": "10"
+        },
+        {
+          "id": 6,
+          "codice_articolo": "ART-0015",
+          "descrizione": "Laptop 15 pollici i7",
+          "nome_categoria": "Abbigliamento",
+          "unita_misura": "KG",
+          "costo_unitario": 988.08,
+          "prezzo_vendita": 1491.83,
+          "fornitore_id": 13,
+          "nome_fornitore": "Fornitori Alimentari Sud",
+          "giacenza_disponibile": "100",
+          "valore_totale_giacenza": 40000.0,
+          "scorta_minima": "5"
+        },
+        {
+          "id": 7,
+          "codice_articolo": "ART-0016",
+          "descrizione": "Laptop 15 pollici i7",
+          "nome_categoria": "Giardinaggio",
+          "unita_misura": "LT",
+          "costo_unitario": 1067.73,
+          "prezzo_vendita": 1574.27,
+          "fornitore_id": 5,
+          "nome_fornitore": "Textile International",
+          "giacenza_disponibile": "10",
+          "valore_totale_giacenza": 40000.0,
+          "scorta_minima": "20"
+        },
+        {
+          "id": 8,
+          "codice_articolo": "ART-0017",
+          "descrizione": "Laptop 15 pollici i7",
+          "nome_categoria": "Sport",
+          "unita_misura": "M",
+          "costo_unitario": 1200.0,
+          "prezzo_vendita": 1166.68,
+          "fornitore_id": 1,
+          "nome_fornitore": "TecnoComponenti Spa",
+          "giacenza_disponibile": "1000",
+          "valore_totale_giacenza": 40000.0,
+          "scorta_minima": "5"
+        }
+      ],
+      "ordini_acquisto": [
+        {
+          "id": 1,
+          "numero_ordine": "ORD-2026-001",
+          "fornitore_id": 4,
+          "magazzino_id": 7,
+          "data_ordine": "2026-01-20",
+          "data_consegna_prevista": "2026-02-05",
+          "stato_ordine": "evaso",
+          "totale_ordine": 2662.06
+        },
+        {
+          "id": 2,
+          "numero_ordine": "ORD-2026-0011",
+          "fornitore_id": 3,
+          "magazzino_id": 8,
+          "data_ordine": "2025-12-27",
+          "data_consegna_prevista": "2026-02-13",
+          "stato_ordine": "aperto",
+          "totale_ordine": 2620.99
+        },
+        {
+          "id": 3,
+          "numero_ordine": "ORD-2026-0012",
+          "fornitore_id": 7,
+          "magazzino_id": 6,
+          "data_ordine": "2026-02-01",
+          "data_consegna_prevista": "2026-02-17",
+          "stato_ordine": "aperto",
+          "totale_ordine": 750.0
+        },
+        {
+          "id": 4,
+          "numero_ordine": "ORD-2026-0013",
+          "fornitore_id": 4,
+          "magazzino_id": 6,
+          "data_ordine": "2026-01-21",
+          "data_consegna_prevista": "2026-02-02",
+          "stato_ordine": "aperto",
+          "totale_ordine": 1140.49
+        },
+        {
+          "id": 5,
+          "numero_ordine": "ORD-2026-0014",
+          "fornitore_id": 9,
+          "magazzino_id": 1,
+          "data_ordine": "2026-01-26",
+          "data_consegna_prevista": "2026-01-30",
+          "stato_ordine": "aperto",
+          "totale_ordine": 1523.37
+        },
+        {
+          "id": 6,
+          "numero_ordine": "ORD-2026-0015",
+          "fornitore_id": 7,
+          "magazzino_id": 5,
+          "data_ordine": "2026-02-04",
+          "data_consegna_prevista": "2026-02-17",
+          "stato_ordine": "annullato",
+          "totale_ordine": 895.26
+        },
+        {
+          "id": 7,
+          "numero_ordine": "ORD-2026-0016",
+          "fornitore_id": 2,
+          "magazzino_id": 3,
+          "data_ordine": "2026-01-07",
+          "data_consegna_prevista": "2026-02-02",
+          "stato_ordine": "evaso",
+          "totale_ordine": 1542.25
+        },
+        {
+          "id": 8,
+          "numero_ordine": "ORD-2026-0017",
+          "fornitore_id": 14,
+          "magazzino_id": 6,
+          "data_ordine": "2025-12-23",
+          "data_consegna_prevista": "2026-02-20",
+          "stato_ordine": "aperto",
+          "totale_ordine": 1919.88
+        }
+      ],
+      "righe_ordine_acquisto": [
+        {
+          "ordine_id": 1772,
+          "numero_riga": 1,
+          "articolo_id": 24,
+          "quantita_ordinata": "200",
+          "prezzo_unitario": 696.18,
+          "subtotale_riga": 9779.42
+        },
+        {
+          "ordine_id": 1753,
+          "numero_riga": 2,
+          "articolo_id": 72,
+          "quantita_ordinata": "2",
+          "prezzo_unitario": 963.4,
+          "subtotale_riga": 9188.48
+        },
+        {
+          "ordine_id": 613,
+          "numero_riga": 3,
+          "articolo_id": 66,
+          "quantita_ordinata": "5",
+          "prezzo_unitario": 814.35,
+          "subtotale_riga": 6561.45
+        },
+        {
+          "ordine_id": 1804,
+          "numero_riga": 4,
+          "articolo_id": 21,
+          "quantita_ordinata": "5",
+          "prezzo_unitario": 949.47,
+          "subtotale_riga": 7278.63
+        },
+        {
+          "ordine_id": 1863,
+          "numero_riga": 5,
+          "articolo_id": 6,
+          "quantita_ordinata": "100",
+          "prezzo_unitario": 806.52,
+          "subtotale_riga": 9609.56
+        },
+        {
+          "ordine_id": 1635,
+          "numero_riga": 6,
+          "articolo_id": 10,
+          "quantita_ordinata": "20",
+          "prezzo_unitario": 1022.28,
+          "subtotale_riga": 7283.62
+        },
+        {
+          "ordine_id": 970,
+          "numero_riga": 7,
+          "articolo_id": 45,
+          "quantita_ordinata": "1",
+          "prezzo_unitario": 825.29,
+          "subtotale_riga": 9057.15
+        },
+        {
+          "ordine_id": 1293,
+          "numero_riga": 8,
+          "articolo_id": 48,
+          "quantita_ordinata": "1",
+          "prezzo_unitario": 701.85,
+          "subtotale_riga": 8995.57
+        }
+      ],
+      "movimenti_magazzino": [
+        {
+          "id": 1,
+          "articolo_id": 56,
+          "magazzino_id": 9,
+          "data_movimento": "2025-12-29 09:00:00",
+          "tipo_movimento": "carico",
+          "quantita_mossa": "-100",
+          "causale": null
+        },
+        {
+          "id": 2,
+          "articolo_id": 7,
+          "magazzino_id": 8,
+          "data_movimento": "2025-11-23 09:00:00",
+          "tipo_movimento": "scarico",
+          "quantita_mossa": "200",
+          "causale": "Rettifica inventariale"
+        },
+        {
+          "id": 3,
+          "articolo_id": 24,
+          "magazzino_id": 8,
+          "data_movimento": "2026-02-16 09:00:00",
+          "tipo_movimento": "carico",
+          "quantita_mossa": "50",
+          "causale": "Vendita a cliente"
+        },
+        {
+          "id": 4,
+          "articolo_id": 41,
+          "magazzino_id": 4,
+          "data_movimento": "2026-01-22 09:00:00",
+          "tipo_movimento": "scarico",
+          "quantita_mossa": "10",
+          "causale": "Trasferimento tra magazzini"
+        },
+        {
+          "id": 5,
+          "articolo_id": 39,
+          "magazzino_id": 7,
+          "data_movimento": "2026-01-16 09:00:00",
+          "tipo_movimento": "rettifica",
+          "quantita_mossa": "-100",
+          "causale": "Reso da cliente"
+        },
+        {
+          "id": 6,
+          "articolo_id": 68,
+          "magazzino_id": 6,
+          "data_movimento": "2026-02-17 09:00:00",
+          "tipo_movimento": "scarico",
+          "quantita_mossa": "-100",
+          "causale": "Rettifica inventariale"
+        },
+        {
+          "id": 7,
+          "articolo_id": 15,
+          "magazzino_id": 3,
+          "data_movimento": "2026-01-25 09:00:00",
+          "tipo_movimento": "scarico",
+          "quantita_mossa": "-20",
+          "causale": "Danneggiamento merce"
+        },
+        {
+          "id": 8,
+          "articolo_id": 34,
+          "magazzino_id": 5,
+          "data_movimento": "2025-12-19 09:00:00",
+          "tipo_movimento": "rettifica",
+          "quantita_mossa": "-20",
+          "causale": "Vendita a cliente"
+        }
+      ]
+    }
+  },
+  "story": "Alla direzione supply chain dell'azienda, la revisione trimestrale degli stock è affidata al gruppo di controllo della logistica. Il punto di osservazione principale è l'archivio denominato articoli_magazzino, nel quale ogni scheda descrive un prodotto tramite il codice articolo, la descrizione, la classe merceologica di bilancio, l'unità di misura, il costo unitario, il prezzo di vendita, la giacenza disponibile, il valore totale di giacenza e la scorta minima; in ciascuna scheda è inoltre riportata l'anagrafica del partner di fornitura, che qualora risultasse mancante viene integrata con la dicitura N/D così da non lasciare spazi vuoti nella documentazione gestionale. Per dare un quadro completo, gli analisti affiancano l'archivio fornitori, che conserva ragione sociale, partita iva, città e recapiti elettronici di ciascun partner commerciale, e il registro magazzini, dove sono annotati codice, denominazione, indirizzo e capacità massima di ogni sede di stoccaggio, dal Magazzino Milano Centrale al Magazzino Napoli Porto. L'indagine si concentra sulle voci la cui classe merceologica di bilancio risulta Alimentari. Per ciascuna di esse il team determina lo stato di scorta applicando la scala di valutazione concordata in sede di budget: se la giacenza disponibile è scesa a 0 unità la voce viene etichettata come esaurito; se resta sopra lo zero ma sotto la scorta minima prevista, ad esempio una soglia di 5 o di 10 pezzi, assume la dicitura sotto scorta minima; quando la disponibilità si avvicina alla soglia senza discostarsene molto si parla di vicino alla soglia; in tutti gli altri casi la classificazione attribuita è scorta adeguata. Accanto allo stato, gli analisti calcolano il margine unitario arrotondato, ricavato dalla differenza tra prezzo di vendita e costo unitario, e dispongono l'elenco dal margine più alto al più basso, così che la direzione individui subito le referenze alimentari più remunerative. La verifica si estende poi ai flussi collegati: il registro ordini_acquisto traccia numero d'ordine, data dell'ordine, data di consegna prevista, stato dell'ordine — aperto, confermato, evaso oppure annullato — e totale dell'ordine rivolto a ciascun fornitore; il dettaglio delle righe_ordine_acquisto precisa quantità ordinata, prezzo unitario e subtotale di ogni posizione d'acquisto; infine il registro movimenti_magazzino documenta carichi, scarichi e rettifiche con le relative causali, come Rettifica inventariale, Reso da cliente o Danneggiamento merce, consentendo di riconciliare le giacenze dichiarate con i movimenti fisici effettivamente avvenuti nei depositi. Grazie a questo percorso di controllo, il gruppo presenta alla direzione un quadro affidabile delle scorte alimentari, dei loro stati critici e dei margini attesi."
+}

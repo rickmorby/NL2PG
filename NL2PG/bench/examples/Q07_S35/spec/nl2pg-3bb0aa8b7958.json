@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "multi_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "vendite",
+      "obsolete_value": "registro_transazioni",
+      "description": "La tabella dei fatti vendite, partizionata dichiarativamente con PARTITION BY RANGE sulla chiave data_ordine, viene denominata nella prosa aziendale registro_transazioni. Il SQL generato deve riferirsi alla tabella logica vendite; i filtri su data_ordine abilitano il pruning delle partizioni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_totale",
+      "obsolete_value": "valore_fatturato_lordo",
+      "description": "La colonna importo_totale della tabella vendite è indicata nei documenti commerciali interni con il gergo di settore valore_fatturato_lordo. Le query che aggregano i ricavi devono usare la colonna reale importo_totale, raggiunta tramite la catena di join vendite -> clienti -> prodotti seguendo le foreign key."
+    }
+  ],
+  "spec_hash": "75d951cdfac64f82"
+}

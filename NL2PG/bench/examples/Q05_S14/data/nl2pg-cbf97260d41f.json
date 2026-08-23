@@ -1,0 +1,299 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "5034de98ac03de82"
+  },
+  "schema_ddl": "CREATE DOMAIN importo_stipendio AS NUMERIC(10,2) CHECK (VALUE >= 500 AND VALUE <= 50000);\n\nCREATE DOMAIN livello_seniorita AS TEXT CHECK (VALUE IN ('junior', 'mid', 'senior'));\n\nCREATE TABLE dipartimenti (\n    id INT PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL,\n    budget_annuo NUMERIC(12,2) NOT NULL CHECK (budget_annuo > 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile importo_stipendio NOT NULL,\n    seniority livello_seniorita NOT NULL DEFAULT 'junior',\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dipartimenti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_dipartimento": "Risorse Umane",
+            "sede": "Roma",
+            "budget_annuo": 450000.0,
+            "created_at": "2021-01-15 09:00:00"
+          },
+          {
+            "id": 2,
+            "nome_dipartimento": "Sviluppo Software",
+            "sede": "Milano",
+            "budget_annuo": 1250000.0,
+            "created_at": "2020-03-02 10:30:00"
+          },
+          {
+            "id": 3,
+            "nome_dipartimento": "Vendite",
+            "sede": "Milano",
+            "budget_annuo": 820000.0,
+            "created_at": "2020-06-20 08:45:00"
+          },
+          {
+            "id": 4,
+            "nome_dipartimento": "Marketing",
+            "sede": "Torino",
+            "budget_annuo": 360000.0,
+            "created_at": "2021-09-10 11:15:00"
+          },
+          {
+            "id": 5,
+            "nome_dipartimento": "Finanza e Controllo",
+            "sede": "Roma",
+            "budget_annuo": 640000.0,
+            "created_at": "2019-11-05 09:20:00"
+          },
+          {
+            "id": 6,
+            "nome_dipartimento": "Logistica",
+            "sede": "Napoli",
+            "budget_annuo": 510000.0,
+            "created_at": "2022-02-18 14:00:00"
+          },
+          {
+            "id": 7,
+            "nome_dipartimento": "Assistenza Clienti",
+            "sede": "Bologna",
+            "budget_annuo": 295000.0,
+            "created_at": "2022-05-30 10:10:00"
+          },
+          {
+            "id": 8,
+            "nome_dipartimento": "Ricerca e Sviluppo",
+            "sede": "Torino",
+            "budget_annuo": 980000.0,
+            "created_at": "2020-01-27 09:50:00"
+          }
+        ],
+        "variations": {
+          "sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze"
+            ]
+          },
+          "budget_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "created_at": {
+            "axis": "shift",
+            "delta_min": -1500.0,
+            "delta_max": -200.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 15.0,
+        "templates": [
+          {
+            "id": 1,
+            "dipartimento_id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "email": "mario.rossi@acme.it",
+            "data_assunzione": "2019-03-11",
+            "stipendio_mensile": 4200.0,
+            "seniority": "senior",
+            "attivo": true,
+            "created_at": "2019-03-11 09:15:00",
+            "updated_at": "2025-06-30 17:45:00"
+          },
+          {
+            "id": 2,
+            "dipartimento_id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLAU85C42F205Z",
+            "email": "laura.bianchi@acme.it",
+            "data_assunzione": "2021-09-01",
+            "stipendio_mensile": 3150.0,
+            "seniority": "mid",
+            "attivo": true,
+            "created_at": "2021-09-01 08:30:00",
+            "updated_at": "2025-05-12 16:20:00"
+          },
+          {
+            "id": 3,
+            "dipartimento_id": 2,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI92D55G224W",
+            "email": "giulia.verdi@acme.it",
+            "data_assunzione": "2023-02-13",
+            "stipendio_mensile": 2150.0,
+            "seniority": "junior",
+            "attivo": true,
+            "created_at": "2023-02-13 09:00:00",
+            "updated_at": "2025-04-01 12:00:00"
+          },
+          {
+            "id": 4,
+            "dipartimento_id": 3,
+            "nome": "Luca",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRLCU78B15L219K",
+            "email": "luca.ferrari@acme.it",
+            "data_assunzione": "2018-05-21",
+            "stipendio_mensile": 4850.0,
+            "seniority": "senior",
+            "attivo": false,
+            "created_at": "2018-05-21 10:45:00",
+            "updated_at": "2024-11-30 18:00:00"
+          },
+          {
+            "id": 5,
+            "dipartimento_id": 4,
+            "nome": "Sara",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTSRA88E63H501Q",
+            "email": "sara.conti@acme.it",
+            "data_assunzione": "2022-07-04",
+            "stipendio_mensile": 2780.0,
+            "seniority": "mid",
+            "attivo": true,
+            "created_at": "2022-07-04 09:10:00",
+            "updated_at": "2025-07-15 15:35:00"
+          },
+          {
+            "id": 6,
+            "dipartimento_id": 5,
+            "nome": "Paolo",
+            "cognome": "Moretti",
+            "codice_fiscale": "MRTPLA75F20M052Y",
+            "email": "paolo.moretti@acme.it",
+            "data_assunzione": "2020-10-19",
+            "stipendio_mensile": 3950.0,
+            "seniority": "senior",
+            "attivo": true,
+            "created_at": "2020-10-19 08:55:00",
+            "updated_at": "2025-03-22 11:25:00"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Luca",
+              "Sara",
+              "Paolo",
+              "Anna",
+              "Marco",
+              "Elena",
+              "Davide",
+              "Chiara",
+              "Francesco"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Ferrari",
+              "Conti",
+              "Moretti",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Bruno",
+              "Gallo",
+              "Costa"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -730.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stipendio_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.85,
+            "factor_max": 1.25,
+            "pool": []
+          },
+          "seniority": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "junior",
+              "junior",
+              "mid",
+              "mid",
+              "mid",
+              "senior"
+            ]
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

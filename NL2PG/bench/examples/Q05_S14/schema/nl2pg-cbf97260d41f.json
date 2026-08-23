@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "5034de98ac03de82"
+  },
+  "schema_ddl": "CREATE DOMAIN importo_stipendio AS NUMERIC(10,2) CHECK (VALUE >= 500 AND VALUE <= 50000);\n\nCREATE DOMAIN livello_seniorita AS TEXT CHECK (VALUE IN ('junior', 'mid', 'senior'));\n\nCREATE TABLE dipartimenti (\n    id INT PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL,\n    budget_annuo NUMERIC(12,2) NOT NULL CHECK (budget_annuo > 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile importo_stipendio NOT NULL,\n    seniority livello_seniorita NOT NULL DEFAULT 'junior',\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);"
+}

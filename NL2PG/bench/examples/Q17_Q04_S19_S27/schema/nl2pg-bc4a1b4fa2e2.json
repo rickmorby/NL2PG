@@ -1,0 +1,32 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "window",
+      "join",
+      "conjunctive"
+    ],
+    "twist": [
+      "jargon",
+      "ambiguity"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "transazioni",
+        "obsolete_value": "movimentazioni commerciali",
+        "description": "La tabella delle vendite registrate, denominata 'transazioni' nello schema, viene indicata nella prosa aziendale con il gergo interno 'movimentazioni commerciali'. Il modello deve riconoscere che ogni menzione di 'movimentazioni commerciali' si riferisce alla tabella transazioni e non a movimenti di magazzino, documenti contabili o note di credito."
+      },
+      {
+        "twist_type": "ambiguity",
+        "target_value": "data_transazione",
+        "obsolete_value": "data dell'operazione",
+        "description": "La colonna 'data_transazione' della tabella transazioni viene indicata nella prosa aziendale come 'data dell'operazione'. Il termine è volutamente ambiguo perché la stessa tabella contiene anche la colonna 'data_consegna': il modello deve risolvere l'ambiguità interpretando 'data dell'operazione' come la data di registrazione della vendita (data_transazione) e non la data di evasione o consegna dell'ordine."
+      }
+    ],
+    "spec_hash": "fe1e8719b893f389"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT UNIQUE,\n    data_registrazione DATE NOT NULL\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome_prodotto TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    prezzo_listino NUMERIC(10,2) NOT NULL CHECK (prezzo_listino >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0)\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    data_transazione DATE NOT NULL,\n    data_consegna DATE,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    canale_vendita TEXT NOT NULL DEFAULT 'negozio',\n    CHECK (data_consegna IS NULL OR data_consegna >= data_transazione)\n);"
+}

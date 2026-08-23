@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "values"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "movimenti_vendita",
+      "description": "Nella prosa aziendale la tabella ordini viene chiamata movimenti_vendita, ma nello schema reale il nome fisico della tabella resta ordini."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "cliente_id",
+      "obsolete_value": "riferimento_controparte",
+      "description": "La colonna ordini.cliente_id viene indicata con il gergo interno riferimento_controparte; l'associazione con la tabella clienti deve comunque avvenire sul nome tecnico cliente_id."
+    }
+  ],
+  "spec_hash": "389042c92024eb2c"
+}

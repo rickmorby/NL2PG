@@ -1,0 +1,34 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "offset_fetch"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "prodotti",
+      "obsolete_value": "catalogo_articoli",
+      "description": "La tabella prodotti, che contiene l'anagrafica degli articoli venduti insieme al timestamp di ultima modifica della scheda, viene denominata catalogo_articoli nella prosa aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "storico_prezzi",
+      "obsolete_value": "archivio_listini",
+      "description": "La tabella storico_prezzi, che registra le versioni temporali dei prezzi con data_validita_da e data_validita_a, viene indicata come archivio_listini nella documentazione commerciale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "prezzo_unitario",
+      "obsolete_value": "PVP",
+      "description": "La colonna prezzo_unitario presente nelle tabelle ordini_righe e storico_prezzi viene riferita nei testi aziendali con il gergo PVP (Prezzo di Vendita al Pubblico), richiedendo la decodifica del termine tecnico."
+    }
+  ],
+  "spec_hash": "b4f7991830c32e0c"
+}

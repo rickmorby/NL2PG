@@ -1,0 +1,11 @@
+{
+  "domain": "finanza",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "cf2f1fb6fc2bfd37"
+}

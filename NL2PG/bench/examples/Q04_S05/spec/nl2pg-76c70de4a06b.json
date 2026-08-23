@@ -1,0 +1,11 @@
+{
+  "domain": "sanità",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "87e55453a9f31608"
+}

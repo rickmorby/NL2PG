@@ -1,0 +1,556 @@
+{
+  "schema_ddl": "CREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    codice_sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE storico_prezzi (\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    valid_from TIMESTAMP NOT NULL,\n    valid_to TIMESTAMP,\n    PRIMARY KEY (prodotto_id, valid_from),\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    email TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    citta TEXT\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa',\n    totale NUMERIC(12,2) CHECK (totale >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "categorie": {
+        "row_count": 48,
+        "columns": {
+          "id": {
+            "distinct": 48,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 48
+          },
+          "nome": {
+            "distinct": 48,
+            "sample": [
+              "Abbigliamento",
+              "Abbigliamento1",
+              "Abbigliamento2",
+              "Abbigliamento3",
+              "Abbigliamento4"
+            ]
+          },
+          "descrizione": {
+            "distinct": 7,
+            "sample": [
+              "Alimentari e bevande",
+              "Articoli per la casa e il giardino",
+              "Attrezzatura sportiva",
+              "Dispositivi elettronici e accessori",
+              "Giocattoli per bambini"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 167,
+        "columns": {
+          "id": {
+            "distinct": 167,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 167
+          },
+          "codice_sku": {
+            "distinct": 167,
+            "sample": [
+              "ABB-001",
+              "ABB-0011",
+              "ABB-00110",
+              "ABB-00111",
+              "ABB-00112"
+            ]
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Cuffie wireless",
+              "Giacca invernale",
+              "Giallo di Venezia",
+              "Jeans slim fit",
+              "Lampada da tavolo"
+            ]
+          },
+          "categoria_id": {
+            "distinct": 47,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 48
+          },
+          "attivo": {
+            "distinct": 2,
+            "sample": [
+              "false",
+              "true"
+            ]
+          },
+          "creato_il": {
+            "distinct": 160,
+            "sample": [
+              "2022-11-05 09:15:00",
+              "2022-11-21 09:15:00",
+              "2022-12-05 09:15:00",
+              "2022-12-23 09:15:00",
+              "2023-01-25 09:15:00"
+            ]
+          }
+        }
+      },
+      "storico_prezzi": {
+        "row_count": 167,
+        "columns": {
+          "prodotto_id": {
+            "distinct": 105,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 167
+          },
+          "prezzo_unitario": {
+            "distinct": 160,
+            "sample": [
+              "10.55",
+              "10.62",
+              "10.63",
+              "10.78",
+              "10.95"
+            ],
+            "min": 10.55,
+            "max": 1076.26
+          },
+          "valid_from": {
+            "distinct": 167,
+            "sample": [
+              "2023-12-01 00:00:00",
+              "2023-12-02 00:00:00",
+              "2023-12-03 00:00:00",
+              "2023-12-04 00:00:00",
+              "2023-12-05 00:00:00"
+            ]
+          },
+          "valid_to": {
+            "distinct": 52,
+            "sample": [
+              "2024-08-01 00:00:00",
+              "2024-09-02 00:00:00",
+              "2024-09-07 00:00:00",
+              "2024-09-08 00:00:00",
+              "2024-09-12 00:00:00"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 638,
+        "columns": {
+          "id": {
+            "distinct": 638,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 638
+          },
+          "email": {
+            "distinct": 638,
+            "sample": [
+              "elena.gialli100@example.com",
+              "elena.gialli101@example.com",
+              "elena.gialli102@example.com",
+              "elena.gialli103@example.com",
+              "elena.gialli104@example.com"
+            ]
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Anna",
+              "Davide",
+              "Elena",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Ferrari",
+              "Gialli",
+              "Greco"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1865,
+        "columns": {
+          "id": {
+            "distinct": 1865,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1865
+          },
+          "cliente_id": {
+            "distinct": 599,
+            "sample": [
+              "10",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 2,
+            "max": 638
+          },
+          "data_ordine": {
+            "distinct": 800,
+            "sample": [
+              "2023-07-24 10:30:00",
+              "2023-07-26 10:30:00",
+              "2023-07-27 10:30:00",
+              "2023-07-28 10:30:00",
+              "2023-07-29 10:30:00"
+            ]
+          },
+          "stato_ordine": {
+            "distinct": 4,
+            "sample": [
+              "annullato",
+              "chiuso",
+              "in_attesa",
+              "spedito"
+            ]
+          },
+          "totale": {
+            "distinct": 1659,
+            "sample": [
+              "100.66",
+              "100.88",
+              "100.9",
+              "101.27",
+              "101.58"
+            ],
+            "min": 29.95,
+            "max": 962.25
+          }
+        }
+      }
+    },
+    "preview": {
+      "categorie": [
+        {
+          "id": 1,
+          "nome": "Elettronica",
+          "descrizione": "Vestiti, scarpe e accessori moda"
+        },
+        {
+          "id": 2,
+          "nome": "Elettronica1",
+          "descrizione": "Giocattoli per bambini"
+        },
+        {
+          "id": 3,
+          "nome": "Elettronica2",
+          "descrizione": "Attrezzatura sportiva"
+        },
+        {
+          "id": 4,
+          "nome": "Elettronica3",
+          "descrizione": "Libri cartacei e digitali"
+        },
+        {
+          "id": 5,
+          "nome": "Elettronica4",
+          "descrizione": null
+        },
+        {
+          "id": 6,
+          "nome": "Elettronica5",
+          "descrizione": "Articoli per la casa e il giardino"
+        },
+        {
+          "id": 7,
+          "nome": "Elettronica6",
+          "descrizione": "Dispositivi elettronici e accessori"
+        },
+        {
+          "id": 8,
+          "nome": "Elettronica7",
+          "descrizione": "Dispositivi elettronici e accessori"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "codice_sku": "ELEC-001",
+          "nome": "Jeans slim fit",
+          "categoria_id": 22,
+          "attivo": "true",
+          "creato_il": "2023-10-03 10:00:00"
+        },
+        {
+          "id": 2,
+          "codice_sku": "ELEC-0011",
+          "nome": "Laptop pro 15",
+          "categoria_id": 23,
+          "attivo": "true",
+          "creato_il": "2023-04-11 10:00:00"
+        },
+        {
+          "id": 3,
+          "codice_sku": "ELEC-0012",
+          "nome": "Maglietta cotone",
+          "categoria_id": 17,
+          "attivo": "true",
+          "creato_il": "2023-06-16 10:00:00"
+        },
+        {
+          "id": 4,
+          "codice_sku": "ELEC-0013",
+          "nome": "Lampada da tavolo",
+          "categoria_id": 10,
+          "attivo": "true",
+          "creato_il": "2023-07-25 10:00:00"
+        },
+        {
+          "id": 5,
+          "codice_sku": "ELEC-0014",
+          "nome": "Lampada da tavolo",
+          "categoria_id": 39,
+          "attivo": "true",
+          "creato_il": "2023-05-07 10:00:00"
+        },
+        {
+          "id": 6,
+          "codice_sku": "ELEC-0015",
+          "nome": "Laptop pro 15",
+          "categoria_id": 4,
+          "attivo": "true",
+          "creato_il": "2023-10-18 10:00:00"
+        },
+        {
+          "id": 7,
+          "codice_sku": "ELEC-0016",
+          "nome": "Smartphone X200",
+          "categoria_id": 38,
+          "attivo": "false",
+          "creato_il": "2023-08-04 10:00:00"
+        },
+        {
+          "id": 8,
+          "codice_sku": "ELEC-0017",
+          "nome": "Romanzo storico",
+          "categoria_id": 42,
+          "attivo": "false",
+          "creato_il": "2023-08-05 10:00:00"
+        }
+      ],
+      "storico_prezzi": [
+        {
+          "prodotto_id": 24,
+          "prezzo_unitario": 1030.74,
+          "valid_from": "2024-01-01 00:00:00",
+          "valid_to": null
+        },
+        {
+          "prodotto_id": 71,
+          "prezzo_unitario": 1059.63,
+          "valid_from": "2024-01-02 00:00:00",
+          "valid_to": null
+        },
+        {
+          "prodotto_id": 21,
+          "prezzo_unitario": 794.52,
+          "valid_from": "2024-01-03 00:00:00",
+          "valid_to": null
+        },
+        {
+          "prodotto_id": 89,
+          "prezzo_unitario": 938.91,
+          "valid_from": "2024-01-04 00:00:00",
+          "valid_to": null
+        },
+        {
+          "prodotto_id": 164,
+          "prezzo_unitario": 834.31,
+          "valid_from": "2024-01-05 00:00:00",
+          "valid_to": null
+        },
+        {
+          "prodotto_id": 115,
+          "prezzo_unitario": 759.77,
+          "valid_from": "2024-01-06 00:00:00",
+          "valid_to": null
+        },
+        {
+          "prodotto_id": 51,
+          "prezzo_unitario": 1009.3,
+          "valid_from": "2024-01-07 00:00:00",
+          "valid_to": null
+        },
+        {
+          "prodotto_id": 93,
+          "prezzo_unitario": 1076.26,
+          "valid_from": "2024-01-08 00:00:00",
+          "valid_to": null
+        }
+      ],
+      "clienti": [
+        {
+          "id": 1,
+          "email": "mario.rossi@example.com",
+          "nome": "Mario",
+          "cognome": "Neri",
+          "citta": "Milano"
+        },
+        {
+          "id": 2,
+          "email": "mario.rossi1@example.com",
+          "nome": "Sofia",
+          "cognome": "Bianchi",
+          "citta": "Torino"
+        },
+        {
+          "id": 3,
+          "email": "mario.rossi2@example.com",
+          "nome": "Davide",
+          "cognome": "Bianchi",
+          "citta": "Palermo"
+        },
+        {
+          "id": 4,
+          "email": "mario.rossi3@example.com",
+          "nome": "Elena",
+          "cognome": "Rossi",
+          "citta": "Napoli"
+        },
+        {
+          "id": 5,
+          "email": "mario.rossi4@example.com",
+          "nome": "Paolo",
+          "cognome": "Verdi",
+          "citta": "Genova"
+        },
+        {
+          "id": 6,
+          "email": "mario.rossi5@example.com",
+          "nome": "Sofia",
+          "cognome": "Rossi",
+          "citta": "Firenze"
+        },
+        {
+          "id": 7,
+          "email": "mario.rossi6@example.com",
+          "nome": "Elena",
+          "cognome": "Rossi",
+          "citta": null
+        },
+        {
+          "id": 8,
+          "email": "mario.rossi7@example.com",
+          "nome": "Davide",
+          "cognome": "Rossi",
+          "citta": "Torino"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 1,
+          "cliente_id": 122,
+          "data_ordine": "2023-12-05 10:30:00",
+          "stato_ordine": "chiuso",
+          "totale": 311.62
+        },
+        {
+          "id": 2,
+          "cliente_id": 71,
+          "data_ordine": "2023-12-04 10:30:00",
+          "stato_ordine": "spedito",
+          "totale": 230.12
+        },
+        {
+          "id": 3,
+          "cliente_id": 362,
+          "data_ordine": "2023-12-17 10:30:00",
+          "stato_ordine": "annullato",
+          "totale": 185.9
+        },
+        {
+          "id": 4,
+          "cliente_id": 461,
+          "data_ordine": "2023-08-31 10:30:00",
+          "stato_ordine": "chiuso",
+          "totale": 343.15
+        },
+        {
+          "id": 5,
+          "cliente_id": 384,
+          "data_ordine": "2023-09-16 10:30:00",
+          "stato_ordine": "annullato",
+          "totale": 91.89
+        },
+        {
+          "id": 6,
+          "cliente_id": 486,
+          "data_ordine": "2023-10-10 10:30:00",
+          "stato_ordine": "in_attesa",
+          "totale": 448.34
+        },
+        {
+          "id": 7,
+          "cliente_id": 532,
+          "data_ordine": "2024-01-05 10:30:00",
+          "stato_ordine": "in_attesa",
+          "totale": 387.65
+        },
+        {
+          "id": 8,
+          "cliente_id": 510,
+          "data_ordine": "2023-09-17 10:30:00",
+          "stato_ordine": "in_attesa",
+          "totale": 161.64
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "row_types"
+  ],
+  "query": "SELECT cl.citta, cl.nome || ' ' || cl.cognome AS cliente, o.totale AS importo_massimo, CAST(o.data_ordine AS DATE) AS giorno_ordine FROM ordini o JOIN clienti cl ON cl.id = o.cliente_id WHERE (o.cliente_id, o.totale) IN (SELECT cliente_id, MAX(totale) FROM ordini WHERE stato_ordine IN ('chiuso', 'spedito') AND data_ordine BETWEEN TIMESTAMP '2023-08-01' AND TIMESTAMP '2024-06-30' GROUP BY cliente_id) AND o.stato_ordine IN ('chiuso', 'spedito') AND o.data_ordine BETWEEN TIMESTAMP '2023-08-01' AND TIMESTAMP '2024-06-30' AND cl.citta IN ('Milano', 'Napoli') ORDER BY importo_massimo DESC, cl.email ASC;"
+}

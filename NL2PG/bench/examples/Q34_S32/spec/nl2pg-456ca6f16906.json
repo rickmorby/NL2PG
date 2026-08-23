@@ -1,0 +1,25 @@
+{
+  "domain": "logistica",
+  "n_tables": 3,
+  "hierarchy": "audit_columns",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "movimenti_merce",
+      "description": "La tabella principale del database si chiama realmente 'spedizioni' e contiene le colonne di audit created_at, created_by, updated_at e updated_by oltre ai dati operativi (codice_spedizione, stato, peso_kg). Nella prosa aziendale however viene sistematicamente denominata 'movimenti_merce': i task dovranno risolvere questa corrispondenza per interrogare correttamente la tabella giusta."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "updated_at",
+      "obsolete_value": "ultima_movimentazione",
+      "description": "La colonna di audit 'updated_at', che registra l'istante dell'ultimo aggiornamento della spedizione, viene indicata nella documentazione aziendale con il gergo logistico 'ultima_movimentazione'. Le query su recency e responsabilità (es. WHERE updated_at BETWEEN t1 AND t2 o confronti con NOW() - INTERVAL) dovranno mappare questa perifrasi gergale alla reale colonna timestamp 'updated_at'."
+    }
+  ],
+  "spec_hash": "871c92ddb9b793f2"
+}

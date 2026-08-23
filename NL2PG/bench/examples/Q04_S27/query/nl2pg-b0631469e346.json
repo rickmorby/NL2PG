@@ -1,0 +1,719 @@
+{
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT UNIQUE,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    fornitore_id INT NOT NULL,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    data_ordine DATE NOT NULL,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL,\n    prodotto_id INT NOT NULL,\n    numero_riga INT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100)\n);",
+  "data_profile": {
+    "profile": {
+      "fornitori": {
+        "row_count": 335,
+        "columns": {
+          "id": {
+            "distinct": 335,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 335
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Acciai Valpadana S.p.A.",
+              "Cartotecnica Lombarda S.p.A.",
+              "Chimica Toscana S.r.l.",
+              "Elettronica Sud S.r.l.",
+              "Gomme & Affini S.n.c."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 335,
+            "sample": [
+              "IT01234567890",
+              "IT012345678901",
+              "IT0123456789010",
+              "IT0123456789011",
+              "IT0123456789012"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Brescia",
+              "Firenze",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "email": {
+            "distinct": 319,
+            "sample": [
+              "acquisti10@acciaivalpadana.it",
+              "acquisti11@acciaivalpadana.it",
+              "acquisti12@acciaivalpadana.it",
+              "acquisti13@acciaivalpadana.it",
+              "acquisti14@acciaivalpadana.it"
+            ]
+          },
+          "attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 283,
+        "columns": {
+          "id": {
+            "distinct": 283,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 283
+          },
+          "fornitore_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "sku": {
+            "distinct": 283,
+            "sample": [
+              "ACC-TON-20MM",
+              "ACC-TON-20MM1",
+              "ACC-TON-20MM10",
+              "ACC-TON-20MM11",
+              "ACC-TON-20MM12"
+            ]
+          },
+          "nome": {
+            "distinct": 9,
+            "sample": [
+              "Bulloni M8 zincati (conf. 100)",
+              "Casse in plastica 30L",
+              "Cavi elettrici H07V-K 2.5mm",
+              "Guarnizioni in gomma NBR",
+              "Pellicola stretch trasparente"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Barra tonda in acciaio C45, lunghezza 3 metri",
+              "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+              "Cassa impilabile in polipropilene da 30 litri",
+              "Confezione 5 risme carta A4 80 g/mq",
+              "Resistenza a immersione 1500W 220V"
+            ]
+          },
+          "prezzo_unitario": {
+            "distinct": 272,
+            "sample": [
+              "10.23",
+              "10.25",
+              "10.38",
+              "10.44",
+              "10.61"
+            ],
+            "min": 8.19,
+            "max": 110.62
+          },
+          "scorta_minima": {
+            "distinct": 268,
+            "sample": [
+              "10",
+              "10.0",
+              "10.09",
+              "10.21",
+              "10.32"
+            ],
+            "min": 5.2,
+            "max": 99.7
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 246,
+        "columns": {
+          "id": {
+            "distinct": 246,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 246
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Cooperativa Artigiana Lavoro Legno",
+              "Edil Costruzioni Rossi S.r.l.",
+              "Ferramenta Centrale di Bianchi",
+              "Grossisti Alimentari Meridionali S.p.A.",
+              "Impianti Verdi S.p.A."
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 246,
+            "sample": [
+              "01234567890",
+              "01234567891",
+              "01234567892",
+              "01234567893",
+              "01234567894"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bologna",
+              "Como",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "email": {
+            "distinct": 235,
+            "sample": [
+              "acquisti10@impiantiverdi.it",
+              "acquisti11@impiantiverdi.it",
+              "acquisti12@impiantiverdi.it",
+              "acquisti13@impiantiverdi.it",
+              "acquisti14@impiantiverdi.it"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 2836,
+        "columns": {
+          "id": {
+            "distinct": 2836,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3836
+          },
+          "cliente_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "numero_ordine": {
+            "distinct": 2836,
+            "sample": [
+              "ORD-2026-0001",
+              "ORD-2026-00011",
+              "ORD-2026-000110",
+              "ORD-2026-0001100",
+              "ORD-2026-0001101"
+            ]
+          },
+          "data_ordine": {
+            "distinct": 173,
+            "sample": [
+              "2025-11-13",
+              "2025-11-14",
+              "2025-11-15",
+              "2025-11-16",
+              "2025-11-17"
+            ]
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "confermato",
+              "consegnato",
+              "in_attesa",
+              "spedito"
+            ]
+          },
+          "totale_ordine": {
+            "distinct": 2700,
+            "sample": [
+              "100.48",
+              "100.57",
+              "100.64",
+              "100.91",
+              "1000.96"
+            ],
+            "min": 35.96,
+            "max": 5250.0
+          }
+        }
+      },
+      "righe_ordine": {
+        "row_count": 349,
+        "columns": {
+          "id": {
+            "distinct": 349,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 349
+          },
+          "ordine_id": {
+            "distinct": 6,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 1006
+          },
+          "prodotto_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "numero_riga": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 2
+          },
+          "quantita": {
+            "distinct": 331,
+            "sample": [
+              "1.06",
+              "1.15",
+              "1.28",
+              "1.32",
+              "1.43"
+            ],
+            "min": 1.06,
+            "max": 120.0
+          },
+          "prezzo_unitario": {
+            "distinct": 329,
+            "sample": [
+              "10.1",
+              "10.11",
+              "10.33",
+              "10.47",
+              "10.51"
+            ],
+            "min": 8.75,
+            "max": 93.0
+          },
+          "sconto_percentuale": {
+            "distinct": 6,
+            "sample": [
+              "0",
+              "10.0",
+              "10.00",
+              "15.00",
+              "5.0"
+            ],
+            "min": 0,
+            "max": 10.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "fornitori": [
+        {
+          "id": 1,
+          "ragione_sociale": "Chimica Toscana S.r.l.",
+          "partita_iva": "IT01234567890",
+          "citta": "Brescia",
+          "email": "info@metaltech.it",
+          "attivo": "true"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Cartotecnica Lombarda S.p.A.",
+          "partita_iva": "IT012345678901",
+          "citta": "Firenze",
+          "email": "info1@metaltech.it",
+          "attivo": "true"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Chimica Toscana S.r.l.",
+          "partita_iva": "IT012345678902",
+          "citta": "Verona",
+          "email": "info2@metaltech.it",
+          "attivo": "true"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Elettronica Sud S.r.l.",
+          "partita_iva": "IT012345678903",
+          "citta": "Napoli",
+          "email": "info3@metaltech.it",
+          "attivo": "false"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Elettronica Sud S.r.l.",
+          "partita_iva": "IT012345678904",
+          "citta": "Bologna",
+          "email": "info4@metaltech.it",
+          "attivo": "false"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Cartotecnica Lombarda S.p.A.",
+          "partita_iva": "IT012345678905",
+          "citta": "Napoli",
+          "email": "info5@metaltech.it",
+          "attivo": "false"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Gomme & Affini S.n.c.",
+          "partita_iva": "IT012345678906",
+          "citta": "Bologna",
+          "email": null,
+          "attivo": "true"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Imballaggi Adriatico S.r.l.",
+          "partita_iva": "IT012345678907",
+          "citta": "Firenze",
+          "email": null,
+          "attivo": "true"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "fornitore_id": 1,
+          "sku": "MTL-BOL-M08",
+          "nome": "Cavi elettrici H07V-K 2.5mm",
+          "descrizione": "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+          "prezzo_unitario": 9.9,
+          "scorta_minima": 62.47
+        },
+        {
+          "id": 2,
+          "fornitore_id": 1,
+          "sku": "MTL-BOL-M081",
+          "nome": "Solvente industriale 5kg",
+          "descrizione": "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+          "prezzo_unitario": 11.51,
+          "scorta_minima": 73.32
+        },
+        {
+          "id": 3,
+          "fornitore_id": 1,
+          "sku": "MTL-BOL-M082",
+          "nome": "Cavi elettrici H07V-K 2.5mm",
+          "descrizione": "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+          "prezzo_unitario": 10.44,
+          "scorta_minima": 63.96
+        },
+        {
+          "id": 4,
+          "fornitore_id": 1,
+          "sku": "MTL-BOL-M083",
+          "nome": "Casse in plastica 30L",
+          "descrizione": "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+          "prezzo_unitario": 21.54,
+          "scorta_minima": 41.13
+        },
+        {
+          "id": 5,
+          "fornitore_id": 1,
+          "sku": "MTL-BOL-M084",
+          "nome": "Cavi elettrici H07V-K 2.5mm",
+          "descrizione": "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+          "prezzo_unitario": 17.76,
+          "scorta_minima": 94.72
+        },
+        {
+          "id": 6,
+          "fornitore_id": 1,
+          "sku": "MTL-BOL-M085",
+          "nome": "Bulloni M8 zincati (conf. 100)",
+          "descrizione": "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+          "prezzo_unitario": 8.67,
+          "scorta_minima": 78.96
+        },
+        {
+          "id": 7,
+          "fornitore_id": 1,
+          "sku": "MTL-BOL-M086",
+          "nome": "Guarnizioni in gomma NBR",
+          "descrizione": "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+          "prezzo_unitario": 17.78,
+          "scorta_minima": 67.03
+        },
+        {
+          "id": 8,
+          "fornitore_id": 1,
+          "sku": "MTL-BOL-M087",
+          "nome": "Risme carta A4 80g",
+          "descrizione": "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+          "prezzo_unitario": 18.98,
+          "scorta_minima": 49.08
+        }
+      ],
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Edil Costruzioni Rossi S.r.l.",
+          "codice_fiscale": "01234567890",
+          "citta": "Genova",
+          "email": "amministrazione@edilrossi.it"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Grossisti Alimentari Meridionali S.p.A.",
+          "codice_fiscale": "01234567891",
+          "citta": "Torino",
+          "email": "amministrazione1@edilrossi.it"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Edil Costruzioni Rossi S.r.l.",
+          "codice_fiscale": "01234567892",
+          "citta": "Roma",
+          "email": "amministrazione2@edilrossi.it"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Cooperativa Artigiana Lavoro Legno",
+          "codice_fiscale": "01234567893",
+          "citta": "Firenze",
+          "email": "amministrazione3@edilrossi.it"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Impianti Verdi S.p.A.",
+          "codice_fiscale": "01234567894",
+          "citta": "Torino",
+          "email": "amministrazione4@edilrossi.it"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Edil Costruzioni Rossi S.r.l.",
+          "codice_fiscale": "01234567895",
+          "citta": "Genova",
+          "email": "amministrazione5@edilrossi.it"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Officine Meccaniche del Garda S.n.c.",
+          "codice_fiscale": "01234567896",
+          "citta": "Bologna",
+          "email": "amministrazione6@edilrossi.it"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Tessuti Preziosi S.r.l.",
+          "codice_fiscale": "01234567897",
+          "citta": "Napoli",
+          "email": "amministrazione7@edilrossi.it"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 1001,
+          "cliente_id": 1,
+          "numero_ordine": "ORD-2026-0001",
+          "data_ordine": "2026-01-07",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 3125.0
+        },
+        {
+          "id": 1002,
+          "cliente_id": 1,
+          "numero_ordine": "ORD-2026-00011",
+          "data_ordine": "2026-01-17",
+          "stato_ordine": "confermato",
+          "totale_ordine": 852.43
+        },
+        {
+          "id": 1003,
+          "cliente_id": 1,
+          "numero_ordine": "ORD-2026-00012",
+          "data_ordine": "2026-02-20",
+          "stato_ordine": "spedito",
+          "totale_ordine": 1127.58
+        },
+        {
+          "id": 1004,
+          "cliente_id": 1,
+          "numero_ordine": "ORD-2026-00013",
+          "data_ordine": "2025-12-24",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 834.81
+        },
+        {
+          "id": 1005,
+          "cliente_id": 1,
+          "numero_ordine": "ORD-2026-00014",
+          "data_ordine": "2025-12-30",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 930.67
+        },
+        {
+          "id": 1006,
+          "cliente_id": 1,
+          "numero_ordine": "ORD-2026-00015",
+          "data_ordine": "2026-03-05",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 1718.2
+        },
+        {
+          "id": 1007,
+          "cliente_id": 1,
+          "numero_ordine": "ORD-2026-00016",
+          "data_ordine": "2026-02-05",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 2503.42
+        },
+        {
+          "id": 1008,
+          "cliente_id": 1,
+          "numero_ordine": "ORD-2026-00017",
+          "data_ordine": "2026-02-10",
+          "stato_ordine": "in_attesa",
+          "totale_ordine": 699.72
+        }
+      ],
+      "righe_ordine": [
+        {
+          "id": 1,
+          "ordine_id": 1001,
+          "prodotto_id": 1,
+          "numero_riga": "4",
+          "quantita": 75.12,
+          "prezzo_unitario": 16.48,
+          "sconto_percentuale": "0"
+        },
+        {
+          "id": 2,
+          "ordine_id": 1001,
+          "prodotto_id": 1,
+          "numero_riga": "2",
+          "quantita": 89.73,
+          "prezzo_unitario": 10.33,
+          "sconto_percentuale": "0"
+        },
+        {
+          "id": 3,
+          "ordine_id": 1001,
+          "prodotto_id": 1,
+          "numero_riga": "4",
+          "quantita": 26.59,
+          "prezzo_unitario": 17.99,
+          "sconto_percentuale": "0"
+        },
+        {
+          "id": 4,
+          "ordine_id": 1001,
+          "prodotto_id": 1,
+          "numero_riga": 1,
+          "quantita": 40,
+          "prezzo_unitario": 12.5,
+          "sconto_percentuale": 0
+        },
+        {
+          "id": 5,
+          "ordine_id": 1001,
+          "prodotto_id": 1,
+          "numero_riga": "3",
+          "quantita": 43.75,
+          "prezzo_unitario": 16.26,
+          "sconto_percentuale": "10.00"
+        },
+        {
+          "id": 6,
+          "ordine_id": 1001,
+          "prodotto_id": 1,
+          "numero_riga": 1,
+          "quantita": 40,
+          "prezzo_unitario": 12.5,
+          "sconto_percentuale": 0
+        },
+        {
+          "id": 7,
+          "ordine_id": 1001,
+          "prodotto_id": 1,
+          "numero_riga": "3",
+          "quantita": 84.13,
+          "prezzo_unitario": 9.75,
+          "sconto_percentuale": "15.00"
+        },
+        {
+          "id": 8,
+          "ordine_id": 1001,
+          "prodotto_id": 1,
+          "numero_riga": "3",
+          "quantita": 82.86,
+          "prezzo_unitario": 13.66,
+          "sconto_percentuale": "0"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "join"
+  ],
+  "query": "SELECT f.ragione_sociale AS fornitore, f.citta AS sede_fornitore, COUNT(*) AS numero_prodotti_forniti, ROUND(AVG(p.prezzo_unitario), 2) AS prezzo_medio_euro FROM fornitori f JOIN prodotti p ON p.fornitore_id = f.id WHERE f.attivo IS TRUE AND f.citta IN ('Brescia', 'Firenze', 'Verona') GROUP BY f.id, f.ragione_sociale, f.citta ORDER BY prezzo_medio_euro DESC, f.id ASC;"
+}

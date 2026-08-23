@@ -1,0 +1,226 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "exists"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sim",
+        "obsolete_value": "schede_utente",
+        "description": "La tabella sim (contenente le schede SIM con chiave primaria id_sim) viene denominata schede_utente nella prosa aziendale. Le query devono risolvere schede_utente sulla tabella fisica sim."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "attivazione",
+        "obsolete_value": "provisioning",
+        "description": "La tabella attivazione (con FK unica id_sim verso sim, in corrispondenza 1:1) viene indicata nella documentazione con il termine tecnico di settore provisioning. Le query devono mappare provisioning sulla tabella attivazione; le SIM senza provisioning si individuano con WHERE NOT EXISTS (SELECT 1 FROM attivazione WHERE attivazione.id_sim = sim.id_sim)."
+      }
+    ],
+    "spec_hash": "0c5e56aadd8da574"
+  },
+  "schema_ddl": "CREATE TABLE sim (\n    id_sim INT PRIMARY KEY,\n    iccid TEXT NOT NULL UNIQUE,\n    numero_telefono TEXT NOT NULL UNIQUE,\n    stato TEXT NOT NULL DEFAULT 'inattiva' CHECK (stato IN ('inattiva', 'attiva', 'sospesa', 'disattivata')),\n    data_emissione DATE NOT NULL,\n    operatore TEXT NOT NULL\n);\n\nCREATE TABLE attivazione (\n    id_attivazione INT PRIMARY KEY,\n    id_sim INT NOT NULL UNIQUE REFERENCES sim(id_sim),\n    data_attivazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    piano_tariffario TEXT NOT NULL,\n    costo_attivazione NUMERIC(8,2) NOT NULL CHECK (costo_attivazione >= 0),\n    canale_attivazione TEXT NOT NULL CHECK (canale_attivazione IN ('negozio', 'online', 'call_center', 'rivenditore'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "sim",
+        "nature": "dimension",
+        "min_rows": 300,
+        "max_rows": 500,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_sim": 1,
+            "iccid": "89390123456789012301",
+            "numero_telefono": "+39 340 1122334",
+            "stato": "attiva",
+            "data_emissione": "2025-02-10",
+            "operatore": "TIM"
+          },
+          {
+            "id_sim": 2,
+            "iccid": "89390123456789012302",
+            "numero_telefono": "+39 347 5566778",
+            "stato": "attiva",
+            "data_emissione": "2025-04-22",
+            "operatore": "Vodafone"
+          },
+          {
+            "id_sim": 3,
+            "iccid": "89390123456789012303",
+            "numero_telefono": "+39 320 9988776",
+            "stato": "inattiva",
+            "data_emissione": "2025-06-05",
+            "operatore": "WindTre"
+          },
+          {
+            "id_sim": 4,
+            "iccid": "89390123456789012304",
+            "numero_telefono": "+39 333 4455667",
+            "stato": "sospesa",
+            "data_emissione": "2025-08-18",
+            "operatore": "Iliad"
+          },
+          {
+            "id_sim": 5,
+            "iccid": "89390123456789012305",
+            "numero_telefono": "+39 351 3344556",
+            "stato": "disattivata",
+            "data_emissione": "2024-11-30",
+            "operatore": "TIM"
+          },
+          {
+            "id_sim": 6,
+            "iccid": "89390123456789012306",
+            "numero_telefono": "+39 328 2211334",
+            "stato": "attiva",
+            "data_emissione": "2025-09-12",
+            "operatore": "Fastweb"
+          }
+        ],
+        "variations": {
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attiva",
+              "attiva",
+              "attiva",
+              "inattiva",
+              "inattiva",
+              "sospesa",
+              "disattivata"
+            ]
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -240.0,
+            "delta_max": 120.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "operatore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "TIM",
+              "Vodafone",
+              "WindTre",
+              "Iliad",
+              "Fastweb"
+            ]
+          }
+        }
+      },
+      {
+        "table": "attivazione",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.8,
+        "templates": [
+          {
+            "id_attivazione": 1001,
+            "id_sim": 1,
+            "data_attivazione": "2025-02-12 09:30:00",
+            "piano_tariffario": "Easy 10GB",
+            "costo_attivazione": 9.99,
+            "canale_attivazione": "negozio"
+          },
+          {
+            "id_attivazione": 1002,
+            "id_sim": 2,
+            "data_attivazione": "2025-04-23 14:15:00",
+            "piano_tariffario": "Smart Unlimited",
+            "costo_attivazione": 19.99,
+            "canale_attivazione": "online"
+          },
+          {
+            "id_attivazione": 1003,
+            "id_sim": 4,
+            "data_attivazione": "2025-08-20 11:45:00",
+            "piano_tariffario": "Business 50GB",
+            "costo_attivazione": 29.99,
+            "canale_attivazione": "rivenditore"
+          },
+          {
+            "id_attivazione": 1004,
+            "id_sim": 5,
+            "data_attivazione": "2024-12-02 16:20:00",
+            "piano_tariffario": "Easy 10GB",
+            "costo_attivazione": 0.0,
+            "canale_attivazione": "online"
+          },
+          {
+            "id_attivazione": 1005,
+            "id_sim": 6,
+            "data_attivazione": "2025-09-13 10:05:00",
+            "piano_tariffario": "Flex 30GB",
+            "costo_attivazione": 14.5,
+            "canale_attivazione": "call_center"
+          }
+        ],
+        "variations": {
+          "data_attivazione": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "piano_tariffario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Easy 10GB",
+              "Easy 10GB",
+              "Smart Unlimited",
+              "Flex 30GB",
+              "Business 50GB"
+            ]
+          },
+          "costo_attivazione": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "canale_attivazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "negozio",
+              "online",
+              "online",
+              "call_center",
+              "rivenditore"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

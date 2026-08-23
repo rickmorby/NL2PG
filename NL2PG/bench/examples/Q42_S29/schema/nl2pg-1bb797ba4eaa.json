@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "disjunctive"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_operatori",
+        "description": "La tabella dipendenti del sistema ERP viene denominata anagrafica_operatori nella documentazione e nella prosa aziendale. Le query di ricerca per nominativo devono quindi risolvere questa perifrasi verso la tabella fisica dipendenti, che contiene i campi spezzati nome e cognome."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "nome",
+        "obsolete_value": "prenome",
+        "description": "La colonna nome della tabella dipendenti, prima parte del dato anagrafico unico spezzato su due colonne, viene indicata nei documenti aziendali con il sinonimo prenome. Una ricerca come 'prenome = Mario' deve tradursi in una condizione sulla colonna nome."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "cognome",
+        "obsolete_value": "denominazione_familiare",
+        "description": "Nel gergo interno dell'ufficio personale la colonna cognome della tabella dipendenti, seconda parte del dato anagrafico spezzato, è chiamata denominazione_familiare. Le ricerche per nominativo vanno espresse con condizioni disgiuntive del tipo WHERE nome = 'val' OR cognome = 'val', mappando il termine gergale sulla colonna reale cognome."
+      }
+    ],
+    "spec_hash": "5bac512c7c6a8c39"
+  },
+  "schema_ddl": "CREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile >= 0)\n);\n\nCREATE TABLE progetti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    budget NUMERIC(12,2) NOT NULL CHECK (budget >= 0),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    dipendente_responsabile_id INT REFERENCES dipendenti(id),\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE registrazioni_ore (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    progetto_id INT NOT NULL REFERENCES progetti(id),\n    data_registrazione DATE NOT NULL,\n    ore_lavorate NUMERIC(4,1) NOT NULL CHECK (ore_lavorate > 0 AND ore_lavorate <= 24),\n    descrizione_attivita TEXT\n);"
+}

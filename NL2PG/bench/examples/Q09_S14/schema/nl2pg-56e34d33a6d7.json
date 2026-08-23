@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "synonym",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "acquirenti registrati",
+        "description": "La tabella clienti viene indicata nella prosa aziendale con il sinonimo 'acquirenti registrati'. Il solver deve risolvere il sinonimo e mapparlo alla tabella reale clienti quando costruisce le query di aggregazione."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "totale_ordine",
+        "obsolete_value": "valore complessivo dell'acquisto",
+        "description": "La colonna totale_ordine della tabella ordini viene perifrastata nella prosa aziendale come 'valore complessivo dell'acquisto'. Le clausole HAVING che filtrano i gruppi per soglia di spesa devono riferirsi alla colonna reale totale_ordine, deducendo inoltre i vincoli CHECK/NOT NULL/UNIQUE dal testo."
+      }
+    ],
+    "spec_hash": "6ec1972cb15e4574"
+  },
+  "schema_ddl": "CREATE DOMAIN importo_non_negativo AS NUMERIC(12,2) CHECK (VALUE >= 0);\n\nCREATE DOMAIN stato_ordine AS TEXT CHECK (VALUE IN ('in_attesa', 'pagato', 'spedito', 'consegnato', 'annullato'));\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    totale_ordine importo_non_negativo NOT NULL,\n    stato_ordine stato_ordine NOT NULL DEFAULT 'in_attesa',\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    corriere TEXT NOT NULL,\n    costo_spedizione importo_non_negativo NOT NULL DEFAULT 0,\n    data_spedizione DATE,\n    data_consegna_prevista DATE,\n    CHECK (data_consegna_prevista IS NULL OR data_spedizione IS NULL OR data_consegna_prevista >= data_spedizione)\n);"
+}

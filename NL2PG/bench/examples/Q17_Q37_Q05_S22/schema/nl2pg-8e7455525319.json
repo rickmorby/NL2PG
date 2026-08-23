@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "partita_doppia",
+        "obsolete_value": "metodo_veneziano",
+        "description": "Il termine tecnico 'partita_doppia' viene sostituito dal gergo aziendale 'metodo_veneziano' nella documentazione."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "saldo",
+        "obsolete_value": "giacenza",
+        "description": "La colonna 'saldo' viene riferita come 'giacenza' nei report aziendali."
+      }
+    ],
+    "spec_hash": "8086f5d715699076"
+  },
+  "schema_ddl": "CREATE TABLE metodo_veneziano (\n    id SERIAL PRIMARY KEY,\n    data_registrazione DATE NOT NULL,\n    dare NUMERIC(15,2) NOT NULL CHECK (dare >= 0),\n    avere NUMERIC(15,2) NOT NULL CHECK (avere >= 0),\n    giacenza NUMERIC(15,2) GENERATED ALWAYS AS (dare - avere) STORED,\n    descrizione TEXT,\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);"
+}

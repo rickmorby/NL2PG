@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "offset_fetch"
+  ],
+  "twist": [
+    "jargon",
+    "rename"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "ord_hdr",
+      "obsolete_value": "testata ordini commerciali",
+      "description": "La tabella ord_hdr, che memorizza le testate degli ordini di vendita con le colonne sigla ord_no, cli_id, emp_no e dt_ord, viene indicata nella prosa aziendale esclusivamente con il gergo 'testata ordini commerciali'. Il solver deve allineare il termine gergale alla sigla reale ord_hdr prima di formulare la query."
+    },
+    {
+      "twist_type": "rename",
+      "target_value": "emp_no",
+      "obsolete_value": "matricola agente",
+      "description": "La colonna emp_no presente in ord_hdr, che identifica la matricola dell'agente di vendita, viene denominata 'matricola agente' nella documentazione e nelle richieste aziendali. La query di paginazione deve ordinare con ORDER BY emp_no OFFSET n ROWS FETCH FIRST m ROWS ONLY dopo aver risolto questa corrispondenza tra la perifrasi e la sigla reale."
+    }
+  ],
+  "spec_hash": "cb237a0c3d0b0912"
+}

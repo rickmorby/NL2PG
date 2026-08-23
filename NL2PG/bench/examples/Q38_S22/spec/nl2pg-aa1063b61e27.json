@@ -1,0 +1,34 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 6,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "any_all"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_assicurativi",
+      "description": "La tabella principale delle polizze è denominata contratti_assicurativi nel linguaggio aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "premio",
+      "obsolete_value": "costo_copertura",
+      "description": "Il termine tecnico 'premio' (importo pagato per la polizza) viene spesso sostituito con 'costo_copertura' nei documenti interni."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "sinistro",
+      "obsolete_value": "evento",
+      "description": "La parola 'sinistro' (incidente coperto dalla polizza) può essere ambigua e confusa con 'evento' in contesti generici."
+    }
+  ],
+  "spec_hash": "0a87587e4e0afcbe"
+}

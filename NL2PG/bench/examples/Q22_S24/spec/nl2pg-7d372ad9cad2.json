@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 6,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "distinct_on"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "movimentazioni_merce",
+      "description": "La tabella padre spedizioni viene denominata movimentazioni_merce nella prosa aziendale. Le tabelle figlie pacchi ed eventi_tracciamento referenziano spedizioni tramite FK con ON DELETE CASCADE e ON DELETE SET NULL rispettivamente."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "data_consegna_effettiva",
+      "obsolete_value": "timestamp POD",
+      "description": "La colonna data_consegna_effettiva della tabella consegne viene indicata con il gergo di settore 'timestamp POD' (Proof of Delivery). Le query DISTINCT ON su corriere_id devono ordinare per data_consegna_effettiva DESC per selezionare l'ultima consegna di ciascun corriere; le righe con valore NULL derivano da spedizioni senza prova di consegna, popolate dall'azione ON DELETE SET NULL sulla tabella corrieri."
+    }
+  ],
+  "spec_hash": "e43e29345d2ee0a6"
+}

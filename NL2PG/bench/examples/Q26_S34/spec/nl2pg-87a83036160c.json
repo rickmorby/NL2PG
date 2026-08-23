@@ -1,0 +1,34 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "anti_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipartimenti",
+      "obsolete_value": "aree_organizzative",
+      "description": "La tabella padre dipartimenti viene denominata aree_organizzative nella prosa aziendale. Il solver deve mappare aree_organizzative alla tabella fisica dipartimenti per costruire correttamente l'anti-join con NOT EXISTS sulle FK nullable dei dipendenti."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "valutazioni",
+      "obsolete_value": "revisioni_periodiche_delle_prestazioni",
+      "description": "La tabella valutazioni (figlia collegata ai dipendenti) viene indicata come revisioni_periodiche_delle_prestazioni. Le query di anti-join devono identificare i dipendenti privi di valutazioni tramite WHERE NOT EXISTS (SELECT 1 FROM valutazioni WHERE valutazioni.dipendente_id = dipendenti.id)."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "dipendenti.dipartimento_id",
+      "obsolete_value": "assegnazione organica",
+      "description": "La colonna FK nullable dipartimento_id della tabella dipendenti viene descritta con il gergo HR 'assegnazione organica'. Essendo nullable, i dipendenti senza assegnazione organica presentano dipartimento_id IS NULL e vanno gestiti esplicitamente con IS NULL o join esterni oltre all'anti-join verso dipartimenti."
+    }
+  ],
+  "spec_hash": "d2a119b4a9a88800"
+}

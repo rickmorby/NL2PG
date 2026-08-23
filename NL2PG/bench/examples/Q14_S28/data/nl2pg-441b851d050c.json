@@ -1,0 +1,224 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 3,
+    "hierarchy": "flat",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "emp",
+        "obsolete_value": "dipendenti",
+        "description": "La tabella 'emp' (abbreviazione di employee) viene denominata 'dipendenti' nel linguaggio aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "dept_mgr",
+        "obsolete_value": "responsabile_reparto",
+        "description": "La colonna 'dept_mgr' (department manager) viene riferita come 'responsabile_reparto' nella documentazione aziendale."
+      }
+    ],
+    "spec_hash": "b8ab3bc67aa29f87"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    matricola INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    id_reparto INT,\n    responsabile_reparto INT REFERENCES dipendenti(matricola)\n);\n\nCREATE TABLE reparti (\n    id_reparto INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL,\n    sede TEXT\n);\n\nCREATE TABLE progetti (\n    id_progetto INT PRIMARY KEY,\n    nome_progetto TEXT NOT NULL,\n    matricola INT REFERENCES dipendenti(matricola)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "reparti",
+        "nature": "lookup",
+        "min_rows": 6,
+        "max_rows": 6,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_reparto": 1,
+            "nome_reparto": "Direzione",
+            "sede": "Roma"
+          },
+          {
+            "id_reparto": 2,
+            "nome_reparto": "Amministrazione",
+            "sede": "Milano"
+          },
+          {
+            "id_reparto": 3,
+            "nome_reparto": "Vendite",
+            "sede": "Torino"
+          },
+          {
+            "id_reparto": 4,
+            "nome_reparto": "IT",
+            "sede": "Bologna"
+          },
+          {
+            "id_reparto": 5,
+            "nome_reparto": "Produzione",
+            "sede": "Napoli"
+          },
+          {
+            "id_reparto": 6,
+            "nome_reparto": "Logistica",
+            "sede": "Firenze"
+          }
+        ],
+        "variations": {
+          "sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Bologna",
+              "Napoli",
+              "Firenze",
+              "Genova",
+              "Verona"
+            ]
+          }
+        }
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": 100,
+        "max_rows": 120,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "matricola": 1,
+            "nome": "Mario Rossi",
+            "id_reparto": 1,
+            "responsabile_reparto": null
+          },
+          {
+            "matricola": 2,
+            "nome": "Laura Bianchi",
+            "id_reparto": 2,
+            "responsabile_reparto": 1
+          },
+          {
+            "matricola": 3,
+            "nome": "Giulia Verdi",
+            "id_reparto": 3,
+            "responsabile_reparto": 1
+          },
+          {
+            "matricola": 4,
+            "nome": "Luca Neri",
+            "id_reparto": 4,
+            "responsabile_reparto": 2
+          },
+          {
+            "matricola": 5,
+            "nome": "Anna Russo",
+            "id_reparto": 5,
+            "responsabile_reparto": 2
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Luca Neri",
+              "Anna Russo",
+              "Paolo Ferrari",
+              "Sara Esposito",
+              "Marco Romano",
+              "Francesca Colombo",
+              "Davide Ricci",
+              "Elena Marino",
+              "Andrea Greco"
+            ]
+          },
+          "id_reparto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          }
+        }
+      },
+      {
+        "table": "progetti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.0,
+        "templates": [
+          {
+            "id_progetto": 1,
+            "nome_progetto": "Migrazione ERP",
+            "matricola": 1
+          },
+          {
+            "id_progetto": 2,
+            "nome_progetto": "Portale Dipendenti",
+            "matricola": 2
+          },
+          {
+            "id_progetto": 3,
+            "nome_progetto": "Cruscotto Vendite",
+            "matricola": 3
+          },
+          {
+            "id_progetto": 4,
+            "nome_progetto": "Automazione Logistica",
+            "matricola": 4
+          },
+          {
+            "id_progetto": 5,
+            "nome_progetto": "Sistema Qualità",
+            "matricola": 5
+          }
+        ],
+        "variations": {
+          "nome_progetto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Migrazione ERP",
+              "Portale Dipendenti",
+              "Cruscotto Vendite",
+              "Automazione Logistica",
+              "Sistema Qualità",
+              "Data Warehouse",
+              "Fatturazione Elettronica",
+              "Manutenzione Impianti",
+              "Help Desk",
+              "Business Intelligence"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

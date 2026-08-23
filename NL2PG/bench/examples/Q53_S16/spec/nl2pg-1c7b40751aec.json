@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 5,
+  "hierarchy": "temporal_versioning",
+  "sql_features": [
+    "ordered_set_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "movimenti_contabili",
+      "obsolete_value": "registrazioni",
+      "description": "La tabella movimenti_contabili viene denominata registrazioni nel linguaggio aziendale interno."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "data_validita",
+      "obsolete_value": "timestamp_operativo",
+      "description": "Il campo data_validita viene riferito come timestamp_operativo nei documenti tecnici."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "importo",
+      "obsolete_value": "valore",
+      "description": "Il termine importo viene talvolta sostituito con valore, generando ambiguità con altri campi numerici."
+    }
+  ],
+  "spec_hash": "144799741ab907c7"
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 5,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "set_op"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "contratti",
+      "obsolete_value": "atti di compravendita stipulati",
+      "description": "La tabella contratti viene denominata nella prosa aziendale 'atti di compravendita stipulati'. Il solver deve mappare tale perifrasi alla tabella reale contratti per costruire le SELECT da combinare con UNION/INTERSECT/EXCEPT."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "agenti",
+      "obsolete_value": "consulenti immobiliari abilitati",
+      "description": "La tabella agenti viene indicata nel testo aziendale con il gergo del settore 'consulenti immobiliari abilitati'. Il solver deve riconoscere che il termine tecnico si riferisce alla tabella agenti quando associa le colonne compatibili (es. contratti.agente_id = agenti.id) senza vincoli REFERENCES dichiarati."
+    }
+  ],
+  "spec_hash": "e693c4c36206160a"
+}

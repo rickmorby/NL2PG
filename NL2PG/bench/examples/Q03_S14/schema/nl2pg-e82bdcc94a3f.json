@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "top_n"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "9ad50c432e9d86ea"
+  },
+  "schema_ddl": "CREATE DOMAIN codice_stato_spedizione AS TEXT CHECK (VALUE IN ('in_preparazione', 'in_transito', 'consegnata', 'restituita'));\n\nCREATE DOMAIN peso_chilogrammi AS NUMERIC(10,2) CHECK (VALUE > 0);\n\nCREATE DOMAIN cap_postale AS TEXT CHECK (VALUE ~ '^[0-9]{5}$');\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    cap cap_postale NOT NULL\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    destinatario TEXT NOT NULL,\n    indirizzo_destinazione TEXT NOT NULL,\n    peso_kg peso_chilogrammi NOT NULL,\n    stato codice_stato_spedizione NOT NULL DEFAULT 'in_preparazione',\n    data_spedizione DATE NOT NULL,\n    data_consegna DATE,\n    CHECK (data_consegna IS NULL OR data_consegna >= data_spedizione)\n);"
+}

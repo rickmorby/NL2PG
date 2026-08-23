@@ -1,0 +1,177 @@
+{
+  "schema_ddl": "CREATE TABLE conti (\n    id INT PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    nome_conto TEXT NOT NULL,\n    conto_padre_id INT REFERENCES conti(id),\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'costo', 'ricavo')),\n    livello_gerarchia INT NOT NULL CHECK (livello_gerarchia BETWEEN 1 AND 10),\n    aperto_il DATE NOT NULL,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_profile": {
+    "profile": {
+      "conti": {
+        "row_count": 402,
+        "columns": {
+          "id": {
+            "distinct": 402,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 402
+          },
+          "codice_conto": {
+            "distinct": 402,
+            "sample": [
+              "100000",
+              "100001",
+              "100002",
+              "100003",
+              "100004"
+            ]
+          },
+          "nome_conto": {
+            "distinct": 15,
+            "sample": [
+              "Acquisti di merci",
+              "Banca c/c",
+              "Capitale sociale",
+              "Cassa",
+              "Costi del personale"
+            ]
+          },
+          "conto_padre_id": {
+            "distinct": 195,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 384
+          },
+          "tipo_conto": {
+            "distinct": 4,
+            "sample": [
+              "attivo",
+              "costo",
+              "passivo",
+              "ricavo"
+            ]
+          },
+          "livello_gerarchia": {
+            "distinct": 4,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "aperto_il": {
+            "distinct": 323,
+            "sample": [
+              "2020-08-19",
+              "2020-08-23",
+              "2020-08-27",
+              "2020-08-28",
+              "2020-09-02"
+            ]
+          },
+          "creato_il": {
+            "distinct": 1,
+            "sample": [
+              "2024-01-01 08:30:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "conti": [
+        {
+          "id": 1,
+          "codice_conto": "100000",
+          "nome_conto": "Immobilizzazioni tecniche",
+          "conto_padre_id": null,
+          "tipo_conto": "ricavo",
+          "livello_gerarchia": "4",
+          "aperto_il": "2022-09-06",
+          "creato_il": "2024-01-01 08:30:00"
+        },
+        {
+          "id": 2,
+          "codice_conto": "100001",
+          "nome_conto": "Capitale sociale",
+          "conto_padre_id": 1,
+          "tipo_conto": "attivo",
+          "livello_gerarchia": "3",
+          "aperto_il": "2022-04-10",
+          "creato_il": "2024-01-01 08:30:00"
+        },
+        {
+          "id": 3,
+          "codice_conto": "100002",
+          "nome_conto": "Crediti verso clienti",
+          "conto_padre_id": 2,
+          "tipo_conto": "ricavo",
+          "livello_gerarchia": "3",
+          "aperto_il": "2020-12-29",
+          "creato_il": "2024-01-01 08:30:00"
+        },
+        {
+          "id": 4,
+          "codice_conto": "100003",
+          "nome_conto": "Debiti verso fornitori",
+          "conto_padre_id": 1,
+          "tipo_conto": "ricavo",
+          "livello_gerarchia": "3",
+          "aperto_il": "2022-12-28",
+          "creato_il": "2024-01-01 08:30:00"
+        },
+        {
+          "id": 5,
+          "codice_conto": "100004",
+          "nome_conto": "Capitale sociale",
+          "conto_padre_id": 4,
+          "tipo_conto": "costo",
+          "livello_gerarchia": "2",
+          "aperto_il": "2021-12-18",
+          "creato_il": "2024-01-01 08:30:00"
+        },
+        {
+          "id": 6,
+          "codice_conto": "100005",
+          "nome_conto": "Costi del personale",
+          "conto_padre_id": 4,
+          "tipo_conto": "costo",
+          "livello_gerarchia": "2",
+          "aperto_il": "2022-02-27",
+          "creato_il": "2024-01-01 08:30:00"
+        },
+        {
+          "id": 7,
+          "codice_conto": "100006",
+          "nome_conto": "Fondo svalutazione crediti",
+          "conto_padre_id": 6,
+          "tipo_conto": "costo",
+          "livello_gerarchia": "2",
+          "aperto_il": "2021-09-24",
+          "creato_il": "2024-01-01 08:30:00"
+        },
+        {
+          "id": 8,
+          "codice_conto": "100007",
+          "nome_conto": "Crediti verso clienti",
+          "conto_padre_id": 2,
+          "tipo_conto": "ricavo",
+          "livello_gerarchia": "3",
+          "aperto_il": "2021-09-08",
+          "creato_il": "2024-01-01 08:30:00"
+        }
+      ]
+    }
+  },
+  "story": "Nella sede centrale della holding, l'ufficio di ragioneria custodisce con particolare cura l'archivio denominato conti, considerato la spina dorsale del libro mastro aziendale. Ciascuna scheda ivi conservata reca un codice identificativo progressivo — le numerazioni partono da 100000 — la denominazione del conto, come ad esempio Costi del personale, Crediti verso clienti o Capitale sociale, la natura economica della voce, che può essere attivo, passivo, costo oppure ricavo, il livello gerarchico di appartenenza e la data in cui il conto è stato ufficialmente aperto. Per ricostruire la struttura complessiva del piano, ogni scheda indica inoltre il rimando al proprio conto capofila, così che le voci di dettaglio risultino aggregate sotto le denominazioni madri; l'intero archivio è stato altresì ricompattato in un'unica sessione all'alba del primo gennaio 2024. In occasione della chiusura d'esercizio, il capo ragioniere ha disposto una verifica mirata: bisognava esaminare soltanto i conti di natura costo o ricavo aperti tra il 2019 e il 2024, lasciando fuori attivi e passivi. Gli addetti hanno quindi raggruppato le voci per denominazione, conteggiando quanti conti risultavano registrati sotto ciascun nome e calcolando l'anno medio di apertura di ogni raggruppamento. L'esito è stato ordinato dalla denominazione più frequente alla meno frequente, così da mettere in luce subito quali voci, come Costi del personale o Acquisti di merci, concentrano il maggior numero di aperture. Il responsabile ha osservato che l'anno medio di apertura permette di comprendere se un certo raggruppamento nasce da esigenze recenti o affonda le radici nei primi anni di attività, mentre la frequenza rivela dove si addensa la granularità del piano. Al termine del controllo, gli esiti sono stati inseriti nella documentazione di bilancio, pronti per essere illustrati al collegio sindacale."
+}

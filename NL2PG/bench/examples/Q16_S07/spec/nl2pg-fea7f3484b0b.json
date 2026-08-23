@@ -1,0 +1,12 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "cte",
+    "recursive_cte"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "d23656e6ba2359fd"
+}

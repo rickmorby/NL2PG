@@ -1,0 +1,20 @@
+{
+  "domain": "sanità",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "join"
+  ],
+  "twist": [
+    "ambiguity"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "ambiguity",
+      "target_value": "reparto_id",
+      "obsolete_value": "codice_struttura_operativa",
+      "description": "Il campo identificativo del reparto viene indicato con la dicitura ambigua codice_struttura_operativa."
+    }
+  ],
+  "spec_hash": "5990dad764e087f6"
+}

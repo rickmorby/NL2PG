@@ -1,0 +1,11 @@
+{
+  "domain": "contabilità",
+  "n_tables": 3,
+  "hierarchy": "self_referential",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "4058477b0930e96d"
+}

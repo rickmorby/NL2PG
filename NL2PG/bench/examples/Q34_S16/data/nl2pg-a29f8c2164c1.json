@@ -1,0 +1,608 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 6,
+    "hierarchy": "temporal_versioning",
+    "sql_features": [],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "movimentazioni_merci",
+        "description": "La tabella che registra le spedizioni viene denominata 'movimentazioni_merci' nei documenti aziendali, creando ambiguità con le tabelle di magazzino."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "data_consegna_prevista",
+        "obsolete_value": "ETA (Estimated Time of Arrival)",
+        "description": "La colonna 'data_consegna_prevista' viene indicata come 'ETA' nei report operativi, richiedendo la conoscenza del gergo logistico per l'interpretazione corretta."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato",
+        "obsolete_value": "status",
+        "description": "La colonna 'stato' (che indica lo stato della spedizione) viene spesso confusa con 'status' (usato in altri contesti aziendali per indicare lo stato di un ordine o di un veicolo), generando ambiguità semantica."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "WHERE validita_inizio <= CURRENT_TIMESTAMP AND validita_fine >= CURRENT_TIMESTAMP",
+        "obsolete_value": "Filtra solo le versioni attualmente valide",
+        "description": "La condizione SQL per filtrare le versioni attualmente valide di una spedizione viene espressa in prosa come 'Filtra solo le versioni attualmente valide', richiedendo la traduzione in una clausola temporale esplicita."
+      }
+    ],
+    "spec_hash": "44d368bce6e94892"
+  },
+  "schema_ddl": "CREATE TYPE stato_spedizione AS ENUM ('in_preparazione', 'in_transito', 'consegnato', 'annullato', 'ritardato');\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT CHECK (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'),\n    creato_il TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    modificato_il TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE indirizzi (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id) ON DELETE CASCADE,\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL CHECK (cap ~ '^[0-9]{5}$'),\n    provincia TEXT NOT NULL CHECK (LENGTH(provincia) = 2),\n    nazione TEXT NOT NULL DEFAULT 'Italia',\n    valid_from TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valid_to TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT 'infinity',\n    CHECK (valid_to > valid_from)\n);\n\nCREATE TABLE vettori (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_vettore TEXT NOT NULL UNIQUE,\n    telefono TEXT CHECK (telefono ~ '^[0-9]{10,15}$'),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    indirizzo_id INT NOT NULL REFERENCES indirizzi(id),\n    vettore_id INT NOT NULL REFERENCES vettori(id),\n    data_spedizione TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    data_consegna_prevista TIMESTAMP WITH TIME ZONE NOT NULL,\n    peso_kg NUMERIC(10, 2) NOT NULL CHECK (peso_kg > 0),\n    volume_m3 NUMERIC(10, 3) CHECK (volume_m3 >= 0),\n    stato stato_spedizione NOT NULL DEFAULT 'in_preparazione',\n    note TEXT\n);\n\nCREATE TABLE versioni_spedizioni (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    stato stato_spedizione NOT NULL,\n    data_modifica TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    modificato_da TEXT NOT NULL,\n    note_modifica TEXT,\n    validita_inizio TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    validita_fine TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT 'infinity',\n    CHECK (validita_fine > validita_inizio)\n);\n\nCREATE TABLE tracciamenti (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    posizione TEXT NOT NULL,\n    data_ora TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    note TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario Rossi Srl",
+            "codice_fiscale": "RSSMRA75A01H501X",
+            "email": "mario.rossi@azienda.it"
+          },
+          {
+            "id": 2,
+            "nome": "Laura Bianchi Spa",
+            "codice_fiscale": "BNCLRA80B02L219Y",
+            "email": "laura.bianchi@logistica.it"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia Verdi & C.",
+            "codice_fiscale": "VRDGLU85C03M123Z",
+            "email": "info@verdi-log.it"
+          },
+          {
+            "id": 4,
+            "nome": "Paolo Nero S.p.A.",
+            "codice_fiscale": "NRPLLA90D04N345W",
+            "email": "amministrazione@nero.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi Srl",
+              "Laura Bianchi Spa",
+              "Giulia Verdi & C.",
+              "Paolo Nero S.p.A.",
+              "Alfa Transport",
+              "Beta Logistics",
+              "Gamma Shipping",
+              "Delta Cargo"
+            ]
+          },
+          "email": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "mario.rossi@azienda.it",
+              "laura.bianchi@logistica.it",
+              "info@verdi-log.it",
+              "amministrazione@nero.it",
+              "contatti@alfatransport.it",
+              "supporto@betalogistics.com",
+              "sales@gammashipping.net",
+              "help@deltacargo.org"
+            ]
+          }
+        }
+      },
+      {
+        "table": "indirizzi",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.5,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "via": "Via Roma 123",
+            "citta": "Roma",
+            "cap": "00100",
+            "provincia": "RM",
+            "nazione": "Italia",
+            "valid_from": "2025-01-01 00:00:00+00",
+            "valid_to": "infinity"
+          },
+          {
+            "id": 2,
+            "cliente_id": 1,
+            "via": "Corso Vittorio Emanuele 45",
+            "citta": "Milano",
+            "cap": "20121",
+            "provincia": "MI",
+            "nazione": "Italia",
+            "valid_from": "2025-01-01 00:00:00+00",
+            "valid_to": "infinity"
+          },
+          {
+            "id": 3,
+            "cliente_id": 2,
+            "via": "Piazza Garibaldi 78",
+            "citta": "Torino",
+            "cap": "10121",
+            "provincia": "TO",
+            "nazione": "Italia",
+            "valid_from": "2025-01-01 00:00:00+00",
+            "valid_to": "infinity"
+          },
+          {
+            "id": 4,
+            "cliente_id": 3,
+            "via": "Via Dante Alighieri 10",
+            "citta": "Firenze",
+            "cap": "50121",
+            "provincia": "FI",
+            "nazione": "Italia",
+            "valid_from": "2025-01-01 00:00:00+00",
+            "valid_to": "infinity"
+          }
+        ],
+        "variations": {
+          "via": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Roma 123",
+              "Corso Vittorio Emanuele 45",
+              "Piazza Garibaldi 78",
+              "Via Dante Alighieri 10",
+              "Via Napoli 56",
+              "Corso Magenta 34",
+              "Piazza Duomo 1",
+              "Via Milano 89"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Firenze",
+              "Napoli",
+              "Bologna",
+              "Genova",
+              "Venezia"
+            ]
+          },
+          "cap": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "00100",
+              "20121",
+              "10121",
+              "50121",
+              "80100",
+              "40121",
+              "16121",
+              "30121"
+            ]
+          },
+          "provincia": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "RM",
+              "MI",
+              "TO",
+              "FI",
+              "NA",
+              "BO",
+              "GE",
+              "VE"
+            ]
+          },
+          "nazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Italia",
+              "Italia",
+              "Italia",
+              "Italia",
+              "Italia"
+            ]
+          }
+        }
+      },
+      {
+        "table": "vettori",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Poste Italiane",
+            "codice_vettore": "POSTE001",
+            "telefono": "0612345678",
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "nome": "BRT Corriere",
+            "codice_vettore": "BRT002",
+            "telefono": "0298765432",
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "nome": "DHL Express",
+            "codice_vettore": "DHL003",
+            "telefono": "0345678901",
+            "attivo": true
+          },
+          {
+            "id": 4,
+            "nome": "FedEx",
+            "codice_vettore": "FED004",
+            "telefono": "0412345678",
+            "attivo": false
+          },
+          {
+            "id": 5,
+            "nome": "UPS",
+            "codice_vettore": "UPS005",
+            "telefono": "0598765432",
+            "attivo": true
+          }
+        ],
+        "variations": {
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "indirizzo_id": 1,
+            "vettore_id": 1,
+            "data_spedizione": "2026-01-15 08:00:00+00",
+            "data_consegna_prevista": "2026-01-18 17:00:00+00",
+            "peso_kg": 15.5,
+            "volume_m3": 0.25,
+            "stato": "in_transito",
+            "note": "Spedizione urgente"
+          },
+          {
+            "id": 2,
+            "cliente_id": 2,
+            "indirizzo_id": 3,
+            "vettore_id": 2,
+            "data_spedizione": "2026-01-16 09:00:00+00",
+            "data_consegna_prevista": "2026-01-20 12:00:00+00",
+            "peso_kg": 8.2,
+            "volume_m3": 0.1,
+            "stato": "consegnato",
+            "note": "Consegna al piano"
+          },
+          {
+            "id": 3,
+            "cliente_id": 3,
+            "indirizzo_id": 4,
+            "vettore_id": 3,
+            "data_spedizione": "2026-02-01 10:00:00+00",
+            "data_consegna_prevista": "2026-02-05 15:00:00+00",
+            "peso_kg": 22.0,
+            "volume_m3": 0.5,
+            "stato": "in_preparazione",
+            "note": "Merci fragili"
+          },
+          {
+            "id": 4,
+            "cliente_id": 1,
+            "indirizzo_id": 2,
+            "vettore_id": 1,
+            "data_spedizione": "2026-02-10 11:00:00+00",
+            "data_consegna_prevista": "2026-02-12 16:00:00+00",
+            "peso_kg": 5.75,
+            "volume_m3": 0.075,
+            "stato": "ritardato",
+            "note": "Ritardo doganale"
+          }
+        ],
+        "variations": {
+          "data_spedizione": {
+            "axis": "shift",
+            "delta_min": -15.0,
+            "delta_max": 15.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_consegna_prevista": {
+            "axis": "shift",
+            "delta_min": -10.0,
+            "delta_max": 10.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "volume_m3": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "in_preparazione",
+              "in_transito",
+              "consegnato",
+              "ritardato",
+              "annullato"
+            ]
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Spedizione urgente",
+              "Consegna al piano",
+              "Merci fragili",
+              "Ritardo doganale",
+              "Pagamento alla consegna",
+              "Assicurazione inclusa",
+              "None",
+              "None"
+            ]
+          }
+        }
+      },
+      {
+        "table": "versioni_spedizioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.2,
+        "templates": [
+          {
+            "id": 1,
+            "spedizione_id": 1,
+            "stato": "in_preparazione",
+            "data_modifica": "2026-01-15 08:00:00+00",
+            "modificato_da": "operatore1",
+            "note_modifica": "Creazione spedizione",
+            "validita_inizio": "2026-01-15 08:00:00+00",
+            "validita_fine": "2026-01-16 09:00:00+00"
+          },
+          {
+            "id": 2,
+            "spedizione_id": 1,
+            "stato": "in_transito",
+            "data_modifica": "2026-01-16 09:00:00+00",
+            "modificato_da": "operatore2",
+            "note_modifica": "Partenza dal magazzino",
+            "validita_inizio": "2026-01-16 09:00:00+00",
+            "validita_fine": "2026-01-18 17:00:00+00"
+          },
+          {
+            "id": 3,
+            "spedizione_id": 2,
+            "stato": "in_transito",
+            "data_modifica": "2026-01-16 10:00:00+00",
+            "modificato_da": "operatore3",
+            "note_modifica": "In transito verso destinazione",
+            "validita_inizio": "2026-01-16 10:00:00+00",
+            "validita_fine": "2026-01-20 12:00:00+00"
+          },
+          {
+            "id": 4,
+            "spedizione_id": 2,
+            "stato": "consegnato",
+            "data_modifica": "2026-01-20 12:00:00+00",
+            "modificato_da": "operatore1",
+            "note_modifica": "Consegna completata",
+            "validita_inizio": "2026-01-20 12:00:00+00",
+            "validita_fine": "infinity"
+          }
+        ],
+        "variations": {
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "in_preparazione",
+              "in_transito",
+              "consegnato",
+              "annullato",
+              "ritardato"
+            ]
+          },
+          "modificato_da": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "operatore1",
+              "operatore2",
+              "operatore3",
+              "supervisore1",
+              "amministratore"
+            ]
+          },
+          "note_modifica": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Creazione spedizione",
+              "Partenza dal magazzino",
+              "In transito verso destinazione",
+              "Consegna completata",
+              "Spedizione annullata",
+              "Ritardo segnalato",
+              "None"
+            ]
+          }
+        }
+      },
+      {
+        "table": "tracciamenti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "spedizione_id": 1,
+            "posizione": "Magazzino Roma",
+            "data_ora": "2026-01-15 08:00:00+00",
+            "note": "Prelievo merci"
+          },
+          {
+            "id": 2,
+            "spedizione_id": 1,
+            "posizione": "Autostrada A1 - KM 120",
+            "data_ora": "2026-01-15 14:00:00+00",
+            "note": "In transito"
+          },
+          {
+            "id": 3,
+            "spedizione_id": 1,
+            "posizione": "Centro Distribuzione Milano",
+            "data_ora": "2026-01-16 09:00:00+00",
+            "note": "Arrivo al centro"
+          },
+          {
+            "id": 4,
+            "spedizione_id": 2,
+            "posizione": "Magazzino Torino",
+            "data_ora": "2026-01-16 09:00:00+00",
+            "note": "Partenza"
+          },
+          {
+            "id": 5,
+            "spedizione_id": 2,
+            "posizione": "Destinazione - Via Dante 10",
+            "data_ora": "2026-01-20 12:00:00+00",
+            "note": "Consegna effettuata"
+          }
+        ],
+        "variations": {
+          "posizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Magazzino Roma",
+              "Autostrada A1 - KM 120",
+              "Centro Distribuzione Milano",
+              "Magazzino Torino",
+              "Destinazione - Via Dante 10",
+              "Autostrada A4 - KM 80",
+              "Punto di smistamento Bologna",
+              "Destinazione - Corso Vittorio 45"
+            ]
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Prelievo merci",
+              "In transito",
+              "Arrivo al centro",
+              "Partenza",
+              "Consegna effettuata",
+              "Smistamento in corso",
+              "Ritardo per traffico",
+              "None"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

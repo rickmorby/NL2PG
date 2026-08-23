@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "64ac31d7b53a1282"
+  },
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT UNIQUE,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    fornitore_id INT NOT NULL,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    data_ordine DATE NOT NULL,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL,\n    prodotto_id INT NOT NULL,\n    numero_riga INT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100)\n);"
+}

@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 8,
+  "hierarchy": "mixed",
+  "sql_features": [
+    "cross_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "organico_aziendale",
+      "description": "La tabella dipendenti viene denominata 'organico_aziendale' nella documentazione interna ERP, nascondendo il nome reale dello schema."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "movimentazioni_magazzino",
+      "obsolete_value": "transazioni_logistiche",
+      "description": "La tabella delle movimentazioni di magazzino è indicata con il gergo ERP 'transazioni_logistiche', termine tecnico usato nei moduli WMS ma assente dallo schema fisico."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "fornitori",
+      "obsolete_value": "partner_commerciali",
+      "description": "La tabella fornitori viene chiamata 'partner_commerciali', termine ambiguo che potrebbe indurre a confonderla con una tabella clienti o con entità di business partner generiche presenti in altri moduli ERP."
+    }
+  ],
+  "spec_hash": "63e6846e8c3bd689"
+}

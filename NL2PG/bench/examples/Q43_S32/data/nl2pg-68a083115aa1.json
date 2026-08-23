@@ -1,0 +1,250 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [
+      "sorting"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "prenotazioni",
+        "obsolete_value": "agenda_prenotazioni",
+        "description": "La tabella prenotazioni viene denominata agenda_prenotazioni nella prosa aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "updated_at",
+        "obsolete_value": "data_ultima_modifica",
+        "description": "La colonna updated_at viene indicata come data_ultima_modifica nel gergo sanitario."
+      }
+    ],
+    "spec_hash": "95e119df13cb1b29"
+  },
+  "schema_ddl": "CREATE TABLE prenotazioni (\n    id BIGSERIAL PRIMARY KEY,\n    paziente_id INT NOT NULL,\n    medico_id INT NOT NULL,\n    ambulatorio_id INT NOT NULL,\n    data_ora_prenotazione TIMESTAMP NOT NULL,\n    motivo_visita TEXT NOT NULL,\n    stato_prenotazione TEXT NOT NULL CHECK (stato_prenotazione IN ('prenotata', 'confermata', 'annullata', 'completata')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_ora_prenotazione > CURRENT_TIMESTAMP - INTERVAL '5 years'),\n    CHECK (data_ora_prenotazione < CURRENT_TIMESTAMP + INTERVAL '1 year')\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "prenotazioni",
+        "nature": "fact",
+        "min_rows": 500,
+        "max_rows": 2000,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "paziente_id": 101,
+            "medico_id": 201,
+            "ambulatorio_id": 301,
+            "data_ora_prenotazione": "2026-03-15 10:00:00",
+            "motivo_visita": "Visita di controllo annuale",
+            "stato_prenotazione": "confermata",
+            "created_at": "2026-03-10 09:15:22",
+            "updated_at": "2026-03-12 14:30:45"
+          },
+          {
+            "id": 2,
+            "paziente_id": 102,
+            "medico_id": 202,
+            "ambulatorio_id": 302,
+            "data_ora_prenotazione": "2026-03-16 11:30:00",
+            "motivo_visita": "Dolore addominale ricorrente",
+            "stato_prenotazione": "prenotata",
+            "created_at": "2026-03-11 08:45:10",
+            "updated_at": "2026-03-11 08:45:10"
+          },
+          {
+            "id": 3,
+            "paziente_id": 103,
+            "medico_id": 203,
+            "ambulatorio_id": 303,
+            "data_ora_prenotazione": "2026-03-17 14:00:00",
+            "motivo_visita": "Vaccinazione antinfluenzale",
+            "stato_prenotazione": "completata",
+            "created_at": "2026-03-05 16:20:33",
+            "updated_at": "2026-03-17 15:10:12"
+          },
+          {
+            "id": 4,
+            "paziente_id": 104,
+            "medico_id": 204,
+            "ambulatorio_id": 301,
+            "data_ora_prenotazione": "2026-03-18 09:45:00",
+            "motivo_visita": "Esame del sangue completo",
+            "stato_prenotazione": "annullata",
+            "created_at": "2026-03-12 11:05:40",
+            "updated_at": "2026-03-15 09:25:18"
+          },
+          {
+            "id": 5,
+            "paziente_id": 105,
+            "medico_id": 201,
+            "ambulatorio_id": 302,
+            "data_ora_prenotazione": "2026-03-19 16:20:00",
+            "motivo_visita": "Controllo pressione arteriosa",
+            "stato_prenotazione": "confermata",
+            "created_at": "2026-03-14 10:10:05",
+            "updated_at": "2026-03-14 13:40:22"
+          },
+          {
+            "id": 6,
+            "paziente_id": 106,
+            "medico_id": 205,
+            "ambulatorio_id": 303,
+            "data_ora_prenotazione": "2026-03-20 12:15:00",
+            "motivo_visita": "Visita ortopedica ginocchio",
+            "stato_prenotazione": "prenotata",
+            "created_at": "2026-03-18 07:50:15",
+            "updated_at": "2026-03-18 07:50:15"
+          },
+          {
+            "id": 7,
+            "paziente_id": 107,
+            "medico_id": 202,
+            "ambulatorio_id": 301,
+            "data_ora_prenotazione": "2026-03-21 08:30:00",
+            "motivo_visita": "Controllo glicemia",
+            "stato_prenotazione": "completata",
+            "created_at": "2026-03-10 14:25:30",
+            "updated_at": "2026-03-21 09:40:55"
+          },
+          {
+            "id": 8,
+            "paziente_id": 108,
+            "medico_id": 203,
+            "ambulatorio_id": 302,
+            "data_ora_prenotazione": "2026-03-22 15:40:00",
+            "motivo_visita": "Visita dermatologica",
+            "stato_prenotazione": "confermata",
+            "created_at": "2026-03-15 12:00:00",
+            "updated_at": "2026-03-16 10:20:33"
+          },
+          {
+            "id": 9,
+            "paziente_id": 109,
+            "medico_id": 204,
+            "ambulatorio_id": 303,
+            "data_ora_prenotazione": "2026-03-23 11:00:00",
+            "motivo_visita": "Ecografia addominale",
+            "stato_prenotazione": "prenotata",
+            "created_at": "2026-03-19 09:15:20",
+            "updated_at": "2026-03-19 09:15:20"
+          },
+          {
+            "id": 10,
+            "paziente_id": 110,
+            "medico_id": 205,
+            "ambulatorio_id": 301,
+            "data_ora_prenotazione": "2026-03-24 13:20:00",
+            "motivo_visita": "Visita cardiologica",
+            "stato_prenotazione": "annullata",
+            "created_at": "2026-03-20 16:30:45",
+            "updated_at": "2026-03-22 11:10:18"
+          }
+        ],
+        "variations": {
+          "paziente_id": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 200.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "medico_id": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 50.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "ambulatorio_id": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "301",
+              "302",
+              "303",
+              "304",
+              "305"
+            ]
+          },
+          "data_ora_prenotazione": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "motivo_visita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Visita di controllo annuale",
+              "Dolore addominale ricorrente",
+              "Vaccinazione antinfluenzale",
+              "Esame del sangue completo",
+              "Controllo pressione arteriosa",
+              "Visita ortopedica ginocchio",
+              "Controllo glicemia",
+              "Visita dermatologica",
+              "Ecografia addominale",
+              "Visita cardiologica",
+              "Controllo tiroide",
+              "Visita oculistica",
+              "Radiografia torace",
+              "Visita neurologica"
+            ]
+          },
+          "stato_prenotazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "prenotata",
+              "prenotata",
+              "prenotata",
+              "confermata",
+              "confermata",
+              "confermata",
+              "completata",
+              "completata",
+              "annullata"
+            ]
+          },
+          "created_at": {
+            "axis": "shift",
+            "delta_min": -15.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "updated_at": {
+            "axis": "shift",
+            "delta_min": -10.0,
+            "delta_max": 5.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

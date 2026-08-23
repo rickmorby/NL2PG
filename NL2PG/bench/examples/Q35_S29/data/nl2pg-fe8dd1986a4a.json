@@ -1,0 +1,339 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "case"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "schede_anagrafiche_personale",
+        "description": "La tabella fisica 'dipendenti' viene indicata nella prosa aziendale come 'schede_anagrafiche_personale'. Contiene le colonne id_dipendente, nome e cognome, dove il dato anagrafico unico è spezzato su due colonne separate."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "cognome",
+        "obsolete_value": "nome_di_famiglia",
+        "description": "La colonna 'cognome' della tabella dipendenti viene riferita nei documenti come 'nome_di_famiglia'. Le query devono riconoscere il sinonimo per ricostruire il nome completo con COALESCE(CONCAT(nome, ' ', cognome), 'sconosciuto')."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "reparti",
+        "obsolete_value": "centri di costo",
+        "description": "La tabella 'reparti' viene denominata con il gergo ERP 'centri di costo'. Ogni dipendente appartiene a un solo reparto tramite la chiave esterna id_reparto, mantenendo una gerarchia uno-a-molti tra reparti e dipendenti."
+      }
+    ],
+    "spec_hash": "9ee7d31aed6cff06"
+  },
+  "schema_ddl": "CREATE TABLE reparti (\n    id_reparto INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    codice_centro_costo TEXT NOT NULL UNIQUE,\n    budget_annuo NUMERIC(12,2) CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id_dipendente INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile > 0),\n    id_reparto INT NOT NULL REFERENCES reparti(id_reparto) ON DELETE RESTRICT\n);\n\nCREATE TABLE buste_paga (\n    id_busta_paga BIGINT PRIMARY KEY,\n    id_dipendente INT NOT NULL REFERENCES dipendenti(id_dipendente) ON DELETE CASCADE,\n    periodo_riferimento DATE NOT NULL,\n    importo_lordo NUMERIC(10,2) NOT NULL CHECK (importo_lordo >= 0),\n    importo_netto NUMERIC(10,2) NOT NULL CHECK (importo_netto >= 0),\n    CHECK (importo_netto <= importo_lordo),\n    UNIQUE (id_dipendente, periodo_riferimento)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "reparti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_reparto": 1,
+            "nome_reparto": "Produzione",
+            "codice_centro_costo": "CC-PRO-100",
+            "budget_annuo": 850000.0
+          },
+          {
+            "id_reparto": 2,
+            "nome_reparto": "Ricerca e Sviluppo",
+            "codice_centro_costo": "CC-RSV-200",
+            "budget_annuo": 620000.0
+          },
+          {
+            "id_reparto": 3,
+            "nome_reparto": "Vendite",
+            "codice_centro_costo": "CC-VND-300",
+            "budget_annuo": 480000.0
+          },
+          {
+            "id_reparto": 4,
+            "nome_reparto": "Amministrazione",
+            "codice_centro_costo": "CC-AMM-400",
+            "budget_annuo": 310000.0
+          },
+          {
+            "id_reparto": 5,
+            "nome_reparto": "Logistica",
+            "codice_centro_costo": "CC-LOG-500",
+            "budget_annuo": 395000.0
+          },
+          {
+            "id_reparto": 6,
+            "nome_reparto": "IT e Sistemi Informativi",
+            "codice_centro_costo": "CC-INF-600",
+            "budget_annuo": 540000.0
+          },
+          {
+            "id_reparto": 7,
+            "nome_reparto": "Acquisti",
+            "codice_centro_costo": "CC-Acq-700",
+            "budget_annuo": 265000.0
+          },
+          {
+            "id_reparto": 8,
+            "nome_reparto": "Qualita'",
+            "codice_centro_costo": "CC-QLT-800",
+            "budget_annuo": 185000.0
+          }
+        ],
+        "variations": {
+          "budget_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 15.0,
+        "templates": [
+          {
+            "id_dipendente": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRC80A01F205X",
+            "data_assunzione": "2015-03-02",
+            "stipendio_mensile": 3200.0,
+            "id_reparto": 1
+          },
+          {
+            "id_dipendente": 2,
+            "nome": "Giulia",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCGLI85C45H501Y",
+            "data_assunzione": "2018-09-17",
+            "stipendio_mensile": 2750.0,
+            "id_reparto": 2
+          },
+          {
+            "id_dipendente": 3,
+            "nome": "Alessandro",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRLSN78D12M052W",
+            "data_assunzione": "2012-01-09",
+            "stipendio_mensile": 4100.0,
+            "id_reparto": 3
+          },
+          {
+            "id_dipendente": 4,
+            "nome": "Francesca",
+            "cognome": "Russo",
+            "codice_fiscale": "RSSFNC90E22Z352K",
+            "data_assunzione": "2021-06-01",
+            "stipendio_mensile": 2350.0,
+            "id_reparto": 4
+          },
+          {
+            "id_dipendente": 5,
+            "nome": "Luca",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPSLCU83F05G472V",
+            "data_assunzione": "2016-11-14",
+            "stipendio_mensile": 2980.0,
+            "id_reparto": 5
+          },
+          {
+            "id_dipendente": 6,
+            "nome": "Chiara",
+            "cognome": "Colombo",
+            "codice_fiscale": "CLMCHR88G63B157N",
+            "data_assunzione": "2019-04-22",
+            "stipendio_mensile": 2620.0,
+            "id_reparto": 6
+          },
+          {
+            "id_dipendente": 7,
+            "nome": "Davide",
+            "cognome": "Ricci",
+            "codice_fiscale": "RCCDVD91H08E615P",
+            "data_assunzione": "2022-02-07",
+            "stipendio_mensile": 2150.0,
+            "id_reparto": 7
+          },
+          {
+            "id_dipendente": 8,
+            "nome": "Elena",
+            "cognome": "Marino",
+            "codice_fiscale": "MRNLNE87L44D962Q",
+            "data_assunzione": "2017-08-28",
+            "stipendio_mensile": 2450.0,
+            "id_reparto": 8
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Matteo",
+              "Sara",
+              "Andrea",
+              "Valentina"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Conti",
+              "Gallo",
+              "Costa"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -3600.0,
+            "delta_max": -90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stipendio_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.85,
+            "factor_max": 1.35,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "buste_paga",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 12.0,
+        "templates": [
+          {
+            "id_busta_paga": 100001,
+            "id_dipendente": 1,
+            "periodo_riferimento": "2025-01-01",
+            "importo_lordo": 3200.0,
+            "importo_netto": 1985.0
+          },
+          {
+            "id_busta_paga": 100002,
+            "id_dipendente": 2,
+            "periodo_riferimento": "2025-02-01",
+            "importo_lordo": 2750.0,
+            "importo_netto": 1710.0
+          },
+          {
+            "id_busta_paga": 100003,
+            "id_dipendente": 3,
+            "periodo_riferimento": "2025-03-01",
+            "importo_lordo": 4100.0,
+            "importo_netto": 2480.0
+          },
+          {
+            "id_busta_paga": 100004,
+            "id_dipendente": 4,
+            "periodo_riferimento": "2025-04-01",
+            "importo_lordo": 2900.0,
+            "importo_netto": 1795.0
+          },
+          {
+            "id_busta_paga": 100005,
+            "id_dipendente": 5,
+            "periodo_riferimento": "2025-05-01",
+            "importo_lordo": 3550.0,
+            "importo_netto": 2160.0
+          },
+          {
+            "id_busta_paga": 100006,
+            "id_dipendente": 6,
+            "periodo_riferimento": "2025-06-01",
+            "importo_lordo": 3050.0,
+            "importo_netto": 1880.0
+          }
+        ],
+        "variations": {
+          "periodo_riferimento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "2025-01-01",
+              "2025-02-01",
+              "2025-03-01",
+              "2025-04-01",
+              "2025-05-01",
+              "2025-06-01",
+              "2025-07-01",
+              "2025-08-01",
+              "2025-09-01",
+              "2025-10-01",
+              "2025-11-01",
+              "2025-12-01"
+            ]
+          },
+          "importo_lordo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 1.0,
+            "factor_max": 1.6,
+            "pool": []
+          },
+          "importo_netto": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 120.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

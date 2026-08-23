@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 6,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "pazienti",
+        "obsolete_value": "anagrafica_assistiti",
+        "description": "La tabella pazienti viene denominata anagrafica_assistiti nella prosa aziendale. Le query devono risolvere il nome reale della tabella per eseguire correttamente il JOIN con la tabella ricoveri tramite la chiave esterna paziente_id."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "data_ricovero",
+        "obsolete_value": "giorno_ammissione",
+        "description": "La colonna data_ricovero della tabella ricoveri viene indicata come giorno_ammissione nella documentazione aziendale. Le query che proiettano o filtrano su tale colonna devono mappare il sinonimo al nome reale della colonna."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "ricoveri",
+        "obsolete_value": "episodi_di_degenza",
+        "description": "La tabella ricoveri viene indicata con il gergo clinico episodi_di_degenza nei documenti interni dell'ospedale. Il solver deve riconoscere che il termine tecnico si riferisce alla tabella ricoveri per costruire il percorso di join PK/FK verso la tabella reparti tramite reparto_id."
+      }
+    ],
+    "spec_hash": "a96212b740281ede"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano INT NOT NULL CHECK (piano >= 0),\n    posti_letto_totali INT NOT NULL CHECK (posti_letto_totali > 0)\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    numero_albo TEXT UNIQUE\n);\n\nCREATE TABLE letti (\n    id INT PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    numero_letto INT NOT NULL CHECK (numero_letto > 0),\n    stato_letto TEXT NOT NULL DEFAULT 'libero' CHECK (stato_letto IN ('libero', 'occupato', 'manutenzione')),\n    UNIQUE (reparto_id, numero_letto)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    letto_id INT REFERENCES letti(id),\n    data_ricovero DATE NOT NULL,\n    data_dimissione DATE,\n    motivo_ricovero TEXT NOT NULL,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ricovero)\n);\n\nCREATE TABLE prescrizioni (\n    id INT PRIMARY KEY,\n    ricovero_id INT NOT NULL REFERENCES ricoveri(id),\n    farmaco TEXT NOT NULL,\n    dosaggio TEXT NOT NULL,\n    data_prescrizione DATE NOT NULL,\n    somministrato BOOLEAN NOT NULL DEFAULT FALSE\n);"
+}

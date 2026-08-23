@@ -1,0 +1,602 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 8,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "join",
+      "multi_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "ce62e9bc49a200ca"
+  },
+  "schema_ddl": "CREATE TABLE valute (\n    id SERIAL PRIMARY KEY,\n    codice_valuta CHAR(3) NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    simbolo TEXT NOT NULL\n);\n\nCREATE TABLE conti_correnti (\n    id SERIAL PRIMARY KEY,\n    numero_conto TEXT NOT NULL UNIQUE,\n    nome_conto TEXT NOT NULL,\n    valuta_id INT NOT NULL REFERENCES valute(id),\n    saldo NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    data_apertura DATE NOT NULL,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE indirizzi (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    nazione TEXT NOT NULL,\n    tipo_indirizzo TEXT NOT NULL CHECK (tipo_indirizzo IN ('residenza', 'domicilio', 'lavoro'))\n);\n\nCREATE TABLE transazioni (\n    id SERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti_correnti(id),\n    tipo_transazione TEXT NOT NULL CHECK (tipo_transazione IN ('versamento', 'prelievo', 'bonifico', 'addebito')),\n    importo NUMERIC(15,2) NOT NULL CHECK (importo > 0),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    descrizione TEXT,\n    stato TEXT NOT NULL DEFAULT 'completata' CHECK (stato IN ('completata', 'in_attesa', 'annullata'))\n);\n\nCREATE TABLE bonifici (\n    id SERIAL PRIMARY KEY,\n    transazione_id INT NOT NULL REFERENCES transazioni(id),\n    conto_destinatario TEXT NOT NULL,\n    nome_destinatario TEXT NOT NULL,\n    causale TEXT NOT NULL,\n    data_esecuzione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE categorie_spesa (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    budget_mensile NUMERIC(12,2) CHECK (budget_mensile >= 0)\n);\n\nCREATE TABLE movimenti_spesa (\n    id SERIAL PRIMARY KEY,\n    transazione_id INT NOT NULL REFERENCES transazioni(id),\n    categoria_id INT NOT NULL REFERENCES categorie_spesa(id),\n    note TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "valute",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_valuta": "EUR",
+            "nome": "Euro",
+            "simbolo": "€"
+          },
+          {
+            "id": 2,
+            "codice_valuta": "USD",
+            "nome": "Dollaro Statunitense",
+            "simbolo": "$"
+          },
+          {
+            "id": 3,
+            "codice_valuta": "GBP",
+            "nome": "Sterlina Britannica",
+            "simbolo": "£"
+          },
+          {
+            "id": 4,
+            "codice_valuta": "JPY",
+            "nome": "Yen Giapponese",
+            "simbolo": "¥"
+          },
+          {
+            "id": 5,
+            "codice_valuta": "CHF",
+            "nome": "Franco Svizzero",
+            "simbolo": "CHF"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "categorie_spesa",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Alimentari",
+            "descrizione": "Spese per generi alimentari",
+            "budget_mensile": 400.0
+          },
+          {
+            "id": 2,
+            "nome": "Trasporti",
+            "descrizione": "Spese per trasporti e carburante",
+            "budget_mensile": 200.0
+          },
+          {
+            "id": 3,
+            "nome": "Utile",
+            "descrizione": "Spese per bollette e servizi",
+            "budget_mensile": 300.0
+          },
+          {
+            "id": 4,
+            "nome": "Tempo libero",
+            "descrizione": "Spese per svago e intrattenimento",
+            "budget_mensile": 150.0
+          },
+          {
+            "id": 5,
+            "nome": "Salute",
+            "descrizione": "Spese mediche e farmaceutiche",
+            "budget_mensile": 100.0
+          }
+        ],
+        "variations": {
+          "budget_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_fiscale": "RSSMRA80A01H501X",
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "data_nascita": "1980-01-01",
+            "email": "mario.rossi@example.com",
+            "telefono": "+391234567890"
+          },
+          {
+            "id": 2,
+            "codice_fiscale": "BNCLRA85B02H501Y",
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "data_nascita": "1985-02-15",
+            "email": "laura.bianchi@example.com",
+            "telefono": "+391234567891"
+          },
+          {
+            "id": 3,
+            "codice_fiscale": "VRDGIA90C03H501Z",
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "data_nascita": "1990-03-20",
+            "email": "giulia.verdi@example.com",
+            "telefono": "+391234567892"
+          },
+          {
+            "id": 4,
+            "codice_fiscale": "NRLUC65D04H501W",
+            "nome": "Luca",
+            "cognome": "Neri",
+            "data_nascita": "1965-04-25",
+            "email": null,
+            "telefono": "+391234567893"
+          }
+        ],
+        "variations": {
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -3650.0,
+            "delta_max": 3650.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+391234567890",
+              "+391234567891",
+              "+391234567892",
+              "+391234567893",
+              "None"
+            ]
+          }
+        }
+      },
+      {
+        "table": "indirizzi",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.5,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "via": "Via Roma 12",
+            "citta": "Roma",
+            "cap": "00100",
+            "nazione": "Italia",
+            "tipo_indirizzo": "residenza"
+          },
+          {
+            "id": 2,
+            "cliente_id": 1,
+            "via": "Via Milano 5",
+            "citta": "Roma",
+            "cap": "00100",
+            "nazione": "Italia",
+            "tipo_indirizzo": "domicilio"
+          },
+          {
+            "id": 3,
+            "cliente_id": 2,
+            "via": "Corso Buenos Aires 45",
+            "citta": "Milano",
+            "cap": "20124",
+            "nazione": "Italia",
+            "tipo_indirizzo": "residenza"
+          },
+          {
+            "id": 4,
+            "cliente_id": 3,
+            "via": "Piazza San Carlo 10",
+            "citta": "Torino",
+            "cap": "10123",
+            "nazione": "Italia",
+            "tipo_indirizzo": "lavoro"
+          }
+        ],
+        "variations": {
+          "via": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Roma 12",
+              "Via Milano 5",
+              "Corso Buenos Aires 45",
+              "Piazza San Carlo 10",
+              "Via Napoli 33"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna"
+            ]
+          },
+          "cap": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "00100",
+              "20124",
+              "10123",
+              "80100",
+              "40121"
+            ]
+          },
+          "nazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Italia",
+              "Francia",
+              "Germania",
+              "Spagna"
+            ]
+          },
+          "tipo_indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "residenza",
+              "domicilio",
+              "lavoro"
+            ]
+          }
+        }
+      },
+      {
+        "table": "conti_correnti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.0,
+        "templates": [
+          {
+            "id": 1,
+            "numero_conto": "IT01A1234567890",
+            "nome_conto": "Conto Corrente Personale",
+            "valuta_id": 1,
+            "saldo": 1500.0,
+            "data_apertura": "2020-01-10",
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "numero_conto": "IT02B2345678901",
+            "nome_conto": "Conto Risparmio",
+            "valuta_id": 1,
+            "saldo": 5000.0,
+            "data_apertura": "2019-05-15",
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "numero_conto": "IT03C3456789012",
+            "nome_conto": "Conto Aziendale",
+            "valuta_id": 2,
+            "saldo": 12000.5,
+            "data_apertura": "2021-03-22",
+            "attivo": true
+          },
+          {
+            "id": 4,
+            "numero_conto": "IT04D4567890123",
+            "nome_conto": "Conto Deposito",
+            "valuta_id": 1,
+            "saldo": 0.0,
+            "data_apertura": "2022-07-01",
+            "attivo": false
+          }
+        ],
+        "variations": {
+          "saldo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.1,
+            "factor_max": 5.0,
+            "pool": []
+          },
+          "data_apertura": {
+            "axis": "shift",
+            "delta_min": -730.0,
+            "delta_max": 730.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "transazioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 5.0,
+        "templates": [
+          {
+            "id": 1,
+            "conto_id": 1,
+            "tipo_transazione": "versamento",
+            "importo": 1000.0,
+            "data_transazione": "2026-01-10 09:30:00",
+            "descrizione": "Versamento contanti",
+            "stato": "completata"
+          },
+          {
+            "id": 2,
+            "conto_id": 1,
+            "tipo_transazione": "prelievo",
+            "importo": 200.0,
+            "data_transazione": "2026-01-12 14:15:00",
+            "descrizione": "Prelievo bancomat",
+            "stato": "completata"
+          },
+          {
+            "id": 3,
+            "conto_id": 2,
+            "tipo_transazione": "bonifico",
+            "importo": 500.0,
+            "data_transazione": "2026-01-15 10:00:00",
+            "descrizione": "Bonifico a fornitore",
+            "stato": "completata"
+          },
+          {
+            "id": 4,
+            "conto_id": 3,
+            "tipo_transazione": "addebito",
+            "importo": 150.0,
+            "data_transazione": "2026-01-18 11:45:00",
+            "descrizione": "Addebito bolletta luce",
+            "stato": "in_attesa"
+          },
+          {
+            "id": 5,
+            "conto_id": 1,
+            "tipo_transazione": "prelievo",
+            "importo": 300.0,
+            "data_transazione": "2026-01-20 16:20:00",
+            "descrizione": null,
+            "stato": "annullata"
+          }
+        ],
+        "variations": {
+          "tipo_transazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "versamento",
+              "prelievo",
+              "bonifico",
+              "addebito"
+            ]
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "data_transazione": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "completata",
+              "completata",
+              "completata",
+              "in_attesa",
+              "annullata"
+            ]
+          }
+        }
+      },
+      {
+        "table": "bonifici",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "transazione_id": 3,
+            "conto_destinatario": "IT99X9876543210",
+            "nome_destinatario": "Società Alpha S.r.l.",
+            "causale": "Pagamento fattura n. 123",
+            "data_esecuzione": "2026-01-15 10:30:00"
+          },
+          {
+            "id": 2,
+            "transazione_id": 3,
+            "conto_destinatario": "IT88Y8765432109",
+            "nome_destinatario": "Fornitore Beta",
+            "causale": "Acquisto materiali",
+            "data_esecuzione": "2026-01-16 11:00:00"
+          },
+          {
+            "id": 3,
+            "transazione_id": 3,
+            "conto_destinatario": "IT77Z7654321098",
+            "nome_destinatario": "Servizi Gamma",
+            "causale": "Consulenza tecnica",
+            "data_esecuzione": "2026-01-17 09:15:00"
+          }
+        ],
+        "variations": {
+          "conto_destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "IT99X9876543210",
+              "IT88Y8765432109",
+              "IT77Z7654321098",
+              "IT66A6543210987"
+            ]
+          },
+          "nome_destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Società Alpha S.r.l.",
+              "Fornitore Beta",
+              "Servizi Gamma",
+              "Azienda Delta"
+            ]
+          },
+          "causale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Pagamento fattura n. 123",
+              "Acquisto materiali",
+              "Consulenza tecnica",
+              "Rimborso spese"
+            ]
+          },
+          "data_esecuzione": {
+            "axis": "shift",
+            "delta_min": -2.0,
+            "delta_max": 2.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "movimenti_spesa",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "transazione_id": 2,
+            "categoria_id": 1,
+            "note": "Spesa supermercato"
+          },
+          {
+            "id": 2,
+            "transazione_id": 4,
+            "categoria_id": 3,
+            "note": "Bolletta luce gennaio"
+          },
+          {
+            "id": 3,
+            "transazione_id": 2,
+            "categoria_id": 4,
+            "note": "Cena al ristorante"
+          },
+          {
+            "id": 4,
+            "transazione_id": 1,
+            "categoria_id": 5,
+            "note": "Farmacia"
+          },
+          {
+            "id": 5,
+            "transazione_id": 3,
+            "categoria_id": 2,
+            "note": null
+          }
+        ],
+        "variations": {
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Spesa supermercato",
+              "Bolletta luce gennaio",
+              "Cena al ristorante",
+              "Farmacia",
+              "Abbonamento palestra",
+              "None"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

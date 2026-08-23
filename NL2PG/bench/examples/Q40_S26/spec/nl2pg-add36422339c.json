@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "in_condition"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ricoveri",
+      "obsolete_value": "episodi_di_cura",
+      "description": "La tabella fisica ricoveri viene denominata episodi_di_cura nella prosa aziendale. L'utente deve risalire dalla perifrasi presente nel testo alla tabella reale ricoveri per formulare correttamente join e filtri."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "gravita",
+      "obsolete_value": "punteggio di severità clinica",
+      "description": "La colonna gravita, fisicamente definita come TEXT ma contenente valori logicamente numerici (punteggi interi da 1 a 5), viene indicata nella prosa aziendale con il gergo clinico 'punteggio di severità clinica'. Le query che filtrano per punteggi specifici devono usare WHERE CAST(gravita AS NUMERIC) IN (v1, v2), poiché il confronto diretto su valori TEXT non è semanticamente corretto."
+    }
+  ],
+  "spec_hash": "0fbd5c94a9db73c6"
+}

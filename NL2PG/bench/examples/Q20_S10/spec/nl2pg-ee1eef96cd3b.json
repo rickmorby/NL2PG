@@ -1,0 +1,34 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "right_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_abbonati",
+      "description": "La tabella clienti, che contiene i dati anagrafici degli abbonati con chiave primaria cliente_id, viene denominata anagrafica_abbonati nella prosa aziendale. Le query devono risolvere il nome reale della tabella per costruire il RIGHT OUTER JOIN."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "fatture",
+      "obsolete_value": "documenti_di_addebito",
+      "description": "La tabella fatture, che registra gli addebiti mensili con chiave esterna contratto_id verso la tabella contratti, viene indicata come documenti_di_addebito nella documentazione commerciale. Essendo la tabella sul lato destro del RIGHT OUTER JOIN, tutte le sue righe devono essere preservate anche senza corrispondenza."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "minuti_consumati",
+      "obsolete_value": "traffico_voce_erogato",
+      "description": "La colonna minuti_consumati della tabella linee_telefoniche viene indicata con il gergo tecnico di settore traffico_voce_erogato nei report operativi. Le query che aggregano o filtrano i minuti devono mappare correttamente la colonna reale."
+    }
+  ],
+  "spec_hash": "13cb33930c9124db"
+}

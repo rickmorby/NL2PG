@@ -1,0 +1,27 @@
+{
+  "domain": "università",
+  "n_tables": 2,
+  "hierarchy": "flat",
+  "sql_features": [
+    "relative_time"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "created_at",
+      "obsolete_value": "data_creazione",
+      "description": "La colonna audit 'created_at' viene rinominata in 'data_creazione' nella documentazione aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "updated_by",
+      "obsolete_value": "utente_modificatore",
+      "description": "Il termine tecnico 'updated_by' viene sostituito con il gergo aziendale 'utente_modificatore'."
+    }
+  ],
+  "spec_hash": "d2e5f7c247e83831"
+}

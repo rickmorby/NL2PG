@@ -1,0 +1,280 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 4,
+    "hierarchy": "flat",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti_contabili",
+        "obsolete_value": "registrazioni",
+        "description": "La tabella movimenti_contabili viene comunemente chiamata registrazioni nel linguaggio aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "category_name",
+        "obsolete_value": "natura_contabile",
+        "description": "Il campo category_name è riferito come natura_contabile nei documenti interni."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "supplier_name",
+        "obsolete_value": "fornitore",
+        "description": "Il campo supplier_name è spesso sostituito dal termine fornitore nelle query informali."
+      }
+    ],
+    "spec_hash": "6d86e8c750e4e29b"
+  },
+  "schema_ddl": "CREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    data_movimento DATE NOT NULL,\n    importo NUMERIC(15,2) NOT NULL CHECK (importo != 0),\n    nome_categoria TEXT NOT NULL,\n    nome_fornitore TEXT,\n    totale_per_categoria NUMERIC(15,2) GENERATED ALWAYS AS (importo) STORED,\n    conteggio_per_fornitore INT GENERATED ALWAYS AS (1) STORED\n);\n\nCREATE TABLE categorie_contabili (\n    id SERIAL PRIMARY KEY,\n    nome_categoria TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    totale_movimenti NUMERIC(15,2) DEFAULT 0,\n    n_movimenti INT DEFAULT 0\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    nome_fornitore TEXT NOT NULL UNIQUE,\n    codice_fiscale TEXT UNIQUE,\n    totale_speso NUMERIC(15,2) DEFAULT 0,\n    n_fatture INT DEFAULT 0\n);\n\nCREATE TABLE riepilogo_annuale (\n    id SERIAL PRIMARY KEY,\n    anno INT NOT NULL UNIQUE,\n    totale_movimenti_annuali NUMERIC(15,2) DEFAULT 0,\n    n_movimenti_annuali INT DEFAULT 0,\n    n_categorie_attive INT DEFAULT 0,\n    n_fornitori_attivi INT DEFAULT 0\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "categorie_contabili",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_categoria": "Utenze",
+            "descrizione": "Spese per energia, acqua, gas",
+            "totale_movimenti": 0,
+            "n_movimenti": 0
+          },
+          {
+            "id": 2,
+            "nome_categoria": "Materiali di consumo",
+            "descrizione": "Carta, cancelleria, materiali d'ufficio",
+            "totale_movimenti": 0,
+            "n_movimenti": 0
+          },
+          {
+            "id": 3,
+            "nome_categoria": "Servizi professionali",
+            "descrizione": "Consulenze legali, commerciali, IT",
+            "totale_movimenti": 0,
+            "n_movimenti": 0
+          },
+          {
+            "id": 4,
+            "nome_categoria": "Manutenzione",
+            "descrizione": "Manutenzione ordinaria e straordinaria",
+            "totale_movimenti": 0,
+            "n_movimenti": 0
+          },
+          {
+            "id": 5,
+            "nome_categoria": "Trasporti",
+            "descrizione": "Spese di spedizione e logistica",
+            "totale_movimenti": 0,
+            "n_movimenti": 0
+          }
+        ],
+        "variations": {
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Spese generiche",
+              "Costi operativi",
+              "Investimenti",
+              "Altro",
+              ""
+            ]
+          }
+        }
+      },
+      {
+        "table": "fornitori",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_fornitore": "Energit S.p.A.",
+            "codice_fiscale": "IT12345678901",
+            "totale_speso": 0,
+            "n_fatture": 0
+          },
+          {
+            "id": 2,
+            "nome_fornitore": "Cartaria Rossi",
+            "codice_fiscale": "IT09876543210",
+            "totale_speso": 0,
+            "n_fatture": 0
+          },
+          {
+            "id": 3,
+            "nome_fornitore": "Studio Legale Bianchi",
+            "codice_fiscale": "IT11223344556",
+            "totale_speso": 0,
+            "n_fatture": 0
+          },
+          {
+            "id": 4,
+            "nome_fornitore": "Manutenzioni Verdi",
+            "codice_fiscale": "IT65432109876",
+            "totale_speso": 0,
+            "n_fatture": 0
+          },
+          {
+            "id": 5,
+            "nome_fornitore": "Trasporti Blu",
+            "codice_fiscale": "IT55667788990",
+            "totale_speso": 0,
+            "n_fatture": 0
+          }
+        ],
+        "variations": {
+          "codice_fiscale": {
+            "axis": "fixed",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "movimenti_contabili",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "data_movimento": "2026-01-15",
+            "importo": 1200.5,
+            "nome_categoria": "Utenze",
+            "nome_fornitore": "Energit S.p.A."
+          },
+          {
+            "id": 2,
+            "data_movimento": "2026-01-20",
+            "importo": -850.0,
+            "nome_categoria": "Materiali di consumo",
+            "nome_fornitore": "Cartaria Rossi"
+          },
+          {
+            "id": 3,
+            "data_movimento": "2026-02-05",
+            "importo": 2500.0,
+            "nome_categoria": "Servizi professionali",
+            "nome_fornitore": "Studio Legale Bianchi"
+          },
+          {
+            "id": 4,
+            "data_movimento": "2026-02-10",
+            "importo": -1500.75,
+            "nome_categoria": "Manutenzione",
+            "nome_fornitore": "Manutenzioni Verdi"
+          },
+          {
+            "id": 5,
+            "data_movimento": "2026-03-01",
+            "importo": 950.3,
+            "nome_categoria": "Trasporti",
+            "nome_fornitore": "Trasporti Blu"
+          }
+        ],
+        "variations": {
+          "data_movimento": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "nome_categoria": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Utenze",
+              "Materiali di consumo",
+              "Servizi professionali",
+              "Manutenzione",
+              "Trasporti"
+            ]
+          },
+          "nome_fornitore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Energit S.p.A.",
+              "Cartaria Rossi",
+              "Studio Legale Bianchi",
+              "Manutenzioni Verdi",
+              "Trasporti Blu",
+              ""
+            ]
+          }
+        }
+      },
+      {
+        "table": "riepilogo_annuale",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "anno": 2024,
+            "totale_movimenti_annuali": 0,
+            "n_movimenti_annuali": 0,
+            "n_categorie_attive": 0,
+            "n_fornitori_attivi": 0
+          },
+          {
+            "id": 2,
+            "anno": 2025,
+            "totale_movimenti_annuali": 0,
+            "n_movimenti_annuali": 0,
+            "n_categorie_attive": 0,
+            "n_fornitori_attivi": 0
+          },
+          {
+            "id": 3,
+            "anno": 2026,
+            "totale_movimenti_annuali": 0,
+            "n_movimenti_annuali": 0,
+            "n_categorie_attive": 0,
+            "n_fornitori_attivi": 0
+          }
+        ],
+        "variations": {}
+      }
+    ]
+  }
+}

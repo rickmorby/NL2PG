@@ -1,0 +1,902 @@
+{
+  "schema_ddl": "CREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    data_assunzione DATE NOT NULL\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT\n);\n\nCREATE TABLE immobili (\n    id INT PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'attico', 'terreno', 'ufficio')),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    numero_stanze INT CHECK (numero_stanze >= 0),\n    agente_id INT REFERENCES agenti(id),\n    proprietario_id INT REFERENCES clienti(id)\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL REFERENCES immobili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_visita DATE NOT NULL,\n    esito TEXT CHECK (esito IN ('interessato', 'non_interessato', 'da_contattare')),\n    note TEXT\n);\n\nCREATE TABLE offerte (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL REFERENCES immobili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    importo_offerta NUMERIC(12,2) NOT NULL CHECK (importo_offerta > 0),\n    stato_offerta TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_offerta IN ('in_attesa', 'accettata', 'rifiutata', 'ritirata')),\n    data_offerta DATE NOT NULL\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL REFERENCES immobili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    agente_id INT REFERENCES agenti(id),\n    prezzo_finale NUMERIC(12,2) NOT NULL CHECK (prezzo_finale >= 0),\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('vendita', 'affito')),\n    data_firma DATE NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "agenti": {
+        "row_count": 750,
+        "columns": {
+          "id": {
+            "distinct": 750,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 750
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Anna",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bellini",
+              "Colombo",
+              "Costa",
+              "Ferrari",
+              "Gallo"
+            ]
+          },
+          "email": {
+            "distinct": 714,
+            "sample": [
+              "davide.ricci100@agenziacasa.it",
+              "davide.ricci101@agenziacasa.it",
+              "davide.ricci102@agenziacasa.it",
+              "davide.ricci103@agenziacasa.it",
+              "davide.ricci105@agenziacasa.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 7,
+            "sample": [
+              "+39 010 6789012",
+              "+39 011 3456789",
+              "+39 02 2345678",
+              "+39 045 7890123",
+              "+39 055 5678901"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 646,
+            "sample": [
+              "2016-03-12",
+              "2016-03-14",
+              "2016-03-20",
+              "2016-03-25",
+              "2016-04-08"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 353,
+        "columns": {
+          "id": {
+            "distinct": 353,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 353
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Francesca",
+              "Giovanni",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "De Luca",
+              "Esposito",
+              "Fontana"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 353,
+            "sample": [
+              "BNCALS85M01H501B",
+              "BNCALS85M01H501C",
+              "BNCALS85M01H501D",
+              "BNCALS85M01H501E",
+              "BNCALS85M01H501F"
+            ]
+          },
+          "email": {
+            "distinct": 8,
+            "sample": [
+              "alessandro.bianchi@gmail.com",
+              "andrea.fontana@gmail.com",
+              "francesca.deluca@gmail.com",
+              "giovanni.esposito@gmail.com",
+              "martina.conti@gmail.com"
+            ]
+          },
+          "telefono": {
+            "distinct": 7,
+            "sample": [
+              "+39 320 3334445",
+              "+39 331 7778889",
+              "+39 333 1112223",
+              "+39 339 5556667",
+              "+39 340 6667778"
+            ]
+          }
+        }
+      },
+      "immobili": {
+        "row_count": 109,
+        "columns": {
+          "id": {
+            "distinct": 109,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 109
+          },
+          "indirizzo": {
+            "distinct": 12,
+            "sample": [
+              "Corso Buenos Aires 12",
+              "Corso Vittorio Emanuele 88",
+              "Piazza Dante 5",
+              "Strada di Settignano 22",
+              "Via Etnea 210"
+            ]
+          },
+          "citta": {
+            "distinct": 9,
+            "sample": [
+              "Bologna",
+              "Catania",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "tipo_immobile": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "attico",
+              "terreno",
+              "ufficio",
+              "villa"
+            ]
+          },
+          "prezzo_richiesto": {
+            "distinct": 108,
+            "sample": [
+              "1005806.47",
+              "1046259.5",
+              "1062993.27",
+              "1142509.46",
+              "1146847.04"
+            ],
+            "min": 134735.61,
+            "max": 1572187.33
+          },
+          "superficie_mq": {
+            "distinct": 102,
+            "sample": [
+              "102.9",
+              "104.07",
+              "104.87",
+              "107.25",
+              "107.64"
+            ],
+            "min": 61.89,
+            "max": 7091.55
+          },
+          "numero_stanze": {
+            "distinct": 9,
+            "sample": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 0,
+            "max": 8
+          },
+          "agente_id": {
+            "distinct": 101,
+            "sample": [
+              "11",
+              "114",
+              "121",
+              "122",
+              "129"
+            ],
+            "min": 5,
+            "max": 746
+          },
+          "proprietario_id": {
+            "distinct": 90,
+            "sample": [
+              "1",
+              "105",
+              "106",
+              "108",
+              "109"
+            ],
+            "min": 1,
+            "max": 350
+          }
+        }
+      },
+      "visite": {
+        "row_count": 2844,
+        "columns": {
+          "id": {
+            "distinct": 2844,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2844
+          },
+          "immobile_id": {
+            "distinct": 109,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 109
+          },
+          "cliente_id": {
+            "distinct": 353,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 353
+          },
+          "data_visita": {
+            "distinct": 206,
+            "sample": [
+              "2025-09-11",
+              "2025-09-12",
+              "2025-09-13",
+              "2025-09-14",
+              "2025-09-15"
+            ]
+          },
+          "esito": {
+            "distinct": 3,
+            "sample": [
+              "da_contattare",
+              "interessato",
+              "non_interessato"
+            ]
+          },
+          "note": {
+            "distinct": 8,
+            "sample": [
+              "Cliente molto colpito dalla luminosità dell'appartamento",
+              "Da richiamare entro fine mese per feedback",
+              "Interesse per ristrutturazione degli spazi uffici",
+              "Nessun riscontro post-visita da parte del cliente",
+              "Prezzo percepito troppo alto rispetto al mercato"
+            ]
+          }
+        }
+      },
+      "offerte": {
+        "row_count": 1305,
+        "columns": {
+          "id": {
+            "distinct": 1305,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1305
+          },
+          "immobile_id": {
+            "distinct": 109,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 109
+          },
+          "cliente_id": {
+            "distinct": 346,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 353
+          },
+          "importo_offerta": {
+            "distinct": 1258,
+            "sample": [
+              "195000.0",
+              "195008.2",
+              "195060.71",
+              "195486.8",
+              "195912.83"
+            ],
+            "min": 195000.0,
+            "max": 965895.8
+          },
+          "stato_offerta": {
+            "distinct": 4,
+            "sample": [
+              "accettata",
+              "in_attesa",
+              "rifiutata",
+              "ritirata"
+            ]
+          },
+          "data_offerta": {
+            "distinct": 175,
+            "sample": [
+              "2025-10-06",
+              "2025-10-07",
+              "2025-10-08",
+              "2025-10-09",
+              "2025-10-10"
+            ]
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 1412,
+        "columns": {
+          "id": {
+            "distinct": 1412,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1412
+          },
+          "immobile_id": {
+            "distinct": 109,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 109
+          },
+          "cliente_id": {
+            "distinct": 347,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 353
+          },
+          "agente_id": {
+            "distinct": 631,
+            "sample": [
+              "10",
+              "100",
+              "102",
+              "103",
+              "104"
+            ],
+            "min": 2,
+            "max": 750
+          },
+          "prezzo_finale": {
+            "distinct": 1346,
+            "sample": [
+              "1232.5",
+              "1233.11",
+              "1235.19",
+              "1235.55",
+              "1239.02"
+            ],
+            "min": 1232.5,
+            "max": 988232.3
+          },
+          "tipo_contratto": {
+            "distinct": 2,
+            "sample": [
+              "affito",
+              "vendita"
+            ]
+          },
+          "data_firma": {
+            "distinct": 137,
+            "sample": [
+              "2025-12-16",
+              "2025-12-17",
+              "2025-12-18",
+              "2025-12-19",
+              "2025-12-20"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "agenti": [
+        {
+          "id": 37,
+          "nome": "Elena",
+          "cognome": "Ferrari",
+          "email": "elena.ferrari1@example.com",
+          "telefono": "+39 055 5678901",
+          "data_assunzione": "2017-01-17"
+        },
+        {
+          "id": 4,
+          "nome": "Elena",
+          "cognome": "Longo",
+          "email": "elena.longo1@example.com",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2018-10-17"
+        },
+        {
+          "id": 79,
+          "nome": "Luca",
+          "cognome": "Bellini",
+          "email": "luca.bellini1@example.com",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2019-04-13"
+        },
+        {
+          "id": 10,
+          "nome": "Roberto",
+          "cognome": "Mancini",
+          "email": "roberto.mancini1@example.com",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2016-03-20"
+        },
+        {
+          "id": 62,
+          "nome": "Sara",
+          "cognome": "Ricci",
+          "email": "sara.ricci1@example.com",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2017-12-05"
+        },
+        {
+          "id": 136,
+          "nome": "Sara",
+          "cognome": "Gallo",
+          "email": "sara.gallo1@example.com",
+          "telefono": "+39 081 4567890",
+          "data_assunzione": "2017-07-01"
+        },
+        {
+          "id": 226,
+          "nome": "Chiara",
+          "cognome": "Bellini",
+          "email": "chiara.bellini1@example.com",
+          "telefono": "+39 045 7890123",
+          "data_assunzione": "2017-07-17"
+        },
+        {
+          "id": 216,
+          "nome": "Davide",
+          "cognome": "Greco",
+          "email": "davide.greco1@example.com",
+          "telefono": "+39 081 4567890",
+          "data_assunzione": "2018-12-07"
+        }
+      ],
+      "clienti": [
+        {
+          "id": 44,
+          "nome": "Giovanni",
+          "cognome": "Fontana",
+          "codice_fiscale": "BNCALS85M01H545S",
+          "email": "giovanni.fontana1@example.com",
+          "telefono": "+39 333 1112223"
+        },
+        {
+          "id": 64,
+          "nome": "Martina",
+          "cognome": "Fontana",
+          "codice_fiscale": "DLCFRA90T42H501E",
+          "email": "martina.fontana1@example.com",
+          "telefono": "+39 347 2223334"
+        },
+        {
+          "id": 25,
+          "nome": "Martina",
+          "cognome": "Testa",
+          "codice_fiscale": "BNCALS85M01H501Z",
+          "email": "martina.testa1@example.com",
+          "telefono": "+39 320 3334445"
+        },
+        {
+          "id": 12,
+          "nome": "Matteo",
+          "cognome": "Fontana",
+          "codice_fiscale": "BNCALS85M01H501L",
+          "email": "matteo.fontana1@example.com",
+          "telefono": "+39 320 3334445"
+        },
+        {
+          "id": 23,
+          "nome": "Silvia",
+          "cognome": "Lombardi",
+          "codice_fiscale": "BNCALS85M01H501W",
+          "email": "silvia.lombardi1@example.com",
+          "telefono": "+39 331 7778889"
+        },
+        {
+          "id": 40,
+          "nome": "Stefano",
+          "cognome": "Testa",
+          "codice_fiscale": "BNCALS85M01H541O",
+          "email": "stefano.testa1@example.com",
+          "telefono": "+39 348 4445556"
+        },
+        {
+          "id": 107,
+          "nome": "Francesca",
+          "cognome": "Lombardi",
+          "codice_fiscale": "DLCFRA90T42H549W",
+          "email": "francesca.lombardi1@example.com",
+          "telefono": null
+        },
+        {
+          "id": 101,
+          "nome": "Giovanni",
+          "cognome": "De Luca",
+          "codice_fiscale": "DLCFRA90T42H543Q",
+          "email": "giovanni.deluca1@example.com",
+          "telefono": "+39 333 1112223"
+        }
+      ],
+      "immobili": [
+        {
+          "id": 1,
+          "indirizzo": "Via Etnea 210",
+          "citta": "Milano",
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 473786.05,
+          "superficie_mq": 145.28,
+          "numero_stanze": "8",
+          "agente_id": 666,
+          "proprietario_id": 226
+        },
+        {
+          "id": 2,
+          "indirizzo": "Strada di Settignano 22",
+          "citta": "Catania",
+          "tipo_immobile": "attico",
+          "prezzo_richiesto": 410632.88,
+          "superficie_mq": 123.22,
+          "numero_stanze": "7",
+          "agente_id": null,
+          "proprietario_id": null
+        },
+        {
+          "id": 3,
+          "indirizzo": "Via Etnea 210",
+          "citta": "Bologna",
+          "tipo_immobile": "ufficio",
+          "prezzo_richiesto": 334608.94,
+          "superficie_mq": 114.75,
+          "numero_stanze": "1",
+          "agente_id": 629,
+          "proprietario_id": 233
+        },
+        {
+          "id": 4,
+          "indirizzo": "Strada di Settignano 22",
+          "citta": "Firenze",
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 365992.75,
+          "superficie_mq": 139.2,
+          "numero_stanze": "1",
+          "agente_id": 665,
+          "proprietario_id": 299
+        },
+        {
+          "id": 5,
+          "indirizzo": "Via Mazzini 19",
+          "citta": "Napoli",
+          "tipo_immobile": "ufficio",
+          "prezzo_richiesto": 379870.93,
+          "superficie_mq": 63.27,
+          "numero_stanze": "2",
+          "agente_id": 721,
+          "proprietario_id": 216
+        },
+        {
+          "id": 6,
+          "indirizzo": "Via Veneto 3",
+          "citta": "Genova",
+          "tipo_immobile": "attico",
+          "prezzo_richiesto": 199869.15,
+          "superficie_mq": 125.33,
+          "numero_stanze": null,
+          "agente_id": 477,
+          "proprietario_id": 235
+        },
+        {
+          "id": 7,
+          "indirizzo": "Via Po 8",
+          "citta": "Torino",
+          "tipo_immobile": "terreno",
+          "prezzo_richiesto": 275504.82,
+          "superficie_mq": 116.68,
+          "numero_stanze": "3",
+          "agente_id": null,
+          "proprietario_id": 247
+        },
+        {
+          "id": 8,
+          "indirizzo": "Corso Vittorio Emanuele 88",
+          "citta": "Roma",
+          "tipo_immobile": "ufficio",
+          "prezzo_richiesto": 282389.27,
+          "superficie_mq": 139.89,
+          "numero_stanze": "8",
+          "agente_id": 346,
+          "proprietario_id": 131
+        }
+      ],
+      "visite": [
+        {
+          "id": 1,
+          "immobile_id": 4,
+          "cliente_id": 247,
+          "data_visita": "2025-12-02",
+          "esito": "interessato",
+          "note": "Visita effettuata, valutazione ancora in corso"
+        },
+        {
+          "id": 2,
+          "immobile_id": 67,
+          "cliente_id": 175,
+          "data_visita": "2025-12-13",
+          "esito": "interessato",
+          "note": "Prezzo percepito troppo alto rispetto al mercato"
+        },
+        {
+          "id": 3,
+          "immobile_id": 2,
+          "cliente_id": 136,
+          "data_visita": "2025-10-15",
+          "esito": null,
+          "note": null
+        },
+        {
+          "id": 4,
+          "immobile_id": 41,
+          "cliente_id": 340,
+          "data_visita": "2025-10-29",
+          "esito": "non_interessato",
+          "note": null
+        },
+        {
+          "id": 5,
+          "immobile_id": 83,
+          "cliente_id": 321,
+          "data_visita": "2025-10-05",
+          "esito": "da_contattare",
+          "note": "Prezzo percepito troppo alto rispetto al mercato"
+        },
+        {
+          "id": 6,
+          "immobile_id": 100,
+          "cliente_id": 122,
+          "data_visita": "2025-11-10",
+          "esito": "interessato",
+          "note": "Cliente molto colpito dalla luminosità dell'appartamento"
+        },
+        {
+          "id": 7,
+          "immobile_id": 57,
+          "cliente_id": 24,
+          "data_visita": "2025-11-04",
+          "esito": "interessato",
+          "note": "Visita effettuata, valutazione ancora in corso"
+        },
+        {
+          "id": 8,
+          "immobile_id": 28,
+          "cliente_id": 189,
+          "data_visita": "2025-09-26",
+          "esito": "non_interessato",
+          "note": "Richiesta seconda visita con il coniuge"
+        }
+      ],
+      "offerte": [
+        {
+          "id": 1,
+          "immobile_id": 49,
+          "cliente_id": 264,
+          "importo_offerta": 322027.06,
+          "stato_offerta": "in_attesa",
+          "data_offerta": "2025-10-11"
+        },
+        {
+          "id": 2,
+          "immobile_id": 25,
+          "cliente_id": 2,
+          "importo_offerta": 261533.35,
+          "stato_offerta": "ritirata",
+          "data_offerta": "2025-10-30"
+        },
+        {
+          "id": 3,
+          "immobile_id": 96,
+          "cliente_id": 215,
+          "importo_offerta": 265615.63,
+          "stato_offerta": "rifiutata",
+          "data_offerta": "2025-12-26"
+        },
+        {
+          "id": 4,
+          "immobile_id": 98,
+          "cliente_id": 247,
+          "importo_offerta": 231497.57,
+          "stato_offerta": "rifiutata",
+          "data_offerta": "2025-12-14"
+        },
+        {
+          "id": 5,
+          "immobile_id": 96,
+          "cliente_id": 313,
+          "importo_offerta": 311401.4,
+          "stato_offerta": "in_attesa",
+          "data_offerta": "2025-10-23"
+        },
+        {
+          "id": 6,
+          "immobile_id": 66,
+          "cliente_id": 30,
+          "importo_offerta": 306480.35,
+          "stato_offerta": "rifiutata",
+          "data_offerta": "2025-10-18"
+        },
+        {
+          "id": 7,
+          "immobile_id": 58,
+          "cliente_id": 342,
+          "importo_offerta": 235641.79,
+          "stato_offerta": "rifiutata",
+          "data_offerta": "2025-11-07"
+        },
+        {
+          "id": 8,
+          "immobile_id": 58,
+          "cliente_id": 53,
+          "importo_offerta": 271157.1,
+          "stato_offerta": "in_attesa",
+          "data_offerta": "2025-12-19"
+        }
+      ],
+      "contratti": [
+        {
+          "id": 1,
+          "immobile_id": 61,
+          "cliente_id": 263,
+          "agente_id": 696,
+          "prezzo_finale": 681342.96,
+          "tipo_contratto": "vendita",
+          "data_firma": "2026-01-12"
+        },
+        {
+          "id": 2,
+          "immobile_id": 79,
+          "cliente_id": 239,
+          "agente_id": 537,
+          "prezzo_finale": 694101.32,
+          "tipo_contratto": "vendita",
+          "data_firma": "2026-02-02"
+        },
+        {
+          "id": 3,
+          "immobile_id": 54,
+          "cliente_id": 66,
+          "agente_id": 472,
+          "prezzo_finale": 720376.29,
+          "tipo_contratto": "vendita",
+          "data_firma": "2025-12-19"
+        },
+        {
+          "id": 4,
+          "immobile_id": 58,
+          "cliente_id": 295,
+          "agente_id": 131,
+          "prezzo_finale": 730250.0,
+          "tipo_contratto": "vendita",
+          "data_firma": "2025-12-18"
+        },
+        {
+          "id": 5,
+          "immobile_id": 97,
+          "cliente_id": 151,
+          "agente_id": 220,
+          "prezzo_finale": 671248.47,
+          "tipo_contratto": "affito",
+          "data_firma": "2026-01-26"
+        },
+        {
+          "id": 6,
+          "immobile_id": 85,
+          "cliente_id": 281,
+          "agente_id": 542,
+          "prezzo_finale": 702017.78,
+          "tipo_contratto": "vendita",
+          "data_firma": "2026-02-06"
+        },
+        {
+          "id": 7,
+          "immobile_id": 48,
+          "cliente_id": 4,
+          "agente_id": 100,
+          "prezzo_finale": 615373.13,
+          "tipo_contratto": "vendita",
+          "data_firma": "2026-02-13"
+        },
+        {
+          "id": 8,
+          "immobile_id": 78,
+          "cliente_id": 99,
+          "agente_id": 64,
+          "prezzo_finale": 657574.68,
+          "tipo_contratto": "vendita",
+          "data_firma": "2026-02-10"
+        }
+      ]
+    }
+  },
+  "story": "Alla direzione commerciale dell'Agenzia Casa è arrivato il momento della consueta verifica trimestrale sugli annunci residenziali. Il punto di riferimento è l'archivio denominato unita_abitative, dove sono custodite le schede degli edifici messi sul mercato: per ciascuna scheda compaiono l'indirizzo, la città, la tipologia — appartamento, villa, attico, terreno oppure ufficio — il prezzo richiesto, la superficie espressa in metri quadrati e il numero di stanze. Molte schede riportano anche il mandato di vendita attivo affidato a uno dei collaboratori iscritti nell'albo denominato agenti, un elenco di 750 professionisti con nome, cognome, recapito elettronico, telefono e data di assunzione; le unità prive di incarico figurano invece come in libera gestione, senza alcun mandato associato. Accanto agli annunci, l'anagrafica denominata clienti conserva 353 schede di acquirenti potenziali, complete di codice fiscale e contatti. Il registro delle visite, che nella documentazione interna prende il nome di appuntamenti di visione, annota 2844 sopralluoghi con data, esito — interessato, non_interessato oppure da_contattare — e note redatte dall'operatore, come la segnalazione di un prezzo percepito troppo alto rispetto al mercato. Il registro intitolato offerte traccia invece 1305 proposte economiche, ciascuna con importo, data di presentazione e stato: accettata, rifiutata, ritirata oppure ancora in_attesa. Chiude il quadro l'archivio denominato contratti, con 1412 accordi di vendita o affito formalizzati, corredati da prezzo finale e data di firma. Nel corso del controllo, gli analisti hanno selezionato gli immobili situati a Milano che abbiano ricevuto almeno un appuntamento di visione chiuso con esito interessato. Per ciascun annuncio selezionato — si pensi alla scheda di Via Etnea 210, appartamento di 145.28 mq con 8 stanze e prezzo richiesto pari a 473786.05 euro — è stato conteggiato il numero di proposte rimaste in_attesa. L'elenco definitivo è stato disposto dal maggior numero di offerte in attesa e, a parità di conteggio, dal prezzo più alto, così da orientare subito i collaboratori verso gli annunci con il maggiore potenziale di chiusura."
+}

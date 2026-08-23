@@ -1,0 +1,34 @@
+{
+  "domain": "università",
+  "n_tables": 5,
+  "hierarchy": "multi_entity",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "studenti",
+      "obsolete_value": "anagrafica_iscritti",
+      "description": "La tabella studenti, contenente matricola, nome, cognome e corso di iscrizione, viene denominata anagrafica_iscritti nella prosa aziendale. Il solver deve riconoscere che anagrafica_iscritti corrisponde alla tabella studenti."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "voto",
+      "obsolete_value": "valutazione",
+      "description": "La colonna voto della tabella esami, che registra il punteggio numerico ottenuto dallo studente, viene indicata con il sinonimo valutazione nella documentazione aziendale. Le query che aggregano o filtrano i punteggi devono riferirsi alla colonna voto."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "esami",
+      "obsolete_value": "verbali di sessione",
+      "description": "La tabella esami, che registra gli appelli sostenuti dagli studenti con relativo voto e data, viene indicata con il gergo amministrativo verbali di sessione nella prosa aziendale. Il solver deve mappare tale espressione sulla tabella esami per costruire il percorso di join corretto."
+    }
+  ],
+  "spec_hash": "16c65967d7b39ef2"
+}

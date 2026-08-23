@@ -1,0 +1,27 @@
+{
+  "domain": "università",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "distinct_on"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "esami",
+      "obsolete_value": "verbali_di_profitto",
+      "description": "La tabella figlia esami, che registra ogni prova sostenuta tramite la FK studente_id verso studenti e la FK corso_id verso corsi, non viene mai chiamata con il suo nome reale: nella prosa aziendale è indicata esclusivamente come verbali_di_profitto. Il solver deve dedurre che le righe dei verbali corrispondono agli esami e che ogni studente può avere più verbali (cardinalità 1:N), condizione che gonfia i join e rende necessario DISTINCT ON per selezionare un solo verbale per studente."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "voto",
+      "obsolete_value": "esito_trentesimale",
+      "description": "La colonna voto della tabella esami, espressa in scala da 0 a 30 con eventuale lode, è descritta nei documenti aziendali con il gergo accademico esito_trentesimale. Le query che richiedono di individuare, per ciascuno studente, il miglior esimo tramite SELECT DISTINCT ON (studente_id) ... ORDER BY studente_id, esito_trentesimale DESC devono riconoscere che tale perifrasi denota la colonna voto reale del database."
+    }
+  ],
+  "spec_hash": "9efff35336fc61fc"
+}

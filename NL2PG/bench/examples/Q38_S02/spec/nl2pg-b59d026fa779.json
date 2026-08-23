@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "any_all"
+  ],
+  "twist": [
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_transazione",
+      "obsolete_value": "quota_movimentata",
+      "description": "Nel testo della richiesta, l'importo della transazione viene indicato con il gergo tecnico contabile 'quota_movimentata'."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "centro_di_costo",
+      "obsolete_value": "reparto_spese",
+      "description": "La tabella o colonna dei centri di costo viene riferita tramite il sinonimo 'reparto_spese'."
+    }
+  ],
+  "spec_hash": "978983aa82e3b94a"
+}

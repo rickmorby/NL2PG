@@ -1,0 +1,12 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "join",
+    "left_outer_join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "73e95c003a292d5d"
+}

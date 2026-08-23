@@ -1,0 +1,1109 @@
+{
+  "schema_ddl": "CREATE TABLE albero_organizzativo_interno (\n    id_nodo SERIAL PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL,\n    id_nodo_padre INT REFERENCES albero_organizzativo_interno(id_nodo),\n    livello INT CHECK (livello >= 0),\n    attivo BOOLEAN DEFAULT TRUE\n);\n\nCREATE TABLE facolta (\n    id_facolta SERIAL PRIMARY KEY,\n    nome_facolta TEXT NOT NULL UNIQUE,\n    id_nodo_dipartimento INT REFERENCES albero_organizzativo_interno(id_nodo)\n);\n\nCREATE TABLE corsi_di_studio (\n    id_corso SERIAL PRIMARY KEY,\n    nome_corso TEXT NOT NULL,\n    id_facolta INT NOT NULL REFERENCES facolta(id_facolta),\n    id_nodo_dipartimento INT REFERENCES albero_organizzativo_interno(id_nodo),\n    crediti_totali INT CHECK (crediti_totali > 0)\n);\n\nCREATE TABLE studenti (\n    id_studente SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE,\n    id_corso INT REFERENCES corsi_di_studio(id_corso)\n);\n\nCREATE TABLE docenti (\n    id_docente SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    id_nodo_dipartimento INT REFERENCES albero_organizzativo_interno(id_nodo)\n);\n\nCREATE TABLE aule (\n    id_nodo SERIAL PRIMARY KEY,\n    nome_aula TEXT NOT NULL,\n    edificio TEXT,\n    capienza INT CHECK (capienza > 0)\n);\n\nCREATE TABLE insegnamenti (\n    id_insegnamento SERIAL PRIMARY KEY,\n    nome_insegnamento TEXT NOT NULL,\n    id_docente INT REFERENCES docenti(id_docente),\n    id_corso INT REFERENCES corsi_di_studio(id_corso),\n    cfu INT CHECK (cfu > 0)\n);\n\nCREATE TABLE esami (\n    id_esame SERIAL PRIMARY KEY,\n    id_insegnamento INT NOT NULL REFERENCES insegnamenti(id_insegnamento),\n    data_esame DATE NOT NULL,\n    id_nodo_aula INT REFERENCES aule(id_nodo)\n);\n\nCREATE TABLE iscrizioni_esami (\n    id_studente INT NOT NULL REFERENCES studenti(id_studente),\n    id_esame INT NOT NULL REFERENCES esami(id_esame),\n    voto INT CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN DEFAULT FALSE,\n    PRIMARY KEY (id_studente, id_esame)\n);\n\nCREATE TABLE tabella_log_accessi (\n    id_log SERIAL PRIMARY KEY,\n    utente TEXT,\n    azione TEXT,\n    data_evento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    dettagli TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "albero_organizzativo_interno": {
+        "row_count": 603,
+        "columns": {
+          "id_nodo": {
+            "distinct": 603,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 603
+          },
+          "nome_dipartimento": {
+            "distinct": 4,
+            "sample": [
+              "Dipartimento di Fisica",
+              "Dipartimento di Informatica",
+              "Dipartimento di Matematica",
+              "Direzione Generale"
+            ]
+          },
+          "id_nodo_padre": {
+            "distinct": 294,
+            "sample": [
+              "1",
+              "10",
+              "101",
+              "102",
+              "104"
+            ],
+            "min": 1,
+            "max": 582
+          },
+          "livello": {
+            "distinct": 4,
+            "sample": [
+              "0",
+              "0.0",
+              "1",
+              "1.0"
+            ],
+            "min": 0.0,
+            "max": 1.0
+          },
+          "attivo": {
+            "distinct": 1,
+            "sample": [
+              "True"
+            ],
+            "min": true,
+            "max": true
+          }
+        }
+      },
+      "facolta": {
+        "row_count": 24,
+        "columns": {
+          "id_facolta": {
+            "distinct": 24,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 24
+          },
+          "nome_facolta": {
+            "distinct": 24,
+            "sample": [
+              "Facolta di Ingegneria",
+              "Facolta di Ingegneria_1",
+              "Facolta di Ingegneria_10",
+              "Facolta di Ingegneria_11",
+              "Facolta di Ingegneria_2"
+            ]
+          },
+          "id_nodo_dipartimento": {
+            "distinct": 21,
+            "sample": [
+              "104",
+              "108",
+              "120",
+              "129",
+              "133"
+            ],
+            "min": 2,
+            "max": 500
+          }
+        }
+      },
+      "corsi_di_studio": {
+        "row_count": 781,
+        "columns": {
+          "id_corso": {
+            "distinct": 781,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 781
+          },
+          "nome_corso": {
+            "distinct": 4,
+            "sample": [
+              "Fisica Applicata",
+              "Ingegneria Elettronica",
+              "Ingegneria Informatica",
+              "Matematica Pura"
+            ]
+          },
+          "id_facolta": {
+            "distinct": 24,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 24
+          },
+          "id_nodo_dipartimento": {
+            "distinct": 424,
+            "sample": [
+              "10",
+              "100",
+              "102",
+              "104",
+              "105"
+            ],
+            "min": 2,
+            "max": 602
+          },
+          "crediti_totali": {
+            "distinct": 2,
+            "sample": [
+              "180",
+              "180.0"
+            ],
+            "min": 180.0,
+            "max": 180.0
+          }
+        }
+      },
+      "studenti": {
+        "row_count": 610,
+        "columns": {
+          "id_studente": {
+            "distinct": 610,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 610
+          },
+          "matricola": {
+            "distinct": 610,
+            "sample": [
+              "MAT001",
+              "MAT001_1",
+              "MAT001_10",
+              "MAT001_100",
+              "MAT001_101"
+            ]
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Anna",
+              "Giulia",
+              "Luca",
+              "Marco",
+              "Mario"
+            ]
+          },
+          "cognome": {
+            "distinct": 5,
+            "sample": [
+              "Bianchi",
+              "Neri",
+              "Rossi",
+              "Russo",
+              "Verdi"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 2,
+            "sample": [
+              "2000-05-12",
+              "2001-08-20"
+            ]
+          },
+          "email": {
+            "distinct": 590,
+            "sample": [
+              "anna.verdi@studenti.it",
+              "anna.verdi@studenti.it_1",
+              "anna.verdi@studenti.it_10",
+              "anna.verdi@studenti.it_100",
+              "anna.verdi@studenti.it_101"
+            ]
+          },
+          "id_corso": {
+            "distinct": 409,
+            "sample": [
+              "107",
+              "108",
+              "109",
+              "11",
+              "110"
+            ],
+            "min": 5,
+            "max": 781
+          }
+        }
+      },
+      "docenti": {
+        "row_count": 418,
+        "columns": {
+          "id_docente": {
+            "distinct": 418,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 418
+          },
+          "nome": {
+            "distinct": 4,
+            "sample": [
+              "Elena",
+              "Francesca",
+              "Giovanni",
+              "Paolo"
+            ]
+          },
+          "cognome": {
+            "distinct": 4,
+            "sample": [
+              "Bruni",
+              "Conti",
+              "Esposito",
+              "Gialli"
+            ]
+          },
+          "email": {
+            "distinct": 394,
+            "sample": [
+              "elena.gialli@unifi.it",
+              "elena.gialli@unifi.it_10",
+              "elena.gialli@unifi.it_100",
+              "elena.gialli@unifi.it_101",
+              "elena.gialli@unifi.it_102"
+            ]
+          },
+          "id_nodo_dipartimento": {
+            "distinct": 290,
+            "sample": [
+              "100",
+              "101",
+              "102",
+              "105",
+              "108"
+            ],
+            "min": 2,
+            "max": 601
+          }
+        }
+      },
+      "aule": {
+        "row_count": 31,
+        "columns": {
+          "id_nodo": {
+            "distinct": 31,
+            "sample": [
+              "10",
+              "11",
+              "12",
+              "13",
+              "14"
+            ],
+            "min": 10,
+            "max": 40
+          },
+          "nome_aula": {
+            "distinct": 4,
+            "sample": [
+              "Aula A1",
+              "Aula B2",
+              "Aula C3",
+              "Aula Magna"
+            ]
+          },
+          "edificio": {
+            "distinct": 3,
+            "sample": [
+              "Edificio Centrale",
+              "Edificio Nord",
+              "Edificio Sud"
+            ]
+          },
+          "capienza": {
+            "distinct": 2,
+            "sample": [
+              "100",
+              "50"
+            ],
+            "min": 50,
+            "max": 100
+          }
+        }
+      },
+      "insegnamenti": {
+        "row_count": 760,
+        "columns": {
+          "id_insegnamento": {
+            "distinct": 760,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 760
+          },
+          "nome_insegnamento": {
+            "distinct": 4,
+            "sample": [
+              "Algoritmi",
+              "Analisi Matematica",
+              "Basi di Dati",
+              "Fisica Generale"
+            ]
+          },
+          "id_docente": {
+            "distinct": 348,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "103"
+            ],
+            "min": 1,
+            "max": 418
+          },
+          "id_corso": {
+            "distinct": 463,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 781
+          },
+          "cfu": {
+            "distinct": 4,
+            "sample": [
+              "12",
+              "12.0",
+              "9",
+              "9.0"
+            ],
+            "min": 9.0,
+            "max": 12.0
+          }
+        }
+      },
+      "esami": {
+        "row_count": 1007,
+        "columns": {
+          "id_esame": {
+            "distinct": 1007,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1007
+          },
+          "id_insegnamento": {
+            "distinct": 557,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 760
+          },
+          "data_esame": {
+            "distinct": 24,
+            "sample": [
+              "2026-02-10",
+              "2026-02-11",
+              "2026-02-12",
+              "2026-02-13",
+              "2026-02-14"
+            ]
+          },
+          "id_nodo_aula": {
+            "distinct": 31,
+            "sample": [
+              "10",
+              "11",
+              "12",
+              "13",
+              "14"
+            ],
+            "min": 10,
+            "max": 40
+          }
+        }
+      },
+      "iscrizioni_esami": {
+        "row_count": 2221,
+        "columns": {
+          "id_studente": {
+            "distinct": 584,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 610
+          },
+          "id_esame": {
+            "distinct": 896,
+            "sample": [
+              "1",
+              "100",
+              "1000",
+              "1001",
+              "1002"
+            ],
+            "min": 1,
+            "max": 1007
+          },
+          "voto": {
+            "distinct": 2012,
+            "sample": [
+              "26.0",
+              "26.001458566381455",
+              "26.001809313747124",
+              "26.00194612133715",
+              "26.005994784863"
+            ],
+            "min": 26.0,
+            "max": 30
+          },
+          "lode": {
+            "distinct": 2,
+            "sample": [
+              "False",
+              "True"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "tabella_log_accessi": {
+        "row_count": 2169,
+        "columns": {
+          "id_log": {
+            "distinct": 2169,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2169
+          },
+          "utente": {
+            "distinct": 2,
+            "sample": [
+              "anna.verdi",
+              "mario.rossi"
+            ]
+          },
+          "azione": {
+            "distinct": 4,
+            "sample": [
+              "LOGIN",
+              "LOGOUT",
+              "QUERY",
+              "UPDATE"
+            ]
+          },
+          "data_evento": {
+            "distinct": 2,
+            "sample": [
+              "2026-01-01 08:30:00",
+              "2026-01-01 17:00:00"
+            ]
+          },
+          "dettagli": {
+            "distinct": 2,
+            "sample": [
+              "Accesso riuscito",
+              "Disconnessione"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "albero_organizzativo_interno": [
+        {
+          "id_nodo": 1,
+          "nome_dipartimento": "Direzione Generale",
+          "id_nodo_padre": null,
+          "livello": 0.0,
+          "attivo": true
+        },
+        {
+          "id_nodo": 2,
+          "nome_dipartimento": "Dipartimento di Matematica",
+          "id_nodo_padre": 1,
+          "livello": 0.0,
+          "attivo": true
+        },
+        {
+          "id_nodo": 3,
+          "nome_dipartimento": "Dipartimento di Informatica",
+          "id_nodo_padre": 2,
+          "livello": 0.0,
+          "attivo": null
+        },
+        {
+          "id_nodo": 4,
+          "nome_dipartimento": "Direzione Generale",
+          "id_nodo_padre": 1,
+          "livello": 0.0,
+          "attivo": true
+        },
+        {
+          "id_nodo": 5,
+          "nome_dipartimento": "Dipartimento di Informatica",
+          "id_nodo_padre": 3,
+          "livello": 0.0,
+          "attivo": true
+        },
+        {
+          "id_nodo": 6,
+          "nome_dipartimento": "Dipartimento di Fisica",
+          "id_nodo_padre": 3,
+          "livello": 0.0,
+          "attivo": true
+        },
+        {
+          "id_nodo": 7,
+          "nome_dipartimento": "Dipartimento di Informatica",
+          "id_nodo_padre": 2,
+          "livello": 0.0,
+          "attivo": true
+        },
+        {
+          "id_nodo": 8,
+          "nome_dipartimento": "Direzione Generale",
+          "id_nodo_padre": 4,
+          "livello": 0.0,
+          "attivo": true
+        }
+      ],
+      "facolta": [
+        {
+          "id_facolta": 1,
+          "nome_facolta": "Facolta di Ingegneria",
+          "id_nodo_dipartimento": 104
+        },
+        {
+          "id_facolta": 2,
+          "nome_facolta": "Facolta di Ingegneria_1",
+          "id_nodo_dipartimento": 233
+        },
+        {
+          "id_facolta": 3,
+          "nome_facolta": "Facolta di Ingegneria_2",
+          "id_nodo_dipartimento": 208
+        },
+        {
+          "id_facolta": 4,
+          "nome_facolta": "Facolta di Ingegneria_3",
+          "id_nodo_dipartimento": 226
+        },
+        {
+          "id_facolta": 5,
+          "nome_facolta": "Facolta di Ingegneria_4",
+          "id_nodo_dipartimento": 129
+        },
+        {
+          "id_facolta": 6,
+          "nome_facolta": "Facolta di Ingegneria_5",
+          "id_nodo_dipartimento": 2
+        },
+        {
+          "id_facolta": 7,
+          "nome_facolta": "Facolta di Ingegneria_6",
+          "id_nodo_dipartimento": 108
+        },
+        {
+          "id_facolta": 8,
+          "nome_facolta": "Facolta di Ingegneria_7",
+          "id_nodo_dipartimento": 208
+        }
+      ],
+      "corsi_di_studio": [
+        {
+          "id_corso": 1,
+          "nome_corso": "Fisica Applicata",
+          "id_facolta": 5,
+          "id_nodo_dipartimento": 197,
+          "crediti_totali": 180.0
+        },
+        {
+          "id_corso": 2,
+          "nome_corso": "Ingegneria Elettronica",
+          "id_facolta": 22,
+          "id_nodo_dipartimento": 116,
+          "crediti_totali": 180.0
+        },
+        {
+          "id_corso": 3,
+          "nome_corso": "Fisica Applicata",
+          "id_facolta": 3,
+          "id_nodo_dipartimento": 212,
+          "crediti_totali": 180.0
+        },
+        {
+          "id_corso": 4,
+          "nome_corso": "Ingegneria Informatica",
+          "id_facolta": 5,
+          "id_nodo_dipartimento": 231,
+          "crediti_totali": 180.0
+        },
+        {
+          "id_corso": 5,
+          "nome_corso": "Matematica Pura",
+          "id_facolta": 24,
+          "id_nodo_dipartimento": 52,
+          "crediti_totali": 180.0
+        },
+        {
+          "id_corso": 6,
+          "nome_corso": "Ingegneria Informatica",
+          "id_facolta": 7,
+          "id_nodo_dipartimento": 431,
+          "crediti_totali": 180.0
+        },
+        {
+          "id_corso": 7,
+          "nome_corso": "Matematica Pura",
+          "id_facolta": 20,
+          "id_nodo_dipartimento": 438,
+          "crediti_totali": 180.0
+        },
+        {
+          "id_corso": 8,
+          "nome_corso": "Matematica Pura",
+          "id_facolta": 6,
+          "id_nodo_dipartimento": 461,
+          "crediti_totali": 180.0
+        }
+      ],
+      "studenti": [
+        {
+          "id_studente": 1,
+          "matricola": "MAT001",
+          "nome": "Luca",
+          "cognome": "Rossi",
+          "data_nascita": "2000-05-12",
+          "email": "mario.rossi@studenti.it",
+          "id_corso": 655
+        },
+        {
+          "id_studente": 2,
+          "matricola": "MAT001_1",
+          "nome": "Anna",
+          "cognome": "Verdi",
+          "data_nascita": "2000-05-12",
+          "email": "mario.rossi@studenti.it_1",
+          "id_corso": 298
+        },
+        {
+          "id_studente": 3,
+          "matricola": "MAT001_2",
+          "nome": "Anna",
+          "cognome": "Bianchi",
+          "data_nascita": "2000-05-12",
+          "email": "mario.rossi@studenti.it_2",
+          "id_corso": 746
+        },
+        {
+          "id_studente": 4,
+          "matricola": "MAT001_3",
+          "nome": "Mario",
+          "cognome": "Russo",
+          "data_nascita": "2000-05-12",
+          "email": "mario.rossi@studenti.it_3",
+          "id_corso": 768
+        },
+        {
+          "id_studente": 5,
+          "matricola": "MAT001_4",
+          "nome": "Luca",
+          "cognome": "Neri",
+          "data_nascita": "2000-05-12",
+          "email": "mario.rossi@studenti.it_4",
+          "id_corso": 353
+        },
+        {
+          "id_studente": 6,
+          "matricola": "MAT001_5",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "2000-05-12",
+          "email": "mario.rossi@studenti.it_5",
+          "id_corso": null
+        },
+        {
+          "id_studente": 7,
+          "matricola": "MAT001_6",
+          "nome": "Marco",
+          "cognome": "Russo",
+          "data_nascita": "2000-05-12",
+          "email": "mario.rossi@studenti.it_6",
+          "id_corso": 489
+        },
+        {
+          "id_studente": 8,
+          "matricola": "MAT001_7",
+          "nome": "Mario",
+          "cognome": "Neri",
+          "data_nascita": "2000-05-12",
+          "email": "mario.rossi@studenti.it_7",
+          "id_corso": 555
+        }
+      ],
+      "docenti": [
+        {
+          "id_docente": 28,
+          "nome": "Elena",
+          "cognome": "Esposito",
+          "email": "elena.esposito1@example.com",
+          "id_nodo_dipartimento": 478
+        },
+        {
+          "id_docente": 9,
+          "nome": "Francesca",
+          "cognome": "Conti",
+          "email": "francesca.conti1@example.com",
+          "id_nodo_dipartimento": 543
+        },
+        {
+          "id_docente": 21,
+          "nome": "Francesca",
+          "cognome": "Conti",
+          "email": "francesca.conti2@example.com",
+          "id_nodo_dipartimento": 9
+        },
+        {
+          "id_docente": 87,
+          "nome": "Francesca",
+          "cognome": "Esposito",
+          "email": "francesca.esposito1@example.com",
+          "id_nodo_dipartimento": 382
+        },
+        {
+          "id_docente": 94,
+          "nome": "Francesca",
+          "cognome": "Esposito",
+          "email": "francesca.esposito2@example.com",
+          "id_nodo_dipartimento": 376
+        },
+        {
+          "id_docente": 90,
+          "nome": "Giovanni",
+          "cognome": "Bruni",
+          "email": "giovanni.bruni1@example.com",
+          "id_nodo_dipartimento": 221
+        },
+        {
+          "id_docente": 27,
+          "nome": "Paolo",
+          "cognome": "Esposito",
+          "email": "paolo.esposito1@example.com",
+          "id_nodo_dipartimento": 492
+        },
+        {
+          "id_docente": 60,
+          "nome": "Paolo",
+          "cognome": "Esposito",
+          "email": "paolo.esposito2@example.com",
+          "id_nodo_dipartimento": 475
+        }
+      ],
+      "aule": [
+        {
+          "id_nodo": 10,
+          "nome_aula": "Aula A1",
+          "edificio": "Edificio Centrale",
+          "capienza": null
+        },
+        {
+          "id_nodo": 11,
+          "nome_aula": "Aula B2",
+          "edificio": "Edificio Centrale",
+          "capienza": 100
+        },
+        {
+          "id_nodo": 12,
+          "nome_aula": "Aula A1",
+          "edificio": "Edificio Sud",
+          "capienza": null
+        },
+        {
+          "id_nodo": 13,
+          "nome_aula": "Aula A1",
+          "edificio": "Edificio Centrale",
+          "capienza": 100
+        },
+        {
+          "id_nodo": 14,
+          "nome_aula": "Aula Magna",
+          "edificio": "Edificio Nord",
+          "capienza": 100
+        },
+        {
+          "id_nodo": 15,
+          "nome_aula": "Aula C3",
+          "edificio": "Edificio Nord",
+          "capienza": 100
+        },
+        {
+          "id_nodo": 16,
+          "nome_aula": "Aula A1",
+          "edificio": "Edificio Centrale",
+          "capienza": null
+        },
+        {
+          "id_nodo": 17,
+          "nome_aula": "Aula A1",
+          "edificio": "Edificio Nord",
+          "capienza": 100
+        }
+      ],
+      "insegnamenti": [
+        {
+          "id_insegnamento": 1,
+          "nome_insegnamento": "Algoritmi",
+          "id_docente": 402,
+          "id_corso": 359,
+          "cfu": 9.0
+        },
+        {
+          "id_insegnamento": 2,
+          "nome_insegnamento": "Fisica Generale",
+          "id_docente": 325,
+          "id_corso": 603,
+          "cfu": 9.0
+        },
+        {
+          "id_insegnamento": 3,
+          "nome_insegnamento": "Algoritmi",
+          "id_docente": 92,
+          "id_corso": 300,
+          "cfu": 9.0
+        },
+        {
+          "id_insegnamento": 4,
+          "nome_insegnamento": "Fisica Generale",
+          "id_docente": 154,
+          "id_corso": 529,
+          "cfu": 9.0
+        },
+        {
+          "id_insegnamento": 5,
+          "nome_insegnamento": "Algoritmi",
+          "id_docente": 125,
+          "id_corso": 120,
+          "cfu": null
+        },
+        {
+          "id_insegnamento": 6,
+          "nome_insegnamento": "Analisi Matematica",
+          "id_docente": 46,
+          "id_corso": 676,
+          "cfu": 9.0
+        },
+        {
+          "id_insegnamento": 7,
+          "nome_insegnamento": "Algoritmi",
+          "id_docente": 73,
+          "id_corso": 159,
+          "cfu": 9.0
+        },
+        {
+          "id_insegnamento": 8,
+          "nome_insegnamento": "Algoritmi",
+          "id_docente": 291,
+          "id_corso": 109,
+          "cfu": 9.0
+        }
+      ],
+      "esami": [
+        {
+          "id_esame": 1,
+          "id_insegnamento": 719,
+          "data_esame": "2026-02-21",
+          "id_nodo_aula": 40
+        },
+        {
+          "id_esame": 2,
+          "id_insegnamento": 364,
+          "data_esame": "2026-02-23",
+          "id_nodo_aula": 34
+        },
+        {
+          "id_esame": 3,
+          "id_insegnamento": 309,
+          "data_esame": "2026-02-12",
+          "id_nodo_aula": 26
+        },
+        {
+          "id_esame": 4,
+          "id_insegnamento": 402,
+          "data_esame": "2026-02-24",
+          "id_nodo_aula": 13
+        },
+        {
+          "id_esame": 5,
+          "id_insegnamento": 581,
+          "data_esame": "2026-02-23",
+          "id_nodo_aula": 36
+        },
+        {
+          "id_esame": 6,
+          "id_insegnamento": 629,
+          "data_esame": "2026-02-15",
+          "id_nodo_aula": null
+        },
+        {
+          "id_esame": 7,
+          "id_insegnamento": 394,
+          "data_esame": "2026-02-18",
+          "id_nodo_aula": 22
+        },
+        {
+          "id_esame": 8,
+          "id_insegnamento": 20,
+          "data_esame": "2026-02-25",
+          "id_nodo_aula": 29
+        }
+      ],
+      "iscrizioni_esami": [
+        {
+          "id_studente": 440,
+          "id_esame": 794,
+          "voto": 27.065116366902174,
+          "lode": false
+        },
+        {
+          "id_studente": 20,
+          "id_esame": 40,
+          "voto": 26.990292264848446,
+          "lode": null
+        },
+        {
+          "id_studente": 336,
+          "id_esame": 752,
+          "voto": 28,
+          "lode": null
+        },
+        {
+          "id_studente": 285,
+          "id_esame": 457,
+          "voto": 27.420305174214583,
+          "lode": false
+        },
+        {
+          "id_studente": 79,
+          "id_esame": 112,
+          "voto": 27.298628834054238,
+          "lode": false
+        },
+        {
+          "id_studente": 152,
+          "id_esame": 481,
+          "voto": null,
+          "lode": false
+        },
+        {
+          "id_studente": 57,
+          "id_esame": 145,
+          "voto": 26.235955681580318,
+          "lode": false
+        },
+        {
+          "id_studente": 235,
+          "id_esame": 622,
+          "voto": 26.616195944212382,
+          "lode": false
+        }
+      ],
+      "tabella_log_accessi": [
+        {
+          "id_log": 1,
+          "utente": "mario.rossi",
+          "azione": "LOGOUT",
+          "data_evento": "2026-01-01 08:30:00",
+          "dettagli": "Accesso riuscito"
+        },
+        {
+          "id_log": 2,
+          "utente": "mario.rossi",
+          "azione": null,
+          "data_evento": "2026-01-01 08:30:00",
+          "dettagli": "Accesso riuscito"
+        },
+        {
+          "id_log": 3,
+          "utente": "mario.rossi",
+          "azione": "LOGOUT",
+          "data_evento": "2026-01-01 08:30:00",
+          "dettagli": "Accesso riuscito"
+        },
+        {
+          "id_log": 4,
+          "utente": "mario.rossi",
+          "azione": "LOGIN",
+          "data_evento": "2026-01-01 08:30:00",
+          "dettagli": null
+        },
+        {
+          "id_log": 5,
+          "utente": "mario.rossi",
+          "azione": "UPDATE",
+          "data_evento": "2026-01-01 08:30:00",
+          "dettagli": "Accesso riuscito"
+        },
+        {
+          "id_log": 6,
+          "utente": "mario.rossi",
+          "azione": "LOGOUT",
+          "data_evento": "2026-01-01 08:30:00",
+          "dettagli": "Accesso riuscito"
+        },
+        {
+          "id_log": 7,
+          "utente": "mario.rossi",
+          "azione": "UPDATE",
+          "data_evento": "2026-01-01 08:30:00",
+          "dettagli": "Accesso riuscito"
+        },
+        {
+          "id_log": 8,
+          "utente": "mario.rossi",
+          "azione": "UPDATE",
+          "data_evento": "2026-01-01 08:30:00",
+          "dettagli": "Accesso riuscito"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "recursive_cte"
+  ],
+  "query": "WITH RECURSIVE gerarchia_dipartimenti AS ( SELECT id_nodo, nome_dipartimento, id_nodo_padre, 1 AS livello_gerarchico, nome_dipartimento AS percorso_completo FROM albero_organizzativo_interno WHERE id_nodo_padre IS NULL UNION ALL SELECT a.id_nodo, a.nome_dipartimento, a.id_nodo_padre, g.livello_gerarchico + 1 AS livello_gerarchico, g.percorso_completo || ' -> ' || a.nome_dipartimento AS percorso_completo FROM albero_organizzativo_interno a JOIN gerarchia_dipartimenti g ON a.id_nodo_padre = g.id_nodo ) SELECT g.nome_dipartimento AS dipartimento, g.livello_gerarchico, g.percorso_completo, COUNT(d.id_docente) AS numero_docenti FROM gerarchia_dipartimenti g LEFT JOIN docenti d ON g.id_nodo = d.id_nodo_dipartimento GROUP BY g.nome_dipartimento, g.livello_gerarchico, g.percorso_completo ORDER BY g.percorso_completo;"
+}

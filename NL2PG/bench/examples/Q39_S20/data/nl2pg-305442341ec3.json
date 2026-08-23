@@ -1,0 +1,430 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "between"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_di_copertura",
+        "description": "La tabella polizze viene denominata contratti_di_copertura nella prosa aziendale. Le query devono risolvere il nome reale della tabella per applicare filtri con BETWEEN sulla colonna enumerata tipo_polizza."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "tipo_polizza",
+        "obsolete_value": "tier di sottoscrizione",
+        "description": "La colonna enumerata tipo_polizza, dichiarata come ENUM('base','standard','premium') con valori mutuamente esclusivi, viene indicata nel linguaggio aziendale come tier di sottoscrizione. Le query devono usare BETWEEN 'base' AND 'standard' rispettando l'ordine di definizione del tipo ENUM."
+      }
+    ],
+    "spec_hash": "28a925e9a402078f"
+  },
+  "schema_ddl": "CREATE TYPE tipo_polizza AS ENUM ('base', 'standard', 'premium');\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE agenti (\n    id SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    agente_id INT NOT NULL REFERENCES agenti(id),\n    tipo_polizza tipo_polizza NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    capitale_assicurato NUMERIC(12,2) NOT NULL CHECK (capitale_assicurato >= 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza >= data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id SERIAL PRIMARY KEY,\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    numero_sinistro TEXT NOT NULL UNIQUE,\n    data_accadimento DATE NOT NULL,\n    data_denuncia DATE NOT NULL,\n    importo_danno NUMERIC(12,2) NOT NULL CHECK (importo_danno >= 0),\n    descrizione TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 200,
+        "max_rows": 300,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA72B15H501A",
+            "data_nascita": "1972-02-15",
+            "citta": "Roma"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA85C43F205B",
+            "data_nascita": "1985-03-03",
+            "citta": "Milano"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI90D21L219C",
+            "data_nascita": "1990-04-21",
+            "citta": "Torino"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Russo",
+            "codice_fiscale": "RSSLSN78E05H501D",
+            "data_nascita": "1978-05-05",
+            "citta": "Napoli"
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRFNC88F17D969E",
+            "data_nascita": "1988-06-17",
+            "citta": "Bologna"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Sara",
+              "Marco",
+              "Elena",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Russo",
+              "Ferrari",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci",
+              "Marino"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -2500.0,
+            "delta_max": 2500.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona"
+            ]
+          }
+        }
+      },
+      {
+        "table": "agenti",
+        "nature": "dimension",
+        "min_rows": 30,
+        "max_rows": 60,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "matricola": "AG-001",
+            "nome": "Paolo",
+            "cognome": "Conti",
+            "email": "paolo.conti@assicurazioni.it"
+          },
+          {
+            "id": 2,
+            "matricola": "AG-002",
+            "nome": "Chiara",
+            "cognome": "Gallo",
+            "email": "chiara.gallo@assicurazioni.it"
+          },
+          {
+            "id": 3,
+            "matricola": "AG-003",
+            "nome": "Stefano",
+            "cognome": "Mancini",
+            "email": "stefano.mancini@assicurazioni.it"
+          },
+          {
+            "id": 4,
+            "matricola": "AG-004",
+            "nome": "Valentina",
+            "cognome": "Costa",
+            "email": "valentina.costa@assicurazioni.it"
+          },
+          {
+            "id": 5,
+            "matricola": "AG-005",
+            "nome": "Roberto",
+            "cognome": "Giordano",
+            "email": "roberto.giordano@assicurazioni.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Paolo",
+              "Chiara",
+              "Stefano",
+              "Valentina",
+              "Roberto",
+              "Simona",
+              "Andrea",
+              "Monica"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Conti",
+              "Gallo",
+              "Mancini",
+              "Costa",
+              "Giordano",
+              "Lombardi",
+              "Barbieri",
+              "Moretti"
+            ]
+          }
+        }
+      },
+      {
+        "table": "polizze",
+        "nature": "fact",
+        "min_rows": 400,
+        "max_rows": 700,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "numero_polizza": "POL-2024-000101",
+            "cliente_id": 1,
+            "agente_id": 1,
+            "tipo_polizza": "base",
+            "premio_annuo": 350.0,
+            "capitale_assicurato": 50000.0,
+            "data_emissione": "2024-01-15",
+            "data_scadenza": "2025-01-15"
+          },
+          {
+            "id": 102,
+            "numero_polizza": "POL-2024-000102",
+            "cliente_id": 2,
+            "agente_id": 2,
+            "tipo_polizza": "standard",
+            "premio_annuo": 620.5,
+            "capitale_assicurato": 120000.0,
+            "data_emissione": "2024-03-10",
+            "data_scadenza": "2025-03-10"
+          },
+          {
+            "id": 103,
+            "numero_polizza": "POL-2024-000103",
+            "cliente_id": 3,
+            "agente_id": 1,
+            "tipo_polizza": "premium",
+            "premio_annuo": 1450.0,
+            "capitale_assicurato": 300000.0,
+            "data_emissione": "2024-06-01",
+            "data_scadenza": "2025-06-01"
+          },
+          {
+            "id": 104,
+            "numero_polizza": "POL-2024-000104",
+            "cliente_id": 4,
+            "agente_id": 3,
+            "tipo_polizza": "base",
+            "premio_annuo": 410.25,
+            "capitale_assicurato": 65000.0,
+            "data_emissione": "2024-09-20",
+            "data_scadenza": "2025-09-20"
+          },
+          {
+            "id": 105,
+            "numero_polizza": "POL-2025-000105",
+            "cliente_id": 5,
+            "agente_id": 4,
+            "tipo_polizza": "standard",
+            "premio_annuo": 780.0,
+            "capitale_assicurato": 150000.0,
+            "data_emissione": "2025-01-10",
+            "data_scadenza": "2026-01-10"
+          },
+          {
+            "id": 106,
+            "numero_polizza": "POL-2025-000106",
+            "cliente_id": 1,
+            "agente_id": 5,
+            "tipo_polizza": "premium",
+            "premio_annuo": 1890.75,
+            "capitale_assicurato": 450000.0,
+            "data_emissione": "2025-04-05",
+            "data_scadenza": "2026-04-05"
+          }
+        ],
+        "variations": {
+          "tipo_polizza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "base",
+              "base",
+              "standard",
+              "standard",
+              "premium"
+            ]
+          },
+          "premio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.6,
+            "pool": []
+          },
+          "capitale_assicurato": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.2,
+            "pool": []
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 120.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "sinistri",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.4,
+        "templates": [
+          {
+            "id": 201,
+            "polizza_id": 101,
+            "numero_sinistro": "SIN-2024-000201",
+            "data_accadimento": "2024-05-12",
+            "data_denuncia": "2024-05-18",
+            "importo_danno": 1250.0,
+            "descrizione": "Danno alla carrozzeria da collisione posteriore"
+          },
+          {
+            "id": 202,
+            "polizza_id": 102,
+            "numero_sinistro": "SIN-2024-000202",
+            "data_accadimento": "2024-08-03",
+            "data_denuncia": "2024-08-10",
+            "importo_danno": 8750.5,
+            "descrizione": "Infiltrazione acqua nel tetto dopo violenta grandinata"
+          },
+          {
+            "id": 203,
+            "polizza_id": 103,
+            "numero_sinistro": "SIN-2024-000203",
+            "data_accadimento": "2024-11-22",
+            "data_denuncia": "2024-11-25",
+            "importo_danno": 450.0,
+            "descrizione": "Vetro laterale rotto da tentato furto"
+          },
+          {
+            "id": 204,
+            "polizza_id": 104,
+            "numero_sinistro": "SIN-2025-000204",
+            "data_accadimento": "2025-02-14",
+            "data_denuncia": "2025-02-20",
+            "importo_danno": 23400.0,
+            "descrizione": "Incendio in magazzino con danni a merce e strutture"
+          },
+          {
+            "id": 205,
+            "polizza_id": 105,
+            "numero_sinistro": "SIN-2025-000205",
+            "data_accadimento": "2025-05-30",
+            "data_denuncia": "2025-06-04",
+            "importo_danno": 3100.75,
+            "descrizione": "Danni da responsabilita' civile a terzi in incidente stradale"
+          }
+        ],
+        "variations": {
+          "data_accadimento": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo_danno": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Danno alla carrozzeria da collisione posteriore",
+              "Infiltrazione acqua nel tetto dopo violenta grandinata",
+              "Vetro laterale rotto da tentato furto",
+              "Incendio in magazzino con danni a merce e strutture",
+              "Danni da responsabilita' civile a terzi in incidente stradale",
+              "Danno da scivolamento su pavimento bagnato in negozio"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

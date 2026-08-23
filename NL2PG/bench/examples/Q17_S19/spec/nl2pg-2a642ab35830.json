@@ -1,0 +1,34 @@
+{
+  "domain": "vendite",
+  "n_tables": 6,
+  "hierarchy": "multi_entity",
+  "sql_features": [
+    "window"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_acquirenti",
+      "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; l'agente deve risalire alla tabella reale clienti tramite il twist di rinomina."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_totale",
+      "obsolete_value": "valore fatturato lordo per riga d'ordine",
+      "description": "La colonna importo_totale della tabella dettagli_ordine viene indicata con il gergo commerciale 'valore fatturato lordo per riga d'ordine'; occorre mappare la perifrasi sulla colonna reale."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "stato",
+      "obsolete_value": "situazione dell'ordine",
+      "description": "Il termine stato è ambiguo nello schema vendite: esiste la colonna stato nella tabella ordini (stato evasione: 'in_lavorazione', 'spedito', 'annullato') e la colonna stato nella tabella clienti (regione/provincia). La prosa usa 'situazione dell'ordine' riferendosi esclusivamente allo stato di evasione in ordini, non alla localizzazione del cliente."
+    }
+  ],
+  "spec_hash": "efc10fcf61583280"
+}

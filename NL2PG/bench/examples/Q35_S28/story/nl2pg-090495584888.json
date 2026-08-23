@@ -1,0 +1,126 @@
+{
+  "schema_ddl": "CREATE TABLE dipendenti (\n    emp_no INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    responsabile_reparto INT,\n    stipendio NUMERIC(10,2) CHECK (stipendio >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "dipendenti": {
+        "row_count": 642,
+        "columns": {
+          "emp_no": {
+            "distinct": 642,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 642
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Elena",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Esposito",
+              "Ferrari",
+              "Gialli"
+            ]
+          },
+          "responsabile_reparto": {
+            "distinct": 2,
+            "sample": [
+              "1",
+              "2"
+            ],
+            "min": 1,
+            "max": 2
+          },
+          "stipendio": {
+            "distinct": 591,
+            "sample": [
+              "36000.0",
+              "36028.1",
+              "36097.43",
+              "36107.84",
+              "36453.4"
+            ],
+            "min": 36000.0,
+            "max": 62390.44
+          }
+        }
+      }
+    },
+    "preview": {
+      "dipendenti": [
+        {
+          "emp_no": 1,
+          "nome": "Elena",
+          "cognome": "Colombo",
+          "responsabile_reparto": null,
+          "stipendio": 43905.74
+        },
+        {
+          "emp_no": 2,
+          "nome": "Alessandro",
+          "cognome": "Ferrari",
+          "responsabile_reparto": null,
+          "stipendio": 39308.28
+        },
+        {
+          "emp_no": 3,
+          "nome": "Marco",
+          "cognome": "Gialli",
+          "responsabile_reparto": null,
+          "stipendio": 49357.95
+        },
+        {
+          "emp_no": 4,
+          "nome": "Elena",
+          "cognome": "Ferrari",
+          "responsabile_reparto": null,
+          "stipendio": 44645.95
+        },
+        {
+          "emp_no": 5,
+          "nome": "Giulia",
+          "cognome": "Rossi",
+          "responsabile_reparto": null,
+          "stipendio": 45971.09
+        },
+        {
+          "emp_no": 6,
+          "nome": "Sofia",
+          "cognome": "Neri",
+          "responsabile_reparto": null,
+          "stipendio": 52381.38
+        },
+        {
+          "emp_no": 7,
+          "nome": "Elena",
+          "cognome": "Verdi",
+          "responsabile_reparto": null,
+          "stipendio": 44231.27
+        },
+        {
+          "emp_no": 8,
+          "nome": "Alessandro",
+          "cognome": "Verdi",
+          "responsabile_reparto": null,
+          "stipendio": 40784.21
+        }
+      ]
+    }
+  },
+  "story": "Nell'ufficio del personale, l'archivio denominato dipendenti raccoglie le schede di ciascun collaboratore. Ogni scheda riporta l'identificativo univoco, indicato come id dipendente, insieme al nome, al cognome e alla retribuzione mensile. Inoltre, per ogni risorsa viene annotato il responsabile reparto, ossia il coordinatore di riferimento. Durante una verifica sulle retribuzioni, gli addetti hanno esaminato le fasce stipendiali, escludendo i profili privi di responsabile reparto. L'elenco risultante è stato ordinato dalla retribuzione più alta a quella più bassa, con valori che partono da 36000.0 e arrivano fino a 62390.44."
+}

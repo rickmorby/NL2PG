@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "disjunctive"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "registro_movimenti_commerciali",
+      "description": "La tabella ordini viene denominata registro_movimenti_commerciali nella prosa aziendale; il solver deve mappare la perifrasi alla tabella reale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "deleted_at",
+      "obsolete_value": "data di dismissione del movimento",
+      "description": "La colonna deleted_at viene indicata con il gergo aziendale 'data di dismissione del movimento'; i record visibili sono solo quelli con deleted_at IS NULL e ogni query disgiuntiva deve includere tale predicato di visibilità."
+    }
+  ],
+  "spec_hash": "38d33deaccc4d36c"
+}

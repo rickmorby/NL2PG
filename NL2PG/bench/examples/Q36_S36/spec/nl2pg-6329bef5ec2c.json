@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "string_funcs"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fornitori",
+      "obsolete_value": "anagrafica_appaltatori",
+      "description": "La tabella fornitori, che contiene i dati dei fornitori ERP inclusa la colonna composita sede di tipo INDIRIZZO (definito con CREATE TYPE e campi via, citta, cap, provincia), viene denominata anagrafica_appaltatori nella prosa aziendale. Le query devono risolvere il nome reale della tabella per accedere ai campi compositi tramite la sintassi sede.citta o sede.cap."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "sede",
+      "obsolete_value": "master_data_di_ubiquitazione",
+      "description": "La colonna composita sede (tipo composito INDIRIZZO creato con CREATE TYPE) viene indicata nella documentazione aziendale con il gergo tipico degli sistemi ERP 'master data di ubicazione'. Il richiedente deve riconoscere che 'master data di ubicazione' corrisponde alla colonna composita sede e applicare funzioni stringa come UPPER(sede.citta) o SUBSTRING(sede.cap FROM 1 FOR 2) sui suoi campi interni."
+    }
+  ],
+  "spec_hash": "3477c3417607b4fb"
+}

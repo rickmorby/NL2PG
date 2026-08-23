@@ -1,0 +1,34 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 5,
+  "hierarchy": "flat",
+  "sql_features": [
+    "string_funcs"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "imm",
+      "obsolete_value": "immobili",
+      "description": "La tabella 'imm' (abbreviazione di immobili) viene riferita come 'immobili' nella documentazione aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "cl",
+      "obsolete_value": "clienti",
+      "description": "La tabella 'cl' (sigla per clienti) è sinonimo di 'clienti' nei report interni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "contr",
+      "obsolete_value": "contratti",
+      "description": "La tabella 'contr' (gergo aziendale per contratti) viene usata al posto di 'contratti' nei processi di benchmark."
+    }
+  ],
+  "spec_hash": "e30a560ee1addab7"
+}

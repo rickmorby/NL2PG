@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "b65add17836ec68b"
+  },
+  "schema_ddl": "CREATE TYPE stato_conto AS ENUM ('ATTIVO', 'SOSPESO', 'CHIUSO');\n\nCREATE TYPE stato_prestito AS ENUM ('RICHIESTO', 'APPROVATO', 'EROGATO', 'ESTINTO', 'MOROSO');\n\nCREATE TYPE tipo_transazione AS ENUM ('VERSAMENTO', 'PRELIEVO', 'BONIFICO_USCITA', 'BONIFICO_INGRESSO', 'COMMISSIONE');\n\nCREATE TYPE stato_rata AS ENUM ('IN_ATTESA', 'PAGATA', 'INSOLUTA');\n\nCREATE TABLE clienti (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE conti_correnti (\n    id BIGSERIAL PRIMARY KEY,\n    cliente_id BIGINT NOT NULL REFERENCES clienti(id),\n    iban TEXT NOT NULL UNIQUE,\n    saldo NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    stato_conto stato_conto NOT NULL DEFAULT 'ATTIVO',\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE prestiti (\n    id BIGSERIAL PRIMARY KEY,\n    cliente_id BIGINT NOT NULL REFERENCES clienti(id),\n    capitale_erogato NUMERIC(14,2) NOT NULL CHECK (capitale_erogato > 0),\n    tasso_interesse NUMERIC(5,2) NOT NULL CHECK (tasso_interesse BETWEEN 0 AND 100),\n    durata_mesi INT NOT NULL CHECK (durata_mesi > 0),\n    stato_prestito stato_prestito NOT NULL DEFAULT 'RICHIESTO',\n    data_erogazione DATE\n);\n\nCREATE TABLE transazioni (\n    id BIGSERIAL PRIMARY KEY,\n    conto_id BIGINT NOT NULL REFERENCES conti_correnti(id),\n    tipo_transazione tipo_transazione NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo <> 0),\n    data_transazione TIMESTAMP NOT NULL,\n    descrizione TEXT\n);\n\nCREATE TABLE rate_prestito (\n    id BIGSERIAL PRIMARY KEY,\n    prestito_id BIGINT NOT NULL REFERENCES prestiti(id),\n    numero_rata INT NOT NULL CHECK (numero_rata > 0),\n    importo_rata NUMERIC(12,2) NOT NULL CHECK (importo_rata > 0),\n    data_scadenza DATE NOT NULL,\n    stato_rata stato_rata NOT NULL DEFAULT 'IN_ATTESA',\n    UNIQUE (prestito_id, numero_rata)\n);"
+}

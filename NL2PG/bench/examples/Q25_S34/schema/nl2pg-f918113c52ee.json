@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_acquirenti",
+        "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; il risolutore deve mappare la perifrasi al nome fisico della tabella."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo",
+        "obsolete_value": "valore_complessivo",
+        "description": "La colonna importo della tabella ordini è indicata come valore_complessivo nei documenti commerciali; si tratta di un sinonimo puro che non altera la semantica del dato."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "cliente_id IS NULL",
+        "obsolete_value": "scontrini muti",
+        "description": "Gli ordini con la FK opzionale cliente_id a NULL (vendite senza cliente registrato) sono chiamati scontrini muti nel gergo dei punti vendita; le query devono individuarli tramite IS NULL o join esterni, poiché il NATURAL JOIN/USING li escluderebbe implicitamente."
+      }
+    ],
+    "spec_hash": "7b8ef9be4b83f75b"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    cliente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    citta TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    ordine_id INT PRIMARY KEY,\n    cliente_id INT REFERENCES clienti(cliente_id),\n    importo NUMERIC(10,2) NOT NULL CHECK (importo >= 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato IN ('in_attesa', 'evaso', 'annullato'))\n);\n\nCREATE TABLE righe_ordini (\n    riga_id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(ordine_id),\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);"
+}

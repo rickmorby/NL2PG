@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "anti_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "eventi_tracciamento",
+        "obsolete_value": "registro_movimenti",
+        "description": "La tabella eventi_tracciamento (entità debole con chiave composta id_spedizione + num_evento) viene denominata registro_movimenti nella prosa aziendale. Le query devono risolvere il nome reale della tabella per individuare gli eventi orfani non collegati ad alcuna spedizione tramite WHERE NOT EXISTS."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "depositi",
+        "obsolete_value": "hub di cross-docking",
+        "description": "La tabella depositi (entità proprietaria che referenzia le spedizioni) è indicata nei documenti aziendali con il gergo logistico 'hub di cross-docking'. Il solutore deve mappare questa espressione tecnica al nome reale della tabella per identificare i depositi privi di eventi tracciamento associati."
+      }
+    ],
+    "spec_hash": "6d5e0ca355145d7e"
+  },
+  "schema_ddl": "CREATE TABLE depositi (\n    id INT PRIMARY KEY,\n    codice_deposito TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capacita_pallet INT CHECK (capacita_pallet >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    deposito_id INT NOT NULL REFERENCES depositi(id),\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    destinatario TEXT NOT NULL,\n    citta_destinazione TEXT NOT NULL,\n    peso_kg NUMERIC(8,2) CHECK (peso_kg > 0),\n    stato TEXT NOT NULL DEFAULT 'in_preparazione' CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'annullata')),\n    data_partenza DATE,\n    data_consegna_prevista DATE\n);\n\nCREATE TABLE eventi_tracciamento (\n    id_spedizione INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    num_evento INT NOT NULL CHECK (num_evento > 0),\n    tipo_evento TEXT NOT NULL,\n    descrizione TEXT,\n    istante_evento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    operatore TEXT,\n    PRIMARY KEY (id_spedizione, num_evento)\n);"
+}

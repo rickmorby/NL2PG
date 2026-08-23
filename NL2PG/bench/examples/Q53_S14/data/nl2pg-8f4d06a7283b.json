@@ -1,0 +1,705 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "ordered_set_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "pazienti",
+        "obsolete_value": "anagrafica_assistiti",
+        "description": "La tabella pazienti viene denominata anagrafica_assistiti nella prosa aziendale; il progettista deve riconoscere che anagrafica_assistiti corrisponde alla tabella fisica pazienti."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "pressione_sistolica_mmhg",
+        "obsolete_value": "PAS",
+        "description": "La colonna pressione_sistolica_mmhg della tabella rilevazioni_vitali è indicata nella documentazione clinica con l'acronimo gergale PAS (Pressione Arteriosa Sistolica); occorre mappare PAS sulla colonna reale."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "data_dimissione",
+        "obsolete_value": "chiusura_episodio",
+        "description": "Il termine dimissione ha doppio significato nel dominio: evento clinico di fine degenza e liberazione del posto letto. La prosa usa chiusura_episodio riferendosi esclusivamente alla colonna data_dimissione della tabella ricoveri, non a un campo separato."
+      }
+    ],
+    "spec_hash": "10616944d7a9a0d3"
+  },
+  "schema_ddl": "CREATE DOMAIN mmhg AS INT CHECK (VALUE BETWEEN 50 AND 260);\n\nCREATE DOMAIN temperatura_corporea AS NUMERIC(4,1) CHECK (VALUE BETWEEN 30.0 AND 45.0);\n\nCREATE DOMAIN battito_cardiaco AS INT CHECK (VALUE BETWEEN 20 AND 250);\n\nCREATE DOMAIN stato_ricovero AS TEXT CHECK (VALUE IN ('in_corso', 'dimesso', 'trasferito', 'deceduto'));\n\nCREATE TABLE reparti (\n    id SERIAL PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano_edificio INT CHECK (piano_edificio >= 0),\n    posti_letto_totali INT NOT NULL CHECK (posti_letto_totali > 0)\n);\n\nCREATE TABLE medici (\n    id SERIAL PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_iscrizione_albo TEXT NOT NULL UNIQUE,\n    specializzazione TEXT\n);\n\nCREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    sesso CHAR(1) CHECK (sesso IN ('M', 'F')),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE ricoveri (\n    id SERIAL PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    data_ricovero DATE NOT NULL,\n    data_dimissione DATE,\n    stato_ricovero stato_ricovero NOT NULL DEFAULT 'in_corso',\n    motivo_ricovero TEXT,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ricovero)\n);\n\nCREATE TABLE rilevazioni_vitali (\n    id BIGSERIAL PRIMARY KEY,\n    ricovero_id INT NOT NULL REFERENCES ricoveri(id),\n    momento_rilevazione TIMESTAMP NOT NULL,\n    pressione_sistolica_mmhg mmhg NOT NULL,\n    pressione_diastolica_mmhg mmhg NOT NULL,\n    frequenza_cardiaca_bpm battito_cardiaco,\n    temperatura_corporea_celsius temperatura_corporea,\n    saturazione_ossigeno_pct INT CHECK (saturazione_ossigeno_pct BETWEEN 50 AND 100),\n    note_cliniche TEXT,\n    CHECK (pressione_diastolica_mmhg < pressione_sistolica_mmhg)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "reparti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_reparto": "Cardiologia",
+            "piano_edificio": 2,
+            "posti_letto_totali": 24
+          },
+          {
+            "id": 2,
+            "nome_reparto": "Chirurgia Generale",
+            "piano_edificio": 1,
+            "posti_letto_totali": 30
+          },
+          {
+            "id": 3,
+            "nome_reparto": "Medicina Interna",
+            "piano_edificio": 3,
+            "posti_letto_totali": 28
+          },
+          {
+            "id": 4,
+            "nome_reparto": "Pediatria",
+            "piano_edificio": 0,
+            "posti_letto_totali": 18
+          },
+          {
+            "id": 5,
+            "nome_reparto": "Neurologia",
+            "piano_edificio": 4,
+            "posti_letto_totali": 16
+          },
+          {
+            "id": 6,
+            "nome_reparto": "Ortopedia",
+            "piano_edificio": 2,
+            "posti_letto_totali": 22
+          },
+          {
+            "id": 7,
+            "nome_reparto": "Oncologia",
+            "piano_edificio": 5,
+            "posti_letto_totali": 20
+          },
+          {
+            "id": 8,
+            "nome_reparto": "Pronto Soccorso",
+            "piano_edificio": 0,
+            "posti_letto_totali": 35
+          }
+        ],
+        "variations": {
+          "piano_edificio": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          },
+          "posti_letto_totali": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "10",
+              "12",
+              "15",
+              "18",
+              "20",
+              "22",
+              "25",
+              "28",
+              "30",
+              "32",
+              "35"
+            ]
+          }
+        }
+      },
+      {
+        "table": "medici",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 5.0,
+        "templates": [
+          {
+            "id": 1,
+            "reparto_id": 1,
+            "nome": "Alessandro",
+            "cognome": "Ferrari",
+            "numero_iscrizione_albo": "RM001234",
+            "specializzazione": "Cardiologia interventistica"
+          },
+          {
+            "id": 2,
+            "reparto_id": 2,
+            "nome": "Elena",
+            "cognome": "Moretti",
+            "numero_iscrizione_albo": "MI002345",
+            "specializzazione": "Chirurgia addominale"
+          },
+          {
+            "id": 3,
+            "reparto_id": 3,
+            "nome": "Giuseppe",
+            "cognome": "Rinaldi",
+            "numero_iscrizione_albo": "TO003456",
+            "specializzazione": "Medicina interna"
+          },
+          {
+            "id": 4,
+            "reparto_id": 4,
+            "nome": "Chiara",
+            "cognome": "Greco",
+            "numero_iscrizione_albo": "NA004567",
+            "specializzazione": "Pediatria"
+          },
+          {
+            "id": 5,
+            "reparto_id": 5,
+            "nome": "Marco",
+            "cognome": "Conti",
+            "numero_iscrizione_albo": "BO005678",
+            "specializzazione": "Neurologia clinica"
+          },
+          {
+            "id": 6,
+            "reparto_id": 6,
+            "nome": "Sara",
+            "cognome": "De Luca",
+            "numero_iscrizione_albo": "FI006789",
+            "specializzazione": "Ortopedia e traumatologia"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Luca",
+              "Anna",
+              "Paolo",
+              "Francesca",
+              "Davide",
+              "Martina",
+              "Roberto",
+              "Valentina"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Bianchi",
+              "Romano",
+              "Gallo",
+              "Costa",
+              "Fontana",
+              "Marino",
+              "Barbieri",
+              "Villa"
+            ]
+          },
+          "specializzazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Cardiologia",
+              "Chirurgia generale",
+              "Medicina interna",
+              "Pediatria",
+              "Neurologia",
+              "Ortopedia",
+              "Oncologia medica",
+              "Anestesia e rianimazione"
+            ]
+          }
+        }
+      },
+      {
+        "table": "pazienti",
+        "nature": "dimension",
+        "min_rows": 300,
+        "max_rows": 450,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_fiscale": "RSSMRA85M01H501X",
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "data_nascita": "1985-08-01",
+            "sesso": "M",
+            "creato_il": "2025-01-10 09:15:00"
+          },
+          {
+            "id": 2,
+            "codice_fiscale": "BNCLGU90C45F205Y",
+            "nome": "Luigi",
+            "cognome": "Bianchi",
+            "data_nascita": "1990-03-05",
+            "sesso": "M",
+            "creato_il": "2025-01-12 14:30:00"
+          },
+          {
+            "id": 3,
+            "codice_fiscale": "VRDGIA78D62L219Z",
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "data_nascita": "1978-04-22",
+            "sesso": "F",
+            "creato_il": "2025-02-03 11:05:00"
+          },
+          {
+            "id": 4,
+            "codice_fiscale": "MRTSRA92E11H501W",
+            "nome": "Sara",
+            "cognome": "Martini",
+            "data_nascita": "1992-05-11",
+            "sesso": "F",
+            "creato_il": "2025-02-20 16:45:00"
+          },
+          {
+            "id": 5,
+            "codice_fiscale": "GLLFNC60T19D963K",
+            "nome": "Franco",
+            "cognome": "Galli",
+            "data_nascita": "1960-12-19",
+            "sesso": "M",
+            "creato_il": "2025-03-01 08:20:00"
+          },
+          {
+            "id": 6,
+            "codice_fiscale": "CSLMAR88R53Z114Q",
+            "nome": "Maria",
+            "cognome": "Costa",
+            "data_nascita": "1988-10-13",
+            "sesso": "F",
+            "creato_il": "2025-03-15 10:00:00"
+          },
+          {
+            "id": 7,
+            "codice_fiscale": "FNTNCO75B07I150J",
+            "nome": "Nicola",
+            "cognome": "Fontana",
+            "data_nascita": "1975-02-07",
+            "sesso": "M",
+            "creato_il": "2025-04-02 13:40:00"
+          },
+          {
+            "id": 8,
+            "codice_fiscale": "LDRCRL95S48A662P",
+            "nome": "Carla",
+            "cognome": "Lombardi",
+            "data_nascita": "1995-11-08",
+            "sesso": "F",
+            "creato_il": "2025-04-18 17:25:00"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Luigi",
+              "Giulia",
+              "Sara",
+              "Franco",
+              "Maria",
+              "Nicola",
+              "Carla",
+              "Antonio",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Martini",
+              "Galli",
+              "Costa",
+              "Fontana",
+              "Lombardi",
+              "Esposito",
+              "Colombo"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -5475.0,
+            "delta_max": 1825.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "sesso": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "M",
+              "F"
+            ]
+          },
+          "creato_il": {
+            "axis": "shift",
+            "delta_min": -20.0,
+            "delta_max": 20.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ricoveri",
+        "nature": "fact",
+        "min_rows": 500,
+        "max_rows": 700,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "paziente_id": 1,
+            "medico_id": 1,
+            "reparto_id": 1,
+            "data_ricovero": "2025-06-03",
+            "data_dimissione": "2025-06-10",
+            "stato_ricovero": "dimesso",
+            "motivo_ricovero": "Infarto miocardico acuto"
+          },
+          {
+            "id": 2,
+            "paziente_id": 2,
+            "medico_id": 2,
+            "reparto_id": 2,
+            "data_ricovero": "2025-06-15",
+            "data_dimissione": null,
+            "stato_ricovero": "in_corso",
+            "motivo_ricovero": "Appendicite acuta"
+          },
+          {
+            "id": 3,
+            "paziente_id": 3,
+            "medico_id": 3,
+            "reparto_id": 3,
+            "data_ricovero": "2025-07-01",
+            "data_dimissione": "2025-07-08",
+            "stato_ricovero": "dimesso",
+            "motivo_ricovero": "Polmonite bilaterale"
+          },
+          {
+            "id": 4,
+            "paziente_id": 4,
+            "medico_id": 4,
+            "reparto_id": 4,
+            "data_ricovero": "2025-07-12",
+            "data_dimissione": "2025-07-22",
+            "stato_ricovero": "dimesso",
+            "motivo_ricovero": "Bronchiolite"
+          },
+          {
+            "id": 5,
+            "paziente_id": 5,
+            "medico_id": 5,
+            "reparto_id": 5,
+            "data_ricovero": "2025-07-20",
+            "data_dimissione": "2025-07-25",
+            "stato_ricovero": "trasferito",
+            "motivo_ricovero": "Ictus ischemico"
+          },
+          {
+            "id": 6,
+            "paziente_id": 6,
+            "medico_id": 6,
+            "reparto_id": 6,
+            "data_ricovero": "2025-08-02",
+            "data_dimissione": "2025-08-09",
+            "stato_ricovero": "dimesso",
+            "motivo_ricovero": "Frattura collo del femore"
+          },
+          {
+            "id": 7,
+            "paziente_id": 7,
+            "medico_id": 1,
+            "reparto_id": 1,
+            "data_ricovero": "2025-08-10",
+            "data_dimissione": "2025-08-14",
+            "stato_ricovero": "deceduto",
+            "motivo_ricovero": "Sepsis"
+          },
+          {
+            "id": 8,
+            "paziente_id": 8,
+            "medico_id": 3,
+            "reparto_id": 3,
+            "data_ricovero": "2025-08-18",
+            "data_dimissione": null,
+            "stato_ricovero": "in_corso",
+            "motivo_ricovero": "Scompenso diabetico"
+          }
+        ],
+        "variations": {
+          "data_ricovero": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_dimissione": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_ricovero": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "dimesso",
+              "dimesso",
+              "dimesso",
+              "in_corso",
+              "in_corso",
+              "trasferito",
+              "deceduto"
+            ]
+          },
+          "motivo_ricovero": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Polmonite",
+              "Insufficienza cardiaca",
+              "Frattura femore",
+              "Appendicite acuta",
+              "Ictus ischemico",
+              "Scompenso diabetico",
+              "Sepsis",
+              "Emorragia digestiva"
+            ]
+          }
+        }
+      },
+      {
+        "table": "rilevazioni_vitali",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "ricovero_id": 1,
+            "momento_rilevazione": "2025-06-05 08:00:00",
+            "pressione_sistolica_mmhg": 125,
+            "pressione_diastolica_mmhg": 78,
+            "frequenza_cardiaca_bpm": 72,
+            "temperatura_corporea_celsius": 36.8,
+            "saturazione_ossigeno_pct": 98,
+            "note_cliniche": "Paziente stabile"
+          },
+          {
+            "id": 2,
+            "ricovero_id": 2,
+            "momento_rilevazione": "2025-06-16 12:30:00",
+            "pressione_sistolica_mmhg": 138,
+            "pressione_diastolica_mmhg": 85,
+            "frequenza_cardiaca_bpm": 88,
+            "temperatura_corporea_celsius": 37.9,
+            "saturazione_ossigeno_pct": 95,
+            "note_cliniche": "Stato febbrile in calo"
+          },
+          {
+            "id": 3,
+            "ricovero_id": 3,
+            "momento_rilevazione": "2025-07-03 07:45:00",
+            "pressione_sistolica_mmhg": 118,
+            "pressione_diastolica_mmhg": 72,
+            "frequenza_cardiaca_bpm": 64,
+            "temperatura_corporea_celsius": 36.5,
+            "saturazione_ossigeno_pct": 99,
+            "note_cliniche": "Parametri nei limiti"
+          },
+          {
+            "id": 4,
+            "ricovero_id": 4,
+            "momento_rilevazione": "2025-07-13 20:15:00",
+            "pressione_sistolica_mmhg": 145,
+            "pressione_diastolica_mmhg": 90,
+            "frequenza_cardiaca_bpm": 102,
+            "temperatura_corporea_celsius": 38.6,
+            "saturazione_ossigeno_pct": 93,
+            "note_cliniche": "Monitoraggio intensivo"
+          },
+          {
+            "id": 5,
+            "ricovero_id": 5,
+            "momento_rilevazione": "2025-07-22 06:30:00",
+            "pressione_sistolica_mmhg": 132,
+            "pressione_diastolica_mmhg": 80,
+            "frequenza_cardiaca_bpm": 76,
+            "temperatura_corporea_celsius": 37.2,
+            "saturazione_ossigeno_pct": 97,
+            "note_cliniche": "Buona risposta alla terapia"
+          },
+          {
+            "id": 6,
+            "ricovero_id": 6,
+            "momento_rilevazione": "2025-08-03 14:00:00",
+            "pressione_sistolica_mmhg": 160,
+            "pressione_diastolica_mmhg": 95,
+            "frequenza_cardiaca_bpm": 110,
+            "temperatura_corporea_celsius": 39.1,
+            "saturazione_ossigeno_pct": 91,
+            "note_cliniche": "Ipertensione in trattamento"
+          },
+          {
+            "id": 7,
+            "ricovero_id": 7,
+            "momento_rilevazione": "2025-08-11 09:20:00",
+            "pressione_sistolica_mmhg": 110,
+            "pressione_diastolica_mmhg": 68,
+            "frequenza_cardiaca_bpm": 58,
+            "temperatura_corporea_celsius": 36.2,
+            "saturazione_ossigeno_pct": 99,
+            "note_cliniche": "Bradicardia lieve"
+          },
+          {
+            "id": 8,
+            "ricovero_id": 8,
+            "momento_rilevazione": "2025-08-19 16:40:00",
+            "pressione_sistolica_mmhg": 128,
+            "pressione_diastolica_mmhg": 82,
+            "frequenza_cardiaca_bpm": 84,
+            "temperatura_corporea_celsius": 38.0,
+            "saturazione_ossigeno_pct": 94,
+            "note_cliniche": "Da rivalutare nelle prossime ore"
+          }
+        ],
+        "variations": {
+          "momento_rilevazione": {
+            "axis": "shift",
+            "delta_min": -3.0,
+            "delta_max": 3.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "pressione_sistolica_mmhg": {
+            "axis": "shift",
+            "delta_min": -10.0,
+            "delta_max": 10.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "pressione_diastolica_mmhg": {
+            "axis": "shift",
+            "delta_min": -5.0,
+            "delta_max": 5.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "frequenza_cardiaca_bpm": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.3,
+            "pool": []
+          },
+          "temperatura_corporea_celsius": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.96,
+            "factor_max": 1.04,
+            "pool": []
+          },
+          "saturazione_ossigeno_pct": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "89",
+              "91",
+              "93",
+              "94",
+              "95",
+              "96",
+              "97",
+              "98",
+              "99"
+            ]
+          },
+          "note_cliniche": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Paziente stabile",
+              "Monitoraggio intensivo",
+              "Lievemente febbricolare",
+              "Buona risposta alla terapia",
+              "Da rivalutare nelle prossime ore",
+              "Parametri nei limiti"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

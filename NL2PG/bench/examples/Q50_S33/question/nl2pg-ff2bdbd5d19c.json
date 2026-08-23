@@ -1,0 +1,4 @@
+{
+  "story": "Presso l'ufficio Risorse Umane, l'archivio denominato personale aziendale raccoglie le schede di ciascun dipendente. In ogni scheda sono riportati il nome, il cognome, la data di assunzione e l'eventuale data di dimissione. Per l'elenco del personale attualmente in servizio, gli addetti hanno estratto le schede in cui la data di dimissione non risulta compilata, verificando che la voce relativa allo stato risulti in servizio. Hanno poi riportato nome, cognome e data di assunzione.",
+  "question": "Vorrei l'elenco completo del personale attualmente in servizio presso l'azienda, mostrando per ciascun dipendente il nome, il cognome e la data di assunzione."
+}

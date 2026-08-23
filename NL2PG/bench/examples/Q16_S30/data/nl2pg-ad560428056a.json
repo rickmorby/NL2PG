@@ -1,0 +1,476 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 10,
+    "hierarchy": "recursive_tree",
+    "sql_features": [
+      "recursive_cte"
+    ],
+    "twist": [
+      "rename",
+      "distractor",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "struttura_gerarchica_dipartimenti",
+        "obsolete_value": "albero_organizzativo_interno",
+        "description": "La tabella che definisce la gerarchia dei dipartimenti è denominata internamente come albero_organizzativo_interno."
+      },
+      {
+        "twist_type": "distractor",
+        "target_value": "tabella_log_accessi",
+        "obsolete_value": "storico_eventi_sistema",
+        "description": "Inserimento di una tabella di log irrilevante per la query ricorsiva, progettata per confondere il modello durante lo schema linking."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "id_nodo",
+        "obsolete_value": "codice_identificativo",
+        "description": "Il termine 'codice_identificativo' viene utilizzato sia per i dipartimenti che per le aule, richiedendo disambiguazione contestuale."
+      }
+    ],
+    "spec_hash": "fffeafbc8ad046ce"
+  },
+  "schema_ddl": "CREATE TABLE albero_organizzativo_interno (\n    id_nodo SERIAL PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL,\n    id_nodo_padre INT REFERENCES albero_organizzativo_interno(id_nodo),\n    livello INT CHECK (livello >= 0),\n    attivo BOOLEAN DEFAULT TRUE\n);\n\nCREATE TABLE facolta (\n    id_facolta SERIAL PRIMARY KEY,\n    nome_facolta TEXT NOT NULL UNIQUE,\n    id_nodo_dipartimento INT REFERENCES albero_organizzativo_interno(id_nodo)\n);\n\nCREATE TABLE corsi_di_studio (\n    id_corso SERIAL PRIMARY KEY,\n    nome_corso TEXT NOT NULL,\n    id_facolta INT NOT NULL REFERENCES facolta(id_facolta),\n    id_nodo_dipartimento INT REFERENCES albero_organizzativo_interno(id_nodo),\n    crediti_totali INT CHECK (crediti_totali > 0)\n);\n\nCREATE TABLE studenti (\n    id_studente SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE,\n    id_corso INT REFERENCES corsi_di_studio(id_corso)\n);\n\nCREATE TABLE docenti (\n    id_docente SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    id_nodo_dipartimento INT REFERENCES albero_organizzativo_interno(id_nodo)\n);\n\nCREATE TABLE aule (\n    id_nodo SERIAL PRIMARY KEY,\n    nome_aula TEXT NOT NULL,\n    edificio TEXT,\n    capienza INT CHECK (capienza > 0)\n);\n\nCREATE TABLE insegnamenti (\n    id_insegnamento SERIAL PRIMARY KEY,\n    nome_insegnamento TEXT NOT NULL,\n    id_docente INT REFERENCES docenti(id_docente),\n    id_corso INT REFERENCES corsi_di_studio(id_corso),\n    cfu INT CHECK (cfu > 0)\n);\n\nCREATE TABLE esami (\n    id_esame SERIAL PRIMARY KEY,\n    id_insegnamento INT NOT NULL REFERENCES insegnamenti(id_insegnamento),\n    data_esame DATE NOT NULL,\n    id_nodo_aula INT REFERENCES aule(id_nodo)\n);\n\nCREATE TABLE iscrizioni_esami (\n    id_studente INT NOT NULL REFERENCES studenti(id_studente),\n    id_esame INT NOT NULL REFERENCES esami(id_esame),\n    voto INT CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN DEFAULT FALSE,\n    PRIMARY KEY (id_studente, id_esame)\n);\n\nCREATE TABLE tabella_log_accessi (\n    id_log SERIAL PRIMARY KEY,\n    utente TEXT,\n    azione TEXT,\n    data_evento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    dettagli TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "albero_organizzativo_interno",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_nodo": 1,
+            "nome_dipartimento": "Direzione Generale",
+            "id_nodo_padre": null,
+            "livello": 0,
+            "attivo": true
+          },
+          {
+            "id_nodo": 2,
+            "nome_dipartimento": "Dipartimento di Informatica",
+            "id_nodo_padre": 1,
+            "livello": 1,
+            "attivo": true
+          },
+          {
+            "id_nodo": 3,
+            "nome_dipartimento": "Dipartimento di Fisica",
+            "id_nodo_padre": 1,
+            "livello": 1,
+            "attivo": true
+          }
+        ],
+        "variations": {
+          "nome_dipartimento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Direzione Generale",
+              "Dipartimento di Informatica",
+              "Dipartimento di Fisica",
+              "Dipartimento di Matematica"
+            ]
+          },
+          "livello": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 1.0,
+            "factor_max": 1.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "facolta",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_facolta": 1,
+            "nome_facolta": "Facolta di Ingegneria",
+            "id_nodo_dipartimento": 2
+          },
+          {
+            "id_facolta": 2,
+            "nome_facolta": "Facolta di Scienze",
+            "id_nodo_dipartimento": 3
+          }
+        ],
+        "variations": {
+          "nome_facolta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Facolta di Ingegneria",
+              "Facolta di Scienze",
+              "Facolta di Lettere",
+              "Facolta di Economia"
+            ]
+          }
+        }
+      },
+      {
+        "table": "corsi_di_studio",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_corso": 1,
+            "nome_corso": "Ingegneria Informatica",
+            "id_facolta": 1,
+            "id_nodo_dipartimento": 2,
+            "crediti_totali": 180
+          },
+          {
+            "id_corso": 2,
+            "nome_corso": "Fisica Applicata",
+            "id_facolta": 2,
+            "id_nodo_dipartimento": 3,
+            "crediti_totali": 180
+          }
+        ],
+        "variations": {
+          "nome_corso": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ingegneria Informatica",
+              "Fisica Applicata",
+              "Matematica Pura",
+              "Ingegneria Elettronica"
+            ]
+          },
+          "crediti_totali": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 1.0,
+            "factor_max": 1.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "studenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_studente": 1,
+            "matricola": "MAT001",
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "data_nascita": "2000-05-12",
+            "email": "mario.rossi@studenti.it",
+            "id_corso": 1
+          },
+          {
+            "id_studente": 2,
+            "matricola": "MAT002",
+            "nome": "Anna",
+            "cognome": "Verdi",
+            "data_nascita": "2001-08-20",
+            "email": "anna.verdi@studenti.it",
+            "id_corso": 2
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Anna",
+              "Luca",
+              "Giulia",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Verdi",
+              "Bianchi",
+              "Neri",
+              "Russo"
+            ]
+          }
+        }
+      },
+      {
+        "table": "docenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_docente": 1,
+            "nome": "Giovanni",
+            "cognome": "Bruni",
+            "email": "giovanni.bruni@unifi.it",
+            "id_nodo_dipartimento": 2
+          },
+          {
+            "id_docente": 2,
+            "nome": "Elena",
+            "cognome": "Gialli",
+            "email": "elena.gialli@unifi.it",
+            "id_nodo_dipartimento": 3
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Giovanni",
+              "Elena",
+              "Paolo",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Bruni",
+              "Gialli",
+              "Conti",
+              "Esposito"
+            ]
+          }
+        }
+      },
+      {
+        "table": "aule",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_nodo": 10,
+            "nome_aula": "Aula A1",
+            "edificio": "Edificio Nord",
+            "capienza": 100
+          },
+          {
+            "id_nodo": 11,
+            "nome_aula": "Aula B2",
+            "edificio": "Edificio Sud",
+            "capienza": 50
+          }
+        ],
+        "variations": {
+          "nome_aula": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Aula A1",
+              "Aula B2",
+              "Aula C3",
+              "Aula Magna"
+            ]
+          },
+          "edificio": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Edificio Nord",
+              "Edificio Sud",
+              "Edificio Centrale"
+            ]
+          }
+        }
+      },
+      {
+        "table": "insegnamenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_insegnamento": 1,
+            "nome_insegnamento": "Basi di Dati",
+            "id_docente": 1,
+            "id_corso": 1,
+            "cfu": 9
+          },
+          {
+            "id_insegnamento": 2,
+            "nome_insegnamento": "Fisica Generale",
+            "id_docente": 2,
+            "id_corso": 2,
+            "cfu": 12
+          }
+        ],
+        "variations": {
+          "nome_insegnamento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Basi di Dati",
+              "Fisica Generale",
+              "Algoritmi",
+              "Analisi Matematica"
+            ]
+          },
+          "cfu": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 1.0,
+            "factor_max": 1.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "esami",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_esame": 1,
+            "id_insegnamento": 1,
+            "data_esame": "2026-02-15",
+            "id_nodo_aula": 10
+          },
+          {
+            "id_esame": 2,
+            "id_insegnamento": 2,
+            "data_esame": "2026-02-18",
+            "id_nodo_aula": 11
+          }
+        ],
+        "variations": {
+          "data_esame": {
+            "axis": "shift",
+            "delta_min": -5.0,
+            "delta_max": 15.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "iscrizioni_esami",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_studente": 1,
+            "id_esame": 1,
+            "voto": 28,
+            "lode": false
+          },
+          {
+            "id_studente": 2,
+            "id_esame": 2,
+            "voto": 30,
+            "lode": true
+          }
+        ],
+        "variations": {
+          "voto": {
+            "axis": "shift",
+            "delta_min": -2.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "tabella_log_accessi",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_log": 1,
+            "utente": "mario.rossi",
+            "azione": "LOGIN",
+            "data_evento": "2026-01-01 08:30:00",
+            "dettagli": "Accesso riuscito"
+          },
+          {
+            "id_log": 2,
+            "utente": "anna.verdi",
+            "azione": "LOGOUT",
+            "data_evento": "2026-01-01 17:00:00",
+            "dettagli": "Disconnessione"
+          }
+        ],
+        "variations": {
+          "azione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "LOGIN",
+              "LOGOUT",
+              "QUERY",
+              "UPDATE"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

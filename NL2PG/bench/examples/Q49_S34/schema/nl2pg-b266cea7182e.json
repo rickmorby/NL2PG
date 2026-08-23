@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "is_distinct_from"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sinistri",
+        "obsolete_value": "pratiche_liquidazione",
+        "description": "La tabella sinistri viene denominata pratiche_liquidazione nella prosa aziendale. Lo schema contiene le tabelle polizze (padre) e sinistri (figlio), dove la FK nullable polizza_id su sinistri puo' essere NULL per i sinistri non ancora associati ad alcuna polizza."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "polizza_id",
+        "obsolete_value": "riferimento contrattuale",
+        "description": "La colonna FK polizza_id della tabella sinistri e' indicata nel linguaggio di business come 'riferimento contrattuale'. I valori NULL di tale colonna rappresentano sinistri privi di copertura contrattuale individuata, e il confronto con la chiave primaria id di polizze deve essere eseguito in modo NULL-safe tramite IS DISTINCT FROM."
+      }
+    ],
+    "spec_hash": "3ee26c5eb79f4413"
+  },
+  "schema_ddl": "CREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'responsabilita_civile')),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    stato_polizza TEXT NOT NULL CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta', 'annullata')),\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id INT PRIMARY KEY,\n    polizza_id INT REFERENCES polizze(id) ON DELETE SET NULL,\n    data_sinistro DATE NOT NULL,\n    data_denuncia DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    importo_danno NUMERIC(12,2) NOT NULL CHECK (importo_danno >= 0),\n    stato_sinistro TEXT NOT NULL CHECK (stato_sinistro IN ('aperto', 'in_valutazione', 'liquidato', 'respinto')),\n    CHECK (data_denuncia >= data_sinistro)\n);"
+}

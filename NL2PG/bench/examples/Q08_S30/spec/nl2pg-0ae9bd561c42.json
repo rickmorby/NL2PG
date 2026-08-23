@@ -1,0 +1,20 @@
+{
+  "domain": "sanità",
+  "n_tables": 9,
+  "hierarchy": "self_referential",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "medici",
+      "obsolete_value": "rete_assistenziale_completa",
+      "description": "La narrativa aziendale descrive un'ampia 'rete assistenziale completa' composta da 9 tabelle (pazienti, medici, referti, prescrizioni, appuntamenti, reparti, farmaci, esami_laboratorio, fatturazioni), ma la query primaria richiede esclusivamente un self-join sulla tabella medici (colonna medico_supervisore_id) per confrontare titolari e sostituti. Le altre 7 tabelle sono distrattori plausibili e semanticamente coerenti con il dominio sanità: il risolutore deve ignorarle senza modificare lo scheletro della query."
+    }
+  ],
+  "spec_hash": "e52da2e1624297ba"
+}

@@ -1,0 +1,726 @@
+{
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_annuo NUMERIC(10,2) CHECK (stipendio_annuo > 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE candidati (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    fonte_reclutamento TEXT,\n    data_candidatura DATE NOT NULL\n);\n\nCREATE TABLE colloqui (\n    id INT PRIMARY KEY,\n    candidato_id INT NOT NULL REFERENCES candidati(id),\n    data_colloquio TIMESTAMP NOT NULL,\n    modalita TEXT NOT NULL,\n    esito TEXT CHECK (esito IN ('positivo', 'negativo', 'da_definire'))\n);\n\nCREATE TABLE valutazioni (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    periodo TEXT NOT NULL,\n    punteggio NUMERIC(4,1) CHECK (punteggio BETWEEN 0 AND 100),\n    superata BOOLEAN NOT NULL DEFAULT FALSE,\n    note TEXT\n);\n\nCREATE TABLE documenti (\n    id INT PRIMARY KEY,\n    nome_file TEXT NOT NULL,\n    tipo_documento TEXT NOT NULL,\n    dimensione_byte BIGINT CHECK (dimensione_byte >= 0),\n    data_caricamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    dipendente_id INT REFERENCES dipendenti(id),\n    candidato_id INT REFERENCES candidati(id),\n    CHECK ((dipendente_id IS NULL) <> (candidato_id IS NULL))\n);",
+  "data_profile": {
+    "profile": {
+      "dipendenti": {
+        "row_count": 217,
+        "columns": {
+          "id": {
+            "distinct": 217,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 217
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro",
+              "Anna",
+              "Chiara",
+              "Davide",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Costa",
+              "Ferri",
+              "Fontana"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 217,
+            "sample": [
+              "BNCLRA90T42F205B",
+              "BNCLRA90T42F205C",
+              "BNCLRA90T42F205D",
+              "BNCLRA90T42F205E",
+              "BNCLRA90T42F205F"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 189,
+            "sample": [
+              "2017-08-20",
+              "2017-08-25",
+              "2017-08-29",
+              "2017-09-07",
+              "2017-09-21"
+            ]
+          },
+          "stipendio_annuo": {
+            "distinct": 206,
+            "sample": [
+              "23800.0",
+              "23953.98",
+              "24156.75",
+              "24651.11",
+              "25934.35"
+            ],
+            "min": 23800.0,
+            "max": 85400.0
+          },
+          "attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "candidati": {
+        "row_count": 347,
+        "columns": {
+          "id": {
+            "distinct": 347,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 347
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Andrea",
+              "Chiara",
+              "Elena",
+              "Fabio",
+              "Ilaria"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Amato",
+              "Barone",
+              "Bruno",
+              "De Luca",
+              "Gallo"
+            ]
+          },
+          "email": {
+            "distinct": 347,
+            "sample": [
+              "chiara.villa10@example.com",
+              "chiara.villa11@example.com",
+              "chiara.villa12@example.com",
+              "chiara.villa13@example.com",
+              "chiara.villa14@example.com"
+            ]
+          },
+          "telefono": {
+            "distinct": 9,
+            "sample": [
+              "+39 320 5551122",
+              "+39 328 4567890",
+              "+39 331 4445566",
+              "+39 333 1112223",
+              "+39 335 6677889"
+            ]
+          },
+          "fonte_reclutamento": {
+            "distinct": 7,
+            "sample": [
+              "Indeed",
+              "LinkedIn",
+              "agenzia_headhunting",
+              "annuncio_indeed",
+              "segnalazione_interna"
+            ]
+          },
+          "data_candidatura": {
+            "distinct": 165,
+            "sample": [
+              "2025-08-05",
+              "2025-08-13",
+              "2025-08-14",
+              "2025-08-15",
+              "2025-08-16"
+            ]
+          }
+        }
+      },
+      "colloqui": {
+        "row_count": 693,
+        "columns": {
+          "id": {
+            "distinct": 693,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 793
+          },
+          "candidato_id": {
+            "distinct": 296,
+            "sample": [
+              "10",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 2,
+            "max": 347
+          },
+          "data_colloquio": {
+            "distinct": 199,
+            "sample": [
+              "2025-09-20 10:00:00",
+              "2025-09-21 10:00:00",
+              "2025-09-22 10:00:00",
+              "2025-09-23 10:00:00",
+              "2025-09-24 10:00:00"
+            ]
+          },
+          "modalita": {
+            "distinct": 3,
+            "sample": [
+              "presenza",
+              "telefonico",
+              "videochiamata"
+            ]
+          },
+          "esito": {
+            "distinct": 3,
+            "sample": [
+              "da_definire",
+              "negativo",
+              "positivo"
+            ]
+          }
+        }
+      },
+      "valutazioni": {
+        "row_count": 592,
+        "columns": {
+          "id": {
+            "distinct": 592,
+            "sample": [
+              "201",
+              "202",
+              "203",
+              "204",
+              "205"
+            ],
+            "min": 201,
+            "max": 792
+          },
+          "dipendente_id": {
+            "distinct": 206,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 217
+          },
+          "periodo": {
+            "distinct": 6,
+            "sample": [
+              "2023-H1",
+              "2023-H2",
+              "2024-H1",
+              "2024-H2",
+              "2025-H1"
+            ]
+          },
+          "punteggio": {
+            "distinct": 539,
+            "sample": [
+              "34.2",
+              "34.39876442669332",
+              "34.837337293312906",
+              "34.99684803357738",
+              "36.41008996577645"
+            ],
+            "min": 34.2,
+            "max": 99.8
+          },
+          "superata": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          },
+          "note": {
+            "distinct": 7,
+            "sample": [
+              "Buon contributo agli obiettivi di team",
+              "Da migliorare la gestione delle scadenze",
+              "In crescita rispetto al periodo precedente",
+              "Necessario percorso di formazione mirato",
+              "Obiettivi trimestrali non raggiunti"
+            ]
+          }
+        }
+      },
+      "documenti": {
+        "row_count": 2796,
+        "columns": {
+          "id": {
+            "distinct": 2796,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 301,
+            "max": 3096
+          },
+          "nome_file": {
+            "distinct": 6,
+            "sample": [
+              "certificato_medico_bianchi.pdf",
+              "contratto_assunzione_rossi.pdf",
+              "cv_elena_gallo.pdf",
+              "lettera_motivazionale_rinaldi.pdf",
+              "portfolio_deluca.pdf"
+            ]
+          },
+          "tipo_documento": {
+            "distinct": 6,
+            "sample": [
+              "certificato_medico",
+              "contratto",
+              "cv",
+              "lettera_motivazionale",
+              "portfolio"
+            ]
+          },
+          "dimensione_byte": {
+            "distinct": 2558,
+            "sample": [
+              "1000609.68",
+              "100120.94",
+              "100134.16",
+              "1001421.09",
+              "1004263.66"
+            ],
+            "min": 49152.0,
+            "max": 4194304.0
+          },
+          "data_caricamento": {
+            "distinct": 544,
+            "sample": [
+              "2019-01-26 09:00:00",
+              "2019-01-27 09:00:00",
+              "2019-01-28 09:00:00",
+              "2019-01-29 09:00:00",
+              "2019-01-30 09:00:00"
+            ]
+          },
+          "dipendente_id": {
+            "distinct": 217,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 217
+          },
+          "candidato_id": {
+            "distinct": 339,
+            "sample": [
+              "1",
+              "10",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 347
+          }
+        }
+      }
+    },
+    "preview": {
+      "dipendenti": [
+        {
+          "id": 1,
+          "nome": "Marco",
+          "cognome": "Costa",
+          "codice_fiscale": "RSSMRC85M01H501X",
+          "data_assunzione": "2019-05-18",
+          "stipendio_annuo": 44884.28,
+          "attivo": "true"
+        },
+        {
+          "id": 2,
+          "nome": "Sara",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRC85M01H501B",
+          "data_assunzione": "2019-03-11",
+          "stipendio_annuo": 41616.75,
+          "attivo": "false"
+        },
+        {
+          "id": 3,
+          "nome": "Sara",
+          "cognome": "Costa",
+          "codice_fiscale": "RSSMRC85M01H501C",
+          "data_assunzione": "2019-01-24",
+          "stipendio_annuo": 41082.06,
+          "attivo": "false"
+        },
+        {
+          "id": 4,
+          "nome": "Marco",
+          "cognome": "Lombardi",
+          "codice_fiscale": "RSSMRC85M01H501D",
+          "data_assunzione": "2018-11-28",
+          "stipendio_annuo": 50563.71,
+          "attivo": "true"
+        },
+        {
+          "id": 5,
+          "nome": "Chiara",
+          "cognome": "Ferri",
+          "codice_fiscale": "RSSMRC85M01H501E",
+          "data_assunzione": "2019-06-21",
+          "stipendio_annuo": 38798.2,
+          "attivo": "true"
+        },
+        {
+          "id": 6,
+          "nome": "Davide",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC85M01H501F",
+          "data_assunzione": "2019-05-10",
+          "stipendio_annuo": 49477.09,
+          "attivo": "true"
+        },
+        {
+          "id": 7,
+          "nome": "Matteo",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRC85M01H501G",
+          "data_assunzione": "2019-01-31",
+          "stipendio_annuo": 43610.33,
+          "attivo": "true"
+        },
+        {
+          "id": 8,
+          "nome": "Alessandro",
+          "cognome": "Fontana",
+          "codice_fiscale": "RSSMRC85M01H501H",
+          "data_assunzione": "2019-01-27",
+          "stipendio_annuo": 32540.81,
+          "attivo": "true"
+        }
+      ],
+      "candidati": [
+        {
+          "id": 2,
+          "nome": "Andrea",
+          "cognome": "Barone",
+          "email": "andrea.barone1@example.com",
+          "telefono": "+39 340 9988776",
+          "fonte_reclutamento": "LinkedIn",
+          "data_candidatura": "2025-09-30"
+        },
+        {
+          "id": 11,
+          "nome": "Andrea",
+          "cognome": "Pellegrini",
+          "email": "andrea.pellegrini1@example.com",
+          "telefono": "+39 349 2345678",
+          "fonte_reclutamento": "LinkedIn",
+          "data_candidatura": "2025-09-29"
+        },
+        {
+          "id": 12,
+          "nome": "Chiara",
+          "cognome": "Bruno",
+          "email": "chiara.bruno1@example.com",
+          "telefono": "+39 349 2345678",
+          "fonte_reclutamento": "agenzia_headhunting",
+          "data_candidatura": "2025-10-22"
+        },
+        {
+          "id": 3,
+          "nome": "Chiara",
+          "cognome": "Salvi",
+          "email": "chiara.salvi1@example.com",
+          "telefono": "+39 333 1112223",
+          "fonte_reclutamento": null,
+          "data_candidatura": "2025-10-14"
+        },
+        {
+          "id": 7,
+          "nome": "Chiara",
+          "cognome": "Serra",
+          "email": "chiara.serra1@example.com",
+          "telefono": "+39 335 6677889",
+          "fonte_reclutamento": "LinkedIn",
+          "data_candidatura": "2025-09-16"
+        },
+        {
+          "id": 13,
+          "nome": "Chiara",
+          "cognome": "Serra",
+          "email": "chiara.serra2@example.com",
+          "telefono": "+39 349 2345678",
+          "fonte_reclutamento": "sito_aziendale",
+          "data_candidatura": "2025-10-28"
+        },
+        {
+          "id": 19,
+          "nome": "Elena",
+          "cognome": "Rinaldi",
+          "email": "elena.rinaldi1@example.com",
+          "telefono": "+39 335 6677889",
+          "fonte_reclutamento": "segnalazione_interna",
+          "data_candidatura": "2025-09-04"
+        },
+        {
+          "id": 9,
+          "nome": "Martina",
+          "cognome": "Barone",
+          "email": "martina.barone1@example.com",
+          "telefono": "+39 349 2345678",
+          "fonte_reclutamento": "universita",
+          "data_candidatura": "2025-10-21"
+        }
+      ],
+      "colloqui": [
+        {
+          "id": 101,
+          "candidato_id": 121,
+          "data_colloquio": "2025-10-13 10:00:00",
+          "modalita": "videochiamata",
+          "esito": "positivo"
+        },
+        {
+          "id": 102,
+          "candidato_id": 154,
+          "data_colloquio": "2025-10-19 10:00:00",
+          "modalita": "videochiamata",
+          "esito": "positivo"
+        },
+        {
+          "id": 103,
+          "candidato_id": 292,
+          "data_colloquio": "2025-10-11 10:00:00",
+          "modalita": "videochiamata",
+          "esito": "negativo"
+        },
+        {
+          "id": 104,
+          "candidato_id": 239,
+          "data_colloquio": "2025-10-10 10:00:00",
+          "modalita": "presenza",
+          "esito": "positivo"
+        },
+        {
+          "id": 105,
+          "candidato_id": 315,
+          "data_colloquio": "2025-10-02 10:00:00",
+          "modalita": "videochiamata",
+          "esito": "negativo"
+        },
+        {
+          "id": 106,
+          "candidato_id": 19,
+          "data_colloquio": "2025-10-19 10:00:00",
+          "modalita": "videochiamata",
+          "esito": "negativo"
+        },
+        {
+          "id": 107,
+          "candidato_id": 212,
+          "data_colloquio": "2025-10-27 10:00:00",
+          "modalita": "presenza",
+          "esito": "positivo"
+        },
+        {
+          "id": 108,
+          "candidato_id": 13,
+          "data_colloquio": "2025-09-21 10:00:00",
+          "modalita": "presenza",
+          "esito": "positivo"
+        }
+      ],
+      "valutazioni": [
+        {
+          "id": 201,
+          "dipendente_id": 97,
+          "periodo": "2023-H1",
+          "punteggio": null,
+          "superata": "true",
+          "note": "Necessario percorso di formazione mirato"
+        },
+        {
+          "id": 202,
+          "dipendente_id": 58,
+          "periodo": "2023-H2",
+          "punteggio": 90.55059688174569,
+          "superata": "false",
+          "note": "Performance solida e costante"
+        },
+        {
+          "id": 203,
+          "dipendente_id": 106,
+          "periodo": "2023-H2",
+          "punteggio": 73.18712245947248,
+          "superata": "true",
+          "note": "Performance solida e costante"
+        },
+        {
+          "id": 204,
+          "dipendente_id": 33,
+          "periodo": "2024-H2",
+          "punteggio": 70.18328410092687,
+          "superata": "true",
+          "note": "Ottima collaborazione interfunzionale"
+        },
+        {
+          "id": 205,
+          "dipendente_id": 136,
+          "periodo": "2024-H2",
+          "punteggio": 72.41125142974585,
+          "superata": "true",
+          "note": "In crescita rispetto al periodo precedente"
+        },
+        {
+          "id": 206,
+          "dipendente_id": 87,
+          "periodo": "2024-H1",
+          "punteggio": 70.29246015237683,
+          "superata": "false",
+          "note": "Performance solida e costante"
+        },
+        {
+          "id": 207,
+          "dipendente_id": 27,
+          "periodo": "2023-H2",
+          "punteggio": 79.69287726724382,
+          "superata": "false",
+          "note": "Obiettivi trimestrali non raggiunti"
+        },
+        {
+          "id": 208,
+          "dipendente_id": 193,
+          "periodo": "2024-H1",
+          "punteggio": 72.5,
+          "superata": true,
+          "note": "Buon contributo agli obiettivi di team"
+        }
+      ],
+      "documenti": [
+        {
+          "id": 301,
+          "nome_file": "contratto_assunzione_rossi.pdf",
+          "tipo_documento": "contratto",
+          "dimensione_byte": 188025.46,
+          "data_caricamento": "2019-04-01 09:00:00",
+          "dipendente_id": 204,
+          "candidato_id": null
+        },
+        {
+          "id": 302,
+          "nome_file": "contratto_assunzione_rossi.pdf",
+          "tipo_documento": "contratto",
+          "dimensione_byte": 154055.16,
+          "data_caricamento": "2019-03-31 09:00:00",
+          "dipendente_id": 31,
+          "candidato_id": null
+        },
+        {
+          "id": 303,
+          "nome_file": "contratto_assunzione_rossi.pdf",
+          "tipo_documento": "contratto",
+          "dimensione_byte": 179067.56,
+          "data_caricamento": "2019-03-21 09:00:00",
+          "dipendente_id": 132,
+          "candidato_id": null
+        },
+        {
+          "id": 304,
+          "nome_file": "contratto_assunzione_rossi.pdf",
+          "tipo_documento": "contratto",
+          "dimensione_byte": 292109.08,
+          "data_caricamento": "2019-02-08 09:00:00",
+          "dipendente_id": null,
+          "candidato_id": 117
+        },
+        {
+          "id": 305,
+          "nome_file": "contratto_assunzione_rossi.pdf",
+          "tipo_documento": "contratto",
+          "dimensione_byte": 207939.52,
+          "data_caricamento": "2019-01-27 09:00:00",
+          "dipendente_id": 157,
+          "candidato_id": null
+        },
+        {
+          "id": 306,
+          "nome_file": "contratto_assunzione_rossi.pdf",
+          "tipo_documento": "contratto",
+          "dimensione_byte": 448033.4,
+          "data_caricamento": "2019-02-23 09:00:00",
+          "dipendente_id": null,
+          "candidato_id": 66
+        },
+        {
+          "id": 307,
+          "nome_file": "contratto_assunzione_rossi.pdf",
+          "tipo_documento": "contratto",
+          "dimensione_byte": 197468.79,
+          "data_caricamento": "2019-03-24 09:00:00",
+          "dipendente_id": 86,
+          "candidato_id": null
+        },
+        {
+          "id": 308,
+          "nome_file": "contratto_assunzione_rossi.pdf",
+          "tipo_documento": "contratto",
+          "dimensione_byte": 300371.76,
+          "data_caricamento": "2019-01-27 09:00:00",
+          "dipendente_id": 74,
+          "candidato_id": null
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "boolean_predicate"
+  ],
+  "query": "SELECT d.nome, d.cognome, d.data_assunzione, d.stipendio_annuo AS stipendio_annuo FROM dipendenti d WHERE d.attivo IS TRUE AND d.stipendio_annuo BETWEEN 30000 AND 60000 ORDER BY d.stipendio_annuo DESC, d.cognome ASC, d.codice_fiscale ASC;"
+}

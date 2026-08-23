@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "relative_time"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "registrazioni_contabili",
+      "obsolete_value": "scritture_di_prima_nota",
+      "description": "La tabella registrazioni_contabili (testata delle operazioni contabili con data_registrazione e deleted_at) viene denominata scritture_di_prima_nota nella prosa aziendale. Le query devono risolvere la perifrasi verso il nome reale della tabella."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "deleted_at",
+      "obsolete_value": "data di storno",
+      "description": "Il campo deleted_at presente su tutte le tabelle (conti, registrazioni_contabili, righe_registrazione) viene descritto nella prosa con il gergo contabile 'data di storno'. Le righe considerate valide o 'in essere' sono quelle con deleted_at IS NULL: ogni query temporale della forma WHERE col_data >= CURRENT_DATE - INTERVAL 'n days' deve essere combinata obbligatoriamente con il predicato di visibilità deleted_at IS NULL per escludere i record logicamente cancellati."
+    }
+  ],
+  "spec_hash": "2597479402523695"
+}

@@ -1,0 +1,180 @@
+{
+  "schema_ddl": "CREATE TABLE contratti_assicurativi (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente TEXT NOT NULL,\n    premio_annuo NUMERIC(12,2) NOT NULL CHECK (premio_annuo > 0),\n    data_sottoscrizione DATE NOT NULL,\n    data_scadenza DATE NOT NULL CHECK (data_scadenza > data_sottoscrizione),\n    stato TEXT NOT NULL DEFAULT 'attivo' CHECK (stato IN ('attivo', 'sospeso', 'scaduto', 'annullato')),\n    tipo_copertura TEXT NOT NULL CHECK (tipo_copertura IN ('auto', 'casa', 'salute', 'vita', 'responsabilità civile'))\n);",
+  "data_profile": {
+    "profile": {
+      "contratti_assicurativi": {
+        "row_count": 574,
+        "columns": {
+          "id": {
+            "distinct": 574,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 574
+          },
+          "numero_polizza": {
+            "distinct": 574,
+            "sample": [
+              "POL-2026-AA001",
+              "POL-2026-AA001_1",
+              "POL-2026-AA001_10",
+              "POL-2026-AA001_100",
+              "POL-2026-AA001_101"
+            ]
+          },
+          "cliente": {
+            "distinct": 8,
+            "sample": [
+              "Anna Gialli",
+              "Giulia Verdi",
+              "Laura Bianchi",
+              "Luca Blu",
+              "Marco Verde"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 551,
+            "sample": [
+              "176.6",
+              "179.17",
+              "179.36",
+              "179.82",
+              "180.89"
+            ],
+            "min": 176.6,
+            "max": 900.0
+          },
+          "data_sottoscrizione": {
+            "distinct": 224,
+            "sample": [
+              "2025-05-17",
+              "2025-05-19",
+              "2025-05-26",
+              "2025-05-28",
+              "2025-05-31"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 10,
+            "sample": [
+              "2026-11-10",
+              "2027-01-05",
+              "2027-01-15",
+              "2027-02-20",
+              "2027-03-01"
+            ]
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "annullato",
+              "attivo",
+              "scaduto",
+              "sospeso"
+            ]
+          },
+          "tipo_copertura": {
+            "distinct": 5,
+            "sample": [
+              "auto",
+              "casa",
+              "responsabilità civile",
+              "salute",
+              "vita"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "contratti_assicurativi": [
+        {
+          "id": 1,
+          "numero_polizza": "POL-2026-AA001",
+          "cliente": "Sofia Rosa",
+          "premio_annuo": 455.96,
+          "data_sottoscrizione": "2025-12-09",
+          "data_scadenza": "2028-01-15",
+          "stato": "scaduto",
+          "tipo_copertura": "responsabilità civile"
+        },
+        {
+          "id": 2,
+          "numero_polizza": "POL-2026-AA001_1",
+          "cliente": "Giulia Verdi",
+          "premio_annuo": 570.76,
+          "data_sottoscrizione": "2025-09-24",
+          "data_scadenza": "2028-01-15",
+          "stato": "attivo",
+          "tipo_copertura": "salute"
+        },
+        {
+          "id": 3,
+          "numero_polizza": "POL-2026-AA001_2",
+          "cliente": "Anna Gialli",
+          "premio_annuo": 424.64,
+          "data_sottoscrizione": "2025-07-28",
+          "data_scadenza": "2028-01-15",
+          "stato": "attivo",
+          "tipo_copertura": "responsabilità civile"
+        },
+        {
+          "id": 4,
+          "numero_polizza": "POL-2026-AA001_3",
+          "cliente": "Laura Bianchi",
+          "premio_annuo": 500.17,
+          "data_sottoscrizione": "2025-08-22",
+          "data_scadenza": "2028-01-15",
+          "stato": "attivo",
+          "tipo_copertura": "responsabilità civile"
+        },
+        {
+          "id": 5,
+          "numero_polizza": "POL-2026-AA001_4",
+          "cliente": "Laura Bianchi",
+          "premio_annuo": 664.06,
+          "data_sottoscrizione": "2025-12-05",
+          "data_scadenza": "2028-01-15",
+          "stato": "annullato",
+          "tipo_copertura": "vita"
+        },
+        {
+          "id": 6,
+          "numero_polizza": "POL-2026-AA001_5",
+          "cliente": "Mario Rossi",
+          "premio_annuo": 638.53,
+          "data_sottoscrizione": "2025-08-05",
+          "data_scadenza": "2028-01-15",
+          "stato": "attivo",
+          "tipo_copertura": "auto"
+        },
+        {
+          "id": 7,
+          "numero_polizza": "POL-2026-AA001_6",
+          "cliente": "Luca Blu",
+          "premio_annuo": 582.7,
+          "data_sottoscrizione": "2025-08-01",
+          "data_scadenza": "2028-01-15",
+          "stato": "attivo",
+          "tipo_copertura": "responsabilità civile"
+        },
+        {
+          "id": 8,
+          "numero_polizza": "POL-2026-AA001_7",
+          "cliente": "Mario Rossi",
+          "premio_annuo": 420.68,
+          "data_sottoscrizione": "2026-01-03",
+          "data_scadenza": "2028-01-15",
+          "stato": "sospeso",
+          "tipo_copertura": "salute"
+        }
+      ]
+    }
+  },
+  "story": "Nel cuore dell'ufficio attuariale della Compagnia Assicurativa Aurora, il registro denominato contratti assicurativi rappresenta il cuore pulsante dell'attività. Ogni voce al suo interno raccoglie i dettagli delle polizze sottoscritte: dal numero identificativo univoco, come il codice POL-2026-AA001, al nome del cliente, passando per il costo copertura annuale, che può variare da poche centinaia a diverse migliaia di euro. Gli addetti consultano quotidianamente questo archivio per monitorare lo stato delle coperture, che può essere 'attivo', 'sospeso', 'scaduto' o 'annullato', e la tipologia di protezione offerta, che spazia dall'auto alla salute, dalla responsabilità civile alla vita e alla casa.\n\nDurante una recente verifica trimestrale, il responsabile della divisione ha richiesto un estratto mirato delle polizze attive, focalizzandosi su quelle con un costo copertura più elevato. L'analisi è partita dalla riga numero 11 di un elenco ordinato in modo decrescente proprio in base a questo valore, proseguendo fino alla riga 15. Ogni scheda è stata esaminata con attenzione, verificando che la data di scadenza non fosse anteriore al 2026-01-01 e che il premio annuo non scendesse mai sotto i 176,60 euro, soglia minima registrata nel sistema.\n\nTra le polizze emerse dall'analisi, spiccavano quelle di clienti come Giulia Verdi e Laura Bianchi, entrambe con coperture attive nel ramo responsabilità civile e salute, e premi che superavano i 500 euro annui. Gli operatori hanno annotato con cura ogni dettaglio, confrontando le date di sottoscrizione – alcune risalenti al 2025, altre più recenti – e assicurandosi che nessuna polizza fosse prossima alla scadenza senza un rinnovo già pianificato.\n\nIl lavoro di controllo si è concluso con la redazione di un report interno, dove ogni polizza è stata descritta non solo per il suo valore economico, ma anche per la sua rilevanza strategica. Ad esempio, le coperture 'vita' e 'salute' sono state evidenziate come prioritarie per la fidelizzazione della clientela, mentre quelle 'auto' e 'casa' sono state analizzate in relazione alle dinamiche di mercato. L'archivio contratti assicurativi, insomma, non è solo un elenco di numeri e date, ma uno strumento vivo, capace di raccontare la storia di ogni cliente e delle sue esigenze di protezione."
+}

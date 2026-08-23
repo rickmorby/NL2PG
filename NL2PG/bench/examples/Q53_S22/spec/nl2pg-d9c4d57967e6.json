@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 6,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "ordered_set_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatti_movimenti_contabili",
+      "obsolete_value": "libro_giornale_scritture",
+      "description": "La tabella dei fatti centrale fatti_movimenti_contabili viene denominata libro_giornale_scritture nella prosa aziendale. Le query devono risolvere il nome perifrastico verso la tabella dei fatti dello star schema."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo",
+      "obsolete_value": "valore nominale della scrittura in valuta di conto",
+      "description": "La colonna importo della tabella dei fatti viene indicata nella documentazione aziendale con il gergo contabile 'valore nominale della scrittura in valuta di conto'. Il calcolo di percentile_cont(p) WITHIN GROUP (ORDER BY importo) deve riferirsi a tale colonna."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "dim_centri_costo",
+      "obsolete_value": "unità organizzative di spesa",
+      "description": "La tabella dimensionale dim_centri_costo viene indicata come 'unità organizzative di spesa' nella prosa aziendale. Le join dalla tabella dei fatti verso questa dimensione devono essere risolte tramite il sinonimo."
+    }
+  ],
+  "spec_hash": "44d485c325cf43b9"
+}

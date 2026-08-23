@@ -1,0 +1,34 @@
+{
+  "domain": "vendite",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "sorting"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "storico_stato_ordine",
+      "obsolete_value": "registro_cronologico_pratiche",
+      "description": "La tabella che conserva lo storico delle modifiche degli ordini (storico_stato_ordine) viene denominata registro_cronologico_pratiche nella prosa aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "data_variazione",
+      "obsolete_value": "marcatura temporale di revisione",
+      "description": "La colonna data_variazione della tabella storico_stato_ordine, che registra il timestamp di ogni modifica, viene indicata nella documentazione con il gergo aziendale marcatura temporale di revisione."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "numero_versione",
+      "obsolete_value": "progressivo_revisione",
+      "description": "La colonna numero_versione, che identifica la sequenza progressiva delle modifiche di ciascun ordine, viene indicata come progressivo_revisione nella prosa aziendale."
+    }
+  ],
+  "spec_hash": "a88ddc35766d66c7"
+}

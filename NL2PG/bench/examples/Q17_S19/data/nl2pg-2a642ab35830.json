@@ -1,0 +1,680 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 6,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_acquirenti",
+        "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; l'agente deve risalire alla tabella reale clienti tramite il twist di rinomina."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore fatturato lordo per riga d'ordine",
+        "description": "La colonna importo_totale della tabella dettagli_ordine viene indicata con il gergo commerciale 'valore fatturato lordo per riga d'ordine'; occorre mappare la perifrasi sulla colonna reale."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato",
+        "obsolete_value": "situazione dell'ordine",
+        "description": "Il termine stato è ambiguo nello schema vendite: esiste la colonna stato nella tabella ordini (stato evasione: 'in_lavorazione', 'spedito', 'annullato') e la colonna stato nella tabella clienti (regione/provincia). La prosa usa 'situazione dell'ordine' riferendosi esclusivamente allo stato di evasione in ordini, non alla localizzazione del cliente."
+      }
+    ],
+    "spec_hash": "efc10fcf61583280"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    stato TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato TEXT NOT NULL DEFAULT 'in_lavorazione' CHECK (stato IN ('in_lavorazione', 'spedito', 'annullato')),\n    indirizzo_spedizione TEXT NOT NULL,\n    note TEXT\n);\n\nCREATE TABLE dettagli_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE pagamenti (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    metodo_pagamento TEXT NOT NULL CHECK (metodo_pagamento IN ('carta_credito', 'bonifico', 'paypal', 'contrassegno')),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo >= 0),\n    esito TEXT NOT NULL DEFAULT 'in_attesa' CHECK (esito IN ('completato', 'rifiutato', 'in_attesa')),\n    data_pagamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "categorie",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Elettronica",
+            "descrizione": "Dispositivi elettronici di consumo"
+          },
+          {
+            "id": 2,
+            "nome": "Abbigliamento",
+            "descrizione": "Vestiti e accessori di moda"
+          },
+          {
+            "id": 3,
+            "nome": "Casa e Cucina",
+            "descrizione": "Articoli per la casa e piccoli elettrodomestici"
+          },
+          {
+            "id": 4,
+            "nome": "Sport e Tempo Libero",
+            "descrizione": "Attrezzatura sportiva e outdoor"
+          },
+          {
+            "id": 5,
+            "nome": "Libri e Media",
+            "descrizione": "Libri cartacei, ebook e multimedialita"
+          },
+          {
+            "id": 6,
+            "nome": "Bellezza e Salute",
+            "descrizione": "Cosmetici e prodotti per la cura personale"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 180,
+        "max_rows": 220,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "email": "marco.rossi@example.com",
+            "telefono": "3331122334",
+            "via": "Via del Corso 15",
+            "citta": "Roma",
+            "cap": "00184",
+            "provincia": "RM",
+            "stato": "Lazio",
+            "data_registrazione": "2024-03-12"
+          },
+          {
+            "id": 2,
+            "nome": "Giulia",
+            "cognome": "Bianchi",
+            "email": "giulia.bianchi@example.com",
+            "telefono": "3475566778",
+            "via": "Corso Buenos Aires 42",
+            "citta": "Milano",
+            "cap": "20124",
+            "provincia": "MI",
+            "stato": "Lombardia",
+            "data_registrazione": "2024-05-20"
+          },
+          {
+            "id": 3,
+            "nome": "Alessandro",
+            "cognome": "Ferrari",
+            "email": "alessandro.ferrari@example.com",
+            "telefono": "3209988776",
+            "via": "Via Po 8",
+            "citta": "Torino",
+            "cap": "10124",
+            "provincia": "TO",
+            "stato": "Piemonte",
+            "data_registrazione": "2024-07-01"
+          },
+          {
+            "id": 4,
+            "nome": "Francesca",
+            "cognome": "Esposito",
+            "email": "francesca.esposito@example.com",
+            "telefono": "3484455667",
+            "via": "Via Toledo 120",
+            "citta": "Napoli",
+            "cap": "80134",
+            "provincia": "NA",
+            "stato": "Campania",
+            "data_registrazione": "2024-09-15"
+          },
+          {
+            "id": 5,
+            "nome": "Luca",
+            "cognome": "Colombo",
+            "email": "luca.colombo@example.com",
+            "telefono": "3312233445",
+            "via": "Via dei Calzaiuoli 7",
+            "citta": "Firenze",
+            "cap": "50122",
+            "provincia": "FI",
+            "stato": "Toscana",
+            "data_registrazione": "2025-01-08"
+          },
+          {
+            "id": 6,
+            "nome": "Chiara",
+            "cognome": "Ricci",
+            "email": "chiara.ricci@example.com",
+            "telefono": "3406677889",
+            "via": "Via Indipendenza 23",
+            "citta": "Bologna",
+            "cap": "40121",
+            "provincia": "BO",
+            "stato": "Emilia-Romagna",
+            "data_registrazione": "2025-02-18"
+          },
+          {
+            "id": 7,
+            "nome": "Davide",
+            "cognome": "Greco",
+            "email": "davide.greco@example.com",
+            "telefono": "3661122998",
+            "via": "Via Mercerie 31",
+            "citta": "Venezia",
+            "cap": "30121",
+            "provincia": "VE",
+            "stato": "Veneto",
+            "data_registrazione": "2025-04-25"
+          },
+          {
+            "id": 8,
+            "nome": "Sara",
+            "cognome": "Marino",
+            "email": "sara.marino@example.com",
+            "telefono": "3883344556",
+            "via": "Via Maqueda 55",
+            "citta": "Palermo",
+            "cap": "90133",
+            "provincia": "PA",
+            "stato": "Sicilia",
+            "data_registrazione": "2025-06-30"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Chiara",
+              "Davide",
+              "Sara",
+              "Matteo",
+              "Elena",
+              "Andrea",
+              "Valentina"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Bruno",
+              "Gallo"
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "3331122334",
+              "3475566778",
+              "3209988776",
+              "3484455667",
+              "3312233445",
+              "3406677889",
+              "3661122998",
+              "3883344556",
+              "3357788990",
+              "3490011223"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 120.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 160,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "sku": "SKU-ELE-001",
+            "nome": "Smartphone Nova X5",
+            "descrizione": "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+            "categoria_id": 1,
+            "prezzo_unitario": 299.9,
+            "giacenza_magazzino": 140,
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "sku": "SKU-ELE-002",
+            "nome": "Cuffie Bluetooth SoundPro",
+            "descrizione": "Cancellazione attiva del rumore, 30 ore di autonomia",
+            "categoria_id": 1,
+            "prezzo_unitario": 79.9,
+            "giacenza_magazzino": 260,
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "sku": "SKU-ABB-010",
+            "nome": "Felpa con cappuccio Urban",
+            "descrizione": "Cotone organico, taglie S-XXL",
+            "categoria_id": 2,
+            "prezzo_unitario": 49.9,
+            "giacenza_magazzino": 180,
+            "attivo": true
+          },
+          {
+            "id": 4,
+            "sku": "SKU-CAS-020",
+            "nome": "Frullatore Vortex 800W",
+            "descrizione": "Lama in acciaio inox, bicchiere da 1,5 litri",
+            "categoria_id": 3,
+            "prezzo_unitario": 59.9,
+            "giacenza_magazzino": 95,
+            "attivo": true
+          },
+          {
+            "id": 5,
+            "sku": "SKU-SPT-030",
+            "nome": "Zaino trekking Trail 35L",
+            "descrizione": "Impermeabile, schienale ventilato",
+            "categoria_id": 4,
+            "prezzo_unitario": 89.9,
+            "giacenza_magazzino": 70,
+            "attivo": true
+          },
+          {
+            "id": 6,
+            "sku": "SKU-LIB-040",
+            "nome": "Romanzo Il Gabbiano di Mare",
+            "descrizione": "Edizione tascabile, 320 pagine",
+            "categoria_id": 5,
+            "prezzo_unitario": 16.9,
+            "giacenza_magazzino": 210,
+            "attivo": true
+          },
+          {
+            "id": 7,
+            "sku": "SKU-BEL-050",
+            "nome": "Profumo Ambra Nera",
+            "descrizione": "Eau de parfum 100 ml, fuori produzione",
+            "categoria_id": 6,
+            "prezzo_unitario": 64.5,
+            "giacenza_magazzino": 40,
+            "attivo": false
+          }
+        ],
+        "variations": {
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.6,
+            "pool": []
+          },
+          "giacenza_magazzino": {
+            "axis": "shift",
+            "delta_min": -35.0,
+            "delta_max": 250.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": 500,
+        "max_rows": 650,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_ordine": "ORD-2026-00001",
+            "cliente_id": 1,
+            "data_ordine": "2026-01-05 09:15:00",
+            "stato": "spedito",
+            "indirizzo_spedizione": "Via del Corso 15, 00184 Roma",
+            "note": "Consegna in portineria"
+          },
+          {
+            "id": 2,
+            "numero_ordine": "ORD-2026-00002",
+            "cliente_id": 2,
+            "data_ordine": "2026-01-08 14:40:00",
+            "stato": "spedito",
+            "indirizzo_spedizione": "Corso Buenos Aires 42, 20124 Milano"
+          },
+          {
+            "id": 3,
+            "numero_ordine": "ORD-2026-00003",
+            "cliente_id": 3,
+            "data_ordine": "2026-01-12 11:05:00",
+            "stato": "annullato",
+            "indirizzo_spedizione": "Via Po 8, 10124 Torino",
+            "note": "Cliente ha annullato il giorno successivo"
+          },
+          {
+            "id": 4,
+            "numero_ordine": "ORD-2026-00004",
+            "cliente_id": 4,
+            "data_ordine": "2026-01-20 16:30:00",
+            "stato": "in_lavorazione",
+            "indirizzo_spedizione": "Via Toledo 120, 80134 Napoli"
+          },
+          {
+            "id": 5,
+            "numero_ordine": "ORD-2026-00005",
+            "cliente_id": 5,
+            "data_ordine": "2026-02-02 10:00:00",
+            "stato": "spedito",
+            "indirizzo_spedizione": "Via dei Calzaiuoli 7, 50122 Firenze",
+            "note": "Telefonare prima della consegna"
+          },
+          {
+            "id": 6,
+            "numero_ordine": "ORD-2026-00006",
+            "cliente_id": 6,
+            "data_ordine": "2026-02-10 18:45:00",
+            "stato": "in_lavorazione",
+            "indirizzo_spedizione": "Via Indipendenza 23, 40121 Bologna"
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -40.0,
+            "delta_max": 40.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "spedito",
+              "spedito",
+              "spedito",
+              "in_lavorazione",
+              "in_lavorazione",
+              "annullato"
+            ]
+          },
+          "indirizzo_spedizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via del Corso 15, 00184 Roma",
+              "Corso Buenos Aires 42, 20124 Milano",
+              "Via Po 8, 10124 Torino",
+              "Via Toledo 120, 80134 Napoli",
+              "Via dei Calzaiuoli 7, 50122 Firenze",
+              "Via Indipendenza 23, 40121 Bologna",
+              "Via Mercerie 31, 30121 Venezia",
+              "Via Maqueda 55, 90133 Palermo"
+            ]
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Consegna in portineria",
+              "Telefonare prima della consegna",
+              "Consegna al piano",
+              "",
+              ""
+            ]
+          }
+        }
+      },
+      {
+        "table": "dettagli_ordine",
+        "nature": "fact",
+        "min_rows": 1100,
+        "max_rows": 1300,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ordine_id": 1,
+            "prodotto_id": 1,
+            "quantita": 2,
+            "prezzo_unitario": 299.9,
+            "importo_totale": 599.8
+          },
+          {
+            "id": 2,
+            "ordine_id": 2,
+            "prodotto_id": 3,
+            "quantita": 1,
+            "prezzo_unitario": 49.9,
+            "importo_totale": 49.9
+          },
+          {
+            "id": 3,
+            "ordine_id": 3,
+            "prodotto_id": 2,
+            "quantita": 3,
+            "prezzo_unitario": 79.9,
+            "importo_totale": 239.7
+          },
+          {
+            "id": 4,
+            "ordine_id": 4,
+            "prodotto_id": 4,
+            "quantita": 1,
+            "prezzo_unitario": 59.9,
+            "importo_totale": 59.9
+          },
+          {
+            "id": 5,
+            "ordine_id": 5,
+            "prodotto_id": 5,
+            "quantita": 2,
+            "prezzo_unitario": 89.9,
+            "importo_totale": 179.8
+          },
+          {
+            "id": 6,
+            "ordine_id": 6,
+            "prodotto_id": 6,
+            "quantita": 4,
+            "prezzo_unitario": 16.9,
+            "importo_totale": 67.6
+          }
+        ],
+        "variations": {
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "2",
+              "3",
+              "3",
+              "4"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.35,
+            "pool": []
+          },
+          "importo_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.35,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "pagamenti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.9,
+        "templates": [
+          {
+            "id": 1,
+            "ordine_id": 1,
+            "metodo_pagamento": "carta_credito",
+            "importo": 599.8,
+            "esito": "completato",
+            "data_pagamento": "2026-01-05 09:16:00"
+          },
+          {
+            "id": 2,
+            "ordine_id": 2,
+            "metodo_pagamento": "paypal",
+            "importo": 49.9,
+            "esito": "completato",
+            "data_pagamento": "2026-01-08 14:41:00"
+          },
+          {
+            "id": 3,
+            "ordine_id": 3,
+            "metodo_pagamento": "bonifico",
+            "importo": 239.7,
+            "esito": "rifiutato",
+            "data_pagamento": "2026-01-12 11:06:00"
+          },
+          {
+            "id": 4,
+            "ordine_id": 4,
+            "metodo_pagamento": "contrassegno",
+            "importo": 59.9,
+            "esito": "in_attesa",
+            "data_pagamento": "2026-01-20 16:31:00"
+          },
+          {
+            "id": 5,
+            "ordine_id": 5,
+            "metodo_pagamento": "carta_credito",
+            "importo": 179.8,
+            "esito": "completato",
+            "data_pagamento": "2026-02-02 10:01:00"
+          }
+        ],
+        "variations": {
+          "metodo_pagamento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "carta_credito",
+              "carta_credito",
+              "carta_credito",
+              "paypal",
+              "bonifico",
+              "contrassegno"
+            ]
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.3,
+            "pool": []
+          },
+          "esito": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "completato",
+              "completato",
+              "completato",
+              "completato",
+              "rifiutato",
+              "in_attesa"
+            ]
+          },
+          "data_pagamento": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 4.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

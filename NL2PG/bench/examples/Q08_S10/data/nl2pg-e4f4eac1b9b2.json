@@ -1,0 +1,168 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 2,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "self_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "7b3953cc7beb2495"
+  },
+  "schema_ddl": "CREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    responsabile_id INT\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    data_assunzione DATE,\n    stipendio NUMERIC(10,2) CHECK (stipendio >= 0),\n    manager_id INT REFERENCES dipendenti(id),\n    reparto_id INT REFERENCES reparti(id)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "reparti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Amministrazione",
+            "responsabile_id": null
+          },
+          {
+            "id": 2,
+            "nome": "Vendite",
+            "responsabile_id": null
+          },
+          {
+            "id": 3,
+            "nome": "IT",
+            "responsabile_id": null
+          },
+          {
+            "id": 4,
+            "nome": "Marketing",
+            "responsabile_id": null
+          },
+          {
+            "id": 5,
+            "nome": "Risorse Umane",
+            "responsabile_id": null
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "email": "mario.rossi@example.com",
+            "data_assunzione": "2020-01-15",
+            "stipendio": 3500.0,
+            "manager_id": null,
+            "reparto_id": 1
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@example.com",
+            "data_assunzione": "2021-03-10",
+            "stipendio": 3200.0,
+            "manager_id": 1,
+            "reparto_id": 2
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "email": "giulia.verdi@example.com",
+            "data_assunzione": "2019-06-01",
+            "stipendio": 3800.0,
+            "manager_id": 1,
+            "reparto_id": 3
+          },
+          {
+            "id": 4,
+            "nome": "Luca",
+            "cognome": "Neri",
+            "email": "luca.neri@example.com",
+            "data_assunzione": "2022-09-20",
+            "stipendio": 2800.0,
+            "manager_id": 2,
+            "reparto_id": 2
+          },
+          {
+            "id": 5,
+            "nome": "Anna",
+            "cognome": "Gialli",
+            "email": "anna.gialli@example.com",
+            "data_assunzione": "2023-02-14",
+            "stipendio": 3000.0,
+            "manager_id": 3,
+            "reparto_id": 3
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Luca",
+              "Anna",
+              "Paolo",
+              "Sara",
+              "Marco",
+              "Elena",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Gialli",
+              "Ferrari",
+              "Russo",
+              "Romano",
+              "Colombo",
+              "Ricci"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stipendio": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.2,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

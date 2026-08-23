@@ -1,0 +1,34 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "ordered_set_agg"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "agenti",
+      "obsolete_value": "consulenti_catastali_abilitati",
+      "description": "La tabella agenti, che contiene l'anagrafica spezzata del personale commerciale (colonne nome e cognome separate), viene denominata nella prosa aziendale consulenti_catastali_abilitati. Il risolutore deve mappare la perifrasi alla tabella reale agenti."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "cognome",
+      "obsolete_value": "componente_familiare_dell'anagrafica",
+      "description": "La colonna cognome della tabella agenti, che archivia la seconda parte del dato anagrafico logico unico spezzato su due colonne, viene indicata nei documenti come componente_familiare_dell'anagrafica. La query richiede il calcolo di mode() WITHIN GROUP (ORDER BY cognome) sulla colonna corretta dello split."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "prezzo_vendita",
+      "obsolete_value": "controvalore di realizzo dell'unità abitativa",
+      "description": "La colonna prezzo_vendita della tabella contratti viene espressa nel linguaggio settoriale come controvalore di realizzo dell'unità abitativa. Il termine tecnico-immobiliare deve essere ricondotto alla colonna numerica effettiva su cui filtrare gli agenti prima di calcolare il valore modale del cognome."
+    }
+  ],
+  "spec_hash": "8ef91d1bfabb5a4a"
+}

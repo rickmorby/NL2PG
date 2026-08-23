@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 3,
+  "hierarchy": "isa",
+  "sql_features": [
+    "correlated_subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "operazioni",
+      "obsolete_value": "registro_movimenti",
+      "description": "La tabella base 'operazioni' (entita' generica della gerarchia ISA che contiene pk, importo, data e discriminatore) viene denominata 'registro_movimenti' nella prosa aziendale. Il solver deve riconoscere che 'registro_movimenti' corrisponde alla tabella fisica 'operazioni'."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "tipo_operazione",
+      "obsolete_value": "classificazione_flusso",
+      "description": "La colonna discriminatore 'tipo_operazione' della tabella base 'operazioni', usata per distinguere i sottotipi (bonifici vs investimenti), viene indicata nella documentazione con il gergo finanziario 'classificazione_flusso'. Il solver deve mappare tale termine al discriminatore reale."
+    }
+  ],
+  "spec_hash": "38ba750217de812e"
+}

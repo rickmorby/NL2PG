@@ -1,0 +1,231 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "values"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "flussi_di_cassa",
+        "description": "La tabella figlia transazioni, collegata tramite FK conto_id alla tabella padre conti, viene denominata flussi_di_cassa nella prosa aziendale. Il solver deve riconoscere che flussi_di_cassa corrisponde alla tabella transazioni su cui applicare il JOIN con l'alias derivato da FROM (VALUES ...) AS alias(c1,c2)."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "controvalore",
+        "description": "La colonna importo della tabella transazioni viene indicata nella documentazione aziendale con il gergo finanziario controvalore. Il solver deve mappare il termine tecnico di settore alla colonna reale da aggregare o filtrare nella query costruita con la clausola VALUES inline."
+      }
+    ],
+    "spec_hash": "7d888bf408e0c8c3"
+  },
+  "schema_ddl": "CREATE TABLE conti (\n    id INT PRIMARY KEY,\n    iban TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    valuta CHAR(3) NOT NULL DEFAULT 'EUR',\n    saldo_iniziale NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo_iniziale >= 0),\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    data_valuta DATE NOT NULL,\n    importo NUMERIC(14,2) NOT NULL CHECK (importo <> 0),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('accredito', 'addebito')),\n    causale TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "conti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 160,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "iban": "IT60X0542811101000000012345",
+            "denominazione": "Rossi Impianti SRL",
+            "valuta": "EUR",
+            "saldo_iniziale": 12500.0,
+            "data_apertura": "2019-03-15"
+          },
+          {
+            "id": 2,
+            "iban": "IT02L1234512345000002345678",
+            "denominazione": "Bianchi & Figli Spa",
+            "valuta": "EUR",
+            "saldo_iniziale": 48250.5,
+            "data_apertura": "2017-11-02"
+          },
+          {
+            "id": 3,
+            "iban": "IT21A0301503200000035678901",
+            "denominazione": "Verdi Logistica SRL",
+            "valuta": "EUR",
+            "saldo_iniziale": 7350.25,
+            "data_apertura": "2020-06-20"
+          },
+          {
+            "id": 4,
+            "iban": "IT40M0760103000000046789012",
+            "denominazione": "Studio Tecnico Neri",
+            "valuta": "CHF",
+            "saldo_iniziale": 2200.0,
+            "data_apertura": "2021-01-10"
+          },
+          {
+            "id": 5,
+            "iban": "IT84S3608105138205284937541",
+            "denominazione": "Gialli Food Export SRL",
+            "valuta": "USD",
+            "saldo_iniziale": 15600.75,
+            "data_apertura": "2018-09-05"
+          }
+        ],
+        "variations": {
+          "denominazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi Impianti SRL",
+              "Bianchi & Figli Spa",
+              "Verdi Logistica SRL",
+              "Studio Tecnico Neri",
+              "Gialli Food Export SRL",
+              "Blu Servizi Digitali SRL",
+              "Arancio Costruzioni Spa",
+              "Viola Consulenza Finanziaria",
+              "Celeste Trasporti SRL",
+              "Indaco Ristorazione SNC"
+            ]
+          },
+          "valuta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "EUR",
+              "EUR",
+              "EUR",
+              "EUR",
+              "EUR",
+              "USD",
+              "GBP",
+              "CHF"
+            ]
+          },
+          "saldo_iniziale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 4.0,
+            "pool": []
+          },
+          "data_apertura": {
+            "axis": "shift",
+            "delta_min": -730.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "transazioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 6.0,
+        "templates": [
+          {
+            "id": 1001,
+            "conto_id": 1,
+            "data_valuta": "2026-01-08",
+            "importo": 2450.0,
+            "tipo_movimento": "accredito",
+            "causale": "Bonifico cliente"
+          },
+          {
+            "id": 1002,
+            "conto_id": 2,
+            "data_valuta": "2026-01-15",
+            "importo": -1870.45,
+            "tipo_movimento": "addebito",
+            "causale": "Pagamento fattura"
+          },
+          {
+            "id": 1003,
+            "conto_id": 3,
+            "data_valuta": "2026-02-03",
+            "importo": 9800.0,
+            "tipo_movimento": "accredito",
+            "causale": "Incasso RIBA"
+          },
+          {
+            "id": 1004,
+            "conto_id": 4,
+            "data_valuta": "2026-02-18",
+            "importo": -640.2,
+            "tipo_movimento": "addebito",
+            "causale": "Commissioni bancarie"
+          },
+          {
+            "id": 1005,
+            "conto_id": 5,
+            "data_valuta": "2026-03-05",
+            "importo": 15200.8,
+            "tipo_movimento": "accredito",
+            "causale": "Bonifico estero"
+          },
+          {
+            "id": 1006,
+            "conto_id": 1,
+            "data_valuta": "2026-03-22",
+            "importo": -3150.0,
+            "tipo_movimento": "addebito",
+            "causale": "Stipendi dipendenti"
+          }
+        ],
+        "variations": {
+          "data_valuta": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 120.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "causale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Bonifico cliente",
+              "Bonifico fornitori",
+              "Pagamento fattura",
+              "Versamento contanti",
+              "Incasso RIBA",
+              "Stipendi dipendenti",
+              "Commissioni bancarie",
+              "Pagamento utenze",
+              "Canone leasing",
+              "Rimessa diretta"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

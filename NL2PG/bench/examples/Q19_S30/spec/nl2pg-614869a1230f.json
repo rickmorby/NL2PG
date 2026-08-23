@@ -1,0 +1,48 @@
+{
+  "domain": "logistica",
+  "n_tables": 11,
+  "hierarchy": "many_to_many_with_distractors",
+  "sql_features": [
+    "full_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "distractor",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "consegne_logistiche",
+      "description": "La tabella principale che registra le spedizioni è denominata 'consegne_logistiche' nella documentazione aziendale, mentre nel database è 'spedizioni'."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "peso_kg",
+      "obsolete_value": "massa_spedizione",
+      "description": "La colonna 'peso_kg' nella tabella 'spedizioni' viene indicata come 'massa_spedizione' nei report operativi."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "spedizioni",
+      "obsolete_value": "logistica_inversa",
+      "description": "Esiste una tabella 'logistica_inversa' che registra i resi, ma è irrilevante per la query richiesta (FULL OUTER JOIN tra spedizioni e destinatari)."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "destinatari",
+      "obsolete_value": "hub_di_destinazione",
+      "description": "La tabella 'destinatari' è chiamata 'hub_di_destinazione' nei documenti tecnici interni, creando ambiguità con la tabella 'hub' (distrattore)."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "stato",
+      "obsolete_value": "status_spedizione",
+      "description": "La colonna 'stato' nella tabella 'spedizioni' (che indica lo stato della spedizione) viene confusa con la colonna 'stato' nella tabella 'destinatari' (che indica lo stato geografico). Nella documentazione è chiamata 'status_spedizione' per distinguerla."
+    }
+  ],
+  "spec_hash": "05a2c15e5f10ef65"
+}

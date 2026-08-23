@@ -1,0 +1,28 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "audit_columns",
+    "sql_features": [],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "movimenti_merce",
+        "description": "La tabella principale del database si chiama realmente 'spedizioni' e contiene le colonne di audit created_at, created_by, updated_at e updated_by oltre ai dati operativi (codice_spedizione, stato, peso_kg). Nella prosa aziendale however viene sistematicamente denominata 'movimenti_merce': i task dovranno risolvere questa corrispondenza per interrogare correttamente la tabella giusta."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "updated_at",
+        "obsolete_value": "ultima_movimentazione",
+        "description": "La colonna di audit 'updated_at', che registra l'istante dell'ultimo aggiornamento della spedizione, viene indicata nella documentazione aziendale con il gergo logistico 'ultima_movimentazione'. Le query su recency e responsabilità (es. WHERE updated_at BETWEEN t1 AND t2 o confronti con NOW() - INTERVAL) dovranno mappare questa perifrasi gergale alla reale colonna timestamp 'updated_at'."
+      }
+    ],
+    "spec_hash": "871c92ddb9b793f2"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT\n);\n\nCREATE TABLE vettori (\n    id INT PRIMARY KEY,\n    nome_vettore TEXT NOT NULL,\n    telefono TEXT,\n    nazione TEXT NOT NULL DEFAULT 'IT'\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    vettore_id INT REFERENCES vettori(id),\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg >= 0),\n    data_spedizione DATE NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT\n);"
+}

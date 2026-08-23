@@ -1,0 +1,334 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 3,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "any_all"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_acquirenti",
+        "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; la relazione implicita con ordini e' deducibile dalla colonna cliente_id presente in ordini, senza REFERENCES dichiarate."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "totale_ordine",
+        "obsolete_value": "valore_complessivo",
+        "description": "La colonna totale_ordine della tabella ordini viene indicata nella prosa aziendale come valore_complessivo; le query con ANY/ALL devono confrontare tale importo con gli importi della tabella dettagli_ordine tramite ordine_id."
+      }
+    ],
+    "spec_hash": "857219c4c0c399ed"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    data_registrazione DATE DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    totale_ordine NUMERIC(12,2) NOT NULL CHECK (totale_ordine >= 0),\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'pagato', 'spedito', 'consegnato', 'annullato'))\n);\n\nCREATE TABLE dettagli_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL,\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 200,
+        "max_rows": 300,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "email": "mario.rossi@example.com",
+            "citta": "Roma",
+            "data_registrazione": "2025-01-15"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@example.com",
+            "citta": "Milano",
+            "data_registrazione": "2025-02-20"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "email": "giulia.verdi@example.com",
+            "citta": "Torino",
+            "data_registrazione": "2025-03-10"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "email": "alessandro.conti@example.com",
+            "citta": "Napoli",
+            "data_registrazione": "2025-04-05"
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Moretti",
+            "email": "francesca.moretti@example.com",
+            "citta": "Bologna",
+            "data_registrazione": "2025-05-18"
+          },
+          {
+            "id": 6,
+            "nome": "Luca",
+            "cognome": "Ferrari",
+            "email": "luca.ferrari@example.com",
+            "citta": "Firenze",
+            "data_registrazione": "2025-06-30"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Sara",
+              "Marco",
+              "Elena",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Conti",
+              "Moretti",
+              "Ferrari",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "data_ordine": "2026-01-10",
+            "totale_ordine": 129.9,
+            "stato_ordine": "consegnato"
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "data_ordine": "2026-01-18",
+            "totale_ordine": 89.5,
+            "stato_ordine": "spedito"
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "data_ordine": "2026-01-25",
+            "totale_ordine": 240.0,
+            "stato_ordine": "pagato"
+          },
+          {
+            "id": 104,
+            "cliente_id": 4,
+            "data_ordine": "2026-02-03",
+            "totale_ordine": 57.8,
+            "stato_ordine": "in_attesa"
+          },
+          {
+            "id": 105,
+            "cliente_id": 5,
+            "data_ordine": "2026-02-14",
+            "totale_ordine": 315.4,
+            "stato_ordine": "annullato"
+          },
+          {
+            "id": 106,
+            "cliente_id": 6,
+            "data_ordine": "2026-02-20",
+            "totale_ordine": 102.3,
+            "stato_ordine": "consegnato"
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "totale_ordine": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnato",
+              "consegnato",
+              "spedito",
+              "spedito",
+              "pagato",
+              "in_attesa",
+              "annullato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "dettagli_ordine",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1001,
+            "ordine_id": 101,
+            "prodotto": "Cuffie Wireless Pro",
+            "quantita": 2,
+            "prezzo_unitario": 45.0
+          },
+          {
+            "id": 1002,
+            "ordine_id": 101,
+            "prodotto": "Mouse Ottico USB",
+            "quantita": 1,
+            "prezzo_unitario": 39.9
+          },
+          {
+            "id": 1003,
+            "ordine_id": 102,
+            "prodotto": "Tastiera Meccanica RGB",
+            "quantita": 1,
+            "prezzo_unitario": 89.5
+          },
+          {
+            "id": 1004,
+            "ordine_id": 103,
+            "prodotto": "Monitor 27 pollici 4K",
+            "quantita": 1,
+            "prezzo_unitario": 189.0
+          },
+          {
+            "id": 1005,
+            "ordine_id": 103,
+            "prodotto": "Webcam Full HD",
+            "quantita": 1,
+            "prezzo_unitario": 51.0
+          },
+          {
+            "id": 1006,
+            "ordine_id": 104,
+            "prodotto": "SSD NVMe 1TB",
+            "quantita": 1,
+            "prezzo_unitario": 57.8
+          }
+        ],
+        "variations": {
+          "prodotto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Cuffie Wireless Pro",
+              "Mouse Ottico USB",
+              "Tastiera Meccanica RGB",
+              "Monitor 27 pollici 4K",
+              "Webcam Full HD",
+              "SSD NVMe 1TB",
+              "Hub USB-C 7 porte",
+              "Power Bank 20000mAh"
+            ]
+          },
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "1",
+              "2",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

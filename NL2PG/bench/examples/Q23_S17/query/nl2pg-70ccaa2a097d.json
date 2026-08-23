@@ -1,0 +1,663 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0),\n    indirizzo_spedizione TEXT NOT NULL,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE righe_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    subtotale_riga NUMERIC(12,2) GENERATED ALWAYS AS (ROUND(quantita * prezzo_unitario, 2)) STORED\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 151,
+        "columns": {
+          "id": {
+            "distinct": 151,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 151
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "email": {
+            "distinct": 151,
+            "sample": [
+              "giulia.bianchi10@example.com",
+              "giulia.bianchi11@example.com",
+              "giulia.bianchi12@example.com",
+              "giulia.bianchi13@example.com",
+              "giulia.bianchi14@example.com"
+            ]
+          },
+          "telefono": {
+            "distinct": 6,
+            "sample": [
+              "+39 320 7766554",
+              "+39 331 4477882",
+              "+39 333 1234567",
+              "+39 340 9876543",
+              "+39 348 2201145"
+            ]
+          },
+          "creato_il": {
+            "distinct": 141,
+            "sample": [
+              "2025-02-28 17:10:00",
+              "2025-03-02 17:10:00",
+              "2025-03-05 17:10:00",
+              "2025-03-06 17:10:00",
+              "2025-03-09 17:10:00"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 84,
+            "sample": [
+              "2025-11-17 10:00:00",
+              "2025-11-18 10:00:00",
+              "2025-11-21 10:00:00",
+              "2025-11-24 10:00:00",
+              "2025-11-27 10:00:00"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 424,
+        "columns": {
+          "id": {
+            "distinct": 424,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 424
+          },
+          "sku": {
+            "distinct": 424,
+            "sample": [
+              "SKU-ELC-0001",
+              "SKU-ELC-00011",
+              "SKU-ELC-000110",
+              "SKU-ELC-000111",
+              "SKU-ELC-000112"
+            ]
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Cuffie Wireless ANC",
+              "Hub USB-C 7 porte",
+              "Monitor 27 pollici 4K",
+              "Mouse Ottico USB",
+              "Power Bank 20000mAh"
+            ]
+          },
+          "descrizione": {
+            "distinct": 5,
+            "sample": [
+              "Cuffie over-ear con cancellazione attiva del rumore",
+              "Mouse ergonomico 1600 DPI con cavo USB",
+              "Tastiera gaming switch rosso retroilluminata",
+              "Unità a stato solido NVMe PCIe Gen4",
+              "Webcam 1080p con microfono integrato"
+            ]
+          },
+          "prezzo_unitario": {
+            "distinct": 411,
+            "sample": [
+              "100.05",
+              "101.25",
+              "101.29",
+              "102.09",
+              "102.49"
+            ],
+            "min": 13.18,
+            "max": 233.98
+          },
+          "giacenza_magazzino": {
+            "distinct": 417,
+            "sample": [
+              "102.43911603587662",
+              "103.0627785956062",
+              "104.50413986232994",
+              "104.76022060906865",
+              "105.31257550372344"
+            ],
+            "min": 26.30756181453333,
+            "max": 450.0
+          },
+          "creato_il": {
+            "distinct": 305,
+            "sample": [
+              "2025-02-20 11:00:00",
+              "2025-02-27 11:00:00",
+              "2025-02-28 11:00:00",
+              "2025-03-04 11:00:00",
+              "2025-03-06 11:00:00"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 107,
+            "sample": [
+              "2025-12-06 14:30:00",
+              "2025-12-07 14:30:00",
+              "2025-12-08 14:30:00",
+              "2025-12-09 14:30:00",
+              "2025-12-13 14:30:00"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 474,
+        "columns": {
+          "id": {
+            "distinct": 474,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 474
+          },
+          "numero_ordine": {
+            "distinct": 474,
+            "sample": [
+              "ORD-2026-0001",
+              "ORD-2026-00011",
+              "ORD-2026-000110",
+              "ORD-2026-000111",
+              "ORD-2026-000112"
+            ]
+          },
+          "cliente_id": {
+            "distinct": 144,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 151
+          },
+          "data_ordine": {
+            "distinct": 323,
+            "sample": [
+              "2025-11-06 11:00:00",
+              "2025-11-07 11:00:00",
+              "2025-11-08 15:30:00",
+              "2025-11-09 15:30:00",
+              "2025-11-10 15:30:00"
+            ]
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "confermato",
+              "consegnato",
+              "in_attesa",
+              "spedito"
+            ]
+          },
+          "totale_ordine": {
+            "distinct": 457,
+            "sample": [
+              "1006.53",
+              "101.03",
+              "1010.76",
+              "1019.4",
+              "103.11"
+            ],
+            "min": 37.49,
+            "max": 2445.04
+          },
+          "indirizzo_spedizione": {
+            "distinct": 6,
+            "sample": [
+              "Corso Buenos Aires 45, 20124 Milano",
+              "Piazza Duomo 3, 27100 Pavia",
+              "Via Roma 12, 00184 Roma",
+              "Via Toledo 112, 80134 Napoli",
+              "Via Torino 8, 10123 Torino"
+            ]
+          },
+          "creato_il": {
+            "distinct": 321,
+            "sample": [
+              "2025-11-07 11:05:00",
+              "2025-11-08 11:05:00",
+              "2025-11-09 11:05:00",
+              "2025-11-09 15:35:00",
+              "2025-11-10 11:05:00"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 95,
+            "sample": [
+              "2026-01-16 10:00:00",
+              "2026-01-17 10:00:00",
+              "2026-01-18 10:00:00",
+              "2026-01-19 10:00:00",
+              "2026-01-20 10:00:00"
+            ]
+          }
+        }
+      },
+      "righe_ordine": {
+        "row_count": 666,
+        "columns": {
+          "id": {
+            "distinct": 666,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 666
+          },
+          "ordine_id": {
+            "distinct": 356,
+            "sample": [
+              "10",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 2,
+            "max": 474
+          },
+          "prodotto_id": {
+            "distinct": 336,
+            "sample": [
+              "10",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 2,
+            "max": 424
+          },
+          "quantita": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "prezzo_unitario": {
+            "distinct": 631,
+            "sample": [
+              "100.16",
+              "100.3",
+              "100.36",
+              "100.66",
+              "100.69"
+            ],
+            "min": 14.04,
+            "max": 207.98
+          },
+          "subtotale_riga": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 87,
+          "nome": "Francesca",
+          "cognome": "Conti",
+          "email": "francesca.conti1@example.com",
+          "telefono": null,
+          "creato_il": "2025-05-28T10:45:00",
+          "deleted_at": "2025-12-10T16:20:00"
+        },
+        {
+          "id": 1,
+          "nome": "Matteo",
+          "cognome": "Marino",
+          "email": "matteo.marino1@example.com",
+          "telefono": null,
+          "creato_il": "2025-08-12T09:00:00",
+          "deleted_at": "2026-02-08T10:00:00"
+        },
+        {
+          "id": 3,
+          "nome": "Matteo",
+          "cognome": "Russo",
+          "email": "matteo.russo1@example.com",
+          "telefono": "+39 349 5558899",
+          "creato_il": "2025-08-30T09:00:00",
+          "deleted_at": "2026-02-21T10:00:00"
+        },
+        {
+          "id": 2,
+          "nome": "Sara",
+          "cognome": "Greco",
+          "email": "sara.greco1@example.com",
+          "telefono": "+39 333 1234567",
+          "creato_il": "2025-08-25T09:00:00",
+          "deleted_at": "2025-12-17T10:00:00"
+        },
+        {
+          "id": 105,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi1@example.com",
+          "telefono": null,
+          "creato_il": "2025-07-04T17:10:00",
+          "deleted_at": null
+        },
+        {
+          "id": 57,
+          "nome": "Alessandro",
+          "cognome": "Colombo",
+          "email": "alessandro.colombo1@example.com",
+          "telefono": "+39 348 2201145",
+          "creato_il": "2025-06-14T14:30:00",
+          "deleted_at": "2025-12-14T11:15:00"
+        },
+        {
+          "id": 134,
+          "nome": "Alessandro",
+          "cognome": "Colombo",
+          "email": "alessandro.colombo2@example.com",
+          "telefono": "+39 348 2201145",
+          "creato_il": "2025-07-06T08:55:00",
+          "deleted_at": null
+        },
+        {
+          "id": 26,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "email": "alessandro.conti1@example.com",
+          "telefono": "+39 340 9876543",
+          "creato_il": "2025-08-10T09:00:00",
+          "deleted_at": "2026-03-05T10:00:00"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "sku": "SKU-ELC-0001",
+          "nome": "SSD NVMe 1TB",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "prezzo_unitario": 193.74,
+          "giacenza_magazzino": 174.7130268915677,
+          "creato_il": "2025-03-26 08:30:00",
+          "deleted_at": "2026-01-31 09:00:00"
+        },
+        {
+          "id": 2,
+          "sku": "SKU-ELC-00011",
+          "nome": "SSD NVMe 1TB",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "prezzo_unitario": 156.82,
+          "giacenza_magazzino": 173.62073948044736,
+          "creato_il": "2025-05-04 08:30:00",
+          "deleted_at": "2026-01-13 09:00:00"
+        },
+        {
+          "id": 3,
+          "sku": "SKU-ELC-00012",
+          "nome": "Power Bank 20000mAh",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "prezzo_unitario": 209.53,
+          "giacenza_magazzino": 149.76774419654316,
+          "creato_il": "2025-05-29 08:30:00",
+          "deleted_at": "2025-12-20 09:00:00"
+        },
+        {
+          "id": 4,
+          "sku": "SKU-ELC-00013",
+          "nome": "Monitor 27 pollici 4K",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "prezzo_unitario": 184.56,
+          "giacenza_magazzino": 82.34923118285234,
+          "creato_il": "2025-05-27 08:30:00",
+          "deleted_at": "2026-02-28 09:00:00"
+        },
+        {
+          "id": 5,
+          "sku": "SKU-ELC-00014",
+          "nome": "Power Bank 20000mAh",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "prezzo_unitario": 130.35,
+          "giacenza_magazzino": 119.52668266050725,
+          "creato_il": "2025-07-01 08:30:00",
+          "deleted_at": "2026-02-01 09:00:00"
+        },
+        {
+          "id": 6,
+          "sku": "SKU-ELC-00015",
+          "nome": "Hub USB-C 7 porte",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "prezzo_unitario": 179.78,
+          "giacenza_magazzino": 262.67749175340805,
+          "creato_il": "2025-05-26 08:30:00",
+          "deleted_at": "2026-03-16 09:00:00"
+        },
+        {
+          "id": 7,
+          "sku": "SKU-ELC-00016",
+          "nome": "Tastiera Meccanica RGB",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "prezzo_unitario": 229.04,
+          "giacenza_magazzino": 178.50153180743416,
+          "creato_il": "2025-07-02 08:30:00",
+          "deleted_at": "2026-01-07 09:00:00"
+        },
+        {
+          "id": 8,
+          "sku": "SKU-ELC-00017",
+          "nome": "Power Bank 20000mAh",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "prezzo_unitario": 151.57,
+          "giacenza_magazzino": 214.00358439790642,
+          "creato_il": "2025-07-04 08:30:00",
+          "deleted_at": "2026-02-08 09:00:00"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 1,
+          "numero_ordine": "ORD-2026-0001",
+          "cliente_id": 105,
+          "data_ordine": "2025-12-16 11:00:00",
+          "stato_ordine": "spedito",
+          "totale_ordine": 203.29,
+          "indirizzo_spedizione": "Viale Trieste 78, 35121 Padova",
+          "creato_il": "2026-02-20 11:05:00",
+          "deleted_at": "2026-02-19 10:00:00"
+        },
+        {
+          "id": 2,
+          "numero_ordine": "ORD-2026-00011",
+          "cliente_id": 17,
+          "data_ordine": "2026-02-15 11:00:00",
+          "stato_ordine": "in_attesa",
+          "totale_ordine": 154.45,
+          "indirizzo_spedizione": "Piazza Duomo 3, 27100 Pavia",
+          "creato_il": "2025-12-02 11:05:00",
+          "deleted_at": "2026-02-07 10:00:00"
+        },
+        {
+          "id": 3,
+          "numero_ordine": "ORD-2026-00012",
+          "cliente_id": 50,
+          "data_ordine": "2025-11-27 11:00:00",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 266.29,
+          "indirizzo_spedizione": "Via Torino 8, 10123 Torino",
+          "creato_il": "2026-02-19 11:05:00",
+          "deleted_at": "2026-02-26 10:00:00"
+        },
+        {
+          "id": 4,
+          "numero_ordine": "ORD-2026-00013",
+          "cliente_id": 16,
+          "data_ordine": "2025-12-28 11:00:00",
+          "stato_ordine": "confermato",
+          "totale_ordine": 327.52,
+          "indirizzo_spedizione": "Viale Trieste 78, 35121 Padova",
+          "creato_il": "2025-12-30 11:05:00",
+          "deleted_at": "2026-01-29 10:00:00"
+        },
+        {
+          "id": 5,
+          "numero_ordine": "ORD-2026-00014",
+          "cliente_id": 19,
+          "data_ordine": "2026-01-13 11:00:00",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 303.44,
+          "indirizzo_spedizione": "Via Toledo 112, 80134 Napoli",
+          "creato_il": "2025-12-30 11:05:00",
+          "deleted_at": "2026-01-17 10:00:00"
+        },
+        {
+          "id": 6,
+          "numero_ordine": "ORD-2026-00015",
+          "cliente_id": 71,
+          "data_ordine": "2026-01-20 11:00:00",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 343.47,
+          "indirizzo_spedizione": "Via Toledo 112, 80134 Napoli",
+          "creato_il": "2025-12-19 11:05:00",
+          "deleted_at": "2026-02-25 10:00:00"
+        },
+        {
+          "id": 7,
+          "numero_ordine": "ORD-2026-00016",
+          "cliente_id": 145,
+          "data_ordine": "2026-01-23 11:00:00",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 307.5,
+          "indirizzo_spedizione": "Viale Trieste 78, 35121 Padova",
+          "creato_il": "2025-11-20 11:05:00",
+          "deleted_at": "2026-02-23 10:00:00"
+        },
+        {
+          "id": 8,
+          "numero_ordine": "ORD-2026-00017",
+          "cliente_id": 21,
+          "data_ordine": "2026-01-14 11:00:00",
+          "stato_ordine": "in_attesa",
+          "totale_ordine": 239.59,
+          "indirizzo_spedizione": "Via Roma 12, 00184 Roma",
+          "creato_il": "2026-02-22 11:05:00",
+          "deleted_at": "2026-03-14 10:00:00"
+        }
+      ],
+      "righe_ordine": [
+        {
+          "id": 1,
+          "ordine_id": 311,
+          "prodotto_id": 98,
+          "quantita": "3",
+          "prezzo_unitario": 130.22,
+          "subtotale_riga": null
+        },
+        {
+          "id": 2,
+          "ordine_id": 175,
+          "prodotto_id": 77,
+          "quantita": "5",
+          "prezzo_unitario": 111.28,
+          "subtotale_riga": null
+        },
+        {
+          "id": 3,
+          "ordine_id": 290,
+          "prodotto_id": 120,
+          "quantita": "5",
+          "prezzo_unitario": 149.9,
+          "subtotale_riga": null
+        },
+        {
+          "id": 4,
+          "ordine_id": 305,
+          "prodotto_id": 424,
+          "quantita": "2",
+          "prezzo_unitario": 135.35,
+          "subtotale_riga": null
+        },
+        {
+          "id": 5,
+          "ordine_id": 376,
+          "prodotto_id": 395,
+          "quantita": "2",
+          "prezzo_unitario": 138.11,
+          "subtotale_riga": null
+        },
+        {
+          "id": 6,
+          "ordine_id": 418,
+          "prodotto_id": 124,
+          "quantita": "3",
+          "prezzo_unitario": 145.29,
+          "subtotale_riga": null
+        },
+        {
+          "id": 7,
+          "ordine_id": 285,
+          "prodotto_id": 46,
+          "quantita": "5",
+          "prezzo_unitario": 111.76,
+          "subtotale_riga": null
+        },
+        {
+          "id": 8,
+          "ordine_id": 344,
+          "prodotto_id": 201,
+          "quantita": "3",
+          "prezzo_unitario": 147.65,
+          "subtotale_riga": null
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "filtered_agg"
+  ],
+  "query": "SELECT p.nome AS nome_prodotto, COUNT(*) AS numero_righe_ordine, SUM(ro.quantita) AS quantita_totale_venduta, ROUND(SUM(ro.quantita * ro.prezzo_unitario), 2) AS fatturato_totale, ROUND(SUM(ro.quantita * ro.prezzo_unitario) FILTER (WHERE o.stato_ordine = 'consegnato'), 2) AS fatturato_da_ordini_consegnati, COUNT(*) FILTER (WHERE o.stato_ordine = 'consegnato') AS righe_da_ordini_consegnati FROM prodotti p JOIN righe_ordine ro ON ro.prodotto_id = p.id JOIN ordini o ON o.id = ro.ordine_id WHERE o.stato_ordine <> 'annullato' GROUP BY p.nome ORDER BY fatturato_totale DESC LIMIT 5;"
+}

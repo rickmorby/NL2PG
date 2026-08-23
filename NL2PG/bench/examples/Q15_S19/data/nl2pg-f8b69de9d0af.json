@@ -1,0 +1,529 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 5,
+    "hierarchy": "mixed",
+    "sql_features": [
+      "cte"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_acquirenti",
+        "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; il solver deve mappare la perifrasi al nome reale della tabella nel database."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore_complessivo",
+        "description": "La colonna importo_totale della tabella ordini viene indicata come valore_complessivo nei documenti aziendali; occorre riconoscere il sinonimo per riferirsi alla colonna corretta."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "venditori",
+        "obsolete_value": "rete_commerciale",
+        "description": "La tabella venditori viene indicata con il gergo aziendale rete_commerciale; il termine tecnico interno deve essere tradotto nel nome effettivo della tabella durante la formulazione della query CTE."
+      }
+    ],
+    "spec_hash": "c90c028dc963bf2e"
+  },
+  "schema_ddl": "CREATE TABLE venditori (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    regione TEXT NOT NULL,\n    data_assunzione DATE NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0)\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    venditore_id INT NOT NULL REFERENCES venditori(id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    numero_riga INT NOT NULL,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "venditori",
+        "nature": "dimension",
+        "min_rows": 80,
+        "max_rows": 140,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Bianchi",
+            "regione": "Lombardia",
+            "data_assunzione": "2019-03-11",
+            "email": "marco.bianchi@azienda.it"
+          },
+          {
+            "id": 2,
+            "nome": "Sara",
+            "cognome": "Conti",
+            "regione": "Lazio",
+            "data_assunzione": "2020-07-01",
+            "email": "sara.conti@azienda.it"
+          },
+          {
+            "id": 3,
+            "nome": "Luca",
+            "cognome": "Ferrari",
+            "regione": "Emilia-Romagna",
+            "data_assunzione": "2018-01-15",
+            "email": "luca.ferrari@azienda.it"
+          },
+          {
+            "id": 4,
+            "nome": "Elena",
+            "cognome": "Moretti",
+            "regione": "Campania",
+            "data_assunzione": "2021-09-20",
+            "email": "elena.moretti@azienda.it"
+          },
+          {
+            "id": 5,
+            "nome": "Paolo",
+            "cognome": "Ricci",
+            "regione": "Piemonte",
+            "data_assunzione": "2017-05-02",
+            "email": "paolo.ricci@azienda.it"
+          },
+          {
+            "id": 6,
+            "nome": "Giulia",
+            "cognome": "Gallo",
+            "regione": "Veneto",
+            "data_assunzione": "2022-02-14",
+            "email": "giulia.gallo@azienda.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Sara",
+              "Luca",
+              "Elena",
+              "Paolo",
+              "Giulia",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Bianchi",
+              "Conti",
+              "Ferrari",
+              "Moretti",
+              "Ricci",
+              "Gallo",
+              "Fontana",
+              "Marino",
+              "Greco",
+              "Bruno"
+            ]
+          },
+          "regione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Lombardia",
+              "Lazio",
+              "Emilia-Romagna",
+              "Campania",
+              "Piemonte",
+              "Veneto",
+              "Sicilia",
+              "Toscana",
+              "Puglia",
+              "Calabria"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -500.0,
+            "delta_max": 300.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 250,
+        "max_rows": 450,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Alfa Distribuzione SRL",
+            "codice_fiscale": "ALFDST75M12H501X",
+            "citta": "Milano",
+            "telefono": "+39 02 1234567"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Beta Retail SpA",
+            "codice_fiscale": "BTARTL68A05L219Y",
+            "citta": "Roma",
+            "telefono": "+39 06 9876543"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Gamma Food SNC",
+            "codice_fiscale": "GMMSFT80T23C129Z",
+            "citta": "Napoli",
+            "telefono": "+39 081 5566778"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Delta Servizi SRL",
+            "codice_fiscale": "DLTSRV72B14D963W",
+            "citta": "Torino",
+            "telefono": null
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Epsilon Trading SpA",
+            "codice_fiscale": "EPSTRD85C30E101Q",
+            "citta": "Bologna",
+            "telefono": "+39 051 3344556"
+          },
+          {
+            "id": 6,
+            "ragione_sociale": "Zeta Grossisti SRL",
+            "codice_fiscale": "ZTAGRS79K04F205L",
+            "citta": "Firenze",
+            "telefono": "+39 055 2233445"
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Alfa Distribuzione SRL",
+              "Beta Retail SpA",
+              "Gamma Food SNC",
+              "Delta Servizi SRL",
+              "Epsilon Trading SpA",
+              "Zeta Grossisti SRL",
+              "Omega Market SRL",
+              "Sigma Import SpA",
+              "Iota Consumabili SNC",
+              "Kappa Logistica SRL"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Napoli",
+              "Torino",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona",
+              "Palermo",
+              "Bari"
+            ]
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 280,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Olio EVO 1L",
+            "categoria": "Alimentari",
+            "prezzo_unitario": 8.9,
+            "giacenza_magazzino": 340
+          },
+          {
+            "id": 2,
+            "nome": "Pasta Rigatoni 500g",
+            "categoria": "Alimentari",
+            "prezzo_unitario": 1.45,
+            "giacenza_magazzino": 1200
+          },
+          {
+            "id": 3,
+            "nome": "Detergente Pavimenti 2L",
+            "categoria": "Pulizia",
+            "prezzo_unitario": 3.99,
+            "giacenza_magazzino": 480
+          },
+          {
+            "id": 4,
+            "nome": "Carta Igienica 12 rotoli",
+            "categoria": "Igiene",
+            "prezzo_unitario": 5.49,
+            "giacenza_magazzino": 720
+          },
+          {
+            "id": 5,
+            "nome": "Vino Rosso DOC 750ml",
+            "categoria": "Bevande",
+            "prezzo_unitario": 12.0,
+            "giacenza_magazzino": 210
+          },
+          {
+            "id": 6,
+            "nome": "Acqua Minerale 6x1.5L",
+            "categoria": "Bevande",
+            "prezzo_unitario": 2.7,
+            "giacenza_magazzino": 950
+          },
+          {
+            "id": 7,
+            "nome": "Shampoo Capelli 400ml",
+            "categoria": "Cura Personale",
+            "prezzo_unitario": 4.25,
+            "giacenza_magazzino": 600
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Olio EVO 1L",
+              "Pasta Rigatoni 500g",
+              "Detergente Pavimenti 2L",
+              "Carta Igienica 12 rotoli",
+              "Vino Rosso DOC 750ml",
+              "Acqua Minerale 6x1.5L",
+              "Shampoo Capelli 400ml",
+              "Caffe Macinato 250g",
+              "Sapone Mani 300ml",
+              "Biscotti Assortiti 700g"
+            ]
+          },
+          "categoria": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Alimentari",
+              "Alimentari",
+              "Bevande",
+              "Pulizia",
+              "Igiene",
+              "Cura Personale"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "giacenza_magazzino": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 2.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": 700,
+        "max_rows": 1100,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 5001,
+            "cliente_id": 1,
+            "venditore_id": 1,
+            "data_ordine": "2026-01-10",
+            "importo_totale": 245.8
+          },
+          {
+            "id": 5002,
+            "cliente_id": 2,
+            "venditore_id": 3,
+            "data_ordine": "2026-01-18",
+            "importo_totale": 89.9
+          },
+          {
+            "id": 5003,
+            "cliente_id": 3,
+            "venditore_id": 2,
+            "data_ordine": "2026-02-02",
+            "importo_totale": 512.4
+          },
+          {
+            "id": 5004,
+            "cliente_id": 4,
+            "venditore_id": 5,
+            "data_ordine": "2026-02-14",
+            "importo_totale": 130.0
+          },
+          {
+            "id": 5005,
+            "cliente_id": 5,
+            "venditore_id": 4,
+            "data_ordine": "2026-03-05",
+            "importo_totale": 76.25
+          },
+          {
+            "id": 5006,
+            "cliente_id": 6,
+            "venditore_id": 6,
+            "data_ordine": "2026-03-21",
+            "importo_totale": 398.6
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "righe_ordine",
+        "nature": "fact",
+        "min_rows": 1600,
+        "max_rows": 2600,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "ordine_id": 5001,
+            "numero_riga": 1,
+            "prodotto_id": 1,
+            "quantita": 4,
+            "prezzo_unitario": 8.9
+          },
+          {
+            "ordine_id": 5001,
+            "numero_riga": 2,
+            "prodotto_id": 2,
+            "quantita": 12,
+            "prezzo_unitario": 1.45
+          },
+          {
+            "ordine_id": 5002,
+            "numero_riga": 1,
+            "prodotto_id": 3,
+            "quantita": 6,
+            "prezzo_unitario": 3.99
+          },
+          {
+            "ordine_id": 5003,
+            "numero_riga": 1,
+            "prodotto_id": 5,
+            "quantita": 3,
+            "prezzo_unitario": 12.0
+          },
+          {
+            "ordine_id": 5003,
+            "numero_riga": 2,
+            "prodotto_id": 6,
+            "quantita": 10,
+            "prezzo_unitario": 2.7
+          },
+          {
+            "ordine_id": 5004,
+            "numero_riga": 1,
+            "prodotto_id": 4,
+            "quantita": 8,
+            "prezzo_unitario": 5.49
+          },
+          {
+            "ordine_id": 5005,
+            "numero_riga": 1,
+            "prodotto_id": 7,
+            "quantita": 5,
+            "prezzo_unitario": 4.25
+          },
+          {
+            "ordine_id": 5006,
+            "numero_riga": 1,
+            "prodotto_id": 2,
+            "quantita": 24,
+            "prezzo_unitario": 1.45
+          }
+        ],
+        "variations": {
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "8",
+              "10",
+              "12",
+              "24"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "correlated_subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatture",
+      "obsolete_value": "documenti di vendita emessi",
+      "description": "La tabella fatture viene denominata 'documenti di vendita emessi' nella prosa aziendale. Il progettista deve riconoscere che le richieste sui documenti di vendita si riferiscono alla tabella fisica fatture."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "totale_imponibile",
+      "obsolete_value": "base imponibile ai fini IVA",
+      "description": "La colonna totale_imponibile della tabella righe_fattura è indicata nella documentazione come 'base imponibile ai fini IVA', un gergo contabile che non corrisponde letteralmente al nome della colonna."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "pagamenti",
+      "obsolete_value": "incassi registrati",
+      "description": "La tabella pagamenti è descritta nella prosa aziendale come 'incassi registrati'. Si tratta di un sinonimo contabile: ogni menzione degli incassi registrati va mappata sulla tabella pagamenti."
+    }
+  ],
+  "spec_hash": "d3b783aa0225ae1f"
+}

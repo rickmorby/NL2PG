@@ -1,0 +1,11 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 3,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "multi_join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "b2b682700d7f9d51"
+}

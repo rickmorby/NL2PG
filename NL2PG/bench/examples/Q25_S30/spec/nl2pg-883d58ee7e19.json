@@ -1,0 +1,20 @@
+{
+  "domain": "università",
+  "n_tables": 10,
+  "hierarchy": "path_routing",
+  "sql_features": [
+    "natural_join"
+  ],
+  "twist": [
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "iscrizioni_esami",
+      "obsolete_value": "registro_partecipazioni_verifiche",
+      "description": "La prosa aziendale descrive i dati richiesti come 'registro_partecipazioni_verifiche', suggerendo erroneamente tabelle distrattori plausibili ma irrilevanti presenti nello schema ampio (come 'presenze_lezioni', 'aule' o 'laboratori') che condividono colonne con nome comune (es. studente_id, corso_id, data). L'entità corretta è la tabella iscrizioni_esami, raggiungibile solo tramite il percorso di NATURAL JOIN studenti -> corsi -> appelli -> iscrizioni_esami, ignorando le tabelle esca poste lungo percorsi alternativi."
+    }
+  ],
+  "spec_hash": "80457aadd2a0f0df"
+}

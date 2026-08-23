@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "row_types"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "registro_operativita",
+      "description": "La tabella transazioni, che memorizza le operazioni di acquisto e vendita con la colonna composita prezzo_esecuzione di tipo dato_prezzo definito tramite CREATE TYPE, viene denominata registro_operativita nella prosa aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "prezzo_esecuzione.valore",
+      "obsolete_value": "controvalore di esecuzione",
+      "description": "Il campo valore della colonna composita prezzo_esecuzione (accessibile con la sintassi (prezzo_esecuzione).valore nelle SELECT e filtrabile con WHERE ROW((t.prezzo_esecuzione).valore, t.prezzo_esecuzione.valuta) = ROW(v1, v2)) viene indicato nella documentazione finanziaria con il gergo 'controvalore di esecuzione'."
+    }
+  ],
+  "spec_hash": "d8ed77df6842e21c"
+}

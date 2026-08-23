@@ -1,0 +1,457 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "in_condition"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ricoveri",
+        "obsolete_value": "episodi_di_cura",
+        "description": "La tabella fisica ricoveri viene denominata episodi_di_cura nella prosa aziendale. L'utente deve risalire dalla perifrasi presente nel testo alla tabella reale ricoveri per formulare correttamente join e filtri."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "gravita",
+        "obsolete_value": "punteggio di severità clinica",
+        "description": "La colonna gravita, fisicamente definita come TEXT ma contenente valori logicamente numerici (punteggi interi da 1 a 5), viene indicata nella prosa aziendale con il gergo clinico 'punteggio di severità clinica'. Le query che filtrano per punteggi specifici devono usare WHERE CAST(gravita AS NUMERIC) IN (v1, v2), poiché il confronto diretto su valori TEXT non è semanticamente corretto."
+      }
+    ],
+    "spec_hash": "0fbd5c94a9db73c6"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono_contatto TEXT\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano INT CHECK (piano >= 0),\n    posti_letto_totali INT CHECK (posti_letto_totali >= 0)\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    reparto_id INT NOT NULL REFERENCES reparti(id)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    data_ingresso DATE NOT NULL,\n    data_dimissione DATE,\n    gravita TEXT CHECK (gravita IN ('1', '2', '3', '4', '5')),\n    motivo_ricovero TEXT NOT NULL,\n    costo_giornaliero NUMERIC(10,2) CHECK (costo_giornaliero >= 0),\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ingresso)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "reparti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_reparto": "Cardiologia",
+            "piano": 2,
+            "posti_letto_totali": 24
+          },
+          {
+            "id": 2,
+            "nome_reparto": "Chirurgia Generale",
+            "piano": 1,
+            "posti_letto_totali": 30
+          },
+          {
+            "id": 3,
+            "nome_reparto": "Pediatria",
+            "piano": 0,
+            "posti_letto_totali": 18
+          },
+          {
+            "id": 4,
+            "nome_reparto": "Ortopedia",
+            "piano": 3,
+            "posti_letto_totali": 20
+          },
+          {
+            "id": 5,
+            "nome_reparto": "Neurologia",
+            "piano": 2,
+            "posti_letto_totali": 16
+          },
+          {
+            "id": 6,
+            "nome_reparto": "Medicina Interna",
+            "piano": 1,
+            "posti_letto_totali": 28
+          }
+        ],
+        "variations": {
+          "piano": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          "posti_letto_totali": {
+            "axis": "shift",
+            "delta_min": -4.0,
+            "delta_max": 6.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "pazienti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 250,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA80A01H501X",
+            "data_nascita": "1980-01-15",
+            "telefono_contatto": "+39 06 1234567"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA75C42F205Y",
+            "data_nascita": "1975-03-22",
+            "telefono_contatto": "+39 02 9876543"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI92D55L219Z",
+            "data_nascita": "1992-04-15",
+            "telefono_contatto": "+39 010 3344556"
+          },
+          {
+            "id": 4,
+            "nome": "Antonio",
+            "cognome": "Esposito",
+            "codice_fiscale": "ESPNNT68M12F839W",
+            "data_nascita": "1968-08-12",
+            "telefono_contatto": "+39 081 4567890"
+          },
+          {
+            "id": 5,
+            "nome": "Sara",
+            "cognome": "Colombo",
+            "codice_fiscale": "CLMSRA88T61F158S",
+            "data_nascita": "1988-12-21",
+            "telefono_contatto": "+39 055 7788990"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Antonio",
+              "Sara",
+              "Luca",
+              "Anna",
+              "Marco",
+              "Elena",
+              "Paolo",
+              "Francesca",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Esposito",
+              "Colombo",
+              "Russo",
+              "Ferrari",
+              "Greco",
+              "Conti",
+              "Marino",
+              "Gallo",
+              "Ricci"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -4000.0,
+            "delta_max": 4000.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "telefono_contatto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 06 1234567",
+              "+39 02 9876543",
+              "+39 081 4567890",
+              "+39 055 7788990",
+              "+39 010 3344556",
+              "+39 011 4455667",
+              "+39 091 6677889"
+            ]
+          }
+        }
+      },
+      {
+        "table": "medici",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Roberto",
+            "cognome": "Marchetti",
+            "specializzazione": "Cardiologia interventistica",
+            "reparto_id": 1
+          },
+          {
+            "id": 2,
+            "nome": "Chiara",
+            "cognome": "Fontana",
+            "specializzazione": "Chirurgia addominale",
+            "reparto_id": 2
+          },
+          {
+            "id": 3,
+            "nome": "Davide",
+            "cognome": "Moretti",
+            "specializzazione": "Pediatria generale",
+            "reparto_id": 3
+          },
+          {
+            "id": 4,
+            "nome": "Elena",
+            "cognome": "Gatti",
+            "specializzazione": "Ortopedia e traumatologia",
+            "reparto_id": 4
+          },
+          {
+            "id": 5,
+            "nome": "Franco",
+            "cognome": "Lombardi",
+            "specializzazione": "Neurologia clinica",
+            "reparto_id": 5
+          },
+          {
+            "id": 6,
+            "nome": "Alessandra",
+            "cognome": "Rinaldi",
+            "specializzazione": "Medicina interna",
+            "reparto_id": 6
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roberto",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Franco",
+              "Alessandra",
+              "Stefano",
+              "Valentina",
+              "Giorgio",
+              "Monica"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marchetti",
+              "Fontana",
+              "Moretti",
+              "Gatti",
+              "Lombardi",
+              "Rinaldi",
+              "Barbieri",
+              "Costa",
+              "De Luca",
+              "Villa"
+            ]
+          },
+          "specializzazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Cardiologia interventistica",
+              "Chirurgia addominale",
+              "Pediatria generale",
+              "Ortopedia e traumatologia",
+              "Neurologia clinica",
+              "Medicina interna"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ricoveri",
+        "nature": "fact",
+        "min_rows": 400,
+        "max_rows": 600,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "paziente_id": 1,
+            "medico_id": 1,
+            "data_ingresso": "2025-01-10",
+            "data_dimissione": "2025-01-18",
+            "gravita": "2",
+            "motivo_ricovero": "Infarto miocardico acuto",
+            "costo_giornaliero": 850.0
+          },
+          {
+            "id": 2,
+            "paziente_id": 2,
+            "medico_id": 2,
+            "data_ingresso": "2025-02-14",
+            "data_dimissione": "2025-02-20",
+            "gravita": "3",
+            "motivo_ricovero": "Appendicite acuta",
+            "costo_giornaliero": 720.5
+          },
+          {
+            "id": 3,
+            "paziente_id": 3,
+            "medico_id": 3,
+            "data_ingresso": "2025-03-05",
+            "data_dimissione": null,
+            "gravita": "4",
+            "motivo_ricovero": "Polmonite bilaterale",
+            "costo_giornaliero": 960.0
+          },
+          {
+            "id": 4,
+            "paziente_id": 4,
+            "medico_id": 4,
+            "data_ingresso": "2025-04-22",
+            "data_dimissione": "2025-04-25",
+            "gravita": "1",
+            "motivo_ricovero": "Frattura del femore",
+            "costo_giornaliero": 640.0
+          },
+          {
+            "id": 5,
+            "paziente_id": 5,
+            "medico_id": 5,
+            "data_ingresso": "2025-05-30",
+            "data_dimissione": "2025-06-09",
+            "gravita": "5",
+            "motivo_ricovero": "Ictus ischemico",
+            "costo_giornaliero": 1200.0
+          },
+          {
+            "id": 6,
+            "paziente_id": 6,
+            "medico_id": 6,
+            "data_ingresso": "2025-07-08",
+            "data_dimissione": "2025-07-12",
+            "gravita": "2",
+            "motivo_ricovero": "Scompenso cardiaco",
+            "costo_giornaliero": 700.0
+          }
+        ],
+        "variations": {
+          "data_ingresso": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_dimissione": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "gravita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "1",
+              "2",
+              "2",
+              "2",
+              "3",
+              "3",
+              "4",
+              "5"
+            ]
+          },
+          "motivo_ricovero": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Infarto miocardico acuto",
+              "Appendicite acuta",
+              "Polmonite bilaterale",
+              "Frattura del femore",
+              "Ictus ischemico",
+              "Scompenso cardiaco",
+              "Calcolosi biliare",
+              "Broncopneumopatia cronica",
+              "Artrite settica",
+              "Emorragia digestiva"
+            ]
+          },
+          "costo_giornaliero": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "contratti",
+        "obsolete_value": "piani_abbonamento_storici",
+        "description": "La tabella contratti, che mantiene la relazione uno-a-uno con la tabella sim, viene denominata piani_abbonamento_storici nella prosa aziendale. Il progettista deve riconoscere che le richieste sui 'piani abbonamento storici' si riferiscono alla tabella fisica contratti."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "gigabyte",
+        "obsolete_value": "volume traffico dati",
+        "description": "La colonna gigabyte della tabella contratti, che indica il tetto mensile di dati inclusi nel piano, viene indicata nella documentazione come 'volume traffico dati'. Le query di confronto tra lo schema legacy e quello moderno devono allineare questa colonna tramite UNION ALL nonostante la diversa denominazione."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "iccid",
+        "obsolete_value": "codice identificativo circuito integrato della scheda",
+        "description": "La colonna iccid della tabella sim è espressa nella prosa aziendale con la perifrasi tecnica completa 'codice identificativo circuito integrato della scheda'. Il solver deve mappare l'abbreviazione di settore al nome reale della colonna quando unisce i record dei due schemi discordanti con UNION ALL."
+      }
+    ],
+    "spec_hash": "b24a0c8072ca9f69"
+  },
+  "schema_ddl": "CREATE TABLE sim (\n    id INT PRIMARY KEY,\n    iccid TEXT NOT NULL UNIQUE,\n    numero_telefono TEXT NOT NULL,\n    operatore TEXT NOT NULL,\n    stato TEXT NOT NULL DEFAULT 'attiva' CHECK (stato IN ('attiva', 'sospesa', 'disattivata')),\n    data_attivazione DATE NOT NULL\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    sim_id INT NOT NULL UNIQUE REFERENCES sim(id),\n    denominazione_piano TEXT NOT NULL,\n    gigabyte INT NOT NULL CHECK (gigabyte > 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0),\n    canone_mensile NUMERIC(8,2) NOT NULL CHECK (canone_mensile >= 0),\n    data_sottoscrizione DATE NOT NULL,\n    data_cessazione DATE,\n    CHECK (data_cessazione IS NULL OR data_cessazione >= data_sottoscrizione)\n);"
+}

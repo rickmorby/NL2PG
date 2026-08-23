@@ -1,0 +1,11 @@
+{
+  "domain": "vendite",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "natural_join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "1ed842980fa794f1"
+}

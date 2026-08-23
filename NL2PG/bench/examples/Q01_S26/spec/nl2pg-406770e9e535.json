@@ -1,0 +1,25 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "stipendio_base",
+      "obsolete_value": "emolumento_mensile",
+      "description": "La colonna stipendio_base, memorizzata come stringa testuale, viene indicata con il sinonimo formale emolumento_mensile."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "dipendenti",
+      "obsolete_value": "forza_lavoro_attiva",
+      "description": "La tabella principale dei dipendenti viene riferita nel testo descrittivo come forza_lavoro_attiva."
+    }
+  ],
+  "spec_hash": "b9ce1c9454cf900f"
+}

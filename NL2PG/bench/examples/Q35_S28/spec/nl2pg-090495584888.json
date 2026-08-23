@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "case"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "emp_no",
+      "obsolete_value": "id_dipendente",
+      "description": "La colonna emp_no (sigla aziendale) viene denominata id_dipendente nella documentazione."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "dept_mgr",
+      "obsolete_value": "responsabile_reparto",
+      "description": "La colonna dept_mgr (acronimo aziendale) viene riferita come responsabile_reparto nei report."
+    }
+  ],
+  "spec_hash": "1969969ca2b293f5"
+}

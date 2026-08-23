@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "exists"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sim",
+        "obsolete_value": "schede_utente",
+        "description": "La tabella sim (contenente le schede SIM con chiave primaria id_sim) viene denominata schede_utente nella prosa aziendale. Le query devono risolvere schede_utente sulla tabella fisica sim."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "attivazione",
+        "obsolete_value": "provisioning",
+        "description": "La tabella attivazione (con FK unica id_sim verso sim, in corrispondenza 1:1) viene indicata nella documentazione con il termine tecnico di settore provisioning. Le query devono mappare provisioning sulla tabella attivazione; le SIM senza provisioning si individuano con WHERE NOT EXISTS (SELECT 1 FROM attivazione WHERE attivazione.id_sim = sim.id_sim)."
+      }
+    ],
+    "spec_hash": "0c5e56aadd8da574"
+  },
+  "schema_ddl": "CREATE TABLE sim (\n    id_sim INT PRIMARY KEY,\n    iccid TEXT NOT NULL UNIQUE,\n    numero_telefono TEXT NOT NULL UNIQUE,\n    stato TEXT NOT NULL DEFAULT 'inattiva' CHECK (stato IN ('inattiva', 'attiva', 'sospesa', 'disattivata')),\n    data_emissione DATE NOT NULL,\n    operatore TEXT NOT NULL\n);\n\nCREATE TABLE attivazione (\n    id_attivazione INT PRIMARY KEY,\n    id_sim INT NOT NULL UNIQUE REFERENCES sim(id_sim),\n    data_attivazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    piano_tariffario TEXT NOT NULL,\n    costo_attivazione NUMERIC(8,2) NOT NULL CHECK (costo_attivazione >= 0),\n    canale_attivazione TEXT NOT NULL CHECK (canale_attivazione IN ('negozio', 'online', 'call_center', 'rivenditore'))\n);"
+}

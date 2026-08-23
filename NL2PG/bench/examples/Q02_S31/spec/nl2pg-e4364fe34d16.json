@@ -1,0 +1,34 @@
+{
+  "domain": "vendite",
+  "n_tables": 5,
+  "hierarchy": "flat",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "movimenti_vendita",
+      "description": "La tabella principale delle transazioni è denominata movimenti_vendita nella documentazione aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "category_name",
+      "obsolete_value": "tipologia_prodotto",
+      "description": "Il campo category_name è riferito come tipologia_prodotto nei report interni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "supplier_name",
+      "obsolete_value": "fornitore_primario",
+      "description": "Il termine supplier_name viene sostituito con fornitore_primario nel gergo aziendale."
+    }
+  ],
+  "spec_hash": "a6c63aa2a02a9481"
+}

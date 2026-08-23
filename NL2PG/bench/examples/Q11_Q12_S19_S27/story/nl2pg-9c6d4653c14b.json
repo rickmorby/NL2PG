@@ -1,0 +1,550 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE gestori (\n    id INT PRIMARY KEY,\n    nome_gestore TEXT NOT NULL UNIQUE,\n    partita_iva TEXT NOT NULL UNIQUE,\n    sede_legale TEXT\n);\n\nCREATE TABLE abbonamenti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    gestore_id INT NOT NULL REFERENCES gestori(id),\n    numero_telefono TEXT NOT NULL UNIQUE,\n    piano_tariffario TEXT NOT NULL,\n    data_attivazione DATE NOT NULL,\n    stato TEXT NOT NULL CHECK (stato IN ('attivo', 'sospeso', 'disdetto'))\n);\n\nCREATE TABLE traffico_voce (\n    id INT PRIMARY KEY,\n    abbonamento_id INT NOT NULL REFERENCES abbonamenti(id),\n    data_chiamata DATE NOT NULL,\n    minuti_consumati NUMERIC(8,2) NOT NULL CHECK (minuti_consumati >= 0),\n    costo_chiamata NUMERIC(8,2) NOT NULL CHECK (costo_chiamata >= 0),\n    destinazione TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 119,
+        "columns": {
+          "id": {
+            "distinct": 119,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 119
+          },
+          "nome": {
+            "distinct": 11,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Esposito",
+              "Ferrari",
+              "Marino"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 119,
+            "sample": [
+              "BNCLRA85C42F205B",
+              "BNCLRA85C42F205C",
+              "BNCLRA85C42F205D",
+              "BNCLRA85C42F205E",
+              "BNCLRA85C42F205F"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Brescia",
+              "Firenze",
+              "Genova"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 111,
+            "sample": [
+              "1971-06-01",
+              "1971-07-04",
+              "1971-07-12",
+              "1971-10-19",
+              "1973-01-14"
+            ]
+          },
+          "email": {
+            "distinct": 112,
+            "sample": [
+              "federica.gallo10@example.com",
+              "federica.gallo11@example.com",
+              "federica.gallo12@example.com",
+              "federica.gallo13@example.com",
+              "federica.gallo14@example.com"
+            ]
+          }
+        }
+      },
+      "gestori": {
+        "row_count": 37,
+        "columns": {
+          "id": {
+            "distinct": 37,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 37
+          },
+          "nome_gestore": {
+            "distinct": 37,
+            "sample": [
+              "Fastweb Mobile S.p.A.",
+              "Fastweb Mobile S.p.A.1",
+              "Fastweb Mobile S.p.A.2",
+              "Fastweb Mobile S.p.A.3",
+              "Fastweb Mobile S.p.A.4"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 37,
+            "sample": [
+              "IT04182180007",
+              "IT041821800071",
+              "IT041821800072",
+              "IT041821800073",
+              "IT041821800074"
+            ]
+          },
+          "sede_legale": {
+            "distinct": 5,
+            "sample": [
+              "Bologna",
+              "Milano",
+              "Napoli",
+              "Roma",
+              "Torino"
+            ]
+          }
+        }
+      },
+      "abbonamenti": {
+        "row_count": 470,
+        "columns": {
+          "id": {
+            "distinct": 470,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 570
+          },
+          "cliente_id": {
+            "distinct": 118,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 119
+          },
+          "gestore_id": {
+            "distinct": 37,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 37
+          },
+          "numero_telefono": {
+            "distinct": 470,
+            "sample": [
+              "+393201234569",
+              "+3932012345691",
+              "+39320123456910",
+              "+39320123456911",
+              "+39320123456912"
+            ]
+          },
+          "piano_tariffario": {
+            "distinct": 5,
+            "sample": [
+              "Base",
+              "Business",
+              "Premium",
+              "Smart",
+              "Unlimited"
+            ]
+          },
+          "data_attivazione": {
+            "distinct": 325,
+            "sample": [
+              "2022-02-19",
+              "2022-02-20",
+              "2022-02-21",
+              "2022-03-01",
+              "2022-03-04"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "disdetto",
+              "sospeso"
+            ]
+          }
+        }
+      },
+      "traffico_voce": {
+        "row_count": 1382,
+        "columns": {
+          "id": {
+            "distinct": 1382,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 2382
+          },
+          "abbonamento_id": {
+            "distinct": 444,
+            "sample": [
+              "101",
+              "102",
+              "104",
+              "105",
+              "106"
+            ],
+            "min": 101,
+            "max": 570
+          },
+          "data_chiamata": {
+            "distinct": 304,
+            "sample": [
+              "2024-01-12",
+              "2024-01-13",
+              "2024-01-14",
+              "2024-01-15",
+              "2024-01-16"
+            ]
+          },
+          "minuti_consumati": {
+            "distinct": 1098,
+            "sample": [
+              "0.3",
+              "0.34",
+              "0.35",
+              "0.43",
+              "0.46"
+            ],
+            "min": 0.3,
+            "max": 135.0
+          },
+          "costo_chiamata": {
+            "distinct": 822,
+            "sample": [
+              "0.19",
+              "0.2",
+              "0.21",
+              "0.22",
+              "0.23"
+            ],
+            "min": 0.19,
+            "max": 61.5
+          },
+          "destinazione": {
+            "distinct": 5,
+            "sample": [
+              "estero UE",
+              "extra UE",
+              "fisso nazionale",
+              "mobile nazionale",
+              "numerazione speciale"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Laura",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC80A01H501U",
+          "citta": "Brescia",
+          "data_nascita": "1985-03-12",
+          "email": "marco.rossi@example.com"
+        },
+        {
+          "id": 2,
+          "nome": "Giulia",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRC80A01H501B",
+          "citta": "Bari",
+          "data_nascita": "1984-07-30",
+          "email": null
+        },
+        {
+          "id": 3,
+          "nome": "Marco",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRC80A01H501C",
+          "citta": "Torino",
+          "data_nascita": "1977-07-15",
+          "email": "marco.rossi2@example.com"
+        },
+        {
+          "id": 4,
+          "nome": "Luca",
+          "cognome": "Romano",
+          "codice_fiscale": "RSSMRC80A01H501D",
+          "citta": "Bari",
+          "data_nascita": "1985-10-01",
+          "email": "marco.rossi3@example.com"
+        },
+        {
+          "id": 5,
+          "nome": "Sara",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRC80A01H501E",
+          "citta": "Firenze",
+          "data_nascita": "1983-07-27",
+          "email": "marco.rossi4@example.com"
+        },
+        {
+          "id": 6,
+          "nome": "Francesca",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC80A01H501F",
+          "citta": "Firenze",
+          "data_nascita": "1985-11-13",
+          "email": "marco.rossi5@example.com"
+        },
+        {
+          "id": 7,
+          "nome": "Marco",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC80A01H501G",
+          "citta": "Roma",
+          "data_nascita": "1980-01-15",
+          "email": "marco.rossi6@example.com"
+        },
+        {
+          "id": 8,
+          "nome": "Andrea",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRC80A01H501H",
+          "citta": "Roma",
+          "data_nascita": "1986-10-08",
+          "email": "marco.rossi7@example.com"
+        }
+      ],
+      "gestori": [
+        {
+          "id": 1,
+          "nome_gestore": "TIM S.p.A.",
+          "partita_iva": "IT09739820586",
+          "sede_legale": null
+        },
+        {
+          "id": 2,
+          "nome_gestore": "TIM S.p.A.1",
+          "partita_iva": "IT097398205861",
+          "sede_legale": "Milano"
+        },
+        {
+          "id": 3,
+          "nome_gestore": "TIM S.p.A.2",
+          "partita_iva": "IT097398205862",
+          "sede_legale": "Napoli"
+        },
+        {
+          "id": 4,
+          "nome_gestore": "TIM S.p.A.3",
+          "partita_iva": "IT097398205863",
+          "sede_legale": "Milano"
+        },
+        {
+          "id": 5,
+          "nome_gestore": "TIM S.p.A.4",
+          "partita_iva": "IT097398205864",
+          "sede_legale": "Torino"
+        },
+        {
+          "id": 6,
+          "nome_gestore": "Vodafone Italia S.p.A.",
+          "partita_iva": "IT04182180007",
+          "sede_legale": "Milano"
+        },
+        {
+          "id": 7,
+          "nome_gestore": "Vodafone Italia S.p.A.1",
+          "partita_iva": "IT041821800071",
+          "sede_legale": "Torino"
+        },
+        {
+          "id": 8,
+          "nome_gestore": "Vodafone Italia S.p.A.2",
+          "partita_iva": "IT041821800072",
+          "sede_legale": "Torino"
+        }
+      ],
+      "abbonamenti": [
+        {
+          "id": 101,
+          "cliente_id": 43,
+          "gestore_id": 1,
+          "numero_telefono": "+393401234567",
+          "piano_tariffario": "Smart",
+          "data_attivazione": "2023-05-25",
+          "stato": "disdetto"
+        },
+        {
+          "id": 102,
+          "cliente_id": 90,
+          "gestore_id": 28,
+          "numero_telefono": "+3934012345671",
+          "piano_tariffario": "Premium",
+          "data_attivazione": "2023-05-23",
+          "stato": "attivo"
+        },
+        {
+          "id": 103,
+          "cliente_id": 7,
+          "gestore_id": 4,
+          "numero_telefono": "+3934012345672",
+          "piano_tariffario": "Base",
+          "data_attivazione": "2022-09-29",
+          "stato": "attivo"
+        },
+        {
+          "id": 104,
+          "cliente_id": 16,
+          "gestore_id": 34,
+          "numero_telefono": "+3934012345673",
+          "piano_tariffario": "Business",
+          "data_attivazione": "2022-08-01",
+          "stato": "attivo"
+        },
+        {
+          "id": 105,
+          "cliente_id": 38,
+          "gestore_id": 25,
+          "numero_telefono": "+3934012345674",
+          "piano_tariffario": "Smart",
+          "data_attivazione": "2022-10-26",
+          "stato": "sospeso"
+        },
+        {
+          "id": 106,
+          "cliente_id": 70,
+          "gestore_id": 1,
+          "numero_telefono": "+3934012345675",
+          "piano_tariffario": "Base",
+          "data_attivazione": "2022-11-09",
+          "stato": "sospeso"
+        },
+        {
+          "id": 107,
+          "cliente_id": 59,
+          "gestore_id": 15,
+          "numero_telefono": "+3934012345676",
+          "piano_tariffario": "Premium",
+          "data_attivazione": "2023-07-11",
+          "stato": "attivo"
+        },
+        {
+          "id": 108,
+          "cliente_id": 9,
+          "gestore_id": 34,
+          "numero_telefono": "+3934012345677",
+          "piano_tariffario": "Unlimited",
+          "data_attivazione": "2023-02-24",
+          "stato": "disdetto"
+        }
+      ],
+      "traffico_voce": [
+        {
+          "id": 1001,
+          "abbonamento_id": 445,
+          "data_chiamata": "2024-06-17",
+          "minuti_consumati": 12.1,
+          "costo_chiamata": 5.6,
+          "destinazione": "fisso nazionale"
+        },
+        {
+          "id": 1002,
+          "abbonamento_id": 441,
+          "data_chiamata": "2024-02-15",
+          "minuti_consumati": 22.26,
+          "costo_chiamata": 4.93,
+          "destinazione": "numerazione speciale"
+        },
+        {
+          "id": 1003,
+          "abbonamento_id": 263,
+          "data_chiamata": "2024-08-17",
+          "minuti_consumati": 27.07,
+          "costo_chiamata": 2.57,
+          "destinazione": "numerazione speciale"
+        },
+        {
+          "id": 1004,
+          "abbonamento_id": 180,
+          "data_chiamata": "2024-07-29",
+          "minuti_consumati": 9.68,
+          "costo_chiamata": 3.18,
+          "destinazione": "numerazione speciale"
+        },
+        {
+          "id": 1005,
+          "abbonamento_id": 457,
+          "data_chiamata": "2024-02-23",
+          "minuti_consumati": 14.62,
+          "costo_chiamata": 5.08,
+          "destinazione": "mobile nazionale"
+        },
+        {
+          "id": 1006,
+          "abbonamento_id": 248,
+          "data_chiamata": "2024-09-23",
+          "minuti_consumati": 6.14,
+          "costo_chiamata": 5.37,
+          "destinazione": "mobile nazionale"
+        },
+        {
+          "id": 1007,
+          "abbonamento_id": 450,
+          "data_chiamata": "2024-06-01",
+          "minuti_consumati": 14.99,
+          "costo_chiamata": 8.67,
+          "destinazione": "fisso nazionale"
+        },
+        {
+          "id": 1008,
+          "abbonamento_id": 279,
+          "data_chiamata": "2024-06-18",
+          "minuti_consumati": 3.46,
+          "costo_chiamata": 6.05,
+          "destinazione": "numerazione speciale"
+        }
+      ]
+    }
+  },
+  "story": "Nella direzione commerciale di una società di telecomunicazioni, l'archivio denominato clienti custodisce le schede anagrafiche degli utenti della rete: per ciascun cliente sono annotati il nome, il cognome, il codice fiscale, la città di residenza, la data di nascita e l'indirizzo di posta elettronica; complessivamente le schede in archivio ammontano a 119. Accanto ad esso, il registro gestori raccoglie le informazioni sui 37 operatori telefonici che erogano il servizio, con la ragione sociale del gestore, la partita IVA e la sede legale, che ricade in città come Milano, Torino o Napoli. Ogni utente può stipulare una o più linee contrattuali, annotate nell'archivio abbonamenti — che nei documenti interni assume anche la denominazione di linee_contrattuali — per un totale di 470 voci: ciascuna voce riporta il numero di telefono attivato, il piano tariffario sottoscritto — Base, Smart, Premium, Business oppure Unlimited —, la data di attivazione e lo stato della linea, che può risultare attivo, sospeso o disdetto. Il rimando alla scheda del cliente e al registro dei gestori permette di risalire, per ogni linea, al titolare e all'operatore di riferimento. Per il monitoraggio dei consumi, gli addetti consultano poi il registro traffico_voce, dove ciascuna delle 1382 comunicazioni effettuate durante il 2024 è descritta dalla data della chiamata, dai minuti consumati — indicati nei documenti aziendali anche come traffico_vocale_erogato —, dal costo della chiamata e dalla destinazione, che può essere fisso nazionale, mobile nazionale, estero UE, extra UE oppure numerazione speciale. In occasione della revisione semestrale della spesa telefonica, il responsabile commerciale ha richiesto un'analisi ben precisa. Occorre innanzitutto individuare i clienti residenti a Bari che possiedono almeno una linea in stato attivo: per ciascuno di essi vanno mostrati nome, cognome e città, sommando i costi di tutte le chiamate effettuate esclusivamente attraverso le loro linee attive, trascurando dunque i consumi eventualmente registrati su linee sospese o disdette. A completamento dell'analisi, gli operatori devono calcolare anche la media dei totali di spesa, riferita però all'intera platea dei clienti con abbonamenti attivi, qualunque sia la loro città di residenza, così da offrire un termine di confronto con la spesa media della clientela complessiva. L'elenco finale dei residenti baresi è infine ordinato per spesa telefonica decrescente, in modo da far emergere subito chi, tra i clienti di Bari, incide maggiormente sui ricavi da traffico vocale."
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 2,
+  "hierarchy": "one_to_one",
+  "sql_features": [
+    "right_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "manifesto_di_consegna",
+      "description": "La tabella spedizioni, che contiene i dati di consegna associati biunivocamente agli ordini tramite la chiave esterna unica ordine_id, viene denominata manifesto_di_consegna nella prosa aziendale. Le query devono risolvere questa perifrasi verso la tabella reale spedizioni."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "codice_tracciamento",
+      "obsolete_value": "riferimento_spedizione",
+      "description": "La colonna codice_tracciamento della tabella spedizioni viene indicata con il sinonimo riferimento_spedizione nella documentazione aziendale. Le query che richiedono il codice di tracking del corriere devono mappare il sinonimo sulla colonna reale codice_tracciamento."
+    }
+  ],
+  "spec_hash": "76596add6c5d7d16"
+}

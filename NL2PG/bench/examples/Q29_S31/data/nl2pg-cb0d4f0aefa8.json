@@ -1,0 +1,268 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 2,
+    "hierarchy": "flat",
+    "sql_features": [
+      "agg_distinct"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "categoria_immobile",
+        "obsolete_value": "tipologia_di_bene",
+        "description": "La colonna categoria_immobile della tabella denormalizzata immobili viene denominata tipologia_di_bene nella prosa aziendale. La query deve raggruppare per categoria_immobile anche se il testo parla di tipologia_di_bene."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "fornitore_manutenzione",
+        "obsolete_value": "impresa appaltatrice dei lavori",
+        "description": "La colonna fornitore_manutenzione della tabella immobili viene indicata nella documentazione aziendale con il gergo 'impresa appaltatrice dei lavori'. Il conteggio DISTINCT deve essere applicato su fornitore_manutenzione riconoscendo la corrispondenza semantica."
+      }
+    ],
+    "spec_hash": "8da90e4d067ff5e0"
+  },
+  "schema_ddl": "CREATE TABLE gestori_immobili (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    citta_sede TEXT NOT NULL\n);\n\nCREATE TABLE immobili (\n    id INT PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    categoria_immobile TEXT NOT NULL,\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    valore_stimato NUMERIC(12,2) CHECK (valore_stimato >= 0),\n    fornitore_manutenzione TEXT,\n    gestore_id INT REFERENCES gestori_immobili(id),\n    n_interventi_manutenzione INT NOT NULL DEFAULT 0 CHECK (n_interventi_manutenzione >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "gestori_immobili",
+        "nature": "dimension",
+        "min_rows": 45,
+        "max_rows": 55,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Immobiliare Aurora S.r.l.",
+            "email": "info@auroraimmobili.it",
+            "telefono": "+39 06 1234567",
+            "citta_sede": "Roma"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Milano Gestioni Patrimoniali S.p.A.",
+            "email": "contatti@milanogestioni.it",
+            "telefono": "+39 02 9876543",
+            "citta_sede": "Milano"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Gestione Beni Liguri S.r.l.",
+            "email": "amministrazione@beniliguri.it",
+            "telefono": "+39 010 555123",
+            "citta_sede": "Genova"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Partenope Asset Management S.r.l.",
+            "email": "ufficio@partenopeasset.it",
+            "telefono": "+39 081 4423399",
+            "citta_sede": "Napoli"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Alpi Real Estate S.p.A.",
+            "email": "segreteria@alpirealestate.it",
+            "telefono": "+39 011 667788",
+            "citta_sede": "Torino"
+          }
+        ],
+        "variations": {
+          "citta_sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Bari"
+            ]
+          },
+          "telefono": {
+            "axis": "fixed",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "immobili",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 5.0,
+        "templates": [
+          {
+            "id": 101,
+            "indirizzo": "Via del Corso 12",
+            "citta": "Roma",
+            "categoria_immobile": "Appartamento",
+            "superficie_mq": 85.5,
+            "valore_stimato": 320000.0,
+            "fornitore_manutenzione": "EdilRestauro S.r.l.",
+            "gestore_id": 1,
+            "n_interventi_manutenzione": 4
+          },
+          {
+            "id": 102,
+            "indirizzo": "Corso Buenos Aires 45",
+            "citta": "Milano",
+            "categoria_immobile": "Ufficio",
+            "superficie_mq": 210.0,
+            "valore_stimato": 850000.0,
+            "fornitore_manutenzione": "Manutenzioni Tecniche Lombardia S.p.A.",
+            "gestore_id": 2,
+            "n_interventi_manutenzione": 12
+          },
+          {
+            "id": 103,
+            "indirizzo": "Via Roma 88",
+            "citta": "Torino",
+            "categoria_immobile": "Negozio",
+            "superficie_mq": 60.25,
+            "valore_stimato": 180000.0,
+            "fornitore_manutenzione": "EdilRestauro S.r.l.",
+            "gestore_id": 3,
+            "n_interventi_manutenzione": 2
+          },
+          {
+            "id": 104,
+            "indirizzo": "Via Toledo 130",
+            "citta": "Napoli",
+            "categoria_immobile": "Appartamento",
+            "superficie_mq": 95.0,
+            "valore_stimato": 260000.0,
+            "fornitore_manutenzione": "Costruzioni Vesuvio S.n.c.",
+            "gestore_id": 4,
+            "n_interventi_manutenzione": 7
+          },
+          {
+            "id": 105,
+            "indirizzo": "Via Po 21",
+            "citta": "Torino",
+            "categoria_immobile": "Villa",
+            "superficie_mq": 240.75,
+            "valore_stimato": 720000.0,
+            "fornitore_manutenzione": "GreenService Manutenzioni S.r.l.",
+            "gestore_id": 5,
+            "n_interventi_manutenzione": 9
+          },
+          {
+            "id": 106,
+            "indirizzo": "Via Indipendenza 7",
+            "citta": "Bologna",
+            "categoria_immobile": "Magazzino",
+            "superficie_mq": 450.0,
+            "valore_stimato": 410000.0,
+            "fornitore_manutenzione": "Logistica Manutenzioni Italia S.r.l.",
+            "gestore_id": 1,
+            "n_interventi_manutenzione": 15
+          },
+          {
+            "id": 107,
+            "indirizzo": "Piazza della Signoria 3",
+            "citta": "Firenze",
+            "categoria_immobile": "Palazzo Storico",
+            "superficie_mq": 380.4,
+            "valore_stimato": 1250000.0,
+            "fornitore_manutenzione": "Restauri Artistici Toscana S.r.l.",
+            "gestore_id": 2,
+            "n_interventi_manutenzione": 18
+          }
+        ],
+        "variations": {
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Bari"
+            ]
+          },
+          "categoria_immobile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Appartamento",
+              "Appartamento",
+              "Appartamento",
+              "Villa",
+              "Ufficio",
+              "Negozio",
+              "Magazzino",
+              "Loft",
+              "Palazzo Storico"
+            ]
+          },
+          "superficie_mq": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "valore_stimato": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "fornitore_manutenzione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "EdilRestauro S.r.l.",
+              "EdilRestauro S.r.l.",
+              "Manutenzioni Tecniche Lombardia S.p.A.",
+              "Costruzioni Vesuvio S.n.c.",
+              "GreenService Manutenzioni S.r.l.",
+              "Logistica Manutenzioni Italia S.r.l.",
+              "Restauri Artistici Toscana S.r.l."
+            ]
+          },
+          "n_interventi_manutenzione": {
+            "axis": "shift",
+            "delta_min": -1.0,
+            "delta_max": 6.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

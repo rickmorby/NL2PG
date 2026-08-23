@@ -1,0 +1,535 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    denominazione TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    partita_iva TEXT UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT\n);\n\nCREATE TABLE fatture (\n    id INT PRIMARY KEY,\n    numero_fattura TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL,\n    data_fattura DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_fattura TEXT NOT NULL DEFAULT 'emessa' CHECK (stato_fattura IN ('emessa', 'pagata', 'parzialmente_pagata', 'annullata'))\n);\n\nCREATE TABLE pagamenti (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL,\n    data_pagamento DATE NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    metodo_pagamento TEXT NOT NULL DEFAULT 'bonifico'\n);\n\nCREATE TABLE rate (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL,\n    numero_rata INT NOT NULL,\n    data_scadenza DATE NOT NULL,\n    importo_rata NUMERIC(12,2) NOT NULL CHECK (importo_rata >= 0),\n    rata_saldata BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 479,
+        "columns": {
+          "id": {
+            "distinct": 479,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 479
+          },
+          "denominazione": {
+            "distinct": 8,
+            "sample": [
+              "Bianchi Distribuzione SpA",
+              "Conti Cartotecnica SAS",
+              "Esposito Food Group SRL",
+              "Ferretti Moda SRL",
+              "Greco Costruzioni SpA"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 479,
+            "sample": [
+              "BNCDST75T15F205B",
+              "BNCDST75T15F205C",
+              "BNCDST75T15F205D",
+              "BNCDST75T15F205E",
+              "BNCDST75T15F205F"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 451,
+            "sample": [
+              "01234567890",
+              "01234567891",
+              "01234567892",
+              "01234567893",
+              "01234567895"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "email": {
+            "distinct": 8,
+            "sample": [
+              "admin@lombarditech.it",
+              "amministrazione@bianchidistribuzione.it",
+              "contabilita@verdiarredamenti.it",
+              "fatturazione@espositofood.it",
+              "info@rossiefigli.it"
+            ]
+          }
+        }
+      },
+      "fatture": {
+        "row_count": 1353,
+        "columns": {
+          "id": {
+            "distinct": 1353,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 2353
+          },
+          "numero_fattura": {
+            "distinct": 1353,
+            "sample": [
+              "2026/0001",
+              "2026/00011",
+              "2026/000110",
+              "2026/0001100",
+              "2026/0001101"
+            ]
+          },
+          "cliente_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "data_fattura": {
+            "distinct": 180,
+            "sample": [
+              "2025-11-11",
+              "2025-11-12",
+              "2025-11-13",
+              "2025-11-14",
+              "2025-11-15"
+            ]
+          },
+          "importo_totale": {
+            "distinct": 1303,
+            "sample": [
+              "100.61",
+              "10058.02",
+              "10058.14",
+              "1006.3",
+              "10061.37"
+            ],
+            "min": 63.12,
+            "max": 16800.0
+          },
+          "stato_fattura": {
+            "distinct": 4,
+            "sample": [
+              "annullata",
+              "emessa",
+              "pagata",
+              "parzialmente_pagata"
+            ]
+          }
+        }
+      },
+      "pagamenti": {
+        "row_count": 1450,
+        "columns": {
+          "id": {
+            "distinct": 1450,
+            "sample": [
+              "5001",
+              "5002",
+              "5003",
+              "5004",
+              "5005"
+            ],
+            "min": 5001,
+            "max": 6450
+          },
+          "fattura_id": {
+            "distinct": 5,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 1005
+          },
+          "data_pagamento": {
+            "distinct": 140,
+            "sample": [
+              "2025-12-26",
+              "2025-12-27",
+              "2025-12-28",
+              "2025-12-29",
+              "2025-12-30"
+            ]
+          },
+          "importo": {
+            "distinct": 1379,
+            "sample": [
+              "100.14",
+              "100.2",
+              "1000.0",
+              "1002.12",
+              "1007.77"
+            ],
+            "min": 21.04,
+            "max": 6870.14
+          },
+          "metodo_pagamento": {
+            "distinct": 4,
+            "sample": [
+              "assegno",
+              "bonifico",
+              "contanti",
+              "rid"
+            ]
+          }
+        }
+      },
+      "rate": {
+        "row_count": 2209,
+        "columns": {
+          "id": {
+            "distinct": 2209,
+            "sample": [
+              "10000",
+              "10001",
+              "10002",
+              "10003",
+              "10004"
+            ],
+            "min": 9001,
+            "max": 11209
+          },
+          "fattura_id": {
+            "distinct": 4,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 1001,
+            "max": 1004
+          },
+          "numero_rata": {
+            "distinct": 4,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "data_scadenza": {
+            "distinct": 206,
+            "sample": [
+              "2026-01-11",
+              "2026-01-12",
+              "2026-01-13",
+              "2026-01-14",
+              "2026-01-16"
+            ]
+          },
+          "importo_rata": {
+            "distinct": 2099,
+            "sample": [
+              "1000.48",
+              "1002.72",
+              "1004.69",
+              "1004.91",
+              "1006.0"
+            ],
+            "min": 222.69,
+            "max": 3733.34
+          },
+          "rata_saldata": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "denominazione": "Rossi & Figli SRL",
+          "codice_fiscale": "RSSMRA80A01H501X",
+          "partita_iva": "01234567890",
+          "citta": "Milano",
+          "email": "info@rossiefigli.it"
+        },
+        {
+          "id": 2,
+          "denominazione": "Rossi & Figli SRL",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "partita_iva": "01234567891",
+          "citta": "Genova",
+          "email": "info@rossiefigli.it"
+        },
+        {
+          "id": 3,
+          "denominazione": "Rossi & Figli SRL",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "partita_iva": "01234567892",
+          "citta": "Roma",
+          "email": "info@rossiefigli.it"
+        },
+        {
+          "id": 4,
+          "denominazione": "Rossi & Figli SRL",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "partita_iva": "01234567893",
+          "citta": "Napoli",
+          "email": "info@rossiefigli.it"
+        },
+        {
+          "id": 5,
+          "denominazione": "Rossi & Figli SRL",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "partita_iva": null,
+          "citta": "Milano",
+          "email": "info@rossiefigli.it"
+        },
+        {
+          "id": 6,
+          "denominazione": "Rossi & Figli SRL",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "partita_iva": "01234567895",
+          "citta": "Firenze",
+          "email": "info@rossiefigli.it"
+        },
+        {
+          "id": 7,
+          "denominazione": "Rossi & Figli SRL",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "partita_iva": "01234567896",
+          "citta": "Firenze",
+          "email": "info@rossiefigli.it"
+        },
+        {
+          "id": 8,
+          "denominazione": "Rossi & Figli SRL",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "partita_iva": "01234567897",
+          "citta": "Roma",
+          "email": "info@rossiefigli.it"
+        }
+      ],
+      "fatture": [
+        {
+          "id": 1001,
+          "numero_fattura": "2026/0001",
+          "cliente_id": 1,
+          "data_fattura": "2025-11-13",
+          "importo_totale": 1957.55,
+          "stato_fattura": "parzialmente_pagata"
+        },
+        {
+          "id": 1002,
+          "numero_fattura": "2026/00011",
+          "cliente_id": 1,
+          "data_fattura": "2026-03-08",
+          "importo_totale": 614.78,
+          "stato_fattura": "parzialmente_pagata"
+        },
+        {
+          "id": 1003,
+          "numero_fattura": "2026/00012",
+          "cliente_id": 1,
+          "data_fattura": "2025-12-02",
+          "importo_totale": 2107.79,
+          "stato_fattura": "annullata"
+        },
+        {
+          "id": 1004,
+          "numero_fattura": "2026/00013",
+          "cliente_id": 1,
+          "data_fattura": "2026-01-29",
+          "importo_totale": 1611.83,
+          "stato_fattura": "annullata"
+        },
+        {
+          "id": 1005,
+          "numero_fattura": "2026/00014",
+          "cliente_id": 1,
+          "data_fattura": "2026-02-12",
+          "importo_totale": 3290.45,
+          "stato_fattura": "emessa"
+        },
+        {
+          "id": 1006,
+          "numero_fattura": "2026/00015",
+          "cliente_id": 1,
+          "data_fattura": "2026-01-10",
+          "importo_totale": 1250.0,
+          "stato_fattura": "pagata"
+        },
+        {
+          "id": 1007,
+          "numero_fattura": "2026/00016",
+          "cliente_id": 1,
+          "data_fattura": "2025-12-21",
+          "importo_totale": 891.47,
+          "stato_fattura": "emessa"
+        },
+        {
+          "id": 1008,
+          "numero_fattura": "2026/00017",
+          "cliente_id": 1,
+          "data_fattura": "2026-01-23",
+          "importo_totale": 580.46,
+          "stato_fattura": "emessa"
+        }
+      ],
+      "pagamenti": [
+        {
+          "id": 5001,
+          "fattura_id": 1001,
+          "data_pagamento": "2026-01-11",
+          "importo": 1726.34,
+          "metodo_pagamento": "rid"
+        },
+        {
+          "id": 5002,
+          "fattura_id": 1001,
+          "data_pagamento": "2026-03-21",
+          "importo": 2605.51,
+          "metodo_pagamento": "bonifico"
+        },
+        {
+          "id": 5003,
+          "fattura_id": 1001,
+          "data_pagamento": "2026-02-06",
+          "importo": 2389.25,
+          "metodo_pagamento": "rid"
+        },
+        {
+          "id": 5004,
+          "fattura_id": 1001,
+          "data_pagamento": "2026-02-03",
+          "importo": 1552.82,
+          "metodo_pagamento": "contanti"
+        },
+        {
+          "id": 5005,
+          "fattura_id": 1001,
+          "data_pagamento": "2026-03-17",
+          "importo": 1887.56,
+          "metodo_pagamento": "contanti"
+        },
+        {
+          "id": 5006,
+          "fattura_id": 1001,
+          "data_pagamento": "2026-01-21",
+          "importo": 2679.31,
+          "metodo_pagamento": "rid"
+        },
+        {
+          "id": 5007,
+          "fattura_id": 1001,
+          "data_pagamento": "2026-01-06",
+          "importo": 925.47,
+          "metodo_pagamento": "contanti"
+        },
+        {
+          "id": 5008,
+          "fattura_id": 1001,
+          "data_pagamento": "2026-03-23",
+          "importo": 2150.07,
+          "metodo_pagamento": "assegno"
+        }
+      ],
+      "rate": [
+        {
+          "id": 9001,
+          "fattura_id": 1001,
+          "numero_rata": "3",
+          "data_scadenza": "2026-03-16",
+          "importo_rata": 612.31,
+          "rata_saldata": "true"
+        },
+        {
+          "id": 9002,
+          "fattura_id": 1001,
+          "numero_rata": "2",
+          "data_scadenza": "2026-01-26",
+          "importo_rata": 1200.55,
+          "rata_saldata": "true"
+        },
+        {
+          "id": 9003,
+          "fattura_id": 1001,
+          "numero_rata": "1",
+          "data_scadenza": "2026-01-29",
+          "importo_rata": 897.24,
+          "rata_saldata": "true"
+        },
+        {
+          "id": 9004,
+          "fattura_id": 1001,
+          "numero_rata": "1",
+          "data_scadenza": "2026-03-31",
+          "importo_rata": 1076.14,
+          "rata_saldata": "false"
+        },
+        {
+          "id": 9005,
+          "fattura_id": 1001,
+          "numero_rata": "3",
+          "data_scadenza": "2026-01-17",
+          "importo_rata": 367.12,
+          "rata_saldata": "true"
+        },
+        {
+          "id": 9006,
+          "fattura_id": 1001,
+          "numero_rata": "2",
+          "data_scadenza": "2026-03-16",
+          "importo_rata": 625.31,
+          "rata_saldata": "false"
+        },
+        {
+          "id": 9007,
+          "fattura_id": 1001,
+          "numero_rata": "1",
+          "data_scadenza": "2026-01-12",
+          "importo_rata": 757.86,
+          "rata_saldata": "false"
+        },
+        {
+          "id": 9008,
+          "fattura_id": 1001,
+          "numero_rata": "2",
+          "data_scadenza": "2026-02-02",
+          "importo_rata": 921.52,
+          "rata_saldata": "true"
+        }
+      ]
+    }
+  },
+  "story": "Nella direzione amministrativa di Lombardi Tech, la chiusura di ogni trimestre comincia con la revisione dell'archivio clienti, denominato clienti, dove riposano le 479 schede dei partner commerciali: per ciascuna sono annotati la ragione sociale, il codice fiscale, la partita IVA, la città di insediamento e l'indirizzo di posta elettronica per la corrispondenza contabile. Il registro delle vendite, che negli atti interni compare sotto il nome documenti_di_vendita_emessi e che gli addetti più anziani chiamano ancora fatture, conta 1353 voci: ogni voce reca il proprio numero di documento, come il 2026/0001, la data di emissione, il rimando al cliente servito e il valore_complessivo_dovuto, vale a dire l'importo complessivo dell'operazione. Accanto ad esso lavora la prima nota degli incassi, intitolata prima_nota_incassi e un tempo nota come pagamenti, che annota i 1450 versamenti pervenuti con la loro data, la loro cifra e il mezzo utilizzato: bonifico, rid, contanti oppure assegno. Chiude il quadro lo scadenzario, l'archivio rate, con 2209 voci che ripartono i debiti in una, due o tre tranche numerate, ciascuna corredata dalla data di scadenza, dall'importo della rata e dall'indicazione se la rata risulta saldata. Nel periodo che va dal 2025-11-01 al 2026-04-30, il capo ufficio ha disposto un controllo mirato: occorre isolare, per ogni cliente dell'archivio clienti, i documenti ancora aperti, cioè quelli nello stato emessa oppure parzialmente_pagata, lasciando fuori chi risulta già nello stato pagata e chi è stato messo nello stato annullata. Per ciascuna singola voce del registro documenti_di_vendita_emessi, gli incassi ad essa collegati nella prima_nota_incassi vengono passati in rassegna uno a uno, così da sommare il totale incassato e ricavare, per differenza rispetto al valore_complessivo_dovuto, il residuo da incassare. Dalla medesima rassegna si estraggono anche i dettagli dell'ultimo versamento giunto, con la sua data e il suo mezzo: per il documento 2026/0001, ad esempio, l'ultimo flusso è registrato al 2026-03-21 tramite bonifico, mentre le scadenze collegate corrono dal 2026-01-12 al 2026-03-31. L'elenco finale viene disposto dal residuo più gravoso al più contenuto, cosicché l'ufficio recupero crediti possa inviare i primi solleciti sulle posizioni maggiormente scoperte prima della prossima tornata di chiusura."
+}

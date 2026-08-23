@@ -1,0 +1,11 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "b7822a3d67c06f70"
+}

@@ -1,0 +1,34 @@
+{
+  "domain": "sanità",
+  "n_tables": 6,
+  "hierarchy": "partitioned",
+  "sql_features": [
+    "filtered_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "visite_mediche",
+      "obsolete_value": "prestazioni_ambulatoriali",
+      "description": "La tabella fattuale partizionata visite_mediche (partizionata dichiarativamente sulla data della visita) viene denominata prestazioni_ambulatoriali nella prosa aziendale; le query vanno scritte sul nome reale della tabella logica, lasciando che i filtri sulla chiave di partizione abilitino il pruning."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "esito_ricovero",
+      "obsolete_value": "dimissione nosocomiale",
+      "description": "La colonna esito_ricovero è indicata nella documentazione clinica con il gergo medico 'dimissione nosocomiale'; occorre mappare il termine tecnico-sanitario al nome reale della colonna quando si costruiscono le condizioni dei filtri COUNT(*) FILTER (WHERE ...)."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "pazienti",
+      "obsolete_value": "assistiti",
+      "description": "La tabella anagrafica pazienti è riferita nella prosa amministrativa come assistiti; il sinonimo burocratico va ricondotto all'entità reale del database durante la risoluzione delle join e delle aggregazioni per gruppo."
+    }
+  ],
+  "spec_hash": "dc5c30da46266bef"
+}

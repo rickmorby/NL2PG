@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_risorse_aziendali",
+        "description": "La tabella dipendenti, che contiene i dati anagrafici spezzati nelle colonne first_name e last_name, viene denominata nella prosa aziendale come anagrafica_risorse_aziendali."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "last_name",
+        "obsolete_value": "denominazione familiare",
+        "description": "La colonna last_name della tabella dipendenti viene indicata nella documentazione aziendale con il sinonimo 'denominazione familiare', obbligando a riconoscere che il dato logico del cognome è archiviato su una colonna separata rispetto al nome."
+      }
+    ],
+    "spec_hash": "22b44c63dd806862"
+  },
+  "schema_ddl": "CREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile >= 0)\n);\n\nCREATE TABLE richieste_ferie (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    stato TEXT NOT NULL CHECK (stato IN ('in_attesa', 'approvata', 'rifiutata')),\n    CHECK (data_fine >= data_inizio)\n);"
+}

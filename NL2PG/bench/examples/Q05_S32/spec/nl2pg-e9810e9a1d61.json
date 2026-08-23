@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "group_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "registro_movimenti_contabili",
+      "description": "La tabella principale delle transazioni viene indicata nel linguaggio aziendale come registro_movimenti_contabili."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "created_by",
+      "obsolete_value": "operatore_di_input",
+      "description": "Il campo di audit created_by viene riferito internamente come operatore_di_input per indicare l'utente che ha inserito la registrazione."
+    }
+  ],
+  "spec_hash": "3392d1b943ae51ef"
+}

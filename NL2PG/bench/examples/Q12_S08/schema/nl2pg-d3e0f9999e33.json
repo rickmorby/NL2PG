@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 3,
+    "hierarchy": "isa",
+    "sql_features": [
+      "correlated_subquery"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "operazioni",
+        "obsolete_value": "registro_movimenti",
+        "description": "La tabella base 'operazioni' (entita' generica della gerarchia ISA che contiene pk, importo, data e discriminatore) viene denominata 'registro_movimenti' nella prosa aziendale. Il solver deve riconoscere che 'registro_movimenti' corrisponde alla tabella fisica 'operazioni'."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "tipo_operazione",
+        "obsolete_value": "classificazione_flusso",
+        "description": "La colonna discriminatore 'tipo_operazione' della tabella base 'operazioni', usata per distinguere i sottotipi (bonifici vs investimenti), viene indicata nella documentazione con il gergo finanziario 'classificazione_flusso'. Il solver deve mappare tale termine al discriminatore reale."
+      }
+    ],
+    "spec_hash": "38ba750217de812e"
+  },
+  "schema_ddl": "CREATE TABLE operazioni (\n    id INT PRIMARY KEY,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    data_operazione DATE NOT NULL,\n    tipo_operazione TEXT NOT NULL CHECK (tipo_operazione IN ('bonifico', 'investimento'))\n);\n\nCREATE TABLE bonifici (\n    id INT PRIMARY KEY REFERENCES operazioni(id) ON DELETE CASCADE,\n    iban_destinatario TEXT NOT NULL,\n    nome_beneficiario TEXT NOT NULL,\n    causale TEXT\n);\n\nCREATE TABLE investimenti (\n    id INT PRIMARY KEY REFERENCES operazioni(id) ON DELETE CASCADE,\n    strumento_finanziario TEXT NOT NULL,\n    quantita NUMERIC(14,4) NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(12,4) NOT NULL CHECK (prezzo_unitario >= 0)\n);"
+}

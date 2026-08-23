@@ -1,0 +1,1179 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_ordine TEXT NOT NULL UNIQUE,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('bozza', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE righe_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE pagamenti (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    metodo_pagamento TEXT NOT NULL CHECK (metodo_pagamento IN ('carta_credito', 'paypal', 'bonifico', 'contrassegno')),\n    importo_pagato NUMERIC(12,2) NOT NULL CHECK (importo_pagato >= 0),\n    stato_pagamento TEXT NOT NULL CHECK (stato_pagamento IN ('in_attesa', 'completato', 'rifiutato', 'rimborsato')),\n    data_pagamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);",
+  "data_profile": {
+    "profile": {
+      "categorie": {
+        "row_count": 22,
+        "columns": {
+          "id": {
+            "distinct": 22,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 22
+          },
+          "nome": {
+            "distinct": 22,
+            "sample": [
+              "Bellezza",
+              "Bellezza1",
+              "Bellezza2",
+              "Casa e Cucina",
+              "Casa e Cucina1"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Attrezzatura sportiva e outdoor",
+              "Cosmetici e cura della persona",
+              "Dispositivi elettronici di consumo",
+              "Elettrodomestici e articoli per la casa",
+              "Libri cartacei ed ebook"
+            ]
+          },
+          "created_at": {
+            "distinct": 21,
+            "sample": [
+              "2024-12-19 09:00:00",
+              "2024-12-22 09:05:00",
+              "2024-12-22 10:10:00",
+              "2024-12-22 10:15:00",
+              "2024-12-23 08:50:00"
+            ]
+          },
+          "created_by": {
+            "distinct": 1,
+            "sample": [
+              "admin"
+            ]
+          },
+          "updated_at": {
+            "distinct": 22,
+            "sample": [
+              "2025-05-21 10:30:00",
+              "2025-05-22 10:30:00",
+              "2025-06-09 10:30:00",
+              "2025-06-16 10:30:00",
+              "2025-07-05 11:00:00"
+            ]
+          },
+          "updated_by": {
+            "distinct": 2,
+            "sample": [
+              "admin",
+              "catalog_manager"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 536,
+        "columns": {
+          "id": {
+            "distinct": 536,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 536
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "email": {
+            "distinct": 536,
+            "sample": [
+              "alessandro.ferrari100@example.com",
+              "alessandro.ferrari101@example.com",
+              "alessandro.ferrari102@example.com",
+              "alessandro.ferrari103@example.com",
+              "alessandro.ferrari104@example.com"
+            ]
+          },
+          "telefono": {
+            "distinct": 6,
+            "sample": [
+              "+39 320 5551234",
+              "+39 331 2223344",
+              "+39 333 1112233",
+              "+39 339 4448899",
+              "+39 347 9876543"
+            ]
+          },
+          "created_at": {
+            "distinct": 453,
+            "sample": [
+              "2023-06-15 09:30:00",
+              "2023-06-25 09:30:00",
+              "2023-07-08 09:30:00",
+              "2023-07-09 09:30:00",
+              "2023-07-17 09:30:00"
+            ]
+          },
+          "created_by": {
+            "distinct": 3,
+            "sample": [
+              "call_center",
+              "import_crm",
+              "web_shop"
+            ]
+          },
+          "updated_at": {
+            "distinct": 294,
+            "sample": [
+              "2025-08-31 12:50:00",
+              "2025-09-01 12:50:00",
+              "2025-09-02 12:50:00",
+              "2025-09-03 12:50:00",
+              "2025-09-05 12:50:00"
+            ]
+          },
+          "updated_by": {
+            "distinct": 3,
+            "sample": [
+              "admin",
+              "import_crm",
+              "sistema"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 551,
+        "columns": {
+          "id": {
+            "distinct": 551,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 551
+          },
+          "categoria_id": {
+            "distinct": 22,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 22
+          },
+          "sku": {
+            "distinct": 551,
+            "sample": [
+              "SKU-BE-006",
+              "SKU-BE-0061",
+              "SKU-BE-00610",
+              "SKU-BE-00611",
+              "SKU-BE-00612"
+            ]
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Cuffie Bluetooth ANC",
+              "Frullatore Vortex 1200W",
+              "Laptop UltraBook 14",
+              "Macchina Caffe Espresso",
+              "Monitor 27 pollici 4K"
+            ]
+          },
+          "prezzo_unitario": {
+            "distinct": 536,
+            "sample": [
+              "100.12",
+              "100.47",
+              "100.63",
+              "1002.91",
+              "101.16"
+            ],
+            "min": 14.7,
+            "max": 1798.2
+          },
+          "giacenza_magazzino": {
+            "distinct": 538,
+            "sample": [
+              "100.05",
+              "100.38",
+              "1001.73",
+              "1003.18",
+              "101.07"
+            ],
+            "min": 9.0,
+            "max": 1200.0
+          },
+          "attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          },
+          "created_at": {
+            "distinct": 436,
+            "sample": [
+              "2024-09-04 09:00:00",
+              "2024-09-05 09:00:00",
+              "2024-09-06 09:00:00",
+              "2024-09-07 09:00:00",
+              "2024-09-08 09:00:00"
+            ]
+          },
+          "created_by": {
+            "distinct": 2,
+            "sample": [
+              "admin",
+              "catalog_manager"
+            ]
+          },
+          "updated_at": {
+            "distinct": 286,
+            "sample": [
+              "2025-08-18 12:25:00",
+              "2025-08-19 12:25:00",
+              "2025-08-22 12:25:00",
+              "2025-08-23 12:25:00",
+              "2025-08-24 12:25:00"
+            ]
+          },
+          "updated_by": {
+            "distinct": 3,
+            "sample": [
+              "admin",
+              "catalog_manager",
+              "sistema"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1597,
+        "columns": {
+          "id": {
+            "distinct": 1597,
+            "sample": [
+              "5001",
+              "5002",
+              "5003",
+              "5004",
+              "5005"
+            ],
+            "min": 5001,
+            "max": 6597
+          },
+          "cliente_id": {
+            "distinct": 504,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 536
+          },
+          "numero_ordine": {
+            "distinct": 1597,
+            "sample": [
+              "ORD-2026-000501",
+              "ORD-2026-0005011",
+              "ORD-2026-00050110",
+              "ORD-2026-000501100",
+              "ORD-2026-000501101"
+            ]
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "bozza",
+              "confermato",
+              "consegnato",
+              "spedito"
+            ]
+          },
+          "totale_ordine": {
+            "distinct": 1533,
+            "sample": [
+              "100.23",
+              "100.46",
+              "100.79",
+              "1003.99",
+              "1004.99"
+            ],
+            "min": 30.56,
+            "max": 3122.5
+          },
+          "data_ordine": {
+            "distinct": 180,
+            "sample": [
+              "2025-09-30",
+              "2025-10-01",
+              "2025-10-03",
+              "2025-10-04",
+              "2025-10-05"
+            ]
+          },
+          "created_at": {
+            "distinct": 572,
+            "sample": [
+              "2025-09-30 09:15:00",
+              "2025-10-01 09:15:00",
+              "2025-10-02 09:15:00",
+              "2025-10-03 09:15:00",
+              "2025-10-04 09:15:00"
+            ]
+          },
+          "created_by": {
+            "distinct": 3,
+            "sample": [
+              "call_center",
+              "sistema",
+              "web_shop"
+            ]
+          },
+          "updated_at": {
+            "distinct": 254,
+            "sample": [
+              "2025-12-21 16:40:00",
+              "2025-12-22 16:40:00",
+              "2025-12-23 16:40:00",
+              "2025-12-24 16:40:00",
+              "2025-12-25 16:40:00"
+            ]
+          },
+          "updated_by": {
+            "distinct": 3,
+            "sample": [
+              "customer_care",
+              "logistics",
+              "sistema"
+            ]
+          }
+        }
+      },
+      "righe_ordine": {
+        "row_count": 617,
+        "columns": {
+          "id": {
+            "distinct": 617,
+            "sample": [
+              "9001",
+              "9002",
+              "9003",
+              "9004",
+              "9005"
+            ],
+            "min": 9001,
+            "max": 9617
+          },
+          "ordine_id": {
+            "distinct": 513,
+            "sample": [
+              "5001",
+              "5006",
+              "5008",
+              "5010",
+              "5013"
+            ],
+            "min": 5001,
+            "max": 6597
+          },
+          "prodotto_id": {
+            "distinct": 376,
+            "sample": [
+              "1",
+              "10",
+              "103",
+              "104",
+              "107"
+            ],
+            "min": 1,
+            "max": 551
+          },
+          "quantita": {
+            "distinct": 600,
+            "sample": [
+              "1.0",
+              "1.003544492614172",
+              "1.0046557598527337",
+              "1.0069002124140123",
+              "1.007568696984856"
+            ],
+            "min": 1.0,
+            "max": 5.996933499135441
+          },
+          "prezzo_unitario": {
+            "distinct": 589,
+            "sample": [
+              "100.02",
+              "100.19",
+              "100.26",
+              "100.44",
+              "100.52"
+            ],
+            "min": 17.18,
+            "max": 1298.7
+          },
+          "sconto_percentuale": {
+            "distinct": 4,
+            "sample": [
+              "0",
+              "10",
+              "15",
+              "5"
+            ],
+            "min": 0,
+            "max": 15
+          },
+          "created_at": {
+            "distinct": 413,
+            "sample": [
+              "2025-09-30 09:15:00",
+              "2025-09-30 09:16:00",
+              "2025-10-01 09:15:00",
+              "2025-10-02 09:15:00",
+              "2025-10-02 09:16:00"
+            ]
+          },
+          "created_by": {
+            "distinct": 2,
+            "sample": [
+              "call_center",
+              "web_shop"
+            ]
+          },
+          "updated_at": {
+            "distinct": 264,
+            "sample": [
+              "2025-12-09 09:15:00",
+              "2025-12-09 09:16:00",
+              "2025-12-10 09:15:00",
+              "2025-12-10 09:16:00",
+              "2025-12-11 09:15:00"
+            ]
+          },
+          "updated_by": {
+            "distinct": 2,
+            "sample": [
+              "sistema",
+              "warehouse_app"
+            ]
+          }
+        }
+      },
+      "pagamenti": {
+        "row_count": 1455,
+        "columns": {
+          "id": {
+            "distinct": 1455,
+            "sample": [
+              "7001",
+              "7002",
+              "7003",
+              "7004",
+              "7005"
+            ],
+            "min": 7001,
+            "max": 8455
+          },
+          "ordine_id": {
+            "distinct": 957,
+            "sample": [
+              "5001",
+              "5003",
+              "5004",
+              "5007",
+              "5008"
+            ],
+            "min": 5001,
+            "max": 6592
+          },
+          "metodo_pagamento": {
+            "distinct": 4,
+            "sample": [
+              "bonifico",
+              "carta_credito",
+              "contrassegno",
+              "paypal"
+            ]
+          },
+          "importo_pagato": {
+            "distinct": 1382,
+            "sample": [
+              "100.53",
+              "101.08",
+              "101.21",
+              "101.27",
+              "101.44"
+            ],
+            "min": 38.55,
+            "max": 2498.0
+          },
+          "stato_pagamento": {
+            "distinct": 4,
+            "sample": [
+              "completato",
+              "in_attesa",
+              "rifiutato",
+              "rimborsato"
+            ]
+          },
+          "data_pagamento": {
+            "distinct": 443,
+            "sample": [
+              "2025-10-30 09:20:00",
+              "2025-10-31 09:20:00",
+              "2025-11-01 09:20:00",
+              "2025-11-02 09:20:00",
+              "2025-11-03 09:20:00"
+            ]
+          },
+          "created_at": {
+            "distinct": 435,
+            "sample": [
+              "2025-10-30 09:20:00",
+              "2025-10-31 09:20:00",
+              "2025-11-01 09:20:00",
+              "2025-11-02 09:20:00",
+              "2025-11-03 09:20:00"
+            ]
+          },
+          "created_by": {
+            "distinct": 2,
+            "sample": [
+              "amministrazione",
+              "payment_gateway"
+            ]
+          },
+          "updated_at": {
+            "distinct": 203,
+            "sample": [
+              "2025-12-15 09:21:00",
+              "2025-12-16 09:21:00",
+              "2025-12-17 09:21:00",
+              "2025-12-18 09:21:00",
+              "2025-12-19 09:21:00"
+            ]
+          },
+          "updated_by": {
+            "distinct": 2,
+            "sample": [
+              "payment_gateway",
+              "sistema"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "categorie": [
+        {
+          "id": 1,
+          "nome": "Elettronica",
+          "descrizione": "Dispositivi elettronici di consumo",
+          "created_at": "2025-01-17 09:00:00",
+          "created_by": "admin",
+          "updated_at": "2025-05-22 10:30:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 2,
+          "nome": "Elettronica1",
+          "descrizione": "Dispositivi elettronici di consumo",
+          "created_at": "2025-01-14 09:00:00",
+          "created_by": "admin",
+          "updated_at": "2025-06-16 10:30:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 3,
+          "nome": "Elettronica2",
+          "descrizione": "Dispositivi elettronici di consumo",
+          "created_at": "2024-12-19 09:00:00",
+          "created_by": "admin",
+          "updated_at": "2025-06-09 10:30:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 4,
+          "nome": "Elettronica3",
+          "descrizione": "Dispositivi elettronici di consumo",
+          "created_at": "2024-12-25 09:00:00",
+          "created_by": "admin",
+          "updated_at": "2025-05-21 10:30:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 5,
+          "nome": "Informatica",
+          "descrizione": "PC, accessori e periferiche",
+          "created_at": "2024-12-22 09:05:00",
+          "created_by": "admin",
+          "updated_at": "2025-07-22 11:00:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 6,
+          "nome": "Informatica1",
+          "descrizione": "PC, accessori e periferiche",
+          "created_at": "2025-01-09 09:05:00",
+          "created_by": "admin",
+          "updated_at": "2025-07-21 11:00:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 7,
+          "nome": "Informatica2",
+          "descrizione": "PC, accessori e periferiche",
+          "created_at": "2024-12-31 09:05:00",
+          "created_by": "admin",
+          "updated_at": "2025-07-05 11:00:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 8,
+          "nome": "Informatica3",
+          "descrizione": "PC, accessori e periferiche",
+          "created_at": "2025-01-12 09:05:00",
+          "created_by": "admin",
+          "updated_at": "2025-07-18 11:00:00",
+          "updated_by": "admin"
+        }
+      ],
+      "clienti": [
+        {
+          "id": 47,
+          "nome": "Chiara",
+          "cognome": "Rossi",
+          "email": "chiara.rossi1@example.com",
+          "telefono": "+39 339 4448899",
+          "created_at": "2023-11-12T09:30:00",
+          "created_by": "web_shop",
+          "updated_at": "2025-12-25T10:00:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 173,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi3@example.com",
+          "telefono": "+39 348 7770011",
+          "created_at": "2024-08-11T14:10:00",
+          "created_by": "web_shop",
+          "updated_at": "2025-10-08T17:35:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 408,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi8@example.com",
+          "telefono": "+39 339 4448899",
+          "created_at": "2025-01-22T16:20:00",
+          "created_by": "web_shop",
+          "updated_at": "2025-11-11T12:50:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 437,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi9@example.com",
+          "telefono": "+39 320 5551234",
+          "created_at": "2025-06-16T10:05:00",
+          "created_by": "call_center",
+          "updated_at": "2025-12-08T15:15:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 1,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi1@example.com",
+          "telefono": "+39 347 9876543",
+          "created_at": "2023-08-09T09:30:00",
+          "created_by": "web_shop",
+          "updated_at": "2025-10-22T10:00:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 80,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi2@example.com",
+          "telefono": "+39 348 7770011",
+          "created_at": "2024-05-07T09:30:00",
+          "created_by": "web_shop",
+          "updated_at": "2025-10-03T10:00:00",
+          "updated_by": "import_crm"
+        },
+        {
+          "id": 217,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi4@example.com",
+          "telefono": "+39 331 2223344",
+          "created_at": "2024-05-30T11:45:00",
+          "created_by": "web_shop",
+          "updated_at": "2025-11-21T09:05:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 254,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi5@example.com",
+          "telefono": "+39 347 9876543",
+          "created_at": "2024-01-07T11:45:00",
+          "created_by": "web_shop",
+          "updated_at": "2025-11-24T09:05:00",
+          "updated_by": "import_crm"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "categoria_id": 17,
+          "sku": "SKU-EL-001",
+          "nome": "Tastiera Meccanica RGB",
+          "prezzo_unitario": 302.66,
+          "giacenza_magazzino": 138.46,
+          "attivo": "true",
+          "created_at": "2024-09-04 09:00:00",
+          "created_by": "catalog_manager",
+          "updated_at": "2025-10-09 10:30:00",
+          "updated_by": "catalog_manager"
+        },
+        {
+          "id": 2,
+          "categoria_id": 21,
+          "sku": "SKU-EL-0011",
+          "nome": "Monitor 27 pollici 4K",
+          "prezzo_unitario": 230.99,
+          "giacenza_magazzino": 184.75,
+          "attivo": "true",
+          "created_at": "2024-10-13 09:00:00",
+          "created_by": "admin",
+          "updated_at": "2025-10-28 10:30:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 3,
+          "categoria_id": 8,
+          "sku": "SKU-EL-0012",
+          "nome": "Cuffie Bluetooth ANC",
+          "prezzo_unitario": 252.71,
+          "giacenza_magazzino": 204.46,
+          "attivo": "true",
+          "created_at": "2024-10-02 09:00:00",
+          "created_by": "catalog_manager",
+          "updated_at": "2025-11-16 10:30:00",
+          "updated_by": "catalog_manager"
+        },
+        {
+          "id": 4,
+          "categoria_id": 10,
+          "sku": "SKU-EL-0013",
+          "nome": "Cuffie Bluetooth ANC",
+          "prezzo_unitario": 596.78,
+          "giacenza_magazzino": 116.07,
+          "attivo": "true",
+          "created_at": "2025-02-25 09:00:00",
+          "created_by": "admin",
+          "updated_at": "2025-10-15 10:30:00",
+          "updated_by": "catalog_manager"
+        },
+        {
+          "id": 5,
+          "categoria_id": 18,
+          "sku": "SKU-EL-0014",
+          "nome": "Frullatore Vortex 1200W",
+          "prezzo_unitario": 214.78,
+          "giacenza_magazzino": 143.76,
+          "attivo": "true",
+          "created_at": "2024-09-21 09:00:00",
+          "created_by": "catalog_manager",
+          "updated_at": "2025-11-22 10:30:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 6,
+          "categoria_id": 9,
+          "sku": "SKU-EL-0015",
+          "nome": "Smartphone Nova 5G",
+          "prezzo_unitario": 349.9,
+          "giacenza_magazzino": 120,
+          "attivo": true,
+          "created_at": "2025-02-01 09:00:00",
+          "created_by": "catalog_manager",
+          "updated_at": "2025-11-30 10:30:00",
+          "updated_by": "catalog_manager"
+        },
+        {
+          "id": 7,
+          "categoria_id": 2,
+          "sku": "SKU-EL-0016",
+          "nome": "Laptop UltraBook 14",
+          "prezzo_unitario": 259.29,
+          "giacenza_magazzino": 32.5,
+          "attivo": "true",
+          "created_at": "2024-12-15 09:00:00",
+          "created_by": "catalog_manager",
+          "updated_at": "2025-11-01 10:30:00",
+          "updated_by": "admin"
+        },
+        {
+          "id": 8,
+          "categoria_id": 13,
+          "sku": "SKU-EL-0017",
+          "nome": "Tastiera Meccanica RGB",
+          "prezzo_unitario": 501.58,
+          "giacenza_magazzino": 130.05,
+          "attivo": "false",
+          "created_at": "2025-02-28 09:00:00",
+          "created_by": "admin",
+          "updated_at": "2025-10-16 10:30:00",
+          "updated_by": "sistema"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 5001,
+          "cliente_id": 63,
+          "numero_ordine": "ORD-2026-000501",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 162.76,
+          "data_ordine": "2026-01-01",
+          "created_at": "2025-10-25 09:15:00",
+          "created_by": "call_center",
+          "updated_at": "2026-02-06 16:40:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 5002,
+          "cliente_id": 64,
+          "numero_ordine": "ORD-2026-0005011",
+          "stato_ordine": "confermato",
+          "totale_ordine": 277.61,
+          "data_ordine": "2025-10-26",
+          "created_at": "2025-12-02 09:15:00",
+          "created_by": "web_shop",
+          "updated_at": "2026-01-25 16:40:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 5003,
+          "cliente_id": 423,
+          "numero_ordine": "ORD-2026-0005012",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 343.58,
+          "data_ordine": "2025-11-14",
+          "created_at": "2025-10-06 09:15:00",
+          "created_by": "call_center",
+          "updated_at": "2026-01-15 16:40:00",
+          "updated_by": "logistics"
+        },
+        {
+          "id": 5004,
+          "cliente_id": 526,
+          "numero_ordine": "ORD-2026-0005013",
+          "stato_ordine": "consegnato",
+          "totale_ordine": 224.46,
+          "data_ordine": "2025-10-16",
+          "created_at": "2025-12-11 09:15:00",
+          "created_by": "web_shop",
+          "updated_at": "2026-01-17 16:40:00",
+          "updated_by": "customer_care"
+        },
+        {
+          "id": 5005,
+          "cliente_id": 303,
+          "numero_ordine": "ORD-2026-0005014",
+          "stato_ordine": "spedito",
+          "totale_ordine": 131.95,
+          "data_ordine": "2025-10-14",
+          "created_at": "2026-02-01 09:15:00",
+          "created_by": "web_shop",
+          "updated_at": "2026-01-29 16:40:00",
+          "updated_by": "customer_care"
+        },
+        {
+          "id": 5006,
+          "cliente_id": 134,
+          "numero_ordine": "ORD-2026-0005015",
+          "stato_ordine": "bozza",
+          "totale_ordine": 443.9,
+          "data_ordine": "2025-10-04",
+          "created_at": "2025-11-10 09:15:00",
+          "created_by": "call_center",
+          "updated_at": "2026-01-02 16:40:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 5007,
+          "cliente_id": 439,
+          "numero_ordine": "ORD-2026-0005016",
+          "stato_ordine": "annullato",
+          "totale_ordine": 316.25,
+          "data_ordine": "2025-12-02",
+          "created_at": "2025-12-12 09:15:00",
+          "created_by": "call_center",
+          "updated_at": "2026-01-04 16:40:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 5008,
+          "cliente_id": 461,
+          "numero_ordine": "ORD-2026-0005017",
+          "stato_ordine": "confermato",
+          "totale_ordine": 382.47,
+          "data_ordine": "2025-12-09",
+          "created_at": "2025-12-22 09:15:00",
+          "created_by": "sistema",
+          "updated_at": "2026-01-08 16:40:00",
+          "updated_by": "sistema"
+        }
+      ],
+      "righe_ordine": [
+        {
+          "id": 9001,
+          "ordine_id": 6585,
+          "prodotto_id": 194,
+          "quantita": 2.4266761115355955,
+          "prezzo_unitario": 363.27,
+          "sconto_percentuale": "0",
+          "created_at": "2025-11-30 09:15:00",
+          "created_by": "web_shop",
+          "updated_at": "2026-01-08 09:15:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 9002,
+          "ordine_id": 5786,
+          "prodotto_id": 401,
+          "quantita": 3.6265166634983617,
+          "prezzo_unitario": 260.27,
+          "sconto_percentuale": "5",
+          "created_at": "2026-01-31 09:15:00",
+          "created_by": "web_shop",
+          "updated_at": "2026-01-10 09:15:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 9003,
+          "ordine_id": 5303,
+          "prodotto_id": 449,
+          "quantita": 3.9994770143079195,
+          "prezzo_unitario": 347.71,
+          "sconto_percentuale": "15",
+          "created_at": "2025-11-21 09:15:00",
+          "created_by": "call_center",
+          "updated_at": "2025-12-13 09:15:00",
+          "updated_by": "warehouse_app"
+        },
+        {
+          "id": 9004,
+          "ordine_id": 5340,
+          "prodotto_id": 526,
+          "quantita": 1.3750339290708826,
+          "prezzo_unitario": 353.86,
+          "sconto_percentuale": "15",
+          "created_at": "2025-11-09 09:15:00",
+          "created_by": "call_center",
+          "updated_at": "2026-01-26 09:15:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 9005,
+          "ordine_id": 5461,
+          "prodotto_id": 218,
+          "quantita": 2.1022186641710583,
+          "prezzo_unitario": 314.74,
+          "sconto_percentuale": "15",
+          "created_at": "2025-10-21 09:15:00",
+          "created_by": "web_shop",
+          "updated_at": "2026-01-06 09:15:00",
+          "updated_by": "warehouse_app"
+        },
+        {
+          "id": 9006,
+          "ordine_id": 5277,
+          "prodotto_id": 474,
+          "quantita": 3.763355776219371,
+          "prezzo_unitario": 279.38,
+          "sconto_percentuale": "15",
+          "created_at": "2025-11-01 09:15:00",
+          "created_by": "call_center",
+          "updated_at": "2026-01-27 09:15:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 9007,
+          "ordine_id": 5146,
+          "prodotto_id": 164,
+          "quantita": 2.160193887475903,
+          "prezzo_unitario": 301.35,
+          "sconto_percentuale": "10",
+          "created_at": "2026-01-13 09:15:00",
+          "created_by": "call_center",
+          "updated_at": "2026-01-27 09:15:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 9008,
+          "ordine_id": 5001,
+          "prodotto_id": 99,
+          "quantita": 2.286250997148188,
+          "prezzo_unitario": 307.32,
+          "sconto_percentuale": "15",
+          "created_at": "2026-01-08 09:15:00",
+          "created_by": "web_shop",
+          "updated_at": "2026-01-13 09:15:00",
+          "updated_by": "sistema"
+        }
+      ],
+      "pagamenti": [
+        {
+          "id": 7001,
+          "ordine_id": 6285,
+          "metodo_pagamento": "paypal",
+          "importo_pagato": 343.48,
+          "stato_pagamento": "completato",
+          "data_pagamento": "2026-01-17 09:20:00",
+          "created_at": "2026-01-14 09:20:00",
+          "created_by": "payment_gateway",
+          "updated_at": "2026-01-19 09:21:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 7002,
+          "ordine_id": 6174,
+          "metodo_pagamento": "contrassegno",
+          "importo_pagato": 101.27,
+          "stato_pagamento": "rifiutato",
+          "data_pagamento": "2025-11-23 09:20:00",
+          "created_at": "2025-11-27 09:20:00",
+          "created_by": "amministrazione",
+          "updated_at": "2025-12-23 09:21:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 7003,
+          "ordine_id": 6264,
+          "metodo_pagamento": "carta_credito",
+          "importo_pagato": 243.11,
+          "stato_pagamento": "completato",
+          "data_pagamento": "2026-01-14 09:20:00",
+          "created_at": "2025-11-14 09:20:00",
+          "created_by": "amministrazione",
+          "updated_at": "2025-12-25 09:21:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 7004,
+          "ordine_id": 5341,
+          "metodo_pagamento": "paypal",
+          "importo_pagato": 245.12,
+          "stato_pagamento": "completato",
+          "data_pagamento": "2025-11-29 09:20:00",
+          "created_at": "2025-10-31 09:20:00",
+          "created_by": "amministrazione",
+          "updated_at": "2026-01-03 09:21:00",
+          "updated_by": "payment_gateway"
+        },
+        {
+          "id": 7005,
+          "ordine_id": 5537,
+          "metodo_pagamento": "carta_credito",
+          "importo_pagato": 276.5,
+          "stato_pagamento": "completato",
+          "data_pagamento": "2025-11-02 09:20:00",
+          "created_at": "2025-12-30 09:20:00",
+          "created_by": "payment_gateway",
+          "updated_at": "2026-01-04 09:21:00",
+          "updated_by": "payment_gateway"
+        },
+        {
+          "id": 7006,
+          "ordine_id": 6083,
+          "metodo_pagamento": "carta_credito",
+          "importo_pagato": 323.85,
+          "stato_pagamento": "in_attesa",
+          "data_pagamento": "2025-12-09 09:20:00",
+          "created_at": "2025-12-09 09:20:00",
+          "created_by": "payment_gateway",
+          "updated_at": "2026-01-10 09:21:00",
+          "updated_by": "payment_gateway"
+        },
+        {
+          "id": 7007,
+          "ordine_id": 6438,
+          "metodo_pagamento": "paypal",
+          "importo_pagato": 161.46,
+          "stato_pagamento": "rifiutato",
+          "data_pagamento": "2025-12-27 09:20:00",
+          "created_at": "2025-12-03 09:20:00",
+          "created_by": "payment_gateway",
+          "updated_at": "2025-12-28 09:21:00",
+          "updated_by": "sistema"
+        },
+        {
+          "id": 7008,
+          "ordine_id": 6439,
+          "metodo_pagamento": "contrassegno",
+          "importo_pagato": 379.8,
+          "stato_pagamento": "rimborsato",
+          "data_pagamento": "2025-11-20 09:20:00",
+          "created_at": "2025-11-14 09:20:00",
+          "created_by": "payment_gateway",
+          "updated_at": "2025-12-19 09:21:00",
+          "updated_by": "payment_gateway"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "offset_fetch"
+  ],
+  "query": "SELECT INITCAP(c.nome) AS nome_cliente, UPPER(c.cognome) AS cognome_cliente, COUNT(o.id) AS numero_ordini_consegnati, ROUND(SUM(o.totale_ordine), 2) AS fatturato_totale FROM clienti c JOIN ordini o ON o.cliente_id = c.id WHERE o.stato_ordine = 'consegnato' GROUP BY c.nome, c.cognome ORDER BY fatturato_totale DESC, cognome_cliente ASC, nome_cliente ASC OFFSET 5 ROWS FETCH FIRST 10 ROWS ONLY;"
+}

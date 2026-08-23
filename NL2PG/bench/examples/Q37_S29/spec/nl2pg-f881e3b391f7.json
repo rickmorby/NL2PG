@@ -1,0 +1,27 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "math_funcs"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "immobili",
+      "obsolete_value": "schede_alloggi",
+      "description": "La tabella immobili, che contiene i dati degli alloggi con il prezzo spezzato nelle colonne prezzo_intero e prezzo_decimali, viene denominata schede_alloggi nella prosa aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "prezzo_intero",
+      "obsolete_value": "capitale richiesto",
+      "description": "La colonna prezzo_intero, parte intera del prezzo dell'immobile spezzato su due colonne, viene indicata nella documentazione con il gergo immobiliare 'capitale richiesto'. Le query devono usare ROUND/ABS/POWER selezionando correttamente questa componente del dato spezzato."
+    }
+  ],
+  "spec_hash": "30e0a5797594db51"
+}

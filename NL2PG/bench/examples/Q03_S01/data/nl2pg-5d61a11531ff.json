@@ -1,0 +1,172 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "top_n"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobili",
+        "obsolete_value": "schede_alloggi",
+        "description": "La tabella autonoma immobili (con PK id_immobile e attributi come tipo, quartiere, superficie_mq, numero_vani, prezzo) viene denominata schede_alloggi nella prosa aziendale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "prezzo",
+        "obsolete_value": "valore_di_listino",
+        "description": "La colonna prezzo dell'immobile viene indicata con il sinonimo valore_di_listino nella documentazione commerciale, richiedendo il mapping semantico per le query top-N su ORDER BY e LIMIT."
+      }
+    ],
+    "spec_hash": "82b1c7427001ad0d"
+  },
+  "schema_ddl": "CREATE TABLE immobili (\n    id_immobile INT PRIMARY KEY,\n    tipo TEXT NOT NULL,\n    quartiere TEXT NOT NULL,\n    indirizzo TEXT,\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani BETWEEN 1 AND 30),\n    prezzo NUMERIC(12,2) NOT NULL CHECK (prezzo >= 0),\n    disponibile BOOLEAN NOT NULL DEFAULT TRUE\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "immobili",
+        "nature": "dimension",
+        "min_rows": 200,
+        "max_rows": 400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_immobile": 1,
+            "tipo": "appartamento",
+            "quartiere": "Navigli",
+            "indirizzo": "Via Vigevano 12",
+            "superficie_mq": 68.5,
+            "numero_vani": 3,
+            "prezzo": 425000.0,
+            "disponibile": true
+          },
+          {
+            "id_immobile": 2,
+            "tipo": "attico",
+            "quartiere": "Brera",
+            "indirizzo": "Via Fiori Chiari 5",
+            "superficie_mq": 125.0,
+            "numero_vani": 5,
+            "prezzo": 1150000.0,
+            "disponibile": false
+          },
+          {
+            "id_immobile": 3,
+            "tipo": "monolocale",
+            "quartiere": "Isola",
+            "indirizzo": "Via Pastrengo 14",
+            "superficie_mq": 38.0,
+            "numero_vani": 1,
+            "prezzo": 189000.0,
+            "disponibile": true
+          },
+          {
+            "id_immobile": 4,
+            "tipo": "villa",
+            "quartiere": "Sempione",
+            "indirizzo": "Viale Elvezia 22",
+            "superficie_mq": 210.0,
+            "numero_vani": 7,
+            "prezzo": 980000.0,
+            "disponibile": true
+          },
+          {
+            "id_immobile": 5,
+            "tipo": "loft",
+            "quartiere": "Lambrate",
+            "indirizzo": "Via Ventura 8",
+            "superficie_mq": 95.0,
+            "numero_vani": 4,
+            "prezzo": 520000.0,
+            "disponibile": false
+          },
+          {
+            "id_immobile": 6,
+            "tipo": "appartamento",
+            "quartiere": "Porta Romana",
+            "indirizzo": "Corso di Porta Romana 63",
+            "superficie_mq": 82.0,
+            "numero_vani": 4,
+            "prezzo": 610000.0,
+            "disponibile": true
+          }
+        ],
+        "variations": {
+          "tipo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "appartamento",
+              "appartamento",
+              "attico",
+              "monolocale",
+              "villa",
+              "loft"
+            ]
+          },
+          "quartiere": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Navigli",
+              "Brera",
+              "Isola",
+              "Sempione",
+              "Lambrate",
+              "Porta Romana"
+            ]
+          },
+          "superficie_mq": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          },
+          "numero_vani": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 2.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "prezzo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.5,
+            "pool": []
+          },
+          "disponibile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

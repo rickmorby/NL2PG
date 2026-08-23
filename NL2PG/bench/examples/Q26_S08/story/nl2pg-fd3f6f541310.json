@@ -1,0 +1,534 @@
+{
+  "schema_ddl": "CREATE TABLE polizze (\n    id_polizza SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_polizza TEXT NOT NULL DEFAULT 'attiva' CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta', 'stornata')),\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE polizze_auto (\n    id_polizza INT PRIMARY KEY REFERENCES polizze(id_polizza),\n    targa TEXT NOT NULL UNIQUE,\n    marca_veicolo TEXT NOT NULL,\n    modello_veicolo TEXT,\n    anno_immatricolazione INT NOT NULL CHECK (anno_immatricolazione BETWEEN 1950 AND 2100),\n    potenza_kw NUMERIC(6,2) CHECK (potenza_kw > 0)\n);\n\nCREATE TABLE polizze_vita (\n    id_polizza INT PRIMARY KEY REFERENCES polizze(id_polizza),\n    capitale_assicurato NUMERIC(12,2) NOT NULL CHECK (capitale_assicurato > 0),\n    eta_assicurato INT NOT NULL CHECK (eta_assicurato BETWEEN 0 AND 120),\n    beneficiario TEXT NOT NULL\n);\n\nCREATE TABLE sinistri (\n    id_sinistro SERIAL PRIMARY KEY,\n    id_polizza INT NOT NULL REFERENCES polizze(id_polizza),\n    data_accadimento DATE NOT NULL,\n    descrizione_danno TEXT,\n    importo_risarcimento NUMERIC(12,2) CHECK (importo_risarcimento >= 0),\n    stato_sinistro TEXT NOT NULL DEFAULT 'aperto' CHECK (stato_sinistro IN ('aperto', 'in_valutazione', 'liquidato', 'respinto'))\n);",
+  "data_profile": {
+    "profile": {
+      "polizze": {
+        "row_count": 339,
+        "columns": {
+          "id_polizza": {
+            "distinct": 339,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 339
+          },
+          "numero_polizza": {
+            "distinct": 339,
+            "sample": [
+              "POL-2021-000105",
+              "POL-2021-0001051",
+              "POL-2021-00010510",
+              "POL-2021-00010511",
+              "POL-2021-00010512"
+            ]
+          },
+          "intestatario": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro Moretti",
+              "Chiara Gallo",
+              "Davide Fontana",
+              "Elena Marchetti",
+              "Giulia Ferri"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 331,
+            "sample": [
+              "1003.56",
+              "1007.57",
+              "1014.75",
+              "1019.61",
+              "1020.45"
+            ],
+            "min": 177.16,
+            "max": 2238.16
+          },
+          "data_emissione": {
+            "distinct": 275,
+            "sample": [
+              "2020-05-21",
+              "2020-05-30",
+              "2020-06-03",
+              "2020-06-07",
+              "2020-06-09"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 285,
+            "sample": [
+              "2024-06-25",
+              "2024-06-28",
+              "2024-07-02",
+              "2024-07-03",
+              "2024-07-07"
+            ]
+          },
+          "stato_polizza": {
+            "distinct": 4,
+            "sample": [
+              "attiva",
+              "scaduta",
+              "sospesa",
+              "stornata"
+            ]
+          }
+        }
+      },
+      "polizze_auto": {
+        "row_count": 203,
+        "columns": {
+          "id_polizza": {
+            "distinct": 203,
+            "sample": [
+              "10",
+              "108",
+              "109",
+              "11",
+              "110"
+            ],
+            "min": 2,
+            "max": 338
+          },
+          "targa": {
+            "distinct": 203,
+            "sample": [
+              "AB123CD",
+              "AB123CD1",
+              "AB123CD10",
+              "AB123CD11",
+              "AB123CD12"
+            ]
+          },
+          "marca_veicolo": {
+            "distinct": 4,
+            "sample": [
+              "Fiat",
+              "Renault",
+              "Toyota",
+              "Volkswagen"
+            ]
+          },
+          "modello_veicolo": {
+            "distinct": 4,
+            "sample": [
+              "Clio",
+              "Golf",
+              "Panda",
+              "Yaris"
+            ]
+          },
+          "anno_immatricolazione": {
+            "distinct": 7,
+            "sample": [
+              "2012",
+              "2015",
+              "2018",
+              "2019",
+              "2021"
+            ],
+            "min": 2019,
+            "max": 2022
+          },
+          "potenza_kw": {
+            "distinct": 194,
+            "sample": [
+              "100.14",
+              "101.6",
+              "101.77",
+              "102.29",
+              "103.54"
+            ],
+            "min": 35.7,
+            "max": 175.67
+          }
+        }
+      },
+      "polizze_vita": {
+        "row_count": 155,
+        "columns": {
+          "id_polizza": {
+            "distinct": 155,
+            "sample": [
+              "100",
+              "103",
+              "106",
+              "110",
+              "113"
+            ],
+            "min": 2,
+            "max": 339
+          },
+          "capitale_assicurato": {
+            "distinct": 150,
+            "sample": [
+              "100363.76",
+              "100369.15",
+              "102094.37",
+              "102501.74",
+              "103134.57"
+            ],
+            "min": 29186.58,
+            "max": 584266.03
+          },
+          "eta_assicurato": {
+            "distinct": 154,
+            "sample": [
+              "21.19537168596249",
+              "21.895837956139303",
+              "22.676003293951627",
+              "23.243257813855468",
+              "23.520294310637553"
+            ],
+            "min": 21.19537168596249,
+            "max": 68.0
+          },
+          "beneficiario": {
+            "distinct": 6,
+            "sample": [
+              "Elena Neri",
+              "Luca Bianchi",
+              "Maria Rossi",
+              "coniuge",
+              "eredi designati"
+            ]
+          }
+        }
+      },
+      "sinistri": {
+        "row_count": 446,
+        "columns": {
+          "id_sinistro": {
+            "distinct": 446,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 446
+          },
+          "id_polizza": {
+            "distinct": 244,
+            "sample": [
+              "10",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 2,
+            "max": 339
+          },
+          "data_accadimento": {
+            "distinct": 337,
+            "sample": [
+              "2023-01-23",
+              "2023-01-28",
+              "2023-01-30",
+              "2023-02-01",
+              "2023-02-04"
+            ]
+          },
+          "descrizione_danno": {
+            "distinct": 6,
+            "sample": [
+              "Danni da grandine su carrozzeria",
+              "Danno al paraurti posteriore",
+              "Danno anteriore da tamponamento",
+              "Furto accessori esterni",
+              "Incursione laterale in parcheggio"
+            ]
+          },
+          "importo_risarcimento": {
+            "distinct": 419,
+            "sample": [
+              "1000.21",
+              "1003.44",
+              "1021.37",
+              "1021.42",
+              "1025.73"
+            ],
+            "min": 188.62,
+            "max": 6820.0
+          },
+          "stato_sinistro": {
+            "distinct": 4,
+            "sample": [
+              "aperto",
+              "in_valutazione",
+              "liquidato",
+              "respinto"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "polizze": [
+        {
+          "id_polizza": 1,
+          "numero_polizza": "POL-2023-000101",
+          "intestatario": "Chiara Gallo",
+          "premio_annuo": 756.55,
+          "data_emissione": "2022-11-02",
+          "data_scadenza": "2027-02-15",
+          "stato_polizza": "scaduta"
+        },
+        {
+          "id_polizza": 2,
+          "numero_polizza": "POL-2023-0001011",
+          "intestatario": "Alessandro Moretti",
+          "premio_annuo": 875.7,
+          "data_emissione": "2022-12-25",
+          "data_scadenza": "2027-02-06",
+          "stato_polizza": "scaduta"
+        },
+        {
+          "id_polizza": 3,
+          "numero_polizza": "POL-2023-0001012",
+          "intestatario": "Giulia Ferri",
+          "premio_annuo": 705.03,
+          "data_emissione": "2023-03-01",
+          "data_scadenza": "2027-06-12",
+          "stato_polizza": "scaduta"
+        },
+        {
+          "id_polizza": 4,
+          "numero_polizza": "POL-2023-0001013",
+          "intestatario": "Davide Fontana",
+          "premio_annuo": 741.45,
+          "data_emissione": "2023-01-25",
+          "data_scadenza": "2026-12-08",
+          "stato_polizza": "attiva"
+        },
+        {
+          "id_polizza": 5,
+          "numero_polizza": "POL-2023-0001014",
+          "intestatario": "Marco Bianchi",
+          "premio_annuo": 541.8,
+          "data_emissione": "2022-10-23",
+          "data_scadenza": "2027-03-14",
+          "stato_polizza": "attiva"
+        },
+        {
+          "id_polizza": 6,
+          "numero_polizza": "POL-2023-0001015",
+          "intestatario": "Luca Rinaldi",
+          "premio_annuo": 549.9,
+          "data_emissione": "2023-04-25",
+          "data_scadenza": "2026-05-28",
+          "stato_polizza": "attiva"
+        },
+        {
+          "id_polizza": 7,
+          "numero_polizza": "POL-2023-0001016",
+          "intestatario": "Luca Rinaldi",
+          "premio_annuo": 638.62,
+          "data_emissione": "2022-08-24",
+          "data_scadenza": "2026-09-16",
+          "stato_polizza": "sospesa"
+        },
+        {
+          "id_polizza": 8,
+          "numero_polizza": "POL-2023-0001017",
+          "intestatario": "Paolo Lombardi",
+          "premio_annuo": 561.09,
+          "data_emissione": "2022-07-23",
+          "data_scadenza": "2026-12-28",
+          "stato_polizza": "attiva"
+        }
+      ],
+      "polizze_auto": [
+        {
+          "id_polizza": 67,
+          "targa": "AB123CD",
+          "marca_veicolo": "Fiat",
+          "modello_veicolo": "Panda",
+          "anno_immatricolazione": "2019",
+          "potenza_kw": 67.66
+        },
+        {
+          "id_polizza": 23,
+          "targa": "AB123CD1",
+          "marca_veicolo": "Fiat",
+          "modello_veicolo": null,
+          "anno_immatricolazione": "2021",
+          "potenza_kw": 80.11
+        },
+        {
+          "id_polizza": 317,
+          "targa": "AB123CD2",
+          "marca_veicolo": "Fiat",
+          "modello_veicolo": "Panda",
+          "anno_immatricolazione": "2015",
+          "potenza_kw": 39.05
+        },
+        {
+          "id_polizza": 144,
+          "targa": "AB123CD3",
+          "marca_veicolo": "Fiat",
+          "modello_veicolo": null,
+          "anno_immatricolazione": "2023",
+          "potenza_kw": 46.55
+        },
+        {
+          "id_polizza": 115,
+          "targa": "AB123CD4",
+          "marca_veicolo": "Fiat",
+          "modello_veicolo": "Panda",
+          "anno_immatricolazione": "2019",
+          "potenza_kw": 54.63
+        },
+        {
+          "id_polizza": 108,
+          "targa": "AB123CD5",
+          "marca_veicolo": "Fiat",
+          "modello_veicolo": "Panda",
+          "anno_immatricolazione": "2019",
+          "potenza_kw": 57.86
+        },
+        {
+          "id_polizza": 222,
+          "targa": "AB123CD6",
+          "marca_veicolo": "Fiat",
+          "modello_veicolo": "Panda",
+          "anno_immatricolazione": "2012",
+          "potenza_kw": null
+        },
+        {
+          "id_polizza": 123,
+          "targa": "AB123CD7",
+          "marca_veicolo": "Fiat",
+          "modello_veicolo": "Panda",
+          "anno_immatricolazione": "2023",
+          "potenza_kw": 41.29
+        }
+      ],
+      "polizze_vita": [
+        {
+          "id_polizza": 174,
+          "capitale_assicurato": 177323.22,
+          "eta_assicurato": 29.608537211517103,
+          "beneficiario": "Luca Bianchi"
+        },
+        {
+          "id_polizza": 32,
+          "capitale_assicurato": 153578.46,
+          "eta_assicurato": 41.60761770048663,
+          "beneficiario": "coniuge"
+        },
+        {
+          "id_polizza": 245,
+          "capitale_assicurato": 95581.83,
+          "eta_assicurato": 36.00801660978499,
+          "beneficiario": "figli"
+        },
+        {
+          "id_polizza": 234,
+          "capitale_assicurato": 208961.49,
+          "eta_assicurato": 38.50586377859429,
+          "beneficiario": "Maria Rossi"
+        },
+        {
+          "id_polizza": 266,
+          "capitale_assicurato": 129826.72,
+          "eta_assicurato": 27.126328072637158,
+          "beneficiario": "eredi designati"
+        },
+        {
+          "id_polizza": 4,
+          "capitale_assicurato": 148738.73,
+          "eta_assicurato": 41.605996386074395,
+          "beneficiario": "coniuge"
+        },
+        {
+          "id_polizza": 91,
+          "capitale_assicurato": 235117.96,
+          "eta_assicurato": 33.685758640866524,
+          "beneficiario": "coniuge"
+        },
+        {
+          "id_polizza": 302,
+          "capitale_assicurato": 156795.99,
+          "eta_assicurato": 26.08342490841173,
+          "beneficiario": "Luca Bianchi"
+        }
+      ],
+      "sinistri": [
+        {
+          "id_sinistro": 1,
+          "id_polizza": 249,
+          "data_accadimento": "2023-10-23",
+          "descrizione_danno": "Incursione laterale in parcheggio",
+          "importo_risarcimento": null,
+          "stato_sinistro": "in_valutazione"
+        },
+        {
+          "id_sinistro": 2,
+          "id_polizza": 210,
+          "data_accadimento": "2023-12-15",
+          "descrizione_danno": "Incursione laterale in parcheggio",
+          "importo_risarcimento": 1625.33,
+          "stato_sinistro": "respinto"
+        },
+        {
+          "id_sinistro": 3,
+          "id_polizza": 254,
+          "data_accadimento": "2024-02-26",
+          "descrizione_danno": "Furto accessori esterni",
+          "importo_risarcimento": 3760.8,
+          "stato_sinistro": "liquidato"
+        },
+        {
+          "id_sinistro": 4,
+          "id_polizza": 153,
+          "data_accadimento": "2023-11-09",
+          "descrizione_danno": "Danni da grandine su carrozzeria",
+          "importo_risarcimento": 3305.83,
+          "stato_sinistro": "respinto"
+        },
+        {
+          "id_sinistro": 5,
+          "id_polizza": 15,
+          "data_accadimento": "2023-08-26",
+          "descrizione_danno": "Danno anteriore da tamponamento",
+          "importo_risarcimento": 1292.85,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id_sinistro": 6,
+          "id_polizza": 280,
+          "data_accadimento": "2023-09-21",
+          "descrizione_danno": null,
+          "importo_risarcimento": 4036.62,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id_sinistro": 7,
+          "id_polizza": 182,
+          "data_accadimento": "2024-01-19",
+          "descrizione_danno": "Danno al paraurti posteriore",
+          "importo_risarcimento": 3753.16,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id_sinistro": 8,
+          "id_polizza": 167,
+          "data_accadimento": "2023-10-22",
+          "descrizione_danno": "Danno al paraurti posteriore",
+          "importo_risarcimento": 1513.35,
+          "stato_sinistro": "aperto"
+        }
+      ]
+    }
+  },
+  "story": "Alla direzione operativa di Meridiana Assicurazioni la revisione annuale del portafoglio è iniziata con la ricognizione dell'archivio denominato polizze, il registro generale in cui ogni contratto stipulato con la clientela occupa una propria scheda. In ciascuna scheda sono annotati il numero di polizza, ad esempio POL-2023-000101, il nome dell'intestatario, tra cui figurano Chiara Gallo, Alessandro Moretti, Giulia Ferri e Davide Fontana, l'importo della quietanza di premio, ossia il canone annuo versato dal contraente, la data di emissione del contratto, la data di scadenza e lo stato di vigore, che può assumere le diciture attiva, sospesa, scaduta oppure stornata. Il registro generale si articola inoltre in due sezioni specializzate. La prima, intitolata polizze_auto, raccoglie le coperture dedicate ai veicoli: per ciascuna sono indicati la targa, come AB123CD, la marca del mezzo, sia essa Fiat, Renault, Toyota o Volkswagen, il modello, scelto tra Panda, Golf, Yaris e Clio, l'anno di immatricolazione, ad esempio 2019 o 2021, e la potenza espressa in kilowatt, come i 67.66 kW di una utilitaria cittadina. La seconda sezione, denominata polizze_vita, custodisce le garanzie sulla persona, con il capitale assicurato, in alcuni casi superiore a 177323.22 euro, l'età dell'assicurato, ad esempio 41 anni, e il beneficiario designato, che può essere il coniuge, i figli, gli eredi designati oppure una persona precisa come Luca Bianchi o Maria Rossi. Accanto a questi registri opera l'archivio pratiche_liquidazione, dove vengono trascritte tutte le segnalazioni di evento dannoso collegate a una copertura in essere: vi si annotano la data di accadimento, come il 2023-10-23, la descrizione del danno, che spazia dall'incursione laterale in parcheggio al furto accessori esterni, dai danni da grandine su carrozzeria al danno anteriore da tamponamento fino al danno al paraurti posteriore, l'importo del risarcimento, che in taluni casi arriva a 6820.00 euro, e lo stato della pratica, che evolve da aperto a in_valutazione per chiudersi come liquidato oppure respinto. Per la verifica di quest'anno gli analisti devono predisporre l'elenco delle sole coperture auto il cui stato di vigore è classificato come attiva e che, percorsa integralmente l'archivio pratiche_liquidazione, non mostrano nemmeno una segnalazione collegata: posizioni dunque mai toccate da alcun evento dannoso. Per ciascuna di esse occorre riportare il nome dell'intestatario, la targa del veicolo, la marca, il modello e l'importo della quietanza di premio. L'elenco va disposto dalla quietanza di premio più alta alla più bassa e, qualora due posizioni presentino lo stesso importo, a decidere è la targa, assunta in ordine alfabetico crescente come criterio dirimente univoco. Restano esclusi dal controllo le garanzie sulla persona, così come le coperture auto sospese in attesa di rinnovo documentale o già scadute."
+}

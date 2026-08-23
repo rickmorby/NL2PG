@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "disjunctive"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "operazioni_finanziarie",
+        "obsolete_value": "registro_movimenti",
+        "description": "La tabella operazioni_finanziarie viene denominata registro_movimenti nella prosa aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_lordo",
+        "obsolete_value": "valore_nominale_esposto",
+        "description": "La colonna importo_lordo viene indicata con il gergo valore_nominale_esposto nei documenti interni."
+      }
+    ],
+    "spec_hash": "0d95ca22d66afa71"
+  },
+  "schema_ddl": "CREATE TABLE operazioni_finanziarie (\n    id SERIAL PRIMARY KEY,\n    tipo_operazione TEXT NOT NULL CHECK (tipo_operazione IN ('accredito', 'addebito', 'bonifico', 'investimento', 'prelievo')),\n    importo_lordo NUMERIC(15,2) NOT NULL CHECK (importo_lordo >= 0),\n    data_operazione DATE NOT NULL,\n    descrizione TEXT,\n    categoria TEXT CHECK (categoria IN ('stipendio', 'utenze', 'alimentari', 'trasporti', 'intrattenimento', 'investimenti', 'altro')),\n    stato TEXT NOT NULL DEFAULT 'registrata' CHECK (stato IN ('registrata', 'contabilizzata', 'annullata')),\n    conto_corrente TEXT,\n    note TEXT\n);"
+}

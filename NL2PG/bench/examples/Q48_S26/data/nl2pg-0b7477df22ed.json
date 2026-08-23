@@ -1,0 +1,343 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "distinct"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fatture",
+        "obsolete_value": "registrazioni di addebito emesse",
+        "description": "La tabella fatture viene denominata 'registrazioni di addebito emesse' nella prosa aziendale, costringendo il solver a mappare la perifrasi sulla tabella fisica corretta."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "esposizione contabile lorda",
+        "description": "La colonna importo, fisicamente definita come TEXT ma contenente valori logicamente numerici da castare con CAST(importo AS NUMERIC) prima del confronto, viene indicata nella documentazione con il gergo contabile 'esposizione contabile lorda'."
+      }
+    ],
+    "spec_hash": "4a0ddc97140f37aa"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE fatture (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_fattura TEXT NOT NULL UNIQUE,\n    data_emissione DATE NOT NULL,\n    importo NUMERIC(12,2) NOT NULL,\n    stato_fattura TEXT NOT NULL DEFAULT 'emessa' CHECK (stato_fattura IN ('emessa', 'pagata', 'annullata')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE righe_fattura (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL REFERENCES fatture(id),\n    descrizione TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    aliquota_iva NUMERIC(5,2) NOT NULL DEFAULT 22.00 CHECK (aliquota_iva >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 220,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Rossi Serramenti S.r.l.",
+            "partita_iva": "IT01234567890",
+            "indirizzo": "Via Torino 45, 20123 Milano",
+            "created_at": "2025-10-02 09:15:00"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Bianchi Logistica S.p.A.",
+            "partita_iva": "IT02345678901",
+            "indirizzo": "Corso Vittorio Emanuele II 12, 00186 Roma",
+            "created_at": "2025-08-14 14:40:00"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Verdi Informatica S.r.l.",
+            "partita_iva": "IT03456789012",
+            "indirizzo": "Via Garibaldi 8, 16121 Genova",
+            "created_at": "2025-11-21 11:05:00"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Alfa Servizi Edili S.a.s.",
+            "partita_iva": "IT04567890123",
+            "indirizzo": "Piazza Duomo 3, 20121 Milano",
+            "created_at": "2025-07-30 16:20:00"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Delta Food Distribuzione S.r.l.",
+            "partita_iva": "IT05678901234",
+            "indirizzo": "Via Emilia 112, 41121 Modena",
+            "created_at": "2025-09-18 10:00:00"
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi Serramenti S.r.l.",
+              "Bianchi Logistica S.p.A.",
+              "Verdi Informatica S.r.l.",
+              "Alfa Servizi Edili S.a.s.",
+              "Delta Food Distribuzione S.r.l.",
+              "Moretti Arredamenti S.n.c.",
+              "Conti Trasporti S.p.A.",
+              "Ricci Consulenza del Lavoro S.r.l."
+            ]
+          },
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Torino 45, 20123 Milano",
+              "Corso Vittorio Emanuele II 12, 00186 Roma",
+              "Via Garibaldi 8, 16121 Genova",
+              "Piazza Duomo 3, 20121 Milano",
+              "Via Emilia 112, 41121 Modena",
+              "Viale Trieste 77, 35121 Padova"
+            ]
+          },
+          "created_at": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "fatture",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "numero_fattura": "2026/001",
+            "data_emissione": "2026-01-12",
+            "importo": "1250.00",
+            "stato_fattura": "pagata",
+            "created_at": "2026-01-12 10:30:00"
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "numero_fattura": "2026/002",
+            "data_emissione": "2026-01-28",
+            "importo": "480.50",
+            "stato_fattura": "emessa",
+            "created_at": "2026-01-28 15:45:00"
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "numero_fattura": "2026/003",
+            "data_emissione": "2026-02-09",
+            "importo": "3200.75",
+            "stato_fattura": "pagata",
+            "created_at": "2026-02-09 09:10:00"
+          },
+          {
+            "id": 104,
+            "cliente_id": 4,
+            "numero_fattura": "2026/004",
+            "data_emissione": "2026-02-20",
+            "importo": "89.90",
+            "stato_fattura": "annullata",
+            "created_at": "2026-02-20 17:25:00"
+          },
+          {
+            "id": 105,
+            "cliente_id": 5,
+            "numero_fattura": "2026/005",
+            "data_emissione": "2026-03-05",
+            "importo": "15600.00",
+            "stato_fattura": "emessa",
+            "created_at": "2026-03-05 12:00:00"
+          }
+        ],
+        "variations": {
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1250.00",
+              "480.50",
+              "3200.75",
+              "89.90",
+              "15600.00",
+              "750.00",
+              "1999.99",
+              "64.25",
+              "4200.10",
+              "310.45"
+            ]
+          },
+          "stato_fattura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "pagata",
+              "pagata",
+              "pagata",
+              "emessa",
+              "emessa",
+              "annullata"
+            ]
+          },
+          "created_at": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "righe_fattura",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1001,
+            "fattura_id": 101,
+            "descrizione": "Consulenza tecnica mensile",
+            "quantita": 1,
+            "prezzo_unitario": 850.0,
+            "aliquota_iva": 22.0
+          },
+          {
+            "id": 1002,
+            "fattura_id": 102,
+            "descrizione": "Licenza software annuale",
+            "quantita": 2,
+            "prezzo_unitario": 190.0,
+            "aliquota_iva": 22.0
+          },
+          {
+            "id": 1003,
+            "fattura_id": 103,
+            "descrizione": "Manutenzione ordinaria impianto",
+            "quantita": 4,
+            "prezzo_unitario": 640.0,
+            "aliquota_iva": 10.0
+          },
+          {
+            "id": 1004,
+            "fattura_id": 104,
+            "descrizione": "Fornitura cartucce toner",
+            "quantita": 12,
+            "prezzo_unitario": 6.5,
+            "aliquota_iva": 22.0
+          },
+          {
+            "id": 1005,
+            "fattura_id": 105,
+            "descrizione": "Noleggio furgone 7 giorni",
+            "quantita": 1,
+            "prezzo_unitario": 420.0,
+            "aliquota_iva": 22.0
+          },
+          {
+            "id": 1006,
+            "fattura_id": 105,
+            "descrizione": "Assistenza remota h.10",
+            "quantita": 3,
+            "prezzo_unitario": 55.0,
+            "aliquota_iva": 22.0
+          }
+        ],
+        "variations": {
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Consulenza tecnica mensile",
+              "Licenza software annuale",
+              "Manutenzione ordinaria impianto",
+              "Fornitura cartucce toner",
+              "Noleggio furgone 7 giorni",
+              "Assistenza remota h.10",
+              "Trasporto merce nazionale",
+              "Corso formazione avanzata"
+            ]
+          },
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "10",
+              "12",
+              "24"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "aliquota_iva": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "22.00",
+              "22.00",
+              "22.00",
+              "22.00",
+              "10.00",
+              "4.00"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

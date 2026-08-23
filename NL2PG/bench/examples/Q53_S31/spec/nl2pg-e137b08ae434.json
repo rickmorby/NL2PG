@@ -1,0 +1,34 @@
+{
+  "domain": "vendite",
+  "n_tables": 5,
+  "hierarchy": "denormalized",
+  "sql_features": [
+    "ordered_set_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "vendite_flat",
+      "obsolete_value": "registro_transazioni_commerciali",
+      "description": "La tabella piatta denormalizzata vendite_flat, che incorpora gli attributi ridondanti category_name e supplier_name, viene denominata registro_transazioni_commerciali nella prosa aziendale. Il solver deve mappare la perifrasi sulla tabella dei fatti denormalizzata su cui eseguire direttamente l'aggregato ordered-set."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "percentile_cont",
+      "obsolete_value": "soglia distributiva P90",
+      "description": "Il requisito di calcolare percentile_cont(0.9) WITHIN GROUP (ORDER BY importo) direttamente sulla tabella denormalizzata viene espresso nella prosa aziendale con il gergo 'soglia distributiva P90'. Il solver deve riconoscere che si tratta di un aggregato ordered-set con PERCENTILE_CONT e non di un semplice filtro o aggregazione standard."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "supplier_name",
+      "obsolete_value": "ragione_sociale_partner",
+      "description": "La colonna denormalizzata supplier_name, incorporata ridondantemente nella tabella vendite_flat, viene indicata nella prosa aziendale come 'ragione_sociale_partner'. Il solver deve risolvere il sinonimo per raggruppare o ordinare correttamente i percentile per fornitore senza join aggiuntivi."
+    }
+  ],
+  "spec_hash": "bea5c462385ab78c"
+}

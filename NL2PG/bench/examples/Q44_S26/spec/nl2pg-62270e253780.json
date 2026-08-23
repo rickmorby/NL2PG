@@ -1,0 +1,34 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 3,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "cast"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "traffico_dati",
+      "obsolete_value": "log_consumi",
+      "description": "La tabella che registra il traffico dati degli utenti è denominata 'log_consumi' nella documentazione aziendale, mentre nel database è 'traffico_dati'."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "volume_mb",
+      "obsolete_value": "throughput",
+      "description": "La colonna che rappresenta il volume di dati in megabyte è indicata come 'throughput' nei report tecnici, mentre nel database è 'volume_mb'."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "data_attivazione",
+      "obsolete_value": "data",
+      "description": "La colonna 'data_attivazione' (data di attivazione del contratto) viene spesso abbreviata come 'data' nei documenti, creando ambiguità con altre colonne di tipo data (es. 'data_ultimo_accesso')."
+    }
+  ],
+  "spec_hash": "1f2c1976125baf02"
+}

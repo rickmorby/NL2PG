@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 5,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "cast"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "pazienti",
+      "obsolete_value": "pat_reg",
+      "description": "La tabella dei pazienti è identificata nel database come pat_reg (Patient Registry)."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "data_ricovero",
+      "obsolete_value": "adm_ts",
+      "description": "Il campo data_ricovero è memorizzato come adm_ts (Admission Timestamp) in formato stringa, richiedendo un cast esplicito a DATE."
+    }
+  ],
+  "spec_hash": "36a216874581ee81"
+}

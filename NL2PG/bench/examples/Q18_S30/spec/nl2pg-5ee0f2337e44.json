@@ -1,0 +1,34 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 6,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "lateral"
+  ],
+  "twist": [
+    "distractor",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "sinistri",
+      "obsolete_value": "pratiche_liquidazione",
+      "description": "La prosa aziendale denomina i sinistri 'pratiche_liquidazione'. Lo schema contiene inoltre una tabella distrattrice 'pratiche_amministrative' con colonne omonime (id_pratica, importo, data_apertura) che non è correlata ai sinistri e non deve essere utilizzata nella query: occorre selezionare solo la tabella sinistri ignorando l'omonimia."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "contraenti",
+      "description": "La tabella clienti, che contiene i dati anagrafici degli assicurati, viene indicata nella prosa aziendale con il sinonimo 'contraenti'. Il mapping richiesto è clienti = contraenti."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "premio_annuo",
+      "obsolete_value": "carico_premiale",
+      "description": "La colonna premio_annuo della tabella polizze è indicata nella documentazione con il gergo assicurativo 'carico premiale'. Le query che chiedono il 'carico premiale' devono leggere la colonna premio_annuo."
+    }
+  ],
+  "spec_hash": "0e257eb7eb429a0c"
+}

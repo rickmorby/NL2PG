@@ -1,0 +1,34 @@
+{
+  "domain": "finanza",
+  "n_tables": 3,
+  "hierarchy": "isa",
+  "sql_features": [
+    "exists"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "strumenti_finanziari",
+      "obsolete_value": "prodotti_di_investimento",
+      "description": "La tabella base della gerarchia ISA, strumenti_finanziari, viene denominata prodotti_di_investimento nella prosa aziendale. Il solver deve riconoscere che la tabella generica che contiene l'entita' padre e le chiavi primarie e' strumenti_finanziari."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "obbligazioni",
+      "obsolete_value": "titoli di debito a reddito fisso",
+      "description": "La tabella sottotipo obbligazioni, collegata a strumenti_finanziari tramite FK verso la chiave primaria della tabella base, viene indicata con il gergo finanziario 'titoli di debito a reddito fisso'. Le query con NOT EXISTS devono verificare l'assenza di corrispondenza proprio su questa tabella specializzata."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "azioni",
+      "obsolete_value": "quote di partecipazione societaria",
+      "description": "La tabella sottotipo azioni, anch'essa collegata a strumenti_finanziari tramite FK verso la chiave primaria della tabella base, viene descritta come 'quote di partecipazione societaria'. Il solver deve mappare questo sinonimo alla tabella azioni quando ricompone la gerarchia ISA o filtra sul discriminatore."
+    }
+  ],
+  "spec_hash": "e16a551e0d83c41a"
+}

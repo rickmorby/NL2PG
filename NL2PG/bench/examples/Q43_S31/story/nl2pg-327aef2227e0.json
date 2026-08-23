@@ -1,0 +1,567 @@
+{
+  "schema_ddl": "CREATE TABLE offerte_commerciali (\n    id SERIAL PRIMARY KEY,\n    nome_piano TEXT NOT NULL,\n    costo_mensile NUMERIC(10,2) NOT NULL CHECK (costo_mensile >= 0),\n    traffico_dati INT NOT NULL CHECK (traffico_dati >= 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0),\n    sms_inclusi INT NOT NULL CHECK (sms_inclusi >= 0)\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    totale_speso NUMERIC(12,2) DEFAULT 0 CHECK (totale_speso >= 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    offerta_id INT NOT NULL REFERENCES offerte_commerciali(id),\n    data_attivazione DATE NOT NULL,\n    data_scadenza DATE,\n    stato_contratto TEXT NOT NULL CHECK (stato_contratto IN ('attivo', 'sospeso', 'terminato')),\n    costo_totale NUMERIC(12,2) \n);\n\nCREATE TABLE fatture (\n    id SERIAL PRIMARY KEY,\n    contratto_id INT NOT NULL REFERENCES contratti(id),\n    data_emissione DATE NOT NULL,\n    importo NUMERIC(10,2) NOT NULL CHECK (importo >= 0),\n    stato_pagamento TEXT NOT NULL CHECK (stato_pagamento IN ('pagato', 'non_pagato', 'parzialmente_pagato')),\n    scadenza_pagamento DATE NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "offerte_commerciali": {
+        "row_count": 41,
+        "columns": {
+          "id": {
+            "distinct": 41,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 41
+          },
+          "nome_piano": {
+            "distinct": 4,
+            "sample": [
+              "Base",
+              "Illimitato",
+              "Premium",
+              "Standard"
+            ]
+          },
+          "costo_mensile": {
+            "distinct": 41,
+            "sample": [
+              "10.13",
+              "10.61",
+              "10.87",
+              "11.42",
+              "11.95"
+            ],
+            "min": 8.09,
+            "max": 55.27
+          },
+          "traffico_dati": {
+            "distinct": 32,
+            "sample": [
+              "0.0",
+              "10.06",
+              "10.29",
+              "10.63",
+              "10.73"
+            ],
+            "min": 0.0,
+            "max": 105.55
+          },
+          "minuti_inclusi": {
+            "distinct": 32,
+            "sample": [
+              "0.0",
+              "100.11",
+              "1008.97",
+              "1019.47",
+              "1026.61"
+            ],
+            "min": 0.0,
+            "max": 1096.55
+          },
+          "sms_inclusi": {
+            "distinct": 32,
+            "sample": [
+              "0.0",
+              "181.64",
+              "196.66",
+              "203.7",
+              "207.52"
+            ],
+            "min": 0.0,
+            "max": 543.32
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 219,
+        "columns": {
+          "id": {
+            "distinct": 219,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 219
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Anna",
+              "Elena",
+              "Giovanni",
+              "Laura",
+              "Luca"
+            ]
+          },
+          "cognome": {
+            "distinct": 8,
+            "sample": [
+              "Bianchi",
+              "Esposito",
+              "Galli",
+              "Moretti",
+              "Neri"
+            ]
+          },
+          "email": {
+            "distinct": 219,
+            "sample": [
+              "anna.neri@example.com",
+              "anna.neri@example.com_1",
+              "anna.neri@example.com_10",
+              "anna.neri@example.com_11",
+              "anna.neri@example.com_12"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 171,
+            "sample": [
+              "2024-10-17 10:30:00",
+              "2024-10-28 10:30:00",
+              "2024-11-02 10:30:00",
+              "2024-11-08 10:30:00",
+              "2024-11-18 10:30:00"
+            ]
+          },
+          "totale_speso": {
+            "distinct": 151,
+            "sample": [
+              "0.0",
+              "102.4",
+              "104.48",
+              "106.69",
+              "108.2"
+            ],
+            "min": 0.0,
+            "max": 475.64
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 551,
+        "columns": {
+          "id": {
+            "distinct": 551,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 551
+          },
+          "cliente_id": {
+            "distinct": 197,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 219
+          },
+          "offerta_id": {
+            "distinct": 41,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 41
+          },
+          "data_attivazione": {
+            "distinct": 168,
+            "sample": [
+              "2024-11-17",
+              "2024-11-18",
+              "2024-11-19",
+              "2024-11-21",
+              "2024-11-23"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 254,
+            "sample": [
+              "2025-09-06",
+              "2025-09-14",
+              "2025-09-16",
+              "2025-09-18",
+              "2025-09-20"
+            ]
+          },
+          "stato_contratto": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "sospeso",
+              "terminato"
+            ]
+          },
+          "costo_totale": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      },
+      "fatture": {
+        "row_count": 1206,
+        "columns": {
+          "id": {
+            "distinct": 1206,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1206
+          },
+          "contratto_id": {
+            "distinct": 479,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "103"
+            ],
+            "min": 1,
+            "max": 551
+          },
+          "data_emissione": {
+            "distinct": 120,
+            "sample": [
+              "2025-01-02",
+              "2025-01-03",
+              "2025-01-04",
+              "2025-01-05",
+              "2025-01-06"
+            ]
+          },
+          "importo": {
+            "distinct": 625,
+            "sample": [
+              "10.01",
+              "10.02",
+              "10.03",
+              "10.04",
+              "10.05"
+            ],
+            "min": 8.99,
+            "max": 32.99
+          },
+          "stato_pagamento": {
+            "distinct": 3,
+            "sample": [
+              "non_pagato",
+              "pagato",
+              "parzialmente_pagato"
+            ]
+          },
+          "scadenza_pagamento": {
+            "distinct": 70,
+            "sample": [
+              "2025-02-15",
+              "2025-02-25",
+              "2025-02-26",
+              "2025-02-27",
+              "2025-02-28"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "offerte_commerciali": [
+        {
+          "id": 1,
+          "nome_piano": "Base",
+          "costo_mensile": 9.52,
+          "traffico_dati": 10.79,
+          "minuti_inclusi": 106.66,
+          "sms_inclusi": 54.34
+        },
+        {
+          "id": 2,
+          "nome_piano": "Base",
+          "costo_mensile": 8.09,
+          "traffico_dati": 9.32,
+          "minuti_inclusi": 93.26,
+          "sms_inclusi": 47.9
+        },
+        {
+          "id": 3,
+          "nome_piano": "Base",
+          "costo_mensile": 10.87,
+          "traffico_dati": 10.73,
+          "minuti_inclusi": 99.01,
+          "sms_inclusi": 45.49
+        },
+        {
+          "id": 4,
+          "nome_piano": "Base",
+          "costo_mensile": 10.61,
+          "traffico_dati": 10.63,
+          "minuti_inclusi": 90.46,
+          "sms_inclusi": 47.28
+        },
+        {
+          "id": 5,
+          "nome_piano": "Base",
+          "costo_mensile": 9.17,
+          "traffico_dati": 10.86,
+          "minuti_inclusi": 100.11,
+          "sms_inclusi": 54.33
+        },
+        {
+          "id": 6,
+          "nome_piano": "Base",
+          "costo_mensile": 11.42,
+          "traffico_dati": 10.29,
+          "minuti_inclusi": 108.35,
+          "sms_inclusi": 51.37
+        },
+        {
+          "id": 7,
+          "nome_piano": "Base",
+          "costo_mensile": 11.95,
+          "traffico_dati": 9.24,
+          "minuti_inclusi": 96.15,
+          "sms_inclusi": 53.38
+        },
+        {
+          "id": 8,
+          "nome_piano": "Base",
+          "costo_mensile": 10.13,
+          "traffico_dati": 9.81,
+          "minuti_inclusi": 93.73,
+          "sms_inclusi": 47.13
+        }
+      ],
+      "clienti": [
+        {
+          "id": 3,
+          "nome": "Anna",
+          "cognome": "Bianchi",
+          "email": "anna.bianchi1@example.com",
+          "data_registrazione": "2025-02-26T10:30:00",
+          "totale_speso": 0.0
+        },
+        {
+          "id": 18,
+          "nome": "Anna",
+          "cognome": "Galli",
+          "email": "anna.galli1@example.com",
+          "data_registrazione": "2025-02-12T10:30:00",
+          "totale_speso": 0.0
+        },
+        {
+          "id": 17,
+          "nome": "Anna",
+          "cognome": "Neri",
+          "email": "anna.neri1@example.com",
+          "data_registrazione": "2025-02-19T10:30:00",
+          "totale_speso": 0.0
+        },
+        {
+          "id": 9,
+          "nome": "Anna",
+          "cognome": "Verdi",
+          "email": "anna.verdi1@example.com",
+          "data_registrazione": "2024-12-14T10:30:00",
+          "totale_speso": 0.0
+        },
+        {
+          "id": 22,
+          "nome": "Elena",
+          "cognome": "Bianchi",
+          "email": "elena.bianchi1@example.com",
+          "data_registrazione": "2025-02-13T10:30:00",
+          "totale_speso": 0.0
+        },
+        {
+          "id": 31,
+          "nome": "Elena",
+          "cognome": "Esposito",
+          "email": "elena.esposito1@example.com",
+          "data_registrazione": "2025-04-14T10:30:00",
+          "totale_speso": 0.0
+        },
+        {
+          "id": 8,
+          "nome": "Elena",
+          "cognome": "Neri",
+          "email": "elena.neri1@example.com",
+          "data_registrazione": "2025-03-07T10:30:00",
+          "totale_speso": 0.0
+        },
+        {
+          "id": 2,
+          "nome": "Elena",
+          "cognome": "Rizzo",
+          "email": "elena.rizzo1@example.com",
+          "data_registrazione": "2024-11-02T10:30:00",
+          "totale_speso": 0.0
+        }
+      ],
+      "contratti": [
+        {
+          "id": 1,
+          "cliente_id": 47,
+          "offerta_id": 2,
+          "data_attivazione": "2025-01-17",
+          "data_scadenza": "2026-10-22",
+          "stato_contratto": "attivo",
+          "costo_totale": null
+        },
+        {
+          "id": 2,
+          "cliente_id": 79,
+          "offerta_id": 41,
+          "data_attivazione": "2025-02-16",
+          "data_scadenza": "2027-01-04",
+          "stato_contratto": "attivo",
+          "costo_totale": null
+        },
+        {
+          "id": 3,
+          "cliente_id": 38,
+          "offerta_id": 25,
+          "data_attivazione": "2025-01-16",
+          "data_scadenza": "2026-10-19",
+          "stato_contratto": "terminato",
+          "costo_totale": null
+        },
+        {
+          "id": 4,
+          "cliente_id": 86,
+          "offerta_id": 11,
+          "data_attivazione": "2024-11-25",
+          "data_scadenza": "2026-05-27",
+          "stato_contratto": "attivo",
+          "costo_totale": null
+        },
+        {
+          "id": 5,
+          "cliente_id": 53,
+          "offerta_id": 11,
+          "data_attivazione": "2025-03-15",
+          "data_scadenza": "2026-02-23",
+          "stato_contratto": "sospeso",
+          "costo_totale": null
+        },
+        {
+          "id": 6,
+          "cliente_id": 121,
+          "offerta_id": 17,
+          "data_attivazione": "2025-01-23",
+          "data_scadenza": null,
+          "stato_contratto": "sospeso",
+          "costo_totale": null
+        },
+        {
+          "id": 7,
+          "cliente_id": 48,
+          "offerta_id": 25,
+          "data_attivazione": "2025-02-18",
+          "data_scadenza": "2026-01-27",
+          "stato_contratto": "attivo",
+          "costo_totale": null
+        },
+        {
+          "id": 8,
+          "cliente_id": 107,
+          "offerta_id": 37,
+          "data_attivazione": "2025-01-01",
+          "data_scadenza": "2027-01-16",
+          "stato_contratto": "attivo",
+          "costo_totale": null
+        }
+      ],
+      "fatture": [
+        {
+          "id": 1,
+          "contratto_id": 241,
+          "data_emissione": "2025-01-10",
+          "importo": 9.25,
+          "stato_pagamento": "pagato",
+          "scadenza_pagamento": "2025-03-07"
+        },
+        {
+          "id": 2,
+          "contratto_id": 471,
+          "data_emissione": "2025-02-09",
+          "importo": 9.34,
+          "stato_pagamento": "pagato",
+          "scadenza_pagamento": "2025-03-05"
+        },
+        {
+          "id": 3,
+          "contratto_id": 472,
+          "data_emissione": "2025-02-11",
+          "importo": 9.43,
+          "stato_pagamento": "pagato",
+          "scadenza_pagamento": "2025-02-26"
+        },
+        {
+          "id": 4,
+          "contratto_id": 152,
+          "data_emissione": "2025-02-07",
+          "importo": 9.09,
+          "stato_pagamento": "pagato",
+          "scadenza_pagamento": "2025-03-08"
+        },
+        {
+          "id": 5,
+          "contratto_id": 290,
+          "data_emissione": "2025-01-10",
+          "importo": 10.73,
+          "stato_pagamento": "pagato",
+          "scadenza_pagamento": "2025-03-01"
+        },
+        {
+          "id": 6,
+          "contratto_id": 42,
+          "data_emissione": "2025-01-07",
+          "importo": 9.78,
+          "stato_pagamento": "non_pagato",
+          "scadenza_pagamento": "2025-03-13"
+        },
+        {
+          "id": 7,
+          "contratto_id": 108,
+          "data_emissione": "2025-01-17",
+          "importo": 10.85,
+          "stato_pagamento": "pagato",
+          "scadenza_pagamento": "2025-03-04"
+        },
+        {
+          "id": 8,
+          "contratto_id": 85,
+          "data_emissione": "2025-01-30",
+          "importo": 9.91,
+          "stato_pagamento": "non_pagato",
+          "scadenza_pagamento": "2025-03-10"
+        }
+      ]
+    }
+  },
+  "story": "Nell’ambito della gestione commerciale dell’azienda, il registro denominato offerte_commerciali raccoglie le informazioni relative ai piani tariffari proposti ai clienti, mentre l’archivio clienti custodisce i dati anagrafici di coloro che hanno sottoscritto un servizio. Ogni accordo stipulato viene tracciato nel registro contratti, dove sono annotate le date di attivazione, le scadenze e lo stato contrattuale, che può essere attivo, sospeso o terminato. Le fatture emesse, registrate nell’apposito archivio fatture, riportano l’importo, la data di emissione e lo stato di pagamento, che può essere pagato, non_pagato o parzialmente_pagato. Durante un’analisi delle transazioni, si è proceduto a estrarre l’elenco dei clienti con nome, cognome, piano offerto, importo e data emissione delle fatture pagate, ordinando i risultati per data emissione decrescente e per importo decrescente. In particolare, sono state considerate le fatture con stato_pagamento pari a pagato, emesse in date come 2025-01-10, 2025-02-09 e 2025-02-11, con importi che variano da 9.09 a 10.85. L’obiettivo era verificare la coerenza tra i piani sottoscritti, registrati nel registro offerte_commerciali, e le fatture corrispondenti, assicurandosi che ogni cliente fosse correttamente associato al proprio contratto e al relativo piano tariffario."
+}

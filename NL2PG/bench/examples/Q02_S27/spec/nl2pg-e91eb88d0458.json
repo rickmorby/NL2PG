@@ -1,0 +1,27 @@
+{
+  "domain": "università",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [
+    "synonym",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "synonym",
+      "target_value": "studenti",
+      "obsolete_value": "iscritti",
+      "description": "La tabella studenti, che contiene i dati anagrafici e la matricola di ciascun studente, viene denominata nella prosa aziendale come 'iscritti'. Il solver deve mappare il termine 'iscritti' alla tabella reale 'studenti' tramite la colonna implicita matricola presente nella tabella esami."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "voto",
+      "obsolete_value": "valutazione conseguita",
+      "description": "La colonna voto della tabella esami, utilizzata per il calcolo della media scalare (scalar_agg), viene indicata nella prosa aziendale con la perifrasi 'valutazione conseguita'. Il solver deve riconoscere che 'valutazione conseguita' si riferisce alla colonna voto quando calcola la media per studente."
+    }
+  ],
+  "spec_hash": "5160e2fc7886d26a"
+}

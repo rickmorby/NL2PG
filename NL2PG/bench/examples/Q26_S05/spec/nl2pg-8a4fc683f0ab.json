@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "anti_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "eventi_tracciamento",
+      "obsolete_value": "registro_movimenti",
+      "description": "La tabella eventi_tracciamento (entità debole con chiave composta id_spedizione + num_evento) viene denominata registro_movimenti nella prosa aziendale. Le query devono risolvere il nome reale della tabella per individuare gli eventi orfani non collegati ad alcuna spedizione tramite WHERE NOT EXISTS."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "depositi",
+      "obsolete_value": "hub di cross-docking",
+      "description": "La tabella depositi (entità proprietaria che referenzia le spedizioni) è indicata nei documenti aziendali con il gergo logistico 'hub di cross-docking'. Il solutore deve mappare questa espressione tecnica al nome reale della tabella per identificare i depositi privi di eventi tracciamento associati."
+    }
+  ],
+  "spec_hash": "6d5e0ca355145d7e"
+}

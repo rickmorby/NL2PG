@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 2,
+  "hierarchy": "flat",
+  "sql_features": [
+    "string_funcs"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_personale",
+      "description": "La tabella piatta denormalizzata dipendenti viene denominata nella prosa aziendale come anagrafica_personale. Le query devono mappare tale perifrasi alla tabella fisica dipendenti."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "nome_reparto",
+      "obsolete_value": "business unit di riferimento",
+      "description": "La colonna denormalizzata nome_reparto incorporata nella tabella dipendenti viene indicata nella documentazione con il gergo aziendale 'business unit di riferimento'. Le query che richiedono UPPER(nome_reparto) o CONCAT(nome_reparto, ' ', nome_sede) devono riferirsi alla colonna fisica nome_reparto."
+    }
+  ],
+  "spec_hash": "204e2f3f58990920"
+}

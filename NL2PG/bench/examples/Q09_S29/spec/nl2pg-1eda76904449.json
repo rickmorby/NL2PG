@@ -1,0 +1,21 @@
+{
+  "domain": "logistica",
+  "n_tables": 2,
+  "hierarchy": "column_splitting",
+  "sql_features": [
+    "group_agg",
+    "having"
+  ],
+  "twist": [
+    "rename"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "consegne",
+      "description": "La tabella spedizioni viene denominata consegne nella terminologia aziendale."
+    }
+  ],
+  "spec_hash": "251266a8161e0a9c"
+}

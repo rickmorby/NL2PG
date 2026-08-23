@@ -1,0 +1,34 @@
+{
+  "domain": "logistica",
+  "n_tables": 5,
+  "hierarchy": "one_to_many_nullable",
+  "sql_features": [
+    "conjunctive"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "vettori",
+      "obsolete_value": "anagrafica_trasportatori",
+      "description": "La tabella vettori, che contiene i trasportatori incaricati delle spedizioni, viene denominata anagrafica_trasportatori nella prosa aziendale. L'utente deve risalire alla tabella reale vettori tramite la FK nullable spedizioni.id_vettore."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "peso_kg",
+      "obsolete_value": "massa_merce",
+      "description": "La colonna peso_kg della tabella spedizioni viene indicata nella documentazione aziendale come massa_merce. Le query con filtri congiuntivi sul peso devono mappare tale sinonimo alla colonna reale peso_kg."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "colli",
+      "obsolete_value": "unita_di_movimentazione",
+      "description": "La tabella colli, figlia di spedizioni, viene indicata con il gergo del settore logistico come unita_di_movimentazione (handling units). L'utente deve interpretare il termine tecnico e collegarlo alla tabella reale colli tramite la FK colli.id_spedizione."
+    }
+  ],
+  "spec_hash": "e2c511382bd7f330"
+}

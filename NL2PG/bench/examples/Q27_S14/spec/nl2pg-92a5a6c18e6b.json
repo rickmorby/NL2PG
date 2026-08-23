@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "grouping_sets"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "pratiche_di_copertura",
+      "description": "L'unica tabella dello schema, polizze, viene denominata pratiche_di_copertura nella prosa aziendale. Il progettista deve riconoscere che le 'pratiche_di_copertura' citate nei requisiti corrispondono alla tabella fisica polizze."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "premio_annuo",
+      "obsolete_value": "carico tariffario periodico",
+      "description": "La colonna premio_annuo della tabella polizze è indicata nel testo con il gergo assicurativo 'carico tariffario periodico'. Inoltre i vincoli impliciti del dominio (premio_annuo > 0 NOT NULL, stato IN ('attiva','sospesa','scaduta')) non sono dichiarati nel testo e vanno tradotti in condizioni WHERE esplicite quando si aggrega con GROUP BY GROUPING SETS ((tipo_polizza), (regione), ())."
+    }
+  ],
+  "spec_hash": "dd0e265df1de9a41"
+}

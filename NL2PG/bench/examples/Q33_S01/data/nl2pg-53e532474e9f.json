@@ -1,0 +1,261 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "registro_movimentazioni",
+        "description": "La tabella spedizioni viene denominata registro_movimentazioni nella prosa aziendale; l'utente deve ricondurre tale perifrasi alla tabella reale del database."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "stato_spedizione",
+        "obsolete_value": "flag di avanzamento flotta",
+        "description": "La colonna stato_spedizione viene indicata con il gergo logistico 'flag di avanzamento flotta'; le query di filtraggio con LIKE dovranno applicare il pattern sulla colonna reale stato_spedizione."
+      }
+    ],
+    "spec_hash": "99b1db46bc6a6afc"
+  },
+  "schema_ddl": "CREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    codice_tracciamento TEXT NOT NULL UNIQUE,\n    stato_spedizione TEXT NOT NULL CHECK (stato_spedizione <> ''),\n    nome_destinatario TEXT NOT NULL,\n    citta_destinazione TEXT NOT NULL,\n    cap_destinazione TEXT,\n    peso_chilogrammi NUMERIC(8,2) CHECK (peso_chilogrammi > 0),\n    data_ritiro DATE NOT NULL,\n    data_consegna_prevista DATE,\n    data_consegna_effettiva DATE,\n    costo_spedizione NUMERIC(10,2) CHECK (costo_spedizione >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": 500,
+        "max_rows": 1500,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_tracciamento": "TRK-2026-000101",
+            "stato_spedizione": "consegnata",
+            "nome_destinatario": "Marco Bianchi",
+            "citta_destinazione": "Roma",
+            "cap_destinazione": "00185",
+            "peso_chilogrammi": 2.4,
+            "data_ritiro": "2026-01-06",
+            "data_consegna_prevista": "2026-01-10",
+            "data_consegna_effettiva": "2026-01-09",
+            "costo_spedizione": 12.9
+          },
+          {
+            "id": 2,
+            "codice_tracciamento": "TRK-2026-000102",
+            "stato_spedizione": "consegnata",
+            "nome_destinatario": "Elena Ferrari",
+            "citta_destinazione": "Milano",
+            "cap_destinazione": "20121",
+            "peso_chilogrammi": 18.75,
+            "data_ritiro": "2026-01-20",
+            "data_consegna_prevista": "2026-01-24",
+            "data_consegna_effettiva": "2026-01-26",
+            "costo_spedizione": 27.4
+          },
+          {
+            "id": 3,
+            "codice_tracciamento": "TRK-2026-000103",
+            "stato_spedizione": "in_transito",
+            "nome_destinatario": "Luca Moretti",
+            "citta_destinazione": "Napoli",
+            "cap_destinazione": "80132",
+            "peso_chilogrammi": 0.85,
+            "data_ritiro": "2026-02-03",
+            "data_consegna_prevista": "2026-02-07",
+            "data_consegna_effettiva": null,
+            "costo_spedizione": 8.5
+          },
+          {
+            "id": 4,
+            "codice_tracciamento": "TRK-2026-000104",
+            "stato_spedizione": "smistata",
+            "nome_destinatario": "Sara Colombo",
+            "citta_destinazione": "Torino",
+            "cap_destinazione": "10121",
+            "peso_chilogrammi": 32.1,
+            "data_ritiro": "2026-02-11",
+            "data_consegna_prevista": "2026-02-16",
+            "data_consegna_effettiva": null,
+            "costo_spedizione": 41.2
+          },
+          {
+            "id": 5,
+            "codice_tracciamento": "TRK-2026-000105",
+            "stato_spedizione": "consegnata",
+            "nome_destinatario": "Alessandro Greco",
+            "citta_destinazione": "Palermo",
+            "cap_destinazione": "90133",
+            "peso_chilogrammi": 5.6,
+            "data_ritiro": "2026-02-18",
+            "data_consegna_prevista": "2026-02-21",
+            "data_consegna_effettiva": "2026-02-22",
+            "costo_spedizione": 15.75
+          },
+          {
+            "id": 6,
+            "codice_tracciamento": "TRK-2026-000106",
+            "stato_spedizione": "fallita",
+            "nome_destinatario": "Chiara Fontana",
+            "citta_destinazione": "Bologna",
+            "cap_destinazione": "40124",
+            "peso_chilogrammi": 12.3,
+            "data_ritiro": "2026-02-25",
+            "data_consegna_prevista": "2026-03-02",
+            "data_consegna_effettiva": null,
+            "costo_spedizione": 22.0
+          },
+          {
+            "id": 7,
+            "codice_tracciamento": "TRK-2026-000107",
+            "stato_spedizione": "consegnata",
+            "nome_destinatario": "Davide Rinaldi",
+            "citta_destinazione": "Firenze",
+            "cap_destinazione": "50123",
+            "peso_chilogrammi": 47.9,
+            "data_ritiro": "2026-03-05",
+            "data_consegna_prevista": "2026-03-09",
+            "data_consegna_effettiva": "2026-03-08",
+            "costo_spedizione": 68.3
+          },
+          {
+            "id": 8,
+            "codice_tracciamento": "TRK-2026-000108",
+            "stato_spedizione": "restituita",
+            "nome_destinatario": "Francesca Marino",
+            "citta_destinazione": "Genova",
+            "cap_destinazione": "16121",
+            "peso_chilogrammi": 9.45,
+            "data_ritiro": "2026-03-12",
+            "data_consegna_prevista": "2026-03-17",
+            "data_consegna_effettiva": null,
+            "costo_spedizione": 19.6
+          }
+        ],
+        "variations": {
+          "stato_spedizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnata",
+              "consegnata",
+              "consegnata",
+              "in_transito",
+              "in_transito",
+              "in_preparazione",
+              "smistata",
+              "ritirata",
+              "fallita",
+              "restituita"
+            ]
+          },
+          "nome_destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco Bianchi",
+              "Elena Ferrari",
+              "Luca Moretti",
+              "Sara Colombo",
+              "Alessandro Greco",
+              "Chiara Fontana",
+              "Davide Rinaldi",
+              "Francesca Marino",
+              "Matteo Galli",
+              "Valentina Serra"
+            ]
+          },
+          "citta_destinazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Napoli",
+              "Torino",
+              "Palermo",
+              "Bologna",
+              "Firenze",
+              "Genova"
+            ]
+          },
+          "cap_destinazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "00185",
+              "20121",
+              "80132",
+              "10121",
+              "90133",
+              "40124",
+              "50123",
+              "16121"
+            ]
+          },
+          "peso_chilogrammi": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 12.0,
+            "pool": []
+          },
+          "data_ritiro": {
+            "axis": "shift",
+            "delta_min": -3.0,
+            "delta_max": 3.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_consegna_prevista": {
+            "axis": "shift",
+            "delta_min": 3.0,
+            "delta_max": 21.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_consegna_effettiva": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 9.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "costo_spedizione": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 4,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "agg_distinct"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "registro_consegne",
+      "description": "La tabella spedizioni (tabella figlio contenente le colonne cliente_id, corriere_id e magazzino_id deducibili dai nomi, senza REFERENCES dichiarate) viene denominata registro_consegne nella prosa aziendale. La query COUNT(DISTINCT spedizioni.cliente_id) con GROUP BY deve quindi risolvere il riferimento registro_consegne verso la tabella spedizioni."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "corrieri",
+      "obsolete_value": "vettori",
+      "description": "La tabella corrieri, referenziata implicitamente dalla colonna corriere_id nella tabella spedizioni, viene indicata nella documentazione aziendale con il sinonimo vettori. Le richieste di conteggio dei clienti distinti per vettore devono mappare vettori alla tabella corrieri."
+    }
+  ],
+  "spec_hash": "d84311f99968dcf2"
+}

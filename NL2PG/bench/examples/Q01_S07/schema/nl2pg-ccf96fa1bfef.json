@@ -1,0 +1,12 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "self_referencing",
+    "sql_features": [],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "850ec246efc5f03a"
+  },
+  "schema_ddl": "CREATE TABLE conti (\n    id INT PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    nome_conto TEXT NOT NULL,\n    conto_padre_id INT REFERENCES conti(id),\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'costo', 'ricavo')),\n    livello_gerarchia INT NOT NULL CHECK (livello_gerarchia BETWEEN 1 AND 10),\n    aperto_il DATE NOT NULL,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);"
+}

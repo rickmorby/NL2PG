@@ -1,0 +1,460 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT CHECK (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$')\n);\n\nCREATE TABLE richieste_acquisto (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_richiesta TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato TEXT NOT NULL CHECK (stato IN ('pendente', 'confermato', 'evaso', 'annullato')),\n    totale DECIMAL(10, 2) NOT NULL CHECK (totale >= 0)\n);\n\nCREATE TABLE centro_logistico (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_max INT NOT NULL CHECK (capacita_max > 0)\n);\n\nCREATE TABLE inventario (\n    id SERIAL PRIMARY KEY,\n    centro_logistico_id INT NOT NULL REFERENCES centro_logistico(id),\n    prodotto_id INT NOT NULL,\n    unita INT NOT NULL CHECK (unita >= 0),\n    prezzo_unitario DECIMAL(10, 2) NOT NULL CHECK (prezzo_unitario >= 0),\n    valore_totale DECIMAL(10, 2) GENERATED ALWAYS AS (unita * prezzo_unitario) STORED\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 419,
+        "columns": {
+          "id": {
+            "distinct": 419,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 419
+          },
+          "nome": {
+            "distinct": 6,
+            "sample": [
+              "Anna Gialli Srl",
+              "Giulia Verdi & Co",
+              "Laura Bianchi Spa",
+              "Luca Blu Spa",
+              "Mario Rossi Srl"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 419,
+            "sample": [
+              "BNCLRA85B02H501Y",
+              "BNCLRA85B02H501Y_1",
+              "BNCLRA85B02H501Y_10",
+              "BNCLRA85B02H501Y_100",
+              "BNCLRA85B02H501Y_101"
+            ]
+          },
+          "email": {
+            "distinct": 6,
+            "sample": [
+              "anna.gialli@azienda.it",
+              "giulia.verdi@azienda.it",
+              "laura.bianchi@azienda.it",
+              "luca.blu@azienda.it",
+              "mario.rossi@azienda.it"
+            ]
+          }
+        }
+      },
+      "richieste_acquisto": {
+        "row_count": 1836,
+        "columns": {
+          "id": {
+            "distinct": 1836,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1936
+          },
+          "cliente_id": {
+            "distinct": 416,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 419
+          },
+          "data_richiesta": {
+            "distinct": 474,
+            "sample": [
+              "2025-11-16 09:00:00",
+              "2025-11-17 09:00:00",
+              "2025-11-17 10:30:00",
+              "2025-11-18 09:00:00",
+              "2025-11-18 10:30:00"
+            ]
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "annullato",
+              "confermato",
+              "evaso",
+              "pendente"
+            ]
+          },
+          "totale": {
+            "distinct": 1758,
+            "sample": [
+              "1005.09",
+              "1006.03",
+              "1006.38",
+              "1007.63",
+              "1010.68"
+            ],
+            "min": 150.0,
+            "max": 9602.25
+          }
+        }
+      },
+      "centro_logistico": {
+        "row_count": 34,
+        "columns": {
+          "id": {
+            "distinct": 34,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 34
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Magazzino Centro",
+              "Magazzino Est",
+              "Magazzino Nord",
+              "Magazzino Ovest",
+              "Magazzino Sud"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 5,
+            "sample": [
+              "Via Industriale 10, Milano",
+              "Via Portuale 25, Napoli",
+              "Via Roma 5, Roma",
+              "Via Torino 15, Torino",
+              "Via Venezia 30, Venezia"
+            ]
+          },
+          "capacita_max": {
+            "distinct": 5,
+            "sample": [
+              "2500",
+              "3000",
+              "4000",
+              "5000",
+              "6000"
+            ]
+          }
+        }
+      },
+      "inventario": {
+        "row_count": 283,
+        "columns": {
+          "id": {
+            "distinct": 283,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 283
+          },
+          "centro_logistico_id": {
+            "distinct": 34,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 34
+          },
+          "prodotto_id": {
+            "distinct": 8,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 104
+          },
+          "unita": {
+            "distinct": 272,
+            "sample": [
+              "10.0",
+              "100",
+              "100.88",
+              "101.45",
+              "102.04"
+            ],
+            "min": 6.15,
+            "max": 971.82
+          },
+          "prezzo_unitario": {
+            "distinct": 270,
+            "sample": [
+              "10.13",
+              "10.25",
+              "10.28",
+              "10.41",
+              "10.47"
+            ],
+            "min": 5.12,
+            "max": 59.81
+          },
+          "valore_totale": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 21,
+          "nome": "Anna Gialli Srl",
+          "codice_fiscale": "RSSMRA78A01H501X_20",
+          "email": "annagiallisrl1@example.com"
+        },
+        {
+          "id": 79,
+          "nome": "Anna Gialli Srl",
+          "codice_fiscale": "RSSMRA78A01H501X_78",
+          "email": "annagiallisrl2@example.com"
+        },
+        {
+          "id": 13,
+          "nome": "Giulia Verdi & Co",
+          "codice_fiscale": "RSSMRA78A01H501X_12",
+          "email": "giuliaverdico1@example.com"
+        },
+        {
+          "id": 20,
+          "nome": "Luca Blu Spa",
+          "codice_fiscale": "RSSMRA78A01H501X_19",
+          "email": "lucabluspa1@example.com"
+        },
+        {
+          "id": 73,
+          "nome": "Mario Rossi Srl",
+          "codice_fiscale": "RSSMRA78A01H501X_72",
+          "email": "mariorossisrl1@example.com"
+        },
+        {
+          "id": 42,
+          "nome": "Paolo Neri Ltd",
+          "codice_fiscale": "RSSMRA78A01H501X_41",
+          "email": "paoloneriltd1@example.com"
+        },
+        {
+          "id": 76,
+          "nome": "Paolo Neri Ltd",
+          "codice_fiscale": "RSSMRA78A01H501X_75",
+          "email": "paoloneriltd2@example.com"
+        },
+        {
+          "id": 168,
+          "nome": "Anna Gialli Srl",
+          "codice_fiscale": "BNCLRA85B02H501Y_27",
+          "email": "annagiallisrl3@example.com"
+        }
+      ],
+      "richieste_acquisto": [
+        {
+          "id": 101,
+          "cliente_id": 36,
+          "data_richiesta": "2026-01-29 09:00:00",
+          "stato": "annullato",
+          "totale": 454.93
+        },
+        {
+          "id": 102,
+          "cliente_id": 357,
+          "data_richiesta": "2026-03-07 09:00:00",
+          "stato": "confermato",
+          "totale": 3339.07
+        },
+        {
+          "id": 103,
+          "cliente_id": 204,
+          "data_richiesta": "2026-03-16 09:00:00",
+          "stato": "confermato",
+          "totale": 2246.21
+        },
+        {
+          "id": 104,
+          "cliente_id": 335,
+          "data_richiesta": "2026-03-11 09:00:00",
+          "stato": "annullato",
+          "totale": 3162.89
+        },
+        {
+          "id": 105,
+          "cliente_id": 406,
+          "data_richiesta": "2026-03-06 09:00:00",
+          "stato": "confermato",
+          "totale": 3887.72
+        },
+        {
+          "id": 106,
+          "cliente_id": 98,
+          "data_richiesta": "2025-12-08 09:00:00",
+          "stato": "pendente",
+          "totale": 4177.18
+        },
+        {
+          "id": 107,
+          "cliente_id": 127,
+          "data_richiesta": "2025-12-26 09:00:00",
+          "stato": "pendente",
+          "totale": 1774.97
+        },
+        {
+          "id": 108,
+          "cliente_id": 272,
+          "data_richiesta": "2025-11-24 09:00:00",
+          "stato": "confermato",
+          "totale": 3686.61
+        }
+      ],
+      "centro_logistico": [
+        {
+          "id": 1,
+          "nome": "Magazzino Nord",
+          "indirizzo": "Via Torino 15, Torino",
+          "capacita_max": "2500"
+        },
+        {
+          "id": 2,
+          "nome": "Magazzino Ovest",
+          "indirizzo": "Via Industriale 10, Milano",
+          "capacita_max": "6000"
+        },
+        {
+          "id": 3,
+          "nome": "Magazzino Nord",
+          "indirizzo": "Via Portuale 25, Napoli",
+          "capacita_max": "3000"
+        },
+        {
+          "id": 4,
+          "nome": "Magazzino Est",
+          "indirizzo": "Via Venezia 30, Venezia",
+          "capacita_max": "4000"
+        },
+        {
+          "id": 5,
+          "nome": "Magazzino Ovest",
+          "indirizzo": "Via Venezia 30, Venezia",
+          "capacita_max": "3000"
+        },
+        {
+          "id": 6,
+          "nome": "Magazzino Est",
+          "indirizzo": "Via Venezia 30, Venezia",
+          "capacita_max": "6000"
+        },
+        {
+          "id": 7,
+          "nome": "Magazzino Est",
+          "indirizzo": "Via Portuale 25, Napoli",
+          "capacita_max": "2500"
+        },
+        {
+          "id": 8,
+          "nome": "Magazzino Nord",
+          "indirizzo": "Via Industriale 10, Milano",
+          "capacita_max": "2500"
+        }
+      ],
+      "inventario": [
+        {
+          "id": 1,
+          "centro_logistico_id": 4,
+          "prodotto_id": "106",
+          "unita": 377.18,
+          "prezzo_unitario": 28.39,
+          "valore_totale": null
+        },
+        {
+          "id": 2,
+          "centro_logistico_id": 30,
+          "prodotto_id": "108",
+          "unita": 369.18,
+          "prezzo_unitario": 14.47,
+          "valore_totale": null
+        },
+        {
+          "id": 3,
+          "centro_logistico_id": 29,
+          "prodotto_id": "102",
+          "unita": 278.0,
+          "prezzo_unitario": 22.27,
+          "valore_totale": null
+        },
+        {
+          "id": 4,
+          "centro_logistico_id": 25,
+          "prodotto_id": "104",
+          "unita": 169.14,
+          "prezzo_unitario": 26.81,
+          "valore_totale": null
+        },
+        {
+          "id": 5,
+          "centro_logistico_id": 33,
+          "prodotto_id": "104",
+          "unita": 10.0,
+          "prezzo_unitario": 20.62,
+          "valore_totale": null
+        },
+        {
+          "id": 6,
+          "centro_logistico_id": 30,
+          "prodotto_id": "103",
+          "unita": 466.64,
+          "prezzo_unitario": 22.94,
+          "valore_totale": null
+        },
+        {
+          "id": 7,
+          "centro_logistico_id": 2,
+          "prodotto_id": "105",
+          "unita": 237.08,
+          "prezzo_unitario": 11.15,
+          "valore_totale": null
+        },
+        {
+          "id": 8,
+          "centro_logistico_id": 3,
+          "prodotto_id": "105",
+          "unita": 299.0,
+          "prezzo_unitario": 31.0,
+          "valore_totale": null
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "set_op"
+  ],
+  "query": "WITH richieste_attive AS (SELECT nome, totale FROM clienti c JOIN richieste_acquisto ra ON c.id = ra.cliente_id WHERE ra.stato IN ('confermato', 'evaso') AND ra.totale BETWEEN 1000.00 AND 5000.00) SELECT nome, totale FROM richieste_attive UNION ALL SELECT nome, 0 AS totale FROM clienti WHERE nome LIKE 'L%' AND codice_fiscale IS NOT NULL;"
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "agg_distinct"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatture",
+      "obsolete_value": "movimenti_documentali_emessi",
+      "description": "La tabella che registra fisicamente le fatture emesse è indicata nella prosa aziendale con la perifrasi movimenti_documentali_emessi. Il risolutore deve riconoscere che ogni menzione dei movimenti documentali emessi si riferisce alla tabella fisica fatture."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "numero_fattura",
+      "obsolete_value": "protocollo di registrazione contabile",
+      "description": "La colonna numero_fattura è denominata nel gergo contabile come protocollo di registrazione contabile. La colonna è fisicamente di tipo TEXT ma contiene valori logicamente numerici (es. '00123'): per eseguire correttamente COUNT(DISTINCT numero_fattura) con GROUP BY sul cliente, occorre applicare CAST(numero_fattura AS NUMERIC), poiché rappresentazioni testuali diverse ('0123' e '123') identificano lo stesso documento numerico e non devono essere conteggiate due volte."
+    }
+  ],
+  "spec_hash": "5fee31c8f10cfe8a"
+}

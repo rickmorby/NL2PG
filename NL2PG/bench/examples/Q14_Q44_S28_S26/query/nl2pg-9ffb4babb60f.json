@@ -1,0 +1,318 @@
+{
+  "schema_ddl": "CREATE TABLE sim (\n    id INT PRIMARY KEY,\n    iccid TEXT NOT NULL UNIQUE,\n    numero_telefono TEXT NOT NULL,\n    operatore TEXT NOT NULL,\n    stato TEXT NOT NULL DEFAULT 'attiva' CHECK (stato IN ('attiva', 'sospesa', 'disattivata')),\n    data_attivazione DATE NOT NULL\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    sim_id INT NOT NULL UNIQUE REFERENCES sim(id),\n    denominazione_piano TEXT NOT NULL,\n    gigabyte INT NOT NULL CHECK (gigabyte > 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0),\n    canone_mensile NUMERIC(8,2) NOT NULL CHECK (canone_mensile >= 0),\n    data_sottoscrizione DATE NOT NULL,\n    data_cessazione DATE,\n    CHECK (data_cessazione IS NULL OR data_cessazione >= data_sottoscrizione)\n);",
+  "data_profile": {
+    "profile": {
+      "sim": {
+        "row_count": 358,
+        "columns": {
+          "id": {
+            "distinct": 358,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 358
+          },
+          "iccid": {
+            "distinct": 358,
+            "sample": [
+              "8939012345678901230",
+              "8939012345678901231",
+              "8939012345678901232",
+              "8939012345678901232_101",
+              "8939012345678901232_102"
+            ]
+          },
+          "numero_telefono": {
+            "distinct": 8,
+            "sample": [
+              "+393201234567",
+              "+393311234567",
+              "+393331122334",
+              "+393331234567",
+              "+393381234567"
+            ]
+          },
+          "operatore": {
+            "distinct": 6,
+            "sample": [
+              "Fastweb",
+              "Iliad",
+              "PosteMobile",
+              "TIM",
+              "Vodafone"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "attiva",
+              "disattivata",
+              "sospesa"
+            ]
+          },
+          "data_attivazione": {
+            "distinct": 300,
+            "sample": [
+              "2020-12-03",
+              "2020-12-04",
+              "2020-12-09",
+              "2020-12-10",
+              "2020-12-23"
+            ]
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 352,
+        "columns": {
+          "id": {
+            "distinct": 352,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 352
+          },
+          "sim_id": {
+            "distinct": 352,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 358
+          },
+          "denominazione_piano": {
+            "distinct": 5,
+            "sample": [
+              "Piano Base",
+              "Piano Business",
+              "Piano Plus",
+              "Piano Premium",
+              "Piano Young"
+            ]
+          },
+          "gigabyte": {
+            "distinct": 345,
+            "sample": [
+              "10.0",
+              "10.09",
+              "10.23",
+              "10.29",
+              "10.67"
+            ],
+            "min": 2.54,
+            "max": 199.45
+          },
+          "minuti_inclusi": {
+            "distinct": 350,
+            "sample": [
+              "100",
+              "1000.0",
+              "1007.47",
+              "1012.1",
+              "1013.07"
+            ],
+            "min": 50.32,
+            "max": 3996.87
+          },
+          "canone_mensile": {
+            "distinct": 329,
+            "sample": [
+              "10.0",
+              "10.02",
+              "10.14",
+              "10.18",
+              "10.26"
+            ],
+            "min": 5.0,
+            "max": 79.33
+          },
+          "data_sottoscrizione": {
+            "distinct": 257,
+            "sample": [
+              "2021-09-06",
+              "2021-09-10",
+              "2021-09-11",
+              "2021-09-12",
+              "2021-09-13"
+            ]
+          },
+          "data_cessazione": {
+            "distinct": 2,
+            "sample": [
+              "2024-06-30",
+              "2024-12-31"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "sim": [
+        {
+          "id": 1,
+          "iccid": "8939012345678901230",
+          "numero_telefono": "+393451234567",
+          "operatore": "Iliad",
+          "stato": "attiva",
+          "data_attivazione": "2022-10-07"
+        },
+        {
+          "id": 2,
+          "iccid": "8939012345678901231",
+          "numero_telefono": "+393451234567",
+          "operatore": "Iliad",
+          "stato": "sospesa",
+          "data_attivazione": "2022-06-12"
+        },
+        {
+          "id": 3,
+          "iccid": "8939012345678901232",
+          "numero_telefono": "+393471234567",
+          "operatore": "Fastweb",
+          "stato": "attiva",
+          "data_attivazione": "2021-09-22"
+        },
+        {
+          "id": 4,
+          "iccid": "8939012345678901233",
+          "numero_telefono": "+393381234567",
+          "operatore": "Iliad",
+          "stato": "sospesa",
+          "data_attivazione": "2021-11-05"
+        },
+        {
+          "id": 5,
+          "iccid": "8939012345678901234",
+          "numero_telefono": "+393331122334",
+          "operatore": "PosteMobile",
+          "stato": "sospesa",
+          "data_attivazione": "2021-09-24"
+        },
+        {
+          "id": 6,
+          "iccid": "8939012345678901235",
+          "numero_telefono": "+393331122334",
+          "operatore": "PosteMobile",
+          "stato": "disattivata",
+          "data_attivazione": "2022-05-02"
+        },
+        {
+          "id": 7,
+          "iccid": "8939012345678901236",
+          "numero_telefono": "+393381234567",
+          "operatore": "Iliad",
+          "stato": "disattivata",
+          "data_attivazione": "2021-08-25"
+        },
+        {
+          "id": 8,
+          "iccid": "8939012345678901237",
+          "numero_telefono": "+393331122334",
+          "operatore": "Vodafone",
+          "stato": "sospesa",
+          "data_attivazione": "2023-03-10"
+        }
+      ],
+      "contratti": [
+        {
+          "id": 1,
+          "sim_id": 355,
+          "denominazione_piano": "Piano Young",
+          "gigabyte": 8.31,
+          "minuti_inclusi": 95.99,
+          "canone_mensile": 12.29,
+          "data_sottoscrizione": "2022-02-24",
+          "data_cessazione": null
+        },
+        {
+          "id": 2,
+          "sim_id": 148,
+          "denominazione_piano": "Piano Base",
+          "gigabyte": 9.77,
+          "minuti_inclusi": 99.09,
+          "canone_mensile": 13.1,
+          "data_sottoscrizione": "2022-02-06",
+          "data_cessazione": null
+        },
+        {
+          "id": 3,
+          "sim_id": 145,
+          "denominazione_piano": "Piano Base",
+          "gigabyte": 3.49,
+          "minuti_inclusi": 168.94,
+          "canone_mensile": 13.63,
+          "data_sottoscrizione": "2022-04-14",
+          "data_cessazione": null
+        },
+        {
+          "id": 4,
+          "sim_id": 67,
+          "denominazione_piano": "Piano Premium",
+          "gigabyte": 4.78,
+          "minuti_inclusi": 124.79,
+          "canone_mensile": 16.75,
+          "data_sottoscrizione": "2022-01-18",
+          "data_cessazione": null
+        },
+        {
+          "id": 5,
+          "sim_id": 218,
+          "denominazione_piano": "Piano Business",
+          "gigabyte": 9.11,
+          "minuti_inclusi": 73.88,
+          "canone_mensile": 6.81,
+          "data_sottoscrizione": "2022-03-01",
+          "data_cessazione": null
+        },
+        {
+          "id": 6,
+          "sim_id": 161,
+          "denominazione_piano": "Piano Plus",
+          "gigabyte": 2.57,
+          "minuti_inclusi": 91.27,
+          "canone_mensile": 10.14,
+          "data_sottoscrizione": "2022-01-24",
+          "data_cessazione": null
+        },
+        {
+          "id": 7,
+          "sim_id": 84,
+          "denominazione_piano": "Piano Young",
+          "gigabyte": 9.85,
+          "minuti_inclusi": 57.65,
+          "canone_mensile": 7.91,
+          "data_sottoscrizione": "2022-04-13",
+          "data_cessazione": null
+        },
+        {
+          "id": 8,
+          "sim_id": 74,
+          "denominazione_piano": "Piano Young",
+          "gigabyte": 3.43,
+          "minuti_inclusi": 139.39,
+          "canone_mensile": 9.71,
+          "data_sottoscrizione": "2022-02-01",
+          "data_cessazione": null
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "set_op"
+  ],
+  "query": "SELECT UPPER(s.operatore) AS operatore, COUNT(*) AS sim_attive FROM sim s WHERE s.stato = 'attiva' GROUP BY s.operatore UNION ALL SELECT UPPER(s.operatore) AS operatore, COUNT(*) AS sim_sospese FROM sim s WHERE s.stato = 'sospesa' GROUP BY s.operatore;"
+}

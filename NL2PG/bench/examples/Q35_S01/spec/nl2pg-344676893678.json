@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "case"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "scritture_contabili",
+      "obsolete_value": "registro_movimenti_amministrativi",
+      "description": "La tabella scritture_contabili, che contiene le registrazioni contabili con chiave primaria id_scrittura e attributi come data_registrazione, conto, importo_dare, importo_avere e stato_pagamento, viene denominata nella prosa aziendale registro_movimenti_amministrativi."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_pagamento",
+      "obsolete_value": "posizione di liquidazione del debito",
+      "description": "La colonna stato_pagamento della tabella scritture_contabili, che assume valori come 'pagato', 'sospeso' o 'insoluto', viene indicata nella documentazione aziendale con il gergo contabile 'posizione di liquidazione del debito'. Le query devono riconoscere questa perifrasi per filtrare o classificare correttamente i record tramite CASE WHEN."
+    }
+  ],
+  "spec_hash": "a265fa25f838a6a8"
+}

@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 4,
+    "hierarchy": "flat_denormalized",
+    "sql_features": [
+      "sorting"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "piani_tariffari",
+        "obsolete_value": "offerte_commerciali",
+        "description": "La tabella contenente i piani tariffari viene denominata 'offerte_commerciali' nella documentazione aziendale, creando una discrepanza con il nome reale della tabella."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "traffico_dati",
+        "obsolete_value": "throughput_mensile",
+        "description": "La colonna che misura il traffico dati in GB viene indicata come 'throughput_mensile' nei report tecnici, mentre nel database è registrata come 'traffico_dati'."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato_contratto",
+        "obsolete_value": "status",
+        "description": "La colonna 'stato_contratto' (valori: 'attivo', 'sospeso', 'terminato') viene spesso chiamata genericamente 'status' nei documenti, senza specificare il contesto contrattuale, causando ambiguità con altri campi di stato presenti nello schema."
+      }
+    ],
+    "spec_hash": "3ad4787e8d5bed98"
+  },
+  "schema_ddl": "CREATE TABLE offerte_commerciali (\n    id SERIAL PRIMARY KEY,\n    nome_piano TEXT NOT NULL,\n    costo_mensile NUMERIC(10,2) NOT NULL CHECK (costo_mensile >= 0),\n    traffico_dati INT NOT NULL CHECK (traffico_dati >= 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0),\n    sms_inclusi INT NOT NULL CHECK (sms_inclusi >= 0)\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    totale_speso NUMERIC(12,2) DEFAULT 0 CHECK (totale_speso >= 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    offerta_id INT NOT NULL REFERENCES offerte_commerciali(id),\n    data_attivazione DATE NOT NULL,\n    data_scadenza DATE,\n    stato_contratto TEXT NOT NULL CHECK (stato_contratto IN ('attivo', 'sospeso', 'terminato')),\n    costo_totale NUMERIC(12,2) \n);\n\nCREATE TABLE fatture (\n    id SERIAL PRIMARY KEY,\n    contratto_id INT NOT NULL REFERENCES contratti(id),\n    data_emissione DATE NOT NULL,\n    importo NUMERIC(10,2) NOT NULL CHECK (importo >= 0),\n    stato_pagamento TEXT NOT NULL CHECK (stato_pagamento IN ('pagato', 'non_pagato', 'parzialmente_pagato')),\n    scadenza_pagamento DATE NOT NULL\n);"
+}

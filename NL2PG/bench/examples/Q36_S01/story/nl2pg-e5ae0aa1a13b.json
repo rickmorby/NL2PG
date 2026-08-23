@@ -1,0 +1,127 @@
+{
+  "schema_ddl": "CREATE TABLE conti_correnti (\n    id_conto INT PRIMARY KEY,\n    intestatario TEXT NOT NULL,\n    iban TEXT NOT NULL UNIQUE,\n    saldo NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    filiale TEXT NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "conti_correnti": {
+        "row_count": 443,
+        "columns": {
+          "id_conto": {
+            "distinct": 443,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 443
+          },
+          "intestatario": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro Conti",
+              "Anna Ricci",
+              "Chiara Lombardi",
+              "Davide Fontana",
+              "Elena Gallo"
+            ]
+          },
+          "iban": {
+            "distinct": 443,
+            "sample": [
+              "IT02L0301503200012345678901",
+              "IT02L03015032000123456789011",
+              "IT02L030150320001234567890110",
+              "IT02L030150320001234567890111",
+              "IT02L030150320001234567890112"
+            ]
+          },
+          "saldo": {
+            "distinct": 432,
+            "sample": [
+              "100128.24",
+              "101171.61",
+              "10265.7",
+              "104436.86",
+              "106846.59"
+            ],
+            "min": 43.01,
+            "max": 400601.7
+          },
+          "filiale": {
+            "distinct": 8,
+            "sample": [
+              "Bologna Centrale",
+              "Firenze Santa Maria Novella",
+              "Genova Porto Antico",
+              "Milano Duomo",
+              "Napoli Vomero"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "conti_correnti": [
+        {
+          "id_conto": 1,
+          "intestatario": "Davide Fontana",
+          "iban": "IT60X0542811101000000123456",
+          "saldo": 1540.08,
+          "filiale": "Milano Duomo"
+        },
+        {
+          "id_conto": 2,
+          "intestatario": "Davide Fontana",
+          "iban": "IT60X05428111010000001234561",
+          "saldo": 8864.38,
+          "filiale": "Napoli Vomero"
+        },
+        {
+          "id_conto": 3,
+          "intestatario": "Giulia Verdi",
+          "iban": "IT60X05428111010000001234562",
+          "saldo": 23428.44,
+          "filiale": "Bologna Centrale"
+        },
+        {
+          "id_conto": 4,
+          "intestatario": "Paolo Greco",
+          "iban": "IT60X05428111010000001234563",
+          "saldo": 67336.02,
+          "filiale": "Genova Porto Antico"
+        },
+        {
+          "id_conto": 5,
+          "intestatario": "Anna Ricci",
+          "iban": "IT60X05428111010000001234564",
+          "saldo": 53346.41,
+          "filiale": "Bologna Centrale"
+        },
+        {
+          "id_conto": 6,
+          "intestatario": "Chiara Lombardi",
+          "iban": "IT60X05428111010000001234565",
+          "saldo": 21964.76,
+          "filiale": "Bologna Centrale"
+        },
+        {
+          "id_conto": 7,
+          "intestatario": "Luca Ferrari",
+          "iban": "IT60X05428111010000001234566",
+          "saldo": 50055.0,
+          "filiale": "Milano Duomo"
+        },
+        {
+          "id_conto": 8,
+          "intestatario": "Paolo Greco",
+          "iban": "IT60X05428111010000001234567",
+          "saldo": 67332.32,
+          "filiale": "Napoli Vomero"
+        }
+      ]
+    }
+  },
+  "story": "Alla Direzione Affari dei Privati dell'istituto di credito, l'ufficio Verifiche Operative ha avviato il controllo periodico sulle posizioni patrimoniali della clientela. Il riferimento centrale del lavoro è l'archivio denominato posizioni_cliente, citato nelle circolari storiche anche come registro dei conti_correnti, nel quale ogni scheda descrive un rapporto deposito attraverso il numero identificativo del conto, il nome dell'intestatario, il codice IBAN completo, la giacenza disponibile e la filiale di apertura. Il capo servizio Elena Gallo ha chiesto ai collaboratori di estrarre l'elenco delle posizioni riferite alla filiale Milano Duomo che presentano una giacenza pari o superiore a 50000 euro. Per ciascuna posizione occorre riportare il nome dell'intestatario riscritto interamente in maiuscolo, ad esempio DAVIDE FONTANA al posto di Davide Fontana, insieme al codice paese desunto dai primi due caratteri dell'IBAN, che per tutti i rapporti domestici risulta essere IT, come si evince dagli esempi d'archivio quali IT60X0542811101000000123456. L'elenco dovrà inoltre essere disposto dalla giacenza più elevata alla più contenuta, così da far emergere subito i clienti di maggior peso. Durante le verifiche gli operatori hanno confrontato i risultati con le altre piazze dell'istituto: Bologna Centrale, Napoli Vomero, Genova Porto Antico e Firenze Santa Maria Novella, dove intestatari come Anna Ricci, Paolo Greco o Giulia Verdi movimentano rapporti dalle giacenze molto diverse, dal minimo di 43.01 euro fino a punte oltre i 400601.70 euro. Nel complesso l'archivio conta 443 schede attive ripartite tra otto filiali, e proprio questa ampiezza impone un ordinamento rigoroso: prima le giacenze maggiori di Milano Duomo, poi tutte le altre in progressiva diminuzione, affinché la direzione possa valutare con immediatezza la concentrazione dei depositi nella sede simbolo della città."
+}

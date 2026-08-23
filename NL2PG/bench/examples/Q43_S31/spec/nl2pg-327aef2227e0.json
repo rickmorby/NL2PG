@@ -1,0 +1,34 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 4,
+  "hierarchy": "flat_denormalized",
+  "sql_features": [
+    "sorting"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "piani_tariffari",
+      "obsolete_value": "offerte_commerciali",
+      "description": "La tabella contenente i piani tariffari viene denominata 'offerte_commerciali' nella documentazione aziendale, creando una discrepanza con il nome reale della tabella."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "traffico_dati",
+      "obsolete_value": "throughput_mensile",
+      "description": "La colonna che misura il traffico dati in GB viene indicata come 'throughput_mensile' nei report tecnici, mentre nel database è registrata come 'traffico_dati'."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "stato_contratto",
+      "obsolete_value": "status",
+      "description": "La colonna 'stato_contratto' (valori: 'attivo', 'sospeso', 'terminato') viene spesso chiamata genericamente 'status' nei documenti, senza specificare il contesto contrattuale, causando ambiguità con altri campi di stato presenti nello schema."
+    }
+  ],
+  "spec_hash": "3ad4787e8d5bed98"
+}

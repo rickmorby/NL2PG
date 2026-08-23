@@ -1,0 +1,27 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "is_null"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "agenzie",
+      "obsolete_value": "filiali",
+      "description": "La tabella agenzie (padre nella relazione 1:N) viene denominata filiali nella prosa aziendale. Le query dovranno risolvere la corrispondenza tra filiali e la tabella fisica agenzie."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "immobili",
+      "obsolete_value": "unità abitative",
+      "description": "La tabella immobili (figlia con FK nullable agenzia_id) viene indicata con il sinonimo unità abitative nella documentazione aziendale. Le query IS NULL / IS NOT NULL sulla FK dovranno riferirsi agli immobili tramite questa perifrasi."
+    }
+  ],
+  "spec_hash": "79a0c028b69fdb7b"
+}

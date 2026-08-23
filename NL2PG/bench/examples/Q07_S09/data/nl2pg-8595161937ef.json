@@ -1,0 +1,484 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 5,
+    "hierarchy": "many_to_many",
+    "sql_features": [
+      "join",
+      "multi_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fornitori",
+        "obsolete_value": "anagrafica_partner_commerciali",
+        "description": "La tabella fornitori, che contiene i dati dei soggetti che riforniscono gli articoli, viene denominata anagrafica_partner_commerciali nella prosa aziendale del sistema ERP."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "quantita_minima_ordine",
+        "obsolete_value": "MOQ",
+        "description": "La colonna quantita_minima_ordine della tabella associativa articoli_fornitori viene indicata nella documentazione aziendale con l'acronimo MOQ (Minimum Order Quantity), gergo tipico del procurement e della supply chain."
+      }
+    ],
+    "spec_hash": "51bd1443aac1cfa8"
+  },
+  "schema_ddl": "CREATE TABLE categorie_articolo (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE articoli (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    categoria_id INT NOT NULL REFERENCES categorie_articolo(id),\n    unita_misura TEXT NOT NULL,\n    prezzo_vendita NUMERIC(10,2) NOT NULL CHECK (prezzo_vendita >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0)\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    citta TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE articoli_fornitori (\n    articolo_id INT NOT NULL REFERENCES articoli(id) ON DELETE CASCADE,\n    fornitore_id INT NOT NULL REFERENCES fornitori(id) ON DELETE CASCADE,\n    quantita_minima_ordine INT NOT NULL CHECK (quantita_minima_ordine > 0),\n    prezzo_acquisto NUMERIC(10,2) NOT NULL CHECK (prezzo_acquisto >= 0),\n    lead_time_giorni INT NOT NULL DEFAULT 7 CHECK (lead_time_giorni > 0),\n    PRIMARY KEY (articolo_id, fornitore_id)\n);\n\nCREATE TABLE ordini_acquisto (\n    id SERIAL PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    articolo_id INT NOT NULL REFERENCES articoli(id),\n    quantita_ordinata INT NOT NULL CHECK (quantita_ordinata > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'ricevuto', 'annullato'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "categorie_articolo",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Utensili elettrici",
+            "descrizione": "Trapani, avvitatori e smerigliatrici"
+          },
+          {
+            "id": 2,
+            "nome": "Ferramenta",
+            "descrizione": "Viteria, bulloneria e fissaggi"
+          },
+          {
+            "id": 3,
+            "nome": "Dispositivi di protezione individuale",
+            "descrizione": "Guanti, elmetti e occhiali di sicurezza"
+          },
+          {
+            "id": 4,
+            "nome": "Componenti elettronici",
+            "descrizione": "Cavi, connettori e componenti passivi"
+          },
+          {
+            "id": 5,
+            "nome": "Materiale da imballaggio",
+            "descrizione": "Cartoni, nastro adesivo e film estensibile"
+          },
+          {
+            "id": 6,
+            "nome": "Lubrificanti e prodotti chimici",
+            "descrizione": "Oli tecnici, sgrassanti e adesivi industriali"
+          },
+          {
+            "id": 7,
+            "nome": "Attrezzature da officina",
+            "descrizione": "Chiavi, pinze e strumenti di misura"
+          },
+          {
+            "id": 8,
+            "nome": "Cancelleria tecnica",
+            "descrizione": "Manuali, etichette e documentazione di reparto"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "articoli",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 200,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_articolo": "ART-00001",
+            "descrizione": "Trapano a percussione 750W",
+            "categoria_id": 1,
+            "unita_misura": "pz",
+            "prezzo_vendita": 89.9,
+            "scorta_minima": 10
+          },
+          {
+            "id": 2,
+            "codice_articolo": "ART-00002",
+            "descrizione": "Viti esagonali M8x40 confezione da 100",
+            "categoria_id": 2,
+            "unita_misura": "conf",
+            "prezzo_vendita": 12.5,
+            "scorta_minima": 50
+          },
+          {
+            "id": 3,
+            "codice_articolo": "ART-00003",
+            "descrizione": "Guanti antitaglio taglia 9",
+            "categoria_id": 3,
+            "unita_misura": "paia",
+            "prezzo_vendita": 7.8,
+            "scorta_minima": 100
+          },
+          {
+            "id": 4,
+            "codice_articolo": "ART-00004",
+            "descrizione": "Cavo elettrico H07V-K 2.5 mmq",
+            "categoria_id": 4,
+            "unita_misura": "mt",
+            "prezzo_vendita": 1.35,
+            "scorta_minima": 200
+          },
+          {
+            "id": 5,
+            "codice_articolo": "ART-00005",
+            "descrizione": "Cartone ondulato 60x40x40",
+            "categoria_id": 5,
+            "unita_misura": "pz",
+            "prezzo_vendita": 0.95,
+            "scorta_minima": 250
+          },
+          {
+            "id": 6,
+            "codice_articolo": "ART-00006",
+            "descrizione": "Olio lubrificante multiuso 400 ml",
+            "categoria_id": 6,
+            "unita_misura": "pz",
+            "prezzo_vendita": 4.6,
+            "scorta_minima": 40
+          }
+        ],
+        "variations": {
+          "unita_misura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "pz",
+              "conf",
+              "paia",
+              "mt",
+              "kg"
+            ]
+          },
+          "prezzo_vendita": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "scorta_minima": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "5",
+              "10",
+              "20",
+              "50",
+              "100",
+              "200"
+            ]
+          }
+        }
+      },
+      {
+        "table": "fornitori",
+        "nature": "dimension",
+        "min_rows": 40,
+        "max_rows": 80,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+            "partita_iva": "IT01234567891",
+            "email": "ordini@metalmeccanica-lombarda.it",
+            "telefono": "+39 02 1234567",
+            "citta": "Milano",
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Ferramenta Centrale S.r.l.",
+            "partita_iva": "IT09876543210",
+            "email": "vendite@ferramentacentrale.it",
+            "telefono": "+39 06 9876543",
+            "citta": "Roma",
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Sicurezza Lavoro Piemonte S.n.c.",
+            "partita_iva": "IT01112223334",
+            "email": "info@sicurezzalavoro-piemonte.it",
+            "telefono": "+39 011 5566778",
+            "citta": "Torino",
+            "attivo": true
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "ElettroDistribuzione Veneta S.p.A.",
+            "partita_iva": "IT04455667788",
+            "email": "acquisti@elettrodistribuzione.it",
+            "telefono": "+39 041 3344556",
+            "citta": "Padova",
+            "attivo": false
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Imballaggi Sud S.r.l.",
+            "partita_iva": "IT07788990011",
+            "email": "commercial@imballaggisud.it",
+            "telefono": "+39 081 2233445",
+            "citta": "Napoli",
+            "attivo": true
+          }
+        ],
+        "variations": {
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Padova",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Brescia"
+            ]
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "articoli_fornitori",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "articolo_id": 1,
+            "fornitore_id": 1,
+            "quantita_minima_ordine": 10,
+            "prezzo_acquisto": 62.3,
+            "lead_time_giorni": 7
+          },
+          {
+            "articolo_id": 2,
+            "fornitore_id": 2,
+            "quantita_minima_ordine": 100,
+            "prezzo_acquisto": 9.1,
+            "lead_time_giorni": 14
+          },
+          {
+            "articolo_id": 3,
+            "fornitore_id": 3,
+            "quantita_minima_ordine": 50,
+            "prezzo_acquisto": 5.4,
+            "lead_time_giorni": 5
+          },
+          {
+            "articolo_id": 4,
+            "fornitore_id": 4,
+            "quantita_minima_ordine": 200,
+            "prezzo_acquisto": 0.95,
+            "lead_time_giorni": 10
+          },
+          {
+            "articolo_id": 5,
+            "fornitore_id": 5,
+            "quantita_minima_ordine": 100,
+            "prezzo_acquisto": 0.65,
+            "lead_time_giorni": 3
+          },
+          {
+            "articolo_id": 6,
+            "fornitore_id": 1,
+            "quantita_minima_ordine": 24,
+            "prezzo_acquisto": 3.2,
+            "lead_time_giorni": 7
+          }
+        ],
+        "variations": {
+          "quantita_minima_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "10",
+              "20",
+              "24",
+              "50",
+              "100",
+              "200"
+            ]
+          },
+          "prezzo_acquisto": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.5,
+            "pool": []
+          },
+          "lead_time_giorni": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "3",
+              "5",
+              "7",
+              "10",
+              "14",
+              "21"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ordini_acquisto",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_ordine": "OA-2026-00001",
+            "fornitore_id": 1,
+            "articolo_id": 1,
+            "quantita_ordinata": 50,
+            "prezzo_unitario": 64.0,
+            "data_ordine": "2026-01-12",
+            "stato_ordine": "ricevuto"
+          },
+          {
+            "id": 2,
+            "numero_ordine": "OA-2026-00002",
+            "fornitore_id": 2,
+            "articolo_id": 2,
+            "quantita_ordinata": 300,
+            "prezzo_unitario": 9.45,
+            "data_ordine": "2026-01-20",
+            "stato_ordine": "ricevuto"
+          },
+          {
+            "id": 3,
+            "numero_ordine": "OA-2026-00003",
+            "fornitore_id": 3,
+            "articolo_id": 3,
+            "quantita_ordinata": 120,
+            "prezzo_unitario": 5.6,
+            "data_ordine": "2026-02-03",
+            "stato_ordine": "confermato"
+          },
+          {
+            "id": 4,
+            "numero_ordine": "OA-2026-00004",
+            "fornitore_id": 4,
+            "articolo_id": 4,
+            "quantita_ordinata": 1000,
+            "prezzo_unitario": 1.05,
+            "data_ordine": "2026-02-14",
+            "stato_ordine": "spedito"
+          },
+          {
+            "id": 5,
+            "numero_ordine": "OA-2026-00005",
+            "fornitore_id": 5,
+            "articolo_id": 5,
+            "quantita_ordinata": 400,
+            "prezzo_unitario": 0.7,
+            "data_ordine": "2026-03-01",
+            "stato_ordine": "in_attesa"
+          },
+          {
+            "id": 6,
+            "numero_ordine": "OA-2026-00006",
+            "fornitore_id": 1,
+            "articolo_id": 6,
+            "quantita_ordinata": 96,
+            "prezzo_unitario": 3.35,
+            "data_ordine": "2026-03-10",
+            "stato_ordine": "annullato"
+          }
+        ],
+        "variations": {
+          "quantita_ordinata": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "10",
+              "25",
+              "50",
+              "100",
+              "200",
+              "500",
+              "1000"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.35,
+            "pool": []
+          },
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "ricevuto",
+              "ricevuto",
+              "ricevuto",
+              "confermato",
+              "confermato",
+              "spedito",
+              "in_attesa",
+              "annullato"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

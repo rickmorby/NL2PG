@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 4,
+    "hierarchy": "mixed",
+    "sql_features": [
+      "subquery"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "registrazione_movimenti",
+        "description": "La tabella transazioni viene denominata registrazione_movimenti nella prosa aziendale. Il progettista deve riconoscere che ogni menzione a registrazione_movimenti si riferisce alla tabella fisica transazioni, che registra i movimenti di denaro sui conti."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "saldo_disponibile",
+        "obsolete_value": "liquidita_operativa_netta",
+        "description": "La colonna saldo_disponibile della tabella conti viene indicata nella documentazione aziendale con il gergo finanziario liquidita_operativa_netta. Il progettista deve mappare tale termine tecnico alla colonna reale saldo_disponibile quando formula le condizioni di filtro o selezione."
+      }
+    ],
+    "spec_hash": "bb796e3a7f0aaacd"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    iban TEXT NOT NULL UNIQUE,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('corrente', 'risparmio', 'deposito')),\n    saldo_disponibile NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo_disponibile >= 0),\n    data_apertura DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE transazioni (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo <> 0),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('accredito', 'addebito')),\n    descrizione TEXT,\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE carte (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    numero_carta TEXT NOT NULL UNIQUE,\n    scadenza DATE NOT NULL,\n    limite_spesa NUMERIC(10,2) NOT NULL CHECK (limite_spesa > 0),\n    attiva BOOLEAN NOT NULL DEFAULT TRUE\n);"
+}

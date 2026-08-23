@@ -1,0 +1,11 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 4,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "405a333667f6c46b"
+}

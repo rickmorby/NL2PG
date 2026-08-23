@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "prezzi_storici",
+        "obsolete_value": "archivio_variazioni_listino",
+        "description": "La tabella prezzi_storici, che conserva lo storico temporale delle versioni di prezzo dei prodotti tramite le colonne valid_from e valid_to, viene denominata nella prosa aziendale 'archivio_variazioni_listino'. Le query devono risolvere questa perifrasi verso la tabella reale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "valid_to",
+        "obsolete_value": "termine di efficacia commerciale",
+        "description": "La colonna valid_to della tabella prezzi_storici è descritta nella documentazione con il gergo interno 'termine di efficacia commerciale'. Essa indica l'istante di fine validità della versione del prezzo ed è la colonna chiave su cui ordinare (ORDER BY prodotto_id, valid_from DESC) prima di applicare SELECT DISTINCT ON per estrarre la versione corrente."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato",
+        "obsolete_value": "condizione corrente dell'elemento",
+        "description": "L'espressione 'condizione corrente dell'elemento' usata nei requisiti è volutamente ambigua: può riferirsi sia alla colonna stato_ordine della tabella ordini sia alla colonna stato_disponibilita della tabella prodotti. Il solutore deve disambiguare dal contesto della query DISTINCT ON quale colonna di stato sia effettivamente richiesta."
+      }
+    ],
+    "spec_hash": "bf23bae0f686b2c5"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    telefono TEXT,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    sku TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    categoria TEXT,\n    stato_disponibilita TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_disponibilita IN ('disponibile', 'esaurito', 'in_arrivo', 'ritirato')),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE prezzi_storici (\n    id SERIAL PRIMARY KEY,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id) ON DELETE CASCADE,\n    prezzo NUMERIC(10,2) NOT NULL CHECK (prezzo >= 0),\n    valid_from TIMESTAMP NOT NULL,\n    valid_to TIMESTAMP,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale NUMERIC(12,2) CHECK (totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    numero_riga INT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);"
+}

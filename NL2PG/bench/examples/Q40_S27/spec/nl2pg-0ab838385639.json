@@ -1,0 +1,34 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 5,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "in_condition"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_personale",
+      "description": "La tabella dipendenti viene denominata anagrafica_personale nella prosa aziendale. Le relazioni con le altre tabelle non sono dichiarate tramite REFERENCES: il collegamento deve essere dedotto dalla colonna dipendente_id presente nelle tabelle contratti e stipendi."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "stipendio_mensile",
+      "obsolete_value": "compenso_base",
+      "description": "La colonna stipendio_mensile della tabella stipendi viene indicata come compenso_base nella documentazione aziendale. Il solver deve riconoscere che compenso_base corrisponde a stipendio_mensile quando costruisce la subquery con IN per filtrare i dipendenti con determinate retribuzioni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "reparti",
+      "obsolete_value": "centri di costo",
+      "description": "La tabella reparti viene indicata con il gergo aziendale centri di costo nella prosa. Il collegamento implicito avviene tramite la colonna reparto_id presente in dipendenti, che deve essere usata nella condizione IN (SELECT reparto_id FROM reparti WHERE ...) per filtrare i dipendenti dei centri di costo richiesti."
+    }
+  ],
+  "spec_hash": "992e7dbf312b4d46"
+}

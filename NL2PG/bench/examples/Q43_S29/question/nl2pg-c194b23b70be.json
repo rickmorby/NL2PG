@@ -1,0 +1,4 @@
+{
+  "story": "Presso la direzione logistica, l'archivio denominato personale_consegnatario raccoglie le schede dei corrieri, con il nome, il cognome, il codice identificativo del corriere, la data di assunzione e lo stato operativo. Per predisporre l'elenco richiesto, gli operatori considerano soltanto le posizioni attive, indicate con true, ed escludono le situazioni non più operative. L'elenco viene disposto partendo dalla data di assunzione più recente; a parità di data, si ordina prima il cognome e poi il nome.",
+  "question": "Puoi predisporre l'elenco dei soli corrieri attivi, mostrando nome, cognome e data di assunzione, ordinando dalla data di assunzione più recente e, a parità di data, per cognome e poi nome?"
+}

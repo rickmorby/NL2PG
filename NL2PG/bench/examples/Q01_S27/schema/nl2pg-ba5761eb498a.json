@@ -1,0 +1,28 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 5,
+    "hierarchy": "implicit_fk",
+    "sql_features": [],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "consegne_programmate",
+        "description": "La tabella 'spedizioni' viene denominata 'consegne_programmate' nei documenti aziendali e nelle richieste di reportistica."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "peso_kg",
+        "obsolete_value": "massa_lorda",
+        "description": "La colonna 'peso_kg' nella tabella 'spedizioni' viene indicata come 'massa_lorda' nei manuali operativi e nelle specifiche di carico."
+      }
+    ],
+    "spec_hash": "9a70c57deb05543c"
+  },
+  "schema_ddl": "CREATE TABLE magazzini (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_max NUMERIC(10,2) CHECK (capacita_max > 0)\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    peso_unitario NUMERIC(8,3) CHECK (peso_unitario > 0),\n    volume_unitario NUMERIC(8,3) CHECK (volume_unitario > 0)\n);\n\nCREATE TABLE consegne_programmate (\n    id SERIAL PRIMARY KEY,\n    magazzino_partenza_id INT NOT NULL REFERENCES magazzini(id),\n    magazzino_destinazione_id INT NOT NULL REFERENCES magazzini(id),\n    data_partenza TIMESTAMP NOT NULL,\n    data_arrivo_prevista TIMESTAMP NOT NULL CHECK (data_arrivo_prevista > data_partenza),\n    stato TEXT NOT NULL DEFAULT 'programmata'\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    consegna_id INT NOT NULL REFERENCES consegne_programmate(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    massa_lorda NUMERIC(8,3) NOT NULL CHECK (massa_lorda > 0),\n    note TEXT\n);\n\nCREATE TABLE autisti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    licenza TEXT NOT NULL UNIQUE,\n    disponibile BOOLEAN NOT NULL DEFAULT true\n);"
+}

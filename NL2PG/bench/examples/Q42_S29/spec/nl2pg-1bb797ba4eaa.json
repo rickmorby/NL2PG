@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "disjunctive"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_operatori",
+      "description": "La tabella dipendenti del sistema ERP viene denominata anagrafica_operatori nella documentazione e nella prosa aziendale. Le query di ricerca per nominativo devono quindi risolvere questa perifrasi verso la tabella fisica dipendenti, che contiene i campi spezzati nome e cognome."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "nome",
+      "obsolete_value": "prenome",
+      "description": "La colonna nome della tabella dipendenti, prima parte del dato anagrafico unico spezzato su due colonne, viene indicata nei documenti aziendali con il sinonimo prenome. Una ricerca come 'prenome = Mario' deve tradursi in una condizione sulla colonna nome."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "cognome",
+      "obsolete_value": "denominazione_familiare",
+      "description": "Nel gergo interno dell'ufficio personale la colonna cognome della tabella dipendenti, seconda parte del dato anagrafico spezzato, è chiamata denominazione_familiare. Le ricerche per nominativo vanno espresse con condizioni disgiuntive del tipo WHERE nome = 'val' OR cognome = 'val', mappando il termine gergale sulla colonna reale cognome."
+    }
+  ],
+  "spec_hash": "5bac512c7c6a8c39"
+}

@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 5,
+    "hierarchy": "many_to_many",
+    "sql_features": [
+      "join",
+      "multi_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fornitori",
+        "obsolete_value": "anagrafica_partner_commerciali",
+        "description": "La tabella fornitori, che contiene i dati dei soggetti che riforniscono gli articoli, viene denominata anagrafica_partner_commerciali nella prosa aziendale del sistema ERP."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "quantita_minima_ordine",
+        "obsolete_value": "MOQ",
+        "description": "La colonna quantita_minima_ordine della tabella associativa articoli_fornitori viene indicata nella documentazione aziendale con l'acronimo MOQ (Minimum Order Quantity), gergo tipico del procurement e della supply chain."
+      }
+    ],
+    "spec_hash": "51bd1443aac1cfa8"
+  },
+  "schema_ddl": "CREATE TABLE categorie_articolo (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE articoli (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    categoria_id INT NOT NULL REFERENCES categorie_articolo(id),\n    unita_misura TEXT NOT NULL,\n    prezzo_vendita NUMERIC(10,2) NOT NULL CHECK (prezzo_vendita >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0)\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    citta TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE articoli_fornitori (\n    articolo_id INT NOT NULL REFERENCES articoli(id) ON DELETE CASCADE,\n    fornitore_id INT NOT NULL REFERENCES fornitori(id) ON DELETE CASCADE,\n    quantita_minima_ordine INT NOT NULL CHECK (quantita_minima_ordine > 0),\n    prezzo_acquisto NUMERIC(10,2) NOT NULL CHECK (prezzo_acquisto >= 0),\n    lead_time_giorni INT NOT NULL DEFAULT 7 CHECK (lead_time_giorni > 0),\n    PRIMARY KEY (articolo_id, fornitore_id)\n);\n\nCREATE TABLE ordini_acquisto (\n    id SERIAL PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    articolo_id INT NOT NULL REFERENCES articoli(id),\n    quantita_ordinata INT NOT NULL CHECK (quantita_ordinata > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'ricevuto', 'annullato'))\n);"
+}

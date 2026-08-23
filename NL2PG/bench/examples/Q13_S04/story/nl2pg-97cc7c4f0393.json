@@ -1,0 +1,277 @@
+{
+  "schema_ddl": "CREATE TABLE sim (\n    id_sim INT PRIMARY KEY,\n    iccid TEXT NOT NULL UNIQUE,\n    numero_telefono TEXT NOT NULL UNIQUE,\n    stato TEXT NOT NULL DEFAULT 'inattiva' CHECK (stato IN ('inattiva', 'attiva', 'sospesa', 'disattivata')),\n    data_emissione DATE NOT NULL,\n    operatore TEXT NOT NULL\n);\n\nCREATE TABLE attivazione (\n    id_attivazione INT PRIMARY KEY,\n    id_sim INT NOT NULL UNIQUE REFERENCES sim(id_sim),\n    data_attivazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    piano_tariffario TEXT NOT NULL,\n    costo_attivazione NUMERIC(8,2) NOT NULL CHECK (costo_attivazione >= 0),\n    canale_attivazione TEXT NOT NULL CHECK (canale_attivazione IN ('negozio', 'online', 'call_center', 'rivenditore'))\n);",
+  "data_profile": {
+    "profile": {
+      "sim": {
+        "row_count": 212,
+        "columns": {
+          "id_sim": {
+            "distinct": 212,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 212
+          },
+          "iccid": {
+            "distinct": 212,
+            "sample": [
+              "89390123456789012301",
+              "89390123456789012302",
+              "89390123456789012303",
+              "89390123456789012304",
+              "89390123456789012304_101"
+            ]
+          },
+          "numero_telefono": {
+            "distinct": 212,
+            "sample": [
+              "+39 320 9988776",
+              "+39 320 99887761",
+              "+39 320 998877610",
+              "+39 320 998877611",
+              "+39 320 998877612"
+            ]
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "attiva",
+              "disattivata",
+              "inattiva",
+              "sospesa"
+            ]
+          },
+          "data_emissione": {
+            "distinct": 175,
+            "sample": [
+              "2024-04-04",
+              "2024-04-07",
+              "2024-04-09",
+              "2024-04-19",
+              "2024-04-26"
+            ]
+          },
+          "operatore": {
+            "distinct": 5,
+            "sample": [
+              "Fastweb",
+              "Iliad",
+              "TIM",
+              "Vodafone",
+              "WindTre"
+            ]
+          }
+        }
+      },
+      "attivazione": {
+        "row_count": 166,
+        "columns": {
+          "id_attivazione": {
+            "distinct": 166,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 1166
+          },
+          "id_sim": {
+            "distinct": 166,
+            "sample": [
+              "1",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 212
+          },
+          "data_attivazione": {
+            "distinct": 134,
+            "sample": [
+              "2024-10-22 16:20:00",
+              "2024-10-25 16:20:00",
+              "2024-10-27 16:20:00",
+              "2024-10-29 16:20:00",
+              "2024-10-31 16:20:00"
+            ]
+          },
+          "piano_tariffario": {
+            "distinct": 4,
+            "sample": [
+              "Business 50GB",
+              "Easy 10GB",
+              "Flex 30GB",
+              "Smart Unlimited"
+            ]
+          },
+          "costo_attivazione": {
+            "distinct": 131,
+            "sample": [
+              "0.0",
+              "10.11",
+              "10.18",
+              "10.21",
+              "10.26"
+            ],
+            "min": 0.0,
+            "max": 59.23
+          },
+          "canale_attivazione": {
+            "distinct": 4,
+            "sample": [
+              "call_center",
+              "negozio",
+              "online",
+              "rivenditore"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "sim": [
+        {
+          "id_sim": 1,
+          "iccid": "89390123456789012301",
+          "numero_telefono": "+39 340 1122334",
+          "stato": "attiva",
+          "data_emissione": "2024-10-18",
+          "operatore": "Iliad"
+        },
+        {
+          "id_sim": 2,
+          "iccid": "89390123456789012302",
+          "numero_telefono": "+39 340 11223341",
+          "stato": "inattiva",
+          "data_emissione": "2025-06-10",
+          "operatore": "Vodafone"
+        },
+        {
+          "id_sim": 3,
+          "iccid": "89390123456789012303",
+          "numero_telefono": "+39 340 11223342",
+          "stato": "attiva",
+          "data_emissione": "2024-09-20",
+          "operatore": "Vodafone"
+        },
+        {
+          "id_sim": 4,
+          "iccid": "89390123456789012304",
+          "numero_telefono": "+39 340 11223343",
+          "stato": "inattiva",
+          "data_emissione": "2024-12-13",
+          "operatore": "Vodafone"
+        },
+        {
+          "id_sim": 5,
+          "iccid": "89390123456789012305",
+          "numero_telefono": "+39 340 11223344",
+          "stato": "inattiva",
+          "data_emissione": "2024-12-25",
+          "operatore": "Iliad"
+        },
+        {
+          "id_sim": 6,
+          "iccid": "89390123456789012306",
+          "numero_telefono": "+39 340 11223345",
+          "stato": "sospesa",
+          "data_emissione": "2025-03-11",
+          "operatore": "Iliad"
+        },
+        {
+          "id_sim": 7,
+          "iccid": "89390123456789012307",
+          "numero_telefono": "+39 340 11223346",
+          "stato": "disattivata",
+          "data_emissione": "2024-09-22",
+          "operatore": "Fastweb"
+        },
+        {
+          "id_sim": 8,
+          "iccid": "89390123456789012308",
+          "numero_telefono": "+39 340 11223347",
+          "stato": "sospesa",
+          "data_emissione": "2025-04-01",
+          "operatore": "Iliad"
+        }
+      ],
+      "attivazione": [
+        {
+          "id_attivazione": 1001,
+          "id_sim": 43,
+          "data_attivazione": "2025-01-04 09:30:00",
+          "piano_tariffario": "Smart Unlimited",
+          "costo_attivazione": 8.76,
+          "canale_attivazione": "call_center"
+        },
+        {
+          "id_attivazione": 1002,
+          "id_sim": 161,
+          "data_attivazione": "2025-01-02 09:30:00",
+          "piano_tariffario": "Easy 10GB",
+          "costo_attivazione": 9.53,
+          "canale_attivazione": "call_center"
+        },
+        {
+          "id_attivazione": 1003,
+          "id_sim": 47,
+          "data_attivazione": "2025-01-22 09:30:00",
+          "piano_tariffario": "Business 50GB",
+          "costo_attivazione": 9.22,
+          "canale_attivazione": "online"
+        },
+        {
+          "id_attivazione": 1004,
+          "id_sim": 122,
+          "data_attivazione": "2025-01-12 09:30:00",
+          "piano_tariffario": "Flex 30GB",
+          "costo_attivazione": 12.41,
+          "canale_attivazione": "online"
+        },
+        {
+          "id_attivazione": 1005,
+          "id_sim": 85,
+          "data_attivazione": "2025-03-02 09:30:00",
+          "piano_tariffario": "Easy 10GB",
+          "costo_attivazione": 6.34,
+          "canale_attivazione": "call_center"
+        },
+        {
+          "id_attivazione": 1006,
+          "id_sim": 80,
+          "data_attivazione": "2025-03-07 09:30:00",
+          "piano_tariffario": "Smart Unlimited",
+          "costo_attivazione": 8.85,
+          "canale_attivazione": "online"
+        },
+        {
+          "id_attivazione": 1007,
+          "id_sim": 38,
+          "data_attivazione": "2025-01-30 09:30:00",
+          "piano_tariffario": "Flex 30GB",
+          "costo_attivazione": 19.98,
+          "canale_attivazione": "rivenditore"
+        },
+        {
+          "id_attivazione": 1008,
+          "id_sim": 29,
+          "data_attivazione": "2025-02-03 09:30:00",
+          "piano_tariffario": "Flex 30GB",
+          "costo_attivazione": 10.18,
+          "canale_attivazione": "online"
+        }
+      ]
+    }
+  },
+  "story": "Alla Direzione Operativa di un operatore di telefonia mobile, l'archivio denominato schede_utente custodisce tutte le schede SIM rilasciate sul mercato: per ogni scheda sono annotati il codice identificativo interno, il codice ICCID — ad esempio 89390123456789012301 — il numero di telefono associato, lo stato del dispositivo, che può risultare inattiva, attiva, sospesa oppure disattivata, la data di emissione e l'operatore di riferimento, scelto tra Fastweb, Iliad, TIM, Vodafone e WindTre. In parallelo, il registro intitolato provisioning documenta ogni operazione di attivazione commercialmente conclusa: ciascuna voce richiama la scheda interessata, indica il momento preciso in cui l'attivazione è stata perfezionata — come accaduto il 2025-01-04 alle ore 09:30 — specifica il piano tariffario sottoscritto, scegliendo tra Business 50GB, Easy 10GB, Flex 30GB e Smart Unlimited, riporta l'importo sostenuto a titolo di costo di attivazione, che nell'archivio oscilla da importi nulli fino a 59.23 euro, e infine segnala il canale attraverso cui l'operazione è stata condotta: negozio, online, call_center oppure rivenditore. In occasione della revisione trimestrale del portafoglio clienti, gli incaricati hanno dovuto predisporre l'elenco delle schede in stato attiva per le quali risulta almeno una registrazione di provisioning effettuata tramite il canale online. Per ciascuna scheda ammessa all'elenco sono stati trascritti il numero di telefono, l'operatore, lo stato e la data di emissione: si pensi alla scheda con numero +39 340 1122334, affidata a Iliad ed emessa il 2024-10-18, oppure a quella attivata online il 2025-01-22 con piano Business 50GB. Le voci selezionate sono state infine ordinate dalla data di emissione più recente, così che il responsabile commerciale potesse concentrarsi anzitutto sulle schede immesse sul mercato più di recente, lasciando in fondo all'elenco quelle emessi diversi mesi prima."
+}

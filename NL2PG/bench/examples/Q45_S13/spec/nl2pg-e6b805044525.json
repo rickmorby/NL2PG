@@ -1,0 +1,32 @@
+{
+  "domain": "vendite",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "polysemy",
+    "ambiguity"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "registrazione_transazioni",
+      "description": "La tabella ordini viene denominata registrazione_transazioni nella prosa aziendale; il solutore deve mappare la perifrasi alla tabella reale prima di formulare la query."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "importo_totale",
+      "obsolete_value": "valore",
+      "description": "Il termine generico 'valore' indica talvolta la colonna importo_totale dell'ordine e talvolta il campo prezzo_unitario delle righe d'ordine; la dipendenza funzionale id_ordine -> importo_totale consente di dedurre quale colonna aggregare (SUM) e quale significato attribuire al termine nel contesto della domanda sotto-specificata."
+    },
+    {
+      "twist_type": "ambiguity",
+      "target_value": "filiale",
+      "obsolete_value": "sede del Nord",
+      "description": "L'espressione 'sede del Nord' non precisa se filtrare la colonna filiale con valore 'Nord' oppure la colonna regione_spedizione; il filtro corretto va dedotto dalla dipendenza funzionale id_filiale -> filiale presente nello schema ridondante prima dell'esecuzione."
+    }
+  ],
+  "spec_hash": "247580e446bb2a15"
+}

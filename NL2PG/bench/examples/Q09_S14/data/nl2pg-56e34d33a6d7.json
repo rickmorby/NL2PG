@@ -1,0 +1,287 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "synonym",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "acquirenti registrati",
+        "description": "La tabella clienti viene indicata nella prosa aziendale con il sinonimo 'acquirenti registrati'. Il solver deve risolvere il sinonimo e mapparlo alla tabella reale clienti quando costruisce le query di aggregazione."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "totale_ordine",
+        "obsolete_value": "valore complessivo dell'acquisto",
+        "description": "La colonna totale_ordine della tabella ordini viene perifrastata nella prosa aziendale come 'valore complessivo dell'acquisto'. Le clausole HAVING che filtrano i gruppi per soglia di spesa devono riferirsi alla colonna reale totale_ordine, deducendo inoltre i vincoli CHECK/NOT NULL/UNIQUE dal testo."
+      }
+    ],
+    "spec_hash": "6ec1972cb15e4574"
+  },
+  "schema_ddl": "CREATE DOMAIN importo_non_negativo AS NUMERIC(12,2) CHECK (VALUE >= 0);\n\nCREATE DOMAIN stato_ordine AS TEXT CHECK (VALUE IN ('in_attesa', 'pagato', 'spedito', 'consegnato', 'annullato'));\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    totale_ordine importo_non_negativo NOT NULL,\n    stato_ordine stato_ordine NOT NULL DEFAULT 'in_attesa',\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    corriere TEXT NOT NULL,\n    costo_spedizione importo_non_negativo NOT NULL DEFAULT 0,\n    data_spedizione DATE,\n    data_consegna_prevista DATE,\n    CHECK (data_consegna_prevista IS NULL OR data_spedizione IS NULL OR data_consegna_prevista >= data_spedizione)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 300,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "email": "mario.rossi@example.com",
+            "data_registrazione": "2025-01-15"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@example.com",
+            "data_registrazione": "2025-02-03"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "email": "giulia.verdi@example.com",
+            "data_registrazione": "2025-03-21"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "email": "alessandro.conti@example.com",
+            "data_registrazione": "2025-05-09"
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Moretti",
+            "email": "francesca.moretti@example.com",
+            "data_registrazione": "2025-07-30"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Luca",
+              "Sara",
+              "Elena",
+              "Davide",
+              "Chiara",
+              "Andrea",
+              "Martina",
+              "Paolo",
+              "Silvia"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Russo",
+              "Ferrari",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Bruno"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 4.0,
+        "templates": [
+          {
+            "id": 1001,
+            "cliente_id": 1,
+            "totale_ordine": 129.9,
+            "stato_ordine": "consegnato",
+            "data_ordine": "2026-01-12"
+          },
+          {
+            "id": 1002,
+            "cliente_id": 2,
+            "totale_ordine": 54.5,
+            "stato_ordine": "pagato",
+            "data_ordine": "2026-01-18"
+          },
+          {
+            "id": 1003,
+            "cliente_id": 3,
+            "totale_ordine": 320.0,
+            "stato_ordine": "spedito",
+            "data_ordine": "2026-02-02"
+          },
+          {
+            "id": 1004,
+            "cliente_id": 4,
+            "totale_ordine": 89.99,
+            "stato_ordine": "in_attesa",
+            "data_ordine": "2026-02-14"
+          },
+          {
+            "id": 1005,
+            "cliente_id": 5,
+            "totale_ordine": 210.75,
+            "stato_ordine": "annullato",
+            "data_ordine": "2026-02-20"
+          }
+        ],
+        "variations": {
+          "totale_ordine": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "in_attesa",
+              "pagato",
+              "spedito",
+              "consegnato",
+              "consegnato",
+              "consegnato",
+              "annullato"
+            ]
+          },
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -40.0,
+            "delta_max": 40.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.0,
+        "templates": [
+          {
+            "id": 5001,
+            "ordine_id": 1001,
+            "corriere": "BRT",
+            "costo_spedizione": 7.9,
+            "data_spedizione": "2026-01-13",
+            "data_consegna_prevista": "2026-01-18"
+          },
+          {
+            "id": 5002,
+            "ordine_id": 1002,
+            "corriere": "DHL",
+            "costo_spedizione": 12.5,
+            "data_spedizione": "2026-01-19",
+            "data_consegna_prevista": "2026-01-24"
+          },
+          {
+            "id": 5003,
+            "ordine_id": 1003,
+            "corriere": "GLS",
+            "costo_spedizione": 9.9,
+            "data_spedizione": "2026-02-03",
+            "data_consegna_prevista": "2026-02-10"
+          },
+          {
+            "id": 5004,
+            "ordine_id": 1004,
+            "corriere": "Bartolini",
+            "costo_spedizione": 6.5,
+            "data_spedizione": "2026-02-15",
+            "data_consegna_prevista": null
+          },
+          {
+            "id": 5005,
+            "ordine_id": 1005,
+            "corriere": "Poste Italiane",
+            "costo_spedizione": 5.9,
+            "data_spedizione": "2026-02-21",
+            "data_consegna_prevista": "2026-02-27"
+          }
+        ],
+        "variations": {
+          "corriere": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "BRT",
+              "DHL",
+              "GLS",
+              "Bartolini",
+              "Poste Italiane",
+              "SDA"
+            ]
+          },
+          "costo_spedizione": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "data_spedizione": {
+            "axis": "shift",
+            "delta_min": -2.0,
+            "delta_max": 2.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 3,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "top_n"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "d4e2f152f94ca124"
+}

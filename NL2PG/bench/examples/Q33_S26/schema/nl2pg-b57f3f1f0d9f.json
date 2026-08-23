@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "registrazioni",
+        "obsolete_value": "scritture di prima nota",
+        "description": "La tabella registrazioni viene denominata 'scritture di prima nota' nella prosa aziendale; il solver deve mappare questa perifrasi al nome fisico della tabella nel database."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "consistenza monetaria della voce",
+        "description": "La colonna importo è fisicamente di tipo TEXT pur contenente valori logicamente numerici; nella prosa viene indicata con il gergo contabile 'consistenza monetaria della voce'. Per eseguire confronti numerici o aggregazioni occorre applicare CAST(importo AS NUMERIC) prima del confronto, mentre i filtri testuali possono usare direttamente LIKE sul valore TEXT."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "movimenti",
+        "obsolete_value": "movimento contabile",
+        "description": "Il termine 'movimento contabile' nella prosa aziendale indica sia la singola riga della tabella movimenti sia l'intera registrazione contabile ad essa collegata; il solver deve disambiguare il significato dal contesto della query per identificare correttamente tabella e colonne coinvolte."
+      }
+    ],
+    "spec_hash": "7d849dea95319018"
+  },
+  "schema_ddl": "CREATE TABLE conti (\n    id SERIAL PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    natura_conto TEXT NOT NULL CHECK (natura_conto IN ('attivo', 'passivo', 'costo', 'ricavo'))\n);\n\nCREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    numero_protocollo INT NOT NULL UNIQUE CHECK (numero_protocollo > 0),\n    data_registrazione DATE NOT NULL,\n    causale TEXT NOT NULL,\n    descrizione_scrittura TEXT\n);\n\nCREATE TABLE movimenti (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(12,2) NOT NULL,\n    sezione_dare_avere TEXT NOT NULL CHECK (sezione_dare_avere IN ('dare', 'avere'))\n);"
+}

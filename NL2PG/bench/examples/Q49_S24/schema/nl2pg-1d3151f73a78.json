@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 6,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "is_distinct_from"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_personale",
+        "description": "La tabella dipendenti viene denominata anagrafica_personale nella prosa aziendale. Le query devono risalire alla tabella fisica dipendenti tramite la perifrasi fornita."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "sede_id",
+        "obsolete_value": "codice_hub_operativo",
+        "description": "La colonna sede_id della tabella dipendenti, resa NULL dalla regola referenziale ON DELETE SET NULL quando una sede viene eliminata, viene indicata nei documenti aziendali con il gergo codice_hub_operativo. Il confronto tra la colonna corrente e quella storica richiede IS DISTINCT FROM per gestire correttamente i NULL prodotti dall'azione referenziale."
+      }
+    ],
+    "spec_hash": "fa6aa06490d6eb78"
+  },
+  "schema_ddl": "CREATE TABLE sedi (\n    id INT PRIMARY KEY,\n    nome_sede TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) CHECK (stipendio_mensile > 0),\n    sede_id INT REFERENCES sedi(id) ON DELETE SET NULL\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL,\n    sede_id INT REFERENCES sedi(id) ON DELETE CASCADE,\n    responsabile_id INT REFERENCES dipendenti(id) ON DELETE SET NULL\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON UPDATE CASCADE ON DELETE CASCADE,\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('tempo_indeterminato', 'tempo_determinato', 'part_time', 'apprendistato')),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    retribuzione_annua NUMERIC(12,2) CHECK (retribuzione_annua > 0),\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE presenze (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON DELETE CASCADE,\n    data_presenza DATE NOT NULL,\n    ora_ingresso TIME NOT NULL,\n    ora_uscita TIME,\n    CHECK (ora_uscita IS NULL OR ora_uscita > ora_ingresso)\n);\n\nCREATE TABLE ferie (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON DELETE CASCADE,\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    giorni INT NOT NULL CHECK (giorni > 0),\n    stato_richiesta TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_richiesta IN ('in_attesa', 'approvata', 'rifiutata')),\n    CHECK (data_fine >= data_inizio)\n);"
+}

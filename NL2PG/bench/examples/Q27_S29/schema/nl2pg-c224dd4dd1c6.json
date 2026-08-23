@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "column_splitting",
+    "sql_features": [
+      "grouping_sets"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "movimentazioni_merci",
+        "description": "La tabella che registra le spedizioni viene denominata 'movimentazioni_merci' nei documenti aziendali, ma nel database è 'spedizioni'."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "indirizzo_consegna",
+        "obsolete_value": "destinazione_logistica",
+        "description": "La colonna che contiene l'indirizzo di consegna viene chiamata 'destinazione_logistica' nei report, ma nel database è 'indirizzo_consegna'."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "codice_tracciamento",
+        "obsolete_value": "riferimento_spedizione",
+        "description": "Il termine 'riferimento_spedizione' può indicare sia il 'codice_tracciamento' (univoco per spedizione) che il 'numero_ordine' (collegato al cliente). Nel database, 'codice_tracciamento' è la colonna corretta per identificare una spedizione specifica."
+      }
+    ],
+    "spec_hash": "2e6d1fdaefdf7459"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_ordine TEXT NOT NULL UNIQUE,\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(10,2) NOT NULL CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    codice_tracciamento TEXT NOT NULL UNIQUE,\n    indirizzo_consegna TEXT NOT NULL,\n    data_spedizione DATE NOT NULL,\n    stato_spedizione TEXT NOT NULL CHECK (stato_spedizione IN ('in_preparazione', 'in_transito', 'consegnato', 'annullato'))\n);"
+}

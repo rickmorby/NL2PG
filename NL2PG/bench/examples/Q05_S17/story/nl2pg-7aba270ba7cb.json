@@ -1,0 +1,381 @@
+{
+  "schema_ddl": "CREATE TABLE istituti_credito (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_abi TEXT NOT NULL UNIQUE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    istituto_id INT NOT NULL REFERENCES istituti_credito(id),\n    numero_conto TEXT NOT NULL UNIQUE,\n    saldo NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE movimenti (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    data_movimento DATE NOT NULL,\n    descrizione TEXT,\n    categoria TEXT NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo <> 0),\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_profile": {
+    "profile": {
+      "istituti_credito": {
+        "row_count": 36,
+        "columns": {
+          "id": {
+            "distinct": 36,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 36
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "BPER Banca S.p.A.",
+              "Banca Carige S.p.A.",
+              "Banca Mediolanum S.p.A.",
+              "Banca Monte dei Paschi di Siena S.p.A.",
+              "Banca Popolare di Sondrio S.p.A."
+            ]
+          },
+          "codice_abi": {
+            "distinct": 36,
+            "sample": [
+              "01030",
+              "01031",
+              "01032",
+              "02008",
+              "02009"
+            ]
+          },
+          "eliminato": {
+            "distinct": 2,
+            "sample": [
+              "False",
+              "True"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "conti": {
+        "row_count": 296,
+        "columns": {
+          "id": {
+            "distinct": 296,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 296
+          },
+          "istituto_id": {
+            "distinct": 36,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 36
+          },
+          "numero_conto": {
+            "distinct": 296,
+            "sample": [
+              "IT02A0301503200000012345678",
+              "IT02A03015032000000123456781",
+              "IT02A030150320000001234567810",
+              "IT02A030150320000001234567811",
+              "IT02A030150320000001234567812"
+            ]
+          },
+          "saldo": {
+            "distinct": 254,
+            "sample": [
+              "0.0",
+              "10030.28",
+              "10158.55",
+              "10179.85",
+              "103165.99"
+            ],
+            "min": 0.0,
+            "max": 438433.98
+          },
+          "eliminato": {
+            "distinct": 3,
+            "sample": [
+              "False",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": false
+          }
+        }
+      },
+      "movimenti": {
+        "row_count": 2905,
+        "columns": {
+          "id": {
+            "distinct": 2905,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2905
+          },
+          "conto_id": {
+            "distinct": 296,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 296
+          },
+          "data_movimento": {
+            "distinct": 327,
+            "sample": [
+              "2025-07-29",
+              "2025-08-01",
+              "2025-08-02",
+              "2025-08-03",
+              "2025-08-04"
+            ]
+          },
+          "descrizione": {
+            "distinct": 10,
+            "sample": [
+              "Abbonamento mensile mezzi pubblici",
+              "Abbonamento piattaforma streaming",
+              "Accredito stipendio mensile",
+              "Acquisto farmaci in farmacia",
+              "Bolletta luce e gas"
+            ]
+          },
+          "categoria": {
+            "distinct": 10,
+            "sample": [
+              "abitazione",
+              "accredito",
+              "alimentari",
+              "prelievo",
+              "ristorazione"
+            ]
+          },
+          "importo": {
+            "distinct": 2693,
+            "sample": [
+              "-10.25",
+              "-10.71",
+              "-10.96",
+              "-100.02",
+              "-100.13"
+            ],
+            "min": -1584.0,
+            "max": 5390.0
+          },
+          "eliminato": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "istituti_credito": [
+        {
+          "id": 1,
+          "nome": "UniCredit S.p.A.",
+          "codice_abi": "02008",
+          "eliminato": false
+        },
+        {
+          "id": 2,
+          "nome": "UniCredit S.p.A.",
+          "codice_abi": "02009",
+          "eliminato": false
+        },
+        {
+          "id": 3,
+          "nome": "UniCredit S.p.A.",
+          "codice_abi": "02010",
+          "eliminato": false
+        },
+        {
+          "id": 4,
+          "nome": "Intesa Sanpaolo S.p.A.",
+          "codice_abi": "03069",
+          "eliminato": false
+        },
+        {
+          "id": 5,
+          "nome": "Intesa Sanpaolo S.p.A.",
+          "codice_abi": "03070",
+          "eliminato": false
+        },
+        {
+          "id": 6,
+          "nome": "Intesa Sanpaolo S.p.A.",
+          "codice_abi": "03071",
+          "eliminato": false
+        },
+        {
+          "id": 7,
+          "nome": "Banca Monte dei Paschi di Siena S.p.A.",
+          "codice_abi": "01030",
+          "eliminato": false
+        },
+        {
+          "id": 8,
+          "nome": "Banca Monte dei Paschi di Siena S.p.A.",
+          "codice_abi": "01031",
+          "eliminato": false
+        }
+      ],
+      "conti": [
+        {
+          "id": 1,
+          "istituto_id": 6,
+          "numero_conto": "IT02A0301503200000012345678",
+          "saldo": 3856.01,
+          "eliminato": "false"
+        },
+        {
+          "id": 2,
+          "istituto_id": 33,
+          "numero_conto": "IT02A03015032000000123456781",
+          "saldo": 14917.93,
+          "eliminato": "false"
+        },
+        {
+          "id": 3,
+          "istituto_id": 32,
+          "numero_conto": "IT02A03015032000000123456782",
+          "saldo": 22487.24,
+          "eliminato": "true"
+        },
+        {
+          "id": 4,
+          "istituto_id": 28,
+          "numero_conto": "IT02A03015032000000123456783",
+          "saldo": 19569.58,
+          "eliminato": "true"
+        },
+        {
+          "id": 5,
+          "istituto_id": 27,
+          "numero_conto": "IT02A03015032000000123456784",
+          "saldo": 10858.0,
+          "eliminato": "false"
+        },
+        {
+          "id": 6,
+          "istituto_id": 14,
+          "numero_conto": "IT02A03015032000000123456785",
+          "saldo": 14686.27,
+          "eliminato": "false"
+        },
+        {
+          "id": 7,
+          "istituto_id": 29,
+          "numero_conto": "IT02A03015032000000123456786",
+          "saldo": 17034.73,
+          "eliminato": "false"
+        },
+        {
+          "id": 8,
+          "istituto_id": 29,
+          "numero_conto": "IT02A03015032000000123456787",
+          "saldo": 32790.8,
+          "eliminato": "false"
+        }
+      ],
+      "movimenti": [
+        {
+          "id": 1,
+          "conto_id": 3,
+          "data_movimento": "2026-03-09",
+          "descrizione": "Accredito stipendio mensile",
+          "categoria": "stipendio",
+          "importo": 1793.61,
+          "eliminato": "false"
+        },
+        {
+          "id": 2,
+          "conto_id": 105,
+          "data_movimento": "2026-02-16",
+          "descrizione": null,
+          "categoria": "stipendio",
+          "importo": 4041.63,
+          "eliminato": "false"
+        },
+        {
+          "id": 3,
+          "conto_id": 118,
+          "data_movimento": "2026-01-06",
+          "descrizione": "Accredito stipendio mensile",
+          "categoria": "stipendio",
+          "importo": 4345.26,
+          "eliminato": "false"
+        },
+        {
+          "id": 4,
+          "conto_id": 48,
+          "data_movimento": "2026-02-17",
+          "descrizione": "Accredito stipendio mensile",
+          "categoria": "stipendio",
+          "importo": 4808.44,
+          "eliminato": "true"
+        },
+        {
+          "id": 5,
+          "conto_id": 203,
+          "data_movimento": "2025-10-18",
+          "descrizione": "Accredito stipendio mensile",
+          "categoria": "stipendio",
+          "importo": 5015.93,
+          "eliminato": "false"
+        },
+        {
+          "id": 6,
+          "conto_id": 63,
+          "data_movimento": "2026-01-07",
+          "descrizione": "Accredito stipendio mensile",
+          "categoria": "stipendio",
+          "importo": 4181.69,
+          "eliminato": "false"
+        },
+        {
+          "id": 7,
+          "conto_id": 116,
+          "data_movimento": "2025-09-22",
+          "descrizione": "Accredito stipendio mensile",
+          "categoria": "stipendio",
+          "importo": 3044.33,
+          "eliminato": "false"
+        },
+        {
+          "id": 8,
+          "conto_id": 89,
+          "data_movimento": "2026-01-24",
+          "descrizione": "Accredito stipendio mensile",
+          "categoria": "stipendio",
+          "importo": 4732.18,
+          "eliminato": "false"
+        }
+      ]
+    }
+  },
+  "story": "Nella direzione generale del gruppo bancario, il reparto Controllo Patrimoniale ha aperto la consueta campagna di verifica trimestrale degli archivi gestionali. Il primo riferimento è l'archivio denominato istituti_credito, che custodisce le schede degli enti erogatori aderenti alla rete: per ciascuna scheda sono annotati la denominazione sociale — si citano UniCredit S.p.A., Intesa Sanpaolo S.p.A. e Banca Monte dei Paschi di Siena S.p.A. tra le firme più ricorrenti — il codice ABI che identifica univocamente l'ente, con esempi come 02008, 03069 oppure 01030, e un contrassegno che segnala se l'istituto risulta eliminato dalla struttura attiva. Le 36 schede complessive sono state passate al setaccio: quelle marcate come eliminate sono state messe da parte prima di qualsiasi elaborazione.\n\nIl secondo archivio, intitolato conti, raccoglie le posizioni dei correntisti: ogni posizione riporta il numero di conto in formato internazionale, ad esempio IT02A0301503200000012345678, il saldo disponibile — oscillante nello scenario osservato da 0.00 fino a punte di 438433.98 euro, con valori intermedi come 3856.01 o 14917.93 — e il rimando all'istituto di appartenenza. Anche qui vige un contrassegno di eliminazione: le posizioni chiuse, come quella con saldo 22487.24, restano fuori dai conteggi ufficiali. In totale si contano 296 posizioni censite.\n\nCompleta il quadro il registro movimenti, dove ogni operazione è descritta dalla data di esecuzione, dal testo esplicativo — «Accredito stipendio mensile», «Bolletta luce e gas», «Abbonamento mensile mezzi pubblici» — dalla categoria di spesa, tra cui stipendio, alimentari, ristorazione, prelievo, abitazione e accredito, e dall'importo, positivo quando entra denaro e negativo quando esce: nell'arco esaminato gli importi spaziano da un massimo di 5390.00 euro a un minimo di -1584.00 euro. Un esempio concreto è il movimento del 2026-03-09 per 1793.61 euro a saldo dello stipendio. Il registro conta 2905 operazioni storicizzate.\n\nLo scopo della verifica era duplice: calcolare il patrimonio complessivo di ciascun istituto di credito, sommando i soli saldi delle posizioni operative, e determinare quanti conti attivi risultano intestati presso ogni ente. Gli addetti hanno pertanto escluso sia gli istituti eliminati sia i conti eliminati, così da fotografare solo la rete realmente funzionante. La graduatoria finale è stata disposta per patrimonio totale decrescente e, qualora due enti avessero presentato lo stesso ammontare, il criterio di spareggio univoco individuato è stato il codice ABI, a garanzia di un ordinamento privo di ambiguità. Il responsabile di reparto ha firmato il verbale sottolineando come la pulizia degli archivi, unita alla tracciabilità puntuale dei movimenti, costituisca il fondamento di ogni rendiconto affidabile."
+}

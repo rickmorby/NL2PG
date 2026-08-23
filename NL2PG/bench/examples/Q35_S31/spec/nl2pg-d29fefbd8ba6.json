@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 6,
+  "hierarchy": "flat",
+  "sql_features": [
+    "case"
+  ],
+  "twist": [
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "category_name",
+      "obsolete_value": "classe merceologica di bilancio",
+      "description": "La colonna category_name della tabella piatta articoli_magazzino viene indicata nella prosa aziendale con il gergo contabile 'classe merceologica di bilancio'. Le query devono applicare CASE WHEN category_name = 'valore' THEN etichetta ELSE altro END riconoscendo che il valore letterale da confrontare è 'valore', pur essendo la colonna descritta solo tramite terminologia settoriale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "supplier_name",
+      "obsolete_value": "anagrafica del partner di fornitura",
+      "description": "La colonna ridondante supplier_name incorporata nella tabella piatta viene denominata nella documentazione aziendale come 'anagrafica del partner di fornitura'. Le query devono usare COALESCE(supplier_name, 'N/D') per gestire i valori NULLI, identificando correttamente la colonna nonostante la perifrasi sinonimica impiegata nei requisiti."
+    }
+  ],
+  "spec_hash": "d99fe971cadbdec9"
+}

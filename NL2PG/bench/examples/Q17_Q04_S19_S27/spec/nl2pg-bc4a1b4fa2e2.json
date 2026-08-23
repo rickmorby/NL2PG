@@ -1,0 +1,29 @@
+{
+  "domain": "vendite",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "window",
+    "join",
+    "conjunctive"
+  ],
+  "twist": [
+    "jargon",
+    "ambiguity"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "transazioni",
+      "obsolete_value": "movimentazioni commerciali",
+      "description": "La tabella delle vendite registrate, denominata 'transazioni' nello schema, viene indicata nella prosa aziendale con il gergo interno 'movimentazioni commerciali'. Il modello deve riconoscere che ogni menzione di 'movimentazioni commerciali' si riferisce alla tabella transazioni e non a movimenti di magazzino, documenti contabili o note di credito."
+    },
+    {
+      "twist_type": "ambiguity",
+      "target_value": "data_transazione",
+      "obsolete_value": "data dell'operazione",
+      "description": "La colonna 'data_transazione' della tabella transazioni viene indicata nella prosa aziendale come 'data dell'operazione'. Il termine è volutamente ambiguo perché la stessa tabella contiene anche la colonna 'data_consegna': il modello deve risolvere l'ambiguità interpretando 'data dell'operazione' come la data di registrazione della vendita (data_transazione) e non la data di evasione o consegna dell'ordine."
+    }
+  ],
+  "spec_hash": "fe1e8719b893f389"
+}

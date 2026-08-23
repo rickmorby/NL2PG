@@ -1,0 +1,34 @@
+{
+  "domain": "università",
+  "n_tables": 5,
+  "hierarchy": "mixed",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "corsi",
+      "obsolete_value": "offerta_didattica",
+      "description": "La tabella corsi, che contiene la colonna autoriferita corso_prerequisito_id per modellare i prerequisiti tra corsi, viene denominata offerta_didattica nella prosa aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "crediti",
+      "obsolete_value": "CFU",
+      "description": "La colonna crediti della tabella corsi viene indicata nel testo con l'acronimo gergale CFU (Crediti Formativi Universitari), richiedendo la decodifica del termine tecnico."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "iscrizioni",
+      "obsolete_value": "verbalizzazioni",
+      "description": "La tabella iscrizioni, che registra gli esami sostenuti dagli studenti, viene indicata nella prosa come verbalizzazioni, usando un sinonimo amministrativo del dominio accademico."
+    }
+  ],
+  "spec_hash": "2e4754c72a81b1d3"
+}

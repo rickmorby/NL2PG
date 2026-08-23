@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "full_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "movimenti_merce",
+      "description": "La tabella spedizioni viene denominata movimenti_merce nella prosa aziendale. Il progettista deve riconoscere che ogni riferimento ai movimenti di merce corrisponde alla tabella spedizioni nel database."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "costo_trasporto",
+      "obsolete_value": "tariffa_di_vettura",
+      "description": "La colonna costo_trasporto della tabella spedizioni viene indicata con il gergo del settore come tariffa_di_vettura. La query richiede di aggregare o confrontare tale valore gestendo i NULL prodotti dal FULL OUTER JOIN tramite COALESCE."
+    }
+  ],
+  "spec_hash": "4f23921bec93c402"
+}

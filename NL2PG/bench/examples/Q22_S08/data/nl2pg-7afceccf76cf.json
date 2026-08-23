@@ -1,0 +1,682 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 6,
+    "hierarchy": "isa",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobile",
+        "obsolete_value": "anagrafica_unita_edilizie",
+        "description": "La tabella base della gerarchia ISA, 'immobile', viene denominata 'anagrafica_unita_edilizie' nella prosa aziendale. Le query devono risalire al nome reale della tabella per ricomporre la specializzazione tramite join o discriminatore."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "terreno",
+        "obsolete_value": "particella_fondiaria",
+        "description": "Il sottotipo 'terreno' viene indicato nel linguaggio di settore come 'particella_fondiaria'. Il solver deve riconoscere che il termine gergale si riferisce alla tabella sottotipo collegata a 'immobile' tramite FK/discriminatore."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "classe_energetica",
+        "obsolete_value": "classe dell'immobile",
+        "description": "Il termine 'classe' nella prosa aziendale è ambiguo: può indicare una fascia di pregio commerciale oppure l'attributo tecnico 'classe_energetica'. Le query che menzionano 'classe dell'immobile' vanno interpretate come riferite alla colonna classe_energetica, non a una classificazione di mercato."
+      }
+    ],
+    "spec_hash": "0bfde2cfcc730032"
+  },
+  "schema_ddl": "CREATE TYPE tipo_unita AS ENUM ('terreno', 'abitazione');\n\nCREATE TYPE tipo_classe_energetica AS ENUM ('A4', 'A3', 'A2', 'A1', 'A', 'B', 'C', 'D', 'E', 'F', 'G');\n\nCREATE TABLE proprietario (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    telefono TEXT,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE immobile (\n    id SERIAL PRIMARY KEY,\n    proprietario_id INT NOT NULL REFERENCES proprietario(id) ON DELETE RESTRICT ON UPDATE CASCADE,\n    indirizzo TEXT NOT NULL,\n    civico TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    tipo_unita tipo_unita NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE terreno (\n    id INT PRIMARY KEY REFERENCES immobile(id) ON DELETE CASCADE ON UPDATE CASCADE,\n    particella_catastale TEXT NOT NULL,\n    foglio_catastale TEXT NOT NULL,\n    mappale TEXT NOT NULL,\n    subalterno TEXT,\n    edificabile BOOLEAN NOT NULL DEFAULT FALSE,\n    destinazione_uso TEXT NOT NULL,\n    UNIQUE (foglio_catastale, particella_catastale, mappale, subalterno)\n);\n\nCREATE TABLE abitazione (\n    id INT PRIMARY KEY REFERENCES immobile(id) ON DELETE CASCADE ON UPDATE CASCADE,\n    numero_vani INT NOT NULL CHECK (numero_vani > 0),\n    piano INT NOT NULL DEFAULT 0,\n    classe_energetica tipo_classe_energetica NOT NULL,\n    anno_costruzione INT CHECK (anno_costruzione BETWEEN 1700 AND 2100),\n    riscaldamento_autonomo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE agenzia (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE incarico_vendita (\n    id SERIAL PRIMARY KEY,\n    immobile_id INT NOT NULL REFERENCES immobile(id) ON DELETE CASCADE ON UPDATE CASCADE,\n    agenzia_id INT NOT NULL REFERENCES agenzia(id) ON DELETE RESTRICT ON UPDATE CASCADE,\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto > 0),\n    provvigione_percentuale NUMERIC(4,2) NOT NULL DEFAULT 3.00 CHECK (provvigione_percentuale >= 0 AND provvigione_percentuale <= 100),\n    data_incarico DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato_incarico TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_incarico IN ('attivo', 'sospeso', 'concluso', 'ritirato'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "proprietario",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 220,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_fiscale": "RSSMRA85M01H501Z",
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "telefono": "06-1234567",
+            "citta": "Roma"
+          },
+          {
+            "id": 2,
+            "codice_fiscale": "BNCLCU90A45F205X",
+            "nome": "Lucia",
+            "cognome": "Bianchi",
+            "telefono": "02-9876543",
+            "citta": "Milano"
+          },
+          {
+            "id": 3,
+            "codice_fiscale": "VRDGNN78C12L219W",
+            "nome": "Gianni",
+            "cognome": "Verdi",
+            "telefono": null,
+            "citta": "Torino"
+          },
+          {
+            "id": 4,
+            "codice_fiscale": "FRAMCH92D08E509Q",
+            "nome": "Michela",
+            "cognome": "Franco",
+            "telefono": "081-555123",
+            "citta": "Napoli"
+          },
+          {
+            "id": 5,
+            "codice_fiscale": "GLLMRC88E22I254T",
+            "nome": "Marco",
+            "cognome": "Gallo",
+            "telefono": "055-442211",
+            "citta": "Firenze"
+          },
+          {
+            "id": 6,
+            "codice_fiscale": "CNTSIL87B19D963Y",
+            "nome": "Silvia",
+            "cognome": "Conti",
+            "telefono": "051-778899",
+            "citta": "Bologna"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Lucia",
+              "Gianni",
+              "Michela",
+              "Marco",
+              "Silvia",
+              "Paolo",
+              "Anna",
+              "Luca",
+              "Chiara"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Franco",
+              "Gallo",
+              "Conti",
+              "Moretti",
+              "Barbieri",
+              "Costa",
+              "Fontana"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Firenze",
+              "Bologna"
+            ]
+          }
+        }
+      },
+      {
+        "table": "immobile",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "proprietario_id": 1,
+            "indirizzo": "Via Appia",
+            "civico": "12",
+            "comune": "Roma",
+            "provincia": "RM",
+            "cap": "00184",
+            "superficie_mq": 120.5,
+            "tipo_unita": "abitazione",
+            "data_registrazione": "2023-03-15"
+          },
+          {
+            "id": 2,
+            "proprietario_id": 2,
+            "indirizzo": "Via Torino",
+            "civico": "45/A",
+            "comune": "Milano",
+            "provincia": "MI",
+            "cap": "20123",
+            "superficie_mq": 85.0,
+            "tipo_unita": "abitazione",
+            "data_registrazione": "2022-11-02"
+          },
+          {
+            "id": 3,
+            "proprietario_id": 3,
+            "indirizzo": "Strada Comunale San Rocco",
+            "civico": "SNC",
+            "comune": "Asti",
+            "provincia": "AT",
+            "cap": "14100",
+            "superficie_mq": 4500.0,
+            "tipo_unita": "terreno",
+            "data_registrazione": "2021-06-20"
+          },
+          {
+            "id": 4,
+            "proprietario_id": 4,
+            "indirizzo": "Corso Umberto I",
+            "civico": "7",
+            "comune": "Napoli",
+            "provincia": "NA",
+            "cap": "80138",
+            "superficie_mq": 95.3,
+            "tipo_unita": "abitazione",
+            "data_registrazione": "2023-01-10"
+          },
+          {
+            "id": 5,
+            "proprietario_id": 5,
+            "indirizzo": "Localita Poggio alle Vigne",
+            "civico": "3",
+            "comune": "Greve in Chianti",
+            "provincia": "FI",
+            "cap": "50022",
+            "superficie_mq": 12000.0,
+            "tipo_unita": "terreno",
+            "data_registrazione": "2020-09-05"
+          },
+          {
+            "id": 6,
+            "proprietario_id": 1,
+            "indirizzo": "Via del Corso",
+            "civico": "101",
+            "comune": "Roma",
+            "provincia": "RM",
+            "cap": "00186",
+            "superficie_mq": 60.75,
+            "tipo_unita": "abitazione",
+            "data_registrazione": "2024-02-18"
+          }
+        ],
+        "variations": {
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Garibaldi",
+              "Via Roma",
+              "Via Dante",
+              "Piazza della Repubblica",
+              "Via Mazzini",
+              "Via Cavour",
+              "Viale Trieste",
+              "Via Petrarca"
+            ]
+          },
+          "civico": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "5",
+              "12",
+              "27",
+              "45",
+              "78",
+              "SNC"
+            ]
+          },
+          "superficie_mq": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "tipo_unita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "abitazione",
+              "abitazione",
+              "abitazione",
+              "terreno"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -500.0,
+            "delta_max": 200.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "terreno",
+        "nature": "explicit",
+        "min_rows": 140,
+        "max_rows": 180,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 3,
+            "particella_catastale": "124",
+            "foglio_catastale": "17",
+            "mappale": "310",
+            "subalterno": null,
+            "edificabile": false,
+            "destinazione_uso": "agricolo"
+          },
+          {
+            "id": 5,
+            "particella_catastale": "89",
+            "foglio_catastale": "42",
+            "mappale": "115",
+            "subalterno": "2",
+            "edificabile": true,
+            "destinazione_uso": "edificabile residenziale"
+          },
+          {
+            "id": 9,
+            "particella_catastale": "203",
+            "foglio_catastale": "8",
+            "mappale": "77",
+            "subalterno": null,
+            "edificabile": false,
+            "destinazione_uso": "boschivo"
+          },
+          {
+            "id": 14,
+            "particella_catastale": "56",
+            "foglio_catastale": "23",
+            "mappale": "402",
+            "subalterno": "1",
+            "edificabile": true,
+            "destinazione_uso": "commerciale"
+          }
+        ],
+        "variations": {
+          "edificabile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "false",
+              "false",
+              "true"
+            ]
+          },
+          "destinazione_uso": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "agricolo",
+              "edificabile residenziale",
+              "commerciale",
+              "industriale",
+              "boschivo",
+              "pastorale"
+            ]
+          }
+        }
+      },
+      {
+        "table": "abitazione",
+        "nature": "explicit",
+        "min_rows": 350,
+        "max_rows": 460,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_vani": 4,
+            "piano": 2,
+            "classe_energetica": "C",
+            "anno_costruzione": 1985,
+            "riscaldamento_autonomo": true
+          },
+          {
+            "id": 2,
+            "numero_vani": 3,
+            "piano": 1,
+            "classe_energetica": "B",
+            "anno_costruzione": 2005,
+            "riscaldamento_autonomo": true
+          },
+          {
+            "id": 4,
+            "numero_vani": 5,
+            "piano": 0,
+            "classe_energetica": "D",
+            "anno_costruzione": 1972,
+            "riscaldamento_autonomo": false
+          },
+          {
+            "id": 6,
+            "numero_vani": 2,
+            "piano": 3,
+            "classe_energetica": "A2",
+            "anno_costruzione": 2018,
+            "riscaldamento_autonomo": true
+          },
+          {
+            "id": 11,
+            "numero_vani": 6,
+            "piano": -1,
+            "classe_energetica": "G",
+            "anno_costruzione": 1901,
+            "riscaldamento_autonomo": false
+          }
+        ],
+        "variations": {
+          "numero_vani": {
+            "axis": "shift",
+            "delta_min": -1.0,
+            "delta_max": 2.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "piano": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "-1",
+              "0",
+              "1",
+              "1",
+              "2",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          },
+          "classe_energetica": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "A2",
+              "A3",
+              "B",
+              "B",
+              "C",
+              "C",
+              "C",
+              "D",
+              "D",
+              "E",
+              "F",
+              "G"
+            ]
+          },
+          "anno_costruzione": {
+            "axis": "shift",
+            "delta_min": -25.0,
+            "delta_max": 25.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "riscaldamento_autonomo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "agenzia",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Immobiliare Aurora S.r.l.",
+            "partita_iva": "IT01234567890",
+            "citta": "Roma",
+            "telefono": "06-4521789"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Casa Mia Consulenti Associati",
+            "partita_iva": "IT09876543210",
+            "citta": "Milano",
+            "telefono": "02-7654321"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Terre e Dimore S.a.s.",
+            "partita_iva": "IT04567891234",
+            "citta": "Firenze",
+            "telefono": "055-1122334"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Nuova Casa Agenzia Immobiliare",
+            "partita_iva": "IT03456789123",
+            "citta": "Napoli",
+            "telefono": "081-3344556"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Piemonte Case S.r.l.",
+            "partita_iva": "IT05678912345",
+            "citta": "Torino",
+            "telefono": "011-6677889"
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Immobiliare Aurora S.r.l.",
+              "Casa Mia Consulenti Associati",
+              "Terre e Dimore S.a.s.",
+              "Nuova Casa Agenzia Immobiliare",
+              "Piemonte Case S.r.l.",
+              "Gruppo Fondiario Adriatico S.p.A.",
+              "Studio Tecnico Catastale Associato"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Firenze",
+              "Bologna"
+            ]
+          }
+        }
+      },
+      {
+        "table": "incarico_vendita",
+        "nature": "fact",
+        "min_rows": 500,
+        "max_rows": 900,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "immobile_id": 1,
+            "agenzia_id": 1,
+            "prezzo_richiesto": 285000.0,
+            "provvigione_percentuale": 3.0,
+            "data_incarico": "2024-03-10",
+            "stato_incarico": "concluso"
+          },
+          {
+            "id": 2,
+            "immobile_id": 2,
+            "agenzia_id": 2,
+            "prezzo_richiesto": 195000.0,
+            "provvigione_percentuale": 2.5,
+            "data_incarico": "2025-01-20",
+            "stato_incarico": "attivo"
+          },
+          {
+            "id": 3,
+            "immobile_id": 3,
+            "agenzia_id": 3,
+            "prezzo_richiesto": 85000.0,
+            "provvigione_percentuale": 4.0,
+            "data_incarico": "2024-07-05",
+            "stato_incarico": "sospeso"
+          },
+          {
+            "id": 4,
+            "immobile_id": 4,
+            "agenzia_id": 1,
+            "prezzo_richiesto": 320000.0,
+            "provvigione_percentuale": 3.0,
+            "data_incarico": "2025-04-15",
+            "stato_incarico": "attivo"
+          },
+          {
+            "id": 5,
+            "immobile_id": 5,
+            "agenzia_id": 4,
+            "prezzo_richiesto": 145000.0,
+            "provvigione_percentuale": 3.5,
+            "data_incarico": "2023-11-28",
+            "stato_incarico": "ritirato"
+          },
+          {
+            "id": 6,
+            "immobile_id": 6,
+            "agenzia_id": 5,
+            "prezzo_richiesto": 210000.0,
+            "provvigione_percentuale": 2.0,
+            "data_incarico": "2025-06-01",
+            "stato_incarico": "attivo"
+          }
+        ],
+        "variations": {
+          "prezzo_richiesto": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "provvigione_percentuale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1.50",
+              "2.00",
+              "2.50",
+              "3.00",
+              "3.00",
+              "3.50",
+              "4.00",
+              "5.00"
+            ]
+          },
+          "data_incarico": {
+            "axis": "shift",
+            "delta_min": -240.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_incarico": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "attivo",
+              "attivo",
+              "concluso",
+              "concluso",
+              "sospeso",
+              "ritirato"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

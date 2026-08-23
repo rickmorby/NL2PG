@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "agg_distinct"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "contratti",
+        "obsolete_value": "intestazioni_attivazione",
+        "description": "La tabella contratti, che contiene le righe di attivazione delle linee con il campo deleted_at per la cancellazione logica, viene denominata intestazioni_attivazione nella prosa aziendale. Le query devono risolvere intestazioni_attivazione sulla tabella fisica contratti."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "deleted_at",
+        "obsolete_value": "data_dismissione_linea",
+        "description": "Il timestamp di cancellazione logica deleted_at della tabella contratti viene descritto nei documenti aziendali come data_dismissione_linea. I contratti con data_dismissione_linea valorizzata sono da intendersi dismessi logicamente: per contare solo le linee attive occorre filtrare con deleted_at IS NULL, mentre per i soli contratti dismessi si usa deleted_at IS NOT NULL."
+      }
+    ],
+    "spec_hash": "237e36a3d18c352a"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    email TEXT\n);\n\nCREATE TABLE piani_tariffari (\n    id SERIAL PRIMARY KEY,\n    nome_piano TEXT NOT NULL UNIQUE,\n    canone_mensile NUMERIC(8,2) NOT NULL CHECK (canone_mensile >= 0),\n    giga_inclusi INT NOT NULL DEFAULT 0 CHECK (giga_inclusi >= 0),\n    minuti_inclusi INT NOT NULL DEFAULT 0 CHECK (minuti_inclusi >= 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    piano_id INT NOT NULL REFERENCES piani_tariffari(id),\n    numero_linea TEXT NOT NULL UNIQUE,\n    data_attivazione DATE NOT NULL,\n    deleted_at TIMESTAMP,\n    CONSTRAINT chk_dismissione_coerente CHECK (deleted_at IS NULL OR deleted_at >= data_attivazione)\n);"
+}

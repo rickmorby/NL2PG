@@ -1,0 +1,29 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "subquery",
+    "correlated_subquery",
+    "scalar_agg"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "abbonamenti",
+      "obsolete_value": "linee_contrattuali",
+      "description": "La tabella abbonamenti, che contiene i piani attivati dai clienti presso ciascun gestore, viene denominata nella prosa aziendale come linee_contrattuali. Il modello deve risalire al nome fisico reale della tabella senza che la chiave esterna verso gestori sia dichiarata esplicitamente."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "minuti_consumati",
+      "obsolete_value": "traffico_vocale_erogato",
+      "description": "La colonna minuti_consumati della tabella traffico_voce viene indicata nei documenti aziendali con il sinonimo tecnico traffico_vocale_erogato. Le query di confronto tra sottoinsiemi disgiunti di abbonamenti devono aggregare scalare su questa colonna riconoscendo l'equivalenza semantica."
+    }
+  ],
+  "spec_hash": "d8762458c01d0567"
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "distinct"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatture",
+      "obsolete_value": "registrazioni di addebito emesse",
+      "description": "La tabella fatture viene denominata 'registrazioni di addebito emesse' nella prosa aziendale, costringendo il solver a mappare la perifrasi sulla tabella fisica corretta."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo",
+      "obsolete_value": "esposizione contabile lorda",
+      "description": "La colonna importo, fisicamente definita come TEXT ma contenente valori logicamente numerici da castare con CAST(importo AS NUMERIC) prima del confronto, viene indicata nella documentazione con il gergo contabile 'esposizione contabile lorda'."
+    }
+  ],
+  "spec_hash": "4a0ddc97140f37aa"
+}

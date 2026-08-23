@@ -1,0 +1,32 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "subquery",
+      "correlated_subquery",
+      "scalar_agg"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "abbonamenti",
+        "obsolete_value": "linee_contrattuali",
+        "description": "La tabella abbonamenti, che contiene i piani attivati dai clienti presso ciascun gestore, viene denominata nella prosa aziendale come linee_contrattuali. Il modello deve risalire al nome fisico reale della tabella senza che la chiave esterna verso gestori sia dichiarata esplicitamente."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "minuti_consumati",
+        "obsolete_value": "traffico_vocale_erogato",
+        "description": "La colonna minuti_consumati della tabella traffico_voce viene indicata nei documenti aziendali con il sinonimo tecnico traffico_vocale_erogato. Le query di confronto tra sottoinsiemi disgiunti di abbonamenti devono aggregare scalare su questa colonna riconoscendo l'equivalenza semantica."
+      }
+    ],
+    "spec_hash": "d8762458c01d0567"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE gestori (\n    id INT PRIMARY KEY,\n    nome_gestore TEXT NOT NULL UNIQUE,\n    partita_iva TEXT NOT NULL UNIQUE,\n    sede_legale TEXT\n);\n\nCREATE TABLE abbonamenti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    gestore_id INT NOT NULL REFERENCES gestori(id),\n    numero_telefono TEXT NOT NULL UNIQUE,\n    piano_tariffario TEXT NOT NULL,\n    data_attivazione DATE NOT NULL,\n    stato TEXT NOT NULL CHECK (stato IN ('attivo', 'sospeso', 'disdetto'))\n);\n\nCREATE TABLE traffico_voce (\n    id INT PRIMARY KEY,\n    abbonamento_id INT NOT NULL REFERENCES abbonamenti(id),\n    data_chiamata DATE NOT NULL,\n    minuti_consumati NUMERIC(8,2) NOT NULL CHECK (minuti_consumati >= 0),\n    costo_chiamata NUMERIC(8,2) NOT NULL CHECK (costo_chiamata >= 0),\n    destinazione TEXT\n);"
+}

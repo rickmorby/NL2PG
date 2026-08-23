@@ -1,0 +1,281 @@
+{
+  "schema_ddl": "CREATE TABLE conti (\n    id INT PRIMARY KEY,\n    iban TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    valuta TEXT NOT NULL DEFAULT 'EUR',\n    saldo_iniziale NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo_iniziale >= 0),\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL,\n    data_operazione TIMESTAMP NOT NULL,\n    importo NUMERIC(14,2) NOT NULL CHECK (importo <> 0),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('accredito', 'addebito')),\n    causale TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "conti": {
+        "row_count": 762,
+        "columns": {
+          "id": {
+            "distinct": 762,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 762
+          },
+          "iban": {
+            "distinct": 762,
+            "sample": [
+              "IT02L0301503200000003512345",
+              "IT02L03015032000000035123451",
+              "IT02L030150320000000351234510",
+              "IT02L0301503200000003512345100",
+              "IT02L0301503200000003512345101"
+            ]
+          },
+          "intestatario": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro Conti",
+              "Anna Greco",
+              "EdilCasa Costruzioni SpA",
+              "Francesca Moretti",
+              "Giulia Verdi"
+            ]
+          },
+          "valuta": {
+            "distinct": 4,
+            "sample": [
+              "CHF",
+              "EUR",
+              "GBP",
+              "USD"
+            ]
+          },
+          "saldo_iniziale": {
+            "distinct": 740,
+            "sample": [
+              "10065.12",
+              "10087.78",
+              "1010.72",
+              "101224.54",
+              "10131.23"
+            ],
+            "min": 500.0,
+            "max": 296250.75
+          },
+          "data_apertura": {
+            "distinct": 612,
+            "sample": [
+              "2016-03-30",
+              "2016-04-03",
+              "2016-04-19",
+              "2016-04-21",
+              "2016-04-24"
+            ]
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 1811,
+        "columns": {
+          "id": {
+            "distinct": 1811,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 2811
+          },
+          "conto_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "data_operazione": {
+            "distinct": 656,
+            "sample": [
+              "2025-11-06 09:14:00",
+              "2025-11-07 09:14:00",
+              "2025-11-08 09:14:00",
+              "2025-11-09 09:14:00",
+              "2025-11-09 18:32:00"
+            ]
+          },
+          "importo": {
+            "distinct": 1727,
+            "sample": [
+              "-100.09",
+              "-100.1",
+              "-100.58",
+              "-100.99",
+              "-1005.29"
+            ],
+            "min": -1125.0,
+            "max": 8000.0
+          },
+          "tipo_movimento": {
+            "distinct": 2,
+            "sample": [
+              "accredito",
+              "addebito"
+            ]
+          },
+          "causale": {
+            "distinct": 8,
+            "sample": [
+              "Accredito interessi maturati",
+              "Bollettino pagoPA",
+              "Bonifico SEPA",
+              "Canone conto corrente",
+              "Pagamento POS"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "conti": [
+        {
+          "id": 1,
+          "iban": "IT60X0542811101000000123456",
+          "intestatario": "Anna Greco",
+          "valuta": "EUR",
+          "saldo_iniziale": 30418.59,
+          "data_apertura": "2017-11-13"
+        },
+        {
+          "id": 2,
+          "iban": "IT60X05428111010000001234561",
+          "intestatario": "Anna Greco",
+          "valuta": "USD",
+          "saldo_iniziale": 3154.13,
+          "data_apertura": "2017-12-24"
+        },
+        {
+          "id": 3,
+          "iban": "IT60X05428111010000001234562",
+          "intestatario": "Anna Greco",
+          "valuta": "USD",
+          "saldo_iniziale": 10131.23,
+          "data_apertura": "2017-07-23"
+        },
+        {
+          "id": 4,
+          "iban": "IT60X05428111010000001234563",
+          "intestatario": "Sofia Ricci",
+          "valuta": "EUR",
+          "saldo_iniziale": 29035.52,
+          "data_apertura": "2019-02-24"
+        },
+        {
+          "id": 5,
+          "iban": "IT60X05428111010000001234564",
+          "intestatario": "TechNova SRL",
+          "valuta": "EUR",
+          "saldo_iniziale": 18019.92,
+          "data_apertura": "2018-03-02"
+        },
+        {
+          "id": 6,
+          "iban": "IT60X05428111010000001234565",
+          "intestatario": "Sofia Ricci",
+          "valuta": "USD",
+          "saldo_iniziale": 22962.8,
+          "data_apertura": "2017-10-16"
+        },
+        {
+          "id": 7,
+          "iban": "IT60X05428111010000001234566",
+          "intestatario": "Marco De Luca",
+          "valuta": "CHF",
+          "saldo_iniziale": 8608.95,
+          "data_apertura": "2019-01-08"
+        },
+        {
+          "id": 8,
+          "iban": "IT60X05428111010000001234567",
+          "intestatario": "TechNova SRL",
+          "valuta": "CHF",
+          "saldo_iniziale": 15716.33,
+          "data_apertura": "2018-08-10"
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 1001,
+          "conto_id": 1,
+          "data_operazione": "2026-01-15 09:14:00",
+          "importo": 294.1,
+          "tipo_movimento": "accredito",
+          "causale": "Versamento contanti"
+        },
+        {
+          "id": 1002,
+          "conto_id": 1,
+          "data_operazione": "2025-12-23 09:14:00",
+          "importo": 465.77,
+          "tipo_movimento": "accredito",
+          "causale": "Pagamento POS"
+        },
+        {
+          "id": 1003,
+          "conto_id": 1,
+          "data_operazione": "2025-11-30 09:14:00",
+          "importo": 184.19,
+          "tipo_movimento": "accredito",
+          "causale": "Canone conto corrente"
+        },
+        {
+          "id": 1004,
+          "conto_id": 1,
+          "data_operazione": "2025-12-12 09:14:00",
+          "importo": 515.07,
+          "tipo_movimento": "accredito",
+          "causale": "Ricarica carta prepagata"
+        },
+        {
+          "id": 1005,
+          "conto_id": 1,
+          "data_operazione": "2026-01-05 09:14:00",
+          "importo": 250.0,
+          "tipo_movimento": "accredito",
+          "causale": "Bonifico SEPA"
+        },
+        {
+          "id": 1006,
+          "conto_id": 1,
+          "data_operazione": "2025-11-08 09:14:00",
+          "importo": 391.89,
+          "tipo_movimento": "accredito",
+          "causale": "Accredito interessi maturati"
+        },
+        {
+          "id": 1007,
+          "conto_id": 1,
+          "data_operazione": "2025-11-25 09:14:00",
+          "importo": 595.52,
+          "tipo_movimento": "accredito",
+          "causale": "Prelievo ATM"
+        },
+        {
+          "id": 1008,
+          "conto_id": 1,
+          "data_operazione": "2026-01-05 09:14:00",
+          "importo": 239.91,
+          "tipo_movimento": "accredito",
+          "causale": "Ricarica carta prepagata"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "window"
+  ],
+  "query": "WITH movimenti_per_conto AS (\n    SELECT conto_id,\n           COUNT(*) AS numero_movimenti,\n           COALESCE(SUM(importo) FILTER (WHERE tipo_movimento = 'accredito'), 0) AS totale_accrediti,\n           COALESCE(SUM(importo) FILTER (WHERE tipo_movimento = 'addebito'), 0) AS totale_addebiti\n    FROM transazioni\n    GROUP BY conto_id\n)\nSELECT c.iban,\n       c.intestatario,\n       c.valuta,\n       c.saldo_iniziale,\n       COALESCE(m.numero_movimenti, 0) AS numero_movimenti,\n       COALESCE(m.totale_accrediti, 0) AS totale_accrediti,\n       COALESCE(m.totale_addebiti, 0) AS totale_addebiti,\n       RANK() OVER (ORDER BY c.saldo_iniziale DESC) AS posizione_classifica\nFROM conti c\nLEFT JOIN movimenti_per_conto m ON m.conto_id = c.id\nWHERE c.valuta = 'EUR'\nORDER BY posizione_classifica ASC, c.saldo_iniziale DESC, c.iban ASC;"
+}

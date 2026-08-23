@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 6,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "is_distinct_from"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_personale",
+      "description": "La tabella dipendenti viene denominata anagrafica_personale nella prosa aziendale. Le query devono risalire alla tabella fisica dipendenti tramite la perifrasi fornita."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "sede_id",
+      "obsolete_value": "codice_hub_operativo",
+      "description": "La colonna sede_id della tabella dipendenti, resa NULL dalla regola referenziale ON DELETE SET NULL quando una sede viene eliminata, viene indicata nei documenti aziendali con il gergo codice_hub_operativo. Il confronto tra la colonna corrente e quella storica richiede IS DISTINCT FROM per gestire correttamente i NULL prodotti dall'azione referenziale."
+    }
+  ],
+  "spec_hash": "fa6aa06490d6eb78"
+}

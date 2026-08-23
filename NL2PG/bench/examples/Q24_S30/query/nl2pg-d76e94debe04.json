@@ -1,0 +1,1791 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT UNIQUE,\n    partita_iva TEXT UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE magazzini (\n    id SERIAL PRIMARY KEY,\n    codice_magazzino TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capacita_pallet INT NOT NULL CHECK (capacita_pallet > 0)\n);\n\nCREATE TABLE destinazioni (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT,\n    cap TEXT,\n    paese TEXT NOT NULL DEFAULT 'Italia'\n);\n\nCREATE TABLE corrieri (\n    id SERIAL PRIMARY KEY,\n    denominazione TEXT NOT NULL,\n    partita_iva TEXT UNIQUE,\n    telefono TEXT,\n    email TEXT,\n    zona_copertura TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE contratti_corrieri (\n    id SERIAL PRIMARY KEY,\n    corriere_id INT NOT NULL REFERENCES corrieri(id),\n    data_registrazione DATE NOT NULL,\n    data_scadenza DATE,\n    tipo_tariffa TEXT NOT NULL DEFAULT 'chilometrica',\n    importo_canone NUMERIC(10,2) NOT NULL CHECK (importo_canone >= 0)\n);\n\nCREATE TABLE flotta_veicoli (\n    id SERIAL PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    modello TEXT NOT NULL,\n    capacita_kg INT NOT NULL CHECK (capacita_kg > 0),\n    corriere_id INT REFERENCES corrieri(id),\n    data_registrazione DATE NOT NULL,\n    importo_valore NUMERIC(10,2) CHECK (importo_valore >= 0)\n);\n\nCREATE TABLE autisti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_patente TEXT NOT NULL UNIQUE,\n    corriere_id INT REFERENCES corrieri(id),\n    data_assunzione DATE\n);\n\nCREATE TABLE assegnazioni_autisti (\n    id SERIAL PRIMARY KEY,\n    autista_id INT NOT NULL REFERENCES autisti(id),\n    veicolo_id INT NOT NULL REFERENCES flotta_veicoli(id),\n    data_registrazione DATE NOT NULL,\n    turno TEXT NOT NULL CHECK (turno IN ('mattina', 'pomeriggio', 'notte')),\n    importo_indennita NUMERIC(8,2) CHECK (importo_indennita >= 0)\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    destinazione_id INT NOT NULL REFERENCES destinazioni(id),\n    magazzino_partenza_id INT NOT NULL REFERENCES magazzini(id),\n    corriere_id INT REFERENCES corrieri(id),\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    stato TEXT NOT NULL DEFAULT 'in_preparazione',\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE,\n    data_consegna_prevista DATE,\n    costo_trasporto NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (costo_trasporto >= 0)\n);\n\nCREATE TABLE colli (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    numero_progressivo INT NOT NULL,\n    peso_kg NUMERIC(6,2) NOT NULL CHECK (peso_kg > 0),\n    fragile BOOLEAN NOT NULL DEFAULT FALSE,\n    descrizione_contenuto TEXT,\n    UNIQUE (spedizione_id, numero_progressivo)\n);\n\nCREATE TABLE resi (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    motivo_reso TEXT NOT NULL,\n    data_registrazione DATE NOT NULL,\n    importo_rimborso NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (importo_rimborso >= 0),\n    stato_reso TEXT NOT NULL DEFAULT 'aperto'\n);\n\nCREATE TABLE fatture (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_fattura TEXT NOT NULL UNIQUE,\n    data_registrazione DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    pagata BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 445,
+        "columns": {
+          "id": {
+            "distinct": 445,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 445
+          },
+          "ragione_sociale": {
+            "distinct": 10,
+            "sample": [
+              "Arancio Logistics Snc",
+              "Bianchi Trasporti SpA",
+              "Blu Freight Srl",
+              "Celeste Express Srl",
+              "Gialli Cargo Srl"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 422,
+            "sample": [
+              "BNCLGU75B41F205B",
+              "BNCLGU75B41F205C",
+              "BNCLGU75B41F205D",
+              "BNCLGU75B41F205E",
+              "BNCLGU75B41F205F"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 426,
+            "sample": [
+              "11223344556",
+              "11223344557",
+              "11223344558",
+              "11223344559",
+              "11223344560"
+            ]
+          },
+          "email": {
+            "distinct": 10,
+            "sample": [
+              "amministrazione@bianchitrasporti.it",
+              "cargo@viola.it",
+              "contatti@verdiexpress.it",
+              "express@celeste.it",
+              "info@neridistribuzione.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 10,
+            "sample": [
+              "0113334455",
+              "0114445566",
+              "026667890",
+              "028889900",
+              "0552223344"
+            ]
+          },
+          "creato_il": {
+            "distinct": 5,
+            "sample": [
+              "2024-01-15 09:30:00",
+              "2024-02-20 14:15:00",
+              "2024-03-10 11:00:00",
+              "2024-04-05 16:45:00",
+              "2024-05-12 08:20:00"
+            ]
+          }
+        }
+      },
+      "magazzini": {
+        "row_count": 38,
+        "columns": {
+          "id": {
+            "distinct": 38,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 38
+          },
+          "codice_magazzino": {
+            "distinct": 38,
+            "sample": [
+              "FI-01",
+              "FI-011",
+              "FI-012",
+              "FI-013",
+              "FI-014"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 5,
+            "sample": [
+              "Corso Francia 180",
+              "Via Nazionale 75",
+              "Via Tiburtina 320",
+              "Via dell'Industria 50",
+              "Viale Europa 22"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "capacita_pallet": {
+            "distinct": 8,
+            "sample": [
+              "10000",
+              "3000",
+              "4000",
+              "5000",
+              "6000"
+            ]
+          }
+        }
+      },
+      "destinazioni": {
+        "row_count": 1222,
+        "columns": {
+          "id": {
+            "distinct": 1222,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1222
+          },
+          "cliente_id": {
+            "distinct": 419,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 445
+          },
+          "indirizzo": {
+            "distinct": 8,
+            "sample": [
+              "Corso Buenos Aires 45",
+              "Corso Vittorio Emanuele 30",
+              "Piazza Duomo 1",
+              "Via Garibaldi 55",
+              "Via Nazionale 200"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "provincia": {
+            "distinct": 8,
+            "sample": [
+              "BO",
+              "FI",
+              "GE",
+              "MI",
+              "NA"
+            ]
+          },
+          "cap": {
+            "distinct": 9,
+            "sample": [
+              "00184",
+              "10121",
+              "16121",
+              "20121",
+              "20124"
+            ]
+          },
+          "paese": {
+            "distinct": 4,
+            "sample": [
+              "Francia",
+              "Germania",
+              "Italia",
+              "Svizzera"
+            ]
+          }
+        }
+      },
+      "corrieri": {
+        "row_count": 144,
+        "columns": {
+          "id": {
+            "distinct": 144,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 144
+          },
+          "denominazione": {
+            "distinct": 8,
+            "sample": [
+              "Centro Cargo Srl",
+              "EuroFreight Srl",
+              "FastLogistics SpA",
+              "Italia Trasporti SpA",
+              "Mediterranea Logistics Snc"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 138,
+            "sample": [
+              "11122233344",
+              "11122233345",
+              "11122233346",
+              "11122233347",
+              "11122233348"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "0117778899",
+              "024445566",
+              "029990011",
+              "0558889900",
+              "061112233"
+            ]
+          },
+          "email": {
+            "distinct": 5,
+            "sample": [
+              "dispatch@fastlog.it",
+              "info@centrocargo.it",
+              "info@eurofreight.it",
+              "logistic@ittrasporti.it",
+              "spedizioni@sudexpress.it"
+            ]
+          },
+          "zona_copertura": {
+            "distinct": 7,
+            "sample": [
+              "Centro Italia",
+              "Centro-Nord",
+              "Estero",
+              "Isole",
+              "Nazionale"
+            ]
+          },
+          "attivo": {
+            "distinct": 2,
+            "sample": [
+              "false",
+              "true"
+            ]
+          },
+          "creato_il": {
+            "distinct": 5,
+            "sample": [
+              "2023-06-01 10:00:00",
+              "2023-07-15 09:00:00",
+              "2023-08-20 11:30:00",
+              "2023-09-10 08:45:00",
+              "2023-10-05 14:20:00"
+            ]
+          }
+        }
+      },
+      "contratti_corrieri": {
+        "row_count": 288,
+        "columns": {
+          "id": {
+            "distinct": 288,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 288
+          },
+          "corriere_id": {
+            "distinct": 122,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 144
+          },
+          "data_registrazione": {
+            "distinct": 150,
+            "sample": [
+              "2023-11-14",
+              "2023-11-18",
+              "2023-11-19",
+              "2023-11-20",
+              "2023-11-26"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 143,
+            "sample": [
+              "2025-02-15",
+              "2025-05-12",
+              "2025-11-07",
+              "2025-11-08",
+              "2025-11-10"
+            ]
+          },
+          "tipo_tariffa": {
+            "distinct": 3,
+            "sample": [
+              "chilometrica",
+              "fissa",
+              "misura"
+            ]
+          },
+          "importo_canone": {
+            "distinct": 282,
+            "sample": [
+              "10074.91",
+              "10122.96",
+              "10174.07",
+              "10203.84",
+              "10260.82"
+            ],
+            "min": 7431.29,
+            "max": 37262.7
+          }
+        }
+      },
+      "flotta_veicoli": {
+        "row_count": 399,
+        "columns": {
+          "id": {
+            "distinct": 399,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 399
+          },
+          "targa": {
+            "distinct": 399,
+            "sample": [
+              "AB123CD",
+              "AB123CD1",
+              "AB123CD10",
+              "AB123CD11",
+              "AB123CD12"
+            ]
+          },
+          "modello": {
+            "distinct": 7,
+            "sample": [
+              "Fiat Ducato",
+              "Ford Transit",
+              "Iveco Daily",
+              "Mercedes Sprinter",
+              "Peugeot Boxer"
+            ]
+          },
+          "capacita_kg": {
+            "distinct": 9,
+            "sample": [
+              "1200",
+              "1500",
+              "1600",
+              "1800",
+              "2000"
+            ],
+            "min": 1500,
+            "max": 2200
+          },
+          "corriere_id": {
+            "distinct": 133,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 144
+          },
+          "data_registrazione": {
+            "distinct": 202,
+            "sample": [
+              "2023-03-18",
+              "2023-03-22",
+              "2023-03-25",
+              "2023-03-31",
+              "2023-04-01"
+            ]
+          },
+          "importo_valore": {
+            "distinct": 371,
+            "sample": [
+              "24000.0",
+              "24033.08",
+              "24057.02",
+              "24334.73",
+              "24777.32"
+            ],
+            "min": 24000.0,
+            "max": 54516.36
+          }
+        }
+      },
+      "autisti": {
+        "row_count": 346,
+        "columns": {
+          "id": {
+            "distinct": 346,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 346
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Antonio",
+              "Francesco",
+              "Giuseppe"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Arancio",
+              "Bianchi",
+              "Blu",
+              "Celeste",
+              "Gialli"
+            ]
+          },
+          "numero_patente": {
+            "distinct": 346,
+            "sample": [
+              "BNCLGU75B41F205B",
+              "BNCLGU75B41F205C",
+              "BNCLGU75B41F205D",
+              "BNCLGU75B41F205E",
+              "BNCLGU75B41F205F"
+            ]
+          },
+          "corriere_id": {
+            "distinct": 128,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 144
+          },
+          "data_assunzione": {
+            "distinct": 281,
+            "sample": [
+              "2019-11-21",
+              "2019-12-10",
+              "2019-12-31",
+              "2020-01-05",
+              "2020-01-11"
+            ]
+          }
+        }
+      },
+      "assegnazioni_autisti": {
+        "row_count": 1468,
+        "columns": {
+          "id": {
+            "distinct": 1468,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1468
+          },
+          "autista_id": {
+            "distinct": 342,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 346
+          },
+          "veicolo_id": {
+            "distinct": 385,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 399
+          },
+          "data_registrazione": {
+            "distinct": 357,
+            "sample": [
+              "2023-12-04",
+              "2023-12-06",
+              "2023-12-07",
+              "2023-12-08",
+              "2023-12-09"
+            ]
+          },
+          "turno": {
+            "distinct": 3,
+            "sample": [
+              "mattina",
+              "notte",
+              "pomeriggio"
+            ]
+          },
+          "importo_indennita": {
+            "distinct": 10,
+            "sample": [
+              "20.00",
+              "25.0",
+              "25.00",
+              "30.0",
+              "30.00"
+            ],
+            "min": 25.0,
+            "max": 45.0
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 1514,
+        "columns": {
+          "id": {
+            "distinct": 1514,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1514
+          },
+          "cliente_id": {
+            "distinct": 433,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 445
+          },
+          "destinazione_id": {
+            "distinct": 870,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1222
+          },
+          "magazzino_partenza_id": {
+            "distinct": 38,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 38
+          },
+          "corriere_id": {
+            "distinct": 144,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 144
+          },
+          "peso_kg": {
+            "distinct": 1443,
+            "sample": [
+              "100.24",
+              "100.46",
+              "100.67",
+              "100.94",
+              "1001.67"
+            ],
+            "min": 13.5,
+            "max": 1500.0
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "consegnato",
+              "in_attesa",
+              "in_preparazione",
+              "in_transito"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 187,
+            "sample": [
+              "2024-03-07",
+              "2024-03-08",
+              "2024-03-10",
+              "2024-03-11",
+              "2024-03-12"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 18,
+            "sample": [
+              "2024-06-07",
+              "2024-06-09",
+              "2024-06-10",
+              "2024-06-11",
+              "2024-06-12"
+            ]
+          },
+          "costo_trasporto": {
+            "distinct": 1418,
+            "sample": [
+              "100.0",
+              "100.02",
+              "100.06",
+              "100.33",
+              "100.59"
+            ],
+            "min": 20.0,
+            "max": 550.0
+          }
+        }
+      },
+      "colli": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "spedizione_id": {
+            "distinct": 1514,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1514
+          },
+          "numero_progressivo": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "peso_kg": {
+            "distinct": 2665,
+            "sample": [
+              "10.0",
+              "10.02",
+              "10.09",
+              "10.11",
+              "10.13"
+            ],
+            "min": 5.0,
+            "max": 400.0
+          },
+          "fragile": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          },
+          "descrizione_contenuto": {
+            "distinct": 10,
+            "sample": [
+              "Abbigliamento",
+              "Alimentari",
+              "Componenti elettronici",
+              "Documenti cartacei",
+              "Libri"
+            ]
+          }
+        }
+      },
+      "resi": {
+        "row_count": 485,
+        "columns": {
+          "id": {
+            "distinct": 485,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 485
+          },
+          "spedizione_id": {
+            "distinct": 424,
+            "sample": [
+              "10",
+              "100",
+              "1001",
+              "1002",
+              "1005"
+            ],
+            "min": 10,
+            "max": 1514
+          },
+          "motivo_reso": {
+            "distinct": 6,
+            "sample": [
+              "Articolo sbagliato",
+              "Consegna in ritardo",
+              "Danneggiato durante il trasporto",
+              "Difetto di fabbrica",
+              "Prodotto non conforme"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 64,
+            "sample": [
+              "2024-05-13",
+              "2024-05-14",
+              "2024-05-15",
+              "2024-05-16",
+              "2024-05-17"
+            ]
+          },
+          "importo_rimborso": {
+            "distinct": 446,
+            "sample": [
+              "100.18",
+              "100.19",
+              "101.64",
+              "102.13",
+              "102.24"
+            ],
+            "min": 42.5,
+            "max": 220.0
+          },
+          "stato_reso": {
+            "distinct": 3,
+            "sample": [
+              "aperto",
+              "chiuso",
+              "in_valutazione"
+            ]
+          }
+        }
+      },
+      "fatture": {
+        "row_count": 822,
+        "columns": {
+          "id": {
+            "distinct": 822,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 822
+          },
+          "cliente_id": {
+            "distinct": 381,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 445
+          },
+          "numero_fattura": {
+            "distinct": 822,
+            "sample": [
+              "FAT-2024-0001",
+              "FAT-2024-00011",
+              "FAT-2024-000110",
+              "FAT-2024-0001100",
+              "FAT-2024-0001101"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 183,
+            "sample": [
+              "2024-03-17",
+              "2024-03-18",
+              "2024-03-19",
+              "2024-03-20",
+              "2024-03-21"
+            ]
+          },
+          "importo_totale": {
+            "distinct": 792,
+            "sample": [
+              "1007.98",
+              "1011.37",
+              "1015.0",
+              "1020.49",
+              "10214.65"
+            ],
+            "min": 356.0,
+            "max": 14000.0
+          },
+          "pagata": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Rossi Logistica Srl",
+          "codice_fiscale": "RSSMRA80A01H501U",
+          "partita_iva": "12345678901",
+          "email": "trasporti@marrone.it",
+          "telefono": "067778899",
+          "creato_il": "2024-01-15 09:30:00"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Celeste Express Srl",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "partita_iva": "12345678902",
+          "email": "express@celeste.it",
+          "telefono": "0552223344",
+          "creato_il": "2024-01-15 09:30:00"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Gialli Cargo Srl",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "partita_iva": "12345678903",
+          "email": "express@celeste.it",
+          "telefono": "0114445566",
+          "creato_il": "2024-01-15 09:30:00"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Rossi Logistica Srl",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "partita_iva": "12345678904",
+          "email": "spedizioni@arancio.it",
+          "telefono": "0553334455",
+          "creato_il": "2024-01-15 09:30:00"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Rossi Logistica Srl",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "partita_iva": "12345678905",
+          "email": "logistics@blufreight.it",
+          "telefono": "0817778899",
+          "creato_il": "2024-01-15 09:30:00"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Bianchi Trasporti SpA",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "partita_iva": "12345678906",
+          "email": "amministrazione@bianchitrasporti.it",
+          "telefono": "0815556677",
+          "creato_il": "2024-01-15 09:30:00"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Blu Freight Srl",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "partita_iva": "12345678907",
+          "email": null,
+          "telefono": "028889900",
+          "creato_il": "2024-01-15 09:30:00"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Verdi Express Snc",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "partita_iva": "12345678908",
+          "email": "info@neridistribuzione.it",
+          "telefono": "067778899",
+          "creato_il": "2024-01-15 09:30:00"
+        }
+      ],
+      "magazzini": [
+        {
+          "id": 1,
+          "codice_magazzino": "MI-01",
+          "indirizzo": "Via dell'Industria 50",
+          "citta": "Milano",
+          "capacita_pallet": "4000"
+        },
+        {
+          "id": 2,
+          "codice_magazzino": "MI-011",
+          "indirizzo": "Via dell'Industria 50",
+          "citta": "Napoli",
+          "capacita_pallet": "7000"
+        },
+        {
+          "id": 3,
+          "codice_magazzino": "MI-012",
+          "indirizzo": "Via dell'Industria 50",
+          "citta": "Napoli",
+          "capacita_pallet": "5000"
+        },
+        {
+          "id": 4,
+          "codice_magazzino": "MI-013",
+          "indirizzo": "Via dell'Industria 50",
+          "citta": "Roma",
+          "capacita_pallet": "6000"
+        },
+        {
+          "id": 5,
+          "codice_magazzino": "MI-014",
+          "indirizzo": "Via dell'Industria 50",
+          "citta": "Torino",
+          "capacita_pallet": "3000"
+        },
+        {
+          "id": 6,
+          "codice_magazzino": "MI-015",
+          "indirizzo": "Via dell'Industria 50",
+          "citta": "Bologna",
+          "capacita_pallet": "9000"
+        },
+        {
+          "id": 7,
+          "codice_magazzino": "MI-016",
+          "indirizzo": "Via dell'Industria 50",
+          "citta": "Roma",
+          "capacita_pallet": "10000"
+        },
+        {
+          "id": 8,
+          "codice_magazzino": "MI-017",
+          "indirizzo": "Via dell'Industria 50",
+          "citta": "Bologna",
+          "capacita_pallet": "7000"
+        }
+      ],
+      "destinazioni": [
+        {
+          "id": 1,
+          "cliente_id": 57,
+          "indirizzo": "Via Nazionale 200",
+          "citta": "Bologna",
+          "provincia": "NA",
+          "cap": "50121",
+          "paese": "Italia"
+        },
+        {
+          "id": 2,
+          "cliente_id": 173,
+          "indirizzo": "Via Roma 100",
+          "citta": "Milano",
+          "provincia": "MI",
+          "cap": "20121",
+          "paese": "Italia"
+        },
+        {
+          "id": 3,
+          "cliente_id": 251,
+          "indirizzo": "Corso Buenos Aires 45",
+          "citta": "Roma",
+          "provincia": "MI",
+          "cap": null,
+          "paese": "Germania"
+        },
+        {
+          "id": 4,
+          "cliente_id": 220,
+          "indirizzo": "Via dei Mille 12",
+          "citta": "Firenze",
+          "provincia": "GE",
+          "cap": "50121",
+          "paese": "Svizzera"
+        },
+        {
+          "id": 5,
+          "cliente_id": 25,
+          "indirizzo": "Corso Buenos Aires 45",
+          "citta": "Roma",
+          "provincia": "VR",
+          "cap": "16121",
+          "paese": "Francia"
+        },
+        {
+          "id": 6,
+          "cliente_id": 304,
+          "indirizzo": "Via Garibaldi 55",
+          "citta": "Roma",
+          "provincia": "FI",
+          "cap": "80132",
+          "paese": "Germania"
+        },
+        {
+          "id": 7,
+          "cliente_id": 152,
+          "indirizzo": "Corso Vittorio Emanuele 30",
+          "citta": "Napoli",
+          "provincia": "VR",
+          "cap": "40121",
+          "paese": "Svizzera"
+        },
+        {
+          "id": 8,
+          "cliente_id": 79,
+          "indirizzo": "Via Garibaldi 55",
+          "citta": "Bologna",
+          "provincia": "FI",
+          "cap": "00184",
+          "paese": "Italia"
+        }
+      ],
+      "corrieri": [
+        {
+          "id": 1,
+          "denominazione": "Peninsular Express SpA",
+          "partita_iva": "11122233344",
+          "telefono": "0816667788",
+          "email": "dispatch@fastlog.it",
+          "zona_copertura": "Estero",
+          "attivo": "false",
+          "creato_il": "2023-06-01 10:00:00"
+        },
+        {
+          "id": 2,
+          "denominazione": "Centro Cargo Srl",
+          "partita_iva": "11122233345",
+          "telefono": "0117778899",
+          "email": null,
+          "zona_copertura": "Centro Italia",
+          "attivo": "true",
+          "creato_il": "2023-06-01 10:00:00"
+        },
+        {
+          "id": 3,
+          "denominazione": "Centro Cargo Srl",
+          "partita_iva": "11122233346",
+          "telefono": null,
+          "email": "dispatch@fastlog.it",
+          "zona_copertura": "Sud Italia",
+          "attivo": "true",
+          "creato_il": "2023-06-01 10:00:00"
+        },
+        {
+          "id": 4,
+          "denominazione": "Italia Trasporti SpA",
+          "partita_iva": "11122233347",
+          "telefono": "0558889900",
+          "email": "dispatch@fastlog.it",
+          "zona_copertura": "Estero",
+          "attivo": "true",
+          "creato_il": "2023-06-01 10:00:00"
+        },
+        {
+          "id": 5,
+          "denominazione": "EuroFreight Srl",
+          "partita_iva": "11122233348",
+          "telefono": "061112233",
+          "email": "dispatch@fastlog.it",
+          "zona_copertura": "Nord Italia",
+          "attivo": "true",
+          "creato_il": "2023-06-01 10:00:00"
+        },
+        {
+          "id": 6,
+          "denominazione": "Nord Cargo Srl",
+          "partita_iva": "11122233349",
+          "telefono": "0816667788",
+          "email": "dispatch@fastlog.it",
+          "zona_copertura": "Estero",
+          "attivo": "true",
+          "creato_il": "2023-06-01 10:00:00"
+        },
+        {
+          "id": 7,
+          "denominazione": "Peninsular Express SpA",
+          "partita_iva": "11122233350",
+          "telefono": "0117778899",
+          "email": null,
+          "zona_copertura": "Centro Italia",
+          "attivo": "true",
+          "creato_il": "2023-06-01 10:00:00"
+        },
+        {
+          "id": 8,
+          "denominazione": "Mediterranea Logistics Snc",
+          "partita_iva": "11122233351",
+          "telefono": "0117778899",
+          "email": "dispatch@fastlog.it",
+          "zona_copertura": "Centro-Nord",
+          "attivo": "false",
+          "creato_il": "2023-06-01 10:00:00"
+        }
+      ],
+      "contratti_corrieri": [
+        {
+          "id": 1,
+          "corriere_id": 83,
+          "data_registrazione": "2024-02-06",
+          "data_scadenza": "2026-01-18",
+          "tipo_tariffa": "fissa",
+          "importo_canone": 11809.54
+        },
+        {
+          "id": 2,
+          "corriere_id": 38,
+          "data_registrazione": "2023-12-04",
+          "data_scadenza": "2026-02-03",
+          "tipo_tariffa": "chilometrica",
+          "importo_canone": 11400.31
+        },
+        {
+          "id": 3,
+          "corriere_id": 24,
+          "data_registrazione": "2024-02-29",
+          "data_scadenza": "2025-12-10",
+          "tipo_tariffa": "fissa",
+          "importo_canone": 16109.21
+        },
+        {
+          "id": 4,
+          "corriere_id": 51,
+          "data_registrazione": "2023-12-27",
+          "data_scadenza": "2026-01-19",
+          "tipo_tariffa": "chilometrica",
+          "importo_canone": 14537.43
+        },
+        {
+          "id": 5,
+          "corriere_id": 15,
+          "data_registrazione": "2024-01-20",
+          "data_scadenza": "2025-12-05",
+          "tipo_tariffa": "chilometrica",
+          "importo_canone": 17800.44
+        },
+        {
+          "id": 6,
+          "corriere_id": 80,
+          "data_registrazione": "2023-12-15",
+          "data_scadenza": "2026-01-28",
+          "tipo_tariffa": "fissa",
+          "importo_canone": 9801.22
+        },
+        {
+          "id": 7,
+          "corriere_id": 85,
+          "data_registrazione": "2023-12-31",
+          "data_scadenza": "2025-12-05",
+          "tipo_tariffa": "chilometrica",
+          "importo_canone": 17085.25
+        },
+        {
+          "id": 8,
+          "corriere_id": 59,
+          "data_registrazione": "2024-01-09",
+          "data_scadenza": "2026-01-20",
+          "tipo_tariffa": "misura",
+          "importo_canone": 16580.57
+        }
+      ],
+      "flotta_veicoli": [
+        {
+          "id": 1,
+          "targa": "AB123CD",
+          "modello": "Peugeot Boxer",
+          "capacita_kg": "1200",
+          "corriere_id": 22,
+          "data_registrazione": "2023-07-19",
+          "importo_valore": 40979.93
+        },
+        {
+          "id": 2,
+          "targa": "AB123CD1",
+          "modello": "Fiat Ducato",
+          "capacita_kg": "3000",
+          "corriere_id": null,
+          "data_registrazione": "2023-03-31",
+          "importo_valore": 35293.41
+        },
+        {
+          "id": 3,
+          "targa": "AB123CD2",
+          "modello": "Renault Master",
+          "capacita_kg": "3500",
+          "corriere_id": 66,
+          "data_registrazione": "2023-04-21",
+          "importo_valore": 37724.84
+        },
+        {
+          "id": 4,
+          "targa": "AB123CD3",
+          "modello": "Mercedes Sprinter",
+          "capacita_kg": "1800",
+          "corriere_id": 3,
+          "data_registrazione": "2023-04-04",
+          "importo_valore": 29626.51
+        },
+        {
+          "id": 5,
+          "targa": "AB123CD4",
+          "modello": "Ford Transit",
+          "capacita_kg": "3500",
+          "corriere_id": 82,
+          "data_registrazione": "2023-06-03",
+          "importo_valore": 38873.96
+        },
+        {
+          "id": 6,
+          "targa": "AB123CD5",
+          "modello": "Renault Master",
+          "capacita_kg": "1800",
+          "corriere_id": 91,
+          "data_registrazione": "2023-06-21",
+          "importo_valore": 32477.1
+        },
+        {
+          "id": 7,
+          "targa": "AB123CD6",
+          "modello": "VW Crafter",
+          "capacita_kg": "2000",
+          "corriere_id": 131,
+          "data_registrazione": "2023-04-07",
+          "importo_valore": 38293.47
+        },
+        {
+          "id": 8,
+          "targa": "AB123CD7",
+          "modello": "Iveco Daily",
+          "capacita_kg": "1800",
+          "corriere_id": 34,
+          "data_registrazione": "2023-05-24",
+          "importo_valore": 41729.08
+        }
+      ],
+      "autisti": [
+        {
+          "id": 1,
+          "nome": "Giuseppe",
+          "cognome": "Verdi",
+          "numero_patente": "MRSSMR80A01H501B",
+          "corriere_id": 99,
+          "data_assunzione": "2021-10-28"
+        },
+        {
+          "id": 2,
+          "nome": "Marco",
+          "cognome": "Rossi",
+          "numero_patente": "MRSSMR80A01H501C",
+          "corriere_id": 64,
+          "data_assunzione": "2022-03-01"
+        },
+        {
+          "id": 3,
+          "nome": "Francesco",
+          "cognome": "Celeste",
+          "numero_patente": "MRSSMR80A01H501D",
+          "corriere_id": 11,
+          "data_assunzione": "2021-09-13"
+        },
+        {
+          "id": 4,
+          "nome": "Paolo",
+          "cognome": "Verdi",
+          "numero_patente": "MRSSMR80A01H501E",
+          "corriere_id": 27,
+          "data_assunzione": null
+        },
+        {
+          "id": 5,
+          "nome": "Alessandro",
+          "cognome": "Arancio",
+          "numero_patente": "MRSSMR80A01H501F",
+          "corriere_id": 126,
+          "data_assunzione": "2022-02-01"
+        },
+        {
+          "id": 6,
+          "nome": "Alessandro",
+          "cognome": "Celeste",
+          "numero_patente": "MRSSMR80A01H501G",
+          "corriere_id": 116,
+          "data_assunzione": "2022-07-17"
+        },
+        {
+          "id": 7,
+          "nome": "Marco",
+          "cognome": "Rossi",
+          "numero_patente": "MRSSMR80A01H501H",
+          "corriere_id": 22,
+          "data_assunzione": "2022-07-09"
+        },
+        {
+          "id": 8,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "numero_patente": "MRSSMR80A01H501I",
+          "corriere_id": 45,
+          "data_assunzione": "2021-12-22"
+        }
+      ],
+      "assegnazioni_autisti": [
+        {
+          "id": 1,
+          "autista_id": 58,
+          "veicolo_id": 221,
+          "data_registrazione": "2024-08-29",
+          "turno": "mattina",
+          "importo_indennita": "40.00"
+        },
+        {
+          "id": 2,
+          "autista_id": 153,
+          "veicolo_id": 115,
+          "data_registrazione": "2024-04-29",
+          "turno": "mattina",
+          "importo_indennita": "40.00"
+        },
+        {
+          "id": 3,
+          "autista_id": 250,
+          "veicolo_id": 233,
+          "data_registrazione": "2024-02-17",
+          "turno": "mattina",
+          "importo_indennita": "30.00"
+        },
+        {
+          "id": 4,
+          "autista_id": 246,
+          "veicolo_id": 395,
+          "data_registrazione": "2024-07-31",
+          "turno": "pomeriggio",
+          "importo_indennita": "30.00"
+        },
+        {
+          "id": 5,
+          "autista_id": 89,
+          "veicolo_id": 69,
+          "data_registrazione": "2024-04-19",
+          "turno": "pomeriggio",
+          "importo_indennita": "45.00"
+        },
+        {
+          "id": 6,
+          "autista_id": 330,
+          "veicolo_id": 175,
+          "data_registrazione": "2024-09-14",
+          "turno": "pomeriggio",
+          "importo_indennita": "20.00"
+        },
+        {
+          "id": 7,
+          "autista_id": 212,
+          "veicolo_id": 145,
+          "data_registrazione": "2024-07-31",
+          "turno": "mattina",
+          "importo_indennita": "40.00"
+        },
+        {
+          "id": 8,
+          "autista_id": 299,
+          "veicolo_id": 262,
+          "data_registrazione": "2024-07-28",
+          "turno": "mattina",
+          "importo_indennita": null
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 1,
+          "cliente_id": 266,
+          "destinazione_id": 739,
+          "magazzino_partenza_id": 8,
+          "corriere_id": 14,
+          "peso_kg": 242.15,
+          "stato": "consegnato",
+          "data_registrazione": "2024-06-24",
+          "data_consegna_prevista": "2024-06-15",
+          "costo_trasporto": 128.72
+        },
+        {
+          "id": 2,
+          "cliente_id": 87,
+          "destinazione_id": 1053,
+          "magazzino_partenza_id": 33,
+          "corriere_id": 21,
+          "peso_kg": 353.96,
+          "stato": "consegnato",
+          "data_registrazione": "2024-07-09",
+          "data_consegna_prevista": "2024-06-15",
+          "costo_trasporto": 49.7
+        },
+        {
+          "id": 3,
+          "cliente_id": 183,
+          "destinazione_id": 173,
+          "magazzino_partenza_id": 36,
+          "corriere_id": 33,
+          "peso_kg": 241.03,
+          "stato": "in_transito",
+          "data_registrazione": "2024-06-27",
+          "data_consegna_prevista": "2024-06-17",
+          "costo_trasporto": 143.03
+        },
+        {
+          "id": 4,
+          "cliente_id": 40,
+          "destinazione_id": 822,
+          "magazzino_partenza_id": 26,
+          "corriere_id": 14,
+          "peso_kg": 134.38,
+          "stato": "in_preparazione",
+          "data_registrazione": "2024-07-05",
+          "data_consegna_prevista": "2024-06-17",
+          "costo_trasporto": 188.5
+        },
+        {
+          "id": 5,
+          "cliente_id": 45,
+          "destinazione_id": 1049,
+          "magazzino_partenza_id": 30,
+          "corriere_id": 123,
+          "peso_kg": 444.34,
+          "stato": "consegnato",
+          "data_registrazione": "2024-04-17",
+          "data_consegna_prevista": null,
+          "costo_trasporto": 45.2
+        },
+        {
+          "id": 6,
+          "cliente_id": 264,
+          "destinazione_id": 772,
+          "magazzino_partenza_id": 5,
+          "corriere_id": 69,
+          "peso_kg": 315.64,
+          "stato": "consegnato",
+          "data_registrazione": "2024-06-10",
+          "data_consegna_prevista": "2024-06-15",
+          "costo_trasporto": 162.03
+        },
+        {
+          "id": 7,
+          "cliente_id": 252,
+          "destinazione_id": 1076,
+          "magazzino_partenza_id": 22,
+          "corriere_id": 96,
+          "peso_kg": 435.97,
+          "stato": "consegnato",
+          "data_registrazione": "2024-03-31",
+          "data_consegna_prevista": "2024-06-18",
+          "costo_trasporto": 142.69
+        },
+        {
+          "id": 8,
+          "cliente_id": 8,
+          "destinazione_id": 387,
+          "magazzino_partenza_id": 11,
+          "corriere_id": 22,
+          "peso_kg": 150.5,
+          "stato": "consegnato",
+          "data_registrazione": "2024-06-10",
+          "data_consegna_prevista": "2024-06-13",
+          "costo_trasporto": 85.0
+        }
+      ],
+      "colli": [
+        {
+          "id": 1,
+          "spedizione_id": 1238,
+          "numero_progressivo": 1,
+          "peso_kg": 89.43,
+          "fragile": "true",
+          "descrizione_contenuto": "Alimentari"
+        },
+        {
+          "id": 2,
+          "spedizione_id": 967,
+          "numero_progressivo": 2,
+          "peso_kg": 16.82,
+          "fragile": "false",
+          "descrizione_contenuto": "Prodotti chimici"
+        },
+        {
+          "id": 3,
+          "spedizione_id": 588,
+          "numero_progressivo": 3,
+          "peso_kg": 65.83,
+          "fragile": "true",
+          "descrizione_contenuto": "Parti meccaniche"
+        },
+        {
+          "id": 4,
+          "spedizione_id": 166,
+          "numero_progressivo": 4,
+          "peso_kg": 79.89,
+          "fragile": "true",
+          "descrizione_contenuto": "Libri"
+        },
+        {
+          "id": 5,
+          "spedizione_id": 506,
+          "numero_progressivo": 5,
+          "peso_kg": 37.67,
+          "fragile": "false",
+          "descrizione_contenuto": "Abbigliamento"
+        },
+        {
+          "id": 6,
+          "spedizione_id": 359,
+          "numero_progressivo": 6,
+          "peso_kg": 46.71,
+          "fragile": "false",
+          "descrizione_contenuto": "Componenti elettronici"
+        },
+        {
+          "id": 7,
+          "spedizione_id": 1041,
+          "numero_progressivo": 7,
+          "peso_kg": 39.15,
+          "fragile": "false",
+          "descrizione_contenuto": "Abbigliamento"
+        },
+        {
+          "id": 8,
+          "spedizione_id": 174,
+          "numero_progressivo": 8,
+          "peso_kg": 82.6,
+          "fragile": "true",
+          "descrizione_contenuto": "Alimentari"
+        }
+      ],
+      "resi": [
+        {
+          "id": 1,
+          "spedizione_id": 690,
+          "motivo_reso": "Articolo sbagliato",
+          "data_registrazione": "2024-05-24",
+          "importo_rimborso": 69.1,
+          "stato_reso": "chiuso"
+        },
+        {
+          "id": 2,
+          "spedizione_id": 1449,
+          "motivo_reso": "Difetto di fabbrica",
+          "data_registrazione": "2024-06-21",
+          "importo_rimborso": 72.34,
+          "stato_reso": "in_valutazione"
+        },
+        {
+          "id": 3,
+          "spedizione_id": 505,
+          "motivo_reso": "Danneggiato durante il trasporto",
+          "data_registrazione": "2024-06-03",
+          "importo_rimborso": 71.63,
+          "stato_reso": "aperto"
+        },
+        {
+          "id": 4,
+          "spedizione_id": 1408,
+          "motivo_reso": "Danneggiato durante il trasporto",
+          "data_registrazione": "2024-06-11",
+          "importo_rimborso": 73.17,
+          "stato_reso": "chiuso"
+        },
+        {
+          "id": 5,
+          "spedizione_id": 524,
+          "motivo_reso": "Danneggiato durante il trasporto",
+          "data_registrazione": "2024-06-08",
+          "importo_rimborso": 54.8,
+          "stato_reso": "aperto"
+        },
+        {
+          "id": 6,
+          "spedizione_id": 823,
+          "motivo_reso": "Rettifica ordine",
+          "data_registrazione": "2024-05-18",
+          "importo_rimborso": 74.29,
+          "stato_reso": "aperto"
+        },
+        {
+          "id": 7,
+          "spedizione_id": 1202,
+          "motivo_reso": "Consegna in ritardo",
+          "data_registrazione": "2024-06-07",
+          "importo_rimborso": 67.25,
+          "stato_reso": "aperto"
+        },
+        {
+          "id": 8,
+          "spedizione_id": 293,
+          "motivo_reso": "Prodotto non conforme",
+          "data_registrazione": "2024-05-19",
+          "importo_rimborso": 75.18,
+          "stato_reso": "aperto"
+        }
+      ],
+      "fatture": [
+        {
+          "id": 1,
+          "cliente_id": 24,
+          "numero_fattura": "FAT-2024-0001",
+          "data_registrazione": "2024-03-23",
+          "importo_totale": 2169.35,
+          "pagata": "true"
+        },
+        {
+          "id": 2,
+          "cliente_id": 374,
+          "numero_fattura": "FAT-2024-00011",
+          "data_registrazione": "2024-05-05",
+          "importo_totale": 504.64,
+          "pagata": "true"
+        },
+        {
+          "id": 3,
+          "cliente_id": 58,
+          "numero_fattura": "FAT-2024-00012",
+          "data_registrazione": "2024-07-21",
+          "importo_totale": 848.88,
+          "pagata": "true"
+        },
+        {
+          "id": 4,
+          "cliente_id": 135,
+          "numero_fattura": "FAT-2024-00013",
+          "data_registrazione": "2024-07-07",
+          "importo_totale": 2696.13,
+          "pagata": "true"
+        },
+        {
+          "id": 5,
+          "cliente_id": 190,
+          "numero_fattura": "FAT-2024-00014",
+          "data_registrazione": "2024-06-15",
+          "importo_totale": 2995.45,
+          "pagata": "true"
+        },
+        {
+          "id": 6,
+          "cliente_id": 347,
+          "numero_fattura": "FAT-2024-00015",
+          "data_registrazione": "2024-06-15",
+          "importo_totale": 1250.0,
+          "pagata": true
+        },
+        {
+          "id": 7,
+          "cliente_id": 140,
+          "numero_fattura": "FAT-2024-00016",
+          "data_registrazione": "2024-09-11",
+          "importo_totale": 2870.04,
+          "pagata": "false"
+        },
+        {
+          "id": 8,
+          "cliente_id": 254,
+          "numero_fattura": "FAT-2024-00017",
+          "data_registrazione": "2024-05-13",
+          "importo_totale": 1323.75,
+          "pagata": "true"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "join",
+    "left_outer_join"
+  ],
+  "query": "SELECT d.paese AS paese_destinazione, d.citta AS citta_destinazione, COUNT(s.id) AS numero_spedizioni_consegnate, ROUND(AVG(s.peso_kg)::numeric, 2) AS peso_medio_spedizione_kg, ROUND(SUM(s.costo_trasporto)::numeric, 2) AS costo_totale_trasporti, COUNT(r.id) AS numero_resi_collegati FROM spedizioni s JOIN destinazioni d ON s.destinazione_id = d.id LEFT JOIN resi r ON r.spedizione_id = s.id WHERE s.stato = 'consegnato' AND s.data_registrazione BETWEEN '2024-01-01' AND '2024-12-31' GROUP BY d.paese, d.citta ORDER BY costo_totale_trasporti DESC;"
+}

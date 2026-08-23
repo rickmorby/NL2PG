@@ -1,0 +1,429 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "exists"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fornitori",
+        "obsolete_value": "anagrafica_partner",
+        "description": "La tabella padre fornitori viene denominata anagrafica_partner nella prosa aziendale; l'utente deve riconoscere che le richieste su 'anagrafica_partner' si riferiscono alla tabella fornitori."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "scorta_minima",
+        "obsolete_value": "stock di sicurezza",
+        "description": "La colonna scorta_minima della tabella articoli viene indicata con il gergo ERP/logistico 'stock di sicurezza'; le query che menzionano tale termine devono risolvere la colonna scorta_minima."
+      }
+    ],
+    "spec_hash": "0ad98d9b4bb39e17"
+  },
+  "schema_ddl": "CREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    codice_fornitore TEXT NOT NULL UNIQUE,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    citta TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE articoli (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    unita_misura TEXT NOT NULL DEFAULT 'PZ',\n    prezzo_listino NUMERIC(10,2) NOT NULL CHECK (prezzo_listino >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0),\n    fornitore_preferenziale_id INT REFERENCES fornitori(id)\n);\n\nCREATE TABLE ordini_acquisto (\n    id SERIAL PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    data_ordine DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato_ordine TEXT NOT NULL DEFAULT 'aperto' CHECK (stato_ordine IN ('aperto', 'confermato', 'evaso', 'annullato')),\n    fornitore_id INT NOT NULL REFERENCES fornitori(id)\n);\n\nCREATE TABLE righe_ordine_acquisto (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini_acquisto(id),\n    articolo_id INT NOT NULL REFERENCES articoli(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario_riga NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario_riga >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "fornitori",
+        "nature": "dimension",
+        "min_rows": 80,
+        "max_rows": 120,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_fornitore": "FORN-001",
+            "ragione_sociale": "Acciaierie Nord S.p.A.",
+            "partita_iva": "IT01234567891",
+            "email": "ordini@acciaierienord.it",
+            "telefono": "+39 02 1234567",
+            "citta": "Brescia",
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "codice_fornitore": "FORN-002",
+            "ragione_sociale": "Plastica Sud S.r.l.",
+            "partita_iva": "IT09876543210",
+            "email": "info@plasticasud.it",
+            "telefono": "+39 081 7654321",
+            "citta": "Napoli",
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "codice_fornitore": "FORN-003",
+            "ragione_sociale": "Elettronica Toscana S.r.l.",
+            "partita_iva": "IT05678912340",
+            "email": "vendite@eltosca.it",
+            "telefono": "+39 055 9988776",
+            "citta": "Firenze",
+            "attivo": true
+          },
+          {
+            "id": 4,
+            "codice_fornitore": "FORN-004",
+            "ragione_sociale": "Cartotecnica Veneta S.p.A.",
+            "partita_iva": "IT03456789123",
+            "email": "acquisti@cartoveneta.it",
+            "telefono": "+39 041 5566778",
+            "citta": "Padova",
+            "attivo": false
+          },
+          {
+            "id": 5,
+            "codice_fornitore": "FORN-005",
+            "ragione_sociale": "Chimica Lombarda S.r.l.",
+            "partita_iva": "IT07654321987",
+            "email": "sales@chimicalombarda.it",
+            "telefono": "+39 02 3344556",
+            "citta": "Milano",
+            "attivo": true
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Acciaierie Nord S.p.A.",
+              "Plastica Sud S.r.l.",
+              "Elettronica Toscana S.r.l.",
+              "Cartotecnica Veneta S.p.A.",
+              "Chimica Lombarda S.r.l.",
+              "Metalmeccanica Alfa S.r.l.",
+              "Tessile Emilia S.p.A.",
+              "Imballaggi Adriatico S.r.l."
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Brescia",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Padova",
+              "Bologna",
+              "Verona",
+              "Genova"
+            ]
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "articoli",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "codice_articolo": "ART-1001",
+            "descrizione": "Vite esagonale M8 x 40 zincata",
+            "unita_misura": "PZ",
+            "prezzo_listino": 0.15,
+            "scorta_minima": 5000,
+            "fornitore_preferenziale_id": 1
+          },
+          {
+            "id": 2,
+            "codice_articolo": "ART-1002",
+            "descrizione": "Lamiera acciaio DC01 spessore 2mm",
+            "unita_misura": "KG",
+            "prezzo_listino": 1.85,
+            "scorta_minima": 800,
+            "fornitore_preferenziale_id": 1
+          },
+          {
+            "id": 3,
+            "codice_articolo": "ART-1003",
+            "descrizione": "Custodia plastica ABS per elettronica",
+            "unita_misura": "PZ",
+            "prezzo_listino": 4.2,
+            "scorta_minima": 250,
+            "fornitore_preferenziale_id": 2
+          },
+          {
+            "id": 4,
+            "codice_articolo": "ART-1004",
+            "descrizione": "Condensatore elettrolitico 100uF 25V",
+            "unita_misura": "PZ",
+            "prezzo_listino": 0.62,
+            "scorta_minima": 1200,
+            "fornitore_preferenziale_id": 3
+          },
+          {
+            "id": 5,
+            "codice_articolo": "ART-1005",
+            "descrizione": "Carta patinata A4 80gr risma",
+            "unita_misura": "RSM",
+            "prezzo_listino": 3.9,
+            "scorta_minima": 150,
+            "fornitore_preferenziale_id": 4
+          },
+          {
+            "id": 6,
+            "codice_articolo": "ART-1006",
+            "descrizione": "Solvente industriale sgrassante 5L",
+            "unita_misura": "LT",
+            "prezzo_listino": 12.5,
+            "scorta_minima": 60,
+            "fornitore_preferenziale_id": 5
+          }
+        ],
+        "variations": {
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Vite esagonale M8 x 40 zincata",
+              "Lamiera acciaio DC01 spessore 2mm",
+              "Custodia plastica ABS per elettronica",
+              "Condensatore elettrolitico 100uF 25V",
+              "Carta patinata A4 80gr risma",
+              "Solvente industriale sgrassante 5L",
+              "Cavo elettrico H07V-K 2.5mmq",
+              "Guarnizione gomma NBR diam. 50mm"
+            ]
+          },
+          "unita_misura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "PZ",
+              "PZ",
+              "KG",
+              "LT",
+              "MT",
+              "RSM"
+            ]
+          },
+          "prezzo_listino": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "scorta_minima": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ordini_acquisto",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 4.0,
+        "templates": [
+          {
+            "id": 101,
+            "numero_ordine": "OA-2026-0001",
+            "data_ordine": "2026-01-12",
+            "data_consegna_prevista": "2026-02-02",
+            "stato_ordine": "evaso",
+            "fornitore_id": 1
+          },
+          {
+            "id": 102,
+            "numero_ordine": "OA-2026-0002",
+            "data_ordine": "2026-01-20",
+            "data_consegna_prevista": "2026-02-10",
+            "stato_ordine": "confermato",
+            "fornitore_id": 2
+          },
+          {
+            "id": 103,
+            "numero_ordine": "OA-2026-0003",
+            "data_ordine": "2026-02-03",
+            "data_consegna_prevista": "2026-02-24",
+            "stato_ordine": "aperto",
+            "fornitore_id": 3
+          },
+          {
+            "id": 104,
+            "numero_ordine": "OA-2026-0004",
+            "data_ordine": "2026-02-18",
+            "data_consegna_prevista": "2026-03-06",
+            "stato_ordine": "confermato",
+            "fornitore_id": 1
+          },
+          {
+            "id": 105,
+            "numero_ordine": "OA-2026-0005",
+            "data_ordine": "2026-03-05",
+            "data_consegna_prevista": "2026-03-26",
+            "stato_ordine": "annullato",
+            "fornitore_id": 4
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_consegna_prevista": {
+            "axis": "shift",
+            "delta_min": 30.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "evaso",
+              "evaso",
+              "evaso",
+              "confermato",
+              "confermato",
+              "aperto",
+              "annullato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "righe_ordine_acquisto",
+        "nature": "fact",
+        "min_rows": 800,
+        "max_rows": 1400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ordine_id": 101,
+            "articolo_id": 1,
+            "quantita": 5000,
+            "prezzo_unitario_riga": 0.14,
+            "sconto_percentuale": 5.0
+          },
+          {
+            "id": 2,
+            "ordine_id": 102,
+            "articolo_id": 3,
+            "quantita": 800,
+            "prezzo_unitario_riga": 4.05,
+            "sconto_percentuale": 0.0
+          },
+          {
+            "id": 3,
+            "ordine_id": 103,
+            "articolo_id": 4,
+            "quantita": 2500,
+            "prezzo_unitario_riga": 0.58,
+            "sconto_percentuale": 10.0
+          },
+          {
+            "id": 4,
+            "ordine_id": 104,
+            "articolo_id": 2,
+            "quantita": 1200,
+            "prezzo_unitario_riga": 1.79,
+            "sconto_percentuale": 3.5
+          },
+          {
+            "id": 5,
+            "ordine_id": 105,
+            "articolo_id": 6,
+            "quantita": 200,
+            "prezzo_unitario_riga": 12.1,
+            "sconto_percentuale": 0.0
+          },
+          {
+            "id": 6,
+            "ordine_id": 101,
+            "articolo_id": 5,
+            "quantita": 300,
+            "prezzo_unitario_riga": 3.75,
+            "sconto_percentuale": 7.5
+          }
+        ],
+        "variations": {
+          "quantita": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "prezzo_unitario_riga": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.3,
+            "pool": []
+          },
+          "sconto_percentuale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0.00",
+              "0.00",
+              "2.50",
+              "5.00",
+              "10.00",
+              "15.00"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

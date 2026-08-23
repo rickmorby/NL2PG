@@ -1,0 +1,388 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 4,
+    "hierarchy": "isa",
+    "sql_features": [
+      "anti_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sinistri",
+        "obsolete_value": "pratiche_liquidazione",
+        "description": "La tabella sinistri, che registra gli eventi dannosi collegati alle polizze tramite FK su polizze.id_polizza, viene denominata pratiche_liquidazione nella prosa aziendale. Le query anti-join (NOT EXISTS / NOT IN) per individuare le polizze prive di eventi dannosi devono quindi risolvere pratiche_liquidazione verso la tabella fisica sinistri."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "premio_annuo",
+        "obsolete_value": "quietanza di premio",
+        "description": "La colonna premio_annuo della tabella base polizze viene indicata nella documentazione con il gergo assicurativo 'quietanza di premio'. Il solver deve riconoscere che il termine tecnico del settore si riferisce alla colonna premio_annuo quando filtra o aggrega i valori delle polizze ricomposte dalla gerarchia ISA (join tra polizze e sottotipi polizze_auto/polizze_vita)."
+      }
+    ],
+    "spec_hash": "0b728b9e62a05980"
+  },
+  "schema_ddl": "CREATE TABLE polizze (\n    id_polizza SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_polizza TEXT NOT NULL DEFAULT 'attiva' CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta', 'stornata')),\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE polizze_auto (\n    id_polizza INT PRIMARY KEY REFERENCES polizze(id_polizza),\n    targa TEXT NOT NULL UNIQUE,\n    marca_veicolo TEXT NOT NULL,\n    modello_veicolo TEXT,\n    anno_immatricolazione INT NOT NULL CHECK (anno_immatricolazione BETWEEN 1950 AND 2100),\n    potenza_kw NUMERIC(6,2) CHECK (potenza_kw > 0)\n);\n\nCREATE TABLE polizze_vita (\n    id_polizza INT PRIMARY KEY REFERENCES polizze(id_polizza),\n    capitale_assicurato NUMERIC(12,2) NOT NULL CHECK (capitale_assicurato > 0),\n    eta_assicurato INT NOT NULL CHECK (eta_assicurato BETWEEN 0 AND 120),\n    beneficiario TEXT NOT NULL\n);\n\nCREATE TABLE sinistri (\n    id_sinistro SERIAL PRIMARY KEY,\n    id_polizza INT NOT NULL REFERENCES polizze(id_polizza),\n    data_accadimento DATE NOT NULL,\n    descrizione_danno TEXT,\n    importo_risarcimento NUMERIC(12,2) CHECK (importo_risarcimento >= 0),\n    stato_sinistro TEXT NOT NULL DEFAULT 'aperto' CHECK (stato_sinistro IN ('aperto', 'in_valutazione', 'liquidato', 'respinto'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "polizze",
+        "nature": "dimension",
+        "min_rows": 350,
+        "max_rows": 500,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_polizza": 1,
+            "numero_polizza": "POL-2023-000101",
+            "intestatario": "Marco Bianchi",
+            "premio_annuo": 486.5,
+            "data_emissione": "2023-05-12",
+            "data_scadenza": "2026-05-12",
+            "stato_polizza": "attiva"
+          },
+          {
+            "id_polizza": 2,
+            "numero_polizza": "POL-2022-000102",
+            "intestatario": "Laura Conti",
+            "premio_annuo": 892.3,
+            "data_emissione": "2022-11-03",
+            "data_scadenza": "2025-11-03",
+            "stato_polizza": "scaduta"
+          },
+          {
+            "id_polizza": 3,
+            "numero_polizza": "POL-2024-000103",
+            "intestatario": "Giulia Ferri",
+            "premio_annuo": 324.75,
+            "data_emissione": "2024-01-20",
+            "data_scadenza": "2027-01-20",
+            "stato_polizza": "attiva"
+          },
+          {
+            "id_polizza": 4,
+            "numero_polizza": "POL-2023-000104",
+            "intestatario": "Alessandro Moretti",
+            "premio_annuo": 1250.0,
+            "data_emissione": "2023-09-08",
+            "data_scadenza": "2026-09-08",
+            "stato_polizza": "sospesa"
+          },
+          {
+            "id_polizza": 5,
+            "numero_polizza": "POL-2021-000105",
+            "intestatario": "Chiara Gallo",
+            "premio_annuo": 275.9,
+            "data_emissione": "2021-06-25",
+            "data_scadenza": "2024-06-25",
+            "stato_polizza": "scaduta"
+          },
+          {
+            "id_polizza": 6,
+            "numero_polizza": "POL-2024-000106",
+            "intestatario": "Luca Rinaldi",
+            "premio_annuo": 618.4,
+            "data_emissione": "2024-04-14",
+            "data_scadenza": "2027-04-14",
+            "stato_polizza": "stornata"
+          }
+        ],
+        "variations": {
+          "intestatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco Bianchi",
+              "Laura Conti",
+              "Giulia Ferri",
+              "Alessandro Moretti",
+              "Chiara Gallo",
+              "Luca Rinaldi",
+              "Sara Vitale",
+              "Davide Fontana",
+              "Elena Marchetti",
+              "Paolo Lombardi"
+            ]
+          },
+          "premio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -400.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 400.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_polizza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attiva",
+              "attiva",
+              "attiva",
+              "attiva",
+              "sospesa",
+              "scaduta",
+              "stornata"
+            ]
+          }
+        }
+      },
+      {
+        "table": "polizze_auto",
+        "nature": "explicit",
+        "min_rows": 170,
+        "max_rows": 230,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_polizza": 1,
+            "targa": "AB123CD",
+            "marca_veicolo": "Fiat",
+            "modello_veicolo": "Panda",
+            "anno_immatricolazione": 2019,
+            "potenza_kw": 51.0
+          },
+          {
+            "id_polizza": 2,
+            "targa": "EF456GH",
+            "marca_veicolo": "Toyota",
+            "modello_veicolo": "Yaris",
+            "anno_immatricolazione": 2021,
+            "potenza_kw": 92.0
+          },
+          {
+            "id_polizza": 3,
+            "targa": "IL789MN",
+            "marca_veicolo": "Volkswagen",
+            "modello_veicolo": "Golf",
+            "anno_immatricolazione": 2015,
+            "potenza_kw": 110.0
+          },
+          {
+            "id_polizza": 4,
+            "targa": "OP234QR",
+            "marca_veicolo": "Renault",
+            "modello_veicolo": "Clio",
+            "anno_immatricolazione": 2022,
+            "potenza_kw": 74.0
+          }
+        ],
+        "variations": {
+          "anno_immatricolazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "2012",
+              "2015",
+              "2018",
+              "2019",
+              "2021",
+              "2023"
+            ]
+          },
+          "potenza_kw": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "polizze_vita",
+        "nature": "explicit",
+        "min_rows": 150,
+        "max_rows": 210,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_polizza": 5,
+            "capitale_assicurato": 100000.0,
+            "eta_assicurato": 34,
+            "beneficiario": "coniuge"
+          },
+          {
+            "id_polizza": 6,
+            "capitale_assicurato": 250000.0,
+            "eta_assicurato": 47,
+            "beneficiario": "Maria Rossi"
+          },
+          {
+            "id_polizza": 7,
+            "capitale_assicurato": 50000.0,
+            "eta_assicurato": 29,
+            "beneficiario": "figli"
+          },
+          {
+            "id_polizza": 8,
+            "capitale_assicurato": 150000.0,
+            "eta_assicurato": 58,
+            "beneficiario": "Elena Neri"
+          }
+        ],
+        "variations": {
+          "capitale_assicurato": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "eta_assicurato": {
+            "axis": "shift",
+            "delta_min": -10.0,
+            "delta_max": 10.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "beneficiario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "coniuge",
+              "figli",
+              "Maria Rossi",
+              "Luca Bianchi",
+              "Elena Neri",
+              "eredi designati"
+            ]
+          }
+        }
+      },
+      {
+        "table": "sinistri",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.2,
+        "templates": [
+          {
+            "id_sinistro": 1,
+            "id_polizza": 1,
+            "data_accadimento": "2024-02-10",
+            "descrizione_danno": "Danno anteriore da tamponamento",
+            "importo_risarcimento": 1850.0,
+            "stato_sinistro": "liquidato"
+          },
+          {
+            "id_sinistro": 2,
+            "id_polizza": 2,
+            "data_accadimento": "2023-07-22",
+            "descrizione_danno": "Rottura cristallo laterale",
+            "importo_risarcimento": 420.5,
+            "stato_sinistro": "liquidato"
+          },
+          {
+            "id_sinistro": 3,
+            "id_polizza": 3,
+            "data_accadimento": "2025-01-05",
+            "descrizione_danno": "Danni da grandine su carrozzeria",
+            "importo_risarcimento": 3100.0,
+            "stato_sinistro": "in_valutazione"
+          },
+          {
+            "id_sinistro": 4,
+            "id_polizza": 4,
+            "data_accadimento": "2024-11-18",
+            "descrizione_danno": "Incursione laterale in parcheggio",
+            "importo_risarcimento": 760.25,
+            "stato_sinistro": "aperto"
+          },
+          {
+            "id_sinistro": 5,
+            "id_polizza": 1,
+            "data_accadimento": "2025-03-30",
+            "descrizione_danno": "Danno al paraurti posteriore",
+            "importo_risarcimento": 1240.0,
+            "stato_sinistro": "respinto"
+          }
+        ],
+        "variations": {
+          "data_accadimento": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "descrizione_danno": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Danno anteriore da tamponamento",
+              "Rottura cristallo laterale",
+              "Danni da grandine su carrozzeria",
+              "Incursione laterale in parcheggio",
+              "Danno al paraurti posteriore",
+              "Furto accessori esterni"
+            ]
+          },
+          "importo_risarcimento": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.2,
+            "pool": []
+          },
+          "stato_sinistro": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "aperto",
+              "aperto",
+              "in_valutazione",
+              "in_valutazione",
+              "liquidato",
+              "liquidato",
+              "respinto"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

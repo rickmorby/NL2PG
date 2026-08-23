@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "filtered_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini_produzione",
+      "obsolete_value": "commesse_di_lavoro",
+      "description": "La tabella ordini_produzione viene denominata commesse_di_lavoro nella prosa aziendale; il lettore deve mappare la perifrasi al nome reale della tabella."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_ordine",
+      "obsolete_value": "fase del ciclo produttivo",
+      "description": "La colonna ENUM stato_ordine (valori mutuamente esclusivi: 'pianificato', 'in_corso', 'sospeso', 'completato', 'annullato') viene descritta con il gergo aziendale 'fase del ciclo produttivo'; le condizioni dei filtri COUNT(*) FILTER devono riferirsi ai valori ENUM dichiarati."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "dipendenti",
+      "obsolete_value": "operatori",
+      "description": "La tabella dipendenti viene indicata con il sinonimo operatori nei testi di business; join e raggruppamenti devono usare la tabella reale dipendenti."
+    }
+  ],
+  "spec_hash": "2f4519db3c860f6f"
+}

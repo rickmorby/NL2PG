@@ -1,0 +1,552 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 6,
+    "hierarchy": "temporal_versioning",
+    "sql_features": [
+      "math_funcs"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "storico_prezzi",
+        "obsolete_value": "registro_variazioni_tariffarie",
+        "description": "La tabella storico_prezzi, che contiene le versioni temporali dei prezzi dei prodotti con validita' da/a, viene denominata registro_variazioni_tariffarie nella prosa aziendale. Le query devono risolvere il nome obsoleto verso la tabella reale dello storico."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "prezzo_unitario",
+        "obsolete_value": "valore tariffario corrente",
+        "description": "La colonna prezzo_unitario della tabella storico_prezzi viene indicata nel linguaggio aziendale come 'valore tariffario corrente'. Il solver deve mappare questo gergo commerciale alla colonna numerica effettiva su cui applicare ABS(POWER(new-old,1)) e ROUND."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "versione",
+        "obsolete_value": "revisione",
+        "description": "Il termine 'revisione' nella prosa aziendale e' ambiguo: indica sia la colonna versione della tabella storico_prezzi (progressivo delle modifiche di prezzo) sia la colonna versione_catalogo della tabella prodotti. Il solver deve disambiguare dal contesto della query quale colonna 'versione' utilizzare per calcolare la durata tra due revisioni consecutive."
+      }
+    ],
+    "spec_hash": "4c540cea62c8614d"
+  },
+  "schema_ddl": "CREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    fornitore_id INT REFERENCES fornitori(id),\n    versione_catalogo INT NOT NULL DEFAULT 1 CHECK (versione_catalogo >= 1),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE storico_prezzi (\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    versione INT NOT NULL CHECK (versione >= 1),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    PRIMARY KEY (prodotto_id, versione),\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    importo_totale NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_totale >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "categorie",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Elettronica",
+            "descrizione": "Dispositivi elettronici di consumo e accessori"
+          },
+          {
+            "id": 2,
+            "nome": "Informatica",
+            "descrizione": "Periferiche, componenti e accessori PC"
+          },
+          {
+            "id": 3,
+            "nome": "Casa e Cucina",
+            "descrizione": "Elettrodomestici piccoli e articoli per la casa"
+          },
+          {
+            "id": 4,
+            "nome": "Sport e Tempo Libero",
+            "descrizione": "Attrezzatura sportiva e outdoor"
+          },
+          {
+            "id": 5,
+            "nome": "Libri",
+            "descrizione": "Narrativa, saggistica e manuali"
+          },
+          {
+            "id": 6,
+            "nome": "Bellezza",
+            "descrizione": "Cosmetici e prodotti per la cura personale"
+          },
+          {
+            "id": 7,
+            "nome": "Giocattoli",
+            "descrizione": "Giochi e articoli per l'infanzia"
+          },
+          {
+            "id": 8,
+            "nome": "Abbigliamento",
+            "descrizione": "Vestiti, calzature e accessori moda"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "fornitori",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "TechSupply S.r.l.",
+            "partita_iva": "01234567891",
+            "citta": "Milano"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "EuroDistribuzione SpA",
+            "partita_iva": "02345678912",
+            "citta": "Roma"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "NordComponenti S.n.c.",
+            "partita_iva": "03456789123",
+            "citta": "Torino"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "CasaVerde Import S.r.l.",
+            "partita_iva": "04567891234",
+            "citta": "Napoli"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "SportLine Forniture S.r.l.",
+            "partita_iva": "05678912345",
+            "citta": "Bologna"
+          },
+          {
+            "id": 6,
+            "ragione_sociale": "EdiCulture Distribuzione S.r.l.",
+            "partita_iva": "06789123456",
+            "citta": "Firenze"
+          }
+        ],
+        "variations": {
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona"
+            ]
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": 200,
+        "max_rows": 400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "sku": "SKU-EL-001",
+            "nome": "Cuffie Bluetooth SoundPro X2",
+            "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+            "categoria_id": 1,
+            "fornitore_id": 1,
+            "versione_catalogo": 1,
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "sku": "SKU-EL-002",
+            "nome": "Smartwatch PulseFit 5",
+            "descrizione": "Smartwatch con monitoraggio cardio e GPS integrato",
+            "categoria_id": 1,
+            "fornitore_id": 2,
+            "versione_catalogo": 2,
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "sku": "SKU-IN-010",
+            "nome": "Tastiera meccanica KeyMaster TKL",
+            "descrizione": "Tastiera meccanica tenkeyless switch red",
+            "categoria_id": 2,
+            "fornitore_id": 1,
+            "versione_catalogo": 1,
+            "attivo": true
+          },
+          {
+            "id": 4,
+            "sku": "SKU-IN-011",
+            "nome": "Mouse wireless SilentClick Pro",
+            "descrizione": "Mouse ergonomico silenzioso 16000 DPI",
+            "categoria_id": 2,
+            "fornitore_id": 3,
+            "versione_catalogo": 1,
+            "attivo": false
+          },
+          {
+            "id": 5,
+            "sku": "SKU-CC-020",
+            "nome": "Frullatore VortexMix 800W",
+            "descrizione": "Frullatore da banco con bicchiere triplo strato",
+            "categoria_id": 3,
+            "fornitore_id": 4,
+            "versione_catalogo": 1,
+            "attivo": true
+          },
+          {
+            "id": 6,
+            "sku": "SKU-SP-030",
+            "nome": "Zaino trail running TrailPack 25L",
+            "descrizione": "Zaino leggero idrorepellente con tasca idrica",
+            "categoria_id": 4,
+            "fornitore_id": 5,
+            "versione_catalogo": 3,
+            "attivo": true
+          },
+          {
+            "id": 7,
+            "sku": "SKU-LB-040",
+            "nome": "I silenzi del nord",
+            "descrizione": "Romanzo giallo, edizione tascabile 480 pagine",
+            "categoria_id": 5,
+            "fornitore_id": 6,
+            "versione_catalogo": 1,
+            "attivo": true
+          },
+          {
+            "id": 8,
+            "sku": "SKU-BE-050",
+            "nome": "Siero viso HydraGlow 30ml",
+            "descrizione": "Siero concentrato con acido ialuronico",
+            "categoria_id": 6,
+            "fornitore_id": 4,
+            "versione_catalogo": 2,
+            "attivo": false
+          }
+        ],
+        "variations": {
+          "versione_catalogo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "1",
+              "1",
+              "2",
+              "2",
+              "3"
+            ]
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "storico_prezzi",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.5,
+        "templates": [
+          {
+            "prodotto_id": 1,
+            "versione": 1,
+            "prezzo_unitario": 79.9,
+            "data_inizio": "2025-01-15",
+            "data_fine": "2025-06-30"
+          },
+          {
+            "prodotto_id": 1,
+            "versione": 2,
+            "prezzo_unitario": 74.9,
+            "data_inizio": "2025-07-01",
+            "data_fine": "2025-12-31"
+          },
+          {
+            "prodotto_id": 1,
+            "versione": 3,
+            "prezzo_unitario": 69.9,
+            "data_inizio": "2026-01-01",
+            "data_fine": null
+          },
+          {
+            "prodotto_id": 2,
+            "versione": 1,
+            "prezzo_unitario": 129.0,
+            "data_inizio": "2025-03-01",
+            "data_fine": "2025-08-31"
+          },
+          {
+            "prodotto_id": 2,
+            "versione": 2,
+            "prezzo_unitario": 119.0,
+            "data_inizio": "2025-09-01",
+            "data_fine": null
+          },
+          {
+            "prodotto_id": 3,
+            "versione": 1,
+            "prezzo_unitario": 89.99,
+            "data_inizio": "2025-02-10",
+            "data_fine": "2025-09-30"
+          },
+          {
+            "prodotto_id": 3,
+            "versione": 2,
+            "prezzo_unitario": 84.99,
+            "data_inizio": "2025-10-01",
+            "data_fine": null
+          },
+          {
+            "prodotto_id": 4,
+            "versione": 1,
+            "prezzo_unitario": 49.5,
+            "data_inizio": "2025-05-20",
+            "data_fine": null
+          }
+        ],
+        "variations": {
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.35,
+            "pool": []
+          },
+          "data_inizio": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_fine": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 250,
+        "max_rows": 450,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "email": "mario.rossi@example.com",
+            "citta": "Roma"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@example.com",
+            "citta": "Milano"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "email": "giulia.verdi@example.com",
+            "citta": "Torino"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Ferrari",
+            "email": "alessandro.ferrari@example.com",
+            "citta": "Napoli"
+          },
+          {
+            "id": 5,
+            "nome": "Chiara",
+            "cognome": "Esposito",
+            "email": "chiara.esposito@example.com",
+            "citta": "Bologna"
+          },
+          {
+            "id": 6,
+            "nome": "Davide",
+            "cognome": "Conti",
+            "email": "davide.conti@example.com",
+            "citta": "Firenze"
+          },
+          {
+            "id": 7,
+            "nome": "Sara",
+            "cognome": "Moretti",
+            "email": "sara.moretti@example.com",
+            "citta": "Genova"
+          },
+          {
+            "id": 8,
+            "nome": "Luca",
+            "cognome": "Gallo",
+            "email": "luca.gallo@example.com",
+            "citta": "Verona"
+          }
+        ],
+        "variations": {
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona",
+              "Padova",
+              "Bari"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1001,
+            "cliente_id": 1,
+            "data_ordine": "2026-01-05",
+            "stato_ordine": "consegnato",
+            "importo_totale": 154.8
+          },
+          {
+            "id": 1002,
+            "cliente_id": 2,
+            "data_ordine": "2026-01-12",
+            "stato_ordine": "consegnato",
+            "importo_totale": 89.9
+          },
+          {
+            "id": 1003,
+            "cliente_id": 3,
+            "data_ordine": "2026-01-20",
+            "stato_ordine": "spedito",
+            "importo_totale": 239.0
+          },
+          {
+            "id": 1004,
+            "cliente_id": 4,
+            "data_ordine": "2026-02-02",
+            "stato_ordine": "confermato",
+            "importo_totale": 64.5
+          },
+          {
+            "id": 1005,
+            "cliente_id": 5,
+            "data_ordine": "2026-02-14",
+            "stato_ordine": "in_attesa",
+            "importo_totale": 312.75
+          },
+          {
+            "id": 1006,
+            "cliente_id": 6,
+            "data_ordine": "2026-02-21",
+            "stato_ordine": "annullato",
+            "importo_totale": 45.0
+          },
+          {
+            "id": 1007,
+            "cliente_id": 7,
+            "data_ordine": "2026-03-03",
+            "stato_ordine": "consegnato",
+            "importo_totale": 128.4
+          },
+          {
+            "id": 1008,
+            "cliente_id": 8,
+            "data_ordine": "2026-03-10",
+            "stato_ordine": "spedito",
+            "importo_totale": 199.99
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -75.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnato",
+              "consegnato",
+              "consegnato",
+              "spedito",
+              "spedito",
+              "confermato",
+              "in_attesa",
+              "annullato"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

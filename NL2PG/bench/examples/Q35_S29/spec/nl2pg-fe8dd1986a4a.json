@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "case"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "schede_anagrafiche_personale",
+      "description": "La tabella fisica 'dipendenti' viene indicata nella prosa aziendale come 'schede_anagrafiche_personale'. Contiene le colonne id_dipendente, nome e cognome, dove il dato anagrafico unico è spezzato su due colonne separate."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "cognome",
+      "obsolete_value": "nome_di_famiglia",
+      "description": "La colonna 'cognome' della tabella dipendenti viene riferita nei documenti come 'nome_di_famiglia'. Le query devono riconoscere il sinonimo per ricostruire il nome completo con COALESCE(CONCAT(nome, ' ', cognome), 'sconosciuto')."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "reparti",
+      "obsolete_value": "centri di costo",
+      "description": "La tabella 'reparti' viene denominata con il gergo ERP 'centri di costo'. Ogni dipendente appartiene a un solo reparto tramite la chiave esterna id_reparto, mantenendo una gerarchia uno-a-molti tra reparti e dipendenti."
+    }
+  ],
+  "spec_hash": "9ee7d31aed6cff06"
+}

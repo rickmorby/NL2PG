@@ -1,0 +1,791 @@
+{
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano INT NOT NULL CHECK (piano >= 0),\n    posti_letto_totali INT NOT NULL CHECK (posti_letto_totali > 0)\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    numero_albo TEXT UNIQUE\n);\n\nCREATE TABLE letti (\n    id INT PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    numero_letto INT NOT NULL CHECK (numero_letto > 0),\n    stato_letto TEXT NOT NULL DEFAULT 'libero' CHECK (stato_letto IN ('libero', 'occupato', 'manutenzione')),\n    UNIQUE (reparto_id, numero_letto)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    letto_id INT REFERENCES letti(id),\n    data_ricovero DATE NOT NULL,\n    data_dimissione DATE,\n    motivo_ricovero TEXT NOT NULL,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ricovero)\n);\n\nCREATE TABLE prescrizioni (\n    id INT PRIMARY KEY,\n    ricovero_id INT NOT NULL REFERENCES ricoveri(id),\n    farmaco TEXT NOT NULL,\n    dosaggio TEXT NOT NULL,\n    data_prescrizione DATE NOT NULL,\n    somministrato BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_profile": {
+    "profile": {
+      "pazienti": {
+        "row_count": 346,
+        "columns": {
+          "id": {
+            "distinct": 346,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 346
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Alessandro",
+              "Davide",
+              "Francesca",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 8,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Esposito",
+              "Ferrari",
+              "Ricci"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 346,
+            "sample": [
+              "BRALAU75C45F205B",
+              "BRALAU75C45F205C",
+              "BRALAU75C45F205D",
+              "BRALAU75C45F205E",
+              "BRALAU75C45F205F"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 338,
+            "sample": [
+              "1954-09-11",
+              "1955-01-18",
+              "1955-02-19",
+              "1956-05-19",
+              "1956-06-27"
+            ]
+          },
+          "telefono": {
+            "distinct": 6,
+            "sample": [
+              "+39 320 1122334",
+              "+39 331 9988776",
+              "+39 335 2211445",
+              "+39 340 4433221",
+              "+39 347 5566778"
+            ]
+          }
+        }
+      },
+      "reparti": {
+        "row_count": 31,
+        "columns": {
+          "id": {
+            "distinct": 31,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 31
+          },
+          "nome_reparto": {
+            "distinct": 31,
+            "sample": [
+              "Cardiologia",
+              "Cardiologia1",
+              "Cardiologia2",
+              "Cardiologia3",
+              "Cardiologia4"
+            ]
+          },
+          "piano": {
+            "distinct": 31,
+            "sample": [
+              "0.013348927459044369",
+              "0.015518980585351283",
+              "0.25052039119281355",
+              "0.3437093192057823",
+              "0.4323508281874209"
+            ],
+            "min": 0.013348927459044369,
+            "max": 3.84548941147022
+          },
+          "posti_letto_totali": {
+            "distinct": 31,
+            "sample": [
+              "15.52",
+              "17.46",
+              "20.17",
+              "20.63",
+              "21.58"
+            ],
+            "min": 15.52,
+            "max": 43.04
+          }
+        }
+      },
+      "medici": {
+        "row_count": 113,
+        "columns": {
+          "id": {
+            "distinct": 113,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 113
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Andrea",
+              "Chiara",
+              "Elena",
+              "Marco",
+              "Paolo"
+            ]
+          },
+          "cognome": {
+            "distinct": 8,
+            "sample": [
+              "Conti",
+              "Fontana",
+              "Gallo",
+              "Greco",
+              "Lombardi"
+            ]
+          },
+          "specializzazione": {
+            "distinct": 6,
+            "sample": [
+              "Cardiologia",
+              "Chirurgia Generale",
+              "Medicina Interna",
+              "Neurologia",
+              "Ortopedia"
+            ]
+          },
+          "reparto_id": {
+            "distinct": 31,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 31
+          },
+          "numero_albo": {
+            "distinct": 103,
+            "sample": [
+              "BO006789",
+              "BO0067891",
+              "BO00678910",
+              "BO00678911",
+              "BO00678912"
+            ]
+          }
+        }
+      },
+      "letti": {
+        "row_count": 246,
+        "columns": {
+          "id": {
+            "distinct": 246,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 246
+          },
+          "reparto_id": {
+            "distinct": 31,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 31
+          },
+          "numero_letto": {
+            "distinct": 246,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 246
+          },
+          "stato_letto": {
+            "distinct": 3,
+            "sample": [
+              "libero",
+              "manutenzione",
+              "occupato"
+            ]
+          }
+        }
+      },
+      "ricoveri": {
+        "row_count": 2066,
+        "columns": {
+          "id": {
+            "distinct": 2066,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 2166
+          },
+          "paziente_id": {
+            "distinct": 346,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 346
+          },
+          "reparto_id": {
+            "distinct": 31,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 31
+          },
+          "medico_id": {
+            "distinct": 113,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 113
+          },
+          "letto_id": {
+            "distinct": 246,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 246
+          },
+          "data_ricovero": {
+            "distinct": 172,
+            "sample": [
+              "2025-10-12",
+              "2025-10-13",
+              "2025-10-14",
+              "2025-10-15",
+              "2025-10-16"
+            ]
+          },
+          "data_dimissione": {
+            "distinct": 88,
+            "sample": [
+              "2026-01-18",
+              "2026-01-19",
+              "2026-01-20",
+              "2026-01-21",
+              "2026-01-22"
+            ]
+          },
+          "motivo_ricovero": {
+            "distinct": 8,
+            "sample": [
+              "Appendicite acuta",
+              "Bronchite acuta",
+              "Colecistite acuta",
+              "Frattura del femore",
+              "Ictus ischemico"
+            ]
+          }
+        }
+      },
+      "prescrizioni": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 501,
+            "max": 3500
+          },
+          "ricovero_id": {
+            "distinct": 1565,
+            "sample": [
+              "1000",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 101,
+            "max": 2166
+          },
+          "farmaco": {
+            "distinct": 8,
+            "sample": [
+              "Amoxicillina",
+              "Enoxaparina",
+              "Furosemide",
+              "Insulina glargine",
+              "Metformina"
+            ]
+          },
+          "dosaggio": {
+            "distinct": 6,
+            "sample": [
+              "1 g ogni 12 ore",
+              "1000 mg ogni 8 ore",
+              "20 UI la sera",
+              "20 mg una volta al giorno",
+              "25 mg due volte al giorno"
+            ]
+          },
+          "data_prescrizione": {
+            "distinct": 112,
+            "sample": [
+              "2025-12-22",
+              "2025-12-23",
+              "2025-12-24",
+              "2025-12-25",
+              "2025-12-26"
+            ]
+          },
+          "somministrato": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "pazienti": [
+        {
+          "id": 1,
+          "nome": "Alessandro",
+          "cognome": "Rossi",
+          "codice_fiscale": "MRSMSM70A01H501X",
+          "data_nascita": "1963-06-24",
+          "telefono": "+39 366 7788990"
+        },
+        {
+          "id": 2,
+          "nome": "Giulia",
+          "cognome": "Verdi",
+          "codice_fiscale": "MRSMSM70A01H501B",
+          "data_nascita": "1956-08-03",
+          "telefono": "+39 366 7788990"
+        },
+        {
+          "id": 3,
+          "nome": "Davide",
+          "cognome": "Ricci",
+          "codice_fiscale": "MRSMSM70A01H501C",
+          "data_nascita": "1980-06-12",
+          "telefono": "+39 340 4433221"
+        },
+        {
+          "id": 4,
+          "nome": "Francesca",
+          "cognome": "Ricci",
+          "codice_fiscale": "MRSMSM70A01H501D",
+          "data_nascita": "1960-10-24",
+          "telefono": "+39 366 7788990"
+        },
+        {
+          "id": 5,
+          "nome": "Davide",
+          "cognome": "Russo",
+          "codice_fiscale": "MRSMSM70A01H501E",
+          "data_nascita": "1960-11-23",
+          "telefono": "+39 320 1122334"
+        },
+        {
+          "id": 6,
+          "nome": "Davide",
+          "cognome": "Rossi",
+          "codice_fiscale": "MRSMSM70A01H501F",
+          "data_nascita": "1958-06-07",
+          "telefono": "+39 366 7788990"
+        },
+        {
+          "id": 7,
+          "nome": "Francesca",
+          "cognome": "Colombo",
+          "codice_fiscale": "MRSMSM70A01H501G",
+          "data_nascita": "1982-03-13",
+          "telefono": "+39 335 2211445"
+        },
+        {
+          "id": 8,
+          "nome": "Mario",
+          "cognome": "Verdi",
+          "codice_fiscale": "MRSMSM70A01H501H",
+          "data_nascita": "1980-10-08",
+          "telefono": "+39 331 9988776"
+        }
+      ],
+      "reparti": [
+        {
+          "id": 1,
+          "nome_reparto": "Cardiologia",
+          "piano": 1.5769777068858353,
+          "posti_letto_totali": 38.9
+        },
+        {
+          "id": 2,
+          "nome_reparto": "Cardiologia1",
+          "piano": 2.4646098160255554,
+          "posti_letto_totali": 32.2
+        },
+        {
+          "id": 3,
+          "nome_reparto": "Cardiologia2",
+          "piano": 1.2738969042608874,
+          "posti_letto_totali": 37.48
+        },
+        {
+          "id": 4,
+          "nome_reparto": "Cardiologia3",
+          "piano": 2.1442184573459837,
+          "posti_letto_totali": 38.54
+        },
+        {
+          "id": 5,
+          "nome_reparto": "Cardiologia4",
+          "piano": 2.953009108708734,
+          "posti_letto_totali": 25.09
+        },
+        {
+          "id": 6,
+          "nome_reparto": "Cardiologia5",
+          "piano": 2.231903598503615,
+          "posti_letto_totali": 29.8
+        },
+        {
+          "id": 7,
+          "nome_reparto": "Neurologia",
+          "piano": 2.059171391003515,
+          "posti_letto_totali": 23.36
+        },
+        {
+          "id": 8,
+          "nome_reparto": "Neurologia1",
+          "piano": 3.84548941147022,
+          "posti_letto_totali": 29.05
+        }
+      ],
+      "medici": [
+        {
+          "id": 1,
+          "nome": "Chiara",
+          "cognome": "Conti",
+          "specializzazione": "Cardiologia",
+          "reparto_id": 6,
+          "numero_albo": "RM001234"
+        },
+        {
+          "id": 2,
+          "nome": "Chiara",
+          "cognome": "Marino",
+          "specializzazione": "Cardiologia",
+          "reparto_id": 8,
+          "numero_albo": "RM0012341"
+        },
+        {
+          "id": 3,
+          "nome": "Sara",
+          "cognome": "Fontana",
+          "specializzazione": "Cardiologia",
+          "reparto_id": 4,
+          "numero_albo": "RM0012342"
+        },
+        {
+          "id": 4,
+          "nome": "Paolo",
+          "cognome": "Lombardi",
+          "specializzazione": "Cardiologia",
+          "reparto_id": 26,
+          "numero_albo": "RM0012343"
+        },
+        {
+          "id": 5,
+          "nome": "Roberto",
+          "cognome": "Fontana",
+          "specializzazione": "Cardiologia",
+          "reparto_id": 9,
+          "numero_albo": "RM0012344"
+        },
+        {
+          "id": 6,
+          "nome": "Sara",
+          "cognome": "Conti",
+          "specializzazione": "Cardiologia",
+          "reparto_id": 12,
+          "numero_albo": "RM0012345"
+        },
+        {
+          "id": 7,
+          "nome": "Andrea",
+          "cognome": "Greco",
+          "specializzazione": "Cardiologia",
+          "reparto_id": 5,
+          "numero_albo": null
+        },
+        {
+          "id": 8,
+          "nome": "Marco",
+          "cognome": "Gallo",
+          "specializzazione": "Cardiologia",
+          "reparto_id": 6,
+          "numero_albo": "RM0012347"
+        }
+      ],
+      "letti": [
+        {
+          "id": 1,
+          "reparto_id": 21,
+          "numero_letto": 1,
+          "stato_letto": "occupato"
+        },
+        {
+          "id": 2,
+          "reparto_id": 13,
+          "numero_letto": 2,
+          "stato_letto": "occupato"
+        },
+        {
+          "id": 3,
+          "reparto_id": 12,
+          "numero_letto": 3,
+          "stato_letto": "occupato"
+        },
+        {
+          "id": 4,
+          "reparto_id": 22,
+          "numero_letto": 4,
+          "stato_letto": "libero"
+        },
+        {
+          "id": 5,
+          "reparto_id": 15,
+          "numero_letto": 5,
+          "stato_letto": "libero"
+        },
+        {
+          "id": 6,
+          "reparto_id": 18,
+          "numero_letto": 6,
+          "stato_letto": "manutenzione"
+        },
+        {
+          "id": 7,
+          "reparto_id": 9,
+          "numero_letto": 7,
+          "stato_letto": "occupato"
+        },
+        {
+          "id": 8,
+          "reparto_id": 19,
+          "numero_letto": 8,
+          "stato_letto": "occupato"
+        }
+      ],
+      "ricoveri": [
+        {
+          "id": 101,
+          "paziente_id": 187,
+          "reparto_id": 22,
+          "medico_id": 84,
+          "letto_id": 243,
+          "data_ricovero": "2025-10-31",
+          "data_dimissione": "2026-02-04",
+          "motivo_ricovero": "Frattura del femore"
+        },
+        {
+          "id": 102,
+          "paziente_id": 7,
+          "reparto_id": 5,
+          "medico_id": 14,
+          "letto_id": 107,
+          "data_ricovero": "2025-11-08",
+          "data_dimissione": "2026-01-29",
+          "motivo_ricovero": "Colecistite acuta"
+        },
+        {
+          "id": 103,
+          "paziente_id": 5,
+          "reparto_id": 24,
+          "medico_id": 113,
+          "letto_id": 116,
+          "data_ricovero": "2025-11-28",
+          "data_dimissione": "2026-01-30",
+          "motivo_ricovero": "Colecistite acuta"
+        },
+        {
+          "id": 104,
+          "paziente_id": 35,
+          "reparto_id": 16,
+          "medico_id": 80,
+          "letto_id": 64,
+          "data_ricovero": "2025-11-23",
+          "data_dimissione": "2026-01-23",
+          "motivo_ricovero": "Bronchite acuta"
+        },
+        {
+          "id": 105,
+          "paziente_id": 51,
+          "reparto_id": 3,
+          "medico_id": 12,
+          "letto_id": 178,
+          "data_ricovero": "2025-12-03",
+          "data_dimissione": "2026-01-30",
+          "motivo_ricovero": "Infarto miocardico acuto"
+        },
+        {
+          "id": 106,
+          "paziente_id": 328,
+          "reparto_id": 19,
+          "medico_id": 81,
+          "letto_id": 224,
+          "data_ricovero": "2025-12-05",
+          "data_dimissione": "2026-01-23",
+          "motivo_ricovero": "Bronchite acuta"
+        },
+        {
+          "id": 107,
+          "paziente_id": 202,
+          "reparto_id": 26,
+          "medico_id": 86,
+          "letto_id": 88,
+          "data_ricovero": "2026-01-10",
+          "data_dimissione": "2026-01-18",
+          "motivo_ricovero": "Ictus ischemico"
+        },
+        {
+          "id": 108,
+          "paziente_id": 20,
+          "reparto_id": 14,
+          "medico_id": 8,
+          "letto_id": 192,
+          "data_ricovero": "2025-11-12",
+          "data_dimissione": "2026-02-03",
+          "motivo_ricovero": "Frattura del femore"
+        }
+      ],
+      "prescrizioni": [
+        {
+          "id": 501,
+          "ricovero_id": 2135,
+          "farmaco": "Amoxicillina",
+          "dosaggio": "20 UI la sera",
+          "data_prescrizione": "2025-12-28",
+          "somministrato": "false"
+        },
+        {
+          "id": 502,
+          "ricovero_id": 437,
+          "farmaco": "Insulina glargine",
+          "dosaggio": "4000 UI una volta al giorno",
+          "data_prescrizione": "2026-01-19",
+          "somministrato": "true"
+        },
+        {
+          "id": 503,
+          "ricovero_id": 1876,
+          "farmaco": "Ramipril",
+          "dosaggio": "25 mg due volte al giorno",
+          "data_prescrizione": "2026-01-12",
+          "somministrato": "true"
+        },
+        {
+          "id": 504,
+          "ricovero_id": 1177,
+          "farmaco": "Amoxicillina",
+          "dosaggio": "4000 UI una volta al giorno",
+          "data_prescrizione": "2026-01-25",
+          "somministrato": "true"
+        },
+        {
+          "id": 505,
+          "ricovero_id": 1893,
+          "farmaco": "Amoxicillina",
+          "dosaggio": "1 g ogni 12 ore",
+          "data_prescrizione": "2025-12-23",
+          "somministrato": "false"
+        },
+        {
+          "id": 506,
+          "ricovero_id": 1332,
+          "farmaco": "Metformina",
+          "dosaggio": "1 g ogni 12 ore",
+          "data_prescrizione": "2025-12-29",
+          "somministrato": "false"
+        },
+        {
+          "id": 507,
+          "ricovero_id": 1458,
+          "farmaco": "Omeprazolo",
+          "dosaggio": "20 mg una volta al giorno",
+          "data_prescrizione": "2026-01-14",
+          "somministrato": "true"
+        },
+        {
+          "id": 508,
+          "ricovero_id": 1595,
+          "farmaco": "Paracetamolo",
+          "dosaggio": "4000 UI una volta al giorno",
+          "data_prescrizione": "2025-12-25",
+          "somministrato": "true"
+        }
+      ]
+    }
+  },
+  "story": "Presso la Direzione Sanitaria dell'Ospedale Santa Lucia, la revisione semestrale dell'attività di degenza segue ogni volta la stessa routine. I revisori aprono anzitutto l'archivio denominato anagrafica_assistiti — l'anagrafica degli assistiti che nei documenti più datati compare ancora sotto il nome pazienti — dove sono custodite le schede delle persone seguite dalla struttura: per ciascuna si trovano il nome, il cognome, il codice fiscale, la data di nascita e un recapito telefonico. Accanto a questo archivio, il registro intitolato reparti descrive le trentuna unità operative dell'ospedale, indicando per ognuna la denominazione, il piano dell'edificio su cui insiste e la dotazione complessiva dei posti letto. Il corpo clinico è invece tracciato nell'elenco dei medici, dove per ogni professionista risultano la specializzazione dichiarata, il numero di iscrizione all'albo e l'unità operativa di appartenenza; il registro dei letti fotografa infine la situazione quotidiana di ogni posto, distinguendo quelli liberi da quelli occupati o fermi in manutenzione. Il cuore dell'indagine resta però la documentazione degli episodi_di_degenza, il gergo clinico con cui i caposala indicano internamente i ricoveri: per ciascun episodio sono riportati il giorno_ammissione, la data di dimissione quando è già intervenuta, il motivo che ha giustificato l'ingresso in reparto, il medico curante incaricato e il letto effettivamente assegnato. A completare il quadro, il registro delle prescrizioni annota per ogni degenza il farmaco disposto — Amoxicillina, Enoxaparina, Furosemide e altri ancora — con il relativo dosaggio, la data in cui la terapia è stata prescritta e l'esito della somministrazione, precisando se il medicinale è stato effettivamente dato all'assistito o se la voce risulta ancora in sospeso. Nell'ultimo ciclo di verifiche gli auditor hanno dovuto contare, per ciascuna unità operativa, quanti episodi di degenza recano come motivo esattamente 'Bronchite acuta', disponendo poi l'elenco dei reparti dal numero più alto di casi fino a quello più basso. L'esercizio ha richiesto di incrociare l'identificativo dell'unità operativa presente negli episodi con quello del registro dei reparti, così da attribuire ogni caso alla denominazione corretta: dalle sedi di Cardiologia alle unità di Neurologia, passando per Ortopedia e Medicina Interna. Alcuni episodi risalgono ad ammissioni registrate a fine ottobre 2025, altri a ingressi dei primi mesi del 2026, con dimissioni concentrate intorno a metà gennaio; in mezzo, migliaia di voci di terapia da ricontrollare una per una. Il referto finale, con la graduatoria dei reparti per casi di Bronchite acuta, è stato trasmesso alla Direzione medica di presidio per pianificare i rifornimenti di ossigeno e i turni infermieristici della stagione invernale."
+}

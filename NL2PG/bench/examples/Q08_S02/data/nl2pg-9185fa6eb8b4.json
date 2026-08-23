@@ -1,0 +1,356 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "self_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "570f425d6d763a59"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    edificio TEXT NOT NULL\n);\n\nCREATE TABLE studenti (\n    id SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_immatricolazione DATE NOT NULL,\n    tutor_id INT REFERENCES studenti(id) ON DELETE SET NULL,\n    CHECK (tutor_id IS NULL OR tutor_id <> id)\n);\n\nCREATE TABLE corsi (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    titolo TEXT NOT NULL,\n    cfu INT NOT NULL CHECK (cfu BETWEEN 1 AND 30),\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id) ON DELETE RESTRICT\n);\n\nCREATE TABLE esami (\n    id SERIAL PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id) ON DELETE CASCADE,\n    corso_id INT NOT NULL REFERENCES corsi(id) ON DELETE CASCADE,\n    data_esame DATE NOT NULL,\n    voto INT NOT NULL CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dipartimenti",
+        "nature": "lookup",
+        "min_rows": 8,
+        "max_rows": 10,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Informatica",
+            "edificio": "Edificio A"
+          },
+          {
+            "id": 2,
+            "nome": "Matematica",
+            "edificio": "Edificio B"
+          },
+          {
+            "id": 3,
+            "nome": "Fisica",
+            "edificio": "Edificio A"
+          },
+          {
+            "id": 4,
+            "nome": "Ingegneria",
+            "edificio": "Edificio C"
+          },
+          {
+            "id": 5,
+            "nome": "Economia",
+            "edificio": "Edificio D"
+          },
+          {
+            "id": 6,
+            "nome": "Biologia",
+            "edificio": "Edificio B"
+          }
+        ],
+        "variations": {
+          "edificio": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Edificio A",
+              "Edificio B",
+              "Edificio C",
+              "Edificio D"
+            ]
+          }
+        }
+      },
+      {
+        "table": "studenti",
+        "nature": "dimension",
+        "min_rows": 250,
+        "max_rows": 350,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "matricola": "VR123456",
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "data_immatricolazione": "2022-09-15",
+            "tutor_id": null
+          },
+          {
+            "id": 2,
+            "matricola": "BN234567",
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "data_immatricolazione": "2022-09-15",
+            "tutor_id": 1
+          },
+          {
+            "id": 3,
+            "matricola": "VD345678",
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "data_immatricolazione": "2023-09-18",
+            "tutor_id": 1
+          },
+          {
+            "id": 4,
+            "matricola": "ES456789",
+            "nome": "Luca",
+            "cognome": "Esposito",
+            "data_immatricolazione": "2023-09-18",
+            "tutor_id": 2
+          },
+          {
+            "id": 5,
+            "matricola": "CO567890",
+            "nome": "Sara",
+            "cognome": "Conti",
+            "data_immatricolazione": "2024-09-16",
+            "tutor_id": null
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Luca",
+              "Sara",
+              "Alessandro",
+              "Francesca",
+              "Davide",
+              "Chiara",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Esposito",
+              "Conti",
+              "Russo",
+              "Ferrari",
+              "Romano",
+              "Gallo",
+              "Costa"
+            ]
+          },
+          "data_immatricolazione": {
+            "axis": "shift",
+            "delta_min": -40.0,
+            "delta_max": 40.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "corsi",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 101,
+            "codice": "INF2101",
+            "titolo": "Programmazione I",
+            "cfu": 9,
+            "dipartimento_id": 1
+          },
+          {
+            "id": 102,
+            "codice": "INF2202",
+            "titolo": "Basi di Dati",
+            "cfu": 12,
+            "dipartimento_id": 1
+          },
+          {
+            "id": 103,
+            "codice": "MAT1101",
+            "titolo": "Analisi Matematica I",
+            "cfu": 12,
+            "dipartimento_id": 2
+          },
+          {
+            "id": 104,
+            "codice": "FIS1201",
+            "titolo": "Fisica Generale I",
+            "cfu": 10,
+            "dipartimento_id": 3
+          },
+          {
+            "id": 105,
+            "codice": "ECO1301",
+            "titolo": "Microeconomia",
+            "cfu": 8,
+            "dipartimento_id": 5
+          }
+        ],
+        "variations": {
+          "titolo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Programmazione I",
+              "Basi di Dati",
+              "Analisi Matematica I",
+              "Fisica Generale I",
+              "Algoritmi e Strutture Dati",
+              "Statistica",
+              "Chimica Organica",
+              "Microeconomia",
+              "Reti di Calcolatori",
+              "Geometria"
+            ]
+          },
+          "cfu": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "6",
+              "6",
+              "9",
+              "9",
+              "12",
+              "12",
+              "15"
+            ]
+          }
+        }
+      },
+      {
+        "table": "esami",
+        "nature": "fact",
+        "min_rows": 500,
+        "max_rows": 900,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1001,
+            "studente_id": 1,
+            "corso_id": 101,
+            "data_esame": "2023-01-20",
+            "voto": 27,
+            "lode": false
+          },
+          {
+            "id": 1002,
+            "studente_id": 2,
+            "corso_id": 103,
+            "data_esame": "2023-02-10",
+            "voto": 30,
+            "lode": true
+          },
+          {
+            "id": 1003,
+            "studente_id": 3,
+            "corso_id": 102,
+            "data_esame": "2023-06-15",
+            "voto": 22,
+            "lode": false
+          },
+          {
+            "id": 1004,
+            "studente_id": 4,
+            "corso_id": 104,
+            "data_esame": "2023-07-05",
+            "voto": 25,
+            "lode": false
+          },
+          {
+            "id": 1005,
+            "studente_id": 5,
+            "corso_id": 105,
+            "data_esame": "2024-01-18",
+            "voto": 28,
+            "lode": false
+          }
+        ],
+        "variations": {
+          "data_esame": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "voto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "22",
+              "23",
+              "23",
+              "24",
+              "24",
+              "25",
+              "25",
+              "26",
+              "26",
+              "27",
+              "27",
+              "28",
+              "28",
+              "29",
+              "30"
+            ]
+          },
+          "lode": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "false",
+              "false",
+              "false",
+              "false",
+              "false",
+              "false",
+              "false",
+              "false",
+              "true"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

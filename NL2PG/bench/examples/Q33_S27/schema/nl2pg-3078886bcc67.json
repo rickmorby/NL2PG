@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fornitori",
+        "obsolete_value": "anagrafica_passivo",
+        "description": "La tabella fornitori, che contiene i dati anagrafici dei partner commerciali, viene denominata nella prosa aziendale come anagrafica_passivo. Le relazioni restano deducibili dalla colonna fornitore_id presente nelle tabelle articoli e ordini_acquisto."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "stato_ordine",
+        "obsolete_value": "indicatore avanzamento ciclo passivo",
+        "description": "La colonna stato_ordine della tabella ordini_acquisto e' indicata nel testo aziendale con il gergo ERP 'indicatore avanzamento ciclo passivo'. Le query devono filtrare questa colonna con LIKE su valori testuali quali 'APERTO%' o 'CHIUSO%'."
+      }
+    ],
+    "spec_hash": "2bff6ca104dab716"
+  },
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    codice_fornitore TEXT NOT NULL UNIQUE,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    email_contatto TEXT,\n    telefono_contatto TEXT,\n    indirizzo_sede TEXT,\n    citta_sede TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE articoli (\n    id INT PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    fornitore_id INT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    unita_misura TEXT NOT NULL DEFAULT 'PZ',\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0)\n);\n\nCREATE TABLE ordini_acquisto (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT NOT NULL,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine LIKE 'APERTO%' OR stato_ordine LIKE 'IN_EVASIONE%' OR stato_ordine LIKE 'CHIUSO%'),\n    data_ordine DATE NOT NULL,\n    data_consegna_prevista DATE,\n    note_ordine TEXT\n);\n\nCREATE TABLE righe_ordine_acquisto (\n    id INT PRIMARY KEY,\n    ordine_acquisto_id INT NOT NULL,\n    articolo_id INT NOT NULL,\n    quantita_ordinata INT NOT NULL CHECK (quantita_ordinata > 0),\n    quantita_ricevuta INT NOT NULL DEFAULT 0 CHECK (quantita_ricevuta >= 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100)\n);"
+}

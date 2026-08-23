@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 6,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_acquirenti",
+        "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; l'agente deve risalire alla tabella reale clienti tramite il twist di rinomina."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore fatturato lordo per riga d'ordine",
+        "description": "La colonna importo_totale della tabella dettagli_ordine viene indicata con il gergo commerciale 'valore fatturato lordo per riga d'ordine'; occorre mappare la perifrasi sulla colonna reale."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato",
+        "obsolete_value": "situazione dell'ordine",
+        "description": "Il termine stato è ambiguo nello schema vendite: esiste la colonna stato nella tabella ordini (stato evasione: 'in_lavorazione', 'spedito', 'annullato') e la colonna stato nella tabella clienti (regione/provincia). La prosa usa 'situazione dell'ordine' riferendosi esclusivamente allo stato di evasione in ordini, non alla localizzazione del cliente."
+      }
+    ],
+    "spec_hash": "efc10fcf61583280"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    stato TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato TEXT NOT NULL DEFAULT 'in_lavorazione' CHECK (stato IN ('in_lavorazione', 'spedito', 'annullato')),\n    indirizzo_spedizione TEXT NOT NULL,\n    note TEXT\n);\n\nCREATE TABLE dettagli_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE pagamenti (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    metodo_pagamento TEXT NOT NULL CHECK (metodo_pagamento IN ('carta_credito', 'bonifico', 'paypal', 'contrassegno')),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo >= 0),\n    esito TEXT NOT NULL DEFAULT 'in_attesa' CHECK (esito IN ('completato', 'rifiutato', 'in_attesa')),\n    data_pagamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);"
+}

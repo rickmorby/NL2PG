@@ -1,0 +1,577 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 5,
+    "hierarchy": "one_to_many_nullable",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "vettori",
+        "obsolete_value": "anagrafica_trasportatori",
+        "description": "La tabella vettori, che contiene i trasportatori incaricati delle spedizioni, viene denominata anagrafica_trasportatori nella prosa aziendale. L'utente deve risalire alla tabella reale vettori tramite la FK nullable spedizioni.id_vettore."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "peso_kg",
+        "obsolete_value": "massa_merce",
+        "description": "La colonna peso_kg della tabella spedizioni viene indicata nella documentazione aziendale come massa_merce. Le query con filtri congiuntivi sul peso devono mappare tale sinonimo alla colonna reale peso_kg."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "colli",
+        "obsolete_value": "unita_di_movimentazione",
+        "description": "La tabella colli, figlia di spedizioni, viene indicata con il gergo del settore logistico come unita_di_movimentazione (handling units). L'utente deve interpretare il termine tecnico e collegarlo alla tabella reale colli tramite la FK colli.id_spedizione."
+      }
+    ],
+    "spec_hash": "e2c511382bd7f330"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT\n);\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT\n);\n\nCREATE TABLE vettori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    tipo_mezzo TEXT NOT NULL CHECK (tipo_mezzo IN ('furgone', 'camion', 'tir', 'nave', 'aereo'))\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    magazzino_partenza_id INT REFERENCES magazzini(id),\n    id_vettore INT REFERENCES vettori(id),\n    peso_kg NUMERIC(10,2) NOT NULL CHECK (peso_kg > 0),\n    data_spedizione DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    costo_spedizione NUMERIC(10,2) CHECK (costo_spedizione >= 0)\n);\n\nCREATE TABLE colli (\n    id INT PRIMARY KEY,\n    id_spedizione INT NOT NULL REFERENCES spedizioni(id),\n    numero_collo INT NOT NULL,\n    descrizione TEXT,\n    lunghezza_cm NUMERIC(6,2) CHECK (lunghezza_cm > 0),\n    larghezza_cm NUMERIC(6,2) CHECK (larghezza_cm > 0),\n    altezza_cm NUMERIC(6,2) CHECK (altezza_cm > 0),\n    UNIQUE (id_spedizione, numero_collo)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 160,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Tecnologie Alfa S.p.A.",
+            "partita_iva": "IT02345678901",
+            "citta": "Milano",
+            "email": "info@tecalfa.it"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Mobili Rossi S.r.l.",
+            "partita_iva": "IT03456789012",
+            "citta": "Treviso",
+            "email": "ordini@mobilirossi.it"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Chimica Delta S.p.A.",
+            "partita_iva": "IT04567890123",
+            "citta": "Brindisi",
+            "email": "logistica@chimicadelta.it"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Textile Nova S.r.l.",
+            "partita_iva": "IT05678901234",
+            "citta": "Prato",
+            "email": "spedizioni@textilenova.it"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "AgroFood Sud S.r.l.",
+            "partita_iva": "IT06789012345",
+            "citta": "Foggia",
+            "email": "ufficio@agrofoodsud.it"
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Tecnologie Alfa S.p.A.",
+              "Mobili Rossi S.r.l.",
+              "Chimica Delta S.p.A.",
+              "Textile Nova S.r.l.",
+              "AgroFood Sud S.r.l.",
+              "Metalmeccanica Beta S.r.l.",
+              "Cartotecnica Gamma S.p.A.",
+              "Farmaceutici Epsilon S.p.A."
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Torino",
+              "Bologna",
+              "Verona",
+              "Treviso",
+              "Padova",
+              "Brescia",
+              "Napoli",
+              "Bari",
+              "Firenze"
+            ]
+          },
+          "email": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "info@tecalfa.it",
+              "ordini@mobilirossi.it",
+              "logistica@chimicadelta.it",
+              "spedizioni@textilenova.it",
+              "ufficio@agrofoodsud.it",
+              "acquisti@metbeta.it",
+              "amministrazione@cartgamma.it",
+              "export@farmepsilon.it"
+            ]
+          }
+        }
+      },
+      {
+        "table": "magazzini",
+        "nature": "explicit",
+        "min_rows": 8,
+        "max_rows": 12,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Hub Nord Milano",
+            "indirizzo": "Via dell'Industria 12",
+            "citta": "Milano",
+            "cap": "20151"
+          },
+          {
+            "id": 2,
+            "nome": "Deposito Centro Bologna",
+            "indirizzo": "Via Emilia Ponente 88",
+            "citta": "Bologna",
+            "cap": "40132"
+          },
+          {
+            "id": 3,
+            "nome": "Platform Sud Napoli",
+            "indirizzo": "Via Campania Logistica 4",
+            "citta": "Napoli",
+            "cap": "80146"
+          },
+          {
+            "id": 4,
+            "nome": "Cross-dock Verona",
+            "indirizzo": "Zona Industriale Bassona 21",
+            "citta": "Verona",
+            "cap": "37141"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Hub Nord Milano",
+              "Deposito Centro Bologna",
+              "Platform Sud Napoli",
+              "Cross-dock Verona",
+              "Magazzino Ovest Torino",
+              "Terminal Adriatico Pescara",
+              "Deposito Est Padova",
+              "Hub Interporto Brescia"
+            ]
+          },
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via dell'Industria 12",
+              "Via Emilia Ponente 88",
+              "Via Campania Logistica 4",
+              "Zona Industriale Bassona 21",
+              "Corso Francia 210",
+              "Via del Porto 7",
+              "Strada Statale 11 km 42",
+              "Via dei Trasporti 33"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Bologna",
+              "Napoli",
+              "Verona",
+              "Torino",
+              "Pescara",
+              "Padova",
+              "Brescia"
+            ]
+          },
+          "cap": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "20151",
+              "40132",
+              "80146",
+              "37141",
+              "10152",
+              "65129",
+              "35127",
+              "25128"
+            ]
+          }
+        }
+      },
+      {
+        "table": "vettori",
+        "nature": "explicit",
+        "min_rows": 18,
+        "max_rows": 24,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Trasporti Rapidi S.r.l.",
+            "partita_iva": "IT09876543210",
+            "telefono": "+39 02 1234567",
+            "tipo_mezzo": "furgone"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Logistica Nazionale S.p.A.",
+            "partita_iva": "IT08765432109",
+            "telefono": "+39 06 2345678",
+            "tipo_mezzo": "camion"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Intermodal Express S.r.l.",
+            "partita_iva": "IT07654321098",
+            "telefono": "+39 010 3456789",
+            "tipo_mezzo": "tir"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Mediterraneo Shipping S.p.A.",
+            "partita_iva": "IT06543210987",
+            "telefono": "+39 081 4567890",
+            "tipo_mezzo": "nave"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "AeroCargo Italia S.r.l.",
+            "partita_iva": "IT05432109876",
+            "telefono": "+39 02 5678901",
+            "tipo_mezzo": "aereo"
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Trasporti Rapidi S.r.l.",
+              "Logistica Nazionale S.p.A.",
+              "Intermodal Express S.r.l.",
+              "Mediterraneo Shipping S.p.A.",
+              "AeroCargo Italia S.r.l.",
+              "Giroveloce Distribuzione S.r.l.",
+              "TransEuropa Freight S.p.A.",
+              "Speedy Parcel Service S.r.l."
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 02 1234567",
+              "+39 06 2345678",
+              "+39 010 3456789",
+              "+39 081 4567890",
+              "+39 02 5678901",
+              "+39 011 6789012",
+              "+39 051 7890123",
+              "+39 045 8901234"
+            ]
+          },
+          "tipo_mezzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "furgone",
+              "furgone",
+              "camion",
+              "camion",
+              "tir",
+              "nave",
+              "aereo"
+            ]
+          }
+        }
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": 550,
+        "max_rows": 650,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "magazzino_partenza_id": 1,
+            "id_vettore": 1,
+            "peso_kg": 245.5,
+            "data_spedizione": "2026-03-02",
+            "data_consegna_prevista": "2026-03-05",
+            "stato": "consegnata",
+            "costo_spedizione": 189.9
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "magazzino_partenza_id": 2,
+            "id_vettore": 2,
+            "peso_kg": 1180.0,
+            "data_spedizione": "2026-03-04",
+            "data_consegna_prevista": "2026-03-09",
+            "stato": "consegnata",
+            "costo_spedizione": 540.0
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "magazzino_partenza_id": 1,
+            "id_vettore": 3,
+            "peso_kg": 86.25,
+            "data_spedizione": "2026-03-10",
+            "data_consegna_prevista": "2026-03-13",
+            "stato": "in_transito",
+            "costo_spedizione": 95.4
+          },
+          {
+            "id": 104,
+            "cliente_id": 4,
+            "magazzino_partenza_id": 3,
+            "id_vettore": 4,
+            "peso_kg": 3200.75,
+            "data_spedizione": "2026-03-12",
+            "data_consegna_prevista": "2026-03-20",
+            "stato": "in_transito",
+            "costo_spedizione": 1250.0
+          },
+          {
+            "id": 105,
+            "cliente_id": 5,
+            "magazzino_partenza_id": 2,
+            "id_vettore": 1,
+            "peso_kg": 54.1,
+            "data_spedizione": "2026-03-15",
+            "data_consegna_prevista": "2026-03-19",
+            "stato": "in_preparazione",
+            "costo_spedizione": 62.75
+          },
+          {
+            "id": 106,
+            "cliente_id": 1,
+            "magazzino_partenza_id": 4,
+            "id_vettore": 5,
+            "peso_kg": 410.0,
+            "data_spedizione": "2026-03-16",
+            "data_consegna_prevista": "2026-03-26",
+            "stato": "rimandata",
+            "costo_spedizione": 310.2
+          }
+        ],
+        "variations": {
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "data_spedizione": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_consegna_prevista": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 21.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnata",
+              "consegnata",
+              "consegnata",
+              "consegnata",
+              "in_transito",
+              "in_transito",
+              "in_preparazione",
+              "rimandata"
+            ]
+          },
+          "costo_spedizione": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "colli",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.5,
+        "templates": [
+          {
+            "id": 1,
+            "id_spedizione": 101,
+            "numero_collo": 1,
+            "descrizione": "Componenti elettronici",
+            "lunghezza_cm": 60.0,
+            "larghezza_cm": 40.0,
+            "altezza_cm": 35.0
+          },
+          {
+            "id": 2,
+            "id_spedizione": 101,
+            "numero_collo": 2,
+            "descrizione": "Cavi e accessori",
+            "lunghezza_cm": 45.0,
+            "larghezza_cm": 35.0,
+            "altezza_cm": 25.0
+          },
+          {
+            "id": 3,
+            "id_spedizione": 102,
+            "numero_collo": 1,
+            "descrizione": "Mobile smontato",
+            "lunghezza_cm": 120.0,
+            "larghezza_cm": 80.0,
+            "altezza_cm": 100.0
+          },
+          {
+            "id": 4,
+            "id_spedizione": 103,
+            "numero_collo": 1,
+            "descrizione": "Bidoni chimici",
+            "lunghezza_cm": 50.0,
+            "larghezza_cm": 50.0,
+            "altezza_cm": 90.0
+          },
+          {
+            "id": 5,
+            "id_spedizione": 104,
+            "numero_collo": 1,
+            "descrizione": "Rotoli di tessuto",
+            "lunghezza_cm": 150.0,
+            "larghezza_cm": 60.0,
+            "altezza_cm": 60.0
+          },
+          {
+            "id": 6,
+            "id_spedizione": 105,
+            "numero_collo": 1,
+            "descrizione": "Casse alimentari",
+            "lunghezza_cm": 70.0,
+            "larghezza_cm": 50.0,
+            "altezza_cm": 45.0
+          }
+        ],
+        "variations": {
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Componenti elettronici",
+              "Cavi e accessori",
+              "Mobile smontato",
+              "Bidoni chimici",
+              "Rotoli di tessuto",
+              "Casse alimentari",
+              "Ricambi auto",
+              "Materiale cartotecnico",
+              "Attrezzatura industriale",
+              "Documenti e campioni"
+            ]
+          },
+          "lunghezza_cm": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          },
+          "larghezza_cm": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          },
+          "altezza_cm": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

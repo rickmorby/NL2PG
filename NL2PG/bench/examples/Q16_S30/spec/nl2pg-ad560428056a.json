@@ -1,0 +1,34 @@
+{
+  "domain": "università",
+  "n_tables": 10,
+  "hierarchy": "recursive_tree",
+  "sql_features": [
+    "recursive_cte"
+  ],
+  "twist": [
+    "rename",
+    "distractor",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "struttura_gerarchica_dipartimenti",
+      "obsolete_value": "albero_organizzativo_interno",
+      "description": "La tabella che definisce la gerarchia dei dipartimenti è denominata internamente come albero_organizzativo_interno."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "tabella_log_accessi",
+      "obsolete_value": "storico_eventi_sistema",
+      "description": "Inserimento di una tabella di log irrilevante per la query ricorsiva, progettata per confondere il modello durante lo schema linking."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "id_nodo",
+      "obsolete_value": "codice_identificativo",
+      "description": "Il termine 'codice_identificativo' viene utilizzato sia per i dipartimenti che per le aule, richiedendo disambiguazione contestuale."
+    }
+  ],
+  "spec_hash": "fffeafbc8ad046ce"
+}

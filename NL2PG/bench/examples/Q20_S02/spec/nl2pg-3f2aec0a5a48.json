@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "right_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "registro_movimenti",
+      "description": "La tabella delle transazioni finanziarie viene indicata nei requisiti aziendali come registro_movimenti."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "importo",
+      "obsolete_value": "valore_nominale",
+      "description": "Il campo importo della transazione viene descritto colloquialmente come valore_nominale."
+    }
+  ],
+  "spec_hash": "d9e8358f9e998a0b"
+}

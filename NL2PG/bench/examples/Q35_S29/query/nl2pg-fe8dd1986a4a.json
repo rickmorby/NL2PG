@@ -1,0 +1,388 @@
+{
+  "schema_ddl": "CREATE TABLE reparti (\n    id_reparto INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    codice_centro_costo TEXT NOT NULL UNIQUE,\n    budget_annuo NUMERIC(12,2) CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id_dipendente INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile > 0),\n    id_reparto INT NOT NULL REFERENCES reparti(id_reparto) ON DELETE RESTRICT\n);\n\nCREATE TABLE buste_paga (\n    id_busta_paga BIGINT PRIMARY KEY,\n    id_dipendente INT NOT NULL REFERENCES dipendenti(id_dipendente) ON DELETE CASCADE,\n    periodo_riferimento DATE NOT NULL,\n    importo_lordo NUMERIC(10,2) NOT NULL CHECK (importo_lordo >= 0),\n    importo_netto NUMERIC(10,2) NOT NULL CHECK (importo_netto >= 0),\n    CHECK (importo_netto <= importo_lordo),\n    UNIQUE (id_dipendente, periodo_riferimento)\n);",
+  "data_profile": {
+    "profile": {
+      "reparti": {
+        "row_count": 27,
+        "columns": {
+          "id_reparto": {
+            "distinct": 27,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 27
+          },
+          "nome_reparto": {
+            "distinct": 27,
+            "sample": [
+              "Acquisti",
+              "Acquisti1",
+              "Acquisti2",
+              "Amministrazione",
+              "Amministrazione1"
+            ]
+          },
+          "codice_centro_costo": {
+            "distinct": 27,
+            "sample": [
+              "CC-AMM-400",
+              "CC-AMM-4001",
+              "CC-AMM-4002",
+              "CC-Acq-700",
+              "CC-Acq-7001"
+            ]
+          },
+          "budget_annuo": {
+            "distinct": 25,
+            "sample": [
+              "139950.66",
+              "185000.0",
+              "217000.0",
+              "273337.97",
+              "317815.65"
+            ],
+            "min": 139950.66,
+            "max": 917561.35
+          }
+        }
+      },
+      "dipendenti": {
+        "row_count": 378,
+        "columns": {
+          "id_dipendente": {
+            "distinct": 378,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 378
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Costa",
+              "Esposito"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 378,
+            "sample": [
+              "BNCGLI85C45H501B",
+              "BNCGLI85C45H501C",
+              "BNCGLI85C45H501D",
+              "BNCGLI85C45H501E",
+              "BNCGLI85C45H501F"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 364,
+            "sample": [
+              "2002-03-02",
+              "2002-09-11",
+              "2002-09-19",
+              "2002-12-04",
+              "2003-01-07"
+            ]
+          },
+          "stipendio_mensile": {
+            "distinct": 375,
+            "sample": [
+              "1827.5",
+              "1879.64",
+              "1911.31",
+              "1927.35",
+              "1939.93"
+            ],
+            "min": 1827.5,
+            "max": 5535.0
+          },
+          "id_reparto": {
+            "distinct": 27,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 27
+          }
+        }
+      },
+      "buste_paga": {
+        "row_count": 378,
+        "columns": {
+          "id_busta_paga": {
+            "distinct": 378,
+            "sample": [
+              "100001",
+              "100002",
+              "100003",
+              "100004",
+              "100005"
+            ],
+            "min": 100001,
+            "max": 100378
+          },
+          "id_dipendente": {
+            "distinct": 378,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 378
+          },
+          "periodo_riferimento": {
+            "distinct": 378,
+            "sample": [
+              "2025-01-01",
+              "2025-01-02",
+              "2025-01-03",
+              "2025-01-04",
+              "2025-01-05"
+            ]
+          },
+          "importo_lordo": {
+            "distinct": 358,
+            "sample": [
+              "3200.0",
+              "3219.24",
+              "3221.83",
+              "3235.0",
+              "3235.7"
+            ],
+            "min": 3200.0,
+            "max": 5120.0
+          },
+          "importo_netto": {
+            "distinct": 361,
+            "sample": [
+              "1865.0",
+              "1866.0364144304378",
+              "1866.069852242279",
+              "1866.1526250971826",
+              "1866.6723352967954"
+            ],
+            "min": 1865.0,
+            "max": 2105.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "reparti": [
+        {
+          "id_reparto": 1,
+          "nome_reparto": "Produzione",
+          "codice_centro_costo": "CC-PRO-100",
+          "budget_annuo": null
+        },
+        {
+          "id_reparto": 2,
+          "nome_reparto": "Produzione1",
+          "codice_centro_costo": "CC-PRO-1001",
+          "budget_annuo": 693552.01
+        },
+        {
+          "id_reparto": 3,
+          "nome_reparto": "Produzione2",
+          "codice_centro_costo": "CC-PRO-1002",
+          "budget_annuo": 765579.92
+        },
+        {
+          "id_reparto": 4,
+          "nome_reparto": "Produzione3",
+          "codice_centro_costo": "CC-PRO-1003",
+          "budget_annuo": 722562.72
+        },
+        {
+          "id_reparto": 5,
+          "nome_reparto": "Ricerca e Sviluppo",
+          "codice_centro_costo": "CC-RSV-200",
+          "budget_annuo": 532314.71
+        },
+        {
+          "id_reparto": 6,
+          "nome_reparto": "Ricerca e Sviluppo1",
+          "codice_centro_costo": "CC-RSV-2001",
+          "budget_annuo": 631212.04
+        },
+        {
+          "id_reparto": 7,
+          "nome_reparto": "Ricerca e Sviluppo2",
+          "codice_centro_costo": "CC-RSV-2002",
+          "budget_annuo": 863788.16
+        },
+        {
+          "id_reparto": 8,
+          "nome_reparto": "Ricerca e Sviluppo3",
+          "codice_centro_costo": "CC-RSV-2003",
+          "budget_annuo": 917561.35
+        }
+      ],
+      "dipendenti": [
+        {
+          "id_dipendente": 1,
+          "nome": "Francesca",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRC80A01F205X",
+          "data_assunzione": "2010-10-13",
+          "stipendio_mensile": 3669.69,
+          "id_reparto": 26
+        },
+        {
+          "id_dipendente": 2,
+          "nome": "Davide",
+          "cognome": "Colombo",
+          "codice_fiscale": "RSSMRC80A01F205B",
+          "data_assunzione": "2009-02-18",
+          "stipendio_mensile": 3219.83,
+          "id_reparto": 4
+        },
+        {
+          "id_dipendente": 3,
+          "nome": "Sara",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRC80A01F205C",
+          "data_assunzione": "2005-07-16",
+          "stipendio_mensile": 3766.07,
+          "id_reparto": 14
+        },
+        {
+          "id_dipendente": 4,
+          "nome": "Matteo",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRC80A01F205D",
+          "data_assunzione": "2009-04-07",
+          "stipendio_mensile": 4206.33,
+          "id_reparto": 3
+        },
+        {
+          "id_dipendente": 5,
+          "nome": "Giulia",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC80A01F205E",
+          "data_assunzione": "2006-10-14",
+          "stipendio_mensile": 3482.09,
+          "id_reparto": 27
+        },
+        {
+          "id_dipendente": 6,
+          "nome": "Andrea",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRC80A01F205F",
+          "data_assunzione": "2008-08-30",
+          "stipendio_mensile": 3647.2,
+          "id_reparto": 18
+        },
+        {
+          "id_dipendente": 7,
+          "nome": "Davide",
+          "cognome": "Colombo",
+          "codice_fiscale": "RSSMRC80A01F205G",
+          "data_assunzione": "2010-04-10",
+          "stipendio_mensile": 3511.02,
+          "id_reparto": 1
+        },
+        {
+          "id_dipendente": 8,
+          "nome": "Chiara",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRC80A01F205H",
+          "data_assunzione": "2008-05-25",
+          "stipendio_mensile": 3306.3,
+          "id_reparto": 16
+        }
+      ],
+      "buste_paga": [
+        {
+          "id_busta_paga": 100001,
+          "id_dipendente": 304,
+          "periodo_riferimento": "2025-01-01",
+          "importo_lordo": 3491.73,
+          "importo_netto": 2003.8762267950565
+        },
+        {
+          "id_busta_paga": 100002,
+          "id_dipendente": 139,
+          "periodo_riferimento": "2025-01-02",
+          "importo_lordo": 3655.46,
+          "importo_netto": 1916.5816889390487
+        },
+        {
+          "id_busta_paga": 100003,
+          "id_dipendente": 233,
+          "periodo_riferimento": "2025-01-03",
+          "importo_lordo": 3354.82,
+          "importo_netto": 1896.299417060743
+        },
+        {
+          "id_busta_paga": 100004,
+          "id_dipendente": 46,
+          "periodo_riferimento": "2025-01-04",
+          "importo_lordo": 3539.06,
+          "importo_netto": 1899.03248975269
+        },
+        {
+          "id_busta_paga": 100005,
+          "id_dipendente": 154,
+          "periodo_riferimento": "2025-01-05",
+          "importo_lordo": 3332.73,
+          "importo_netto": 2095.9593216132994
+        },
+        {
+          "id_busta_paga": 100006,
+          "id_dipendente": 351,
+          "periodo_riferimento": "2025-01-06",
+          "importo_lordo": 3387.31,
+          "importo_netto": 1917.437253624244
+        },
+        {
+          "id_busta_paga": 100007,
+          "id_dipendente": 265,
+          "periodo_riferimento": "2025-01-07",
+          "importo_lordo": 4126.28,
+          "importo_netto": 2029.162032883134
+        },
+        {
+          "id_busta_paga": 100008,
+          "id_dipendente": 74,
+          "periodo_riferimento": "2025-01-08",
+          "importo_lordo": 3340.18,
+          "importo_netto": 1975.3335525742964
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "case"
+  ],
+  "query": "SELECT CASE WHEN d.stipendio_mensile >= 4500 THEN 'Fascia Alta' WHEN d.stipendio_mensile >= 3000 THEN 'Fascia Media' ELSE 'Fascia Base' END AS fascia_stipendiale, COUNT(*) AS numero_dipendenti, ROUND(CAST(AVG(d.stipendio_mensile) AS DECIMAL), 2) AS stipendio_medio, MIN(d.stipendio_mensile) AS stipendio_minimo, MAX(d.stipendio_mensile) AS stipendio_massimo FROM dipendenti AS d JOIN reparti AS r ON d.id_reparto = r.id_reparto WHERE r.nome_reparto LIKE 'Produzione%' GROUP BY fascia_stipendiale ORDER BY numero_dipendenti DESC, fascia_stipendiale ASC"
+}

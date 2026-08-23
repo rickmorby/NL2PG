@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "set_op"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_di_copertura",
+      "description": "La tabella autonoma polizze viene denominata contratti_di_copertura nella prosa aziendale; il solver deve riconoscere che i 'contratti di copertura' citati nei requisiti corrispondono fisicamente alla tabella polizze."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "premio_annuo",
+      "obsolete_value": "imposta_tecnica_periodica",
+      "description": "La colonna premio_annuo viene indicata con il gergo assicurativo imposta_tecnica_periodica; le query richieste devono aggregare o filtrare sulla colonna reale premio_annuo interpretando correttamente la perifrasi settoriale."
+    }
+  ],
+  "spec_hash": "1018b313e610327e"
+}

@@ -1,0 +1,32 @@
+{
+  "domain": "vendite",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_acquirenti",
+      "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; ogni riferimento agli acquirenti registrati punta fisicamente alla tabella clienti dello schema vendite."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "deleted_at",
+      "obsolete_value": "data di dismissione dal perimetro commerciale",
+      "description": "La colonna deleted_at presente su tutte le tabelle dello schema (clienti, ordini, dettagli_ordine, prodotti, agenti) e' descritta con il gergo interno 'data di dismissione dal perimetro commerciale'; le query devono tradurre questa perifrasi nel filtro di cancellazione logica WHERE deleted_at IS NULL per considerare esclusivamente i record attivi, eventualmente combinato con filtri temporali come EXTRACT(unita FROM created_at) o created_at BETWEEN t1 AND t2."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "totale",
+      "obsolete_value": "ammontare complessivo",
+      "description": "Il termine 'totale' (perifrasi: ammontare complessivo) e' polisemico nello schema vendite: indica sia la colonna totale_ordine nell'intestazione degli ordini sia la colonna totale_riga nella tabella dettagli_ordine; solo il contesto della frase aziendale disambigua quale delle due colonne deve essere usata nelle aggregazioni."
+    }
+  ],
+  "spec_hash": "dbc167068086cd4d"
+}

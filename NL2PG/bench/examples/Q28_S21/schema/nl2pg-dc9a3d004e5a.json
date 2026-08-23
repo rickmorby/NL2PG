@@ -1,0 +1,12 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "ecb0ed0d4f727a13"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    sede TEXT\n);\n\nCREATE TABLE corsi (\n    id INT PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    titolo TEXT NOT NULL,\n    cfu INT NOT NULL CHECK (cfu BETWEEN 1 AND 30),\n    periodo_lezioni DATERANGE NOT NULL,\n    CONSTRAINT corso_periodo_valido CHECK (NOT isempty(periodo_lezioni))\n);\n\nCREATE TABLE studenti (\n    id INT PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE iscrizioni (\n    id INT PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    data_iscrizione DATE NOT NULL,\n    voto NUMERIC(4,1) CHECK (voto IS NULL OR voto BETWEEN 18 AND 30)\n);"
+}

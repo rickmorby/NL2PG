@@ -1,0 +1,669 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    telefono TEXT,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    sku TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    categoria TEXT,\n    stato_disponibilita TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_disponibilita IN ('disponibile', 'esaurito', 'in_arrivo', 'ritirato')),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE prezzi_storici (\n    id SERIAL PRIMARY KEY,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id) ON DELETE CASCADE,\n    prezzo NUMERIC(10,2) NOT NULL CHECK (prezzo >= 0),\n    valid_from TIMESTAMP NOT NULL,\n    valid_to TIMESTAMP,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale NUMERIC(12,2) CHECK (totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    numero_riga INT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 662,
+        "columns": {
+          "id": {
+            "distinct": 662,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 662
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Giulia",
+              "Laura",
+              "Mario"
+            ]
+          },
+          "cognome": {
+            "distinct": 5,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Ferrari",
+              "Rossi",
+              "Verdi"
+            ]
+          },
+          "email": {
+            "distinct": 662,
+            "sample": [
+              "alessandro.ferrari100@example.com",
+              "alessandro.ferrari101@example.com",
+              "alessandro.ferrari102@example.com",
+              "alessandro.ferrari103@example.com",
+              "alessandro.ferrari104@example.com"
+            ]
+          },
+          "citta": {
+            "distinct": 6,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "telefono": {
+            "distinct": 6,
+            "sample": [
+              "+39 010 6789012",
+              "+39 011 3456789",
+              "+39 02 2345678",
+              "+39 055 5678901",
+              "+39 06 1234567"
+            ]
+          },
+          "creato_il": {
+            "distinct": 409,
+            "sample": [
+              "2023-12-16 09:30:00",
+              "2023-12-17 09:30:00",
+              "2023-12-18 09:30:00",
+              "2023-12-19 09:30:00",
+              "2023-12-20 09:30:00"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 352,
+        "columns": {
+          "id": {
+            "distinct": 352,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 352
+          },
+          "nome": {
+            "distinct": 6,
+            "sample": [
+              "Cuffie Wireless ANC",
+              "Laptop Pro 14",
+              "Monitor 27 4K",
+              "Smartphone X5",
+              "Tastiera Meccanica K70"
+            ]
+          },
+          "sku": {
+            "distinct": 352,
+            "sample": [
+              "ACC-TAS-005",
+              "ACC-TAS-0051",
+              "ACC-TAS-00510",
+              "ACC-TAS-00511",
+              "ACC-TAS-00512"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Cuffie bluetooth con cancellazione attiva del rumore",
+              "Monitor IPS 27 pollici risoluzione 4K USB-C",
+              "Smartphone 5G display 6.5 pollici 128GB",
+              "Tastiera meccanica switches rossi retroilluminata",
+              "Ultrabook 14 pollici 16GB RAM SSD 512GB"
+            ]
+          },
+          "categoria": {
+            "distinct": 6,
+            "sample": [
+              "Accessori",
+              "Audio",
+              "Elettrodomestici",
+              "Informatica",
+              "Telefonia"
+            ]
+          },
+          "stato_disponibilita": {
+            "distinct": 4,
+            "sample": [
+              "disponibile",
+              "esaurito",
+              "in_arrivo",
+              "ritirato"
+            ]
+          },
+          "creato_il": {
+            "distinct": 258,
+            "sample": [
+              "2023-12-12 08:00:00",
+              "2023-12-14 08:00:00",
+              "2023-12-19 08:00:00",
+              "2023-12-20 08:00:00",
+              "2023-12-22 08:00:00"
+            ]
+          }
+        }
+      },
+      "prezzi_storici": {
+        "row_count": 996,
+        "columns": {
+          "id": {
+            "distinct": 996,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 996
+          },
+          "prodotto_id": {
+            "distinct": 334,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 352
+          },
+          "prezzo": {
+            "distinct": 959,
+            "sample": [
+              "1007.36",
+              "1007.39",
+              "1009.75",
+              "1015.26",
+              "1016.26"
+            ],
+            "min": 104.93,
+            "max": 1818.6
+          },
+          "valid_from": {
+            "distinct": 80,
+            "sample": [
+              "2024-03-01 00:00:00",
+              "2024-03-02 00:00:00",
+              "2024-03-03 00:00:00",
+              "2024-03-04 00:00:00",
+              "2024-03-05 00:00:00"
+            ]
+          },
+          "valid_to": {
+            "distinct": 2,
+            "sample": [
+              "2024-12-31 23:59:59",
+              "2025-06-30 23:59:59"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1863,
+        "columns": {
+          "id": {
+            "distinct": 1863,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1963
+          },
+          "cliente_id": {
+            "distinct": 629,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 662
+          },
+          "data_ordine": {
+            "distinct": 519,
+            "sample": [
+              "2025-11-27 10:15:00",
+              "2025-11-28 10:15:00",
+              "2025-11-29 10:15:00",
+              "2025-11-30 10:15:00",
+              "2025-12-01 10:15:00"
+            ]
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "confermato",
+              "consegnato",
+              "in_attesa",
+              "spedito"
+            ]
+          },
+          "totale": {
+            "distinct": 1404,
+            "sample": [
+              "100.04",
+              "100.21",
+              "100.3",
+              "100.45",
+              "1000.39"
+            ],
+            "min": 36.0,
+            "max": 3126.25
+          }
+        }
+      },
+      "righe_ordine": {
+        "row_count": 1442,
+        "columns": {
+          "ordine_id": {
+            "distinct": 1015,
+            "sample": [
+              "1000",
+              "1002",
+              "1003",
+              "1004",
+              "1006"
+            ],
+            "min": 101,
+            "max": 1962
+          },
+          "prodotto_id": {
+            "distinct": 347,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 352
+          },
+          "numero_riga": {
+            "distinct": 1442,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1442
+          },
+          "quantita": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 4
+          },
+          "prezzo_unitario": {
+            "distinct": 1379,
+            "sample": [
+              "100.69",
+              "100.83",
+              "1003.25",
+              "1004.23",
+              "1004.98"
+            ],
+            "min": 29.99,
+            "max": 2338.2
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi@example.com",
+          "citta": "Napoli",
+          "telefono": "+39 011 3456789",
+          "creato_il": "2024-03-24 09:30:00"
+        },
+        {
+          "id": 2,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi1@example.com",
+          "citta": "Torino",
+          "telefono": "+39 010 6789012",
+          "creato_il": "2024-02-22 09:30:00"
+        },
+        {
+          "id": 3,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi2@example.com",
+          "citta": "Milano",
+          "telefono": "+39 011 3456789",
+          "creato_il": "2024-03-08 09:30:00"
+        },
+        {
+          "id": 4,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi3@example.com",
+          "citta": "Roma",
+          "telefono": "+39 010 6789012",
+          "creato_il": "2024-04-10 09:30:00"
+        },
+        {
+          "id": 5,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi4@example.com",
+          "citta": "Roma",
+          "telefono": "+39 011 3456789",
+          "creato_il": "2024-01-02 09:30:00"
+        },
+        {
+          "id": 6,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi5@example.com",
+          "citta": "Firenze",
+          "telefono": "+39 010 6789012",
+          "creato_il": "2024-02-16 09:30:00"
+        },
+        {
+          "id": 7,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi6@example.com",
+          "citta": "Milano",
+          "telefono": "+39 055 5678901",
+          "creato_il": "2024-04-13 09:30:00"
+        },
+        {
+          "id": 8,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi7@example.com",
+          "citta": "Firenze",
+          "telefono": "+39 081 4567890",
+          "creato_il": "2024-02-10 09:30:00"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "nome": "Laptop Pro 14",
+          "sku": "TECH-LAP-001",
+          "descrizione": "Ultrabook 14 pollici 16GB RAM SSD 512GB",
+          "categoria": "Audio",
+          "stato_disponibilita": "disponibile",
+          "creato_il": "2024-01-01 08:00:00"
+        },
+        {
+          "id": 2,
+          "nome": "Laptop Pro 14",
+          "sku": "TECH-LAP-0011",
+          "descrizione": "Ultrabook 14 pollici 16GB RAM SSD 512GB",
+          "categoria": "Video",
+          "stato_disponibilita": "disponibile",
+          "creato_il": "2024-03-04 08:00:00"
+        },
+        {
+          "id": 3,
+          "nome": "Laptop Pro 14",
+          "sku": "TECH-LAP-0012",
+          "descrizione": "Ultrabook 14 pollici 16GB RAM SSD 512GB",
+          "categoria": "Video",
+          "stato_disponibilita": "disponibile",
+          "creato_il": "2024-02-15 08:00:00"
+        },
+        {
+          "id": 4,
+          "nome": "Laptop Pro 14",
+          "sku": "TECH-LAP-0013",
+          "descrizione": "Ultrabook 14 pollici 16GB RAM SSD 512GB",
+          "categoria": "Informatica",
+          "stato_disponibilita": "disponibile",
+          "creato_il": "2024-03-11 08:00:00"
+        },
+        {
+          "id": 5,
+          "nome": "Laptop Pro 14",
+          "sku": "TECH-LAP-0014",
+          "descrizione": "Ultrabook 14 pollici 16GB RAM SSD 512GB",
+          "categoria": "Video",
+          "stato_disponibilita": "disponibile",
+          "creato_il": "2023-12-14 08:00:00"
+        },
+        {
+          "id": 6,
+          "nome": "Laptop Pro 14",
+          "sku": "TECH-LAP-0015",
+          "descrizione": "Ultrabook 14 pollici 16GB RAM SSD 512GB",
+          "categoria": "Audio",
+          "stato_disponibilita": "in_arrivo",
+          "creato_il": "2024-01-26 08:00:00"
+        },
+        {
+          "id": 7,
+          "nome": "Laptop Pro 14",
+          "sku": "TECH-LAP-0016",
+          "descrizione": "Ultrabook 14 pollici 16GB RAM SSD 512GB",
+          "categoria": "Elettrodomestici",
+          "stato_disponibilita": "disponibile",
+          "creato_il": "2024-01-13 08:00:00"
+        },
+        {
+          "id": 8,
+          "nome": "Laptop Pro 14",
+          "sku": "TECH-LAP-0017",
+          "descrizione": "Ultrabook 14 pollici 16GB RAM SSD 512GB",
+          "categoria": "Video",
+          "stato_disponibilita": "esaurito",
+          "creato_il": "2024-03-07 08:00:00"
+        }
+      ],
+      "prezzi_storici": [
+        {
+          "id": 1,
+          "prodotto_id": 212,
+          "prezzo": 1612.03,
+          "valid_from": "2024-03-11 00:00:00",
+          "valid_to": "2024-12-31 23:59:59"
+        },
+        {
+          "id": 2,
+          "prodotto_id": 217,
+          "prezzo": 1493.71,
+          "valid_from": "2024-03-10 00:00:00",
+          "valid_to": "2024-12-31 23:59:59"
+        },
+        {
+          "id": 3,
+          "prodotto_id": 206,
+          "prezzo": 1731.99,
+          "valid_from": "2024-03-05 00:00:00",
+          "valid_to": "2024-12-31 23:59:59"
+        },
+        {
+          "id": 4,
+          "prodotto_id": 57,
+          "prezzo": 1193.57,
+          "valid_from": "2024-03-11 00:00:00",
+          "valid_to": "2024-12-31 23:59:59"
+        },
+        {
+          "id": 5,
+          "prodotto_id": 118,
+          "prezzo": 1626.85,
+          "valid_from": "2024-03-01 00:00:00",
+          "valid_to": "2024-12-31 23:59:59"
+        },
+        {
+          "id": 6,
+          "prodotto_id": 131,
+          "prezzo": 955.59,
+          "valid_from": "2024-03-02 00:00:00",
+          "valid_to": "2024-12-31 23:59:59"
+        },
+        {
+          "id": 7,
+          "prodotto_id": 130,
+          "prezzo": 1183.55,
+          "valid_from": "2024-03-13 00:00:00",
+          "valid_to": "2024-12-31 23:59:59"
+        },
+        {
+          "id": 8,
+          "prodotto_id": 258,
+          "prezzo": 997.96,
+          "valid_from": "2024-03-07 00:00:00",
+          "valid_to": "2024-12-31 23:59:59"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 101,
+          "cliente_id": 97,
+          "data_ordine": "2026-01-08 10:15:00",
+          "stato_ordine": "annullato",
+          "totale": 2639.04
+        },
+        {
+          "id": 102,
+          "cliente_id": 264,
+          "data_ordine": "2025-12-01 10:15:00",
+          "stato_ordine": "annullato",
+          "totale": 2777.39
+        },
+        {
+          "id": 103,
+          "cliente_id": 407,
+          "data_ordine": "2026-01-10 10:15:00",
+          "stato_ordine": "consegnato",
+          "totale": 1469.46
+        },
+        {
+          "id": 104,
+          "cliente_id": 453,
+          "data_ordine": "2026-01-29 10:15:00",
+          "stato_ordine": "consegnato",
+          "totale": 1347.68
+        },
+        {
+          "id": 105,
+          "cliente_id": 455,
+          "data_ordine": "2026-02-15 10:15:00",
+          "stato_ordine": "in_attesa",
+          "totale": 2728.62
+        },
+        {
+          "id": 106,
+          "cliente_id": 617,
+          "data_ordine": "2026-01-12 10:15:00",
+          "stato_ordine": "consegnato",
+          "totale": 1873.61
+        },
+        {
+          "id": 107,
+          "cliente_id": 224,
+          "data_ordine": "2026-01-23 10:15:00",
+          "stato_ordine": "spedito",
+          "totale": 1992.39
+        },
+        {
+          "id": 108,
+          "cliente_id": 216,
+          "data_ordine": "2026-01-05 10:15:00",
+          "stato_ordine": "spedito",
+          "totale": 845.07
+        }
+      ],
+      "righe_ordine": [
+        {
+          "ordine_id": 457,
+          "prodotto_id": 120,
+          "numero_riga": 1,
+          "quantita": "2",
+          "prezzo_unitario": 2007.8
+        },
+        {
+          "ordine_id": 1259,
+          "prodotto_id": 43,
+          "numero_riga": 2,
+          "quantita": "2",
+          "prezzo_unitario": 2261.92
+        },
+        {
+          "ordine_id": 1372,
+          "prodotto_id": 336,
+          "numero_riga": 3,
+          "quantita": "1",
+          "prezzo_unitario": 2106.02
+        },
+        {
+          "ordine_id": 891,
+          "prodotto_id": 276,
+          "numero_riga": 4,
+          "quantita": "3",
+          "prezzo_unitario": 920.87
+        },
+        {
+          "ordine_id": 829,
+          "prodotto_id": 345,
+          "numero_riga": 5,
+          "quantita": "3",
+          "prezzo_unitario": 1276.68
+        },
+        {
+          "ordine_id": 1126,
+          "prodotto_id": 345,
+          "numero_riga": 6,
+          "quantita": "1",
+          "prezzo_unitario": 2135.01
+        },
+        {
+          "ordine_id": 858,
+          "prodotto_id": 29,
+          "numero_riga": 7,
+          "quantita": 1,
+          "prezzo_unitario": 1299.0
+        },
+        {
+          "ordine_id": 1649,
+          "prodotto_id": 201,
+          "numero_riga": 8,
+          "quantita": "1",
+          "prezzo_unitario": 1980.39
+        }
+      ]
+    }
+  },
+  "story": "Alla direzione commerciale di Elettronica Aurora, rivenditore di informatica e telefonia con piazze a Milano, Roma, Napoli, Firenze, Bologna e Torino, arriva il momento della consueta verifica trimestrale sui flussi d'ordine. Il punto di partenza è l'archivio clienti, dove sono custodite 662 schede: per ciascuna si annotano il nome e il cognome del cliente, l'indirizzo di posta elettronica, la città di residenza, il recapito telefonico e la data di inserimento nella rete commerciale. Accanto ad esso vive il catalogo prodotti, con 352 referenze descritte da nome, codice identificativo di magazzino, descrizione tecnica e categoria di appartenenza, che spazia da Informatica ad Audio, da Telefonia ad Accessori fino agli Elettrodomestici; ogni referenza porta con sé anche quella che il manuale interno chiama, con formula volutamente generica, la «condizione corrente dell'elemento», che può essere disponibile, esaurito, in arrivo oppure ritirato dal listino. Le versioni di prezzo non abitano nel catalogo ma nell'archivio variazioni listino, ossia lo storico dei prezzi, che conta 996 versioni: ciascuna riporta il riferimento alla referenza, l'importo praticato — dai 104.93 euro minimi ai 1818.60 massimi — la data di decorrenza e il cosiddetto «termine di efficacia commerciale», cioè l'istante oltre il quale quella versione cesse di valere; molte versioni entrate in vigore dal 2024-03-01 scadono al 2024-12-31, altre al 2025-06-30, e quando i verificatori devono attribuire a una voce d'acquisto il prezzo di riferimento prelevano la versione con la decorrenza più recente tra quelle ancora in corso. Il cuore della verifica resta però il registro ordini: 1863 intestazioni, ciascuna legata a un cliente, con data di registrazione, importo totale — dai 36.00 euro ai 3126.25 — e anch'essa una propria «condizione corrente dell'elemento», che qui descrive l'avanzamento della pratica: in attesa, confermata, spedita, consegnata oppure annullata. Le composizioni dettagliate sono tracciate nel registro intitolato «righe ordine», 1442 voci in cui figurano la posizione progressiva della voce nell'ambito dell'ordine, la referenza acquistata, la quantità — da 1 a 4 pezzi — e il prezzo unitario applicato, compreso tra 29.99 e 2338.20 euro. La richiesta della direzione è precisa: per ogni città servita occorre individuare l'ordine più recente tra quelli contrassegnati come 'consegnato' oppure 'spedito', lasciando fuori le pratiche ancora in attesa o annullate; per ciascuno vanno indicati il nome completo del cliente, la data dell'ordine e l'importo, con l'elenco finale ordinato alfabeticamente per città. Gli operatori collaudano il metodo su casi reali: a Roma l'ordine del 2026-01-29 risulta consegnato per 1347.68 euro, mentre quello del 2026-02-15, fermo in attesa per 2728.62 euro, resta escluso; a Napoli la pratica del 2026-01-08 è stata annullata e cede il passo a evadizioni più recenti; a Milano un ordine spedito il 2026-01-23 per 1992.39 euro guida la classifica locale, davanti a uno spedito il 2026-01-05 per 845.07 euro. Un avvertimento circola infine tra i revisori: poiché il manuale adopera la stessa locuzione sia per la disponibilità a scaffale sia per l'avanzamento delle pratiche, occorre capire bene quale delle due «condizioni correnti dell'elemento» governi il filtro della verifica: è lo stato di avanzamento dell'ordine, e non la disponibilità del prodotto, a decidere cosa entra nell'elenco finale."
+}

@@ -1,0 +1,575 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE fatture_vendita (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_documento TEXT NOT NULL UNIQUE,\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_fattura TEXT NOT NULL DEFAULT 'emessa' CHECK (stato_fattura IN ('bozza', 'emessa', 'pagata', 'annullata')),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE righe_fattura (\n    id SERIAL PRIMARY KEY,\n    fattura_id INT NOT NULL REFERENCES fatture_vendita(id) ON DELETE CASCADE,\n    numero_riga INT NOT NULL,\n    descrizione TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(12,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo_totale NUMERIC(14,2) NOT NULL CHECK (importo_totale >= 0),\n    UNIQUE (fattura_id, numero_riga)\n);\n\nCREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    fattura_id INT NOT NULL REFERENCES fatture_vendita(id) ON DELETE CASCADE,\n    codice_conto TEXT NOT NULL,\n    descrizione_movimento TEXT NOT NULL,\n    sezione_prima_nota TEXT NOT NULL CHECK (sezione_prima_nota IN ('dare', 'avere')),\n    importo_movimento NUMERIC(14,2) NOT NULL CHECK (importo_movimento >= 0),\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 333,
+        "columns": {
+          "id": {
+            "distinct": 333,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 333
+          },
+          "ragione_sociale": {
+            "distinct": 10,
+            "sample": [
+              "Alfa Servizi SRL",
+              "Beta Costruzioni SpA",
+              "Delta Informatica SRL",
+              "Epsilon Arredamenti SAS",
+              "Gamma Logistica SNC"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 333,
+            "sample": [
+              "IT01234567890",
+              "IT012345678901",
+              "IT0123456789010",
+              "IT0123456789011",
+              "IT0123456789012"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      "fatture_vendita": {
+        "row_count": 1312,
+        "columns": {
+          "id": {
+            "distinct": 1312,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1412
+          },
+          "cliente_id": {
+            "distinct": 328,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 333
+          },
+          "numero_documento": {
+            "distinct": 1312,
+            "sample": [
+              "FT/2026/0001",
+              "FT/2026/00011",
+              "FT/2026/000110",
+              "FT/2026/0001100",
+              "FT/2026/0001101"
+            ]
+          },
+          "data_emissione": {
+            "distinct": 120,
+            "sample": [
+              "2025-11-26",
+              "2025-11-27",
+              "2025-11-28",
+              "2025-11-29",
+              "2025-11-30"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 120,
+            "sample": [
+              "2026-03-11",
+              "2026-03-12",
+              "2026-03-13",
+              "2026-03-14",
+              "2026-03-15"
+            ]
+          },
+          "stato_fattura": {
+            "distinct": 4,
+            "sample": [
+              "annullata",
+              "bozza",
+              "emessa",
+              "pagata"
+            ]
+          },
+          "creato_il": {
+            "distinct": 5,
+            "sample": [
+              "2026-01-10 09:15:00",
+              "2026-01-18 11:30:00",
+              "2026-01-25 14:45:00",
+              "2026-02-02 16:20:00",
+              "2026-02-08 10:05:00"
+            ]
+          }
+        }
+      },
+      "righe_fattura": {
+        "row_count": 1312,
+        "columns": {
+          "id": {
+            "distinct": 1312,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 501,
+            "max": 1812
+          },
+          "fattura_id": {
+            "distinct": 1312,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1412
+          },
+          "numero_riga": {
+            "distinct": 1312,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1312
+          },
+          "descrizione": {
+            "distinct": 10,
+            "sample": [
+              "Assistenza hardware onsite",
+              "Canone hosting cloud",
+              "Consulenza tecnica mensile",
+              "Formazione personale",
+              "Fornitura cartucce toner"
+            ]
+          },
+          "quantita": {
+            "distinct": 1249,
+            "sample": [
+              "1.0",
+              "1.1892276877718606",
+              "1.2773891802545823",
+              "1.3098665882596605",
+              "1.330964419359944"
+            ],
+            "min": 1.0,
+            "max": 11.0
+          },
+          "prezzo_unitario": {
+            "distinct": 1210,
+            "sample": [
+              "100.02",
+              "100.28",
+              "100.35",
+              "100.44",
+              "100.5"
+            ],
+            "min": 39.0,
+            "max": 810.0
+          },
+          "importo_totale": {
+            "distinct": 1247,
+            "sample": [
+              "1000.17",
+              "1005.21",
+              "1008.03",
+              "1008.09",
+              "1008.77"
+            ],
+            "min": 312.0,
+            "max": 1601.46
+          }
+        }
+      },
+      "movimenti_contabili": {
+        "row_count": 2403,
+        "columns": {
+          "id": {
+            "distinct": 2403,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 701,
+            "max": 3103
+          },
+          "fattura_id": {
+            "distinct": 1114,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1412
+          },
+          "codice_conto": {
+            "distinct": 6,
+            "sample": [
+              "1010",
+              "1020",
+              "4010",
+              "4020",
+              "6050"
+            ]
+          },
+          "descrizione_movimento": {
+            "distinct": 8,
+            "sample": [
+              "Accredito rimessa diretta",
+              "Anticipo cliente via bonifico",
+              "Incasso fattura da cliente",
+              "Rateizzo parziale fattura",
+              "Rettifica importo documento"
+            ]
+          },
+          "sezione_prima_nota": {
+            "distinct": 2,
+            "sample": [
+              "avere",
+              "dare"
+            ]
+          },
+          "importo_movimento": {
+            "distinct": 2272,
+            "sample": [
+              "1000.13",
+              "1000.85",
+              "1001.75",
+              "1001.83",
+              "1002.12"
+            ],
+            "min": 190.0,
+            "max": 1440.0
+          },
+          "data_registrazione": {
+            "distinct": 63,
+            "sample": [
+              "2025-12-23",
+              "2025-12-24",
+              "2025-12-25",
+              "2025-12-26",
+              "2025-12-27"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Beta Costruzioni SpA",
+          "partita_iva": "IT01234567890",
+          "citta": "Firenze"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Epsilon Arredamenti SAS",
+          "partita_iva": "IT012345678901",
+          "citta": "Napoli"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Sigma Consulenze SpA",
+          "partita_iva": "IT012345678902",
+          "citta": "Firenze"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Epsilon Arredamenti SAS",
+          "partita_iva": "IT012345678903",
+          "citta": "Milano"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Sigma Consulenze SpA",
+          "partita_iva": "IT012345678904",
+          "citta": "Napoli"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Gamma Logistica SNC",
+          "partita_iva": "IT012345678905",
+          "citta": "Firenze"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Gamma Logistica SNC",
+          "partita_iva": "IT012345678906",
+          "citta": "Roma"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Gamma Logistica SNC",
+          "partita_iva": "IT012345678907",
+          "citta": "Milano"
+        }
+      ],
+      "fatture_vendita": [
+        {
+          "id": 101,
+          "cliente_id": 10,
+          "numero_documento": "FT/2026/0001",
+          "data_emissione": "2025-11-29",
+          "data_scadenza": "2026-04-25",
+          "stato_fattura": "bozza",
+          "creato_il": "2026-01-10 09:15:00"
+        },
+        {
+          "id": 102,
+          "cliente_id": 217,
+          "numero_documento": "FT/2026/00011",
+          "data_emissione": "2025-12-14",
+          "data_scadenza": "2026-04-01",
+          "stato_fattura": "bozza",
+          "creato_il": "2026-01-10 09:15:00"
+        },
+        {
+          "id": 103,
+          "cliente_id": 86,
+          "numero_documento": "FT/2026/00012",
+          "data_emissione": "2025-12-18",
+          "data_scadenza": "2026-05-13",
+          "stato_fattura": "annullata",
+          "creato_il": "2026-01-10 09:15:00"
+        },
+        {
+          "id": 104,
+          "cliente_id": 79,
+          "numero_documento": "FT/2026/00013",
+          "data_emissione": "2025-12-16",
+          "data_scadenza": "2026-03-20",
+          "stato_fattura": "bozza",
+          "creato_il": "2026-01-10 09:15:00"
+        },
+        {
+          "id": 105,
+          "cliente_id": 117,
+          "numero_documento": "FT/2026/00014",
+          "data_emissione": "2026-01-10",
+          "data_scadenza": "2026-06-07",
+          "stato_fattura": "annullata",
+          "creato_il": "2026-01-10 09:15:00"
+        },
+        {
+          "id": 106,
+          "cliente_id": 61,
+          "numero_documento": "FT/2026/00015",
+          "data_emissione": "2026-01-21",
+          "data_scadenza": "2026-05-01",
+          "stato_fattura": "emessa",
+          "creato_il": "2026-01-10 09:15:00"
+        },
+        {
+          "id": 107,
+          "cliente_id": 7,
+          "numero_documento": "FT/2026/00016",
+          "data_emissione": "2025-12-19",
+          "data_scadenza": "2026-05-06",
+          "stato_fattura": "emessa",
+          "creato_il": "2026-01-10 09:15:00"
+        },
+        {
+          "id": 108,
+          "cliente_id": 325,
+          "numero_documento": "FT/2026/00017",
+          "data_emissione": "2025-12-31",
+          "data_scadenza": "2026-04-10",
+          "stato_fattura": "annullata",
+          "creato_il": "2026-01-10 09:15:00"
+        }
+      ],
+      "righe_fattura": [
+        {
+          "id": 501,
+          "fattura_id": 232,
+          "numero_riga": 1,
+          "descrizione": "Noleggio furgone settimanale",
+          "quantita": 10.992594537739059,
+          "prezzo_unitario": 51.04,
+          "importo_totale": 760.26
+        },
+        {
+          "id": 502,
+          "fattura_id": 680,
+          "numero_riga": 2,
+          "descrizione": "Canone hosting cloud",
+          "quantita": 10.143621714173278,
+          "prezzo_unitario": 87.33,
+          "importo_totale": 662.04
+        },
+        {
+          "id": 503,
+          "fattura_id": 1350,
+          "numero_riga": 3,
+          "descrizione": "Noleggio furgone settimanale",
+          "quantita": 9.457935356838608,
+          "prezzo_unitario": 111.23,
+          "importo_totale": 929.63
+        },
+        {
+          "id": 504,
+          "fattura_id": 1232,
+          "numero_riga": 4,
+          "descrizione": "Licenza software annuale",
+          "quantita": 9.013351651071487,
+          "prezzo_unitario": 71.29,
+          "importo_totale": 924.31
+        },
+        {
+          "id": 505,
+          "fattura_id": 869,
+          "numero_riga": 5,
+          "descrizione": "Consulenza tecnica mensile",
+          "quantita": 8.830639501702555,
+          "prezzo_unitario": 85.42,
+          "importo_totale": 490.55
+        },
+        {
+          "id": 506,
+          "fattura_id": 520,
+          "numero_riga": 6,
+          "descrizione": "Canone hosting cloud",
+          "quantita": 7.356262893115337,
+          "prezzo_unitario": 84.54,
+          "importo_totale": 639.94
+        },
+        {
+          "id": 507,
+          "fattura_id": 1332,
+          "numero_riga": 7,
+          "descrizione": "Trasporto merce nazionale",
+          "quantita": 7.061754327741508,
+          "prezzo_unitario": 94.52,
+          "importo_totale": 780.15
+        },
+        {
+          "id": 508,
+          "fattura_id": 374,
+          "numero_riga": 8,
+          "descrizione": "Formazione personale",
+          "quantita": 10.176381036591382,
+          "prezzo_unitario": 55.58,
+          "importo_totale": 502.89
+        }
+      ],
+      "movimenti_contabili": [
+        {
+          "id": 701,
+          "fattura_id": 904,
+          "codice_conto": "1020",
+          "descrizione_movimento": "Ricavo servizi fatturati",
+          "sezione_prima_nota": "avere",
+          "importo_movimento": 443.79,
+          "data_registrazione": "2026-01-07"
+        },
+        {
+          "id": 702,
+          "fattura_id": 846,
+          "codice_conto": "6050",
+          "descrizione_movimento": "Rettifica importo documento",
+          "sezione_prima_nota": "avere",
+          "importo_movimento": 393.61,
+          "data_registrazione": "2026-01-22"
+        },
+        {
+          "id": 703,
+          "fattura_id": 739,
+          "codice_conto": "1020",
+          "descrizione_movimento": "Anticipo cliente via bonifico",
+          "sezione_prima_nota": "avere",
+          "importo_movimento": 880.74,
+          "data_registrazione": "2026-01-08"
+        },
+        {
+          "id": 704,
+          "fattura_id": 198,
+          "codice_conto": "6050",
+          "descrizione_movimento": "Incasso fattura da cliente",
+          "sezione_prima_nota": "avere",
+          "importo_movimento": 675.1,
+          "data_registrazione": "2026-01-15"
+        },
+        {
+          "id": 705,
+          "fattura_id": 1123,
+          "codice_conto": "1020",
+          "descrizione_movimento": "Incasso fattura da cliente",
+          "sezione_prima_nota": "dare",
+          "importo_movimento": 963.34,
+          "data_registrazione": "2026-01-13"
+        },
+        {
+          "id": 706,
+          "fattura_id": 728,
+          "codice_conto": "1010",
+          "descrizione_movimento": "Saldo RIBA ricevuto",
+          "sezione_prima_nota": "avere",
+          "importo_movimento": 590.35,
+          "data_registrazione": "2025-12-24"
+        },
+        {
+          "id": 707,
+          "fattura_id": 475,
+          "codice_conto": "4020",
+          "descrizione_movimento": "Incasso fattura da cliente",
+          "sezione_prima_nota": "dare",
+          "importo_movimento": 311.85,
+          "data_registrazione": "2026-01-10"
+        },
+        {
+          "id": 708,
+          "fattura_id": 791,
+          "codice_conto": "1020",
+          "descrizione_movimento": "Saldo RIBA ricevuto",
+          "sezione_prima_nota": "dare",
+          "importo_movimento": 899.04,
+          "data_registrazione": "2026-01-20"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "distinct_on"
+  ],
+  "query": "WITH totali_fattura AS (SELECT fattura_id, SUM(importo_totale) AS totale_fattura FROM righe_fattura GROUP BY fattura_id) SELECT DISTINCT ON (c.citta) c.citta AS citta_cliente, c.ragione_sociale, f.numero_documento, f.data_emissione, tf.totale_fattura FROM clienti c JOIN fatture_vendita f ON f.cliente_id = c.id JOIN totali_fattura tf ON tf.fattura_id = f.id WHERE f.stato_fattura = 'pagata' ORDER BY c.citta ASC, f.data_emissione DESC, f.id ASC;"
+}

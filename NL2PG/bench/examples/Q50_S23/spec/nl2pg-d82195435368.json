@@ -1,0 +1,34 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 5,
+  "hierarchy": "exclusive_arc",
+  "sql_features": [
+    "boolean_predicate"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "candidati",
+      "obsolete_value": "talent_pool_esterno",
+      "description": "La tabella candidati, che partecipa all'arco esclusivo della tabella documenti insieme a dipendenti, viene denominata talent_pool_esterno nella prosa aziendale. Il nome reale nel database resta candidati."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "attivo",
+      "obsolete_value": "in forza",
+      "description": "Il flag booleano attivo della tabella dipendenti viene espresso con il gergo HR 'in forza'. Le query richieste dovranno tradurre questa espressione nel predicato WHERE dipendenti.attivo IS TRUE."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "superata",
+      "obsolete_value": "verdetto favorevole",
+      "description": "La colonna booleana superata della tabella valutazioni è descritta nei documenti aziendali con il sinonimo 'verdetto favorevole'. Le query dovranno mappare tale perifrasi sul predicato WHERE valutazioni.superata IS TRUE."
+    }
+  ],
+  "spec_hash": "c9029e80594ea393"
+}

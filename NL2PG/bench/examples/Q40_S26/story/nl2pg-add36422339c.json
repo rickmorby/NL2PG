@@ -1,0 +1,533 @@
+{
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono_contatto TEXT\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano INT CHECK (piano >= 0),\n    posti_letto_totali INT CHECK (posti_letto_totali >= 0)\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    reparto_id INT NOT NULL REFERENCES reparti(id)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    data_ingresso DATE NOT NULL,\n    data_dimissione DATE,\n    gravita TEXT CHECK (gravita IN ('1', '2', '3', '4', '5')),\n    motivo_ricovero TEXT NOT NULL,\n    costo_giornaliero NUMERIC(10,2) CHECK (costo_giornaliero >= 0),\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ingresso)\n);",
+  "data_profile": {
+    "profile": {
+      "reparti": {
+        "row_count": 42,
+        "columns": {
+          "id": {
+            "distinct": 42,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 42
+          },
+          "nome_reparto": {
+            "distinct": 42,
+            "sample": [
+              "Cardiologia",
+              "Cardiologia1",
+              "Cardiologia2",
+              "Cardiologia3",
+              "Cardiologia4"
+            ]
+          },
+          "piano": {
+            "distinct": 4,
+            "sample": [
+              "0",
+              "1",
+              "2",
+              "3"
+            ]
+          },
+          "posti_letto_totali": {
+            "distinct": 39,
+            "sample": [
+              "14.036914458114847",
+              "14.700887751180018",
+              "16.864496086640685",
+              "17.20664638543898",
+              "17.732615378063212"
+            ],
+            "min": 14.036914458114847,
+            "max": 33.81041991055869
+          }
+        }
+      },
+      "pazienti": {
+        "row_count": 423,
+        "columns": {
+          "id": {
+            "distinct": 423,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 423
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Anna",
+              "Antonio",
+              "Davide",
+              "Elena",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 423,
+            "sample": [
+              "BNCLRA75C42F205B",
+              "BNCLRA75C42F205C",
+              "BNCLRA75C42F205D",
+              "BNCLRA75C42F205E",
+              "BNCLRA75C42F205F"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 401,
+            "sample": [
+              "1957-11-02",
+              "1957-12-26",
+              "1958-01-09",
+              "1958-02-12",
+              "1958-07-08"
+            ]
+          },
+          "telefono_contatto": {
+            "distinct": 7,
+            "sample": [
+              "+39 010 3344556",
+              "+39 011 4455667",
+              "+39 02 9876543",
+              "+39 055 7788990",
+              "+39 06 1234567"
+            ]
+          }
+        }
+      },
+      "medici": {
+        "row_count": 133,
+        "columns": {
+          "id": {
+            "distinct": 133,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 133
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandra",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Franco"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Barbieri",
+              "Costa",
+              "De Luca",
+              "Fontana",
+              "Gatti"
+            ]
+          },
+          "specializzazione": {
+            "distinct": 6,
+            "sample": [
+              "Cardiologia interventistica",
+              "Chirurgia addominale",
+              "Medicina interna",
+              "Neurologia clinica",
+              "Ortopedia e traumatologia"
+            ]
+          },
+          "reparto_id": {
+            "distinct": 39,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "13",
+              "14"
+            ],
+            "min": 1,
+            "max": 42
+          }
+        }
+      },
+      "ricoveri": {
+        "row_count": 2805,
+        "columns": {
+          "id": {
+            "distinct": 2805,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2805
+          },
+          "paziente_id": {
+            "distinct": 423,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 423
+          },
+          "medico_id": {
+            "distinct": 133,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 133
+          },
+          "data_ingresso": {
+            "distinct": 240,
+            "sample": [
+              "2024-11-11",
+              "2024-11-12",
+              "2024-11-13",
+              "2024-11-14",
+              "2024-11-15"
+            ]
+          },
+          "data_dimissione": {
+            "distinct": 233,
+            "sample": [
+              "2025-01-18",
+              "2025-01-19",
+              "2025-01-20",
+              "2025-01-21",
+              "2025-01-22"
+            ]
+          },
+          "gravita": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          },
+          "motivo_ricovero": {
+            "distinct": 10,
+            "sample": [
+              "Appendicite acuta",
+              "Artrite settica",
+              "Broncopneumopatia cronica",
+              "Calcolosi biliare",
+              "Emorragia digestiva"
+            ]
+          },
+          "costo_giornaliero": {
+            "distinct": 2524,
+            "sample": [
+              "1000.25",
+              "1000.38",
+              "1000.49",
+              "1000.84",
+              "1001.36"
+            ],
+            "min": 448.0,
+            "max": 1920.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "reparti": [
+        {
+          "id": 1,
+          "nome_reparto": "Cardiologia",
+          "piano": "3",
+          "posti_letto_totali": 29.35382096680901
+        },
+        {
+          "id": 2,
+          "nome_reparto": "Cardiologia1",
+          "piano": "1",
+          "posti_letto_totali": 24.25960969979475
+        },
+        {
+          "id": 3,
+          "nome_reparto": "Cardiologia2",
+          "piano": "3",
+          "posti_letto_totali": 23.207824056220915
+        },
+        {
+          "id": 4,
+          "nome_reparto": "Cardiologia3",
+          "piano": "3",
+          "posti_letto_totali": 26.551134200007876
+        },
+        {
+          "id": 5,
+          "nome_reparto": "Cardiologia4",
+          "piano": "1",
+          "posti_letto_totali": 25.854233564886453
+        },
+        {
+          "id": 6,
+          "nome_reparto": "Cardiologia5",
+          "piano": "0",
+          "posti_letto_totali": 27.42481490042446
+        },
+        {
+          "id": 7,
+          "nome_reparto": "Cardiologia6",
+          "piano": "1",
+          "posti_letto_totali": 20.737079724082378
+        },
+        {
+          "id": 8,
+          "nome_reparto": "Chirurgia Generale",
+          "piano": "0",
+          "posti_letto_totali": 31.359393443796222
+        }
+      ],
+      "pazienti": [
+        {
+          "id": 1,
+          "nome": "Laura",
+          "cognome": "Verdi",
+          "codice_fiscale": "RSSMRA80A01H501X",
+          "data_nascita": "1980-04-19",
+          "telefono_contatto": "+39 081 4567890"
+        },
+        {
+          "id": 2,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "data_nascita": "1980-01-15",
+          "telefono_contatto": "+39 06 1234567"
+        },
+        {
+          "id": 3,
+          "nome": "Elena",
+          "cognome": "Esposito",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "data_nascita": "1984-12-06",
+          "telefono_contatto": "+39 091 6677889"
+        },
+        {
+          "id": 4,
+          "nome": "Sara",
+          "cognome": "Verdi",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "data_nascita": "1980-04-20",
+          "telefono_contatto": "+39 081 4567890"
+        },
+        {
+          "id": 5,
+          "nome": "Mario",
+          "cognome": "Verdi",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "data_nascita": "1984-09-20",
+          "telefono_contatto": "+39 010 3344556"
+        },
+        {
+          "id": 6,
+          "nome": "Elena",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "data_nascita": "1975-04-15",
+          "telefono_contatto": "+39 06 1234567"
+        },
+        {
+          "id": 7,
+          "nome": "Sara",
+          "cognome": "Russo",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "data_nascita": "1979-07-23",
+          "telefono_contatto": null
+        },
+        {
+          "id": 8,
+          "nome": "Anna",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "data_nascita": "1987-04-29",
+          "telefono_contatto": "+39 02 9876543"
+        }
+      ],
+      "medici": [
+        {
+          "id": 1,
+          "nome": "Giorgio",
+          "cognome": "Moretti",
+          "specializzazione": "Cardiologia interventistica",
+          "reparto_id": 41
+        },
+        {
+          "id": 2,
+          "nome": "Chiara",
+          "cognome": "Barbieri",
+          "specializzazione": "Neurologia clinica",
+          "reparto_id": 42
+        },
+        {
+          "id": 3,
+          "nome": "Elena",
+          "cognome": "Lombardi",
+          "specializzazione": "Medicina interna",
+          "reparto_id": 19
+        },
+        {
+          "id": 4,
+          "nome": "Alessandra",
+          "cognome": "Gatti",
+          "specializzazione": "Pediatria generale",
+          "reparto_id": 10
+        },
+        {
+          "id": 5,
+          "nome": "Chiara",
+          "cognome": "Rinaldi",
+          "specializzazione": "Neurologia clinica",
+          "reparto_id": 41
+        },
+        {
+          "id": 6,
+          "nome": "Davide",
+          "cognome": "Marchetti",
+          "specializzazione": "Pediatria generale",
+          "reparto_id": 21
+        },
+        {
+          "id": 7,
+          "nome": "Davide",
+          "cognome": "Costa",
+          "specializzazione": "Ortopedia e traumatologia",
+          "reparto_id": 7
+        },
+        {
+          "id": 8,
+          "nome": "Franco",
+          "cognome": "Lombardi",
+          "specializzazione": "Pediatria generale",
+          "reparto_id": 28
+        }
+      ],
+      "ricoveri": [
+        {
+          "id": 1,
+          "paziente_id": 166,
+          "medico_id": 81,
+          "data_ingresso": "2024-11-27",
+          "data_dimissione": "2025-01-18",
+          "gravita": "3",
+          "motivo_ricovero": "Artrite settica",
+          "costo_giornaliero": 1205.4
+        },
+        {
+          "id": 2,
+          "paziente_id": 99,
+          "medico_id": 54,
+          "data_ingresso": "2024-11-14",
+          "data_dimissione": "2025-03-16",
+          "gravita": "2",
+          "motivo_ricovero": "Ictus ischemico",
+          "costo_giornaliero": 685.45
+        },
+        {
+          "id": 3,
+          "paziente_id": 52,
+          "medico_id": 38,
+          "data_ingresso": "2024-12-05",
+          "data_dimissione": "2025-02-04",
+          "gravita": "5",
+          "motivo_ricovero": "Infarto miocardico acuto",
+          "costo_giornaliero": 1153.26
+        },
+        {
+          "id": 4,
+          "paziente_id": 70,
+          "medico_id": 59,
+          "data_ingresso": "2024-12-27",
+          "data_dimissione": "2025-02-14",
+          "gravita": "1",
+          "motivo_ricovero": "Emorragia digestiva",
+          "costo_giornaliero": 694.14
+        },
+        {
+          "id": 5,
+          "paziente_id": 380,
+          "medico_id": 121,
+          "data_ingresso": "2025-01-10",
+          "data_dimissione": "2025-01-18",
+          "gravita": "2",
+          "motivo_ricovero": "Infarto miocardico acuto",
+          "costo_giornaliero": null
+        },
+        {
+          "id": 6,
+          "paziente_id": 240,
+          "medico_id": 25,
+          "data_ingresso": "2025-01-06",
+          "data_dimissione": "2025-01-26",
+          "gravita": "4",
+          "motivo_ricovero": "Appendicite acuta",
+          "costo_giornaliero": 898.43
+        },
+        {
+          "id": 7,
+          "paziente_id": 72,
+          "medico_id": 26,
+          "data_ingresso": "2025-01-10",
+          "data_dimissione": "2025-02-20",
+          "gravita": "4",
+          "motivo_ricovero": "Scompenso cardiaco",
+          "costo_giornaliero": 1052.52
+        },
+        {
+          "id": 8,
+          "paziente_id": 125,
+          "medico_id": 79,
+          "data_ingresso": "2024-11-28",
+          "data_dimissione": "2025-03-09",
+          "gravita": "1",
+          "motivo_ricovero": "Artrite settica",
+          "costo_giornaliero": 1114.53
+        }
+      ]
+    }
+  },
+  "story": "Durante la consueta verifica trimestrale sui costi di gestione, la Direzione Sanitaria dell'ospedale ha promosso un'analisi mirata sulle degenze più critiche dell'ultimo ciclo di attività. Il lavoro è partito dall'archivio denominato pazienti, dove sono custodite le schede anagrafiche di 423 assistiti: per ciascuno sono annotati nome, cognome, codice fiscale, data di nascita e recapito telefonico, elementi indispensabili per risalire senza ambiguità alla persona trattata. Accanto a questo archivio, il registro intitolato reparti descrive le 42 unità operative della struttura, precisando per ognuna la denominazione, il piano di insediamento — compreso tra il piano 0 e il piano 3 — e il totale dei posti letto disponibili, che varia sensibilmente da reparto a reparto. Il corpo clinico è invece documentato nell'elenco dei medici: 133 professionisti, ciascuno con la propria specializzazione, dalla cardiologia interventistica alla neurologia clinica, e con l'indicazione dell'unità operativa di appartenenza. Il cuore dell'indagine riguarda però il registro degli episodi_di_cura, dove ogni degenza è descritta attraverso l'assistito coinvolto, il medico curante, la data di ingresso in struttura, la data di dimissione, il punteggio di severità clinica attribuito al caso su una scala da 1 a 5, il motivo che ha reso necessaria l'ammissione e il costo giornaliero della degenza, oscillante tra 448 e 1920 euro. Gli analisti hanno quindi selezionato gli episodi di cura caratterizzati da un punteggio di severità clinica pari a 4 oppure 5, ossia i quadri più gravi osservati nel periodo. Per ciascun reparto hanno sommato i costi complessivi stimati delle giornate trascorse in ospedale, contato quanti episodi gravi fossero stati registrati e derivato la durata media della degenza in giorni, calcolata come distanza tra la data di ingresso e quella di dimissione. Alcuni controlli incrociati con le schede anagrafiche e con l'elenco dei medici hanno permesso di attribuire correttamente ogni episodio all'unità operativa competente, evitando duplicazioni dovute a nomi e cognomi ripetuti tra gli assistiti. Il risultato è una classifica dei primi 10 reparti per costo totale stimato delle degenze ad alta severità, corredata dal numero di episodi gravi e dalla durata media della degenza espressa in giorni: un quadro destinato a orientare la riallocazione dei posti letto e la programmazione del personale per il prossimo semestre."
+}

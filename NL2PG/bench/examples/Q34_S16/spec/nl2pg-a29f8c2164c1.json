@@ -1,0 +1,39 @@
+{
+  "domain": "logistica",
+  "n_tables": 6,
+  "hierarchy": "temporal_versioning",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "movimentazioni_merci",
+      "description": "La tabella che registra le spedizioni viene denominata 'movimentazioni_merci' nei documenti aziendali, creando ambiguità con le tabelle di magazzino."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "data_consegna_prevista",
+      "obsolete_value": "ETA (Estimated Time of Arrival)",
+      "description": "La colonna 'data_consegna_prevista' viene indicata come 'ETA' nei report operativi, richiedendo la conoscenza del gergo logistico per l'interpretazione corretta."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "stato",
+      "obsolete_value": "status",
+      "description": "La colonna 'stato' (che indica lo stato della spedizione) viene spesso confusa con 'status' (usato in altri contesti aziendali per indicare lo stato di un ordine o di un veicolo), generando ambiguità semantica."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "WHERE validita_inizio <= CURRENT_TIMESTAMP AND validita_fine >= CURRENT_TIMESTAMP",
+      "obsolete_value": "Filtra solo le versioni attualmente valide",
+      "description": "La condizione SQL per filtrare le versioni attualmente valide di una spedizione viene espressa in prosa come 'Filtra solo le versioni attualmente valide', richiedendo la traduzione in una clausola temporale esplicita."
+    }
+  ],
+  "spec_hash": "44d368bce6e94892"
+}

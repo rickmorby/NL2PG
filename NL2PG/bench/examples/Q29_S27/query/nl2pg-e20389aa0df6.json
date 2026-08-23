@@ -1,0 +1,499 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    cap TEXT CHECK (cap ~ '^[0-9]{5}$')\n);\n\nCREATE TABLE corrieri (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    telefono TEXT,\n    tipo_veicolo TEXT NOT NULL CHECK (tipo_veicolo IN ('furgone', 'camion', 'van', 'moto'))\n);\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    denominazione TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_pallet INT NOT NULL CHECK (capacita_pallet > 0)\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    corriere_id INT NOT NULL,\n    magazzino_id INT NOT NULL,\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    stato_consegna TEXT NOT NULL CHECK (stato_consegna IN ('in_preparazione', 'in_transito', 'consegnata', 'fallita')),\n    data_spedizione DATE NOT NULL,\n    data_consegna DATE\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 644,
+        "columns": {
+          "id": {
+            "distinct": 644,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 644
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Alfa Distribuzione Srl",
+              "Beta Food Spa",
+              "Delta Logistica Spa",
+              "Epsilon Cartaria Srl",
+              "Gamma Retail Snc"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 644,
+            "sample": [
+              "01234567890",
+              "01234567891",
+              "01234567892",
+              "01234567893",
+              "01234567894"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "cap": {
+            "distinct": 8,
+            "sample": [
+              "00184",
+              "10121",
+              "16121",
+              "20121",
+              "37121"
+            ]
+          }
+        }
+      },
+      "corrieri": {
+        "row_count": 18,
+        "columns": {
+          "id": {
+            "distinct": 18,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 18
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Bartolini Express",
+              "DHL Supply Chain",
+              "Fercam Trasporti",
+              "GLS Italia",
+              "Poste Speed"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+39 010 44556677",
+              "+39 02 12345671",
+              "+39 055 11223344",
+              "+39 06 22334455",
+              "+39 081 99887766"
+            ]
+          },
+          "tipo_veicolo": {
+            "distinct": 4,
+            "sample": [
+              "camion",
+              "furgone",
+              "moto",
+              "van"
+            ]
+          }
+        }
+      },
+      "magazzini": {
+        "row_count": 50,
+        "columns": {
+          "id": {
+            "distinct": 50,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 50
+          },
+          "denominazione": {
+            "distinct": 8,
+            "sample": [
+              "Deposito Bologna Centro",
+              "Deposito Genova Porto",
+              "Deposito Milano Nord",
+              "Deposito Torino Sud",
+              "Hub Firenze Scandicci"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 8,
+            "sample": [
+              "Corso Unione Sovietica 245, Torino",
+              "Via Campania 88, Napoli",
+              "Via Lomazzo 12, Milano",
+              "Via Pisana 210, Firenze",
+              "Via Salaria 1020, Roma"
+            ]
+          },
+          "capacita_pallet": {
+            "distinct": 50,
+            "sample": [
+              "1215.6",
+              "1292.16",
+              "1366.48",
+              "1389.77",
+              "1413.43"
+            ],
+            "min": 199.43,
+            "max": 2244.02
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 2169,
+        "columns": {
+          "id": {
+            "distinct": 2169,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3169
+          },
+          "cliente_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "corriere_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "magazzino_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "peso_kg": {
+            "distinct": 2019,
+            "sample": [
+              "10.06",
+              "10.18",
+              "10.23",
+              "10.29",
+              "10.3"
+            ],
+            "min": 3.15,
+            "max": 2550.0
+          },
+          "stato_consegna": {
+            "distinct": 4,
+            "sample": [
+              "consegnata",
+              "fallita",
+              "in_preparazione",
+              "in_transito"
+            ]
+          },
+          "data_spedizione": {
+            "distinct": 185,
+            "sample": [
+              "2025-09-12",
+              "2025-09-13",
+              "2025-09-14",
+              "2025-09-15",
+              "2025-09-16"
+            ]
+          },
+          "data_consegna": {
+            "distinct": 18,
+            "sample": [
+              "2026-01-13",
+              "2026-01-14",
+              "2026-01-15",
+              "2026-01-16",
+              "2026-01-17"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Beta Food Spa",
+          "codice_fiscale": "01234567890",
+          "citta": "Genova",
+          "cap": "16121"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Beta Food Spa",
+          "codice_fiscale": "01234567891",
+          "citta": "Bologna",
+          "cap": "37121"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Beta Food Spa",
+          "codice_fiscale": "01234567892",
+          "citta": "Genova",
+          "cap": "37121"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Delta Logistica Spa",
+          "codice_fiscale": "01234567893",
+          "citta": "Verona",
+          "cap": "00184"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Gamma Retail Snc",
+          "codice_fiscale": "01234567894",
+          "citta": "Milano",
+          "cap": "40121"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Alfa Distribuzione Srl",
+          "codice_fiscale": "01234567895",
+          "citta": "Firenze",
+          "cap": "80132"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Gamma Retail Snc",
+          "codice_fiscale": "01234567896",
+          "citta": "Firenze",
+          "cap": "50123"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Beta Food Spa",
+          "codice_fiscale": "01234567897",
+          "citta": "Bologna",
+          "cap": "80132"
+        }
+      ],
+      "corrieri": [
+        {
+          "id": 1,
+          "nome": "TNT Logistics",
+          "telefono": "+39 010 44556677",
+          "tipo_veicolo": "camion"
+        },
+        {
+          "id": 2,
+          "nome": "Poste Speed",
+          "telefono": "+39 02 12345671",
+          "tipo_veicolo": "camion"
+        },
+        {
+          "id": 3,
+          "nome": "RapidCargo Moto",
+          "telefono": "+39 02 12345671",
+          "tipo_veicolo": "camion"
+        },
+        {
+          "id": 4,
+          "nome": "DHL Supply Chain",
+          "telefono": "+39 02 12345671",
+          "tipo_veicolo": "moto"
+        },
+        {
+          "id": 5,
+          "nome": "Bartolini Express",
+          "telefono": "+39 081 99887766",
+          "tipo_veicolo": "moto"
+        },
+        {
+          "id": 6,
+          "nome": "Bartolini Express",
+          "telefono": "+39 06 22334455",
+          "tipo_veicolo": "moto"
+        },
+        {
+          "id": 7,
+          "nome": "Poste Speed",
+          "telefono": "+39 02 12345671",
+          "tipo_veicolo": "moto"
+        },
+        {
+          "id": 8,
+          "nome": "Poste Speed",
+          "telefono": "+39 06 22334455",
+          "tipo_veicolo": "camion"
+        }
+      ],
+      "magazzini": [
+        {
+          "id": 1,
+          "denominazione": "Hub Roma Est",
+          "indirizzo": "Via di Francia 7, Genova",
+          "capacita_pallet": 707.74
+        },
+        {
+          "id": 2,
+          "denominazione": "Hub Napoli Ovest",
+          "indirizzo": "Via Lomazzo 12, Milano",
+          "capacita_pallet": 811.65
+        },
+        {
+          "id": 3,
+          "denominazione": "Deposito Genova Porto",
+          "indirizzo": "Via Salaria 1020, Roma",
+          "capacita_pallet": 955.18
+        },
+        {
+          "id": 4,
+          "denominazione": "Hub Roma Est",
+          "indirizzo": "Via dell'Industria 45, Bologna",
+          "capacita_pallet": 621.89
+        },
+        {
+          "id": 5,
+          "denominazione": "Hub Firenze Scandicci",
+          "indirizzo": "Corso Unione Sovietica 245, Torino",
+          "capacita_pallet": 318.19
+        },
+        {
+          "id": 6,
+          "denominazione": "Hub Roma Est",
+          "indirizzo": "Via Pisana 210, Firenze",
+          "capacita_pallet": 630.2
+        },
+        {
+          "id": 7,
+          "denominazione": "Hub Napoli Ovest",
+          "indirizzo": "Corso Unione Sovietica 245, Torino",
+          "capacita_pallet": 650.69
+        },
+        {
+          "id": 8,
+          "denominazione": "Hub Verona Sud",
+          "indirizzo": "Via dell'Artigianato 33, Verona",
+          "capacita_pallet": 838.43
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 1001,
+          "cliente_id": 1,
+          "corriere_id": 1,
+          "magazzino_id": 1,
+          "peso_kg": 89.2,
+          "stato_consegna": "consegnata",
+          "data_spedizione": "2025-12-26",
+          "data_consegna": "2026-01-13"
+        },
+        {
+          "id": 1002,
+          "cliente_id": 1,
+          "corriere_id": 1,
+          "magazzino_id": 1,
+          "peso_kg": 301.94,
+          "stato_consegna": "consegnata",
+          "data_spedizione": "2025-12-23",
+          "data_consegna": "2026-01-16"
+        },
+        {
+          "id": 1003,
+          "cliente_id": 1,
+          "corriere_id": 1,
+          "magazzino_id": 1,
+          "peso_kg": 143.73,
+          "stato_consegna": "consegnata",
+          "data_spedizione": "2025-09-23",
+          "data_consegna": "2026-01-18"
+        },
+        {
+          "id": 1004,
+          "cliente_id": 1,
+          "corriere_id": 1,
+          "magazzino_id": 1,
+          "peso_kg": 271.4,
+          "stato_consegna": "fallita",
+          "data_spedizione": "2025-10-30",
+          "data_consegna": "2026-01-15"
+        },
+        {
+          "id": 1005,
+          "cliente_id": 1,
+          "corriere_id": 1,
+          "magazzino_id": 1,
+          "peso_kg": 120.5,
+          "stato_consegna": "consegnata",
+          "data_spedizione": "2026-01-10",
+          "data_consegna": "2026-01-13"
+        },
+        {
+          "id": 1006,
+          "cliente_id": 1,
+          "corriere_id": 1,
+          "magazzino_id": 1,
+          "peso_kg": 360.51,
+          "stato_consegna": "consegnata",
+          "data_spedizione": "2025-11-29",
+          "data_consegna": "2026-01-13"
+        },
+        {
+          "id": 1007,
+          "cliente_id": 1,
+          "corriere_id": 1,
+          "magazzino_id": 1,
+          "peso_kg": 203.22,
+          "stato_consegna": "in_preparazione",
+          "data_spedizione": "2025-10-05",
+          "data_consegna": "2026-01-14"
+        },
+        {
+          "id": 1008,
+          "cliente_id": 1,
+          "corriere_id": 1,
+          "magazzino_id": 1,
+          "peso_kg": 163.94,
+          "stato_consegna": "consegnata",
+          "data_spedizione": "2025-10-28",
+          "data_consegna": "2026-01-13"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "agg_distinct"
+  ],
+  "query": "SELECT c.ragione_sociale, COUNT(DISTINCT s.cliente_id) AS numero_clienti_attivi, COUNT(DISTINCT s.magazzino_id) AS numero_magazzini_coinvolti, ROUND(SUM(s.peso_kg), 2) AS peso_totale_kg FROM spedizioni s JOIN clienti c ON s.cliente_id = c.id WHERE s.stato_consegna = 'consegnata' GROUP BY c.ragione_sociale ORDER BY peso_totale_kg DESC, c.ragione_sociale ASC;"
+}

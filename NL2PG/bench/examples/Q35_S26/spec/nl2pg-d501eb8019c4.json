@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "case"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "stipendio_lordo",
+      "obsolete_value": "retribuzione_lorda_annua",
+      "description": "La colonna stipendio_lordo memorizzata come campo di tipo TEXT viene definita come retribuzione_lorda_annua nella documentazione."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "dipendenti",
+      "obsolete_value": "risorse_censite",
+      "description": "Nel gergo aziendale ci si riferisce alla tabella dipendenti con il termine risorse_censite."
+    }
+  ],
+  "spec_hash": "040c2596e08a2384"
+}

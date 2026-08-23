@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 1,
+  "hierarchy": "single_entity",
+  "sql_features": [
+    "disjunctive"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "operazioni_finanziarie",
+      "obsolete_value": "registro_movimenti",
+      "description": "La tabella operazioni_finanziarie viene denominata registro_movimenti nella prosa aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_lordo",
+      "obsolete_value": "valore_nominale_esposto",
+      "description": "La colonna importo_lordo viene indicata con il gergo valore_nominale_esposto nei documenti interni."
+    }
+  ],
+  "spec_hash": "0d95ca22d66afa71"
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "sorting"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "corrieri",
+      "obsolete_value": "personale_consegnatario",
+      "description": "La tabella corrieri viene indicata nella prosa aziendale come personale_consegnatario, ma resta l'unica tabella fisica contenente i dati anagrafici spezzati in first_name e last_name."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "last_name",
+      "obsolete_value": "cognome",
+      "description": "La colonna last_name viene chiamata con il sinonimo italiano cognome; l'ordinamento richiesto deve usare comunque last_name come prima chiave di ordinamento."
+    }
+  ],
+  "spec_hash": "4120e3e66107fff2"
+}

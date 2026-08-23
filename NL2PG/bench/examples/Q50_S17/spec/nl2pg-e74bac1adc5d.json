@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "boolean_predicate"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_risorse_umane",
+      "description": "La tabella dipendenti viene denominata anagrafica_risorse_umane nella prosa aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "progetti",
+      "obsolete_value": "commesse",
+      "description": "Il termine commesse è utilizzato come sinonimo di progetti nei documenti interni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "assegnazioni_progetto",
+      "obsolete_value": "allocazioni_risorse",
+      "description": "Nel gergo aziendale le assegnazioni_progetto sono chiamate allocazioni_risorse."
+    }
+  ],
+  "spec_hash": "b6e193f6e6940bf7"
+}

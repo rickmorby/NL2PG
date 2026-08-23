@@ -1,0 +1,550 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "is_null"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sinistri",
+        "obsolete_value": "pratiche_danno",
+        "description": "La tabella sinistri viene denominata pratiche_danno nella prosa aziendale. Il collegamento con la tabella polizze non è dichiarato tramite REFERENCES ma si deduce dalla colonna polizza_id presente in sinistri; le query richiedono predicati IS NULL / IS NOT NULL su colonne come data_chiusura o liquidazione_id per identificare le pratiche aperte o chiuse."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "contraenti",
+        "description": "Nella prosa aziendale i clienti sono indicati come contraenti. La tabella clienti espone la colonna id, referenziata implicitamente da polizze.cliente_id senza vincolo dichiarato; l'associazione va dedotta dai nomi delle colonne per individuare ad esempio i contraenti senza polizze attive tramite IS NULL."
+      }
+    ],
+    "spec_hash": "0a2bd90d2e824e17"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    email TEXT,\n    telefono TEXT,\n    citta_residenza TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'viaggio')),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    massimale_copertura NUMERIC(12,2) CHECK (massimale_copertura > 0),\n    polizza_attiva BOOLEAN NOT NULL DEFAULT TRUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id SERIAL PRIMARY KEY,\n    polizza_id INT NOT NULL,\n    data_apertura DATE NOT NULL,\n    data_chiusura DATE,\n    liquidazione_id INT,\n    descrizione_danno TEXT NOT NULL,\n    importo_danno NUMERIC(12,2) NOT NULL CHECK (importo_danno >= 0),\n    stato_pratica TEXT NOT NULL DEFAULT 'aperta' CHECK (stato_pratica IN ('aperta', 'in_istruttoria', 'liquidato', 'respinto')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_chiusura IS NULL OR data_chiusura >= data_apertura)\n);\n\nCREATE TABLE liquidazioni (\n    id SERIAL PRIMARY KEY,\n    sinistro_id INT NOT NULL,\n    importo_liquidato NUMERIC(12,2) NOT NULL CHECK (importo_liquidato >= 0),\n    data_liquidazione DATE NOT NULL,\n    modalita_pagamento TEXT NOT NULL CHECK (modalita_pagamento IN ('bonifico', 'assegno', 'accredito')),\n    iban_beneficiario TEXT,\n    note TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 160,
+        "max_rows": 220,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRC84A01H501X",
+            "data_nascita": "1984-01-01",
+            "email": "marco.rossi@example.com",
+            "telefono": "+39 06 1234567",
+            "citta_residenza": "Roma"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA79C42F205Y",
+            "data_nascita": "1979-03-02",
+            "email": "laura.bianchi@example.com",
+            "telefono": "+39 02 7654321",
+            "citta_residenza": "Milano"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI85D55L219Z",
+            "data_nascita": "1985-04-15",
+            "email": "giulia.verdi@example.com",
+            "telefono": "+39 011 9876543",
+            "citta_residenza": "Torino"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTLSS90H30F839W",
+            "data_nascita": "1990-07-30",
+            "email": "alessandro.conti@example.com",
+            "telefono": "+39 081 2468135",
+            "citta_residenza": "Napoli"
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Moretti",
+            "codice_fiscale": "MRTFNC82S52A944V",
+            "data_nascita": "1982-11-12",
+            "email": "francesca.moretti@example.com",
+            "telefono": "+39 051 1357911",
+            "citta_residenza": "Bologna"
+          },
+          {
+            "id": 6,
+            "nome": "Davide",
+            "cognome": "Ricci",
+            "codice_fiscale": "RCCDVD75E25D612T",
+            "data_nascita": "1975-05-25",
+            "email": "davide.ricci@example.com",
+            "telefono": "+39 055 1122334",
+            "citta_residenza": "Firenze"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Davide",
+              "Chiara",
+              "Andrea",
+              "Simona",
+              "Luca"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Conti",
+              "Moretti",
+              "Ricci",
+              "Gallo",
+              "Fontana",
+              "Marino",
+              "Greco"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -4000.0,
+            "delta_max": 4000.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "email": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "marco.rossi@example.com",
+              "laura.bianchi@example.com",
+              "giulia.verdi@example.com",
+              "alessandro.conti@example.com",
+              "francesca.moretti@example.com",
+              "davide.ricci@example.com",
+              "info.cliente@example.com",
+              "servizio.contraente@example.com"
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 06 1234567",
+              "+39 02 7654321",
+              "+39 011 9876543",
+              "+39 081 2468135",
+              "+39 051 1357911",
+              "+39 055 1122334",
+              "+39 099 8877665",
+              "+39 070 4455667"
+            ]
+          },
+          "citta_residenza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze"
+            ]
+          }
+        }
+      },
+      {
+        "table": "polizze",
+        "nature": "fact",
+        "min_rows": 420,
+        "max_rows": 580,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "numero_polizza": "POL-2024-000001",
+            "tipo_polizza": "auto",
+            "data_emissione": "2024-01-15",
+            "data_scadenza": "2025-01-15",
+            "premio_annuo": 450.0,
+            "massimale_copertura": 500000.0,
+            "polizza_attiva": true
+          },
+          {
+            "id": 2,
+            "cliente_id": 2,
+            "numero_polizza": "POL-2024-000002",
+            "tipo_polizza": "casa",
+            "data_emissione": "2024-02-01",
+            "data_scadenza": "2025-02-01",
+            "premio_annuo": 320.5,
+            "massimale_copertura": 300000.0,
+            "polizza_attiva": true
+          },
+          {
+            "id": 3,
+            "cliente_id": 3,
+            "numero_polizza": "POL-2023-000003",
+            "tipo_polizza": "vita",
+            "data_emissione": "2023-11-20",
+            "data_scadenza": "2028-11-20",
+            "premio_annuo": 1200.0,
+            "massimale_copertura": 150000.0,
+            "polizza_attiva": true
+          },
+          {
+            "id": 4,
+            "cliente_id": 4,
+            "numero_polizza": "POL-2024-000004",
+            "tipo_polizza": "salute",
+            "data_emissione": "2024-03-10",
+            "data_scadenza": "2025-03-10",
+            "premio_annuo": 890.0,
+            "massimale_copertura": 100000.0,
+            "polizza_attiva": false
+          },
+          {
+            "id": 5,
+            "cliente_id": 5,
+            "numero_polizza": "POL-2024-000005",
+            "tipo_polizza": "viaggio",
+            "data_emissione": "2024-06-01",
+            "data_scadenza": "2025-06-01",
+            "premio_annuo": 150.0,
+            "massimale_copertura": 30000.0,
+            "polizza_attiva": true
+          },
+          {
+            "id": 6,
+            "cliente_id": 6,
+            "numero_polizza": "POL-2024-000006",
+            "tipo_polizza": "auto",
+            "data_emissione": "2024-04-22",
+            "data_scadenza": "2025-04-22",
+            "premio_annuo": 520.75,
+            "massimale_copertura": 250000.0,
+            "polizza_attiva": true
+          }
+        ],
+        "variations": {
+          "tipo_polizza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "auto",
+              "auto",
+              "casa",
+              "casa",
+              "vita",
+              "salute",
+              "viaggio"
+            ]
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "premio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.9,
+            "pool": []
+          },
+          "massimale_copertura": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "polizza_attiva": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "sinistri",
+        "nature": "fact",
+        "min_rows": 320,
+        "max_rows": 480,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "polizza_id": 1,
+            "data_apertura": "2024-02-10",
+            "data_chiusura": "2024-03-05",
+            "liquidazione_id": 1,
+            "descrizione_danno": "Tamponamento posteriore in coda al semaforo",
+            "importo_danno": 1850.0,
+            "stato_pratica": "liquidato"
+          },
+          {
+            "id": 2,
+            "polizza_id": 2,
+            "data_apertura": "2024-04-18",
+            "data_chiusura": null,
+            "liquidazione_id": null,
+            "descrizione_danno": "Infiltrazione acqua dal tetto dopo forte pioggia",
+            "importo_danno": 3200.0,
+            "stato_pratica": "in_istruttoria"
+          },
+          {
+            "id": 3,
+            "polizza_id": 3,
+            "data_apertura": "2024-05-22",
+            "data_chiusura": "2024-06-30",
+            "liquidazione_id": 2,
+            "descrizione_danno": "Furto con scasso dei beni assicurati",
+            "importo_danno": 7400.0,
+            "stato_pratica": "liquidato"
+          },
+          {
+            "id": 4,
+            "polizza_id": 4,
+            "data_apertura": "2024-07-09",
+            "data_chiusura": "2024-07-20",
+            "liquidazione_id": null,
+            "descrizione_danno": "Incidente con controparte non assicurata",
+            "importo_danno": 950.0,
+            "stato_pratica": "respinto"
+          },
+          {
+            "id": 5,
+            "polizza_id": 5,
+            "data_apertura": "2024-09-14",
+            "data_chiusura": null,
+            "liquidazione_id": null,
+            "descrizione_danno": "Danni da grandine alla carrozzeria",
+            "importo_danno": 2100.0,
+            "stato_pratica": "aperta"
+          },
+          {
+            "id": 6,
+            "polizza_id": 6,
+            "data_apertura": "2024-11-03",
+            "data_chiusura": "2024-12-12",
+            "liquidazione_id": 3,
+            "descrizione_danno": "Spese mediche conseguenti a incidente stradale",
+            "importo_danno": 4300.0,
+            "stato_pratica": "liquidato"
+          }
+        ],
+        "variations": {
+          "descrizione_danno": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Tamponamento posteriore in coda al semaforo",
+              "Infiltrazione acqua dal tetto dopo forte pioggia",
+              "Furto con scasso dei beni assicurati",
+              "Danni da grandine alla carrozzeria",
+              "Incidente con controparte non assicurata",
+              "Rottura tubatura e danno alle pareti",
+              "Spese mediche conseguenti a incidente stradale",
+              "Smarrimento bagaglio durante il viaggio",
+              "Danno elettrico da sovraccarico di corrente",
+              "Vandalismo su veicolo parcheggiato"
+            ]
+          },
+          "importo_danno": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "data_apertura": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "liquidazioni",
+        "nature": "fact",
+        "min_rows": 240,
+        "max_rows": 360,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "sinistro_id": 1,
+            "importo_liquidato": 1750.0,
+            "data_liquidazione": "2024-03-12",
+            "modalita_pagamento": "bonifico",
+            "iban_beneficiario": "IT60X0542811101000000123456",
+            "note": "Pagamento integrale dopo relazione di perizia"
+          },
+          {
+            "id": 2,
+            "sinistro_id": 3,
+            "importo_liquidato": 6800.0,
+            "data_liquidazione": "2024-07-05",
+            "modalita_pagamento": "bonifico",
+            "iban_beneficiario": "IT23A0362701600105284954000",
+            "note": "Liquidazione con applicazione della franchigia"
+          },
+          {
+            "id": 3,
+            "sinistro_id": 6,
+            "importo_liquidato": 4100.0,
+            "data_liquidazione": "2024-12-20",
+            "modalita_pagamento": "accredito",
+            "iban_beneficiario": "IT84S0301503200000003512345",
+            "note": "Saldo finale dopo controperizia"
+          },
+          {
+            "id": 4,
+            "sinistro_id": 1,
+            "importo_liquidato": 100.0,
+            "data_liquidazione": "2024-02-20",
+            "modalita_pagamento": "assegno",
+            "iban_beneficiario": "IT60X0542811101000000123456",
+            "note": "Anticipo tecnico in attesa di stima definitiva"
+          },
+          {
+            "id": 5,
+            "sinistro_id": 3,
+            "importo_liquidato": 600.0,
+            "data_liquidazione": "2024-06-10",
+            "modalita_pagamento": "bonifico",
+            "iban_beneficiario": "IT23A0362701600105284954000",
+            "note": "Anticipo su presunto danno"
+          }
+        ],
+        "variations": {
+          "importo_liquidato": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 1.5,
+            "pool": []
+          },
+          "data_liquidazione": {
+            "axis": "shift",
+            "delta_min": -5.0,
+            "delta_max": 10.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "modalita_pagamento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "bonifico",
+              "bonifico",
+              "bonifico",
+              "accredito",
+              "assegno"
+            ]
+          },
+          "iban_beneficiario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "IT60X0542811101000000123456",
+              "IT23A0362701600105284954000",
+              "IT84S0301503200000003512345",
+              "IT12L0200800503000001234567",
+              "IT99K0760103000000009876543"
+            ]
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Pagamento integrale dopo relazione di perizia",
+              "Liquidazione con applicazione della franchigia",
+              "Anticipo tecnico in attesa di stima definitiva",
+              "Saldo finale dopo controperizia",
+              "Transazione concordata con il contraente"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

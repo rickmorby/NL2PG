@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 10,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "subquery"
+  ],
+  "twist": [
+    "distractor",
+    "polysemy",
+    "rename"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "movimenti_contabili",
+      "obsolete_value": "movimenti_contabili_storici",
+      "description": "Lo schema vasto contiene la tabella movimenti_contabili_storici con struttura e nomi di colonna quasi identici a movimenti_contabili; solo i record di movimenti_contabili rappresentano le scritture valide dell'esercizio corrente e devono essere usati nella subquery interna, ignorando la tabella storica distrattrice."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "totale_documento",
+      "obsolete_value": "valore del documento",
+      "description": "Il termine 'documento' ricorre in più tabelle dello schema (fatture_vendita, note_credito, ordini_acquisto) con semantiche diverse; l'espressione 'valore del documento' usata nella prosa aziendale deve essere risolta esclusivamente sulla colonna totale_documento della tabella fatture_vendita, scartando le colonne omonime delle altre tabelle."
+    },
+    {
+      "twist_type": "rename",
+      "target_value": "registrazioni",
+      "obsolete_value": "scritture contabili",
+      "description": "La tabella registrazioni viene denominata 'scritture contabili' nella prosa aziendale; il solver deve mappare tale perifrasi alla tabella reale registrazioni per costruire correttamente la condizione WHERE col IN (SELECT ...)."
+    }
+  ],
+  "spec_hash": "52b58e14f1861e21"
+}

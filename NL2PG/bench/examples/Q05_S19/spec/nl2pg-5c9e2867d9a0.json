@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 7,
+  "hierarchy": "multi_entity",
+  "sql_features": [
+    "group_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "registrazioni_contabili",
+      "obsolete_value": "movimenti di prima nota",
+      "description": "La tabella registrazioni_contabili viene denominata 'movimenti di prima nota' nella prosa aziendale. Chi scrive la query deve riconoscere che ogni riga di prima nota corrisponde a una registrazione contabile e agganciarsi alla chiave primaria id_registrazione."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "totale_imponibile",
+      "obsolete_value": "base imponibile ai fini liquidazione IVA",
+      "description": "La colonna totale_imponibile della tabella fatture è indicata nella documentazione con il gergo contabile 'base imponibile ai fini liquidazione IVA'. Il solver deve mappare questa perifrasi tecnica direttamente sulla colonna totale_imponibile quando aggrega per gruppo."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "preventivi",
+      "obsolete_value": "impegni di spesa previsionali",
+      "description": "La prosa aziendale menziona gli 'impegni di spesa previsionali', che corrispondono alla tabella preventivi. Questa tabella è un distrattore: pur essendo collegata tramite FK ai centri di costo, non deve essere inclusa nel percorso di join né nel GROUP BY, perché il calcolo richiesto riguarda solo i documenti contabili effettivi."
+    }
+  ],
+  "spec_hash": "bcbf4db337c8dcff"
+}

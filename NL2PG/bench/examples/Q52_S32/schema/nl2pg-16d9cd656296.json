@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 6,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "offset_fetch"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "registrazione_movimenti",
+        "description": "La tabella ordini viene denominata registrazione_movimenti nella prosa aziendale. Le query di paginazione per recency (ORDER BY updated_at DESC OFFSET n ROWS FETCH FIRST m ROWS ONLY) devono risolvere il nome reale della tabella, che include le colonne di audit created_at, created_by, updated_at, updated_by."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "acquirenti",
+        "description": "La tabella clienti viene indicata con il sinonimo acquirenti nei documenti aziendali. Il solver deve mappare acquirenti alla tabella clienti per filtrare o aggregare i risultati paginati per data di ultimo aggiornamento."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "updated_at",
+        "obsolete_value": "timestamp di ultimo tocco",
+        "description": "La colonna di audit updated_at viene indicata con il gergo aziendale 'timestamp di ultimo tocco'. Le richieste di paginazione per recency si riferiscono a questa colonna con la perifrasi, richiedendone la risoluzione verso updated_at per l'ordinamento DESC con OFFSET/FETCH."
+      }
+    ],
+    "spec_hash": "905495840300f98a"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_ordine TEXT NOT NULL UNIQUE,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('bozza', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE righe_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);\n\nCREATE TABLE pagamenti (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    metodo_pagamento TEXT NOT NULL CHECK (metodo_pagamento IN ('carta_credito', 'paypal', 'bonifico', 'contrassegno')),\n    importo_pagato NUMERIC(12,2) NOT NULL CHECK (importo_pagato >= 0),\n    stato_pagamento TEXT NOT NULL CHECK (stato_pagamento IN ('in_attesa', 'completato', 'rifiutato', 'rimborsato')),\n    data_pagamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL DEFAULT 'sistema',\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT NOT NULL DEFAULT 'sistema'\n);"
+}

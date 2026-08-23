@@ -1,0 +1,437 @@
+{
+  "schema_ddl": "CREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    data_registrazione DATE NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo != 0),\n    tipo_voce TEXT NOT NULL,\n    fornitore TEXT,\n    totale_per_fornitore NUMERIC(12,2) GENERATED ALWAYS AS (\n        CASE WHEN fornitore IS NOT NULL THEN importo ELSE NULL END\n    ) STORED,\n    totale_per_tipo NUMERIC(12,2) GENERATED ALWAYS AS (\n        CASE WHEN tipo_voce IS NOT NULL THEN importo ELSE NULL END\n    ) STORED,\n    totale_generale NUMERIC(12,2) GENERATED ALWAYS AS (importo) STORED\n);\n\nCREATE TABLE categorie_contabili (\n    id SERIAL PRIMARY KEY,\n    nome_categoria TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    nome_fornitore TEXT NOT NULL UNIQUE,\n    partiva_iva TEXT CHECK (partiva_iva ~ '^[A-Z]{2}[0-9]{11}$|^$'),\n    data_inserimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE riepiloghi (\n    id SERIAL PRIMARY KEY,\n    periodo DATE NOT NULL,\n    somma_totale NUMERIC(12,2) NOT NULL DEFAULT 0,\n    conteggio_registrazioni INT NOT NULL DEFAULT 0,\n    CHECK (somma_totale >= 0 AND conteggio_registrazioni >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "categorie_contabili": {
+        "row_count": 17,
+        "columns": {
+          "id": {
+            "distinct": 17,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 17
+          },
+          "nome_categoria": {
+            "distinct": 17,
+            "sample": [
+              "Amortamenti",
+              "Amortamenti_1",
+              "Amortamenti_2",
+              "Costi di produzione",
+              "Costi di produzione_1"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Costi amministrativi e generici",
+              "Costi logistici",
+              "Deprezzamento beni strumentali",
+              "Entrate da vendita prodotti/servizi",
+              "Entrate finanziarie"
+            ]
+          }
+        }
+      },
+      "fornitori": {
+        "row_count": 523,
+        "columns": {
+          "id": {
+            "distinct": 523,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 523
+          },
+          "nome_fornitore": {
+            "distinct": 523,
+            "sample": [
+              "Beta SpA",
+              "Beta SpA_1",
+              "Beta SpA_10",
+              "Beta SpA_100",
+              "Beta SpA_101"
+            ]
+          },
+          "partiva_iva": {
+            "distinct": 6,
+            "sample": [
+              "",
+              "IT09876543210",
+              "IT11223344556",
+              "IT12345678901",
+              "IT55544433322"
+            ]
+          },
+          "data_inserimento": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      },
+      "registrazioni": {
+        "row_count": 2096,
+        "columns": {
+          "id": {
+            "distinct": 2096,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2096
+          },
+          "data_registrazione": {
+            "distinct": 147,
+            "sample": [
+              "2025-11-11",
+              "2025-11-12",
+              "2025-11-13",
+              "2025-11-14",
+              "2025-11-15"
+            ]
+          },
+          "importo": {
+            "distinct": 2012,
+            "sample": [
+              "10016.69",
+              "10021.94",
+              "1003.62",
+              "10079.7",
+              "10088.74"
+            ],
+            "min": 240.0,
+            "max": 15000.0
+          },
+          "tipo_voce": {
+            "distinct": 5,
+            "sample": [
+              "Amortamenti",
+              "Costi di produzione",
+              "Ricavi vendite",
+              "Rimborsi",
+              "Spese generali"
+            ]
+          },
+          "fornitore": {
+            "distinct": 6,
+            "sample": [
+              "",
+              "Beta SpA",
+              "Delta Logistics",
+              "Epsilon Tech",
+              "Fornitore Alpha Srl"
+            ]
+          },
+          "totale_per_fornitore": {
+            "distinct": 0,
+            "sample": []
+          },
+          "totale_per_tipo": {
+            "distinct": 0,
+            "sample": []
+          },
+          "totale_generale": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      },
+      "riepiloghi": {
+        "row_count": 688,
+        "columns": {
+          "id": {
+            "distinct": 688,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 688
+          },
+          "periodo": {
+            "distinct": 144,
+            "sample": [
+              "2025-12-02",
+              "2025-12-03",
+              "2025-12-04",
+              "2025-12-05",
+              "2025-12-06"
+            ]
+          },
+          "somma_totale": {
+            "distinct": 659,
+            "sample": [
+              "10500.0",
+              "10510.59",
+              "10546.14",
+              "10596.46",
+              "10658.73"
+            ],
+            "min": 10500.0,
+            "max": 37500.0
+          },
+          "conteggio_registrazioni": {
+            "distinct": 659,
+            "sample": [
+              "35.0",
+              "35.04750379412659",
+              "35.53195010001256",
+              "35.53918095492368",
+              "35.646706264424054"
+            ],
+            "min": 35.0,
+            "max": 80.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "categorie_contabili": [
+        {
+          "id": 1,
+          "nome_categoria": "Costi di produzione",
+          "descrizione": "Costi logistici"
+        },
+        {
+          "id": 2,
+          "nome_categoria": "Costi di produzione_1",
+          "descrizione": "Spese per materiali e manodopera"
+        },
+        {
+          "id": 3,
+          "nome_categoria": "Costi di produzione_2",
+          "descrizione": "Costi logistici"
+        },
+        {
+          "id": 4,
+          "nome_categoria": "Costi di produzione_3",
+          "descrizione": "Entrate da vendita prodotti/servizi"
+        },
+        {
+          "id": 5,
+          "nome_categoria": "Ricavi vendite",
+          "descrizione": "Costi logistici"
+        },
+        {
+          "id": 6,
+          "nome_categoria": "Ricavi vendite_1",
+          "descrizione": "Costi logistici"
+        },
+        {
+          "id": 7,
+          "nome_categoria": "Ricavi vendite_2",
+          "descrizione": "Spese per materiali e manodopera"
+        },
+        {
+          "id": 8,
+          "nome_categoria": "Ricavi vendite_3",
+          "descrizione": "Entrate finanziarie"
+        }
+      ],
+      "fornitori": [
+        {
+          "id": 1,
+          "nome_fornitore": "Fornitore Alpha Srl",
+          "partiva_iva": "IT11223344556",
+          "data_inserimento": null
+        },
+        {
+          "id": 2,
+          "nome_fornitore": "Fornitore Alpha Srl_1",
+          "partiva_iva": "IT12345678901",
+          "data_inserimento": null
+        },
+        {
+          "id": 3,
+          "nome_fornitore": "Fornitore Alpha Srl_2",
+          "partiva_iva": "IT55544433322",
+          "data_inserimento": null
+        },
+        {
+          "id": 4,
+          "nome_fornitore": "Fornitore Alpha Srl_3",
+          "partiva_iva": "",
+          "data_inserimento": null
+        },
+        {
+          "id": 5,
+          "nome_fornitore": "Fornitore Alpha Srl_4",
+          "partiva_iva": "",
+          "data_inserimento": null
+        },
+        {
+          "id": 6,
+          "nome_fornitore": "Fornitore Alpha Srl_5",
+          "partiva_iva": "IT11223344556",
+          "data_inserimento": null
+        },
+        {
+          "id": 7,
+          "nome_fornitore": "Fornitore Alpha Srl_6",
+          "partiva_iva": "",
+          "data_inserimento": null
+        },
+        {
+          "id": 8,
+          "nome_fornitore": "Fornitore Alpha Srl_7",
+          "partiva_iva": "IT55544433322",
+          "data_inserimento": null
+        }
+      ],
+      "registrazioni": [
+        {
+          "id": 1,
+          "data_registrazione": "2025-12-11",
+          "importo": 4159.84,
+          "tipo_voce": "Spese generali",
+          "fornitore": "Delta Logistics",
+          "totale_per_fornitore": null,
+          "totale_per_tipo": null,
+          "totale_generale": null
+        },
+        {
+          "id": 2,
+          "data_registrazione": "2026-02-12",
+          "importo": 3568.28,
+          "tipo_voce": "Spese generali",
+          "fornitore": "Delta Logistics",
+          "totale_per_fornitore": null,
+          "totale_per_tipo": null,
+          "totale_generale": null
+        },
+        {
+          "id": 3,
+          "data_registrazione": "2025-12-22",
+          "importo": 2910.16,
+          "tipo_voce": "Amortamenti",
+          "fornitore": "Beta SpA",
+          "totale_per_fornitore": null,
+          "totale_per_tipo": null,
+          "totale_generale": null
+        },
+        {
+          "id": 4,
+          "data_registrazione": "2025-12-12",
+          "importo": 3268.94,
+          "tipo_voce": "Spese generali",
+          "fornitore": "Epsilon Tech",
+          "totale_per_fornitore": null,
+          "totale_per_tipo": null,
+          "totale_generale": null
+        },
+        {
+          "id": 5,
+          "data_registrazione": "2026-01-27",
+          "importo": 4223.04,
+          "tipo_voce": "Costi di produzione",
+          "fornitore": "Epsilon Tech",
+          "totale_per_fornitore": null,
+          "totale_per_tipo": null,
+          "totale_generale": null
+        },
+        {
+          "id": 6,
+          "data_registrazione": "2026-02-06",
+          "importo": 2115.7,
+          "tipo_voce": "Rimborsi",
+          "fornitore": "Beta SpA",
+          "totale_per_fornitore": null,
+          "totale_per_tipo": null,
+          "totale_generale": null
+        },
+        {
+          "id": 7,
+          "data_registrazione": "2026-01-30",
+          "importo": 2498.77,
+          "tipo_voce": "Amortamenti",
+          "fornitore": "Fornitore Alpha Srl",
+          "totale_per_fornitore": null,
+          "totale_per_tipo": null,
+          "totale_generale": null
+        },
+        {
+          "id": 8,
+          "data_registrazione": "2026-02-03",
+          "importo": 1068.38,
+          "tipo_voce": "Spese generali",
+          "fornitore": "",
+          "totale_per_fornitore": null,
+          "totale_per_tipo": null,
+          "totale_generale": null
+        }
+      ],
+      "riepiloghi": [
+        {
+          "id": 1,
+          "periodo": "2025-12-03",
+          "somma_totale": 15089.26,
+          "conteggio_registrazioni": 49.96276079960918
+        },
+        {
+          "id": 2,
+          "periodo": "2026-01-13",
+          "somma_totale": 13075.0,
+          "conteggio_registrazioni": 35.83513352769832
+        },
+        {
+          "id": 3,
+          "periodo": "2025-12-02",
+          "somma_totale": 17972.25,
+          "conteggio_registrazioni": 49.901916667307034
+        },
+        {
+          "id": 4,
+          "periodo": "2026-01-10",
+          "somma_totale": 16443.84,
+          "conteggio_registrazioni": 46.70306878933389
+        },
+        {
+          "id": 5,
+          "periodo": "2026-01-01",
+          "somma_totale": 16886.21,
+          "conteggio_registrazioni": 55.0
+        },
+        {
+          "id": 6,
+          "periodo": "2025-12-19",
+          "somma_totale": 21932.33,
+          "conteggio_registrazioni": 55.0
+        },
+        {
+          "id": 7,
+          "periodo": "2026-01-24",
+          "somma_totale": 10658.73,
+          "conteggio_registrazioni": 40.49007721528566
+        },
+        {
+          "id": 8,
+          "periodo": "2025-12-03",
+          "somma_totale": 21779.04,
+          "conteggio_registrazioni": 46.33211122061902
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "grouping_sets"
+  ],
+  "query": "SELECT CASE WHEN GROUPING(tipo_voce) = 1 AND GROUPING(fornitore) = 1 THEN 'Totale generale' WHEN GROUPING(fornitore) = 1 THEN 'Totale per tipo voce' ELSE 'Dettaglio per fornitore' END AS livello_aggregazione, tipo_voce, fornitore, SUM(importo) AS totale_importo, COUNT(*) AS conteggio_registrazioni FROM registrazioni WHERE tipo_voce IN ('Spese generali', 'Amortamenti', 'Costi di produzione') AND fornitore IN ('Beta SpA', 'Delta Logistics', 'Epsilon Tech', 'Fornitore Alpha Srl') GROUP BY GROUPING SETS ((tipo_voce, fornitore), (tipo_voce), ());"
+}

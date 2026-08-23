@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "cross_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "prodotti",
+      "obsolete_value": "articoli",
+      "description": "La tabella prodotti viene denominata articoli nel linguaggio aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "quantità",
+      "obsolete_value": "unità_vendute",
+      "description": "La colonna quantità viene riferita come unità_vendute nei documenti interni."
+    }
+  ],
+  "spec_hash": "99ab1327921d222a"
+}

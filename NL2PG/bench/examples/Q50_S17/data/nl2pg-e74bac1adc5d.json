@@ -1,0 +1,359 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "boolean_predicate"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_risorse_umane",
+        "description": "La tabella dipendenti viene denominata anagrafica_risorse_umane nella prosa aziendale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "progetti",
+        "obsolete_value": "commesse",
+        "description": "Il termine commesse è utilizzato come sinonimo di progetti nei documenti interni."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "assegnazioni_progetto",
+        "obsolete_value": "allocazioni_risorse",
+        "description": "Nel gergo aziendale le assegnazioni_progetto sono chiamate allocazioni_risorse."
+      }
+    ],
+    "spec_hash": "b6e193f6e6940bf7"
+  },
+  "schema_ddl": "CREATE TABLE anagrafica_risorse_umane (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE,\n    attivo BOOLEAN DEFAULT TRUE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE progetti (\n    id INT PRIMARY KEY,\n    nome_progetto TEXT NOT NULL,\n    budget NUMERIC(12,2) CHECK (budget >= 0),\n    data_inizio DATE,\n    data_fine DATE,\n    completato BOOLEAN DEFAULT FALSE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE assegnazioni_progetto (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES anagrafica_risorse_umane(id),\n    progetto_id INT NOT NULL REFERENCES progetti(id),\n    data_assegnazione DATE DEFAULT CURRENT_DATE,\n    percentuale_allocazione NUMERIC(5,2) CHECK (percentuale_allocazione > 0 AND percentuale_allocazione <= 100),\n    attiva BOOLEAN DEFAULT TRUE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "anagrafica_risorse_umane",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "data_assunzione": "2020-03-15",
+            "attivo": true,
+            "eliminato": false
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA85B02F205X",
+            "data_assunzione": "2021-07-01",
+            "attivo": true,
+            "eliminato": false
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI90C03L219Y",
+            "data_assunzione": "2019-11-20",
+            "attivo": false,
+            "eliminato": false
+          },
+          {
+            "id": 4,
+            "nome": "Paolo",
+            "cognome": "Neri",
+            "codice_fiscale": "NREPLA75D04M150Z",
+            "data_assunzione": "2022-01-10",
+            "attivo": true,
+            "eliminato": false
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Gialli",
+            "codice_fiscale": "GLLFNC88E05B157K",
+            "data_assunzione": "2023-05-25",
+            "attivo": true,
+            "eliminato": false
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Paolo",
+              "Francesca",
+              "Alessandro",
+              "Chiara",
+              "Marco",
+              "Sara",
+              "Luca"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Gialli",
+              "Colombo",
+              "Fontana",
+              "Greco",
+              "Romano",
+              "Ricci"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -365.0,
+            "delta_max": 365.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "progetti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_progetto": "Migrazione ERP",
+            "budget": 150000.0,
+            "data_inizio": "2025-01-10",
+            "data_fine": "2025-06-30",
+            "completato": true,
+            "eliminato": false
+          },
+          {
+            "id": 2,
+            "nome_progetto": "Sviluppo Portale Intranet",
+            "budget": 80000.0,
+            "data_inizio": "2025-03-01",
+            "data_fine": "2025-09-15",
+            "completato": false,
+            "eliminato": false
+          },
+          {
+            "id": 3,
+            "nome_progetto": "Automazione Processi HR",
+            "budget": 45000.0,
+            "data_inizio": "2025-02-15",
+            "data_fine": "2025-05-20",
+            "completato": true,
+            "eliminato": false
+          },
+          {
+            "id": 4,
+            "nome_progetto": "Upgrade Infrastruttura Cloud",
+            "budget": 220000.0,
+            "data_inizio": "2025-04-01",
+            "data_fine": "2025-12-31",
+            "completato": false,
+            "eliminato": false
+          },
+          {
+            "id": 5,
+            "nome_progetto": "Formazione Cybersecurity",
+            "budget": 30000.0,
+            "data_inizio": "2025-06-01",
+            "data_fine": "2025-07-15",
+            "completato": true,
+            "eliminato": false
+          }
+        ],
+        "variations": {
+          "nome_progetto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Migrazione ERP",
+              "Sviluppo Portale Intranet",
+              "Automazione Processi HR",
+              "Upgrade Infrastruttura Cloud",
+              "Formazione Cybersecurity",
+              "Implementazione CRM",
+              "Ottimizzazione Supply Chain",
+              "Business Intelligence",
+              "Sicurezza Rete",
+              "Digitalizzazione Archivio"
+            ]
+          },
+          "budget": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.5,
+            "pool": []
+          },
+          "data_inizio": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_fine": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "assegnazioni_progetto",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "dipendente_id": 1,
+            "progetto_id": 1,
+            "data_assegnazione": "2025-01-15",
+            "percentuale_allocazione": 100.0,
+            "attiva": true,
+            "eliminato": false
+          },
+          {
+            "id": 2,
+            "dipendente_id": 2,
+            "progetto_id": 1,
+            "data_assegnazione": "2025-01-20",
+            "percentuale_allocazione": 50.0,
+            "attiva": true,
+            "eliminato": false
+          },
+          {
+            "id": 3,
+            "dipendente_id": 3,
+            "progetto_id": 2,
+            "data_assegnazione": "2025-03-05",
+            "percentuale_allocazione": 75.0,
+            "attiva": true,
+            "eliminato": false
+          },
+          {
+            "id": 4,
+            "dipendente_id": 4,
+            "progetto_id": 3,
+            "data_assegnazione": "2025-02-18",
+            "percentuale_allocazione": 25.0,
+            "attiva": false,
+            "eliminato": false
+          },
+          {
+            "id": 5,
+            "dipendente_id": 5,
+            "progetto_id": 4,
+            "data_assegnazione": "2025-04-10",
+            "percentuale_allocazione": 100.0,
+            "attiva": true,
+            "eliminato": false
+          },
+          {
+            "id": 6,
+            "dipendente_id": 1,
+            "progetto_id": 2,
+            "data_assegnazione": "2025-05-01",
+            "percentuale_allocazione": 50.0,
+            "attiva": true,
+            "eliminato": false
+          },
+          {
+            "id": 7,
+            "dipendente_id": 2,
+            "progetto_id": 3,
+            "data_assegnazione": "2025-06-15",
+            "percentuale_allocazione": 75.0,
+            "attiva": true,
+            "eliminato": false
+          },
+          {
+            "id": 8,
+            "dipendente_id": 3,
+            "progetto_id": 4,
+            "data_assegnazione": "2025-07-20",
+            "percentuale_allocazione": 25.0,
+            "attiva": false,
+            "eliminato": false
+          },
+          {
+            "id": 9,
+            "dipendente_id": 4,
+            "progetto_id": 5,
+            "data_assegnazione": "2025-08-01",
+            "percentuale_allocazione": 100.0,
+            "attiva": true,
+            "eliminato": false
+          },
+          {
+            "id": 10,
+            "dipendente_id": 5,
+            "progetto_id": 1,
+            "data_assegnazione": "2025-09-10",
+            "percentuale_allocazione": 50.0,
+            "attiva": true,
+            "eliminato": false
+          }
+        ],
+        "variations": {
+          "data_assegnazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "percentuale_allocazione": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 1.0,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

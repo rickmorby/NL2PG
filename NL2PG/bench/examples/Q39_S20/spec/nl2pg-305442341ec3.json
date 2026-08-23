@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "between"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_di_copertura",
+      "description": "La tabella polizze viene denominata contratti_di_copertura nella prosa aziendale. Le query devono risolvere il nome reale della tabella per applicare filtri con BETWEEN sulla colonna enumerata tipo_polizza."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "tipo_polizza",
+      "obsolete_value": "tier di sottoscrizione",
+      "description": "La colonna enumerata tipo_polizza, dichiarata come ENUM('base','standard','premium') con valori mutuamente esclusivi, viene indicata nel linguaggio aziendale come tier di sottoscrizione. Le query devono usare BETWEEN 'base' AND 'standard' rispettando l'ordine di definizione del tipo ENUM."
+    }
+  ],
+  "spec_hash": "28a925e9a402078f"
+}

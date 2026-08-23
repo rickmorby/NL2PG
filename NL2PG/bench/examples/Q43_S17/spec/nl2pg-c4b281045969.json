@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "sorting"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "pratiche_di_copertura",
+      "description": "La tabella polizze viene denominata pratiche_di_copertura nella prosa aziendale: il risolutore deve mappare la perifrasi al nome reale della tabella nello schema."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "deleted_at",
+      "obsolete_value": "data_ritiro",
+      "description": "La colonna deleted_at (timestamp di cancellazione logica) viene descritta come data_ritiro nella documentazione aziendale: le righe con valore non nullo sono logicamente eliminate e devono essere escluse tramite il predicato deleted_at IS NULL mantenuto nella WHERE, prima dell'ordinamento ORDER BY multi-colonna senza LIMIT."
+    }
+  ],
+  "spec_hash": "96f52999c772d7d5"
+}

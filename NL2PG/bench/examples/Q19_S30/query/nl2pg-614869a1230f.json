@@ -1,0 +1,2288 @@
+{
+  "schema_ddl": "CREATE TYPE stato_spedizione AS ENUM ('in_preparazione', 'in_transito', 'consegnato', 'annullato', 'ritornato');\n\nCREATE TYPE stato_destinatario AS ENUM ('attivo', 'sospeso', 'chiuso');\n\nCREATE TABLE spedizioni (\n    id BIGSERIAL PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    peso_kg NUMERIC(10,3) NOT NULL CHECK (peso_kg > 0),\n    volume_m3 NUMERIC(10,3) CHECK (volume_m3 >= 0),\n    stato stato_spedizione NOT NULL,\n    data_creazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    data_consegna_prevista DATE,\n    data_consegna_effettiva DATE,\n    destinatario_id INT,\n    hub_partenza_id INT,\n    hub_arrivo_id INT,\n    corriere_id INT,\n    valore_dichiarato NUMERIC(12,2) CHECK (valore_dichiarato >= 0),\n    assicurazione_boolean BOOLEAN NOT NULL DEFAULT FALSE,\n    costo_spedizione NUMERIC(10,2) GENERATED ALWAYS AS (\n        CASE WHEN assicurazione_boolean THEN (peso_kg * 2.5 + volume_m3 * 1.8) * 1.15\n             ELSE (peso_kg * 2.5 + volume_m3 * 1.8)\n        END\n    ) STORED,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE destinatari (\n    id BIGSERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT UNIQUE,\n    codice_fiscale TEXT UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    stato stato_destinatario NOT NULL,\n    email TEXT,\n    telefono TEXT,\n    referente TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE hub (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    tipo_hub TEXT NOT NULL CHECK (tipo_hub IN ('partenza', 'arrivo', 'transito', 'smistamento')),\n    capacita_massima NUMERIC(10,2) CHECK (capacita_massima > 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE corrieri (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    partita_iva TEXT UNIQUE,\n    codice_fiscale TEXT UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    email TEXT,\n    telefono TEXT,\n    referente TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE veicoli (\n    id BIGSERIAL PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    tipo_veicolo TEXT NOT NULL CHECK (tipo_veicolo IN ('furgone', 'camion', 'autocarro', 'motociclo')),\n    capacita_kg NUMERIC(10,2) NOT NULL CHECK (capacita_kg > 0),\n    capacita_m3 NUMERIC(10,2) NOT NULL CHECK (capacita_m3 > 0),\n    anno_immatricolazione INT NOT NULL CHECK (anno_immatricolazione BETWEEN 1990 AND EXTRACT(YEAR FROM CURRENT_DATE)),\n    corriere_id INT NOT NULL REFERENCES corrieri(id) ON DELETE CASCADE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE spedizioni_veicoli (\n    spedizione_id BIGINT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    veicolo_id BIGINT NOT NULL REFERENCES veicoli(id) ON DELETE CASCADE,\n    data_assegnazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    PRIMARY KEY (spedizione_id, veicolo_id)\n);\n\nCREATE TABLE logistica_inversa (\n    id BIGSERIAL PRIMARY KEY,\n    codice_reso TEXT NOT NULL UNIQUE,\n    spedizione_originale_id BIGINT REFERENCES spedizioni(id) ON DELETE SET NULL,\n    motivo_reso TEXT NOT NULL,\n    stato_reso TEXT NOT NULL CHECK (stato_reso IN ('ricevuto', 'in_verifica', 'approvato', 'rifiutato', 'rimborsato')),\n    data_creazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    data_chiusura TIMESTAMP,\n    valore_rimborsato NUMERIC(12,2) CHECK (valore_rimborsato >= 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE hub_di_destinazione (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE tracking_spedizioni (\n    id BIGSERIAL PRIMARY KEY,\n    spedizione_id BIGINT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    hub_id BIGINT REFERENCES hub(id) ON DELETE SET NULL,\n    data_evento TIMESTAMP NOT NULL,\n    descrizione_evento TEXT NOT NULL,\n    ubicazione TEXT,\n    stato_attuale stato_spedizione NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE documenti_spedizione (\n    id BIGSERIAL PRIMARY KEY,\n    spedizione_id BIGINT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    tipo_documento TEXT NOT NULL CHECK (tipo_documento IN ('ddt', 'fattura', 'bolla', 'lettera_vettura')),\n    numero_documento TEXT NOT NULL,\n    data_emissione DATE NOT NULL,\n    file_path TEXT NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE magazzini (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    capacita_massima NUMERIC(10,2) CHECK (capacita_massima > 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nALTER TABLE spedizioni ADD CONSTRAINT fk_destinatario\n    FOREIGN KEY (destinatario_id) REFERENCES destinatari(id) ON DELETE SET NULL;\n\nALTER TABLE spedizioni ADD CONSTRAINT fk_hub_partenza\n    FOREIGN KEY (hub_partenza_id) REFERENCES hub(id) ON DELETE SET NULL;\n\nALTER TABLE spedizioni ADD CONSTRAINT fk_hub_arrivo\n    FOREIGN KEY (hub_arrivo_id) REFERENCES hub(id) ON DELETE SET NULL;\n\nALTER TABLE spedizioni ADD CONSTRAINT fk_corriere\n    FOREIGN KEY (corriere_id) REFERENCES corrieri(id) ON DELETE SET NULL;\n\nCREATE INDEX idx_spedizioni_destinatario ON spedizioni(destinatario_id);\nCREATE INDEX idx_spedizioni_stato ON spedizioni(stato);\nCREATE INDEX idx_spedizioni_data_creazione ON spedizioni(data_creazione);\nCREATE INDEX idx_destinatari_stato ON destinatari(stato);\nCREATE INDEX idx_tracking_spedizione ON tracking_spedizioni(spedizione_id);\nCREATE INDEX idx_tracking_data_evento ON tracking_spedizioni(data_evento);",
+  "data_profile": {
+    "profile": {
+      "destinatari": {
+        "row_count": 683,
+        "columns": {
+          "id": {
+            "distinct": 683,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 683
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Azienda Alfa Srl",
+              "Beta Logistics Spa",
+              "Delta Distribuzioni",
+              "Epsilon Transport",
+              "Eta Shipping"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 640,
+            "sample": [
+              "IT09876543210",
+              "IT09876543210_1",
+              "IT09876543210_10",
+              "IT09876543210_100",
+              "IT09876543210_101"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 649,
+            "sample": [
+              "09876543210_10",
+              "09876543210_100",
+              "09876543210_101",
+              "09876543210_102",
+              "09876543210_103"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 3,
+            "sample": [
+              "Corso Milano 25",
+              "Piazza Garibaldi 5",
+              "Via Roma 10"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "provincia": {
+            "distinct": 8,
+            "sample": [
+              "BO",
+              "FI",
+              "GE",
+              "MI",
+              "NA"
+            ]
+          },
+          "cap": {
+            "distinct": 8,
+            "sample": [
+              "00100",
+              "10100",
+              "16100",
+              "20100",
+              "30100"
+            ]
+          },
+          "stato_geografico": {
+            "distinct": 8,
+            "sample": [
+              "Campania",
+              "Emilia-Romagna",
+              "Lazio",
+              "Liguria",
+              "Lombardia"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "chiuso",
+              "sospeso"
+            ]
+          },
+          "email": {
+            "distinct": 5,
+            "sample": [
+              "admin@gammatrading.it",
+              "contatti@betalogistics.it",
+              "info@aziendaalfa.it",
+              "sales@epsilontransport.it",
+              "support@deltadist.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+39011223344",
+              "+39029876543",
+              "+390514445566",
+              "+39061234567",
+              "+390815556677"
+            ]
+          },
+          "referente": {
+            "distinct": 5,
+            "sample": [
+              "Giulia Neri",
+              "Laura Bianchi",
+              "Luca Gialli",
+              "Mario Rossi",
+              "Paolo Verdi"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "updated_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      },
+      "hub": {
+        "row_count": 189,
+        "columns": {
+          "id": {
+            "distinct": 189,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 189
+          },
+          "nome": {
+            "distinct": 189,
+            "sample": [
+              "Hub Centro Roma",
+              "Hub Centro Roma_1",
+              "Hub Centro Roma_10",
+              "Hub Centro Roma_11",
+              "Hub Centro Roma_12"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 3,
+            "sample": [
+              "Via Appia 100",
+              "Via Industriale 1",
+              "Via Napoli 20"
+            ]
+          },
+          "citta": {
+            "distinct": 6,
+            "sample": [
+              "Bari",
+              "Genova",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "provincia": {
+            "distinct": 6,
+            "sample": [
+              "BA",
+              "GE",
+              "MI",
+              "NA",
+              "RM"
+            ]
+          },
+          "cap": {
+            "distinct": 6,
+            "sample": [
+              "00180",
+              "16150",
+              "20150",
+              "30170",
+              "70120"
+            ]
+          },
+          "stato_geografico": {
+            "distinct": 6,
+            "sample": [
+              "Campania",
+              "Lazio",
+              "Liguria",
+              "Lombardia",
+              "Puglia"
+            ]
+          },
+          "tipo_hub": {
+            "distinct": 4,
+            "sample": [
+              "arrivo",
+              "partenza",
+              "smistamento",
+              "transito"
+            ]
+          },
+          "capacita_massima": {
+            "distinct": 175,
+            "sample": [
+              "10075.86",
+              "10115.91",
+              "10303.24",
+              "10361.12",
+              "10373.04"
+            ],
+            "min": 4000.0,
+            "max": 11964.54
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "updated_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "corrieri": {
+        "row_count": 668,
+        "columns": {
+          "id": {
+            "distinct": 668,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 668
+          },
+          "nome": {
+            "distinct": 6,
+            "sample": [
+              "Corriere Nazionale",
+              "Corriere Veloce Spa",
+              "Logistica Rapida",
+              "Spedizioni Express",
+              "Trasporti Italia"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 628,
+            "sample": [
+              "IT11122233344",
+              "IT11122233344_1",
+              "IT11122233344_10",
+              "IT11122233344_100",
+              "IT11122233344_101"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 634,
+            "sample": [
+              "11122233344",
+              "11122233344_1",
+              "11122233344_10",
+              "11122233344_100",
+              "11122233344_101"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 3,
+            "sample": [
+              "Via Corriere 1",
+              "Via Logistica 3",
+              "Via Trasporti 2"
+            ]
+          },
+          "citta": {
+            "distinct": 6,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "provincia": {
+            "distinct": 6,
+            "sample": [
+              "BO",
+              "FI",
+              "MI",
+              "NA",
+              "RM"
+            ]
+          },
+          "cap": {
+            "distinct": 6,
+            "sample": [
+              "00100",
+              "10100",
+              "20100",
+              "40100",
+              "50100"
+            ]
+          },
+          "stato_geografico": {
+            "distinct": 6,
+            "sample": [
+              "Campania",
+              "Emilia-Romagna",
+              "Lazio",
+              "Lombardia",
+              "Piemonte"
+            ]
+          },
+          "email": {
+            "distinct": 5,
+            "sample": [
+              "admin@trasportiitalia.it",
+              "contatti@trasportisicuri.it",
+              "info@corriereveloce.it",
+              "sales@spedizioniexpress.it",
+              "support@logisticarapida.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+390113334445",
+              "+39022223334",
+              "+390516667778",
+              "+39061112223",
+              "+390814445556"
+            ]
+          },
+          "referente": {
+            "distinct": 5,
+            "sample": [
+              "Alberto Bianchi",
+              "Giulia Verdi",
+              "Luca Gialli",
+              "Marco Neri",
+              "Sofia Rossi"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "updated_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      },
+      "veicoli": {
+        "row_count": 1565,
+        "columns": {
+          "id": {
+            "distinct": 1565,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1565
+          },
+          "targa": {
+            "distinct": 1565,
+            "sample": [
+              "AB123CD",
+              "AB123CD_1",
+              "AB123CD_10",
+              "AB123CD_100",
+              "AB123CD_101"
+            ]
+          },
+          "tipo_veicolo": {
+            "distinct": 4,
+            "sample": [
+              "autocarro",
+              "camion",
+              "furgone",
+              "motociclo"
+            ]
+          },
+          "capacita_kg": {
+            "distinct": 1484,
+            "sample": [
+              "10000.0",
+              "10004.2",
+              "10004.29",
+              "10007.61",
+              "10027.57"
+            ],
+            "min": 1050.0,
+            "max": 13000.0
+          },
+          "capacita_m3": {
+            "distinct": 1208,
+            "sample": [
+              "10.0",
+              "10.01",
+              "10.03",
+              "10.04",
+              "10.06"
+            ],
+            "min": 7.0,
+            "max": 65.0
+          },
+          "anno_immatricolazione": {
+            "distinct": 1493,
+            "sample": [
+              "2013.0",
+              "2013.010798257647",
+              "2013.0119914932357",
+              "2013.0176992213635",
+              "2013.0337812468151"
+            ],
+            "min": 2013.0,
+            "max": 2024.0
+          },
+          "corriere_id": {
+            "distinct": 601,
+            "sample": [
+              "1",
+              "10",
+              "101",
+              "103",
+              "104"
+            ],
+            "min": 1,
+            "max": 668
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "updated_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 1761,
+        "columns": {
+          "id": {
+            "distinct": 1761,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1761
+          },
+          "codice_spedizione": {
+            "distinct": 1761,
+            "sample": [
+              "SP20260001",
+              "SP20260001_1",
+              "SP20260001_10",
+              "SP20260001_100",
+              "SP20260001_101"
+            ]
+          },
+          "peso_kg": {
+            "distinct": 1663,
+            "sample": [
+              "100.89",
+              "100.9",
+              "1000.16",
+              "1001.56",
+              "1003.49"
+            ],
+            "min": 75.89,
+            "max": 1600.0
+          },
+          "volume_m3": {
+            "distinct": 961,
+            "sample": [
+              "1.25",
+              "1.26",
+              "1.27",
+              "1.28",
+              "1.29"
+            ],
+            "min": 1.25,
+            "max": 20.0
+          },
+          "stato": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "consegnato",
+              "in_preparazione",
+              "in_transito",
+              "ritornato"
+            ]
+          },
+          "data_creazione": {
+            "distinct": 93,
+            "sample": [
+              "2025-12-21 10:00:00",
+              "2025-12-22 10:00:00",
+              "2025-12-23 10:00:00",
+              "2025-12-24 10:00:00",
+              "2025-12-25 10:00:00"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 27,
+            "sample": [
+              "2025-12-31",
+              "2026-01-01",
+              "2026-01-02",
+              "2026-01-03",
+              "2026-01-04"
+            ]
+          },
+          "data_consegna_effettiva": {
+            "distinct": 11,
+            "sample": [
+              "2026-01-04",
+              "2026-01-05",
+              "2026-01-06",
+              "2026-01-07",
+              "2026-01-08"
+            ]
+          },
+          "destinatario_id": {
+            "distinct": 614,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 683
+          },
+          "hub_partenza_id": {
+            "distinct": 189,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 189
+          },
+          "hub_arrivo_id": {
+            "distinct": 189,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 189
+          },
+          "corriere_id": {
+            "distinct": 611,
+            "sample": [
+              "10",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 2,
+            "max": 668
+          },
+          "valore_dichiarato": {
+            "distinct": 1597,
+            "sample": [
+              "10000.0",
+              "10000.75",
+              "10044.86",
+              "10060.53",
+              "10079.99"
+            ],
+            "min": 2500.0,
+            "max": 40000.0
+          },
+          "assicurazione_boolean": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          },
+          "costo_spedizione": {
+            "distinct": 0,
+            "sample": []
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "updated_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      },
+      "spedizioni_veicoli": {
+        "row_count": 1039,
+        "columns": {
+          "spedizione_id": {
+            "distinct": 780,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1760
+          },
+          "veicolo_id": {
+            "distinct": 757,
+            "sample": [
+              "1000",
+              "1007",
+              "1009",
+              "101",
+              "1013"
+            ],
+            "min": 3,
+            "max": 1565
+          },
+          "data_assegnazione": {
+            "distinct": 9,
+            "sample": [
+              "2026-01-04 10:15:00",
+              "2026-01-05 10:15:00",
+              "2026-01-06 10:15:00",
+              "2026-01-09 08:30:00",
+              "2026-01-10 08:30:00"
+            ]
+          }
+        }
+      },
+      "tracking_spedizioni": {
+        "row_count": 2849,
+        "columns": {
+          "id": {
+            "distinct": 2849,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2849
+          },
+          "spedizione_id": {
+            "distinct": 1412,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1761
+          },
+          "hub_id": {
+            "distinct": 189,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 189
+          },
+          "data_evento": {
+            "distinct": 15,
+            "sample": [
+              "2026-01-07 14:00:00",
+              "2026-01-08 08:00:00",
+              "2026-01-08 14:00:00",
+              "2026-01-09 08:00:00",
+              "2026-01-09 09:30:00"
+            ]
+          },
+          "descrizione_evento": {
+            "distinct": 6,
+            "sample": [
+              "Consegna effettuata",
+              "In transito",
+              "Partenza da hub",
+              "Ritiro programmato",
+              "Spedizione annullata"
+            ]
+          },
+          "ubicazione": {
+            "distinct": 5,
+            "sample": [
+              "Hub Centro Roma",
+              "Hub Nord Milano",
+              "Hub Sud Napoli",
+              "Magazzino Centrale",
+              "Punto di Smistamento"
+            ]
+          },
+          "stato_attuale": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "consegnato",
+              "in_preparazione",
+              "in_transito",
+              "ritornato"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "documenti_spedizione": {
+        "row_count": 2535,
+        "columns": {
+          "id": {
+            "distinct": 2535,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2535
+          },
+          "spedizione_id": {
+            "distinct": 1353,
+            "sample": [
+              "1",
+              "100",
+              "1000",
+              "1001",
+              "1002"
+            ],
+            "min": 1,
+            "max": 1761
+          },
+          "tipo_documento": {
+            "distinct": 4,
+            "sample": [
+              "bolla",
+              "ddt",
+              "fattura",
+              "lettera_vettura"
+            ]
+          },
+          "numero_documento": {
+            "distinct": 4,
+            "sample": [
+              "BOLLA20260003",
+              "DDT20260001",
+              "FATT20260002",
+              "LV20260004"
+            ]
+          },
+          "data_emissione": {
+            "distinct": 13,
+            "sample": [
+              "2026-01-02",
+              "2026-01-03",
+              "2026-01-04",
+              "2026-01-05",
+              "2026-01-06"
+            ]
+          },
+          "file_path": {
+            "distinct": 4,
+            "sample": [
+              "/docs/bolle/2026/BOLLA20260003.pdf",
+              "/docs/ddt/2026/DDT20260001.pdf",
+              "/docs/fatture/2026/FATT20260002.pdf",
+              "/docs/lettere/2026/LV20260004.pdf"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "logistica_inversa": {
+        "row_count": 1944,
+        "columns": {
+          "id": {
+            "distinct": 1944,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1944
+          },
+          "codice_reso": {
+            "distinct": 1944,
+            "sample": [
+              "RESO20260001",
+              "RESO20260001_1",
+              "RESO20260001_10",
+              "RESO20260001_100",
+              "RESO20260001_101"
+            ]
+          },
+          "spedizione_originale_id": {
+            "distinct": 1139,
+            "sample": [
+              "10",
+              "1000",
+              "1001",
+              "1002",
+              "1003"
+            ],
+            "min": 3,
+            "max": 1761
+          },
+          "motivo_reso": {
+            "distinct": 5,
+            "sample": [
+              "Consegna tardiva",
+              "Errore di spedizione",
+              "Prodotto danneggiato",
+              "Prodotto non conforme",
+              "Reso volontario"
+            ]
+          },
+          "stato_reso": {
+            "distinct": 5,
+            "sample": [
+              "approvato",
+              "in_verifica",
+              "ricevuto",
+              "rifiutato",
+              "rimborsato"
+            ]
+          },
+          "data_creazione": {
+            "distinct": 33,
+            "sample": [
+              "2026-01-07 10:00:00",
+              "2026-01-08 10:00:00",
+              "2026-01-08 11:00:00",
+              "2026-01-09 10:00:00",
+              "2026-01-09 11:00:00"
+            ]
+          },
+          "data_chiusura": {
+            "distinct": 10,
+            "sample": [
+              "2026-01-12 09:00:00",
+              "2026-01-13 09:00:00",
+              "2026-01-14 09:00:00",
+              "2026-01-14 10:00:00",
+              "2026-01-15 09:00:00"
+            ]
+          },
+          "valore_rimborsato": {
+            "distinct": 1183,
+            "sample": [
+              "0.0",
+              "10000.0",
+              "10049.31",
+              "10050.98",
+              "10055.72"
+            ],
+            "min": 0.0,
+            "max": 30000.0
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "updated_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "magazzini": {
+        "row_count": 552,
+        "columns": {
+          "id": {
+            "distinct": 552,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 552
+          },
+          "nome": {
+            "distinct": 552,
+            "sample": [
+              "Magazzino Centrale Roma",
+              "Magazzino Centrale Roma_1",
+              "Magazzino Centrale Roma_10",
+              "Magazzino Centrale Roma_100",
+              "Magazzino Centrale Roma_101"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 3,
+            "sample": [
+              "Via Deposito 2",
+              "Via Magazzino 1",
+              "Via Stoccaggio 3"
+            ]
+          },
+          "citta": {
+            "distinct": 5,
+            "sample": [
+              "Genova",
+              "Milano",
+              "Napoli",
+              "Roma",
+              "Venezia"
+            ]
+          },
+          "provincia": {
+            "distinct": 5,
+            "sample": [
+              "GE",
+              "MI",
+              "NA",
+              "RM",
+              "VE"
+            ]
+          },
+          "cap": {
+            "distinct": 5,
+            "sample": [
+              "00150",
+              "16150",
+              "20150",
+              "30170",
+              "80150"
+            ]
+          },
+          "stato_geografico": {
+            "distinct": 5,
+            "sample": [
+              "Campania",
+              "Lazio",
+              "Liguria",
+              "Lombardia",
+              "Veneto"
+            ]
+          },
+          "capacita_massima": {
+            "distinct": 495,
+            "sample": [
+              "10000.0",
+              "10008.28",
+              "10010.41",
+              "10016.28",
+              "10032.56"
+            ],
+            "min": 4800.0,
+            "max": 15000.0
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "updated_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "hub_di_destinazione": {
+        "row_count": 24,
+        "columns": {
+          "id": {
+            "distinct": 24,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 24
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Hub Destinazione Bologna",
+              "Hub Destinazione Milano",
+              "Hub Destinazione Napoli",
+              "Hub Destinazione Roma",
+              "Hub Destinazione Torino"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 3,
+            "sample": [
+              "Via Destinazione 1",
+              "Via Destinazione 2",
+              "Via Destinazione 3"
+            ]
+          },
+          "citta": {
+            "distinct": 5,
+            "sample": [
+              "Bologna",
+              "Milano",
+              "Napoli",
+              "Roma",
+              "Torino"
+            ]
+          },
+          "provincia": {
+            "distinct": 5,
+            "sample": [
+              "BO",
+              "MI",
+              "NA",
+              "RM",
+              "TO"
+            ]
+          },
+          "cap": {
+            "distinct": 5,
+            "sample": [
+              "00100",
+              "10100",
+              "20100",
+              "40100",
+              "80100"
+            ]
+          },
+          "stato_geografico": {
+            "distinct": 5,
+            "sample": [
+              "Campania",
+              "Emilia-Romagna",
+              "Lazio",
+              "Lombardia",
+              "Piemonte"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "destinatari": [
+        {
+          "id": 1,
+          "ragione_sociale": "Eta Shipping",
+          "partita_iva": "IT12345678901",
+          "codice_fiscale": "12345678901",
+          "indirizzo": "Via Roma 10",
+          "citta": "Bologna",
+          "provincia": "FI",
+          "cap": "10100",
+          "stato_geografico": "Piemonte",
+          "stato": "chiuso",
+          "email": "contatti@betalogistics.it",
+          "telefono": "+39011223344",
+          "referente": "Mario Rossi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Delta Distribuzioni",
+          "partita_iva": "IT12345678901_1",
+          "codice_fiscale": "12345678901_1",
+          "indirizzo": "Via Roma 10",
+          "citta": "Firenze",
+          "provincia": "NA",
+          "cap": "40100",
+          "stato_geografico": "Emilia-Romagna",
+          "stato": "chiuso",
+          "email": "support@deltadist.it",
+          "telefono": "+390815556677",
+          "referente": "Paolo Verdi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Beta Logistics Spa",
+          "partita_iva": "IT12345678901_2",
+          "codice_fiscale": "12345678901_2",
+          "indirizzo": "Via Roma 10",
+          "citta": "Bologna",
+          "provincia": "BO",
+          "cap": "30100",
+          "stato_geografico": "Lombardia",
+          "stato": "sospeso",
+          "email": "info@aziendaalfa.it",
+          "telefono": "+390514445566",
+          "referente": "Mario Rossi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Epsilon Transport",
+          "partita_iva": "IT12345678901_3",
+          "codice_fiscale": "12345678901_3",
+          "indirizzo": "Via Roma 10",
+          "citta": "Milano",
+          "provincia": "GE",
+          "cap": "16100",
+          "stato_geografico": "Liguria",
+          "stato": "chiuso",
+          "email": "sales@epsilontransport.it",
+          "telefono": "+39061234567",
+          "referente": "Paolo Verdi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Eta Shipping",
+          "partita_iva": "IT12345678901_4",
+          "codice_fiscale": "12345678901_4",
+          "indirizzo": "Via Roma 10",
+          "citta": "Torino",
+          "provincia": "FI",
+          "cap": "50100",
+          "stato_geografico": "Lazio",
+          "stato": "attivo",
+          "email": "info@aziendaalfa.it",
+          "telefono": "+39011223344",
+          "referente": "Giulia Neri",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Eta Shipping",
+          "partita_iva": "IT12345678901_5",
+          "codice_fiscale": "12345678901_5",
+          "indirizzo": "Via Roma 10",
+          "citta": "Genova",
+          "provincia": "TO",
+          "cap": "00100",
+          "stato_geografico": "Veneto",
+          "stato": "chiuso",
+          "email": "contatti@betalogistics.it",
+          "telefono": "+390514445566",
+          "referente": "Giulia Neri",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Beta Logistics Spa",
+          "partita_iva": "IT12345678901_6",
+          "codice_fiscale": "12345678901_6",
+          "indirizzo": "Via Roma 10",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "20100",
+          "stato_geografico": "Emilia-Romagna",
+          "stato": "attivo",
+          "email": "info@aziendaalfa.it",
+          "telefono": "+390514445566",
+          "referente": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Theta Warehouse",
+          "partita_iva": "IT12345678901_7",
+          "codice_fiscale": "12345678901_7",
+          "indirizzo": "Via Roma 10",
+          "citta": "Venezia",
+          "provincia": "NA",
+          "cap": "00100",
+          "stato_geografico": "Emilia-Romagna",
+          "stato": "attivo",
+          "email": "sales@epsilontransport.it",
+          "telefono": "+39011223344",
+          "referente": "Luca Gialli",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        }
+      ],
+      "hub": [
+        {
+          "id": 1,
+          "nome": "Hub Nord Milano",
+          "indirizzo": "Via Industriale 1",
+          "citta": "Venezia",
+          "provincia": "VE",
+          "cap": "70120",
+          "stato_geografico": "Lazio",
+          "tipo_hub": "transito",
+          "capacita_massima": 6480.34,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "nome": "Hub Nord Milano_1",
+          "indirizzo": "Via Industriale 1",
+          "citta": "Genova",
+          "provincia": "NA",
+          "cap": "00180",
+          "stato_geografico": "Campania",
+          "tipo_hub": "smistamento",
+          "capacita_massima": 6983.23,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "nome": "Hub Nord Milano_2",
+          "indirizzo": "Via Industriale 1",
+          "citta": "Venezia",
+          "provincia": "VE",
+          "cap": "80140",
+          "stato_geografico": "Lazio",
+          "tipo_hub": "transito",
+          "capacita_massima": 5556.83,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "nome": "Hub Nord Milano_3",
+          "indirizzo": "Via Industriale 1",
+          "citta": "Napoli",
+          "provincia": "BA",
+          "cap": "30170",
+          "stato_geografico": "Liguria",
+          "tipo_hub": "arrivo",
+          "capacita_massima": 6446.12,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "nome": "Hub Nord Milano_4",
+          "indirizzo": "Via Industriale 1",
+          "citta": "Venezia",
+          "provincia": "NA",
+          "cap": "70120",
+          "stato_geografico": "Liguria",
+          "tipo_hub": "arrivo",
+          "capacita_massima": 4260.37,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "nome": "Hub Nord Milano_5",
+          "indirizzo": "Via Industriale 1",
+          "citta": "Genova",
+          "provincia": "GE",
+          "cap": "20150",
+          "stato_geografico": "Liguria",
+          "tipo_hub": "partenza",
+          "capacita_massima": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "nome": "Hub Nord Milano_6",
+          "indirizzo": "Via Industriale 1",
+          "citta": "Napoli",
+          "provincia": "NA",
+          "cap": "00180",
+          "stato_geografico": "Campania",
+          "tipo_hub": "arrivo",
+          "capacita_massima": 4857.22,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "nome": "Hub Nord Milano_7",
+          "indirizzo": "Via Industriale 1",
+          "citta": "Roma",
+          "provincia": "GE",
+          "cap": "00180",
+          "stato_geografico": "Campania",
+          "tipo_hub": "partenza",
+          "capacita_massima": 7451.8,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        }
+      ],
+      "corrieri": [
+        {
+          "id": 1,
+          "nome": "Corriere Nazionale",
+          "partita_iva": "IT11122233344",
+          "codice_fiscale": "11122233344",
+          "indirizzo": "Via Corriere 1",
+          "citta": "Roma",
+          "provincia": "BO",
+          "cap": "40100",
+          "stato_geografico": "Emilia-Romagna",
+          "email": "info@corriereveloce.it",
+          "telefono": "+390516667778",
+          "referente": "Alberto Bianchi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 2,
+          "nome": "Trasporti Sicuri Srl",
+          "partita_iva": "IT11122233344_1",
+          "codice_fiscale": "11122233344_1",
+          "indirizzo": "Via Corriere 1",
+          "citta": "Firenze",
+          "provincia": "MI",
+          "cap": "10100",
+          "stato_geografico": "Lombardia",
+          "email": "sales@spedizioniexpress.it",
+          "telefono": "+39061112223",
+          "referente": "Giulia Verdi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 3,
+          "nome": "Trasporti Sicuri Srl",
+          "partita_iva": null,
+          "codice_fiscale": "11122233344_2",
+          "indirizzo": "Via Corriere 1",
+          "citta": "Firenze",
+          "provincia": "MI",
+          "cap": "40100",
+          "stato_geografico": "Piemonte",
+          "email": "contatti@trasportisicuri.it",
+          "telefono": "+39061112223",
+          "referente": "Marco Neri",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 4,
+          "nome": "Spedizioni Express",
+          "partita_iva": "IT11122233344_3",
+          "codice_fiscale": "11122233344_3",
+          "indirizzo": "Via Corriere 1",
+          "citta": "Firenze",
+          "provincia": "MI",
+          "cap": "40100",
+          "stato_geografico": "Piemonte",
+          "email": "contatti@trasportisicuri.it",
+          "telefono": "+390113334445",
+          "referente": "Luca Gialli",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 5,
+          "nome": "Corriere Veloce Spa",
+          "partita_iva": "IT11122233344_4",
+          "codice_fiscale": "11122233344_4",
+          "indirizzo": "Via Corriere 1",
+          "citta": "Firenze",
+          "provincia": "BO",
+          "cap": "20100",
+          "stato_geografico": "Campania",
+          "email": "sales@spedizioniexpress.it",
+          "telefono": "+390814445556",
+          "referente": "Luca Gialli",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 6,
+          "nome": "Corriere Veloce Spa",
+          "partita_iva": "IT11122233344_5",
+          "codice_fiscale": "11122233344_5",
+          "indirizzo": "Via Corriere 1",
+          "citta": "Firenze",
+          "provincia": "TO",
+          "cap": "50100",
+          "stato_geografico": "Lombardia",
+          "email": "admin@trasportiitalia.it",
+          "telefono": "+390113334445",
+          "referente": "Alberto Bianchi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 7,
+          "nome": "Corriere Nazionale",
+          "partita_iva": "IT11122233344_6",
+          "codice_fiscale": null,
+          "indirizzo": "Via Corriere 1",
+          "citta": "Roma",
+          "provincia": "BO",
+          "cap": "80100",
+          "stato_geografico": "Emilia-Romagna",
+          "email": "support@logisticarapida.it",
+          "telefono": "+390814445556",
+          "referente": "Alberto Bianchi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 8,
+          "nome": "Trasporti Italia",
+          "partita_iva": "IT11122233344_7",
+          "codice_fiscale": "11122233344_7",
+          "indirizzo": "Via Corriere 1",
+          "citta": "Torino",
+          "provincia": "TO",
+          "cap": "80100",
+          "stato_geografico": "Piemonte",
+          "email": null,
+          "telefono": "+39061112223",
+          "referente": "Giulia Verdi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        }
+      ],
+      "veicoli": [
+        {
+          "id": 1,
+          "targa": "AB123CD",
+          "tipo_veicolo": "autocarro",
+          "capacita_kg": 1496.86,
+          "capacita_m3": 7.25,
+          "anno_immatricolazione": 2022.0,
+          "corriere_id": 21,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "targa": "AB123CD_1",
+          "tipo_veicolo": "motociclo",
+          "capacita_kg": 1254.63,
+          "capacita_m3": 9.52,
+          "anno_immatricolazione": 2015.4477504776314,
+          "corriere_id": 244,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "targa": "AB123CD_2",
+          "tipo_veicolo": "furgone",
+          "capacita_kg": 1500.0,
+          "capacita_m3": 10.0,
+          "anno_immatricolazione": 2020,
+          "corriere_id": 227,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "targa": "AB123CD_3",
+          "tipo_veicolo": "furgone",
+          "capacita_kg": 1500.0,
+          "capacita_m3": 10.0,
+          "anno_immatricolazione": 2020,
+          "corriere_id": 59,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "targa": "AB123CD_4",
+          "tipo_veicolo": "camion",
+          "capacita_kg": 1929.64,
+          "capacita_m3": 7.96,
+          "anno_immatricolazione": 2016.4678263032195,
+          "corriere_id": 488,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "targa": "AB123CD_5",
+          "tipo_veicolo": "furgone",
+          "capacita_kg": 1950.0,
+          "capacita_m3": 10.76,
+          "anno_immatricolazione": 2019.7113959941082,
+          "corriere_id": 231,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "targa": "AB123CD_6",
+          "tipo_veicolo": "motociclo",
+          "capacita_kg": 1682.42,
+          "capacita_m3": 7.28,
+          "anno_immatricolazione": 2019.828436759031,
+          "corriere_id": 66,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "targa": "AB123CD_7",
+          "tipo_veicolo": "furgone",
+          "capacita_kg": 1752.81,
+          "capacita_m3": 7.13,
+          "anno_immatricolazione": 2019.4227124428019,
+          "corriere_id": 376,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 1,
+          "codice_spedizione": "SP20260001",
+          "peso_kg": 206.32,
+          "volume_m3": 1.6,
+          "stato": "consegnato",
+          "data_creazione": "2026-01-17 08:00:00",
+          "data_consegna_prevista": "2026-01-15",
+          "data_consegna_effettiva": null,
+          "destinatario_id": 272,
+          "hub_partenza_id": 28,
+          "hub_arrivo_id": 137,
+          "corriere_id": 581,
+          "valore_dichiarato": 6655.17,
+          "assicurazione_boolean": "true",
+          "costo_spedizione": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 2,
+          "codice_spedizione": "SP20260001_1",
+          "peso_kg": 196.35,
+          "volume_m3": null,
+          "stato": "in_transito",
+          "data_creazione": "2025-12-31 08:00:00",
+          "data_consegna_prevista": "2026-01-19",
+          "data_consegna_effettiva": null,
+          "destinatario_id": 281,
+          "hub_partenza_id": 86,
+          "hub_arrivo_id": 69,
+          "corriere_id": 241,
+          "valore_dichiarato": 7946.04,
+          "assicurazione_boolean": "true",
+          "costo_spedizione": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 3,
+          "codice_spedizione": "SP20260001_2",
+          "peso_kg": 125.0,
+          "volume_m3": 3.58,
+          "stato": "ritornato",
+          "data_creazione": "2026-01-11 08:00:00",
+          "data_consegna_prevista": "2026-01-12",
+          "data_consegna_effettiva": null,
+          "destinatario_id": 405,
+          "hub_partenza_id": 28,
+          "hub_arrivo_id": 60,
+          "corriere_id": 305,
+          "valore_dichiarato": 8560.56,
+          "assicurazione_boolean": "false",
+          "costo_spedizione": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 4,
+          "codice_spedizione": "SP20260001_3",
+          "peso_kg": 120.34,
+          "volume_m3": 2.75,
+          "stato": "in_transito",
+          "data_creazione": "2026-01-22 08:00:00",
+          "data_consegna_prevista": "2026-01-12",
+          "data_consegna_effettiva": null,
+          "destinatario_id": 415,
+          "hub_partenza_id": 118,
+          "hub_arrivo_id": 83,
+          "corriere_id": 183,
+          "valore_dichiarato": 5767.72,
+          "assicurazione_boolean": "true",
+          "costo_spedizione": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 5,
+          "codice_spedizione": "SP20260001_4",
+          "peso_kg": 201.18,
+          "volume_m3": 1.85,
+          "stato": "in_preparazione",
+          "data_creazione": "2026-01-11 08:00:00",
+          "data_consegna_prevista": "2026-01-22",
+          "data_consegna_effettiva": null,
+          "destinatario_id": 513,
+          "hub_partenza_id": 78,
+          "hub_arrivo_id": 102,
+          "corriere_id": 618,
+          "valore_dichiarato": 8566.53,
+          "assicurazione_boolean": "true",
+          "costo_spedizione": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 6,
+          "codice_spedizione": "SP20260001_5",
+          "peso_kg": 199.34,
+          "volume_m3": 3.02,
+          "stato": "annullato",
+          "data_creazione": "2025-12-28 08:00:00",
+          "data_consegna_prevista": "2026-01-24",
+          "data_consegna_effettiva": null,
+          "destinatario_id": 580,
+          "hub_partenza_id": 6,
+          "hub_arrivo_id": 105,
+          "corriere_id": 234,
+          "valore_dichiarato": 3277.4,
+          "assicurazione_boolean": "true",
+          "costo_spedizione": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 7,
+          "codice_spedizione": "SP20260001_6",
+          "peso_kg": 294.14,
+          "volume_m3": 1.58,
+          "stato": "consegnato",
+          "data_creazione": "2025-12-29 08:00:00",
+          "data_consegna_prevista": null,
+          "data_consegna_effettiva": null,
+          "destinatario_id": null,
+          "hub_partenza_id": 181,
+          "hub_arrivo_id": 126,
+          "corriere_id": 26,
+          "valore_dichiarato": 6311.68,
+          "assicurazione_boolean": "false",
+          "costo_spedizione": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        },
+        {
+          "id": 8,
+          "codice_spedizione": "SP20260001_7",
+          "peso_kg": 249.43,
+          "volume_m3": 3.3,
+          "stato": "in_preparazione",
+          "data_creazione": "2026-01-05 08:00:00",
+          "data_consegna_prevista": "2026-01-16",
+          "data_consegna_effettiva": null,
+          "destinatario_id": 186,
+          "hub_partenza_id": 4,
+          "hub_arrivo_id": 108,
+          "corriere_id": 267,
+          "valore_dichiarato": 4715.74,
+          "assicurazione_boolean": "false",
+          "costo_spedizione": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01",
+          "deleted_at": null
+        }
+      ],
+      "spedizioni_veicoli": [
+        {
+          "spedizione_id": 299,
+          "veicolo_id": 991,
+          "data_assegnazione": "2026-01-10 08:30:00"
+        },
+        {
+          "spedizione_id": 840,
+          "veicolo_id": 592,
+          "data_assegnazione": "2026-01-10 08:30:00"
+        },
+        {
+          "spedizione_id": 1152,
+          "veicolo_id": 1210,
+          "data_assegnazione": "2026-01-10 08:30:00"
+        },
+        {
+          "spedizione_id": 907,
+          "veicolo_id": 1023,
+          "data_assegnazione": "2026-01-10 08:30:00"
+        },
+        {
+          "spedizione_id": 466,
+          "veicolo_id": 1037,
+          "data_assegnazione": "2026-01-10 08:30:00"
+        },
+        {
+          "spedizione_id": 710,
+          "veicolo_id": 221,
+          "data_assegnazione": "2026-01-10 08:30:00"
+        },
+        {
+          "spedizione_id": 1127,
+          "veicolo_id": 463,
+          "data_assegnazione": "2026-01-10 08:30:00"
+        },
+        {
+          "spedizione_id": 616,
+          "veicolo_id": 427,
+          "data_assegnazione": "2026-01-10 08:30:00"
+        }
+      ],
+      "tracking_spedizioni": [
+        {
+          "id": 1,
+          "spedizione_id": 1296,
+          "hub_id": 72,
+          "data_evento": "2026-01-10 08:00:00",
+          "descrizione_evento": "In transito",
+          "ubicazione": "Punto di Smistamento",
+          "stato_attuale": "consegnato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "spedizione_id": 1555,
+          "hub_id": 30,
+          "data_evento": "2026-01-11 08:00:00",
+          "descrizione_evento": "Consegna effettuata",
+          "ubicazione": "Punto di Smistamento",
+          "stato_attuale": "in_transito",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "spedizione_id": 871,
+          "hub_id": 154,
+          "data_evento": "2026-01-10 08:00:00",
+          "descrizione_evento": "Consegna effettuata",
+          "ubicazione": "Hub Sud Napoli",
+          "stato_attuale": "in_preparazione",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "spedizione_id": 238,
+          "hub_id": 105,
+          "data_evento": "2026-01-10 08:00:00",
+          "descrizione_evento": "Spedizione creata",
+          "ubicazione": "Hub Nord Milano",
+          "stato_attuale": "ritornato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "spedizione_id": 1670,
+          "hub_id": 6,
+          "data_evento": "2026-01-11 08:00:00",
+          "descrizione_evento": "Consegna effettuata",
+          "ubicazione": "Punto di Smistamento",
+          "stato_attuale": "in_transito",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "spedizione_id": 1314,
+          "hub_id": 28,
+          "data_evento": "2026-01-10 08:00:00",
+          "descrizione_evento": "Partenza da hub",
+          "ubicazione": "Hub Sud Napoli",
+          "stato_attuale": "in_transito",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "spedizione_id": 568,
+          "hub_id": 108,
+          "data_evento": "2026-01-11 08:00:00",
+          "descrizione_evento": "Partenza da hub",
+          "ubicazione": "Punto di Smistamento",
+          "stato_attuale": "consegnato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "spedizione_id": 213,
+          "hub_id": 19,
+          "data_evento": "2026-01-09 08:00:00",
+          "descrizione_evento": "Ritiro programmato",
+          "ubicazione": "Hub Nord Milano",
+          "stato_attuale": "annullato",
+          "created_at": "2000-01-01"
+        }
+      ],
+      "documenti_spedizione": [
+        {
+          "id": 1,
+          "spedizione_id": 633,
+          "tipo_documento": "ddt",
+          "numero_documento": "BOLLA20260003",
+          "data_emissione": "2026-01-09",
+          "file_path": "/docs/lettere/2026/LV20260004.pdf",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "spedizione_id": 594,
+          "tipo_documento": "ddt",
+          "numero_documento": "DDT20260001",
+          "data_emissione": "2026-01-10",
+          "file_path": "/docs/bolle/2026/BOLLA20260003.pdf",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "spedizione_id": 1360,
+          "tipo_documento": "lettera_vettura",
+          "numero_documento": "BOLLA20260003",
+          "data_emissione": "2026-01-12",
+          "file_path": "/docs/bolle/2026/BOLLA20260003.pdf",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "spedizione_id": 1283,
+          "tipo_documento": "bolla",
+          "numero_documento": "BOLLA20260003",
+          "data_emissione": "2026-01-12",
+          "file_path": "/docs/fatture/2026/FATT20260002.pdf",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "spedizione_id": 1545,
+          "tipo_documento": "fattura",
+          "numero_documento": "FATT20260002",
+          "data_emissione": "2026-01-11",
+          "file_path": "/docs/bolle/2026/BOLLA20260003.pdf",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "spedizione_id": 965,
+          "tipo_documento": "ddt",
+          "numero_documento": "FATT20260002",
+          "data_emissione": "2026-01-13",
+          "file_path": "/docs/ddt/2026/DDT20260001.pdf",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "spedizione_id": 228,
+          "tipo_documento": "bolla",
+          "numero_documento": "BOLLA20260003",
+          "data_emissione": "2026-01-08",
+          "file_path": "/docs/bolle/2026/BOLLA20260003.pdf",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "spedizione_id": 1119,
+          "tipo_documento": "ddt",
+          "numero_documento": "DDT20260001",
+          "data_emissione": "2026-01-10",
+          "file_path": "/docs/ddt/2026/DDT20260001.pdf",
+          "created_at": "2000-01-01"
+        }
+      ],
+      "logistica_inversa": [
+        {
+          "id": 1,
+          "codice_reso": "RESO20260001",
+          "spedizione_originale_id": 288,
+          "motivo_reso": "Errore di spedizione",
+          "stato_reso": "ricevuto",
+          "data_creazione": "2026-01-14 10:00:00",
+          "data_chiusura": null,
+          "valore_rimborsato": 0.0,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "codice_reso": "RESO20260001_1",
+          "spedizione_originale_id": 1417,
+          "motivo_reso": "Errore di spedizione",
+          "stato_reso": "in_verifica",
+          "data_creazione": "2026-01-14 10:00:00",
+          "data_chiusura": null,
+          "valore_rimborsato": 0.0,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "codice_reso": "RESO20260001_2",
+          "spedizione_originale_id": 1604,
+          "motivo_reso": "Errore di spedizione",
+          "stato_reso": "ricevuto",
+          "data_creazione": "2026-01-09 10:00:00",
+          "data_chiusura": null,
+          "valore_rimborsato": 0.0,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "codice_reso": "RESO20260001_3",
+          "spedizione_originale_id": 1485,
+          "motivo_reso": "Errore di spedizione",
+          "stato_reso": "approvato",
+          "data_creazione": "2026-01-15 10:00:00",
+          "data_chiusura": null,
+          "valore_rimborsato": 0.0,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "codice_reso": "RESO20260001_4",
+          "spedizione_originale_id": 543,
+          "motivo_reso": "Consegna tardiva",
+          "stato_reso": "in_verifica",
+          "data_creazione": "2026-01-14 10:00:00",
+          "data_chiusura": null,
+          "valore_rimborsato": 0.0,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "codice_reso": "RESO20260001_5",
+          "spedizione_originale_id": 48,
+          "motivo_reso": "Consegna tardiva",
+          "stato_reso": "rifiutato",
+          "data_creazione": "2026-01-09 10:00:00",
+          "data_chiusura": null,
+          "valore_rimborsato": 0.0,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "codice_reso": "RESO20260001_6",
+          "spedizione_originale_id": 910,
+          "motivo_reso": "Prodotto non conforme",
+          "stato_reso": "approvato",
+          "data_creazione": "2026-01-12 10:00:00",
+          "data_chiusura": null,
+          "valore_rimborsato": 0.0,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "codice_reso": "RESO20260001_7",
+          "spedizione_originale_id": 1581,
+          "motivo_reso": "Errore di spedizione",
+          "stato_reso": "rifiutato",
+          "data_creazione": "2026-01-09 10:00:00",
+          "data_chiusura": null,
+          "valore_rimborsato": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        }
+      ],
+      "magazzini": [
+        {
+          "id": 1,
+          "nome": "Magazzino Centrale Roma",
+          "indirizzo": "Via Magazzino 1",
+          "citta": "Roma",
+          "provincia": "MI",
+          "cap": "30170",
+          "stato_geografico": "Lazio",
+          "capacita_massima": 14057.23,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "nome": "Magazzino Centrale Roma_1",
+          "indirizzo": "Via Magazzino 1",
+          "citta": "Napoli",
+          "provincia": "VE",
+          "cap": "30170",
+          "stato_geografico": "Veneto",
+          "capacita_massima": 10440.91,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "nome": "Magazzino Centrale Roma_2",
+          "indirizzo": "Via Magazzino 1",
+          "citta": "Roma",
+          "provincia": "MI",
+          "cap": "00150",
+          "stato_geografico": "Lombardia",
+          "capacita_massima": 13069.56,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "nome": "Magazzino Centrale Roma_3",
+          "indirizzo": "Via Magazzino 1",
+          "citta": "Venezia",
+          "provincia": "RM",
+          "cap": "80150",
+          "stato_geografico": "Lazio",
+          "capacita_massima": 9904.84,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "nome": "Magazzino Centrale Roma_4",
+          "indirizzo": "Via Magazzino 1",
+          "citta": "Venezia",
+          "provincia": "NA",
+          "cap": "16150",
+          "stato_geografico": "Veneto",
+          "capacita_massima": 11561.0,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "nome": "Magazzino Centrale Roma_5",
+          "indirizzo": "Via Magazzino 1",
+          "citta": "Napoli",
+          "provincia": "MI",
+          "cap": "20150",
+          "stato_geografico": "Campania",
+          "capacita_massima": 11144.69,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "nome": "Magazzino Centrale Roma_6",
+          "indirizzo": "Via Magazzino 1",
+          "citta": "Venezia",
+          "provincia": "RM",
+          "cap": "16150",
+          "stato_geografico": "Liguria",
+          "capacita_massima": 14948.89,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "nome": "Magazzino Centrale Roma_7",
+          "indirizzo": "Via Magazzino 1",
+          "citta": "Genova",
+          "provincia": "MI",
+          "cap": "16150",
+          "stato_geografico": "Campania",
+          "capacita_massima": 10724.07,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        }
+      ],
+      "hub_di_destinazione": [
+        {
+          "id": 1,
+          "nome": "Hub Destinazione Roma",
+          "indirizzo": "Via Destinazione 1",
+          "citta": "Torino",
+          "provincia": "TO",
+          "cap": "40100",
+          "stato_geografico": "Lombardia",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "nome": "Hub Destinazione Bologna",
+          "indirizzo": "Via Destinazione 1",
+          "citta": "Napoli",
+          "provincia": "MI",
+          "cap": "10100",
+          "stato_geografico": "Piemonte",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "nome": "Hub Destinazione Napoli",
+          "indirizzo": "Via Destinazione 1",
+          "citta": "Bologna",
+          "provincia": "BO",
+          "cap": "20100",
+          "stato_geografico": "Lazio",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "nome": "Hub Destinazione Milano",
+          "indirizzo": "Via Destinazione 1",
+          "citta": "Torino",
+          "provincia": "NA",
+          "cap": "40100",
+          "stato_geografico": "Campania",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "nome": "Hub Destinazione Milano",
+          "indirizzo": "Via Destinazione 1",
+          "citta": "Torino",
+          "provincia": "NA",
+          "cap": "10100",
+          "stato_geografico": "Lombardia",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "nome": "Hub Destinazione Napoli",
+          "indirizzo": "Via Destinazione 1",
+          "citta": "Bologna",
+          "provincia": "NA",
+          "cap": "00100",
+          "stato_geografico": "Lazio",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "nome": "Hub Destinazione Milano",
+          "indirizzo": "Via Destinazione 1",
+          "citta": "Torino",
+          "provincia": "BO",
+          "cap": "00100",
+          "stato_geografico": "Piemonte",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "nome": "Hub Destinazione Roma",
+          "indirizzo": "Via Destinazione 1",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "00100",
+          "stato_geografico": "Lazio",
+          "created_at": "2000-01-01"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "full_outer_join"
+  ],
+  "query": "WITH spedizioni_filtrate AS (SELECT codice_spedizione, stato AS stato_spedizione, data_creazione AS data_creazione_spedizione, id AS spedizione_id FROM spedizioni WHERE stato IN ('consegnato', 'in_transito')), resi_filtrati AS (SELECT codice_reso, stato_reso, motivo_reso, data_creazione AS data_creazione_reso, spedizione_originale_id FROM logistica_inversa WHERE stato_reso IN ('approvato', 'rifiutato')) SELECT COALESCE(sf.codice_spedizione, 'N/D') AS codice_spedizione, COALESCE(rf.codice_reso, 'N/D') AS codice_reso, sf.stato_spedizione, rf.stato_reso, rf.motivo_reso, sf.data_creazione_spedizione, rf.data_creazione_reso, CASE WHEN sf.spedizione_id IS NULL THEN 'Solo reso' WHEN rf.spedizione_originale_id IS NULL THEN 'Solo spedizione' ELSE 'Spedizione con reso' END AS tipologia_record FROM spedizioni_filtrate sf FULL OUTER JOIN resi_filtrati rf ON sf.spedizione_id = rf.spedizione_originale_id ORDER BY sf.data_creazione_spedizione NULLS LAST, rf.data_creazione_reso NULLS LAST;"
+}

@@ -1,0 +1,594 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE,\n    utenza_attiva BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE piani_tariffari (\n    id SERIAL PRIMARY KEY,\n    nome_piano TEXT NOT NULL UNIQUE,\n    tecnologia TEXT NOT NULL CHECK (tecnologia IN ('mobile', 'fibra')),\n    prezzo_mensile NUMERIC(8,2) NOT NULL CHECK (prezzo_mensile >= 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    piano_id INT REFERENCES piani_tariffari(id),\n    data_attivazione DATE NOT NULL,\n    data_disdetta DATE,\n    stato_contratto TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_contratto IN ('attivo', 'sospeso', 'cessato')),\n    CHECK (data_disdetta IS NULL OR data_disdetta >= data_attivazione)\n);\n\nCREATE TABLE contratti_mobile (\n    id_contratto INT PRIMARY KEY REFERENCES contratti(id),\n    numero_msisdn TEXT NOT NULL UNIQUE,\n    traffico_dati_gb INT NOT NULL CHECK (traffico_dati_gb >= 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0)\n);\n\nCREATE TABLE contratti_fibra (\n    id_contratto INT PRIMARY KEY REFERENCES contratti(id),\n    traffico_dati_gb INT NOT NULL CHECK (traffico_dati_gb >= 0),\n    velocita_download_mbps INT NOT NULL CHECK (velocita_download_mbps > 0),\n    indirizzo_installazione TEXT NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 611,
+        "columns": {
+          "id": {
+            "distinct": 611,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 611
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Anna",
+              "Davide",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Costa",
+              "Fontana",
+              "Gallo"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 611,
+            "sample": [
+              "FRCMRT92D60H501B",
+              "FRCMRT92D60H501C",
+              "FRCMRT92D60H501D",
+              "FRCMRT92D60H501E",
+              "FRCMRT92D60H501F"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 427,
+            "sample": [
+              "2022-09-21",
+              "2022-09-23",
+              "2022-09-26",
+              "2022-09-30",
+              "2022-10-04"
+            ]
+          },
+          "utenza_attiva": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "piani_tariffari": {
+        "row_count": 9,
+        "columns": {
+          "id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "nome_piano": {
+            "distinct": 9,
+            "sample": [
+              "Fibra Basic 50",
+              "Fibra Home 100",
+              "Fibra Home 300",
+              "Fibra Ultra Gigabit",
+              "Mobile Plus 30GB"
+            ]
+          },
+          "tecnologia": {
+            "distinct": 2,
+            "sample": [
+              "fibra",
+              "mobile"
+            ]
+          },
+          "prezzo_mensile": {
+            "distinct": 8,
+            "sample": [
+              "14.99",
+              "22.99",
+              "24.99",
+              "27.99",
+              "32.99"
+            ],
+            "min": 7.99,
+            "max": 39.99
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 1136,
+        "columns": {
+          "id": {
+            "distinct": 1136,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1236
+          },
+          "cliente_id": {
+            "distinct": 521,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 611
+          },
+          "piano_id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "data_attivazione": {
+            "distinct": 574,
+            "sample": [
+              "2022-08-05",
+              "2022-08-06",
+              "2022-08-09",
+              "2022-08-11",
+              "2022-08-13"
+            ]
+          },
+          "data_disdetta": {
+            "distinct": 142,
+            "sample": [
+              "2024-08-20",
+              "2024-08-21",
+              "2024-08-22",
+              "2024-08-23",
+              "2024-08-25"
+            ]
+          },
+          "stato_contratto": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "cessato",
+              "sospeso"
+            ]
+          }
+        }
+      },
+      "contratti_mobile": {
+        "row_count": 734,
+        "columns": {
+          "id_contratto": {
+            "distinct": 734,
+            "sample": [
+              "1000",
+              "1002",
+              "1003",
+              "1006",
+              "1008"
+            ],
+            "min": 102,
+            "max": 1235
+          },
+          "numero_msisdn": {
+            "distinct": 734,
+            "sample": [
+              "+393201112233",
+              "+3932011122331",
+              "+39320111223310",
+              "+393201112233100",
+              "+393201112233101"
+            ]
+          },
+          "traffico_dati_gb": {
+            "distinct": 655,
+            "sample": [
+              "0.9",
+              "0.99",
+              "1.07",
+              "1.09",
+              "1.1"
+            ],
+            "min": 0.9,
+            "max": 125.0
+          },
+          "minuti_inclusi": {
+            "distinct": 706,
+            "sample": [
+              "100.04",
+              "100.36",
+              "100.74",
+              "1000",
+              "1001.41"
+            ],
+            "min": 48.49,
+            "max": 2000.0
+          }
+        }
+      },
+      "contratti_fibra": {
+        "row_count": 533,
+        "columns": {
+          "id_contratto": {
+            "distinct": 533,
+            "sample": [
+              "1002",
+              "1008",
+              "101",
+              "1010",
+              "1013"
+            ],
+            "min": 101,
+            "max": 1236
+          },
+          "traffico_dati_gb": {
+            "distinct": 510,
+            "sample": [
+              "100.21",
+              "100.33",
+              "1000",
+              "1000.0",
+              "1014.35"
+            ],
+            "min": 45.0,
+            "max": 2000.0
+          },
+          "velocita_download_mbps": {
+            "distinct": 4,
+            "sample": [
+              "100",
+              "1000",
+              "300",
+              "50"
+            ],
+            "min": 50,
+            "max": 1000
+          },
+          "indirizzo_installazione": {
+            "distinct": 11,
+            "sample": [
+              "Corso Francia 7, Torino",
+              "Corso Vittorio Emanuele II 45, Torino",
+              "Piazza Dante 3, Napoli",
+              "Via Camerlata 9, Como",
+              "Via Garibaldi 12, Milano"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Marco",
+          "cognome": "Costa",
+          "codice_fiscale": "MRSRSS85M01H501X",
+          "citta": "Genova",
+          "data_registrazione": "2022-10-04",
+          "utenza_attiva": "false"
+        },
+        {
+          "id": 2,
+          "nome": "Laura",
+          "cognome": "Rossi",
+          "codice_fiscale": "MRSRSS85M01H501B",
+          "citta": "Torino",
+          "data_registrazione": "2023-05-13",
+          "utenza_attiva": "true"
+        },
+        {
+          "id": 3,
+          "nome": "Davide",
+          "cognome": "Ricci",
+          "codice_fiscale": "MRSRSS85M01H501C",
+          "citta": "Roma",
+          "data_registrazione": "2022-10-09",
+          "utenza_attiva": "true"
+        },
+        {
+          "id": 4,
+          "nome": "Laura",
+          "cognome": "Costa",
+          "codice_fiscale": "MRSRSS85M01H501D",
+          "citta": "Milano",
+          "data_registrazione": "2023-01-25",
+          "utenza_attiva": "true"
+        },
+        {
+          "id": 5,
+          "nome": "Davide",
+          "cognome": "Moretti",
+          "codice_fiscale": "MRSRSS85M01H501E",
+          "citta": "Milano",
+          "data_registrazione": "2023-02-24",
+          "utenza_attiva": "true"
+        },
+        {
+          "id": 6,
+          "nome": "Laura",
+          "cognome": "Verdi",
+          "codice_fiscale": "MRSRSS85M01H501F",
+          "citta": "Roma",
+          "data_registrazione": "2023-07-13",
+          "utenza_attiva": "true"
+        },
+        {
+          "id": 7,
+          "nome": "Anna",
+          "cognome": "Gallo",
+          "codice_fiscale": "MRSRSS85M01H501G",
+          "citta": "Bologna",
+          "data_registrazione": "2023-04-24",
+          "utenza_attiva": "true"
+        },
+        {
+          "id": 8,
+          "nome": "Giulia",
+          "cognome": "Rossi",
+          "codice_fiscale": "MRSRSS85M01H501H",
+          "citta": "Bologna",
+          "data_registrazione": "2022-12-16",
+          "utenza_attiva": "true"
+        }
+      ],
+      "piani_tariffari": [
+        {
+          "id": 1,
+          "nome_piano": "Mobile Smart 10GB",
+          "tecnologia": "mobile",
+          "prezzo_mensile": 9.99
+        },
+        {
+          "id": 2,
+          "nome_piano": "Mobile Smart 10GB1",
+          "tecnologia": "mobile",
+          "prezzo_mensile": 9.99
+        },
+        {
+          "id": 3,
+          "nome_piano": "Mobile Plus 30GB",
+          "tecnologia": "mobile",
+          "prezzo_mensile": 14.99
+        },
+        {
+          "id": 4,
+          "nome_piano": "Mobile Unlimited",
+          "tecnologia": "mobile",
+          "prezzo_mensile": 24.99
+        },
+        {
+          "id": 5,
+          "nome_piano": "Mobile Senior 5GB",
+          "tecnologia": "mobile",
+          "prezzo_mensile": 7.99
+        },
+        {
+          "id": 6,
+          "nome_piano": "Fibra Home 100",
+          "tecnologia": "fibra",
+          "prezzo_mensile": 27.99
+        },
+        {
+          "id": 7,
+          "nome_piano": "Fibra Home 300",
+          "tecnologia": "fibra",
+          "prezzo_mensile": 32.99
+        },
+        {
+          "id": 8,
+          "nome_piano": "Fibra Ultra Gigabit",
+          "tecnologia": "fibra",
+          "prezzo_mensile": 39.99
+        }
+      ],
+      "contratti": [
+        {
+          "id": 101,
+          "cliente_id": 292,
+          "piano_id": 2,
+          "data_attivazione": "2022-08-06",
+          "data_disdetta": null,
+          "stato_contratto": "attivo"
+        },
+        {
+          "id": 102,
+          "cliente_id": 521,
+          "piano_id": 9,
+          "data_attivazione": "2022-12-09",
+          "data_disdetta": null,
+          "stato_contratto": "attivo"
+        },
+        {
+          "id": 103,
+          "cliente_id": 317,
+          "piano_id": 9,
+          "data_attivazione": "2022-11-10",
+          "data_disdetta": null,
+          "stato_contratto": "attivo"
+        },
+        {
+          "id": 104,
+          "cliente_id": 364,
+          "piano_id": 8,
+          "data_attivazione": "2022-10-26",
+          "data_disdetta": null,
+          "stato_contratto": "attivo"
+        },
+        {
+          "id": 105,
+          "cliente_id": 229,
+          "piano_id": 6,
+          "data_attivazione": "2023-02-01",
+          "data_disdetta": null,
+          "stato_contratto": "attivo"
+        },
+        {
+          "id": 106,
+          "cliente_id": 227,
+          "piano_id": 5,
+          "data_attivazione": "2023-01-23",
+          "data_disdetta": null,
+          "stato_contratto": "attivo"
+        },
+        {
+          "id": 107,
+          "cliente_id": 146,
+          "piano_id": 6,
+          "data_attivazione": "2023-01-24",
+          "data_disdetta": null,
+          "stato_contratto": "attivo"
+        },
+        {
+          "id": 108,
+          "cliente_id": 159,
+          "piano_id": 7,
+          "data_attivazione": "2022-12-20",
+          "data_disdetta": null,
+          "stato_contratto": "attivo"
+        }
+      ],
+      "contratti_mobile": [
+        {
+          "id_contratto": 478,
+          "numero_msisdn": "+393331234567",
+          "traffico_dati_gb": 26.35,
+          "minuti_inclusi": 147.04
+        },
+        {
+          "id_contratto": 830,
+          "numero_msisdn": "+3933312345671",
+          "traffico_dati_gb": 16.01,
+          "minuti_inclusi": 457.39
+        },
+        {
+          "id_contratto": 216,
+          "numero_msisdn": "+3933312345672",
+          "traffico_dati_gb": 7.86,
+          "minuti_inclusi": 230.59
+        },
+        {
+          "id_contratto": 549,
+          "numero_msisdn": "+3933312345673",
+          "traffico_dati_gb": 25.73,
+          "minuti_inclusi": 507.31
+        },
+        {
+          "id_contratto": 916,
+          "numero_msisdn": "+3933312345674",
+          "traffico_dati_gb": 15.61,
+          "minuti_inclusi": 412.69
+        },
+        {
+          "id_contratto": 884,
+          "numero_msisdn": "+3933312345675",
+          "traffico_dati_gb": 27.12,
+          "minuti_inclusi": 228.35
+        },
+        {
+          "id_contratto": 376,
+          "numero_msisdn": "+3933312345676",
+          "traffico_dati_gb": 18.73,
+          "minuti_inclusi": 425.81
+        },
+        {
+          "id_contratto": 1002,
+          "numero_msisdn": "+3933312345677",
+          "traffico_dati_gb": 5.13,
+          "minuti_inclusi": 468.67
+        }
+      ],
+      "contratti_fibra": [
+        {
+          "id_contratto": 889,
+          "traffico_dati_gb": 569.27,
+          "velocita_download_mbps": "50",
+          "indirizzo_installazione": "Via Indipendenza 33, Bologna"
+        },
+        {
+          "id_contratto": 615,
+          "traffico_dati_gb": 334.72,
+          "velocita_download_mbps": "100",
+          "indirizzo_installazione": "Corso Francia 7, Torino"
+        },
+        {
+          "id_contratto": 765,
+          "traffico_dati_gb": 268.78,
+          "velocita_download_mbps": "100",
+          "indirizzo_installazione": "Via Camerlata 9, Como"
+        },
+        {
+          "id_contratto": 945,
+          "traffico_dati_gb": 300,
+          "velocita_download_mbps": 100,
+          "indirizzo_installazione": "Via Garibaldi 12, Milano"
+        },
+        {
+          "id_contratto": 301,
+          "traffico_dati_gb": 543.12,
+          "velocita_download_mbps": "100",
+          "indirizzo_installazione": "Via Indipendenza 33, Bologna"
+        },
+        {
+          "id_contratto": 985,
+          "traffico_dati_gb": 391.85,
+          "velocita_download_mbps": "100",
+          "indirizzo_installazione": "Via Camerlata 9, Como"
+        },
+        {
+          "id_contratto": 546,
+          "traffico_dati_gb": 520.82,
+          "velocita_download_mbps": "50",
+          "indirizzo_installazione": "Via Indipendenza 33, Bologna"
+        },
+        {
+          "id_contratto": 542,
+          "traffico_dati_gb": 328.25,
+          "velocita_download_mbps": "1000",
+          "indirizzo_installazione": "Via Roma 14, Roma"
+        }
+      ]
+    }
+  },
+  "story": "Nella sede milanese di TeliaNova, gestore di servizi di telecomunicazioni, la chiusura mensile dei ricavi commerciali segue un rituale consolidato tra gli archivi di direzione. Tutto prende avvio dall'archivio denominato clienti, che nella documentazione interna viene spesso citato anche come registro delle utenze: vi sono custodite le schede degli abbonati, ciascuna corredata da nome e cognome, codice fiscale, città di residenza — Milano, Roma, Torino, Bologna, Genova, Napoli, Firenze — dalla data di registrazione e dall'indicazione di eventuali utenze non più attive. Accanto ad esso, il registro intitolato piani_tariffari cataloga le offerte a catalogo, distinguendo la tecnologia mobile dalla fibra e riportando il prezzo mensile di ciascuna proposta: dal Mobile Senior 5GB a 7.99 euro al Mobile Smart 10GB a 9.99 euro, dal Mobile Plus 30GB a 14.99 euro fino al Mobile Unlimited da 24.99 euro, senza dimenticare le formule fisse come Fibra Home 100 a 27.99 euro, Fibra Home 300 a 32.99 euro e Fibra Ultra Gigabit a 39.99 euro. L'archivio contratti, il più corposo con oltre mille annotazioni, riporta per ciascun accordo la data di attivazione, l'eventuale data di disdetta e lo stato del rapporto, che può risultare attivo, sospeso oppure cessato. Gli abbonamenti radiomobili trovano approfondimento nella sezione contratti_mobile, dove compaiono il numero MSISDN, i minuti inclusi e il cosiddetto bucket dati mensile, termine tecnico con cui l'ufficio indica il volume di gigabyte previsto dall'offerta. Per la rete fissa, ogni attivazione è invece tracciata nelle pratiche_attivazione_fibra, denominate anche archivio contratti_fibra, dove al medesimo bucket dati mensile si accompagnano la velocità di download — 50, 100, 300 oppure 1000 megabit al secondo — e l'indirizzo di installazione della linea. Durante l'ultima verifica operativa, il controller commerciale ha richiesto un conteggio dedicato ai soli piani di tecnologia mobile: per ciascuno occorreva determinare quanti contratti risultassero nello stato attivo e quale ricavo mensile potenziale complessivo ne derivasse, ottenuto moltiplicando il numero di rapporti in essere per il prezzo mensile del piano. Le istruzioni prevedevano inoltre che nessuna offerta mobile restasse esclusa: anche i piani privi di qualsiasi contratto attivo dovevano comparire nell'elenco con un conteggio pari a zero, e la sequenza finale andava ordinata dal piano con più contratti attivi verso quello con meno, così da evidenziare subito le proposte più redditizie. In parallelo, un controllo di coerenza sulle pratiche_attivazione_fibra ha confermato che nessuna disdetta risultasse antecedente alla data di attivazione della linea."
+}

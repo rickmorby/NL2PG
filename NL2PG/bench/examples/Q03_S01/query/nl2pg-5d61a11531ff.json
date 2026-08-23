@@ -1,0 +1,189 @@
+{
+  "schema_ddl": "CREATE TABLE immobili (\n    id_immobile INT PRIMARY KEY,\n    tipo TEXT NOT NULL,\n    quartiere TEXT NOT NULL,\n    indirizzo TEXT,\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani BETWEEN 1 AND 30),\n    prezzo NUMERIC(12,2) NOT NULL CHECK (prezzo >= 0),\n    disponibile BOOLEAN NOT NULL DEFAULT TRUE\n);",
+  "data_profile": {
+    "profile": {
+      "immobili": {
+        "row_count": 485,
+        "columns": {
+          "id_immobile": {
+            "distinct": 485,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 485
+          },
+          "tipo": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "attico",
+              "loft",
+              "monolocale",
+              "villa"
+            ]
+          },
+          "quartiere": {
+            "distinct": 6,
+            "sample": [
+              "Brera",
+              "Isola",
+              "Lambrate",
+              "Navigli",
+              "Porta Romana"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 6,
+            "sample": [
+              "Corso di Porta Romana 63",
+              "Via Fiori Chiari 5",
+              "Via Pastrengo 14",
+              "Via Ventura 8",
+              "Via Vigevano 12"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 465,
+            "sample": [
+              "100.06",
+              "100.73",
+              "100.82",
+              "100.91",
+              "101.07"
+            ],
+            "min": 28.85,
+            "max": 334.67
+          },
+          "numero_vani": {
+            "distinct": 468,
+            "sample": [
+              "1",
+              "1.0116464290639038",
+              "1.027858720137344",
+              "1.0582814670690046",
+              "1.0898125418655822"
+            ],
+            "min": 1,
+            "max": 9.0
+          },
+          "prezzo": {
+            "distinct": 475,
+            "sample": [
+              "1004348.73",
+              "1016788.34",
+              "1031103.71",
+              "1032953.86",
+              "1036337.28"
+            ],
+            "min": 142382.77,
+            "max": 1707599.17
+          },
+          "disponibile": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "immobili": [
+        {
+          "id_immobile": 1,
+          "tipo": "loft",
+          "quartiere": "Isola",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 82.44,
+          "numero_vani": 3.2786097491097475,
+          "prezzo": 368126.31,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 2,
+          "tipo": "monolocale",
+          "quartiere": "Sempione",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 108.3,
+          "numero_vani": 4.796579303451773,
+          "prezzo": 556035.73,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 3,
+          "tipo": "loft",
+          "quartiere": "Brera",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 108.06,
+          "numero_vani": 4.737569707443727,
+          "prezzo": 535898.02,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 4,
+          "tipo": "attico",
+          "quartiere": "Navigli",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 106.26,
+          "numero_vani": 4.140461259001199,
+          "prezzo": 595242.83,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 5,
+          "tipo": "appartamento",
+          "quartiere": "Brera",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 71.99,
+          "numero_vani": 4.760210492740626,
+          "prezzo": 624384.35,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 6,
+          "tipo": "attico",
+          "quartiere": "Navigli",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 98.47,
+          "numero_vani": 4.30332548139837,
+          "prezzo": 344671.9,
+          "disponibile": "false"
+        },
+        {
+          "id_immobile": 7,
+          "tipo": "villa",
+          "quartiere": "Sempione",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 80.08,
+          "numero_vani": 4.319817890715744,
+          "prezzo": 454386.17,
+          "disponibile": "false"
+        },
+        {
+          "id_immobile": 8,
+          "tipo": "appartamento",
+          "quartiere": "Isola",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 76.89,
+          "numero_vani": 3.8748752043626906,
+          "prezzo": 444540.27,
+          "disponibile": "false"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "top_n"
+  ],
+  "query": "SELECT tipo, quartiere, indirizzo, superficie_mq, numero_vani, ROUND(prezzo / 1000000, 2) AS prezzo_milioni FROM immobili WHERE disponibile IS TRUE AND tipo IN ('attico', 'loft') AND quartiere IN ('Brera', 'Navigli', 'Isola') ORDER BY prezzo DESC, id_immobile ASC LIMIT 10;"
+}

@@ -1,0 +1,44 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 7,
+    "hierarchy": "multi_level_one_to_many",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "distractor",
+      "polysemy",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_contatti_commerciali",
+        "description": "La tabella che contiene i dati dei clienti è denominata 'anagrafica_contatti_commerciali' nel database, ma nel linguaggio aziendale viene spesso chiamata semplicemente 'clienti'."
+      },
+      {
+        "twist_type": "distractor",
+        "target_value": "ordini",
+        "obsolete_value": "transazioni_storiche",
+        "description": "Esiste una tabella 'transazioni_storiche' che contiene dati di vendite obsolete o annullate, ma non è rilevante per la query corrente. La tabella pertinente è 'ordini'."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "valore_totale",
+        "obsolete_value": "importo",
+        "description": "La colonna 'valore_totale' nella tabella 'ordini' rappresenta l'importo complessivo dell'ordine, ma nel linguaggio aziendale viene spesso chiamata genericamente 'importo', che può riferirsi anche ad altri campi come 'importo_sconto' o 'importo_spedizione'."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "priorità_spedizione",
+        "obsolete_value": "SLA tier",
+        "description": "La colonna 'priorità_spedizione' nella tabella 'ordini' è indicata nel database come un valore numerico (1-3), ma nel linguaggio aziendale viene chiamata 'SLA tier' (Service Level Agreement tier)."
+      }
+    ],
+    "spec_hash": "d352401df5864c87"
+  },
+  "schema_ddl": "CREATE TABLE anagrafica_contatti_commerciali (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_registrazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    is_attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE categorie_prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10, 2) NOT NULL CHECK (prezzo_unitario >= 0),\n    categoria_id INT NOT NULL REFERENCES categorie_prodotti(id),\n    codice_articolo TEXT NOT NULL UNIQUE,\n    quantita_disponibile INT NOT NULL DEFAULT 0 CHECK (quantita_disponibile >= 0)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES anagrafica_contatti_commerciali(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valore_totale NUMERIC(12, 2) NOT NULL CHECK (valore_totale >= 0),\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    priorità_spedizione INT CHECK (priorità_spedizione BETWEEN 1 AND 3),\n    importo_sconto NUMERIC(10, 2) DEFAULT 0 CHECK (importo_sconto >= 0),\n    importo_spedizione NUMERIC(10, 2) DEFAULT 0 CHECK (importo_spedizione >= 0)\n);\n\nCREATE TABLE dettagli_ordini (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario_ordine NUMERIC(10, 2) NOT NULL CHECK (prezzo_unitario_ordine >= 0),\n    totale_riga NUMERIC(12, 2) GENERATED ALWAYS AS (quantita * prezzo_unitario_ordine) STORED\n);\n\nCREATE TABLE indirizzi_spedizione (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES anagrafica_contatti_commerciali(id),\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    nazione TEXT NOT NULL DEFAULT 'Italia',\n    is_predefinito BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE transazioni_storiche (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT REFERENCES ordini(id),\n    tipo_transazione TEXT NOT NULL CHECK (tipo_transazione IN ('pagamento', 'rimborso', 'storno')),\n    importo NUMERIC(10, 2) NOT NULL CHECK (importo >= 0),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    note TEXT\n);"
+}

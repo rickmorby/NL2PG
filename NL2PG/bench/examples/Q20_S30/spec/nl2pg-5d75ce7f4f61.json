@@ -1,0 +1,34 @@
+{
+  "domain": "vendite",
+  "n_tables": 11,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "right_outer_join"
+  ],
+  "twist": [
+    "distractor",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "clienti",
+      "obsolete_value": "archivio_clienti",
+      "description": "Lo schema vasto contiene la tabella distrattrice archivio_clienti con colonne omonime a quelle della tabella clienti (es. id_cliente, ragione_sociale). La prosa aziendale utilizza il termine archivio_clienti per riferirsi ai clienti attivi, costringendo il solver a eseguire lo schema linking accurato e a selezionare esclusivamente la tabella clienti, ignorando la tabella omonima irrilevante."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "importo_totale",
+      "obsolete_value": "valore complessivo dell'ordine",
+      "description": "La colonna importo_totale della tabella ordini viene indicata nella prosa aziendale con la perifrasi valore complessivo dell'ordine. Il solver deve mappare correttamente la perifrasi alla colonna reale, evitando colonne simili presenti nelle tabelle distrattrici come preventivi o resi."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "sconto_applicato",
+      "obsolete_value": "ribasso concesso in trattativa",
+      "description": "La colonna sconto_applicato della tabella righe_ordine viene descritta nel gergo commerciale delle vendite come ribasso concesso in trattativa. Il solver deve riconoscere che il termine settoriale si riferisce alla colonna sconto_applicato e non ad altre colonne percentuali presenti nello schema, come margine_percentuale o aliquota_iva."
+    }
+  ],
+  "spec_hash": "6a6d7144662fba0f"
+}

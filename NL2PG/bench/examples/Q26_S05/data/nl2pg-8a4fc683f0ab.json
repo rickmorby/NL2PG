@@ -1,0 +1,378 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "anti_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "eventi_tracciamento",
+        "obsolete_value": "registro_movimenti",
+        "description": "La tabella eventi_tracciamento (entità debole con chiave composta id_spedizione + num_evento) viene denominata registro_movimenti nella prosa aziendale. Le query devono risolvere il nome reale della tabella per individuare gli eventi orfani non collegati ad alcuna spedizione tramite WHERE NOT EXISTS."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "depositi",
+        "obsolete_value": "hub di cross-docking",
+        "description": "La tabella depositi (entità proprietaria che referenzia le spedizioni) è indicata nei documenti aziendali con il gergo logistico 'hub di cross-docking'. Il solutore deve mappare questa espressione tecnica al nome reale della tabella per identificare i depositi privi di eventi tracciamento associati."
+      }
+    ],
+    "spec_hash": "6d5e0ca355145d7e"
+  },
+  "schema_ddl": "CREATE TABLE depositi (\n    id INT PRIMARY KEY,\n    codice_deposito TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capacita_pallet INT CHECK (capacita_pallet >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    deposito_id INT NOT NULL REFERENCES depositi(id),\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    destinatario TEXT NOT NULL,\n    citta_destinazione TEXT NOT NULL,\n    peso_kg NUMERIC(8,2) CHECK (peso_kg > 0),\n    stato TEXT NOT NULL DEFAULT 'in_preparazione' CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'annullata')),\n    data_partenza DATE,\n    data_consegna_prevista DATE\n);\n\nCREATE TABLE eventi_tracciamento (\n    id_spedizione INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    num_evento INT NOT NULL CHECK (num_evento > 0),\n    tipo_evento TEXT NOT NULL,\n    descrizione TEXT,\n    istante_evento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    operatore TEXT,\n    PRIMARY KEY (id_spedizione, num_evento)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "depositi",
+        "nature": "lookup",
+        "min_rows": 10,
+        "max_rows": 16,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_deposito": "DEP-MIL-01",
+            "nome": "Hub Cross-Docking Milano Est",
+            "citta": "Milano",
+            "capacita_pallet": 14000,
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "codice_deposito": "DEP-ROM-01",
+            "nome": "Hub Cross-Docking Roma Sud",
+            "citta": "Roma",
+            "capacita_pallet": 18000,
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "codice_deposito": "DEP-NAP-01",
+            "nome": "Hub Cross-Docking Napoli Ovest",
+            "citta": "Napoli",
+            "capacita_pallet": 9500,
+            "attivo": true
+          },
+          {
+            "id": 4,
+            "codice_deposito": "DEP-TRN-01",
+            "nome": "Hub Cross-Docking Torino Nord",
+            "citta": "Torino",
+            "capacita_pallet": 11000,
+            "attivo": false
+          },
+          {
+            "id": 5,
+            "codice_deposito": "DEP-BLG-01",
+            "nome": "Hub Cross-Docking Bologna",
+            "citta": "Bologna",
+            "capacita_pallet": 12500,
+            "attivo": true
+          },
+          {
+            "id": 6,
+            "codice_deposito": "DEP-FIR-01",
+            "nome": "Hub Cross-Docking Firenze",
+            "citta": "Firenze",
+            "capacita_pallet": 7200,
+            "attivo": true
+          }
+        ],
+        "variations": {
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Napoli",
+              "Torino",
+              "Bologna",
+              "Firenze",
+              "Padova",
+              "Genova",
+              "Verona",
+              "Bari"
+            ]
+          },
+          "capacita_pallet": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 32.0,
+        "templates": [
+          {
+            "id": 101,
+            "deposito_id": 1,
+            "codice_spedizione": "SPD-2026-00101",
+            "destinatario": "Mario Rossi",
+            "citta_destinazione": "Verona",
+            "peso_kg": 42.5,
+            "stato": "consegnata",
+            "data_partenza": "2026-02-03",
+            "data_consegna_prevista": "2026-02-06"
+          },
+          {
+            "id": 102,
+            "deposito_id": 2,
+            "codice_spedizione": "SPD-2026-00102",
+            "destinatario": "Laura Bianchi",
+            "citta_destinazione": "Bari",
+            "peso_kg": 128.75,
+            "stato": "in_transito",
+            "data_partenza": "2026-02-10",
+            "data_consegna_prevista": "2026-02-13"
+          },
+          {
+            "id": 103,
+            "deposito_id": 1,
+            "codice_spedizione": "SPD-2026-00103",
+            "destinatario": "Giulia Verdi",
+            "citta_destinazione": "Padova",
+            "peso_kg": 15.9,
+            "stato": "in_preparazione",
+            "data_partenza": null,
+            "data_consegna_prevista": "2026-02-20"
+          },
+          {
+            "id": 104,
+            "deposito_id": 3,
+            "codice_spedizione": "SPD-2026-00104",
+            "destinatario": "Luca Ferrari",
+            "citta_destinazione": "Bergamo",
+            "peso_kg": 310.0,
+            "stato": "annullata",
+            "data_partenza": null,
+            "data_consegna_prevista": "2026-02-25"
+          },
+          {
+            "id": 105,
+            "deposito_id": 2,
+            "codice_spedizione": "SPD-2026-00105",
+            "destinatario": "Anna Conti",
+            "citta_destinazione": "Modena",
+            "peso_kg": 76.4,
+            "stato": "consegnata",
+            "data_partenza": "2026-01-28",
+            "data_consegna_prevista": "2026-01-31"
+          }
+        ],
+        "variations": {
+          "destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Luca Ferrari",
+              "Anna Conti",
+              "Marco Gallo",
+              "Sara Moretti",
+              "Paolo Rinaldi",
+              "Chiara Lombardi",
+              "Davide Fontana"
+            ]
+          },
+          "citta_destinazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Verona",
+              "Brescia",
+              "Bergamo",
+              "Padova",
+              "Vicenza",
+              "Treviso",
+              "Modena",
+              "Parma",
+              "Piacenza",
+              "Alessandria",
+              "Bari",
+              "Salerno"
+            ]
+          },
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnata",
+              "consegnata",
+              "consegnata",
+              "in_transito",
+              "in_transito",
+              "in_preparazione",
+              "annullata"
+            ]
+          },
+          "data_partenza": {
+            "axis": "shift",
+            "delta_min": -15.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_consegna_prevista": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 15.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "eventi_tracciamento",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 4.0,
+        "templates": [
+          {
+            "id_spedizione": 1,
+            "num_evento": 1,
+            "tipo_evento": "ritiro",
+            "descrizione": "Pacco ritirato dal mittente, voce aperta nel registro movimenti",
+            "istante_evento": "2026-02-03 08:15:00",
+            "operatore": "G. Ferri"
+          },
+          {
+            "id_spedizione": 1,
+            "num_evento": 2,
+            "tipo_evento": "arrivo_hub",
+            "descrizione": "Arrivo presso hub di cross-docking Milano Est",
+            "istante_evento": "2026-02-03 18:40:00",
+            "operatore": "L. Sartori"
+          },
+          {
+            "id_spedizione": 2,
+            "num_evento": 1,
+            "tipo_evento": "partenza_hub",
+            "descrizione": "Partenza dal hub di cross-docking Roma Sud verso filiale finale",
+            "istante_evento": "2026-02-11 06:30:00",
+            "operatore": "M. Bellini"
+          },
+          {
+            "id_spedizione": 3,
+            "num_evento": 1,
+            "tipo_evento": "in_consegna",
+            "descrizione": "Pacco caricato sul mezzo per la consegna finale",
+            "istante_evento": "2026-02-19 09:05:00",
+            "operatore": "C. Vitale"
+          },
+          {
+            "id_spedizione": 4,
+            "num_evento": 1,
+            "tipo_evento": "giacenza",
+            "descrizione": "Indirizzo destinatario incompleto, pacco in giacenza",
+            "istante_evento": "2026-02-22 14:20:00",
+            "operatore": "R. DAmato"
+          },
+          {
+            "id_spedizione": 5,
+            "num_evento": 1,
+            "tipo_evento": "consegnata",
+            "descrizione": "Consegnato al destinatario, firma acquisita",
+            "istante_evento": "2026-01-31 11:45:00",
+            "operatore": "F. Lo Presti"
+          }
+        ],
+        "variations": {
+          "tipo_evento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "ritiro",
+              "arrivo_hub",
+              "partenza_hub",
+              "in_transito",
+              "in_consegna",
+              "consegnata",
+              "giacenza",
+              "tentativo_consegna"
+            ]
+          },
+          "istante_evento": {
+            "axis": "shift",
+            "delta_min": -7.0,
+            "delta_max": 7.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "operatore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "G. Ferri",
+              "L. Sartori",
+              "M. Bellini",
+              "C. Vitale",
+              "R. DAmato",
+              "F. Lo Presti"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

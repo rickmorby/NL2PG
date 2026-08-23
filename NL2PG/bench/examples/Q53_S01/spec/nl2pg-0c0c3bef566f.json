@@ -1,0 +1,27 @@
+{
+  "domain": "università",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "ordered_set_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "esami",
+      "obsolete_value": "verbali_prova_finale",
+      "description": "La tabella esami viene denominata verbali_prova_finale nella prosa aziendale. Il progettista deve riconoscere che i verbali delle prove finali corrispondono alla tabella esami, unica entità dello schema, contenente PK id_esame e attributi come matricola_studente, corso, voto, cfu, docente e data_esame."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "voto",
+      "obsolete_value": "esito trentesimale",
+      "description": "La colonna voto della tabella esami viene indicata con il gergo accademico 'esito trentesimale' nella documentazione aziendale. Le query che calcolano percentile_cont o mode sulla colonna voto devono riferirsi a tale perifrasi per identificare correttamente l'attributo numerico su cui applicare l'aggregazione ordered-set."
+    }
+  ],
+  "spec_hash": "cbe654a5d162540b"
+}

@@ -1,0 +1,23 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "self_referencing",
+    "sql_features": [
+      "recursive_cte"
+    ],
+    "twist": [
+      "ambiguity"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "ambiguity",
+        "target_value": "id_supervisore",
+        "obsolete_value": "il riferimento gerarchico interno",
+        "description": "La tabella unica operatori_sanitari contiene una chiave esterna auto-referenziale id_supervisore che punta a id_operatore della stessa tabella. Nella prosa aziendale questa colonna non viene mai nominata esplicitamente: è indicata solo con la perifrasi ambigua 'il riferimento gerarchico interno', che può essere scambiata con altri attributi come ruolo o unità_operativa. Il solutore deve inferire da solo l'esistenza dell'auto-referenza e usarla per navigare ricorsivamente la catena di supervisione tramite WITH RECURSIVE."
+      }
+    ],
+    "spec_hash": "de19dabc0a77e817"
+  },
+  "schema_ddl": "CREATE TABLE operatori_sanitari (\n    id_operatore INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    ruolo TEXT NOT NULL CHECK (ruolo IN ('medico', 'infermiere', 'tecnico_sanitario', 'amministrativo')),\n    unita_operativa TEXT NOT NULL,\n    data_assunzione DATE NOT NULL,\n    email TEXT UNIQUE,\n    id_supervisore INT REFERENCES operatori_sanitari(id_operatore),\n    CHECK (id_supervisore IS NULL OR id_supervisore <> id_operatore)\n);"
+}

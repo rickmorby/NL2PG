@@ -1,0 +1,34 @@
+{
+  "domain": "università",
+  "n_tables": 2,
+  "hierarchy": "one_to_one_with_cast",
+  "sql_features": [
+    "math_funcs"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "esami",
+      "obsolete_value": "registri_valutazioni",
+      "description": "La tabella 'esami' viene denominata 'registri_valutazioni' nei documenti ufficiali dell'università."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "voto_text",
+      "obsolete_value": "indicatore_qualitativo_prestazione",
+      "description": "La colonna 'voto_text' (che contiene valori numerici in formato TEXT) viene chiamata 'indicatore_qualitativo_prestazione' nel gergo amministrativo."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "crediti",
+      "obsolete_value": "punti_formativi",
+      "description": "La colonna 'crediti' (valori numerici in formato TEXT) viene indicata come 'punti_formativi' in alcuni contesti, creando ambiguità semantica."
+    }
+  ],
+  "spec_hash": "aa5c253cd516215e"
+}

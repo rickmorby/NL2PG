@@ -1,0 +1,334 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "row_types"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "registro_operativita",
+        "description": "La tabella transazioni, che memorizza le operazioni di acquisto e vendita con la colonna composita prezzo_esecuzione di tipo dato_prezzo definito tramite CREATE TYPE, viene denominata registro_operativita nella prosa aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "prezzo_esecuzione.valore",
+        "obsolete_value": "controvalore di esecuzione",
+        "description": "Il campo valore della colonna composita prezzo_esecuzione (accessibile con la sintassi (prezzo_esecuzione).valore nelle SELECT e filtrabile con WHERE ROW((t.prezzo_esecuzione).valore, t.prezzo_esecuzione.valuta) = ROW(v1, v2)) viene indicato nella documentazione finanziaria con il gergo 'controvalore di esecuzione'."
+      }
+    ],
+    "spec_hash": "d8ed77df6842e21c"
+  },
+  "schema_ddl": "CREATE TYPE dato_prezzo AS (\n    valore NUMERIC(18,6),\n    valuta TEXT\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    numero_conto TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    divisa_conto TEXT NOT NULL DEFAULT 'EUR',\n    saldo_disponibile NUMERIC(16,2) NOT NULL DEFAULT 0 CHECK (saldo_disponibile >= 0),\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE strumenti_finanziari (\n    id INT PRIMARY KEY,\n    codice_isin TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    emittente TEXT NOT NULL,\n    mercato_quotazione TEXT NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    strumento_id INT NOT NULL REFERENCES strumenti_finanziari(id),\n    tipo_operazione TEXT NOT NULL CHECK (tipo_operazione IN ('acquisto', 'vendita')),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_esecuzione dato_prezzo NOT NULL,\n    istante_esecuzione TIMESTAMP NOT NULL,\n    CHECK ((prezzo_esecuzione).valore >= 0),\n    CHECK ((prezzo_esecuzione).valuta IS NOT NULL AND char_length((prezzo_esecuzione).valuta) = 3)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "conti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 250,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_conto": "IT60X0542811101000000123456",
+            "intestatario": "Mario Rossi",
+            "divisa_conto": "EUR",
+            "saldo_disponibile": 15420.75,
+            "data_apertura": "2019-03-14"
+          },
+          {
+            "id": 2,
+            "numero_conto": "IT61Z0542811101000000987654",
+            "intestatario": "Laura Bianchi",
+            "divisa_conto": "EUR",
+            "saldo_disponibile": 89300.0,
+            "data_apertura": "2021-07-01"
+          },
+          {
+            "id": 3,
+            "numero_conto": "IT62Y0301503200000003456789",
+            "intestatario": "Giulia Verdi",
+            "divisa_conto": "USD",
+            "saldo_disponibile": 4200.5,
+            "data_apertura": "2022-11-20"
+          },
+          {
+            "id": 4,
+            "numero_conto": "IT63W0200805000000012345678",
+            "intestatario": "Alessandro Neri",
+            "divisa_conto": "CHF",
+            "saldo_disponibile": 25600.0,
+            "data_apertura": "2020-01-10"
+          },
+          {
+            "id": 5,
+            "numero_conto": "IT64V0100004000000023456781",
+            "intestatario": "Sara Conti",
+            "divisa_conto": "GBP",
+            "saldo_disponibile": 7600.25,
+            "data_apertura": "2023-05-30"
+          },
+          {
+            "id": 6,
+            "numero_conto": "IT65U0542811101000000555544",
+            "intestatario": "Luca Moretti",
+            "divisa_conto": "EUR",
+            "saldo_disponibile": 512.9,
+            "data_apertura": "2024-02-18"
+          }
+        ],
+        "variations": {
+          "intestatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Alessandro Neri",
+              "Sara Conti",
+              "Luca Moretti",
+              "Elena Fontana",
+              "Davide Rinaldi",
+              "Chiara Gallo",
+              "Fabio Marino"
+            ]
+          },
+          "divisa_conto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "EUR",
+              "EUR",
+              "EUR",
+              "EUR",
+              "USD",
+              "CHF",
+              "GBP"
+            ]
+          },
+          "saldo_disponibile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "data_apertura": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "strumenti_finanziari",
+        "nature": "lookup",
+        "min_rows": 30,
+        "max_rows": 45,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_isin": "IT0003128367",
+            "denominazione": "Enel SpA",
+            "emittente": "Enel S.p.A.",
+            "mercato_quotazione": "Borsa Italiana"
+          },
+          {
+            "id": 2,
+            "codice_isin": "IT0000072618",
+            "denominazione": "Intesa Sanpaolo",
+            "emittente": "Intesa Sanpaolo S.p.A.",
+            "mercato_quotazione": "Borsa Italiana"
+          },
+          {
+            "id": 3,
+            "codice_isin": "NL0010273215",
+            "denominazione": "ASML Holding",
+            "emittente": "ASML Holding N.V.",
+            "mercato_quotazione": "Euronext Amsterdam"
+          },
+          {
+            "id": 4,
+            "codice_isin": "US0378331005",
+            "denominazione": "Apple Inc.",
+            "emittente": "Apple Inc.",
+            "mercato_quotazione": "NASDAQ"
+          },
+          {
+            "id": 5,
+            "codice_isin": "DE0007236101",
+            "denominazione": "Siemens AG",
+            "emittente": "Siemens AG",
+            "mercato_quotazione": "Xetra"
+          },
+          {
+            "id": 6,
+            "codice_isin": "FR0000120271",
+            "denominazione": "TotalEnergies",
+            "emittente": "TotalEnergies SE",
+            "mercato_quotazione": "Euronext Paris"
+          }
+        ],
+        "variations": {
+          "mercato_quotazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Borsa Italiana",
+              "Borsa Italiana",
+              "Xetra",
+              "Euronext Paris",
+              "Euronext Amsterdam",
+              "NASDAQ",
+              "NYSE",
+              "LSE"
+            ]
+          }
+        }
+      },
+      {
+        "table": "transazioni",
+        "nature": "fact",
+        "min_rows": 900,
+        "max_rows": 1400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1001,
+            "conto_id": 1,
+            "strumento_id": 1,
+            "tipo_operazione": "acquisto",
+            "quantita": 150,
+            "prezzo_esecuzione": "ROW(6.85, 'EUR')",
+            "istante_esecuzione": "2026-01-12 09:35:00"
+          },
+          {
+            "id": 1002,
+            "conto_id": 2,
+            "strumento_id": 4,
+            "tipo_operazione": "acquisto",
+            "quantita": 25,
+            "prezzo_esecuzione": "ROW(228.40, 'USD')",
+            "istante_esecuzione": "2026-01-15 16:20:00"
+          },
+          {
+            "id": 1003,
+            "conto_id": 3,
+            "strumento_id": 2,
+            "tipo_operazione": "vendita",
+            "quantita": 500,
+            "prezzo_esecuzione": "ROW(4.12, 'EUR')",
+            "istante_esecuzione": "2026-02-03 11:05:00"
+          },
+          {
+            "id": 1004,
+            "conto_id": 1,
+            "strumento_id": 5,
+            "tipo_operazione": "acquisto",
+            "quantita": 40,
+            "prezzo_esecuzione": "ROW(178.95, 'EUR')",
+            "istante_esecuzione": "2026-02-10 14:45:00"
+          },
+          {
+            "id": 1005,
+            "conto_id": 4,
+            "strumento_id": 3,
+            "tipo_operazione": "vendita",
+            "quantita": 10,
+            "prezzo_esecuzione": "ROW(642.30, 'EUR')",
+            "istante_esecuzione": "2026-02-18 10:15:00"
+          },
+          {
+            "id": 1006,
+            "conto_id": 5,
+            "strumento_id": 6,
+            "tipo_operazione": "acquisto",
+            "quantita": 80,
+            "prezzo_esecuzione": "ROW(58.75, 'EUR')",
+            "istante_esecuzione": "2026-03-02 15:30:00"
+          }
+        ],
+        "variations": {
+          "tipo_operazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "acquisto",
+              "acquisto",
+              "acquisto",
+              "vendita"
+            ]
+          },
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "5",
+              "10",
+              "25",
+              "50",
+              "100",
+              "150",
+              "200",
+              "500"
+            ]
+          },
+          "prezzo_esecuzione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "ROW(6.85, 'EUR')",
+              "ROW(4.12, 'EUR')",
+              "ROW(178.95, 'EUR')",
+              "ROW(58.75, 'EUR')",
+              "ROW(24.60, 'EUR')",
+              "ROW(642.30, 'EUR')",
+              "ROW(228.40, 'USD')",
+              "ROW(192.15, 'USD')"
+            ]
+          },
+          "istante_esecuzione": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

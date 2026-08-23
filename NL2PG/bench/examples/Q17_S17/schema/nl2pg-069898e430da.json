@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "visite",
+        "obsolete_value": "consulenze_ambulatoriali",
+        "description": "La tabella visite, che registra gli incontri tra pazienti e medici, viene denominata consulenze_ambulatoriali nella prosa aziendale. Le query devono risolvere il nome perifrastico verso la tabella reale visite."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "deleted_at",
+        "obsolete_value": "data_archiviazione_clinica",
+        "description": "La colonna deleted_at, che implementa la cancellazione logica dei record sulla tabella visite, viene indicata nella documentazione aziendale con il gergo data_archiviazione_clinica. Le righe attive sono quelle con deleted_at IS NULL; le query con funzione finestra ROW_NUMBER() OVER (PARTITION BY paziente_id ORDER BY data_visita DESC) devono escludere i record archiviati (deleted_at IS NOT NULL) prima di selezionare l'ultima visita per paziente."
+      }
+    ],
+    "spec_hash": "ec8228ff78a7824f"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    numero_iscrizione_albo TEXT NOT NULL UNIQUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    data_visita DATE NOT NULL,\n    motivo_visita TEXT,\n    esito_visita TEXT,\n    deleted_at TIMESTAMP,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_visita >= DATE '1900-01-01'),\n    CHECK (deleted_at IS NULL OR deleted_at >= created_at)\n);"
+}

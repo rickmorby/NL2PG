@@ -1,0 +1,203 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "disjunctive"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "operazioni_finanziarie",
+        "obsolete_value": "registro_movimenti",
+        "description": "La tabella operazioni_finanziarie viene denominata registro_movimenti nella prosa aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_lordo",
+        "obsolete_value": "valore_nominale_esposto",
+        "description": "La colonna importo_lordo viene indicata con il gergo valore_nominale_esposto nei documenti interni."
+      }
+    ],
+    "spec_hash": "0d95ca22d66afa71"
+  },
+  "schema_ddl": "CREATE TABLE operazioni_finanziarie (\n    id SERIAL PRIMARY KEY,\n    tipo_operazione TEXT NOT NULL CHECK (tipo_operazione IN ('accredito', 'addebito', 'bonifico', 'investimento', 'prelievo')),\n    importo_lordo NUMERIC(15,2) NOT NULL CHECK (importo_lordo >= 0),\n    data_operazione DATE NOT NULL,\n    descrizione TEXT,\n    categoria TEXT CHECK (categoria IN ('stipendio', 'utenze', 'alimentari', 'trasporti', 'intrattenimento', 'investimenti', 'altro')),\n    stato TEXT NOT NULL DEFAULT 'registrata' CHECK (stato IN ('registrata', 'contabilizzata', 'annullata')),\n    conto_corrente TEXT,\n    note TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "operazioni_finanziarie",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "tipo_operazione": "accredito",
+            "importo_lordo": 2500.0,
+            "data_operazione": "2026-03-15",
+            "descrizione": "Stipendio mensile",
+            "categoria": "stipendio",
+            "stato": "contabilizzata",
+            "conto_corrente": "IT60X0542811101000000123456",
+            "note": "Accredito regolare"
+          },
+          {
+            "id": 2,
+            "tipo_operazione": "addebito",
+            "importo_lordo": 120.5,
+            "data_operazione": "2026-03-10",
+            "descrizione": "Bolletta elettrica",
+            "categoria": "utenze",
+            "stato": "registrata",
+            "conto_corrente": "IT60X0542811101000000123456",
+            "note": null
+          },
+          {
+            "id": 3,
+            "tipo_operazione": "bonifico",
+            "importo_lordo": 450.0,
+            "data_operazione": "2026-02-20",
+            "descrizione": "Pagamento affitto",
+            "categoria": "altro",
+            "stato": "contabilizzata",
+            "conto_corrente": "IT60X0542811101000000123456",
+            "note": "Bonifico verso locatore"
+          },
+          {
+            "id": 4,
+            "tipo_operazione": "investimento",
+            "importo_lordo": 5000.0,
+            "data_operazione": "2026-01-05",
+            "descrizione": "Acquisto quote fondo",
+            "categoria": "investimenti",
+            "stato": "contabilizzata",
+            "conto_corrente": "IT60X0542811101000000123456",
+            "note": "Piano di accumulo"
+          },
+          {
+            "id": 5,
+            "tipo_operazione": "prelievo",
+            "importo_lordo": 200.0,
+            "data_operazione": "2026-03-01",
+            "descrizione": "Prelievo contante",
+            "categoria": "altro",
+            "stato": "annullata",
+            "conto_corrente": null,
+            "note": "Operazione annullata"
+          }
+        ],
+        "variations": {
+          "tipo_operazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "accredito",
+              "addebito",
+              "bonifico",
+              "investimento",
+              "prelievo"
+            ]
+          },
+          "importo_lordo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 5.0,
+            "pool": []
+          },
+          "data_operazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Stipendio mensile",
+              "Bolletta elettrica",
+              "Pagamento affitto",
+              "Acquisto quote fondo",
+              "Prelievo contante",
+              "Spesa supermercato",
+              "Ricarica telefonica",
+              "Abbonamento palestra"
+            ]
+          },
+          "categoria": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "stipendio",
+              "utenze",
+              "alimentari",
+              "trasporti",
+              "intrattenimento",
+              "investimenti",
+              "altro"
+            ]
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "registrata",
+              "registrata",
+              "registrata",
+              "contabilizzata",
+              "annullata"
+            ]
+          },
+          "conto_corrente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "IT60X0542811101000000123456",
+              "IT12A0312801600000123456789",
+              "IT02L1234500000123456789"
+            ]
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Accredito regolare",
+              "Bonifico verso locatore",
+              "Piano di accumulo",
+              "Operazione annullata",
+              "Nessuna nota"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

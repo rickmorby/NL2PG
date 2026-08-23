@@ -1,0 +1,202 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "jargon",
+      "rename"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "clt_mstr",
+        "obsolete_value": "registro anagrafica clienti",
+        "description": "La tabella clt_mstr (master clienti, con colonna cod_cli) è denominata nella prosa aziendale 'registro anagrafica clienti'. Il solver deve allineare il termine naturale del testo alla sigla reale dello schema per costruire correttamente le condizioni LIKE su cod_cli."
+      },
+      {
+        "twist_type": "rename",
+        "target_value": "ord_dtl",
+        "obsolete_value": "movimentazione ordini di vendita",
+        "description": "La tabella ord_dtl (righe dettaglio ordine, con colonne ord_no e art_desc) viene rinominata nella documentazione commerciale come 'movimentazione ordini di vendita'. Le query richieste devono filtrare con WHERE art_desc LIKE 'prefisso%' dopo aver ricondotto la perifrasi alla sigla effettiva."
+      }
+    ],
+    "spec_hash": "6a4cc74086007b41"
+  },
+  "schema_ddl": "CREATE TABLE clt_mstr (\n    cod_cli TEXT PRIMARY KEY,\n    rag_soc TEXT NOT NULL,\n    ind_cli TEXT,\n    cap_cli TEXT,\n    citta_cli TEXT NOT NULL\n);\n\nCREATE TABLE dettagli_ordini (\n    ord_no INT NOT NULL,\n    riga_no INT NOT NULL,\n    cod_cli TEXT NOT NULL REFERENCES clt_mstr(cod_cli),\n    art_desc TEXT NOT NULL,\n    qta_ord INT NOT NULL CHECK (qta_ord > 0),\n    prz_unit NUMERIC(10,2) NOT NULL CHECK (prz_unit >= 0),\n    PRIMARY KEY (ord_no, riga_no)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clt_mstr",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 300,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "cod_cli": "C1001",
+            "rag_soc": "Alimentari Rossi SRL",
+            "ind_cli": "Via Roma 12",
+            "cap_cli": "00184",
+            "citta_cli": "Roma"
+          },
+          {
+            "cod_cli": "C1002",
+            "rag_soc": "Bar Centrale SAS",
+            "ind_cli": "Corso Vittorio Emanuele 45",
+            "cap_cli": "20121",
+            "citta_cli": "Milano"
+          },
+          {
+            "cod_cli": "C2001",
+            "rag_soc": "Ristorante Da Gennaro",
+            "ind_cli": "Via Toledo 88",
+            "cap_cli": "80134",
+            "citta_cli": "Napoli"
+          },
+          {
+            "cod_cli": "C1003",
+            "rag_soc": "Supermercato Verde SPA",
+            "ind_cli": "Via Po 7",
+            "cap_cli": "10124",
+            "citta_cli": "Torino"
+          },
+          {
+            "cod_cli": "C2002",
+            "rag_soc": "Enoteca Bottiglia d'Oro",
+            "ind_cli": "Via Mazzini 21",
+            "cap_cli": "35121",
+            "citta_cli": "Padova"
+          }
+        ],
+        "variations": {
+          "rag_soc": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Alimentari Rossi SRL",
+              "Bar Centrale SAS",
+              "Ristorante Da Gennaro",
+              "Supermercato Verde SPA",
+              "Enoteca Bottiglia d'Oro",
+              "Panificio Il Grano SNC",
+              "Gastronomia Bella Napoli",
+              "Hotel Belvedere SPA",
+              "Pizzeria La Margherita",
+              "Distribuzione Alimentare Nord SRL"
+            ]
+          },
+          "ind_cli": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Roma 12",
+              "Corso Vittorio Emanuele 45",
+              "Via Toledo 88",
+              "Via Po 7",
+              "Via Mazzini 21",
+              "Via Garibaldi 33",
+              "Piazza Duomo 5",
+              "Via Dante 14"
+            ]
+          }
+        }
+      },
+      {
+        "table": "dettagli_ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 4.0,
+        "templates": [
+          {
+            "ord_no": 10001,
+            "riga_no": 1,
+            "cod_cli": "C1001",
+            "art_desc": "CAFFE Miscela Espresso 1kg",
+            "qta_ord": 10,
+            "prz_unit": 18.5
+          },
+          {
+            "ord_no": 10001,
+            "riga_no": 2,
+            "cod_cli": "C1001",
+            "art_desc": "OLIO EVO Toscano 750ml",
+            "qta_ord": 6,
+            "prz_unit": 9.9
+          },
+          {
+            "ord_no": 10002,
+            "riga_no": 1,
+            "cod_cli": "C2001",
+            "art_desc": "VINO Chianti DOCG 750ml",
+            "qta_ord": 24,
+            "prz_unit": 7.5
+          },
+          {
+            "ord_no": 10003,
+            "riga_no": 1,
+            "cod_cli": "C1002",
+            "art_desc": "CAFFE Decaffeinato 250g",
+            "qta_ord": 15,
+            "prz_unit": 5.2
+          },
+          {
+            "ord_no": 10004,
+            "riga_no": 1,
+            "cod_cli": "C1003",
+            "art_desc": "PASTA Penne Rigate 500g",
+            "qta_ord": 40,
+            "prz_unit": 1.1
+          }
+        ],
+        "variations": {
+          "art_desc": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "CAFFE Miscela Espresso 1kg",
+              "CAFFE Decaffeinato 250g",
+              "CAFFE Arabica 500g",
+              "OLIO EVO Toscano 750ml",
+              "OLIO di Oliva Classico 1L",
+              "VINO Chianti DOCG 750ml",
+              "VINO Vermentino 750ml",
+              "PASTA Penne Rigate 500g",
+              "PASTA Spaghetti 500g",
+              "ACETO Balsamico 250ml"
+            ]
+          },
+          "qta_ord": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "prz_unit": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

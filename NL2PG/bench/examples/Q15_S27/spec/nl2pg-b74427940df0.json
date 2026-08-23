@@ -1,0 +1,34 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 4,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "cte"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "immobili",
+      "obsolete_value": "schede_catastali",
+      "description": "La tabella immobili viene denominata schede_catastali nella prosa aziendale. Le relazioni implicite restano deducibili dalla colonna immobile_id presente nelle tabelle collegate."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "acquirenti",
+      "description": "La tabella clienti viene indicata come acquirenti nella documentazione aziendale. Il collegamento implicito si deduce dalla colonna cliente_id nella tabella dei contratti."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "contratti",
+      "obsolete_value": "compromessi",
+      "description": "La tabella contratti viene riferita con il gergo del settore immobiliare come compromessi (contratti preliminari). Le colonne immobile_id e cliente_id permettono di associarla concettualmente alle altre tabelle senza vincoli dichiarati."
+    }
+  ],
+  "spec_hash": "a94ac0e8d9ae791f"
+}

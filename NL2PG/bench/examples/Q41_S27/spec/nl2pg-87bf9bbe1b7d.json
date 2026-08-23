@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "is_null"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "sinistri",
+      "obsolete_value": "pratiche_danno",
+      "description": "La tabella sinistri viene denominata pratiche_danno nella prosa aziendale. Il collegamento con la tabella polizze non è dichiarato tramite REFERENCES ma si deduce dalla colonna polizza_id presente in sinistri; le query richiedono predicati IS NULL / IS NOT NULL su colonne come data_chiusura o liquidazione_id per identificare le pratiche aperte o chiuse."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "contraenti",
+      "description": "Nella prosa aziendale i clienti sono indicati come contraenti. La tabella clienti espone la colonna id, referenziata implicitamente da polizze.cliente_id senza vincolo dichiarato; l'associazione va dedotta dai nomi delle colonne per individuare ad esempio i contraenti senza polizze attive tramite IS NULL."
+    }
+  ],
+  "spec_hash": "0a2bd90d2e824e17"
+}

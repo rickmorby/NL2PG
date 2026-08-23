@@ -1,0 +1,371 @@
+{
+  "schema_ddl": "CREATE DOMAIN importo_stipendio AS NUMERIC(10,2) CHECK (VALUE >= 500 AND VALUE <= 50000);\n\nCREATE DOMAIN livello_seniorita AS TEXT CHECK (VALUE IN ('junior', 'mid', 'senior'));\n\nCREATE TABLE dipartimenti (\n    id INT PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL,\n    budget_annuo NUMERIC(12,2) NOT NULL CHECK (budget_annuo > 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile importo_stipendio NOT NULL,\n    seniority livello_seniorita NOT NULL DEFAULT 'junior',\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_profile": {
+    "profile": {
+      "dipartimenti": {
+        "row_count": 9,
+        "columns": {
+          "id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "nome_dipartimento": {
+            "distinct": 9,
+            "sample": [
+              "Assistenza Clienti",
+              "Finanza e Controllo",
+              "Logistica",
+              "Marketing",
+              "Ricerca e Sviluppo"
+            ]
+          },
+          "sede": {
+            "distinct": 5,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Napoli",
+              "Roma",
+              "Torino"
+            ]
+          },
+          "budget_annuo": {
+            "distinct": 9,
+            "sample": [
+              "1360760.33",
+              "1474776.41",
+              "227446.37",
+              "408521.78",
+              "510000.0"
+            ],
+            "min": 227446.37,
+            "max": 1474776.41
+          },
+          "created_at": {
+            "distinct": 9,
+            "sample": [
+              "2016-09-19 09:20:00",
+              "2017-01-05 09:50:00",
+              "2017-11-29 08:45:00",
+              "2018-05-18 10:30:00",
+              "2018-11-15 09:00:00"
+            ]
+          }
+        }
+      },
+      "dipendenti": {
+        "row_count": 146,
+        "columns": {
+          "id": {
+            "distinct": 146,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 146
+          },
+          "dipartimento_id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Anna",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesco"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Conti",
+              "Costa",
+              "Ferrari"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 146,
+            "sample": [
+              "BNCLAU85C42F205B",
+              "BNCLAU85C42F205C",
+              "BNCLAU85C42F205D",
+              "BNCLAU85C42F205E",
+              "BNCLAU85C42F205F"
+            ]
+          },
+          "email": {
+            "distinct": 140,
+            "sample": [
+              "giulia.verdi10@acme.it",
+              "giulia.verdi11@acme.it",
+              "giulia.verdi12@acme.it",
+              "giulia.verdi13@acme.it",
+              "giulia.verdi16@acme.it"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 143,
+            "sample": [
+              "2016-06-05",
+              "2016-06-11",
+              "2016-07-02",
+              "2016-08-09",
+              "2016-08-14"
+            ]
+          },
+          "stipendio_mensile": {
+            "distinct": 144,
+            "sample": [
+              "1827.5",
+              "1905.07",
+              "1994.84",
+              "2010.51",
+              "2010.98"
+            ],
+            "min": 1827.5,
+            "max": 5973.12
+          },
+          "seniority": {
+            "distinct": 3,
+            "sample": [
+              "junior",
+              "mid",
+              "senior"
+            ]
+          },
+          "attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          },
+          "created_at": {
+            "distinct": 6,
+            "sample": [
+              "2018-05-21 10:45:00",
+              "2019-03-11 09:15:00",
+              "2020-10-19 08:55:00",
+              "2021-09-01 08:30:00",
+              "2022-07-04 09:10:00"
+            ]
+          },
+          "updated_at": {
+            "distinct": 6,
+            "sample": [
+              "2024-11-30 18:00:00",
+              "2025-03-22 11:25:00",
+              "2025-04-01 12:00:00",
+              "2025-05-12 16:20:00",
+              "2025-06-30 17:45:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "dipartimenti": [
+        {
+          "id": 1,
+          "nome_dipartimento": "Risorse Umane",
+          "sede": "Roma",
+          "budget_annuo": 613410.44,
+          "created_at": "2020-02-16 09:00:00"
+        },
+        {
+          "id": 2,
+          "nome_dipartimento": "Risorse Umane1",
+          "sede": "Torino",
+          "budget_annuo": 544255.43,
+          "created_at": "2018-11-15 09:00:00"
+        },
+        {
+          "id": 3,
+          "nome_dipartimento": "Sviluppo Software",
+          "sede": "Torino",
+          "budget_annuo": 1474776.41,
+          "created_at": "2018-05-18 10:30:00"
+        },
+        {
+          "id": 4,
+          "nome_dipartimento": "Vendite",
+          "sede": "Firenze",
+          "budget_annuo": 900715.15,
+          "created_at": "2017-11-29 08:45:00"
+        },
+        {
+          "id": 5,
+          "nome_dipartimento": "Marketing",
+          "sede": "Bologna",
+          "budget_annuo": 408521.78,
+          "created_at": "2020-06-20 11:15:00"
+        },
+        {
+          "id": 6,
+          "nome_dipartimento": "Finanza e Controllo",
+          "sede": "Firenze",
+          "budget_annuo": 751405.79,
+          "created_at": "2016-09-19 09:20:00"
+        },
+        {
+          "id": 7,
+          "nome_dipartimento": "Logistica",
+          "sede": "Napoli",
+          "budget_annuo": 510000.0,
+          "created_at": "2022-02-18 14:00:00"
+        },
+        {
+          "id": 8,
+          "nome_dipartimento": "Assistenza Clienti",
+          "sede": "Bologna",
+          "budget_annuo": 227446.37,
+          "created_at": "2021-08-19 10:10:00"
+        }
+      ],
+      "dipendenti": [
+        {
+          "id": 59,
+          "dipartimento_id": 8,
+          "nome": "Davide",
+          "cognome": "Conti",
+          "codice_fiscale": "VRDGLI92D55G224I",
+          "email": "davide.conti1@example.com",
+          "data_assunzione": "2021-10-14",
+          "stipendio_mensile": 2207.38,
+          "seniority": "junior",
+          "attivo": true,
+          "created_at": "2023-02-13T09:00:00",
+          "updated_at": "2025-04-01T12:00:00"
+        },
+        {
+          "id": 49,
+          "dipartimento_id": 2,
+          "nome": "Francesco",
+          "cognome": "Rossi",
+          "codice_fiscale": "BNCLAU85C42F205X",
+          "email": "francesco.rossi1@example.com",
+          "data_assunzione": "2021-04-03",
+          "stipendio_mensile": 3202.92,
+          "seniority": "senior",
+          "attivo": true,
+          "created_at": "2021-09-01T08:30:00",
+          "updated_at": "2025-05-12T16:20:00"
+        },
+        {
+          "id": 19,
+          "dipartimento_id": 6,
+          "nome": "Mario",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA80A01H501S",
+          "email": "mario.bianchi1@example.com",
+          "data_assunzione": "2019-01-12",
+          "stipendio_mensile": 5083.55,
+          "seniority": "mid",
+          "attivo": true,
+          "created_at": "2019-03-11T09:15:00",
+          "updated_at": "2025-06-30T17:45:00"
+        },
+        {
+          "id": 65,
+          "dipartimento_id": 6,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "VRDGLI92D55G224O",
+          "email": "mario.rossi1@example.com",
+          "data_assunzione": "2021-06-01",
+          "stipendio_mensile": 2510.46,
+          "seniority": "mid",
+          "attivo": true,
+          "created_at": "2023-02-13T09:00:00",
+          "updated_at": "2025-04-01T12:00:00"
+        },
+        {
+          "id": 66,
+          "dipartimento_id": 6,
+          "nome": "Anna",
+          "cognome": "Ricci",
+          "codice_fiscale": "VRDGLI92D55G224P",
+          "email": "anna.ricci1@example.com",
+          "data_assunzione": "2021-05-28",
+          "stipendio_mensile": 2010.98,
+          "seniority": "junior",
+          "attivo": true,
+          "created_at": "2023-02-13T09:00:00",
+          "updated_at": "2025-04-01T12:00:00"
+        },
+        {
+          "id": 14,
+          "dipartimento_id": 1,
+          "nome": "Anna",
+          "cognome": "Bruno",
+          "codice_fiscale": "RSSMRA80A01H501N",
+          "email": "anna.bruno1@acme.it",
+          "data_assunzione": "2018-09-21",
+          "stipendio_mensile": 3976.25,
+          "seniority": "mid",
+          "attivo": true,
+          "created_at": "2019-03-11T09:15:00",
+          "updated_at": "2025-06-30T17:45:00"
+        },
+        {
+          "id": 143,
+          "dipartimento_id": 2,
+          "nome": "Anna",
+          "cognome": "Marino",
+          "codice_fiscale": "MRTPLA75F20M052U",
+          "email": "anna.marino1@example.com",
+          "data_assunzione": "2020-02-02",
+          "stipendio_mensile": 3357.5,
+          "seniority": "junior",
+          "attivo": true,
+          "created_at": "2020-10-19T08:55:00",
+          "updated_at": "2025-03-22T11:25:00"
+        },
+        {
+          "id": 31,
+          "dipartimento_id": 7,
+          "nome": "Chiara",
+          "cognome": "Conti",
+          "codice_fiscale": "BNCLAU85C42F205F",
+          "email": "chiara.conti1@acme.it",
+          "data_assunzione": "2020-09-28",
+          "stipendio_mensile": 3259.29,
+          "seniority": "mid",
+          "attivo": true,
+          "created_at": "2021-09-01T08:30:00",
+          "updated_at": "2025-05-12T16:20:00"
+        }
+      ]
+    }
+  },
+  "story": "Presso la sede centrale di Acme, l'ufficio del Personale conduce periodicamente una revisione dell'organico incrociando due archivi storici. Il primo, l'archivio denominato dipartimenti, conserva una scheda per ciascuna struttura aziendale: vi sono annotati il nome del dipartimento — come Risorse Umane, Vendite, Marketing, Logistica, Finanza e Controllo, Assistenza Clienti o Sviluppo Software — la sede di riferimento, che può essere Roma, Torino, Firenze, Bologna o Napoli, e il budget annuo assegnato, con importi che oscillano tra circa 227446,37 e 1474776,41 euro. Il secondo, l'archivio dipendenti, raccoglie le schede individuali dei collaboratori: per ciascuno sono riportati nome e cognome, il codice fiscale, l'indirizzo di posta elettronica aziendale, la data di assunzione, lo stipendio mensile — nell'attuale esercizio compreso tra 1827,50 e 5973,12 euro — e il livello di seniorità, che può essere junior, mid oppure senior. Ogni scheda reca inoltre un'indicazione sullo stato del rapporto di lavoro: il collaboratore risulta attivo oppure ha cessato il servizio. In occasione dell'ultimo controllo, gli analisti hanno messo in relazione le due schedature per rispondere a un quesito gestionale preciso: per ogni dipartimento dotato di una sede, quanti collaboratori di livello senior risultano ancora attivi e quale è lo stipendio mensile medio da loro percepito? La verifica ha considerato esclusivamente le voci contrassegnate come attivo, scartando i rapporti cessati, e ha isolato i soli profili senior, tralasciando junior e mid. Per ciascun dipartimento gli operatori hanno quindi contato le presenze senior ancora in servizio e calcolato la media degli stipendi mensili corrisposti. L'elenco finale è stato disposto dallo stipendio medio più alto al più basso, così che la direzione potesse individuare immediatamente le strutture in cui l'esperienza senior incide maggiormente sul costo del personale e valutare, in sede di consuntivo, la coerenza di questi importi con i budget annui stanziati."
+}

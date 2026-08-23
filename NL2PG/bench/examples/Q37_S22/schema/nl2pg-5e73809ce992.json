@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 6,
+    "hierarchy": "star_schema",
+    "sql_features": [
+      "math_funcs"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fatti_spedizioni",
+        "obsolete_value": "registro_movimenti_di_flotta",
+        "description": "La tabella dei fatti centrale fatti_spedizioni, che contiene le misure quantitative come peso_kg, costo_trasporto e distanza_km, viene denominata nella prosa aziendale registro_movimenti_di_flotta. Le query devono riconoscere che ogni riga del registro corrisponde a una singola spedizione registrata nel data warehouse."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "giorni_transito",
+        "obsolete_value": "lead time di consegna",
+        "description": "La colonna giorni_transito presente nella tabella dei fatti viene espressa nella documentazione aziendale con il gergo logistico lead time di consegna. I calcoli con ROUND o ABS su questa misura devono riferirsi alla colonna reale giorni_transito, joinando le dimensioni sulle chiavi esterne."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "dim_vettori",
+        "obsolete_value": "anagrafica_partner_di_trasporto",
+        "description": "La tabella dimensionale dim_vettori, che descrive i corrieri incaricati delle spedizioni, viene indicata nella prosa aziendale come anagrafica_partner_di_trasporto. Le query che aggregano o filtrano per vettore devono risalire alla tabella dim_vettori tramite la chiave esterna id_vettore della tabella dei fatti."
+      }
+    ],
+    "spec_hash": "3b02df5124ed77c1"
+  },
+  "schema_ddl": "CREATE TABLE dim_vettori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT,\n    email_operativa TEXT,\n    citta_sede TEXT NOT NULL\n);\n\nCREATE TABLE dim_clienti (\n    id INT PRIMARY KEY,\n    codice_cliente TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    citta_fatturazione TEXT NOT NULL,\n    provincia_fatturazione TEXT\n);\n\nCREATE TABLE dim_mezzi (\n    id INT PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    tipo_mezzo TEXT NOT NULL,\n    capacita_carico_kg NUMERIC(10,2) NOT NULL CHECK (capacita_carico_kg > 0),\n    anno_immatricolazione INT NOT NULL CHECK (anno_immatricolazione BETWEEN 1970 AND 2100)\n);\n\nCREATE TABLE dim_magazzini (\n    id INT PRIMARY KEY,\n    codice_magazzino TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL\n);\n\nCREATE TABLE dim_destinazioni (\n    id INT PRIMARY KEY,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    regione TEXT NOT NULL,\n    zona_logistica TEXT NOT NULL\n);\n\nCREATE TABLE fatti_spedizioni (\n    id BIGINT PRIMARY KEY,\n    data_spedizione DATE NOT NULL,\n    id_vettore INT NOT NULL REFERENCES dim_vettori(id),\n    cliente_id INT NOT NULL REFERENCES dim_clienti(id),\n    mezzo_id INT NOT NULL REFERENCES dim_mezzi(id),\n    magazzino_partenza_id INT NOT NULL REFERENCES dim_magazzini(id),\n    destinazione_id INT NOT NULL REFERENCES dim_destinazioni(id),\n    peso_kg NUMERIC(10,2) NOT NULL CHECK (peso_kg >= 0),\n    costo_trasporto NUMERIC(12,2) NOT NULL CHECK (costo_trasporto >= 0),\n    distanza_km NUMERIC(10,2) NOT NULL CHECK (distanza_km >= 0),\n    giorni_transito INT NOT NULL CHECK (giorni_transito >= 0),\n    numero_colli INT NOT NULL DEFAULT 1 CHECK (numero_colli > 0)\n);"
+}

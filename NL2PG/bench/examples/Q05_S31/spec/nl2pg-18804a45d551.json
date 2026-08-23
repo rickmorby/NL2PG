@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 4,
+  "hierarchy": "flat",
+  "sql_features": [
+    "group_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "movimenti_contabili",
+      "obsolete_value": "registrazioni",
+      "description": "La tabella movimenti_contabili viene comunemente chiamata registrazioni nel linguaggio aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "category_name",
+      "obsolete_value": "natura_contabile",
+      "description": "Il campo category_name è riferito come natura_contabile nei documenti interni."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "supplier_name",
+      "obsolete_value": "fornitore",
+      "description": "Il campo supplier_name è spesso sostituito dal termine fornitore nelle query informali."
+    }
+  ],
+  "spec_hash": "6d86e8c750e4e29b"
+}

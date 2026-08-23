@@ -1,0 +1,1320 @@
+{
+  "schema_ddl": "CREATE TABLE esercizi_contabili (\n    id SERIAL PRIMARY KEY,\n    anno_esercizio INT NOT NULL UNIQUE,\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    chiuso BOOLEAN NOT NULL DEFAULT FALSE,\n    CHECK (data_fine > data_inizio)\n);\n\nCREATE TABLE piano_dei_conti (\n    id SERIAL PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    descrizione_conto TEXT NOT NULL,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'costo', 'ricavo')),\n    saldo_apertura NUMERIC(14,2) NOT NULL DEFAULT 0\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    citta TEXT\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    citta TEXT\n);\n\nCREATE TABLE fatture_vendita (\n    id SERIAL PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi_contabili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_fattura TEXT NOT NULL,\n    data_fattura DATE NOT NULL,\n    totale_documento NUMERIC(14,2) NOT NULL CHECK (totale_documento >= 0),\n    UNIQUE (esercizio_id, numero_fattura)\n);\n\nCREATE TABLE note_credito (\n    id SERIAL PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi_contabili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_nota_credito TEXT NOT NULL,\n    data_nota_credito DATE NOT NULL,\n    totale_documento NUMERIC(14,2) NOT NULL CHECK (totale_documento >= 0),\n    UNIQUE (esercizio_id, numero_nota_credito)\n);\n\nCREATE TABLE ordini_acquisto (\n    id SERIAL PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi_contabili(id),\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    numero_ordine TEXT NOT NULL,\n    data_ordine DATE NOT NULL,\n    totale_documento NUMERIC(14,2) NOT NULL CHECK (totale_documento >= 0),\n    UNIQUE (esercizio_id, numero_ordine)\n);\n\nCREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi_contabili(id),\n    conto_id INT NOT NULL REFERENCES piano_dei_conti(id),\n    data_registrazione DATE NOT NULL,\n    causale TEXT NOT NULL,\n    importo_dare NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (importo_dare >= 0),\n    importo_avere NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (importo_avere >= 0)\n);\n\nCREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    conto_id INT NOT NULL REFERENCES piano_dei_conti(id),\n    data_movimento DATE NOT NULL,\n    importo NUMERIC(14,2) NOT NULL CHECK (importo > 0),\n    dare_avere TEXT NOT NULL CHECK (dare_avere IN ('D', 'A'))\n);\n\nCREATE TABLE movimenti_contabili_storici (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    conto_id INT NOT NULL REFERENCES piano_dei_conti(id),\n    data_movimento DATE NOT NULL,\n    importo NUMERIC(14,2) NOT NULL CHECK (importo > 0),\n    dare_avere TEXT NOT NULL CHECK (dare_avere IN ('D', 'A')),\n    anno_chiusura INT NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "esercizi_contabili": {
+        "row_count": 5,
+        "columns": {
+          "id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "anno_esercizio": {
+            "distinct": 5,
+            "sample": [
+              "2022",
+              "2023",
+              "2024",
+              "2025",
+              "2026"
+            ],
+            "min": 2022,
+            "max": 2026
+          },
+          "data_inizio": {
+            "distinct": 5,
+            "sample": [
+              "2022-01-01",
+              "2023-01-01",
+              "2024-01-01",
+              "2025-01-01",
+              "2026-01-01"
+            ]
+          },
+          "data_fine": {
+            "distinct": 5,
+            "sample": [
+              "2022-12-31",
+              "2023-12-31",
+              "2024-12-31",
+              "2025-12-31",
+              "2026-12-31"
+            ]
+          },
+          "chiuso": {
+            "distinct": 2,
+            "sample": [
+              "False",
+              "True"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "piano_dei_conti": {
+        "row_count": 10,
+        "columns": {
+          "id": {
+            "distinct": 10,
+            "sample": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 10
+          },
+          "codice_conto": {
+            "distinct": 10,
+            "sample": [
+              "1101",
+              "1201",
+              "1301",
+              "1401",
+              "2101"
+            ]
+          },
+          "descrizione_conto": {
+            "distinct": 10,
+            "sample": [
+              "Banca UNI conto corrente",
+              "Cassa",
+              "Costi bancari e finanziari",
+              "Costi per acquisto merci",
+              "Crediti verso clienti"
+            ]
+          },
+          "tipo_conto": {
+            "distinct": 4,
+            "sample": [
+              "attivo",
+              "costo",
+              "passivo",
+              "ricavo"
+            ]
+          },
+          "saldo_apertura": {
+            "distinct": 8,
+            "sample": [
+              "0.0",
+              "11082.66",
+              "120791.22",
+              "16136.48",
+              "17864.45"
+            ],
+            "min": 0.0,
+            "max": 120791.22
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 107,
+        "columns": {
+          "id": {
+            "distinct": 107,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 107
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Alfa Servizi SRL",
+              "Beta Costruzioni SpA",
+              "Delta Consulenza SRL",
+              "Epsilon Logistica SpA",
+              "Gamma Alimentari SNC"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 107,
+            "sample": [
+              "IT01234567890",
+              "IT012345678901",
+              "IT0123456789010",
+              "IT0123456789011",
+              "IT0123456789012"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 8,
+            "sample": [
+              "Corso Vittorio Emanuele II 45",
+              "Piazza Duomo 17",
+              "Via Dante 3",
+              "Via Etnea 130",
+              "Via Garibaldi 8"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Catania",
+              "Firenze",
+              "Milano",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      "fornitori": {
+        "row_count": 138,
+        "columns": {
+          "id": {
+            "distinct": 138,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 138
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Cartotecnica Centro SpA",
+              "Energia Pulita SpA",
+              "Forniture Industriali Nord SRL",
+              "Imballaggi Sud SNC",
+              "Logistica Express SpA"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 138,
+            "sample": [
+              "IT01112223334",
+              "IT011122233341",
+              "IT0111222333410",
+              "IT0111222333411",
+              "IT0111222333412"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 7,
+            "sample": [
+              "Corso Francia 210",
+              "Via Kepler 14",
+              "Via Nazionale 88",
+              "Via Stalingrado 42",
+              "Via dell'Industria 5"
+            ]
+          },
+          "citta": {
+            "distinct": 7,
+            "sample": [
+              "Bari",
+              "Bergamo",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          }
+        }
+      },
+      "fatture_vendita": {
+        "row_count": 945,
+        "columns": {
+          "id": {
+            "distinct": 945,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 945
+          },
+          "esercizio_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "cliente_id": {
+            "distinct": 107,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 107
+          },
+          "numero_fattura": {
+            "distinct": 945,
+            "sample": [
+              "2024/010",
+              "2024/0101",
+              "2024/01010",
+              "2024/010100",
+              "2024/010101"
+            ]
+          },
+          "data_fattura": {
+            "distinct": 341,
+            "sample": [
+              "2024-04-28",
+              "2024-04-29",
+              "2024-04-30",
+              "2024-05-01",
+              "2024-05-02"
+            ]
+          },
+          "totale_documento": {
+            "distinct": 908,
+            "sample": [
+              "1002.59",
+              "10023.68",
+              "1003.84",
+              "10064.84",
+              "1008.04"
+            ],
+            "min": 172.3,
+            "max": 39000.0
+          }
+        }
+      },
+      "note_credito": {
+        "row_count": 1852,
+        "columns": {
+          "id": {
+            "distinct": 1852,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1852
+          },
+          "esercizio_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "cliente_id": {
+            "distinct": 107,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 107
+          },
+          "numero_nota_credito": {
+            "distinct": 1852,
+            "sample": [
+              "NC2024/002",
+              "NC2024/0021",
+              "NC2024/00210",
+              "NC2024/002100",
+              "NC2024/002101"
+            ]
+          },
+          "data_nota_credito": {
+            "distinct": 256,
+            "sample": [
+              "2024-08-18",
+              "2024-08-19",
+              "2024-08-20",
+              "2024-08-21",
+              "2024-08-22"
+            ]
+          },
+          "totale_documento": {
+            "distinct": 1740,
+            "sample": [
+              "100.18",
+              "100.37",
+              "100.78",
+              "100.99",
+              "1000.37"
+            ],
+            "min": 28.89,
+            "max": 2400.0
+          }
+        }
+      },
+      "ordini_acquisto": {
+        "row_count": 2451,
+        "columns": {
+          "id": {
+            "distinct": 2451,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2451
+          },
+          "esercizio_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "fornitore_id": {
+            "distinct": 138,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 138
+          },
+          "numero_ordine": {
+            "distinct": 2451,
+            "sample": [
+              "OA2024/001",
+              "OA2024/0011",
+              "OA2024/00110",
+              "OA2024/001100",
+              "OA2024/001101"
+            ]
+          },
+          "data_ordine": {
+            "distinct": 387,
+            "sample": [
+              "2024-06-04",
+              "2024-06-05",
+              "2024-06-06",
+              "2024-06-07",
+              "2024-06-08"
+            ]
+          },
+          "totale_documento": {
+            "distinct": 2331,
+            "sample": [
+              "10003.39",
+              "1002.35",
+              "10028.87",
+              "10029.97",
+              "10039.61"
+            ],
+            "min": 304.0,
+            "max": 28000.0
+          }
+        }
+      },
+      "registrazioni": {
+        "row_count": 411,
+        "columns": {
+          "id": {
+            "distinct": 411,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 411
+          },
+          "esercizio_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "conto_id": {
+            "distinct": 10,
+            "sample": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 10
+          },
+          "data_registrazione": {
+            "distinct": 252,
+            "sample": [
+              "2024-09-24",
+              "2024-09-26",
+              "2024-10-02",
+              "2024-10-03",
+              "2024-10-04"
+            ]
+          },
+          "causale": {
+            "distinct": 8,
+            "sample": [
+              "Accantonamento TFR",
+              "Acquisto merce a credito",
+              "Fattura vendita a credito",
+              "Liquidazione IVA mensile",
+              "Pagamento fornitore bonifico"
+            ]
+          },
+          "importo_dare": {
+            "distinct": 206,
+            "sample": [
+              "0.0",
+              "1027.67",
+              "10784.19",
+              "1090.78",
+              "11087.32"
+            ],
+            "min": 0.0,
+            "max": 15677.76
+          },
+          "importo_avere": {
+            "distinct": 204,
+            "sample": [
+              "0.0",
+              "1004.16",
+              "10061.48",
+              "1054.37",
+              "1066.04"
+            ],
+            "min": 0.0,
+            "max": 25864.87
+          }
+        }
+      },
+      "movimenti_contabili": {
+        "row_count": 1945,
+        "columns": {
+          "id": {
+            "distinct": 1945,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1945
+          },
+          "registrazione_id": {
+            "distinct": 408,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 411
+          },
+          "conto_id": {
+            "distinct": 10,
+            "sample": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 10
+          },
+          "data_movimento": {
+            "distinct": 43,
+            "sample": [
+              "2026-01-08",
+              "2026-01-09",
+              "2026-01-10",
+              "2026-01-11",
+              "2026-01-12"
+            ]
+          },
+          "importo": {
+            "distinct": 1870,
+            "sample": [
+              "1001.96",
+              "1002.36",
+              "1002.53",
+              "1005.8",
+              "1006.79"
+            ],
+            "min": 376.41,
+            "max": 7350.0
+          },
+          "dare_avere": {
+            "distinct": 2,
+            "sample": [
+              "A",
+              "D"
+            ]
+          }
+        }
+      },
+      "movimenti_contabili_storici": {
+        "row_count": 346,
+        "columns": {
+          "id": {
+            "distinct": 346,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 346
+          },
+          "registrazione_id": {
+            "distinct": 236,
+            "sample": [
+              "1",
+              "100",
+              "101",
+              "103",
+              "104"
+            ],
+            "min": 1,
+            "max": 410
+          },
+          "conto_id": {
+            "distinct": 10,
+            "sample": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 10
+          },
+          "data_movimento": {
+            "distinct": 43,
+            "sample": [
+              "2022-03-03",
+              "2022-03-04",
+              "2022-03-05",
+              "2022-03-06",
+              "2022-03-07"
+            ]
+          },
+          "importo": {
+            "distinct": 335,
+            "sample": [
+              "1023.23",
+              "1032.62",
+              "1046.82",
+              "1059.08",
+              "1060.76"
+            ],
+            "min": 445.12,
+            "max": 6776.7
+          },
+          "dare_avere": {
+            "distinct": 2,
+            "sample": [
+              "A",
+              "D"
+            ]
+          },
+          "anno_chiusura": {
+            "distinct": 3,
+            "sample": [
+              "2022",
+              "2023",
+              "2024"
+            ],
+            "min": 2022,
+            "max": 2024
+          }
+        }
+      }
+    },
+    "preview": {
+      "esercizi_contabili": [
+        {
+          "id": 1,
+          "anno_esercizio": 2022,
+          "data_inizio": "2022-01-01",
+          "data_fine": "2022-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 2,
+          "anno_esercizio": 2023,
+          "data_inizio": "2023-01-01",
+          "data_fine": "2023-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 3,
+          "anno_esercizio": 2024,
+          "data_inizio": "2024-01-01",
+          "data_fine": "2024-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 4,
+          "anno_esercizio": 2025,
+          "data_inizio": "2025-01-01",
+          "data_fine": "2025-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 5,
+          "anno_esercizio": 2026,
+          "data_inizio": "2026-01-01",
+          "data_fine": "2026-12-31",
+          "chiuso": false
+        }
+      ],
+      "piano_dei_conti": [
+        {
+          "id": 1,
+          "codice_conto": "1101",
+          "descrizione_conto": "Cassa",
+          "tipo_conto": "attivo",
+          "saldo_apertura": 21411.21
+        },
+        {
+          "id": 2,
+          "codice_conto": "1201",
+          "descrizione_conto": "Banca UNI conto corrente",
+          "tipo_conto": "attivo",
+          "saldo_apertura": 120791.22
+        },
+        {
+          "id": 3,
+          "codice_conto": "1301",
+          "descrizione_conto": "Crediti verso clienti",
+          "tipo_conto": "attivo",
+          "saldo_apertura": 40391.48
+        },
+        {
+          "id": 4,
+          "codice_conto": "1401",
+          "descrizione_conto": "Rimanenze magazzino",
+          "tipo_conto": "attivo",
+          "saldo_apertura": 16136.48
+        },
+        {
+          "id": 5,
+          "codice_conto": "2101",
+          "descrizione_conto": "Debiti verso fornitori",
+          "tipo_conto": "passivo",
+          "saldo_apertura": 58514.86
+        },
+        {
+          "id": 6,
+          "codice_conto": "2401",
+          "descrizione_conto": "Debiti tributari IVA",
+          "tipo_conto": "passivo",
+          "saldo_apertura": 11082.66
+        },
+        {
+          "id": 7,
+          "codice_conto": "2801",
+          "descrizione_conto": "Trattamento di fine rapporto",
+          "tipo_conto": "passivo",
+          "saldo_apertura": 17864.45
+        },
+        {
+          "id": 8,
+          "codice_conto": "4101",
+          "descrizione_conto": "Ricavi vendita merci",
+          "tipo_conto": "ricavo",
+          "saldo_apertura": 0.0
+        }
+      ],
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Zeta Arredamenti SRL",
+          "partita_iva": "IT01234567890",
+          "indirizzo": "Corso Vittorio Emanuele II 45",
+          "citta": "Catania"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Omega Tecnologie SRL",
+          "partita_iva": "IT012345678901",
+          "indirizzo": "Via Po 21",
+          "citta": "Verona"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Sigma Trasporti SpA",
+          "partita_iva": "IT012345678902",
+          "indirizzo": "Piazza Duomo 17",
+          "citta": "Roma"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Zeta Arredamenti SRL",
+          "partita_iva": "IT012345678903",
+          "indirizzo": "Piazza Duomo 17",
+          "citta": "Bologna"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Alfa Servizi SRL",
+          "partita_iva": "IT012345678904",
+          "indirizzo": "Via Etnea 130",
+          "citta": "Torino"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Omega Tecnologie SRL",
+          "partita_iva": "IT012345678905",
+          "indirizzo": "Viale Trieste 77",
+          "citta": "Milano"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Beta Costruzioni SpA",
+          "partita_iva": "IT012345678906",
+          "indirizzo": null,
+          "citta": "Roma"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Delta Consulenza SRL",
+          "partita_iva": "IT012345678907",
+          "indirizzo": "Corso Vittorio Emanuele II 45",
+          "citta": "Napoli"
+        }
+      ],
+      "fornitori": [
+        {
+          "id": 1,
+          "ragione_sociale": "Materie Prime Italia SRL",
+          "partita_iva": "IT01112223334",
+          "indirizzo": "Via Kepler 14",
+          "citta": "Bari"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Cartotecnica Centro SpA",
+          "partita_iva": "IT011122233341",
+          "indirizzo": "Via delle Arti 9",
+          "citta": "Firenze"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Forniture Industriali Nord SRL",
+          "partita_iva": "IT011122233342",
+          "indirizzo": "Zona Industriale lotto 12",
+          "citta": "Bari"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Tecnologia e Software SRL",
+          "partita_iva": "IT011122233343",
+          "indirizzo": "Via delle Arti 9",
+          "citta": "Bari"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Logistica Express SpA",
+          "partita_iva": "IT011122233344",
+          "indirizzo": "Via Kepler 14",
+          "citta": "Padova"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Imballaggi Sud SNC",
+          "partita_iva": "IT011122233345",
+          "indirizzo": "Via Stalingrado 42",
+          "citta": "Genova"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Imballaggi Sud SNC",
+          "partita_iva": "IT011122233346",
+          "indirizzo": "Corso Francia 210",
+          "citta": "Firenze"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Materie Prime Italia SRL",
+          "partita_iva": "IT011122233347",
+          "indirizzo": "Via dell'Industria 5",
+          "citta": "Padova"
+        }
+      ],
+      "fatture_vendita": [
+        {
+          "id": 1,
+          "esercizio_id": 2,
+          "cliente_id": 61,
+          "numero_fattura": "2026/001",
+          "data_fattura": "2025-12-05",
+          "totale_documento": 4887.23
+        },
+        {
+          "id": 2,
+          "esercizio_id": 5,
+          "cliente_id": 2,
+          "numero_fattura": "2026/0011",
+          "data_fattura": "2026-02-07",
+          "totale_documento": 1947.01
+        },
+        {
+          "id": 3,
+          "esercizio_id": 1,
+          "cliente_id": 80,
+          "numero_fattura": "2026/0012",
+          "data_fattura": "2026-02-28",
+          "totale_documento": 4958.08
+        },
+        {
+          "id": 4,
+          "esercizio_id": 4,
+          "cliente_id": 41,
+          "numero_fattura": "2026/0013",
+          "data_fattura": "2025-12-11",
+          "totale_documento": 1461.84
+        },
+        {
+          "id": 5,
+          "esercizio_id": 3,
+          "cliente_id": 15,
+          "numero_fattura": "2026/0014",
+          "data_fattura": "2025-12-19",
+          "totale_documento": 4262.27
+        },
+        {
+          "id": 6,
+          "esercizio_id": 2,
+          "cliente_id": 37,
+          "numero_fattura": "2026/0015",
+          "data_fattura": "2026-02-15",
+          "totale_documento": 2396.76
+        },
+        {
+          "id": 7,
+          "esercizio_id": 3,
+          "cliente_id": 48,
+          "numero_fattura": "2026/0016",
+          "data_fattura": "2025-12-15",
+          "totale_documento": 2575.92
+        },
+        {
+          "id": 8,
+          "esercizio_id": 3,
+          "cliente_id": 17,
+          "numero_fattura": "2026/0017",
+          "data_fattura": "2026-02-18",
+          "totale_documento": 3331.07
+        }
+      ],
+      "note_credito": [
+        {
+          "id": 1,
+          "esercizio_id": 3,
+          "cliente_id": 53,
+          "numero_nota_credito": "NC2026/001",
+          "data_nota_credito": "2026-03-13",
+          "totale_documento": 143.39
+        },
+        {
+          "id": 2,
+          "esercizio_id": 5,
+          "cliente_id": 29,
+          "numero_nota_credito": "NC2026/0011",
+          "data_nota_credito": "2026-02-15",
+          "totale_documento": 397.9
+        },
+        {
+          "id": 3,
+          "esercizio_id": 4,
+          "cliente_id": 58,
+          "numero_nota_credito": "NC2026/0012",
+          "data_nota_credito": "2026-01-31",
+          "totale_documento": 310.25
+        },
+        {
+          "id": 4,
+          "esercizio_id": 2,
+          "cliente_id": 54,
+          "numero_nota_credito": "NC2026/0013",
+          "data_nota_credito": "2026-02-19",
+          "totale_documento": 630.0
+        },
+        {
+          "id": 5,
+          "esercizio_id": 1,
+          "cliente_id": 96,
+          "numero_nota_credito": "NC2026/0014",
+          "data_nota_credito": "2026-01-11",
+          "totale_documento": 106.21
+        },
+        {
+          "id": 6,
+          "esercizio_id": 5,
+          "cliente_id": 76,
+          "numero_nota_credito": "NC2026/0015",
+          "data_nota_credito": "2026-03-26",
+          "totale_documento": 109.73
+        },
+        {
+          "id": 7,
+          "esercizio_id": 4,
+          "cliente_id": 45,
+          "numero_nota_credito": "NC2026/0016",
+          "data_nota_credito": "2026-03-14",
+          "totale_documento": 308.79
+        },
+        {
+          "id": 8,
+          "esercizio_id": 5,
+          "cliente_id": 104,
+          "numero_nota_credito": "NC2026/0017",
+          "data_nota_credito": "2026-02-10",
+          "totale_documento": 389.5
+        }
+      ],
+      "ordini_acquisto": [
+        {
+          "id": 1,
+          "esercizio_id": 1,
+          "fornitore_id": 71,
+          "numero_ordine": "OA2026/001",
+          "data_ordine": "2026-02-12",
+          "totale_documento": 3622.3
+        },
+        {
+          "id": 2,
+          "esercizio_id": 4,
+          "fornitore_id": 126,
+          "numero_ordine": "OA2026/0011",
+          "data_ordine": "2026-02-10",
+          "totale_documento": 10505.69
+        },
+        {
+          "id": 3,
+          "esercizio_id": 5,
+          "fornitore_id": 120,
+          "numero_ordine": "OA2026/0012",
+          "data_ordine": "2025-11-25",
+          "totale_documento": 8412.14
+        },
+        {
+          "id": 4,
+          "esercizio_id": 3,
+          "fornitore_id": 22,
+          "numero_ordine": "OA2026/0013",
+          "data_ordine": "2026-01-03",
+          "totale_documento": 8413.13
+        },
+        {
+          "id": 5,
+          "esercizio_id": 2,
+          "fornitore_id": 54,
+          "numero_ordine": "OA2026/0014",
+          "data_ordine": "2025-12-28",
+          "totale_documento": 13005.22
+        },
+        {
+          "id": 6,
+          "esercizio_id": 4,
+          "fornitore_id": 129,
+          "numero_ordine": "OA2026/0015",
+          "data_ordine": "2026-02-22",
+          "totale_documento": 5384.77
+        },
+        {
+          "id": 7,
+          "esercizio_id": 4,
+          "fornitore_id": 20,
+          "numero_ordine": "OA2026/0016",
+          "data_ordine": "2026-02-20",
+          "totale_documento": 2239.09
+        },
+        {
+          "id": 8,
+          "esercizio_id": 1,
+          "fornitore_id": 114,
+          "numero_ordine": "OA2026/0017",
+          "data_ordine": "2026-01-04",
+          "totale_documento": 13500.0
+        }
+      ],
+      "registrazioni": [
+        {
+          "id": 1,
+          "esercizio_id": 1,
+          "conto_id": 10,
+          "data_registrazione": "2026-02-28",
+          "causale": "Vendita merci incassata",
+          "importo_dare": 6132.1,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 2,
+          "esercizio_id": 1,
+          "conto_id": 5,
+          "data_registrazione": "2026-02-21",
+          "causale": "Liquidazione IVA mensile",
+          "importo_dare": 846.58,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 3,
+          "esercizio_id": 2,
+          "conto_id": 5,
+          "data_registrazione": "2026-02-05",
+          "causale": "Storno scrittura errata",
+          "importo_dare": 6133.89,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 4,
+          "esercizio_id": 4,
+          "conto_id": 7,
+          "data_registrazione": "2026-01-07",
+          "causale": "Accantonamento TFR",
+          "importo_dare": 6866.24,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 5,
+          "esercizio_id": 3,
+          "conto_id": 5,
+          "data_registrazione": "2026-02-23",
+          "causale": "Storno scrittura errata",
+          "importo_dare": 2539.83,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 6,
+          "esercizio_id": 4,
+          "conto_id": 1,
+          "data_registrazione": "2026-01-04",
+          "causale": "Vendita merci incassata",
+          "importo_dare": 5089.55,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 7,
+          "esercizio_id": 5,
+          "conto_id": 1,
+          "data_registrazione": "2025-11-30",
+          "causale": "Fattura vendita a credito",
+          "importo_dare": 5664.15,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 8,
+          "esercizio_id": 3,
+          "conto_id": 9,
+          "data_registrazione": "2026-02-09",
+          "causale": "Pagamento fornitore bonifico",
+          "importo_dare": 7195.31,
+          "importo_avere": 0.0
+        }
+      ],
+      "movimenti_contabili": [
+        {
+          "id": 1,
+          "registrazione_id": 125,
+          "conto_id": 1,
+          "data_movimento": "2026-01-11",
+          "importo": 6197.67,
+          "dare_avere": "D"
+        },
+        {
+          "id": 2,
+          "registrazione_id": 92,
+          "conto_id": 3,
+          "data_movimento": "2026-01-17",
+          "importo": 1747.34,
+          "dare_avere": "A"
+        },
+        {
+          "id": 3,
+          "registrazione_id": 99,
+          "conto_id": 1,
+          "data_movimento": "2026-01-15",
+          "importo": 3298.22,
+          "dare_avere": "A"
+        },
+        {
+          "id": 4,
+          "registrazione_id": 386,
+          "conto_id": 4,
+          "data_movimento": "2026-01-20",
+          "importo": 4565.39,
+          "dare_avere": "A"
+        },
+        {
+          "id": 5,
+          "registrazione_id": 99,
+          "conto_id": 7,
+          "data_movimento": "2026-01-17",
+          "importo": 1160.01,
+          "dare_avere": "A"
+        },
+        {
+          "id": 6,
+          "registrazione_id": 362,
+          "conto_id": 3,
+          "data_movimento": "2026-01-08",
+          "importo": 5047.06,
+          "dare_avere": "A"
+        },
+        {
+          "id": 7,
+          "registrazione_id": 408,
+          "conto_id": 3,
+          "data_movimento": "2026-01-15",
+          "importo": 5198.13,
+          "dare_avere": "A"
+        },
+        {
+          "id": 8,
+          "registrazione_id": 31,
+          "conto_id": 4,
+          "data_movimento": "2026-01-15",
+          "importo": 6392.25,
+          "dare_avere": "A"
+        }
+      ],
+      "movimenti_contabili_storici": [
+        {
+          "id": 1,
+          "registrazione_id": 309,
+          "conto_id": 1,
+          "data_movimento": "2022-03-10",
+          "importo": 854.2,
+          "dare_avere": "D",
+          "anno_chiusura": "2024"
+        },
+        {
+          "id": 2,
+          "registrazione_id": 302,
+          "conto_id": 4,
+          "data_movimento": "2022-03-07",
+          "importo": 1810.78,
+          "dare_avere": "D",
+          "anno_chiusura": "2022"
+        },
+        {
+          "id": 3,
+          "registrazione_id": 227,
+          "conto_id": 2,
+          "data_movimento": "2022-03-14",
+          "importo": 2328.37,
+          "dare_avere": "D",
+          "anno_chiusura": "2023"
+        },
+        {
+          "id": 4,
+          "registrazione_id": 44,
+          "conto_id": 9,
+          "data_movimento": "2022-03-10",
+          "importo": 1730.14,
+          "dare_avere": "A",
+          "anno_chiusura": "2023"
+        },
+        {
+          "id": 5,
+          "registrazione_id": 121,
+          "conto_id": 6,
+          "data_movimento": "2022-03-11",
+          "importo": 961.4,
+          "dare_avere": "D",
+          "anno_chiusura": "2022"
+        },
+        {
+          "id": 6,
+          "registrazione_id": 131,
+          "conto_id": 3,
+          "data_movimento": "2022-03-10",
+          "importo": 1715.09,
+          "dare_avere": "D",
+          "anno_chiusura": "2023"
+        },
+        {
+          "id": 7,
+          "registrazione_id": 161,
+          "conto_id": 1,
+          "data_movimento": "2022-03-15",
+          "importo": 2400.0,
+          "dare_avere": "A",
+          "anno_chiusura": "2022"
+        },
+        {
+          "id": 8,
+          "registrazione_id": 163,
+          "conto_id": 5,
+          "data_movimento": "2022-03-13",
+          "importo": 2068.38,
+          "dare_avere": "A",
+          "anno_chiusura": "2022"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "subquery"
+  ],
+  "query": "SELECT c.ragione_sociale, c.citta, COUNT(*) AS numero_fatture, SUM(f.totale_documento) AS fatturato_totale, ROUND(AVG(f.totale_documento), 2) AS scontrino_medio FROM clienti c JOIN fatture_vendita f ON f.cliente_id = c.id WHERE c.citta = 'Milano' GROUP BY c.ragione_sociale, c.citta HAVING SUM(f.totale_documento) > (SELECT SUM(f2.totale_documento) / COUNT(DISTINCT f2.cliente_id) FROM fatture_vendita f2) ORDER BY fatturato_totale DESC;"
+}

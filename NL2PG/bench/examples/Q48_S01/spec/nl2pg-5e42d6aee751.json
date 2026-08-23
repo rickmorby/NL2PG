@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "distinct"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "articoli_magazzino",
+      "obsolete_value": "registro_materiali",
+      "description": "La tabella articoli_magazzino viene denominata registro_materiali nella prosa aziendale del sistema ERP."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "unita_misura",
+      "obsolete_value": "base di stoccaggio",
+      "description": "La colonna unita_misura viene indicata nella documentazione con il gergo ERP 'base di stoccaggio', richiedendo il mapping al nome reale della colonna."
+    }
+  ],
+  "spec_hash": "074a8c1288a3e8fc"
+}

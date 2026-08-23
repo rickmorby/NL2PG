@@ -1,0 +1,25 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 2,
+  "hierarchy": "one_to_many_nullable_fk",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "utenze_attive",
+      "description": "La tabella che contiene i dati dei clienti viene denominata 'utenze_attive' nei documenti aziendali, creando ambiguità con il concetto di 'utenza' come linea telefonica."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "linea_telefonica",
+      "obsolete_value": "circuito_di_accesso",
+      "description": "La tabella che rappresenta le linee telefoniche viene indicata come 'circuito_di_accesso' nei report tecnici, un termine gergale interno che non corrisponde al nome reale della tabella."
+    }
+  ],
+  "spec_hash": "5c13cedf73120455"
+}

@@ -1,0 +1,34 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "full_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_collaboratori",
+      "description": "La tabella dipendenti viene denominata anagrafica_collaboratori nella prosa aziendale: le query devono risolvere il riferimento alla tabella fisica dipendenti, che contiene la chiave primaria id_dipendente e la foreign key nullable id_dipartimento verso i dipartimenti."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "retribuzione_lorda_annua",
+      "obsolete_value": "RAL",
+      "description": "La colonna retribuzione_lorda_annua della tabella dipendenti è indicata nei documenti HR con l'acronimo di gergo settoriale RAL (Retribuzione Annua Lorda): le richieste che menzionano la RAL vanno mappate sulla colonna retribuzione_lorda_annua."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "stato_contrattuale",
+      "obsolete_value": "stato",
+      "description": "Il termine ambiguo 'stato' usato nella prosa si riferisce alla colonna stato_contrattuale della tabella dipendenti (valori come attivo, sospeso, cessato) e non allo stato civile presente nell'anagrafica: occorre disambiguare correttamente quando la richiesta parla dello 'stato' di un collaboratore."
+    }
+  ],
+  "spec_hash": "360ca85691caa62d"
+}

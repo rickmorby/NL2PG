@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "registro_movimentazioni",
+        "description": "La tabella spedizioni viene denominata registro_movimentazioni nella prosa aziendale; l'utente deve ricondurre tale perifrasi alla tabella reale del database."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "stato_spedizione",
+        "obsolete_value": "flag di avanzamento flotta",
+        "description": "La colonna stato_spedizione viene indicata con il gergo logistico 'flag di avanzamento flotta'; le query di filtraggio con LIKE dovranno applicare il pattern sulla colonna reale stato_spedizione."
+      }
+    ],
+    "spec_hash": "99b1db46bc6a6afc"
+  },
+  "schema_ddl": "CREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    codice_tracciamento TEXT NOT NULL UNIQUE,\n    stato_spedizione TEXT NOT NULL CHECK (stato_spedizione <> ''),\n    nome_destinatario TEXT NOT NULL,\n    citta_destinazione TEXT NOT NULL,\n    cap_destinazione TEXT,\n    peso_chilogrammi NUMERIC(8,2) CHECK (peso_chilogrammi > 0),\n    data_ritiro DATE NOT NULL,\n    data_consegna_prevista DATE,\n    data_consegna_effettiva DATE,\n    costo_spedizione NUMERIC(10,2) CHECK (costo_spedizione >= 0)\n);"
+}

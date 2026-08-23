@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 9,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "grouping_sets"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatti_vendite",
+      "obsolete_value": "transazioni_commerciali",
+      "description": "La tabella centrale dei fatti (fatti_vendite) viene denominata 'transazioni_commerciali' nei documenti aziendali."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "dim_prodotti",
+      "obsolete_value": "SKU_master",
+      "description": "La tabella dimensionale dei prodotti (dim_prodotti) è indicata come 'SKU_master' nel gergo interno del dipartimento logistica."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "quantita",
+      "obsolete_value": "unita_movimentate",
+      "description": "La colonna 'quantita' nella tabella dei fatti assume significati diversi: in contesto vendite indica 'unita_vendute', mentre in logistica viene chiamata 'unita_movimentate' per riferirsi agli stessi dati."
+    }
+  ],
+  "spec_hash": "8a38f49b5136e869"
+}

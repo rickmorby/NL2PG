@@ -1,0 +1,215 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti_contabili",
+        "obsolete_value": "registro_scritture",
+        "description": "La tabella legacy movimenti_contabili, unica tabella dello schema con colonne fisiche di tipo TEXT, viene denominata registro_scritture nella prosa aziendale. Il solver deve risalire alla tabella reale tramite la perifrasi."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "controvalore della scrittura",
+        "description": "La colonna importo, fisicamente dichiarata TEXT ma logicamente numerica, viene descritta nella prosa con il gergo contabile 'controvalore della scrittura'. Le query che confrontano o aggregano tale valore richiedono CAST(importo AS NUMERIC) prima dell'operazione set (UNION/INTERSECT/EXCEPT)."
+      }
+    ],
+    "spec_hash": "0f86fe77cf6dde72"
+  },
+  "schema_ddl": "CREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    data_registrazione TEXT NOT NULL,\n    numero_conto TEXT NOT NULL,\n    descrizione_scrittura TEXT NOT NULL,\n    importo NUMERIC(12,2) NOT NULL,\n    tipo_scrittura TEXT NOT NULL,\n    documento_riferimento TEXT,\n    CHECK (data_registrazione ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'),\n    CHECK (tipo_scrittura IN ('attivo', 'passivo'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "movimenti_contabili",
+        "nature": "fact",
+        "min_rows": 700,
+        "max_rows": 1400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "data_registrazione": "2026-01-05",
+            "numero_conto": "1001",
+            "descrizione_scrittura": "Apertura cassa iniziale esercizio",
+            "importo": "2500.00",
+            "tipo_scrittura": "attivo",
+            "documento_riferimento": "RC-2026-001"
+          },
+          {
+            "id": 2,
+            "data_registrazione": "2026-01-08",
+            "numero_conto": "1502",
+            "descrizione_scrittura": "Fattura vendita n. 12 a Cliente Alfa",
+            "importo": "1840.50",
+            "tipo_scrittura": "attivo",
+            "documento_riferimento": "FATT-2026-012"
+          },
+          {
+            "id": 3,
+            "data_registrazione": "2026-01-10",
+            "numero_conto": "2401",
+            "descrizione_scrittura": "Fattura acquisto n. 88 da Fornitore Beta",
+            "importo": "960.25",
+            "tipo_scrittura": "passivo",
+            "documento_riferimento": "FATT-2026-088"
+          },
+          {
+            "id": 4,
+            "data_registrazione": "2026-01-15",
+            "numero_conto": "1010",
+            "descrizione_scrittura": "Versamento bancario da cassa",
+            "importo": "1200.00",
+            "tipo_scrittura": "attivo",
+            "documento_riferimento": "BC-2026-004"
+          },
+          {
+            "id": 5,
+            "data_registrazione": "2026-02-02",
+            "numero_conto": "5001",
+            "descrizione_scrittura": "Ricavo vendita servizi di consulenza",
+            "importo": "3200.00",
+            "tipo_scrittura": "passivo",
+            "documento_riferimento": "FATT-2026-031"
+          },
+          {
+            "id": 6,
+            "data_registrazione": "2026-02-09",
+            "numero_conto": "4001",
+            "descrizione_scrittura": "Acquisto materiali di consumo",
+            "importo": "430.80",
+            "tipo_scrittura": "attivo",
+            "documento_riferimento": "DDT-2026-019"
+          },
+          {
+            "id": 7,
+            "data_registrazione": "2026-02-14",
+            "numero_conto": "2901",
+            "descrizione_scrittura": "Rimborso spese trasferta dipendente",
+            "importo": "156.40",
+            "tipo_scrittura": "passivo",
+            "documento_riferimento": "NOTE-2026-007"
+          },
+          {
+            "id": 8,
+            "data_registrazione": "2026-02-20",
+            "numero_conto": "1001",
+            "descrizione_scrittura": "Prelievo cassa per spese minori",
+            "importo": "75.00",
+            "tipo_scrittura": "passivo"
+          }
+        ],
+        "variations": {
+          "data_registrazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "2026-01-06",
+              "2026-01-13",
+              "2026-01-22",
+              "2026-02-04",
+              "2026-02-17",
+              "2026-03-03",
+              "2026-03-19",
+              "2026-04-07",
+              "2026-04-24",
+              "2026-05-11",
+              "2026-05-28",
+              "2026-06-09"
+            ]
+          },
+          "numero_conto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1001",
+              "1010",
+              "1502",
+              "2401",
+              "2801",
+              "2901",
+              "4001",
+              "5001",
+              "6410"
+            ]
+          },
+          "descrizione_scrittura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Pagamento fattura fornitore",
+              "Incasso fattura cliente",
+              "Versamento bancario da cassa",
+              "Prelievo cassa per spese minori",
+              "Fattura vendita servizi di consulenza",
+              "Acquisto materiali di consumo",
+              "Rimborso spese trasferta dipendente",
+              "Pagamento affitto ufficio mensile",
+              "Pagamento utenze elettriche",
+              "Storno nota di credito"
+            ]
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "tipo_scrittura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "attivo",
+              "attivo",
+              "passivo",
+              "passivo"
+            ]
+          },
+          "documento_riferimento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "FATT-2026-001",
+              "FATT-2026-014",
+              "FATT-2026-027",
+              "FATT-2026-043",
+              "RC-2026-002",
+              "RC-2026-009",
+              "BC-2026-005",
+              "DDT-2026-011",
+              "NC-2026-003",
+              "NOTE-2026-006"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

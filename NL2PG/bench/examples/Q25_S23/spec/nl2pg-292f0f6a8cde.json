@@ -1,0 +1,11 @@
+{
+  "domain": "logistica",
+  "n_tables": 4,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "natural_join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "bbad624a1b53f06e"
+}

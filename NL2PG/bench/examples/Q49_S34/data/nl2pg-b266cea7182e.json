@@ -1,0 +1,297 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "is_distinct_from"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sinistri",
+        "obsolete_value": "pratiche_liquidazione",
+        "description": "La tabella sinistri viene denominata pratiche_liquidazione nella prosa aziendale. Lo schema contiene le tabelle polizze (padre) e sinistri (figlio), dove la FK nullable polizza_id su sinistri puo' essere NULL per i sinistri non ancora associati ad alcuna polizza."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "polizza_id",
+        "obsolete_value": "riferimento contrattuale",
+        "description": "La colonna FK polizza_id della tabella sinistri e' indicata nel linguaggio di business come 'riferimento contrattuale'. I valori NULL di tale colonna rappresentano sinistri privi di copertura contrattuale individuata, e il confronto con la chiave primaria id di polizze deve essere eseguito in modo NULL-safe tramite IS DISTINCT FROM."
+      }
+    ],
+    "spec_hash": "3ee26c5eb79f4413"
+  },
+  "schema_ddl": "CREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'responsabilita_civile')),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    stato_polizza TEXT NOT NULL CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta', 'annullata')),\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id INT PRIMARY KEY,\n    polizza_id INT REFERENCES polizze(id) ON DELETE SET NULL,\n    data_sinistro DATE NOT NULL,\n    data_denuncia DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    importo_danno NUMERIC(12,2) NOT NULL CHECK (importo_danno >= 0),\n    stato_sinistro TEXT NOT NULL CHECK (stato_sinistro IN ('aperto', 'in_valutazione', 'liquidato', 'respinto')),\n    CHECK (data_denuncia >= data_sinistro)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "polizze",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_polizza": "POL-2025-000001",
+            "tipo_polizza": "auto",
+            "data_emissione": "2025-01-15",
+            "data_scadenza": "2026-01-15",
+            "premio_annuo": 485.0,
+            "stato_polizza": "attiva"
+          },
+          {
+            "id": 2,
+            "numero_polizza": "POL-2025-000002",
+            "tipo_polizza": "casa",
+            "data_emissione": "2025-03-10",
+            "data_scadenza": "2026-03-10",
+            "premio_annuo": 320.5,
+            "stato_polizza": "attiva"
+          },
+          {
+            "id": 3,
+            "numero_polizza": "POL-2025-000003",
+            "tipo_polizza": "vita",
+            "data_emissione": "2025-06-20",
+            "data_scadenza": "2026-06-20",
+            "premio_annuo": 950.0,
+            "stato_polizza": "attiva"
+          },
+          {
+            "id": 4,
+            "numero_polizza": "POL-2024-000004",
+            "tipo_polizza": "salute",
+            "data_emissione": "2024-11-01",
+            "data_scadenza": "2025-11-01",
+            "premio_annuo": 1240.75,
+            "stato_polizza": "scaduta"
+          },
+          {
+            "id": 5,
+            "numero_polizza": "POL-2024-000005",
+            "tipo_polizza": "responsabilita_civile",
+            "data_emissione": "2024-04-18",
+            "data_scadenza": "2025-04-18",
+            "premio_annuo": 275.0,
+            "stato_polizza": "annullata"
+          },
+          {
+            "id": 6,
+            "numero_polizza": "POL-2025-000006",
+            "tipo_polizza": "auto",
+            "data_emissione": "2025-08-05",
+            "data_scadenza": "2026-08-05",
+            "premio_annuo": 610.25,
+            "stato_polizza": "sospesa"
+          },
+          {
+            "id": 7,
+            "numero_polizza": "POL-2025-000007",
+            "tipo_polizza": "casa",
+            "data_emissione": "2025-02-28",
+            "data_scadenza": "2026-02-28",
+            "premio_annuo": 410.0,
+            "stato_polizza": "attiva"
+          }
+        ],
+        "variations": {
+          "tipo_polizza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "auto",
+              "auto",
+              "auto",
+              "casa",
+              "casa",
+              "vita",
+              "salute",
+              "responsabilita_civile"
+            ]
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "premio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.9,
+            "pool": []
+          },
+          "stato_polizza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attiva",
+              "attiva",
+              "attiva",
+              "attiva",
+              "attiva",
+              "sospesa",
+              "scaduta",
+              "annullata"
+            ]
+          }
+        }
+      },
+      {
+        "table": "sinistri",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "polizza_id": 1,
+            "data_sinistro": "2025-02-10",
+            "data_denuncia": "2025-02-12",
+            "descrizione": "Tamponamento posteriore in area urbana con danni al paraurti",
+            "importo_danno": 1250.0,
+            "stato_sinistro": "liquidato"
+          },
+          {
+            "id": 2,
+            "polizza_id": 2,
+            "data_sinistro": "2025-04-22",
+            "data_denuncia": "2025-04-23",
+            "descrizione": "Infiltrazione acqua dal tetto dopo forte grandinata",
+            "importo_danno": 3400.5,
+            "stato_sinistro": "in_valutazione"
+          },
+          {
+            "id": 3,
+            "polizza_id": 3,
+            "data_sinistro": "2025-07-05",
+            "data_denuncia": "2025-07-20",
+            "descrizione": "Rottura tubatura con allagamento della cucina",
+            "importo_danno": 2100.0,
+            "stato_sinistro": "aperto"
+          },
+          {
+            "id": 4,
+            "polizza_id": 4,
+            "data_sinistro": "2025-01-18",
+            "data_denuncia": "2025-01-19",
+            "descrizione": "Frattura al polso durante attivita' sportiva amatoriale",
+            "importo_danno": 890.4,
+            "stato_sinistro": "liquidato"
+          },
+          {
+            "id": 5,
+            "polizza_id": 5,
+            "data_sinistro": "2024-12-03",
+            "data_denuncia": "2024-12-15",
+            "descrizione": "Danni a terzi da caduta di rami durante tempesta",
+            "importo_danno": 1560.75,
+            "stato_sinistro": "respinto"
+          },
+          {
+            "id": 6,
+            "polizza_id": 6,
+            "data_sinistro": "2025-09-14",
+            "data_denuncia": "2025-09-16",
+            "descrizione": "Vandalismo su veicolo parcheggiato: graffi e specchietto rotto",
+            "importo_danno": 640.0,
+            "stato_sinistro": "aperto"
+          },
+          {
+            "id": 7,
+            "polizza_id": 7,
+            "data_sinistro": "2025-05-30",
+            "data_denuncia": "2025-06-02",
+            "descrizione": "Incendio in cantina causato da cortocircuito impianto elettrico",
+            "importo_danno": 5200.0,
+            "stato_sinistro": "in_valutazione"
+          }
+        ],
+        "variations": {
+          "data_sinistro": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_denuncia": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 15.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Tamponamento posteriore in area urbana con danni al paraurti",
+              "Infiltrazione acqua dal tetto dopo forte grandinata",
+              "Rottura tubatura con allagamento della cucina",
+              "Frattura al polso durante attivita' sportiva amatoriale",
+              "Danni a terzi da caduta di rami durante tempesta",
+              "Vandalismo su veicolo parcheggiato: graffi e specchietto rotto",
+              "Incendio in cantina causato da cortocircuito impianto elettrico",
+              "Sinistro stradale con coinvolgimento di terzo veicolo in sosta"
+            ]
+          },
+          "importo_danno": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "stato_sinistro": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "aperto",
+              "aperto",
+              "in_valutazione",
+              "in_valutazione",
+              "liquidato",
+              "liquidato",
+              "respinto"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

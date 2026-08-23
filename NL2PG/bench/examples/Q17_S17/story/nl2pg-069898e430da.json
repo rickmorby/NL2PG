@@ -1,0 +1,464 @@
+{
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    numero_iscrizione_albo TEXT NOT NULL UNIQUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    data_visita DATE NOT NULL,\n    motivo_visita TEXT,\n    esito_visita TEXT,\n    deleted_at TIMESTAMP,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_visita >= DATE '1900-01-01'),\n    CHECK (deleted_at IS NULL OR deleted_at >= created_at)\n);",
+  "data_profile": {
+    "profile": {
+      "pazienti": {
+        "row_count": 445,
+        "columns": {
+          "id": {
+            "distinct": 445,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 445
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Conti",
+              "Gallo",
+              "Greco"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 445,
+            "sample": [
+              "BNCLRA90C45F205B",
+              "BNCLRA90C45F205C",
+              "BNCLRA90C45F205D",
+              "BNCLRA90C45F205E",
+              "BNCLRA90C45F205F"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 428,
+            "sample": [
+              "1963-11-21",
+              "1964-05-25",
+              "1964-08-12",
+              "1964-09-14",
+              "1965-01-28"
+            ]
+          },
+          "telefono": {
+            "distinct": 6,
+            "sample": [
+              "+39 320 4567890",
+              "+39 333 1234567",
+              "+39 335 8899001",
+              "+39 339 5566778",
+              "+39 347 9876543"
+            ]
+          },
+          "created_at": {
+            "distinct": 229,
+            "sample": [
+              "2023-12-16 09:00:00",
+              "2023-12-17 09:00:00",
+              "2023-12-19 09:00:00",
+              "2023-12-21 09:00:00",
+              "2023-12-22 09:00:00"
+            ]
+          }
+        }
+      },
+      "medici": {
+        "row_count": 162,
+        "columns": {
+          "id": {
+            "distinct": 162,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 162
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Andrea",
+              "Anna",
+              "Elena",
+              "Fabio",
+              "Giovanni"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Costa",
+              "Esposito",
+              "Ferrari",
+              "Fontana",
+              "Greco"
+            ]
+          },
+          "specializzazione": {
+            "distinct": 8,
+            "sample": [
+              "Cardiologia",
+              "Dermatologia",
+              "Ginecologia",
+              "Medicina generale",
+              "Neurologia"
+            ]
+          },
+          "numero_iscrizione_albo": {
+            "distinct": 162,
+            "sample": [
+              "MI001234",
+              "MI0012341",
+              "MI00123410",
+              "MI00123411",
+              "MI00123412"
+            ]
+          },
+          "created_at": {
+            "distinct": 5,
+            "sample": [
+              "2023-01-10 08:00:00",
+              "2023-02-14 09:30:00",
+              "2023-03-20 10:00:00",
+              "2023-04-25 11:15:00",
+              "2023-05-30 15:00:00"
+            ]
+          }
+        }
+      },
+      "visite": {
+        "row_count": 2496,
+        "columns": {
+          "id": {
+            "distinct": 2496,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2496
+          },
+          "paziente_id": {
+            "distinct": 442,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 445
+          },
+          "medico_id": {
+            "distinct": 162,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 162
+          },
+          "data_visita": {
+            "distinct": 226,
+            "sample": [
+              "2025-03-10",
+              "2025-03-11",
+              "2025-03-12",
+              "2025-03-13",
+              "2025-03-14"
+            ]
+          },
+          "motivo_visita": {
+            "distinct": 8,
+            "sample": [
+              "Certificato medico sportivo",
+              "Consulenza specialistica",
+              "Controllo periodico",
+              "Controllo pressione arteriosa",
+              "Dolore addominale"
+            ]
+          },
+          "esito_visita": {
+            "distinct": 7,
+            "sample": [
+              "Esami da approfondire",
+              "Guarigione in corso",
+              "Idoneo",
+              "Normale",
+              "Prescrizione terapia"
+            ]
+          },
+          "deleted_at": {
+            "distinct": 2,
+            "sample": [
+              "2025-08-01 10:15:00",
+              "2025-09-30 16:20:00"
+            ]
+          },
+          "created_at": {
+            "distinct": 6,
+            "sample": [
+              "2025-03-01 08:30:00",
+              "2025-04-10 09:00:00",
+              "2025-05-18 11:45:00",
+              "2025-06-05 07:50:00",
+              "2025-07-10 14:10:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "pazienti": [
+        {
+          "id": 1,
+          "nome": "Sara",
+          "cognome": "Greco",
+          "codice_fiscale": "RSSMRC85M01H501X",
+          "data_nascita": "1996-05-07",
+          "telefono": "+39 333 1234567",
+          "created_at": "2023-12-19 09:00:00"
+        },
+        {
+          "id": 2,
+          "nome": "Sara",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRC85M01H501B",
+          "data_nascita": "1972-05-01",
+          "telefono": "+39 320 4567890",
+          "created_at": "2024-01-05 09:00:00"
+        },
+        {
+          "id": 3,
+          "nome": "Davide",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC85M01H501C",
+          "data_nascita": "1994-08-11",
+          "telefono": "+39 335 8899001",
+          "created_at": "2023-12-25 09:00:00"
+        },
+        {
+          "id": 4,
+          "nome": "Sara",
+          "cognome": "Gallo",
+          "codice_fiscale": "RSSMRC85M01H501D",
+          "data_nascita": "1982-03-07",
+          "telefono": "+39 333 1234567",
+          "created_at": "2024-01-28 09:00:00"
+        },
+        {
+          "id": 5,
+          "nome": "Luca",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRC85M01H501E",
+          "data_nascita": "1989-08-06",
+          "telefono": "+39 339 5566778",
+          "created_at": "2023-12-23 09:00:00"
+        },
+        {
+          "id": 6,
+          "nome": "Chiara",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC85M01H501F",
+          "data_nascita": "1995-10-09",
+          "telefono": "+39 348 1122334",
+          "created_at": "2024-02-07 09:00:00"
+        },
+        {
+          "id": 7,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRC85M01H501G",
+          "data_nascita": "1990-03-05",
+          "telefono": "+39 347 9876543",
+          "created_at": "2024-01-30 09:00:00"
+        },
+        {
+          "id": 8,
+          "nome": "Davide",
+          "cognome": "Bruno",
+          "codice_fiscale": "RSSMRC85M01H501H",
+          "data_nascita": "1981-02-07",
+          "telefono": null,
+          "created_at": "2024-01-08 09:00:00"
+        }
+      ],
+      "medici": [
+        {
+          "id": 1,
+          "nome": "Fabio",
+          "cognome": "Russo",
+          "specializzazione": "Medicina generale",
+          "numero_iscrizione_albo": "MI001234",
+          "created_at": "2023-01-10 08:00:00"
+        },
+        {
+          "id": 2,
+          "nome": "Luigi",
+          "cognome": "Serra",
+          "specializzazione": "Medicina generale",
+          "numero_iscrizione_albo": "MI0012341",
+          "created_at": "2023-01-10 08:00:00"
+        },
+        {
+          "id": 3,
+          "nome": "Paolo",
+          "cognome": "Ferrari",
+          "specializzazione": "Cardiologia",
+          "numero_iscrizione_albo": "MI0012342",
+          "created_at": "2023-01-10 08:00:00"
+        },
+        {
+          "id": 4,
+          "nome": "Paolo",
+          "cognome": "Fontana",
+          "specializzazione": "Dermatologia",
+          "numero_iscrizione_albo": "MI0012343",
+          "created_at": "2023-01-10 08:00:00"
+        },
+        {
+          "id": 5,
+          "nome": "Giovanni",
+          "cognome": "Lombardi",
+          "specializzazione": "Cardiologia",
+          "numero_iscrizione_albo": "MI0012344",
+          "created_at": "2023-01-10 08:00:00"
+        },
+        {
+          "id": 6,
+          "nome": "Anna",
+          "cognome": "Fontana",
+          "specializzazione": "Ortopedia",
+          "numero_iscrizione_albo": "MI0012345",
+          "created_at": "2023-01-10 08:00:00"
+        },
+        {
+          "id": 7,
+          "nome": "Paolo",
+          "cognome": "Ferrari",
+          "specializzazione": "Pediatria",
+          "numero_iscrizione_albo": "MI0012346",
+          "created_at": "2023-01-10 08:00:00"
+        },
+        {
+          "id": 8,
+          "nome": "Elena",
+          "cognome": "Costa",
+          "specializzazione": "Oculistica",
+          "numero_iscrizione_albo": "MI0012347",
+          "created_at": "2023-01-10 08:00:00"
+        }
+      ],
+      "visite": [
+        {
+          "id": 1,
+          "paziente_id": 291,
+          "medico_id": 110,
+          "data_visita": "2025-04-13",
+          "motivo_visita": "Certificato medico sportivo",
+          "esito_visita": "Ricovero consigliato",
+          "deleted_at": null,
+          "created_at": "2025-03-01 08:30:00"
+        },
+        {
+          "id": 2,
+          "paziente_id": 2,
+          "medico_id": 86,
+          "data_visita": "2025-03-23",
+          "motivo_visita": "Vaccinazione",
+          "esito_visita": "Prescrizione terapia",
+          "deleted_at": null,
+          "created_at": "2025-03-01 08:30:00"
+        },
+        {
+          "id": 3,
+          "paziente_id": 442,
+          "medico_id": 19,
+          "data_visita": "2025-04-19",
+          "motivo_visita": "Controllo pressione arteriosa",
+          "esito_visita": "Esami da approfondire",
+          "deleted_at": null,
+          "created_at": "2025-03-01 08:30:00"
+        },
+        {
+          "id": 4,
+          "paziente_id": 298,
+          "medico_id": 61,
+          "data_visita": "2025-05-05",
+          "motivo_visita": "Follow-up post intervento",
+          "esito_visita": "Esami da approfondire",
+          "deleted_at": null,
+          "created_at": "2025-03-01 08:30:00"
+        },
+        {
+          "id": 5,
+          "paziente_id": 255,
+          "medico_id": 112,
+          "data_visita": "2025-04-29",
+          "motivo_visita": "Certificato medico sportivo",
+          "esito_visita": "Esami da approfondire",
+          "deleted_at": null,
+          "created_at": "2025-03-01 08:30:00"
+        },
+        {
+          "id": 6,
+          "paziente_id": 237,
+          "medico_id": 138,
+          "data_visita": "2025-05-01",
+          "motivo_visita": "Vaccinazione",
+          "esito_visita": "Prescrizione terapia",
+          "deleted_at": null,
+          "created_at": "2025-03-01 08:30:00"
+        },
+        {
+          "id": 7,
+          "paziente_id": 88,
+          "medico_id": 147,
+          "data_visita": "2025-04-26",
+          "motivo_visita": "Vaccinazione",
+          "esito_visita": "Prescrizione terapia",
+          "deleted_at": null,
+          "created_at": "2025-03-01 08:30:00"
+        },
+        {
+          "id": 8,
+          "paziente_id": 86,
+          "medico_id": 98,
+          "data_visita": "2025-04-07",
+          "motivo_visita": "Certificato medico sportivo",
+          "esito_visita": "Esami da approfondire",
+          "deleted_at": null,
+          "created_at": "2025-03-01 08:30:00"
+        }
+      ]
+    }
+  },
+  "story": "Presso la Direzione Sanitaria del poliambulatorio Villa Serena, la revisione annuale dei flussi assistenziali è partita dall'archivio denominato pazienti, dove sono custodite le schede anagrafiche degli assistiti: per ciascuna persona risultano annotati il nome, il cognome, il codice fiscale, la data di nascita e l'eventuale recapito telefonico, oltre alla data di apertura della scheda. A questo archivio si affianca il registro medici, che raccoglie le qualifiche del corpo clinico con nome, cognome, specializzazione dichiarata e numero di iscrizione all'albo professionale. Gli incontri tra assistiti e dottori trovano invece collocazione nel registro intitolato consulenze_ambulatoriali: ogni voce riporta il paziente coinvolto, il medico che ha presidiato l'appuntamento, la data di svolgimento, il motivo della prestazione — certificato medico sportivo, controllo periodico, controllo pressione arteriosa, dolore addominale, consulenza specialistica o vaccinazione — e l'esito riscontrato, che può essere Idoneo, Normale, Guarigione in corso, Esami da approfondire oppure Prescrizione terapia. La dismissione degli incontri non più validi avviene tramite la cosiddetta data_archiviazione_clinica: quando tale indicazione risulta valorizzata, ad esempio con la marcatura del 2025-08-01 ore 10:15 oppure del 2025-09-30 ore 16:20, la voce si considera archiviata ed è esclusa da ogni conteggio operativo; solo le voci prive di data_archiviazione_clinica restano pienamente attive. Su queste basi, l'Ufficio Controllo di Gestione ha predisposto la classifica dei medici delle specializzazioni Cardiologia, Dermatologia e Neurologia ordinata secondo il numero di consulenze effettuate, conteggiando esclusivamente gli incontri non archiviati, e ha attribuito a ciascun dottore la propria posizione in graduatoria, così da mettere in luce i colleghi più attivi negli ambulatori delle tre discipline. Il responsabile amministrativo ha altresì verificato che nessuna voce risultasse priva del rimando al proprio assistito o al proprio medico curante, mentre il referente qualità ha campionato alcune date di nascita comprese tra il 1963-11-21 e il 1965-01-28 per confermare la coerenza dell'anagrafica. Il documento finale, trasmesso ai capi reparto, descrive sia il volume complessivo delle prestazioni sia la distribuzione delle posizioni in classifica, offrendo una fotografia affidabile dell'attività specialistica del periodo."
+}

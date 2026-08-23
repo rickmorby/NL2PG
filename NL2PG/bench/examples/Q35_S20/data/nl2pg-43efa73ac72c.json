@@ -1,0 +1,214 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "case"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_assicurativi",
+        "description": "La tabella 'polizze' viene denominata 'contratti_assicurativi' nei documenti aziendali."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "stato_polizza",
+        "obsolete_value": "flag_attivazione_copertura",
+        "description": "Il campo 'stato_polizza' (ENUM: 'attiva', 'sospesa', 'cessata') viene indicato come 'flag_attivazione_copertura' nel gergo interno, pur mantenendo gli stessi valori enumerati."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "massimale",
+        "obsolete_value": "limite_copertura",
+        "description": "Il termine 'massimale' (valore numerico che indica il tetto massimo di risarcimento) viene ambiguamente sostituito con 'limite_copertura', che potrebbe essere confuso con un valore percentuale o una soglia di franchigia."
+      }
+    ],
+    "spec_hash": "7b7d1ad9a58ece27"
+  },
+  "schema_ddl": "CREATE TYPE stato_polizza AS ENUM ('attiva', 'sospesa', 'cessata');\n\nCREATE TABLE contratti_assicurativi (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente TEXT NOT NULL,\n    massimale NUMERIC(12, 2) NOT NULL CHECK (massimale > 0),\n    stato_polizza stato_polizza NOT NULL,\n    data_inizio DATE NOT NULL,\n    data_fine DATE CHECK (data_fine IS NULL OR data_fine > data_inizio)\n);\n\nCREATE TABLE sinistri (\n    id SERIAL PRIMARY KEY,\n    contratto_id INT NOT NULL REFERENCES contratti_assicurativi(id),\n    data_sinistro DATE NOT NULL,\n    importo_richiesto NUMERIC(12, 2) NOT NULL CHECK (importo_richiesto > 0),\n    importo_liquidato NUMERIC(12, 2) CHECK (importo_liquidato >= 0 AND importo_liquidato <= importo_richiesto),\n    stato_sinistro TEXT NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "contratti_assicurativi",
+        "nature": "dimension",
+        "min_rows": 180,
+        "max_rows": 320,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_polizza": "POL-2025-0001",
+            "cliente": "Mario Rossi",
+            "massimale": 150000.0,
+            "stato_polizza": "attiva",
+            "data_inizio": "2025-01-10",
+            "data_fine": null
+          },
+          {
+            "id": 2,
+            "numero_polizza": "POL-2025-0002",
+            "cliente": "Laura Bianchi",
+            "massimale": 250000.0,
+            "stato_polizza": "attiva",
+            "data_inizio": "2025-03-15",
+            "data_fine": null
+          },
+          {
+            "id": 3,
+            "numero_polizza": "POL-2024-0115",
+            "cliente": "Giulia Verdi",
+            "massimale": 100000.0,
+            "stato_polizza": "sospesa",
+            "data_inizio": "2024-11-05",
+            "data_fine": null
+          },
+          {
+            "id": 4,
+            "numero_polizza": "POL-2023-0087",
+            "cliente": "Luca Neri",
+            "massimale": 500000.0,
+            "stato_polizza": "cessata",
+            "data_inizio": "2023-06-01",
+            "data_fine": "2024-06-01"
+          },
+          {
+            "id": 5,
+            "numero_polizza": "POL-2024-0102",
+            "cliente": "Anna Ferrari",
+            "massimale": 75000.0,
+            "stato_polizza": "cessata",
+            "data_inizio": "2024-09-20",
+            "data_fine": "2025-09-20"
+          },
+          {
+            "id": 6,
+            "numero_polizza": "POL-2026-0003",
+            "cliente": "Paolo Esposito",
+            "massimale": 300000.0,
+            "stato_polizza": "attiva",
+            "data_inizio": "2026-01-01",
+            "data_fine": null
+          }
+        ],
+        "variations": {
+          "cliente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Luca Neri",
+              "Anna Ferrari",
+              "Paolo Esposito",
+              "Sara Conti",
+              "Marco Greco"
+            ]
+          },
+          "massimale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "data_inizio": {
+            "axis": "shift",
+            "delta_min": -720.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "sinistri",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.5,
+        "templates": [
+          {
+            "id": 1,
+            "contratto_id": 1,
+            "data_sinistro": "2026-01-10",
+            "importo_richiesto": 12000.0,
+            "importo_liquidato": 0.0,
+            "stato_sinistro": "aperto"
+          },
+          {
+            "id": 2,
+            "contratto_id": 2,
+            "data_sinistro": "2026-01-25",
+            "importo_richiesto": 8500.0,
+            "importo_liquidato": null,
+            "stato_sinistro": "in valutazione"
+          },
+          {
+            "id": 3,
+            "contratto_id": 3,
+            "data_sinistro": "2025-12-05",
+            "importo_richiesto": 15000.0,
+            "importo_liquidato": 15000.0,
+            "stato_sinistro": "liquidato"
+          },
+          {
+            "id": 4,
+            "contratto_id": 4,
+            "data_sinistro": "2024-03-12",
+            "importo_richiesto": 3200.0,
+            "importo_liquidato": 0.0,
+            "stato_sinistro": "respinto"
+          },
+          {
+            "id": 5,
+            "contratto_id": 5,
+            "data_sinistro": "2025-02-20",
+            "importo_richiesto": 27000.0,
+            "importo_liquidato": 18000.0,
+            "stato_sinistro": "liquidato"
+          },
+          {
+            "id": 6,
+            "contratto_id": 6,
+            "data_sinistro": "2026-02-10",
+            "importo_richiesto": 950.0,
+            "importo_liquidato": 500.0,
+            "stato_sinistro": "chiuso"
+          }
+        ],
+        "variations": {
+          "data_sinistro": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo_richiesto": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 1.1,
+            "factor_max": 2.5,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobili",
+        "obsolete_value": "unita_abitative",
+        "description": "La tabella immobili viene denominata unita_abitative nella prosa aziendale. Le chiavi esterne sono implicite: colonne con lo stesso nome (es. immobile_id, agente_id) sono condivise tra le tabelle, cosi che il natural join risolva semanticamente le relazioni senza vincoli FK espliciti."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "prezzo_richiesto",
+        "obsolete_value": "valore_di_listino",
+        "description": "La colonna prezzo_richiesto della tabella immobili viene indicata nella narrativa aziendale come valore_di_listino. Il lettore deve mappare il sinonimo alla colonna reale per formulare correttamente aggregazioni e confronti basati su natural join."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "visite",
+        "obsolete_value": "appuntamenti di visione degli immobili",
+        "description": "La tabella visite viene descritta nella prosa come appuntamenti di visione degli immobili. La perifrasi richiede di ricondurre la descrizione semantica al nome effettivo della tabella, le cui colonne condivise (cliente_id, agente_id, immobile_id) abilitano il join naturale con clienti, agenti e immobili."
+      }
+    ],
+    "spec_hash": "28cbd158407e767e"
+  },
+  "schema_ddl": "CREATE TABLE agenti (\n    agente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    data_assunzione DATE NOT NULL\n);\n\nCREATE TABLE clienti (\n    cliente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    budget_massimo NUMERIC(12,2) CHECK (budget_massimo >= 0)\n);\n\nCREATE TABLE immobili (\n    immobile_id INT PRIMARY KEY,\n    agente_id INT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia CHAR(2),\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani > 0),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato_immobile TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_immobile IN ('disponibile', 'riservato', 'venduto', 'affittato'))\n);\n\nCREATE TABLE visite (\n    visita_id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    agente_id INT NOT NULL,\n    immobile_id INT NOT NULL,\n    data_visita DATE NOT NULL,\n    ora_visita TIME NOT NULL,\n    esito_visita TEXT CHECK (esito_visita IN ('interessato', 'non_interessato', 'da_rivalutare')),\n    note TEXT\n);\n\nCREATE TABLE contratti (\n    contratto_id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    agente_id INT NOT NULL,\n    immobile_id INT NOT NULL,\n    data_firma DATE NOT NULL,\n    prezzo_finale NUMERIC(12,2) NOT NULL CHECK (prezzo_finale >= 0),\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('vendita', 'affitto'))\n);"
+}

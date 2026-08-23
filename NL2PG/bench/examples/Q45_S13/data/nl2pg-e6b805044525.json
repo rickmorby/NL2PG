@@ -1,0 +1,284 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [],
+    "twist": [
+      "rename",
+      "polysemy",
+      "ambiguity"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "registrazione_transazioni",
+        "description": "La tabella ordini viene denominata registrazione_transazioni nella prosa aziendale; il solutore deve mappare la perifrasi alla tabella reale prima di formulare la query."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore",
+        "description": "Il termine generico 'valore' indica talvolta la colonna importo_totale dell'ordine e talvolta il campo prezzo_unitario delle righe d'ordine; la dipendenza funzionale id_ordine -> importo_totale consente di dedurre quale colonna aggregare (SUM) e quale significato attribuire al termine nel contesto della domanda sotto-specificata."
+      },
+      {
+        "twist_type": "ambiguity",
+        "target_value": "filiale",
+        "obsolete_value": "sede del Nord",
+        "description": "L'espressione 'sede del Nord' non precisa se filtrare la colonna filiale con valore 'Nord' oppure la colonna regione_spedizione; il filtro corretto va dedotto dalla dipendenza funzionale id_filiale -> filiale presente nello schema ridondante prima dell'esecuzione."
+      }
+    ],
+    "spec_hash": "247580e446bb2a15"
+  },
+  "schema_ddl": "CREATE TABLE filiali (\n    id INT PRIMARY KEY,\n    filiale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE ordini (\n    id_ordine INT PRIMARY KEY,\n    filiale_id INT NOT NULL REFERENCES filiali(id),\n    nome_filiale TEXT NOT NULL,\n    cliente TEXT NOT NULL,\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    regione_spedizione TEXT NOT NULL\n);\n\nCREATE TABLE righe_ordine (\n    ordine_id INT NOT NULL REFERENCES ordini(id_ordine),\n    numero_riga INT NOT NULL CHECK (numero_riga > 0),\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "filiali",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "filiale": "Sede Nord Milano",
+            "citta": "Milano"
+          },
+          {
+            "id": 2,
+            "filiale": "Sede Sud Napoli",
+            "citta": "Napoli"
+          },
+          {
+            "id": 3,
+            "filiale": "Filiale Centro Roma",
+            "citta": "Roma"
+          },
+          {
+            "id": 4,
+            "filiale": "Sede Nord Torino",
+            "citta": "Torino"
+          },
+          {
+            "id": 5,
+            "filiale": "Filiale Est Bologna",
+            "citta": "Bologna"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 60.0,
+        "templates": [
+          {
+            "id_ordine": 1001,
+            "filiale_id": 1,
+            "nome_filiale": "Sede Nord Milano",
+            "cliente": "Rossi Distribuzione SRL",
+            "data_ordine": "2026-01-15",
+            "importo_totale": 1250.0,
+            "regione_spedizione": "Nord"
+          },
+          {
+            "id_ordine": 1002,
+            "filiale_id": 2,
+            "nome_filiale": "Sede Sud Napoli",
+            "cliente": "Mediterraneo Food SpA",
+            "data_ordine": "2026-01-22",
+            "importo_totale": 890.5,
+            "regione_spedizione": "Sud"
+          },
+          {
+            "id_ordine": 1003,
+            "filiale_id": 3,
+            "nome_filiale": "Filiale Centro Roma",
+            "cliente": "Elettronica Lazio SNC",
+            "data_ordine": "2026-02-03",
+            "importo_totale": 2340.75,
+            "regione_spedizione": "Centro"
+          },
+          {
+            "id_ordine": 1004,
+            "filiale_id": 4,
+            "nome_filiale": "Sede Nord Torino",
+            "cliente": "Alpi Componenti SRL",
+            "data_ordine": "2026-02-18",
+            "importo_totale": 640.0,
+            "regione_spedizione": "Nord"
+          },
+          {
+            "id_ordine": 1005,
+            "filiale_id": 5,
+            "nome_filiale": "Filiale Est Bologna",
+            "cliente": "Emilia Pack SpA",
+            "data_ordine": "2026-03-05",
+            "importo_totale": 1580.25,
+            "regione_spedizione": "Centro"
+          }
+        ],
+        "variations": {
+          "nome_filiale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Sede Nord Milano",
+              "Sede Sud Napoli",
+              "Filiale Centro Roma",
+              "Sede Nord Torino",
+              "Filiale Est Bologna"
+            ]
+          },
+          "cliente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi Distribuzione SRL",
+              "Mediterraneo Food SpA",
+              "Elettronica Lazio SNC",
+              "Alpi Componenti SRL",
+              "Emilia Pack SpA",
+              "Ferramenta Centrale SAS",
+              "Tessili Adriatico SRL",
+              "Ufficio Più SpA"
+            ]
+          },
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "regione_spedizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Nord",
+              "Nord",
+              "Centro",
+              "Sud",
+              "Isole"
+            ]
+          }
+        }
+      },
+      {
+        "table": "righe_ordine",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "ordine_id": 1001,
+            "numero_riga": 1,
+            "prodotto": "Laptop Pro 14",
+            "quantita": 2,
+            "prezzo_unitario": 899.0
+          },
+          {
+            "ordine_id": 1001,
+            "numero_riga": 2,
+            "prodotto": "Mouse Wireless MX",
+            "quantita": 5,
+            "prezzo_unitario": 29.9
+          },
+          {
+            "ordine_id": 1002,
+            "numero_riga": 1,
+            "prodotto": "Monitor 27 4K",
+            "quantita": 3,
+            "prezzo_unitario": 249.0
+          },
+          {
+            "ordine_id": 1003,
+            "numero_riga": 1,
+            "prodotto": "Stampante LaserJet",
+            "quantita": 1,
+            "prezzo_unitario": 320.5
+          },
+          {
+            "ordine_id": 1004,
+            "numero_riga": 1,
+            "prodotto": "Tastiera Meccanica K8",
+            "quantita": 4,
+            "prezzo_unitario": 89.99
+          },
+          {
+            "ordine_id": 1005,
+            "numero_riga": 1,
+            "prodotto": "Docking Station USB-C",
+            "quantita": 2,
+            "prezzo_unitario": 179.0
+          }
+        ],
+        "variations": {
+          "prodotto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Laptop Pro 14",
+              "Mouse Wireless MX",
+              "Monitor 27 4K",
+              "Stampante LaserJet",
+              "Tastiera Meccanica K8",
+              "Docking Station USB-C",
+              "Webcam HD Pro",
+              "SSD Esterno 1TB"
+            ]
+          },
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "10"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

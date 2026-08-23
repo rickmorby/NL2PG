@@ -1,0 +1,565 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    cliente_id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE vettori (\n    vettore_id INT PRIMARY KEY,\n    denominazione TEXT NOT NULL,\n    codice_abilitazione TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT\n);\n\nCREATE TABLE magazzini (\n    magazzino_id INT PRIMARY KEY,\n    nome_deposito TEXT NOT NULL,\n    capacita_pallet INT NOT NULL CHECK (capacita_pallet > 0),\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE spedizioni (\n    spedizione_id INT PRIMARY KEY,\n    vettore_id INT NOT NULL REFERENCES vettori(vettore_id),\n    magazzino_id INT NOT NULL REFERENCES magazzini(magazzino_id),\n    cliente_id INT NOT NULL REFERENCES clienti(cliente_id),\n    data_spedizione DATE NOT NULL,\n    peso_totale_kg NUMERIC(10,2) NOT NULL CHECK (peso_totale_kg >= 0),\n    stato_consegna TEXT NOT NULL CHECK (stato_consegna IN ('pianificata', 'in_transito', 'consegnata', 'fallita'))\n);\n\nCREATE TABLE colli (\n    collo_id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(spedizione_id),\n    peso_collo_kg NUMERIC(8,2) NOT NULL CHECK (peso_collo_kg > 0),\n    descrizione_contenuto TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 203,
+        "columns": {
+          "cliente_id": {
+            "distinct": 203,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 203
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Alimentari Rossi SRL",
+              "Cartotecnica Blu SRL",
+              "Chimica Neri SpA",
+              "Elettronica Viola SpA",
+              "Ferramenta Gialli SRL"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 203,
+            "sample": [
+              "IT01234567890",
+              "IT012345678901",
+              "IT0123456789010",
+              "IT0123456789011",
+              "IT0123456789012"
+            ]
+          },
+          "citta": {
+            "distinct": 9,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      "vettori": {
+        "row_count": 22,
+        "columns": {
+          "vettore_id": {
+            "distinct": 22,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 22
+          },
+          "denominazione": {
+            "distinct": 7,
+            "sample": [
+              "AlpiLog SpA",
+              "Delta Transport SRL",
+              "Meridiana Trasporti",
+              "NordSpeed Logistics",
+              "RapidCargo SRL"
+            ]
+          },
+          "codice_abilitazione": {
+            "distinct": 22,
+            "sample": [
+              "AF-AB-005",
+              "AF-AB-0051",
+              "AF-AB-0052",
+              "AF-AB-0053",
+              "AL-AB-004"
+            ]
+          },
+          "telefono_contatto": {
+            "distinct": 6,
+            "sample": [
+              "+39 011 4567890",
+              "+39 02 1234567",
+              "+39 055 6789012",
+              "+39 06 2345678",
+              "+39 071 5678901"
+            ]
+          }
+        }
+      },
+      "magazzini": {
+        "row_count": 16,
+        "columns": {
+          "magazzino_id": {
+            "distinct": 16,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 16
+          },
+          "nome_deposito": {
+            "distinct": 8,
+            "sample": [
+              "Cross-dock Bologna",
+              "Deposito Est Padova",
+              "Deposito Sud Napoli",
+              "Hub Centro Roma",
+              "Hub Nord Milano"
+            ]
+          },
+          "capacita_pallet": {
+            "distinct": 16,
+            "sample": [
+              "1773.09",
+              "1975.96",
+              "2282.45",
+              "2442.02",
+              "3044.44"
+            ],
+            "min": 1773.09,
+            "max": 8641.37
+          },
+          "citta": {
+            "distinct": 7,
+            "sample": [
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Padova",
+              "Roma"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 2743,
+        "columns": {
+          "spedizione_id": {
+            "distinct": 2743,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3743
+          },
+          "vettore_id": {
+            "distinct": 22,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 22
+          },
+          "magazzino_id": {
+            "distinct": 16,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 16
+          },
+          "cliente_id": {
+            "distinct": 203,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 203
+          },
+          "data_spedizione": {
+            "distinct": 150,
+            "sample": [
+              "2025-11-13",
+              "2025-11-14",
+              "2025-11-15",
+              "2025-11-16",
+              "2025-11-17"
+            ]
+          },
+          "peso_totale_kg": {
+            "distinct": 2621,
+            "sample": [
+              "100.41",
+              "100.93",
+              "1000.88",
+              "1001.87",
+              "1004.34"
+            ],
+            "min": 26.93,
+            "max": 6300.0
+          },
+          "stato_consegna": {
+            "distinct": 4,
+            "sample": [
+              "consegnata",
+              "fallita",
+              "in_transito",
+              "pianificata"
+            ]
+          }
+        }
+      },
+      "colli": {
+        "row_count": 3000,
+        "columns": {
+          "collo_id": {
+            "distinct": 3000,
+            "sample": [
+              "20001",
+              "20002",
+              "20003",
+              "20004",
+              "20005"
+            ],
+            "min": 20001,
+            "max": 23000
+          },
+          "spedizione_id": {
+            "distinct": 1842,
+            "sample": [
+              "1001",
+              "1003",
+              "1005",
+              "1006",
+              "1007"
+            ],
+            "min": 1001,
+            "max": 3743
+          },
+          "peso_collo_kg": {
+            "distinct": 2564,
+            "sample": [
+              "10.0",
+              "10.01",
+              "10.03",
+              "10.04",
+              "10.08"
+            ],
+            "min": 2.9,
+            "max": 600.0
+          },
+          "descrizione_contenuto": {
+            "distinct": 8,
+            "sample": [
+              "Attrezzatura industriale",
+              "Barili di olio",
+              "Casse di vino",
+              "Componenti elettronici",
+              "Documentazione e campionature"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "cliente_id": 1,
+          "ragione_sociale": "Elettronica Viola SpA",
+          "partita_iva": "IT01234567890",
+          "citta": "Milano"
+        },
+        {
+          "cliente_id": 2,
+          "ragione_sociale": "Elettronica Viola SpA",
+          "partita_iva": "IT012345678901",
+          "citta": "Verona"
+        },
+        {
+          "cliente_id": 3,
+          "ragione_sociale": "Tessile Verdi SNC",
+          "partita_iva": "IT012345678902",
+          "citta": "Firenze"
+        },
+        {
+          "cliente_id": 4,
+          "ragione_sociale": "Cartotecnica Blu SRL",
+          "partita_iva": "IT012345678903",
+          "citta": "Napoli"
+        },
+        {
+          "cliente_id": 5,
+          "ragione_sociale": "Ferramenta Gialli SRL",
+          "partita_iva": "IT012345678904",
+          "citta": "Bologna"
+        },
+        {
+          "cliente_id": 6,
+          "ragione_sociale": "Mobili Arancio SNC",
+          "partita_iva": "IT012345678905",
+          "citta": "Napoli"
+        },
+        {
+          "cliente_id": 7,
+          "ragione_sociale": "Metalmeccanica Bianchi SpA",
+          "partita_iva": "IT012345678906",
+          "citta": "Napoli"
+        },
+        {
+          "cliente_id": 8,
+          "ragione_sociale": "Chimica Neri SpA",
+          "partita_iva": "IT012345678907",
+          "citta": "Verona"
+        }
+      ],
+      "vettori": [
+        {
+          "vettore_id": 1,
+          "denominazione": "Delta Transport SRL",
+          "codice_abilitazione": "TR-AB-001",
+          "telefono_contatto": "+39 011 4567890"
+        },
+        {
+          "vettore_id": 2,
+          "denominazione": "RapidCargo SRL",
+          "codice_abilitazione": "TR-AB-0011",
+          "telefono_contatto": "+39 071 5678901"
+        },
+        {
+          "vettore_id": 3,
+          "denominazione": "TransItalia SpA",
+          "codice_abilitazione": "TR-AB-0012",
+          "telefono_contatto": "+39 02 1234567"
+        },
+        {
+          "vettore_id": 4,
+          "denominazione": "NordSpeed Logistics",
+          "codice_abilitazione": "TR-AB-0013",
+          "telefono_contatto": null
+        },
+        {
+          "vettore_id": 5,
+          "denominazione": "TransItalia SpA",
+          "codice_abilitazione": "TR-AB-0014",
+          "telefono_contatto": "+39 055 6789012"
+        },
+        {
+          "vettore_id": 6,
+          "denominazione": "Tyrrhenian Lines SpA",
+          "codice_abilitazione": "RC-AB-002",
+          "telefono_contatto": "+39 02 1234567"
+        },
+        {
+          "vettore_id": 7,
+          "denominazione": "NordSpeed Logistics",
+          "codice_abilitazione": "RC-AB-0021",
+          "telefono_contatto": "+39 081 3456789"
+        },
+        {
+          "vettore_id": 8,
+          "denominazione": "RapidCargo SRL",
+          "codice_abilitazione": "RC-AB-0022",
+          "telefono_contatto": "+39 011 4567890"
+        }
+      ],
+      "magazzini": [
+        {
+          "magazzino_id": 1,
+          "nome_deposito": "Cross-dock Bologna",
+          "capacita_pallet": 5199.56,
+          "citta": "Roma"
+        },
+        {
+          "magazzino_id": 2,
+          "nome_deposito": "Hub Centro Roma",
+          "capacita_pallet": 5501.24,
+          "citta": "Venezia"
+        },
+        {
+          "magazzino_id": 3,
+          "nome_deposito": "Hub Nord Milano",
+          "capacita_pallet": 4500,
+          "citta": "Milano"
+        },
+        {
+          "magazzino_id": 4,
+          "nome_deposito": "Hub Nord Milano",
+          "capacita_pallet": 1773.09,
+          "citta": "Milano"
+        },
+        {
+          "magazzino_id": 5,
+          "nome_deposito": "Hub Centro Roma",
+          "capacita_pallet": 2282.45,
+          "citta": "Milano"
+        },
+        {
+          "magazzino_id": 6,
+          "nome_deposito": "Hub Ovest Torino",
+          "capacita_pallet": 3044.44,
+          "citta": "Torino"
+        },
+        {
+          "magazzino_id": 7,
+          "nome_deposito": "Cross-dock Bologna",
+          "capacita_pallet": 8641.37,
+          "citta": "Padova"
+        },
+        {
+          "magazzino_id": 8,
+          "nome_deposito": "Hub Centro Roma",
+          "capacita_pallet": 5906.62,
+          "citta": "Firenze"
+        }
+      ],
+      "spedizioni": [
+        {
+          "spedizione_id": 1001,
+          "vettore_id": 8,
+          "magazzino_id": 3,
+          "cliente_id": 182,
+          "data_spedizione": "2026-01-27",
+          "peso_totale_kg": 3484.1,
+          "stato_consegna": "fallita"
+        },
+        {
+          "spedizione_id": 1002,
+          "vettore_id": 8,
+          "magazzino_id": 9,
+          "cliente_id": 49,
+          "data_spedizione": "2025-12-27",
+          "peso_totale_kg": 2006.61,
+          "stato_consegna": "fallita"
+        },
+        {
+          "spedizione_id": 1003,
+          "vettore_id": 18,
+          "magazzino_id": 3,
+          "cliente_id": 59,
+          "data_spedizione": "2025-12-21",
+          "peso_totale_kg": 1104.95,
+          "stato_consegna": "in_transito"
+        },
+        {
+          "spedizione_id": 1004,
+          "vettore_id": 15,
+          "magazzino_id": 13,
+          "cliente_id": 142,
+          "data_spedizione": "2025-12-05",
+          "peso_totale_kg": 422.92,
+          "stato_consegna": "fallita"
+        },
+        {
+          "spedizione_id": 1005,
+          "vettore_id": 8,
+          "magazzino_id": 2,
+          "cliente_id": 187,
+          "data_spedizione": "2025-12-09",
+          "peso_totale_kg": 2603.6,
+          "stato_consegna": "consegnata"
+        },
+        {
+          "spedizione_id": 1006,
+          "vettore_id": 20,
+          "magazzino_id": 3,
+          "cliente_id": 46,
+          "data_spedizione": "2026-01-20",
+          "peso_totale_kg": 1232.27,
+          "stato_consegna": "fallita"
+        },
+        {
+          "spedizione_id": 1007,
+          "vettore_id": 2,
+          "magazzino_id": 4,
+          "cliente_id": 121,
+          "data_spedizione": "2025-11-23",
+          "peso_totale_kg": 1432.02,
+          "stato_consegna": "in_transito"
+        },
+        {
+          "spedizione_id": 1008,
+          "vettore_id": 10,
+          "magazzino_id": 7,
+          "cliente_id": 178,
+          "data_spedizione": "2025-11-20",
+          "peso_totale_kg": 1487.38,
+          "stato_consegna": "fallita"
+        }
+      ],
+      "colli": [
+        {
+          "collo_id": 20001,
+          "spedizione_id": 2068,
+          "peso_collo_kg": 167.82,
+          "descrizione_contenuto": "Attrezzatura industriale"
+        },
+        {
+          "collo_id": 20002,
+          "spedizione_id": 2994,
+          "peso_collo_kg": 116.3,
+          "descrizione_contenuto": null
+        },
+        {
+          "collo_id": 20003,
+          "spedizione_id": 2642,
+          "peso_collo_kg": 171.6,
+          "descrizione_contenuto": "Pallet componenti meccanici"
+        },
+        {
+          "collo_id": 20004,
+          "spedizione_id": 2954,
+          "peso_collo_kg": 56.09,
+          "descrizione_contenuto": "Documentazione e campionature"
+        },
+        {
+          "collo_id": 20005,
+          "spedizione_id": 2858,
+          "peso_collo_kg": 85.4,
+          "descrizione_contenuto": "Casse di vino"
+        },
+        {
+          "collo_id": 20006,
+          "spedizione_id": 3278,
+          "peso_collo_kg": 39.3,
+          "descrizione_contenuto": "Componenti elettronici"
+        },
+        {
+          "collo_id": 20007,
+          "spedizione_id": 2407,
+          "peso_collo_kg": 97.11,
+          "descrizione_contenuto": "Documentazione e campionature"
+        },
+        {
+          "collo_id": 20008,
+          "spedizione_id": 2698,
+          "peso_collo_kg": 156.49,
+          "descrizione_contenuto": "Scatolami alimentare"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "any_all"
+  ],
+  "query": "SELECT c.ragione_sociale, c.citta, COUNT(*) AS spedizioni_consegnate, ROUND(SUM(s.peso_totale_kg), 2) AS peso_totale_kg FROM clienti c JOIN spedizioni s ON c.cliente_id = s.cliente_id WHERE s.stato_consegna = 'consegnata' AND s.peso_totale_kg > ANY (SELECT s2.peso_totale_kg FROM spedizioni s2 JOIN magazzini m ON s2.magazzino_id = m.magazzino_id WHERE m.nome_deposito = 'Hub Nord Milano' AND s2.stato_consegna = 'fallita') GROUP BY c.ragione_sociale, c.citta ORDER BY peso_totale_kg DESC;"
+}

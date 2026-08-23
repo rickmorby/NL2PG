@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 4,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "group_agg"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini_fornitori",
+      "obsolete_value": "registro_approvvigionamenti",
+      "description": "La tabella ordini_fornitori viene indicata nella richiesta aziendale con il nome obsoleto registro_approvvigionamenti."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "costo_unitario",
+      "obsolete_value": "prezzo_di_acquisto",
+      "description": "La colonna costo_unitario viene riferita nel testo del problema utilizzando il sinonimo prezzo_di_acquisto."
+    }
+  ],
+  "spec_hash": "d966e94432cddb76"
+}

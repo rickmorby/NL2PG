@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "agg_distinct"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "vendite",
+        "obsolete_value": "registrazione_transazioni_commerciali",
+        "description": "La tabella vendite viene denominata registrazione_transazioni_commerciali nella prosa aziendale. Il progettista deve riconoscere che il termine perifrastico usato nei documenti di business corrisponde alla tabella fisica vendite."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "stato",
+        "obsolete_value": "classificazione_operativa_del_flusso",
+        "description": "La colonna ENUM stato della tabella vendite, con valori dichiarati 'confermata', 'annullata' e 'resa', viene indicata nella documentazione aziendale come classificazione_operativa_del_flusso. La query richiede COUNT(DISTINCT prodotto_id) raggruppato per stato, considerando esclusivamente i tre valori dichiarati nel tipo enumerato."
+      }
+    ],
+    "spec_hash": "03959e053c229b2d"
+  },
+  "schema_ddl": "CREATE TYPE stato_vendita AS ENUM ('confermata', 'annullata', 'resa');\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE vendite (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    stato stato_vendita NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    data_vendita DATE NOT NULL DEFAULT CURRENT_DATE\n);"
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 4,
+  "hierarchy": "isa",
+  "sql_features": [
+    "anti_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "sinistri",
+      "obsolete_value": "pratiche_liquidazione",
+      "description": "La tabella sinistri, che registra gli eventi dannosi collegati alle polizze tramite FK su polizze.id_polizza, viene denominata pratiche_liquidazione nella prosa aziendale. Le query anti-join (NOT EXISTS / NOT IN) per individuare le polizze prive di eventi dannosi devono quindi risolvere pratiche_liquidazione verso la tabella fisica sinistri."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "premio_annuo",
+      "obsolete_value": "quietanza di premio",
+      "description": "La colonna premio_annuo della tabella base polizze viene indicata nella documentazione con il gergo assicurativo 'quietanza di premio'. Il solver deve riconoscere che il termine tecnico del settore si riferisce alla colonna premio_annuo quando filtra o aggrega i valori delle polizze ricomposte dalla gerarchia ISA (join tra polizze e sottotipi polizze_auto/polizze_vita)."
+    }
+  ],
+  "spec_hash": "0b728b9e62a05980"
+}

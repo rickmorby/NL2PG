@@ -1,0 +1,698 @@
+{
+  "schema_ddl": "CREATE TABLE categorie_articolo (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE articoli (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    categoria_id INT NOT NULL REFERENCES categorie_articolo(id),\n    unita_misura TEXT NOT NULL,\n    prezzo_vendita NUMERIC(10,2) NOT NULL CHECK (prezzo_vendita >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0)\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    citta TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE articoli_fornitori (\n    articolo_id INT NOT NULL REFERENCES articoli(id) ON DELETE CASCADE,\n    fornitore_id INT NOT NULL REFERENCES fornitori(id) ON DELETE CASCADE,\n    quantita_minima_ordine INT NOT NULL CHECK (quantita_minima_ordine > 0),\n    prezzo_acquisto NUMERIC(10,2) NOT NULL CHECK (prezzo_acquisto >= 0),\n    lead_time_giorni INT NOT NULL DEFAULT 7 CHECK (lead_time_giorni > 0),\n    PRIMARY KEY (articolo_id, fornitore_id)\n);\n\nCREATE TABLE ordini_acquisto (\n    id SERIAL PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    articolo_id INT NOT NULL REFERENCES articoli(id),\n    quantita_ordinata INT NOT NULL CHECK (quantita_ordinata > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'ricevuto', 'annullato'))\n);",
+  "data_profile": {
+    "profile": {
+      "categorie_articolo": {
+        "row_count": 43,
+        "columns": {
+          "id": {
+            "distinct": 43,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 43
+          },
+          "nome": {
+            "distinct": 43,
+            "sample": [
+              "Attrezzature da officina",
+              "Attrezzature da officina1",
+              "Attrezzature da officina2",
+              "Attrezzature da officina3",
+              "Attrezzature da officina4"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Cartoni, nastro adesivo e film estensibile",
+              "Cavi, connettori e componenti passivi",
+              "Chiavi, pinze e strumenti di misura",
+              "Guanti, elmetti e occhiali di sicurezza",
+              "Manuali, etichette e documentazione di reparto"
+            ]
+          }
+        }
+      },
+      "articoli": {
+        "row_count": 111,
+        "columns": {
+          "id": {
+            "distinct": 111,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 111
+          },
+          "codice_articolo": {
+            "distinct": 111,
+            "sample": [
+              "ART-00001",
+              "ART-000011",
+              "ART-0000110",
+              "ART-0000111",
+              "ART-0000112"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Cartone ondulato 60x40x40",
+              "Cavo elettrico H07V-K 2.5 mmq",
+              "Guanti antitaglio taglia 9",
+              "Olio lubrificante multiuso 400 ml",
+              "Trapano a percussione 750W"
+            ]
+          },
+          "categoria_id": {
+            "distinct": 39,
+            "sample": [
+              "10",
+              "11",
+              "12",
+              "13",
+              "14"
+            ],
+            "min": 2,
+            "max": 42
+          },
+          "unita_misura": {
+            "distinct": 5,
+            "sample": [
+              "conf",
+              "kg",
+              "mt",
+              "paia",
+              "pz"
+            ]
+          },
+          "prezzo_vendita": {
+            "distinct": 107,
+            "sample": [
+              "0.61",
+              "0.73",
+              "0.78",
+              "0.88",
+              "0.95"
+            ],
+            "min": 0.61,
+            "max": 161.82
+          },
+          "scorta_minima": {
+            "distinct": 8,
+            "sample": [
+              "10",
+              "100",
+              "20",
+              "200",
+              "250"
+            ],
+            "min": 40,
+            "max": 250
+          }
+        }
+      },
+      "fornitori": {
+        "row_count": 778,
+        "columns": {
+          "id": {
+            "distinct": 778,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 778
+          },
+          "ragione_sociale": {
+            "distinct": 5,
+            "sample": [
+              "ElettroDistribuzione Veneta S.p.A.",
+              "Ferramenta Centrale S.r.l.",
+              "Imballaggi Sud S.r.l.",
+              "Metalmeccanica Lombarda S.p.A.",
+              "Sicurezza Lavoro Piemonte S.n.c."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 778,
+            "sample": [
+              "IT01112223334",
+              "IT011122233341",
+              "IT0111222333410",
+              "IT01112223334100",
+              "IT01112223334101"
+            ]
+          },
+          "email": {
+            "distinct": 5,
+            "sample": [
+              "acquisti@elettrodistribuzione.it",
+              "commercial@imballaggisud.it",
+              "info@sicurezzalavoro-piemonte.it",
+              "ordini@metalmeccanica-lombarda.it",
+              "vendite@ferramentacentrale.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+39 011 5566778",
+              "+39 02 1234567",
+              "+39 041 3344556",
+              "+39 06 9876543",
+              "+39 081 2233445"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Brescia",
+              "Firenze",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "articoli_fornitori": {
+        "row_count": 111,
+        "columns": {
+          "articolo_id": {
+            "distinct": 66,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 109
+          },
+          "fornitore_id": {
+            "distinct": 106,
+            "sample": [
+              "112",
+              "119",
+              "121",
+              "128",
+              "135"
+            ],
+            "min": 6,
+            "max": 774
+          },
+          "quantita_minima_ordine": {
+            "distinct": 6,
+            "sample": [
+              "10",
+              "100",
+              "20",
+              "200",
+              "24"
+            ],
+            "min": 50,
+            "max": 50
+          },
+          "prezzo_acquisto": {
+            "distinct": 104,
+            "sample": [
+              "0.45",
+              "0.5",
+              "0.51",
+              "0.56",
+              "0.65"
+            ],
+            "min": 0.45,
+            "max": 93.36
+          },
+          "lead_time_giorni": {
+            "distinct": 6,
+            "sample": [
+              "10",
+              "14",
+              "21",
+              "3",
+              "5"
+            ],
+            "min": 5,
+            "max": 5
+          }
+        }
+      },
+      "ordini_acquisto": {
+        "row_count": 2798,
+        "columns": {
+          "id": {
+            "distinct": 2798,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2798
+          },
+          "numero_ordine": {
+            "distinct": 2798,
+            "sample": [
+              "OA-2026-00001",
+              "OA-2026-000011",
+              "OA-2026-0000110",
+              "OA-2026-00001100",
+              "OA-2026-00001101"
+            ]
+          },
+          "fornitore_id": {
+            "distinct": 753,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 778
+          },
+          "articolo_id": {
+            "distinct": 111,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 111
+          },
+          "quantita_ordinata": {
+            "distinct": 11,
+            "sample": [
+              "10",
+              "100",
+              "1000",
+              "120",
+              "200"
+            ],
+            "min": 50,
+            "max": 1000
+          },
+          "prezzo_unitario": {
+            "distinct": 1211,
+            "sample": [
+              "0.52",
+              "0.53",
+              "0.54",
+              "0.55",
+              "0.56"
+            ],
+            "min": 0.52,
+            "max": 86.4
+          },
+          "data_ordine": {
+            "distinct": 235,
+            "sample": [
+              "2025-07-16",
+              "2025-07-17",
+              "2025-07-18",
+              "2025-07-19",
+              "2025-07-20"
+            ]
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "confermato",
+              "in_attesa",
+              "ricevuto",
+              "spedito"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "categorie_articolo": [
+        {
+          "id": 1,
+          "nome": "Utensili elettrici",
+          "descrizione": "Trapani, avvitatori e smerigliatrici"
+        },
+        {
+          "id": 2,
+          "nome": "Utensili elettrici1",
+          "descrizione": "Trapani, avvitatori e smerigliatrici"
+        },
+        {
+          "id": 3,
+          "nome": "Utensili elettrici2",
+          "descrizione": "Trapani, avvitatori e smerigliatrici"
+        },
+        {
+          "id": 4,
+          "nome": "Utensili elettrici3",
+          "descrizione": "Trapani, avvitatori e smerigliatrici"
+        },
+        {
+          "id": 5,
+          "nome": "Utensili elettrici4",
+          "descrizione": "Trapani, avvitatori e smerigliatrici"
+        },
+        {
+          "id": 6,
+          "nome": "Utensili elettrici5",
+          "descrizione": "Trapani, avvitatori e smerigliatrici"
+        },
+        {
+          "id": 7,
+          "nome": "Ferramenta",
+          "descrizione": "Viteria, bulloneria e fissaggi"
+        },
+        {
+          "id": 8,
+          "nome": "Ferramenta1",
+          "descrizione": "Viteria, bulloneria e fissaggi"
+        }
+      ],
+      "articoli": [
+        {
+          "id": 1,
+          "codice_articolo": "ART-00001",
+          "descrizione": "Trapano a percussione 750W",
+          "categoria_id": 37,
+          "unita_misura": "kg",
+          "prezzo_vendita": 127.58,
+          "scorta_minima": "200"
+        },
+        {
+          "id": 2,
+          "codice_articolo": "ART-000011",
+          "descrizione": "Trapano a percussione 750W",
+          "categoria_id": 37,
+          "unita_misura": "conf",
+          "prezzo_vendita": 58.87,
+          "scorta_minima": "200"
+        },
+        {
+          "id": 3,
+          "codice_articolo": "ART-000012",
+          "descrizione": "Trapano a percussione 750W",
+          "categoria_id": 33,
+          "unita_misura": "conf",
+          "prezzo_vendita": 149.06,
+          "scorta_minima": "50"
+        },
+        {
+          "id": 4,
+          "codice_articolo": "ART-000013",
+          "descrizione": "Trapano a percussione 750W",
+          "categoria_id": 4,
+          "unita_misura": "conf",
+          "prezzo_vendita": 98.52,
+          "scorta_minima": "50"
+        },
+        {
+          "id": 5,
+          "codice_articolo": "ART-000014",
+          "descrizione": "Trapano a percussione 750W",
+          "categoria_id": 22,
+          "unita_misura": "paia",
+          "prezzo_vendita": 148.1,
+          "scorta_minima": "200"
+        },
+        {
+          "id": 6,
+          "codice_articolo": "ART-000015",
+          "descrizione": "Trapano a percussione 750W",
+          "categoria_id": 24,
+          "unita_misura": "conf",
+          "prezzo_vendita": 70.74,
+          "scorta_minima": "20"
+        },
+        {
+          "id": 7,
+          "codice_articolo": "ART-000016",
+          "descrizione": "Trapano a percussione 750W",
+          "categoria_id": 8,
+          "unita_misura": "mt",
+          "prezzo_vendita": 149.59,
+          "scorta_minima": "200"
+        },
+        {
+          "id": 8,
+          "codice_articolo": "ART-000017",
+          "descrizione": "Trapano a percussione 750W",
+          "categoria_id": 36,
+          "unita_misura": "paia",
+          "prezzo_vendita": 64.56,
+          "scorta_minima": "50"
+        }
+      ],
+      "fornitori": [
+        {
+          "id": 1,
+          "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+          "partita_iva": "IT01234567891",
+          "email": "ordini@metalmeccanica-lombarda.it",
+          "telefono": "+39 02 1234567",
+          "citta": "Bologna",
+          "attivo": "false"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+          "partita_iva": "IT012345678911",
+          "email": "ordini@metalmeccanica-lombarda.it",
+          "telefono": "+39 02 1234567",
+          "citta": "Brescia",
+          "attivo": "true"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+          "partita_iva": "IT012345678912",
+          "email": "ordini@metalmeccanica-lombarda.it",
+          "telefono": "+39 02 1234567",
+          "citta": "Torino",
+          "attivo": "true"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+          "partita_iva": "IT012345678913",
+          "email": "ordini@metalmeccanica-lombarda.it",
+          "telefono": "+39 02 1234567",
+          "citta": "Firenze",
+          "attivo": "true"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+          "partita_iva": "IT012345678914",
+          "email": "ordini@metalmeccanica-lombarda.it",
+          "telefono": "+39 02 1234567",
+          "citta": "Firenze",
+          "attivo": "true"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+          "partita_iva": "IT012345678915",
+          "email": "ordini@metalmeccanica-lombarda.it",
+          "telefono": "+39 02 1234567",
+          "citta": "Brescia",
+          "attivo": "true"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+          "partita_iva": "IT012345678916",
+          "email": "ordini@metalmeccanica-lombarda.it",
+          "telefono": "+39 02 1234567",
+          "citta": "Brescia",
+          "attivo": "true"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+          "partita_iva": "IT012345678917",
+          "email": "ordini@metalmeccanica-lombarda.it",
+          "telefono": "+39 02 1234567",
+          "citta": "Padova",
+          "attivo": "true"
+        }
+      ],
+      "articoli_fornitori": [
+        {
+          "articolo_id": 23,
+          "fornitore_id": 608,
+          "quantita_minima_ordine": "100",
+          "prezzo_acquisto": 55.56,
+          "lead_time_giorni": "10"
+        },
+        {
+          "articolo_id": 12,
+          "fornitore_id": 423,
+          "quantita_minima_ordine": "10",
+          "prezzo_acquisto": 83.7,
+          "lead_time_giorni": "21"
+        },
+        {
+          "articolo_id": 49,
+          "fornitore_id": 697,
+          "quantita_minima_ordine": "20",
+          "prezzo_acquisto": 62.67,
+          "lead_time_giorni": "7"
+        },
+        {
+          "articolo_id": 70,
+          "fornitore_id": 45,
+          "quantita_minima_ordine": "50",
+          "prezzo_acquisto": 73.84,
+          "lead_time_giorni": "7"
+        },
+        {
+          "articolo_id": 51,
+          "fornitore_id": 542,
+          "quantita_minima_ordine": "20",
+          "prezzo_acquisto": 74.23,
+          "lead_time_giorni": "3"
+        },
+        {
+          "articolo_id": 55,
+          "fornitore_id": 773,
+          "quantita_minima_ordine": "10",
+          "prezzo_acquisto": 55.52,
+          "lead_time_giorni": "3"
+        },
+        {
+          "articolo_id": 48,
+          "fornitore_id": 313,
+          "quantita_minima_ordine": "10",
+          "prezzo_acquisto": 93.35,
+          "lead_time_giorni": "3"
+        },
+        {
+          "articolo_id": 32,
+          "fornitore_id": 206,
+          "quantita_minima_ordine": "24",
+          "prezzo_acquisto": 73.59,
+          "lead_time_giorni": "7"
+        }
+      ],
+      "ordini_acquisto": [
+        {
+          "id": 1,
+          "numero_ordine": "OA-2026-00001",
+          "fornitore_id": 677,
+          "articolo_id": 32,
+          "quantita_ordinata": "25",
+          "prezzo_unitario": 86.4,
+          "data_ordine": "2025-11-25",
+          "stato_ordine": "ricevuto"
+        },
+        {
+          "id": 2,
+          "numero_ordine": "OA-2026-000011",
+          "fornitore_id": 182,
+          "articolo_id": 59,
+          "quantita_ordinata": "10",
+          "prezzo_unitario": 56.58,
+          "data_ordine": "2025-10-14",
+          "stato_ordine": "ricevuto"
+        },
+        {
+          "id": 3,
+          "numero_ordine": "OA-2026-000012",
+          "fornitore_id": 216,
+          "articolo_id": 109,
+          "quantita_ordinata": "1000",
+          "prezzo_unitario": 68.47,
+          "data_ordine": "2025-11-24",
+          "stato_ordine": "spedito"
+        },
+        {
+          "id": 4,
+          "numero_ordine": "OA-2026-000013",
+          "fornitore_id": 373,
+          "articolo_id": 73,
+          "quantita_ordinata": "50",
+          "prezzo_unitario": 60.91,
+          "data_ordine": "2025-09-09",
+          "stato_ordine": "ricevuto"
+        },
+        {
+          "id": 5,
+          "numero_ordine": "OA-2026-000014",
+          "fornitore_id": 360,
+          "articolo_id": 37,
+          "quantita_ordinata": "100",
+          "prezzo_unitario": 63.28,
+          "data_ordine": "2025-08-23",
+          "stato_ordine": "annullato"
+        },
+        {
+          "id": 6,
+          "numero_ordine": "OA-2026-000015",
+          "fornitore_id": 5,
+          "articolo_id": 24,
+          "quantita_ordinata": "10",
+          "prezzo_unitario": 61.43,
+          "data_ordine": "2025-10-17",
+          "stato_ordine": "annullato"
+        },
+        {
+          "id": 7,
+          "numero_ordine": "OA-2026-000016",
+          "fornitore_id": 234,
+          "articolo_id": 75,
+          "quantita_ordinata": "100",
+          "prezzo_unitario": 53.33,
+          "data_ordine": "2025-12-21",
+          "stato_ordine": "confermato"
+        },
+        {
+          "id": 8,
+          "numero_ordine": "OA-2026-000017",
+          "fornitore_id": 24,
+          "articolo_id": 38,
+          "quantita_ordinata": "1000",
+          "prezzo_unitario": 68.05,
+          "data_ordine": "2025-12-02",
+          "stato_ordine": "in_attesa"
+        }
+      ]
+    }
+  },
+  "story": "Nell'ufficio Acquisti di una realtà distributiva operante nel settore ferramenta e utensileria, la revisione semestrale della spesa segue un iter ben codificato. Tutto parte dal registro denominato categorie_articolo, che suddivide il catalogo merceologico in sezioni omogenee — dagli utensili elettrici alla viteria e bulloneria — ciascuna corredata da un nome e da una breve descrizione. Le schede dei prodotti confluiscono poi nell'archivio articoli: per ogni voce sono annotati il codice identificativo, la descrizione tecnica, l'unità di misura, il prezzo di vendita e la scorta minima da mantenere in magazzino, soglia sotto la quale il responsabile di reparto deve sollecitare il rifornimento. Il quadro si completa con l'anagrafica_partner_commerciali, il registro ufficiale che custodisce i dati di tutti i soggetti che riforniscono l'azienda: ragione sociale, partita IVA, indirizzo di posta elettronica, numero di telefono e città di insediamento, insieme all'indicazione se il rapporto commerciale risulti attivo oppure sospeso. A fare da ponte tra merce e controparti è il prontuario articoli_fornitori, dove per ogni abbinamento prodotto-rifornitore vengono fissati la quantità minima d'ordine — che nella documentazione interna del procurement compare con l'acronimo MOQ — il prezzo d'acquisto pattuito e il lead time espresso in giorni, che nelle trattative recenti oscilla tra 3 e 21 giorni lavorativi. Infine, il libro ordini_acquisto traccia puntualmente ogni ordinativo emesso: numero progressivo dell'ordine, quantità ordinata, prezzo unitario concordato, data di emissione e stato di avanzamento, che può risultare in_attesa, confermato, spedito, ricevuto oppure annullato. Nel corso dell'ultima revisione, gli analisti della spesa hanno condotto un controllo mirato sugli ordinativi registrati tra luglio e dicembre 2025, ossia quelli con data compresa tra il 2025-07-01 e il 2025-12-31. Sono stati presi in considerazione esclusivamente gli stati confermato, spedito e ricevuto, scartando gli ordinativi ancora in_attesa presso le controparti e quelli annullati dopo la negoziazione. Per ciascun partner commerciale attivo secondo l'anagrafica_partner_commerciali, il gruppo ha determinato la città di riferimento, il numero di articoli distinti effettivamente ordinati, il valore totale della spesa sostenuta e il prezzo medio unitario degli acquisti. Sono rimasti nell'elenco solo i partner con un valore totale superiore a 1000 euro, mentre tutti gli altri sono stati esclusi dalla sintesi. L'elenco finale è stato disposto per valore decrescente, così da mettere in cima i rapporti commerciali più onerosi e orientare le future trattative su prezzi d'acquisto, MOQ e condizioni di consegna."
+}

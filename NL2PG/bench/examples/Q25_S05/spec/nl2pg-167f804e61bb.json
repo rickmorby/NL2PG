@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 4,
+  "hierarchy": "weak_entity_composition",
+  "sql_features": [
+    "natural_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti_dipendenze",
+      "obsolete_value": "nucleo_familiare_carico",
+      "description": "La tabella che modella l'entità debole dei familiari a carico è rinominata nel linguaggio aziendale come nucleo_familiare_carico."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "data_assunzione",
+      "obsolete_value": "data_ingresso_in_forza",
+      "description": "Il termine tecnico data_assunzione viene sostituito nel gergo HR interno con l'espressione data_ingresso_in_forza."
+    }
+  ],
+  "spec_hash": "4eb3ed88325c412c"
+}

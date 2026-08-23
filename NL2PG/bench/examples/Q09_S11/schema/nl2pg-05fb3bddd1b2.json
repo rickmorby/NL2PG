@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "129098acf6937754"
+  },
+  "schema_ddl": "CREATE TABLE vettori (\n    codice_vettore TEXT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT,\n    citta_operativa TEXT NOT NULL\n);\n\nCREATE TABLE spedizioni (\n    numero_spedizione TEXT PRIMARY KEY,\n    codice_vettore TEXT NOT NULL REFERENCES vettori(codice_vettore),\n    destinatario TEXT NOT NULL,\n    indirizzo_destinazione TEXT NOT NULL,\n    data_partenza DATE NOT NULL,\n    data_consegna_prevista DATE NOT NULL,\n    stato_spedizione TEXT NOT NULL DEFAULT 'in_preparazione' CHECK (stato_spedizione IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    costo_spedizione NUMERIC(10,2) NOT NULL CHECK (costo_spedizione >= 0),\n    CHECK (data_consegna_prevista >= data_partenza)\n);\n\nCREATE TABLE colli (\n    numero_spedizione TEXT NOT NULL REFERENCES spedizioni(numero_spedizione) ON DELETE CASCADE,\n    progressivo_collo INT NOT NULL CHECK (progressivo_collo > 0),\n    descrizione_contenuto TEXT NOT NULL,\n    peso_kg NUMERIC(7,2) NOT NULL CHECK (peso_kg > 0),\n    fragile BOOLEAN NOT NULL DEFAULT FALSE,\n    PRIMARY KEY (numero_spedizione, progressivo_collo)\n);"
+}

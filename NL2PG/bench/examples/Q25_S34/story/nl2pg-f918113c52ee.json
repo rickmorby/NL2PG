@@ -1,0 +1,381 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    cliente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    citta TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    ordine_id INT PRIMARY KEY,\n    cliente_id INT REFERENCES clienti(cliente_id),\n    importo NUMERIC(10,2) NOT NULL CHECK (importo >= 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato IN ('in_attesa', 'evaso', 'annullato'))\n);\n\nCREATE TABLE righe_ordini (\n    riga_id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(ordine_id),\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 437,
+        "columns": {
+          "cliente_id": {
+            "distinct": 437,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 437
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Esposito",
+              "Ferrari",
+              "Fontana"
+            ]
+          },
+          "email": {
+            "distinct": 414,
+            "sample": [
+              "alessandro.ferrari10@example.com",
+              "alessandro.ferrari11@example.com",
+              "alessandro.ferrari12@example.com",
+              "alessandro.ferrari13@example.com",
+              "alessandro.ferrari14@example.com"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 218,
+            "sample": [
+              "2023-10-17",
+              "2023-10-21",
+              "2023-10-26",
+              "2023-10-29",
+              "2023-10-30"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1368,
+        "columns": {
+          "ordine_id": {
+            "distinct": 1368,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1368
+          },
+          "cliente_id": {
+            "distinct": 412,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 437
+          },
+          "importo": {
+            "distinct": 1308,
+            "sample": [
+              "10.01",
+              "10.09",
+              "10.28",
+              "10.32",
+              "10.34"
+            ],
+            "min": 3.75,
+            "max": 960.0
+          },
+          "data_ordine": {
+            "distinct": 315,
+            "sample": [
+              "2024-12-01",
+              "2024-12-02",
+              "2024-12-04",
+              "2024-12-05",
+              "2024-12-06"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "annullato",
+              "evaso",
+              "in_attesa"
+            ]
+          }
+        }
+      },
+      "righe_ordini": {
+        "row_count": 3000,
+        "columns": {
+          "riga_id": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "ordine_id": {
+            "distinct": 1213,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1368
+          },
+          "prodotto": {
+            "distinct": 10,
+            "sample": [
+              "Cuffie Bluetooth",
+              "Hub USB-C",
+              "Laptop Ultrabook 14\"",
+              "Monitor 27\" 4K",
+              "Mouse wireless"
+            ]
+          },
+          "quantita": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "prezzo_unitario": {
+            "distinct": 2727,
+            "sample": [
+              "100.36",
+              "100.52",
+              "100.54",
+              "100.56",
+              "100.67"
+            ],
+            "min": 12.45,
+            "max": 1798.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "cliente_id": 54,
+          "nome": "Luca",
+          "cognome": "Rossi",
+          "email": "luca.rossi1@example.com",
+          "citta": "Torino",
+          "data_registrazione": "2024-03-05"
+        },
+        {
+          "cliente_id": 36,
+          "nome": "Mario",
+          "cognome": "Moretti",
+          "email": "mario.moretti1@example.com",
+          "citta": "Napoli",
+          "data_registrazione": "2024-04-14"
+        },
+        {
+          "cliente_id": 168,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "email": "alessandro.conti1@example.com",
+          "citta": "Padova",
+          "data_registrazione": "2024-05-03"
+        },
+        {
+          "cliente_id": 148,
+          "nome": "Davide",
+          "cognome": "Bianchi",
+          "email": "davide.bianchi1@example.com",
+          "citta": "Genova",
+          "data_registrazione": "2024-02-04"
+        },
+        {
+          "cliente_id": 173,
+          "nome": "Luca",
+          "cognome": "Conti",
+          "email": "luca.conti1@example.com",
+          "citta": "Roma",
+          "data_registrazione": "2024-04-17"
+        },
+        {
+          "cliente_id": 166,
+          "nome": "Luca",
+          "cognome": "Moretti",
+          "email": "luca.moretti1@example.com",
+          "citta": "Bologna",
+          "data_registrazione": "2024-02-18"
+        },
+        {
+          "cliente_id": 115,
+          "nome": "Marco",
+          "cognome": "Rossi",
+          "email": "marco.rossi1@example.com",
+          "citta": "Torino",
+          "data_registrazione": "2024-04-26"
+        },
+        {
+          "cliente_id": 278,
+          "nome": "Alessandro",
+          "cognome": "Ferrari",
+          "email": "alessandro.ferrari1@example.com",
+          "citta": "Napoli",
+          "data_registrazione": "2024-04-12"
+        }
+      ],
+      "ordini": [
+        {
+          "ordine_id": 1,
+          "cliente_id": 155,
+          "importo": 370.32,
+          "data_ordine": "2024-12-16",
+          "stato": "evaso"
+        },
+        {
+          "ordine_id": 2,
+          "cliente_id": 154,
+          "importo": 104.34,
+          "data_ordine": "2024-12-01",
+          "stato": "evaso"
+        },
+        {
+          "ordine_id": 3,
+          "cliente_id": 427,
+          "importo": 78.46,
+          "data_ordine": "2025-02-25",
+          "stato": "annullato"
+        },
+        {
+          "ordine_id": 4,
+          "cliente_id": 434,
+          "importo": 343.75,
+          "data_ordine": "2025-02-06",
+          "stato": "evaso"
+        },
+        {
+          "ordine_id": 5,
+          "cliente_id": 410,
+          "importo": 298.86,
+          "data_ordine": "2025-02-23",
+          "stato": "evaso"
+        },
+        {
+          "ordine_id": 6,
+          "cliente_id": null,
+          "importo": 321.52,
+          "data_ordine": "2025-01-21",
+          "stato": "evaso"
+        },
+        {
+          "ordine_id": 7,
+          "cliente_id": 105,
+          "importo": 373.62,
+          "data_ordine": "2025-01-14",
+          "stato": "annullato"
+        },
+        {
+          "ordine_id": 8,
+          "cliente_id": 262,
+          "importo": 432.93,
+          "data_ordine": "2024-12-26",
+          "stato": "evaso"
+        }
+      ],
+      "righe_ordini": [
+        {
+          "riga_id": 1,
+          "ordine_id": 1297,
+          "prodotto": "Router Wi-Fi 6",
+          "quantita": "2",
+          "prezzo_unitario": 1653.9
+        },
+        {
+          "riga_id": 2,
+          "ordine_id": 597,
+          "prodotto": "Router Wi-Fi 6",
+          "quantita": "4",
+          "prezzo_unitario": 1552.04
+        },
+        {
+          "riga_id": 3,
+          "ordine_id": 1029,
+          "prodotto": "Webcam Full HD",
+          "quantita": "2",
+          "prezzo_unitario": 623.15
+        },
+        {
+          "riga_id": 4,
+          "ordine_id": 511,
+          "prodotto": "Cuffie Bluetooth",
+          "quantita": "2",
+          "prezzo_unitario": 457.12
+        },
+        {
+          "riga_id": 5,
+          "ordine_id": 742,
+          "prodotto": "Laptop Ultrabook 14\"",
+          "quantita": "1",
+          "prezzo_unitario": 1276.04
+        },
+        {
+          "riga_id": 6,
+          "ordine_id": 555,
+          "prodotto": "Webcam Full HD",
+          "quantita": "1",
+          "prezzo_unitario": 917.76
+        },
+        {
+          "riga_id": 7,
+          "ordine_id": 234,
+          "prodotto": "Mouse wireless",
+          "quantita": "1",
+          "prezzo_unitario": 891.76
+        },
+        {
+          "riga_id": 8,
+          "ordine_id": 965,
+          "prodotto": "Stampante laser",
+          "quantita": "3",
+          "prezzo_unitario": 1012.8
+        }
+      ]
+    }
+  },
+  "story": "Presso NovaTech Distribuzione, rivenditore di elettronica con magazzino logistico alle porte di Milano, la direzione commerciale ha aperto la revisione trimestrale dei risultati di vendita. Il cuore documentale dell'azienda è l'archivio denominato anagrafica_acquirenti, che raccoglie 437 schede dei clienti registrati: per ciascun acquirente sono annotati il nome, il cognome, l'indirizzo di posta elettronica, la città di residenza — tra cui Milano, Roma, Napoli, Torino, Bologna, Firenze, Genova e Padova — e la data di registrazione, che nella gran parte dei casi ricade tra l'autunno 2023 e la primavera 2024. Accanto ad esso, il registro intitolato ordini conserva 1368 impegni di spesa: ogni voce riporta l'identificativo progressivo dell'ordine, il rimando all'acquirente iscritto nell'anagrafica_acquirenti, il valore_complessivo dell'operazione — così viene chiamato, nei documenti commerciali, l'importo complessivo, che muove da un minimo di 3,75 euro fino a 960 euro — la data di acquisizione, con operazioni che decorrono dal 2024-12-01 in avanti, e lo stato di lavorazione, che può risultare in_attesa, evaso oppure annullato. Non tutte le vendite, però, transitano da un acquirente registrato: gli ordini privi di rimando all'anagrafica sono noti, nel gergo dei punti vendita, come scontrini muti, e rappresentano acquisti effettuati senza tessera fedeltà. Il dettaglio merceologico è invece custodito nel registro denominato righe_ordini, che conta 3000 voci: ciascuna precisa l'ordine di appartenenza, il prodotto richiesto — Router Wi-Fi 6, Webcam Full HD, Cuffie Bluetooth, Laptop Ultrabook 14\", Monitor 27\" 4K, Mouse wireless, Stampante laser, Hub USB-C — la quantità richiesta, mai superiore a 5 pezzi per voce, e il prezzo_unitario praticato, che oscilla da 12,45 euro fino a punte di 1798 euro. Il responsabile analisi, Giulia Fontana, ha quindi predisposto la classifica dei primi 5 prodotti più redditizi, ordinati per ricavo totale decrescente, ottenuto moltiplicando la quantità per il prezzo_unitario di ciascuna voce. Il computo abbraccia esclusivamente gli ordini contrassegnati dallo stato evaso, scartando quelli ancora in_attesa o definitivamente annullati; per ogni prodotto compariranno inoltre le unità complessivamente vendute e il numero di ordini distinti in cui l'articolo compare. Prima di firmare il rapporto, il team verificherà che nessuno scontrino muto alteri i conteggi e che ogni voce del registro righe_ordini trovi riscontro in un ordine effettivamente evaso."
+}

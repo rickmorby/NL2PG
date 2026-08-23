@@ -1,0 +1,321 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "fc1045596f865d5f"
+  },
+  "schema_ddl": "CREATE TABLE istituti_credito (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_abi TEXT NOT NULL UNIQUE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    istituto_id INT NOT NULL REFERENCES istituti_credito(id),\n    numero_conto TEXT NOT NULL UNIQUE,\n    saldo NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE movimenti (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    data_movimento DATE NOT NULL,\n    descrizione TEXT,\n    categoria TEXT NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo <> 0),\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "istituti_credito",
+        "nature": "lookup",
+        "min_rows": 12,
+        "max_rows": 12,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "UniCredit S.p.A.",
+            "codice_abi": "02008",
+            "eliminato": false
+          },
+          {
+            "id": 2,
+            "nome": "Intesa Sanpaolo S.p.A.",
+            "codice_abi": "03069",
+            "eliminato": false
+          },
+          {
+            "id": 3,
+            "nome": "Banca Monte dei Paschi di Siena S.p.A.",
+            "codice_abi": "01030",
+            "eliminato": false
+          },
+          {
+            "id": 4,
+            "nome": "Banco BPM S.p.A.",
+            "codice_abi": "05034",
+            "eliminato": false
+          },
+          {
+            "id": 5,
+            "nome": "BPER Banca S.p.A.",
+            "codice_abi": "05387",
+            "eliminato": false
+          },
+          {
+            "id": 6,
+            "nome": "Banca Mediolanum S.p.A.",
+            "codice_abi": "03599",
+            "eliminato": false
+          },
+          {
+            "id": 7,
+            "nome": "Credito Emiliano S.p.A.",
+            "codice_abi": "07072",
+            "eliminato": false
+          },
+          {
+            "id": 8,
+            "nome": "Banca Popolare di Sondrio S.p.A.",
+            "codice_abi": "05696",
+            "eliminato": false
+          },
+          {
+            "id": 9,
+            "nome": "Mediobanca S.p.A.",
+            "codice_abi": "10681",
+            "eliminato": false
+          },
+          {
+            "id": 10,
+            "nome": "ING Bank N.V. Sede Secondaria Italiana",
+            "codice_abi": "34206",
+            "eliminato": false
+          },
+          {
+            "id": 11,
+            "nome": "FinecoBank Banca Fineco S.p.A.",
+            "codice_abi": "03015",
+            "eliminato": true
+          },
+          {
+            "id": 12,
+            "nome": "Banca Carige S.p.A.",
+            "codice_abi": "06175",
+            "eliminato": true
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "conti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 8.0,
+        "templates": [
+          {
+            "id": 1,
+            "istituto_id": 1,
+            "numero_conto": "IT02A0301503200000012345678",
+            "saldo": 12500.75,
+            "eliminato": false
+          },
+          {
+            "id": 2,
+            "istituto_id": 2,
+            "numero_conto": "IT60X0542811101000000123456",
+            "saldo": 3400.2,
+            "eliminato": false
+          },
+          {
+            "id": 3,
+            "istituto_id": 3,
+            "numero_conto": "IT84M0103002800000087654321",
+            "saldo": 98750.0,
+            "eliminato": false
+          },
+          {
+            "id": 4,
+            "istituto_id": 4,
+            "numero_conto": "IT21K0503401600000045678901",
+            "saldo": 520.4,
+            "eliminato": false
+          },
+          {
+            "id": 5,
+            "istituto_id": 5,
+            "numero_conto": "IT37Q0538710400000076543210",
+            "saldo": 152300.0,
+            "eliminato": false
+          },
+          {
+            "id": 6,
+            "istituto_id": 6,
+            "numero_conto": "IT91R0359901600000023456789",
+            "saldo": 18750.6,
+            "eliminato": true
+          },
+          {
+            "id": 7,
+            "istituto_id": 7,
+            "numero_conto": "IT44B0707206000000034567890",
+            "saldo": 6420.15,
+            "eliminato": false
+          },
+          {
+            "id": 8,
+            "istituto_id": 8,
+            "numero_conto": "IT58S0569611100000098765432",
+            "saldo": 0.0,
+            "eliminato": false
+          }
+        ],
+        "variations": {
+          "saldo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "eliminato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "false",
+              "false",
+              "false",
+              "false",
+              "true"
+            ]
+          }
+        }
+      },
+      {
+        "table": "movimenti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 10.0,
+        "templates": [
+          {
+            "id": 1,
+            "conto_id": 1,
+            "data_movimento": "2026-01-27",
+            "descrizione": "Accredito stipendio mensile",
+            "categoria": "stipendio",
+            "importo": 2450.0,
+            "eliminato": false
+          },
+          {
+            "id": 2,
+            "conto_id": 2,
+            "data_movimento": "2026-01-08",
+            "descrizione": "Spesa supermercato settimanale",
+            "categoria": "alimentari",
+            "importo": -92.3,
+            "eliminato": false
+          },
+          {
+            "id": 3,
+            "conto_id": 3,
+            "data_movimento": "2026-02-03",
+            "descrizione": "Bolletta luce e gas",
+            "categoria": "utenze",
+            "importo": -78.45,
+            "eliminato": false
+          },
+          {
+            "id": 4,
+            "conto_id": 4,
+            "data_movimento": "2026-01-05",
+            "descrizione": "Pagamento affitto mensile",
+            "categoria": "abitazione",
+            "importo": -720.0,
+            "eliminato": false
+          },
+          {
+            "id": 5,
+            "conto_id": 5,
+            "data_movimento": "2026-02-21",
+            "descrizione": "Cena al ristorante",
+            "categoria": "ristorazione",
+            "importo": -38.9,
+            "eliminato": false
+          },
+          {
+            "id": 6,
+            "conto_id": 6,
+            "data_movimento": "2026-02-01",
+            "descrizione": "Abbonamento mensile mezzi pubblici",
+            "categoria": "trasporti",
+            "importo": -55.0,
+            "eliminato": false
+          },
+          {
+            "id": 7,
+            "conto_id": 7,
+            "data_movimento": "2026-01-15",
+            "descrizione": "Abbonamento piattaforma streaming",
+            "categoria": "svago",
+            "importo": -19.99,
+            "eliminato": false
+          },
+          {
+            "id": 8,
+            "conto_id": 8,
+            "data_movimento": "2026-03-09",
+            "descrizione": "Acquisto farmaci in farmacia",
+            "categoria": "salute",
+            "importo": -24.5,
+            "eliminato": false
+          },
+          {
+            "id": 9,
+            "conto_id": 1,
+            "data_movimento": "2026-03-12",
+            "descrizione": "Bonifico ricevuto rimborso spese",
+            "categoria": "accredito",
+            "importo": 450.0,
+            "eliminato": false
+          },
+          {
+            "id": 10,
+            "conto_id": 2,
+            "data_movimento": "2026-03-20",
+            "descrizione": "Prelievo contante ATM",
+            "categoria": "prelievo",
+            "importo": -150.0,
+            "eliminato": true
+          }
+        ],
+        "variations": {
+          "data_movimento": {
+            "axis": "shift",
+            "delta_min": -160.0,
+            "delta_max": 100.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.2,
+            "pool": []
+          },
+          "eliminato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "false",
+              "false",
+              "false",
+              "false",
+              "false",
+              "true"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

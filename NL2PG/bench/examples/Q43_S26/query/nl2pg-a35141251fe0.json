@@ -1,0 +1,478 @@
+{
+  "schema_ddl": "CREATE TABLE esercizi (\n    id INT PRIMARY KEY,\n    anno INT NOT NULL UNIQUE,\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    chiuso BOOLEAN NOT NULL DEFAULT FALSE,\n    CHECK (data_fine > data_inizio)\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'costo', 'ricavo'))\n);\n\nCREATE TABLE registrazioni (\n    id INT PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi(id),\n    numero_registrazione INT NOT NULL,\n    data_registrazione DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    UNIQUE (esercizio_id, numero_registrazione),\n    CHECK (numero_registrazione > 0)\n);\n\nCREATE TABLE movimenti_contabili (\n    id INT PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(12,2) NOT NULL,\n    dare_avere TEXT NOT NULL CHECK (dare_avere IN ('dare', 'avere')),\n    data_valuta DATE NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "esercizi": {
+        "row_count": 48,
+        "columns": {
+          "id": {
+            "distinct": 48,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 48
+          },
+          "anno": {
+            "distinct": 48,
+            "sample": [
+              "2019",
+              "2020",
+              "2021",
+              "2022",
+              "2023"
+            ],
+            "min": 2019,
+            "max": 2066
+          },
+          "data_inizio": {
+            "distinct": 8,
+            "sample": [
+              "2019-01-01",
+              "2020-01-01",
+              "2021-01-01",
+              "2022-01-01",
+              "2023-01-01"
+            ]
+          },
+          "data_fine": {
+            "distinct": 8,
+            "sample": [
+              "2019-12-31",
+              "2020-12-31",
+              "2021-12-31",
+              "2022-12-31",
+              "2023-12-31"
+            ]
+          },
+          "chiuso": {
+            "distinct": 2,
+            "sample": [
+              "False",
+              "True"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "conti": {
+        "row_count": 40,
+        "columns": {
+          "id": {
+            "distinct": 40,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 40
+          },
+          "codice_conto": {
+            "distinct": 40,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ]
+          },
+          "denominazione": {
+            "distinct": 10,
+            "sample": [
+              "Acquisti di materiali",
+              "Attrezzature industriali",
+              "Banca c/c",
+              "Capitale sociale",
+              "Cassa"
+            ]
+          },
+          "tipo_conto": {
+            "distinct": 4,
+            "sample": [
+              "attivo",
+              "costo",
+              "passivo",
+              "ricavo"
+            ]
+          }
+        }
+      },
+      "registrazioni": {
+        "row_count": 619,
+        "columns": {
+          "id": {
+            "distinct": 619,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 619
+          },
+          "esercizio_id": {
+            "distinct": 48,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 48
+          },
+          "numero_registrazione": {
+            "distinct": 619,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 619
+          },
+          "data_registrazione": {
+            "distinct": 233,
+            "sample": [
+              "2025-11-09",
+              "2025-11-10",
+              "2025-11-12",
+              "2025-11-13",
+              "2025-11-16"
+            ]
+          },
+          "descrizione": {
+            "distinct": 15,
+            "sample": [
+              "Acquisto materiali di consumo",
+              "Ammortamento attrezzature",
+              "Corrispettivi cassa",
+              "Fattura vendita cliente",
+              "Fattura vendita cliente Alpha"
+            ]
+          }
+        }
+      },
+      "movimenti_contabili": {
+        "row_count": 1630,
+        "columns": {
+          "id": {
+            "distinct": 1630,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1630
+          },
+          "registrazione_id": {
+            "distinct": 568,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 619
+          },
+          "conto_id": {
+            "distinct": 40,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 40
+          },
+          "importo": {
+            "distinct": 12,
+            "sample": [
+              "1250.50",
+              "15000",
+              "1875.30",
+              "2300.10",
+              "2450"
+            ]
+          },
+          "dare_avere": {
+            "distinct": 2,
+            "sample": [
+              "avere",
+              "dare"
+            ]
+          },
+          "data_valuta": {
+            "distinct": 160,
+            "sample": [
+              "2025-11-21",
+              "2025-11-22",
+              "2025-11-23",
+              "2025-11-24",
+              "2025-11-25"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "esercizi": [
+        {
+          "id": 1,
+          "anno": 2019,
+          "data_inizio": "2019-01-01",
+          "data_fine": "2019-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 2,
+          "anno": 2020,
+          "data_inizio": "2019-01-01",
+          "data_fine": "2019-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 3,
+          "anno": 2021,
+          "data_inizio": "2019-01-01",
+          "data_fine": "2019-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 4,
+          "anno": 2022,
+          "data_inizio": "2019-01-01",
+          "data_fine": "2019-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 5,
+          "anno": 2023,
+          "data_inizio": "2019-01-01",
+          "data_fine": "2019-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 6,
+          "anno": 2024,
+          "data_inizio": "2019-01-01",
+          "data_fine": "2019-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 7,
+          "anno": 2025,
+          "data_inizio": "2020-01-01",
+          "data_fine": "2020-12-31",
+          "chiuso": true
+        },
+        {
+          "id": 8,
+          "anno": 2026,
+          "data_inizio": "2020-01-01",
+          "data_fine": "2020-12-31",
+          "chiuso": true
+        }
+      ],
+      "conti": [
+        {
+          "id": 1,
+          "codice_conto": "101",
+          "denominazione": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 2,
+          "codice_conto": "102",
+          "denominazione": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 3,
+          "codice_conto": "103",
+          "denominazione": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 4,
+          "codice_conto": "104",
+          "denominazione": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 5,
+          "codice_conto": "105",
+          "denominazione": "Banca c/c",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 6,
+          "codice_conto": "106",
+          "denominazione": "Banca c/c",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 7,
+          "codice_conto": "107",
+          "denominazione": "Banca c/c",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 8,
+          "codice_conto": "108",
+          "denominazione": "Banca c/c",
+          "tipo_conto": "attivo"
+        }
+      ],
+      "registrazioni": [
+        {
+          "id": 1,
+          "esercizio_id": 37,
+          "numero_registrazione": 1,
+          "data_registrazione": "2026-03-04",
+          "descrizione": "Pagamento canoni e utenze"
+        },
+        {
+          "id": 2,
+          "esercizio_id": 31,
+          "numero_registrazione": 2,
+          "data_registrazione": "2025-11-30",
+          "descrizione": "Fattura vendita cliente"
+        },
+        {
+          "id": 3,
+          "esercizio_id": 3,
+          "numero_registrazione": 3,
+          "data_registrazione": "2026-01-09",
+          "descrizione": "Liquidazione stipendi"
+        },
+        {
+          "id": 4,
+          "esercizio_id": 47,
+          "numero_registrazione": 4,
+          "data_registrazione": "2026-02-15",
+          "descrizione": "Versamento IVA"
+        },
+        {
+          "id": 5,
+          "esercizio_id": 5,
+          "numero_registrazione": 5,
+          "data_registrazione": "2026-02-22",
+          "descrizione": "Corrispettivi cassa"
+        },
+        {
+          "id": 6,
+          "esercizio_id": 48,
+          "numero_registrazione": 6,
+          "data_registrazione": "2026-01-26",
+          "descrizione": "Liquidazione stipendi"
+        },
+        {
+          "id": 7,
+          "esercizio_id": 7,
+          "numero_registrazione": 7,
+          "data_registrazione": "2026-01-05",
+          "descrizione": "Fattura vendita cliente Alpha"
+        },
+        {
+          "id": 8,
+          "esercizio_id": 28,
+          "numero_registrazione": 8,
+          "data_registrazione": "2025-12-08",
+          "descrizione": "Versamento IVA"
+        }
+      ],
+      "movimenti_contabili": [
+        {
+          "id": 1,
+          "registrazione_id": 21,
+          "conto_id": 19,
+          "importo": "950",
+          "dare_avere": "dare",
+          "data_valuta": "2026-01-15"
+        },
+        {
+          "id": 2,
+          "registrazione_id": 433,
+          "conto_id": 23,
+          "importo": "15000",
+          "dare_avere": "dare",
+          "data_valuta": "2026-01-07"
+        },
+        {
+          "id": 3,
+          "registrazione_id": 401,
+          "conto_id": 32,
+          "importo": "75.25",
+          "dare_avere": "avere",
+          "data_valuta": "2025-12-16"
+        },
+        {
+          "id": 4,
+          "registrazione_id": 329,
+          "conto_id": 33,
+          "importo": "89.90",
+          "dare_avere": "avere",
+          "data_valuta": "2025-12-26"
+        },
+        {
+          "id": 5,
+          "registrazione_id": 12,
+          "conto_id": 35,
+          "importo": "480.75",
+          "dare_avere": "dare",
+          "data_valuta": "2026-01-08"
+        },
+        {
+          "id": 6,
+          "registrazione_id": 148,
+          "conto_id": 20,
+          "importo": "1875.30",
+          "dare_avere": "dare",
+          "data_valuta": "2025-12-11"
+        },
+        {
+          "id": 7,
+          "registrazione_id": 19,
+          "conto_id": 4,
+          "importo": "89.90",
+          "dare_avere": "avere",
+          "data_valuta": "2026-02-16"
+        },
+        {
+          "id": 8,
+          "registrazione_id": 28,
+          "conto_id": 40,
+          "importo": "75.25",
+          "dare_avere": "dare",
+          "data_valuta": "2025-12-17"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "sorting"
+  ],
+  "query": "SELECT r.descrizione AS descrizione_registrazione, c.codice_conto AS codice_conto, c.denominazione AS denominazione_conto, m.importo::numeric AS importo_movimento, m.data_valuta AS data_valuta FROM movimenti_contabili m JOIN registrazioni r ON m.registrazione_id = r.id JOIN conti c ON m.conto_id = c.id WHERE m.dare_avere = 'dare' AND c.tipo_conto = 'costo' ORDER BY importo_movimento DESC, data_valuta ASC, m.id ASC;"
+}

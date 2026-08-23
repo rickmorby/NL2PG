@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 5,
+    "hierarchy": "one_to_many_nullable",
+    "sql_features": [
+      "conjunctive"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "vettori",
+        "obsolete_value": "anagrafica_trasportatori",
+        "description": "La tabella vettori, che contiene i trasportatori incaricati delle spedizioni, viene denominata anagrafica_trasportatori nella prosa aziendale. L'utente deve risalire alla tabella reale vettori tramite la FK nullable spedizioni.id_vettore."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "peso_kg",
+        "obsolete_value": "massa_merce",
+        "description": "La colonna peso_kg della tabella spedizioni viene indicata nella documentazione aziendale come massa_merce. Le query con filtri congiuntivi sul peso devono mappare tale sinonimo alla colonna reale peso_kg."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "colli",
+        "obsolete_value": "unita_di_movimentazione",
+        "description": "La tabella colli, figlia di spedizioni, viene indicata con il gergo del settore logistico come unita_di_movimentazione (handling units). L'utente deve interpretare il termine tecnico e collegarlo alla tabella reale colli tramite la FK colli.id_spedizione."
+      }
+    ],
+    "spec_hash": "e2c511382bd7f330"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT\n);\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT\n);\n\nCREATE TABLE vettori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    tipo_mezzo TEXT NOT NULL CHECK (tipo_mezzo IN ('furgone', 'camion', 'tir', 'nave', 'aereo'))\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    magazzino_partenza_id INT REFERENCES magazzini(id),\n    id_vettore INT REFERENCES vettori(id),\n    peso_kg NUMERIC(10,2) NOT NULL CHECK (peso_kg > 0),\n    data_spedizione DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    costo_spedizione NUMERIC(10,2) CHECK (costo_spedizione >= 0)\n);\n\nCREATE TABLE colli (\n    id INT PRIMARY KEY,\n    id_spedizione INT NOT NULL REFERENCES spedizioni(id),\n    numero_collo INT NOT NULL,\n    descrizione TEXT,\n    lunghezza_cm NUMERIC(6,2) CHECK (lunghezza_cm > 0),\n    larghezza_cm NUMERIC(6,2) CHECK (larghezza_cm > 0),\n    altezza_cm NUMERIC(6,2) CHECK (altezza_cm > 0),\n    UNIQUE (id_spedizione, numero_collo)\n);"
+}

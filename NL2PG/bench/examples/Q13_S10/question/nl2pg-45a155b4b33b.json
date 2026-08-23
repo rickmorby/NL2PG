@@ -1,0 +1,4 @@
+{
+  "story": "All'interno del dipartimento logistico, la direzione conduce verifiche periodiche per ottimizzare la gestione delle merci e monitorare l'efficienza dei partner esterni. Per ciascun operatore logistico terzo censito nell'archivio denominato corriere, il centro di controllo esamina con attenzione i volumi movimentati. All'interno del registro intitolato carichi in partenza, che raccoglie tutti i dettagli relativi agli invii effettuati, gli analisti verificano il peso complessivo registrato per ogni operazione di trasporto, ponendo particolare attenzione alle spedizioni che superano la soglia di 50 kg. Infine, ogni singolo pacco viene catalogato con cura nella sezione denominata colli, assicurando la tracciabilità e la corretta associazione dei valori dichiarati per ciascun invio.",
+  "question": "Quali sono i nomi e i recapiti telefonici dei corrieri che hanno gestito almeno una spedizione con un peso superiore a 50 kg?"
+}

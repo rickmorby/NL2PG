@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "boolean_predicate"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_risorse_umane",
+        "description": "La tabella dipendenti viene denominata anagrafica_risorse_umane nella prosa aziendale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "progetti",
+        "obsolete_value": "commesse",
+        "description": "Il termine commesse è utilizzato come sinonimo di progetti nei documenti interni."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "assegnazioni_progetto",
+        "obsolete_value": "allocazioni_risorse",
+        "description": "Nel gergo aziendale le assegnazioni_progetto sono chiamate allocazioni_risorse."
+      }
+    ],
+    "spec_hash": "b6e193f6e6940bf7"
+  },
+  "schema_ddl": "CREATE TABLE anagrafica_risorse_umane (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE,\n    attivo BOOLEAN DEFAULT TRUE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE progetti (\n    id INT PRIMARY KEY,\n    nome_progetto TEXT NOT NULL,\n    budget NUMERIC(12,2) CHECK (budget >= 0),\n    data_inizio DATE,\n    data_fine DATE,\n    completato BOOLEAN DEFAULT FALSE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE assegnazioni_progetto (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES anagrafica_risorse_umane(id),\n    progetto_id INT NOT NULL REFERENCES progetti(id),\n    data_assegnazione DATE DEFAULT CURRENT_DATE,\n    percentuale_allocazione NUMERIC(5,2) CHECK (percentuale_allocazione > 0 AND percentuale_allocazione <= 100),\n    attiva BOOLEAN DEFAULT TRUE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);"
+}

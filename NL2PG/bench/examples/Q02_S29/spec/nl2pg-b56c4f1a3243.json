@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 2,
+  "hierarchy": "one_to_one",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_personale",
+      "description": "La tabella fisica dipendenti viene denominata anagrafica_personale nella prosa aziendale. I dati anagrafici dell'entità logica dipendente sono suddivisi in più colonne fisiche (nome e cognome separati) e la tabella complementare retribuzioni completa il profilo tramite relazione uno-a-uno."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stipendio_base",
+      "obsolete_value": "RAL",
+      "description": "La colonna stipendio_base della tabella retribuzioni viene indicata nella documentazione aziendale con il gergo HR 'RAL' (Retribuzione Annua Lorda). Le query di aggregazione scalare (es. AVG o MAX sulla retribuzione complessiva) devono combinare stipendio_base e bonus_annuo, colonne fisiche separate che insieme compongono il valore logico unitario."
+    }
+  ],
+  "spec_hash": "c276df67b989cb8a"
+}

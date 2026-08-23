@@ -1,0 +1,501 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_apertura_relazione DATE NOT NULL\n);\n\nCREATE TABLE filiali (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    codice_abi TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    filiale_id INT NOT NULL,\n    iban TEXT NOT NULL UNIQUE,\n    fido_concesso NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (fido_concesso >= 0),\n    saldo NUMERIC(12,2) NOT NULL DEFAULT 0,\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL,\n    data_transazione DATE NOT NULL,\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('accredito', 'addebito')),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    descrizione TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 725,
+        "columns": {
+          "id": {
+            "distinct": 725,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 725
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro Neri",
+              "Chiara Moretti",
+              "Davide Fontana",
+              "Elena Marchetti",
+              "Francesca Rinaldi"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 725,
+            "sample": [
+              "BNCLRA75C22F205B",
+              "BNCLRA75C22F205C",
+              "BNCLRA75C22F205D",
+              "BNCLRA75C22F205E",
+              "BNCLRA75C22F205F"
+            ]
+          },
+          "data_apertura_relazione": {
+            "distinct": 605,
+            "sample": [
+              "2015-05-25",
+              "2015-06-02",
+              "2015-06-26",
+              "2015-07-23",
+              "2015-07-28"
+            ]
+          }
+        }
+      },
+      "filiali": {
+        "row_count": 30,
+        "columns": {
+          "id": {
+            "distinct": 30,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 30
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Agenzia Centro",
+              "Agenzia Duomo",
+              "Agenzia Garibaldi",
+              "Agenzia Indipendenza",
+              "Agenzia Mazzini"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "codice_abi": {
+            "distinct": 30,
+            "sample": [
+              "00500",
+              "00501",
+              "00502",
+              "00503",
+              "00504"
+            ]
+          }
+        }
+      },
+      "conti": {
+        "row_count": 411,
+        "columns": {
+          "id": {
+            "distinct": 411,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 411
+          },
+          "cliente_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "filiale_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "iban": {
+            "distinct": 411,
+            "sample": [
+              "IT60X0542811101000000123456",
+              "IT60X05428111010000001234561",
+              "IT60X054281110100000012345610",
+              "IT60X054281110100000012345611",
+              "IT60X054281110100000012345612"
+            ]
+          },
+          "fido_concesso": {
+            "distinct": 333,
+            "sample": [
+              "0.0",
+              "10000.0",
+              "10072.31",
+              "10287.74",
+              "10294.88"
+            ],
+            "min": 0.0,
+            "max": 29699.41
+          },
+          "saldo": {
+            "distinct": 400,
+            "sample": [
+              "-100.15",
+              "-100.76",
+              "-102.32",
+              "-107.56",
+              "-114.13"
+            ],
+            "min": -4714.62,
+            "max": 119687.47
+          },
+          "data_apertura": {
+            "distinct": 376,
+            "sample": [
+              "2015-07-31",
+              "2015-08-19",
+              "2015-08-20",
+              "2016-01-12",
+              "2016-01-26"
+            ]
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 2991,
+        "columns": {
+          "id": {
+            "distinct": 2991,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2991
+          },
+          "conto_id": {
+            "distinct": 8,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 8
+          },
+          "data_transazione": {
+            "distinct": 455,
+            "sample": [
+              "2024-07-14",
+              "2024-07-16",
+              "2024-07-17",
+              "2024-07-18",
+              "2024-07-19"
+            ]
+          },
+          "tipo_movimento": {
+            "distinct": 2,
+            "sample": [
+              "accredito",
+              "addebito"
+            ]
+          },
+          "importo": {
+            "distinct": 2845,
+            "sample": [
+              "10.13",
+              "10.27",
+              "10.53",
+              "10.55",
+              "100.04"
+            ],
+            "min": 9.1,
+            "max": 10200.0
+          },
+          "descrizione": {
+            "distinct": 12,
+            "sample": [
+              "Accredito dividendi",
+              "Accredito stipendio",
+              "Acquisto elettronica",
+              "Addebito bolletta gas",
+              "Bonifico in uscita fornitore"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Francesca Rinaldi",
+          "codice_fiscale": "RSSMRA80A01H501U",
+          "data_apertura_relazione": "2019-06-01"
+        },
+        {
+          "id": 2,
+          "nome": "Chiara Moretti",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "data_apertura_relazione": "2018-10-16"
+        },
+        {
+          "id": 3,
+          "nome": "Paolo Gatti",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "data_apertura_relazione": "2016-04-18"
+        },
+        {
+          "id": 4,
+          "nome": "Marco De Luca",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "data_apertura_relazione": "2018-01-31"
+        },
+        {
+          "id": 5,
+          "nome": "Francesca Rinaldi",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "data_apertura_relazione": "2019-10-04"
+        },
+        {
+          "id": 6,
+          "nome": "Laura Bianchi",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "data_apertura_relazione": "2017-11-23"
+        },
+        {
+          "id": 7,
+          "nome": "Chiara Moretti",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "data_apertura_relazione": "2019-09-13"
+        },
+        {
+          "id": 8,
+          "nome": "Paolo Gatti",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "data_apertura_relazione": "2019-04-17"
+        }
+      ],
+      "filiali": [
+        {
+          "id": 1,
+          "nome": "Agenzia Duomo",
+          "citta": "Torino",
+          "codice_abi": "03069"
+        },
+        {
+          "id": 2,
+          "nome": "Agenzia Signoria",
+          "citta": "Firenze",
+          "codice_abi": "03070"
+        },
+        {
+          "id": 3,
+          "nome": "Agenzia Centro",
+          "citta": "Bologna",
+          "codice_abi": "03071"
+        },
+        {
+          "id": 4,
+          "nome": "Agenzia Toledo",
+          "citta": "Napoli",
+          "codice_abi": "03072"
+        },
+        {
+          "id": 5,
+          "nome": "Agenzia Vittorio Veneto",
+          "citta": "Genova",
+          "codice_abi": "03073"
+        },
+        {
+          "id": 6,
+          "nome": "Agenzia Porta Nuova",
+          "citta": "Roma",
+          "codice_abi": "05696"
+        },
+        {
+          "id": 7,
+          "nome": "Agenzia Duomo",
+          "citta": "Milano",
+          "codice_abi": "05697"
+        },
+        {
+          "id": 8,
+          "nome": "Agenzia Duomo",
+          "citta": "Genova",
+          "codice_abi": "05698"
+        }
+      ],
+      "conti": [
+        {
+          "id": 1,
+          "cliente_id": 1,
+          "filiale_id": 1,
+          "iban": "IT60X0542811101000000123456",
+          "fido_concesso": 15000.0,
+          "saldo": 4283.08,
+          "data_apertura": "2018-06-12"
+        },
+        {
+          "id": 2,
+          "cliente_id": 1,
+          "filiale_id": 1,
+          "iban": "IT60X05428111010000001234561",
+          "fido_concesso": 2701.82,
+          "saldo": 16506.0,
+          "data_apertura": "2018-01-31"
+        },
+        {
+          "id": 3,
+          "cliente_id": 1,
+          "filiale_id": 1,
+          "iban": "IT60X05428111010000001234562",
+          "fido_concesso": 11178.6,
+          "saldo": 11699.26,
+          "data_apertura": "2020-06-10"
+        },
+        {
+          "id": 4,
+          "cliente_id": 1,
+          "filiale_id": 1,
+          "iban": "IT60X05428111010000001234563",
+          "fido_concesso": 10813.69,
+          "saldo": 25266.07,
+          "data_apertura": "2020-07-30"
+        },
+        {
+          "id": 5,
+          "cliente_id": 1,
+          "filiale_id": 1,
+          "iban": "IT60X05428111010000001234564",
+          "fido_concesso": 6105.41,
+          "saldo": 21702.54,
+          "data_apertura": "2019-11-17"
+        },
+        {
+          "id": 6,
+          "cliente_id": 1,
+          "filiale_id": 1,
+          "iban": "IT60X05428111010000001234565",
+          "fido_concesso": 11370.92,
+          "saldo": 17369.86,
+          "data_apertura": "2019-08-20"
+        },
+        {
+          "id": 7,
+          "cliente_id": 1,
+          "filiale_id": 1,
+          "iban": "IT60X05428111010000001234566",
+          "fido_concesso": 5369.9,
+          "saldo": 27769.87,
+          "data_apertura": "2018-10-22"
+        },
+        {
+          "id": 8,
+          "cliente_id": 1,
+          "filiale_id": 1,
+          "iban": "IT60X05428111010000001234567",
+          "fido_concesso": 10956.05,
+          "saldo": 6285.72,
+          "data_apertura": "2018-05-12"
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 1,
+          "conto_id": 1,
+          "data_transazione": "2024-11-12",
+          "tipo_movimento": "accredito",
+          "importo": 6355.04,
+          "descrizione": "Bonifico in uscita fornitore"
+        },
+        {
+          "id": 2,
+          "conto_id": 1,
+          "data_transazione": "2024-12-30",
+          "tipo_movimento": "accredito",
+          "importo": 603.11,
+          "descrizione": "Canone affitto mensile"
+        },
+        {
+          "id": 3,
+          "conto_id": 1,
+          "data_transazione": "2025-04-08",
+          "tipo_movimento": "addebito",
+          "importo": 4110.48,
+          "descrizione": "Acquisto elettronica"
+        },
+        {
+          "id": 4,
+          "conto_id": 1,
+          "data_transazione": "2025-05-15",
+          "tipo_movimento": "addebito",
+          "importo": 2858.55,
+          "descrizione": "Rimborso spese"
+        },
+        {
+          "id": 5,
+          "conto_id": 1,
+          "data_transazione": "2024-12-31",
+          "tipo_movimento": "addebito",
+          "importo": 3106.2,
+          "descrizione": "Canone affitto mensile"
+        },
+        {
+          "id": 6,
+          "conto_id": 1,
+          "data_transazione": "2025-05-05",
+          "tipo_movimento": "addebito",
+          "importo": 6089.64,
+          "descrizione": "Versamento contanti"
+        },
+        {
+          "id": 7,
+          "conto_id": 1,
+          "data_transazione": "2024-11-19",
+          "tipo_movimento": "addebito",
+          "importo": 4448.88,
+          "descrizione": "Prelievo ATM"
+        },
+        {
+          "id": 8,
+          "conto_id": 1,
+          "data_transazione": "2025-06-18",
+          "tipo_movimento": "addebito",
+          "importo": 3570.34,
+          "descrizione": "Rimborso spese"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "group_agg",
+    "having"
+  ],
+  "query": "SELECT f.citta, COUNT(c.id) AS numero_conti, COUNT(DISTINCT c.cliente_id) AS clienti_distinti, ROUND(SUM(c.saldo), 2) AS saldo_totale, ROUND(AVG(c.fido_concesso), 2) AS fido_medio FROM filiali f JOIN conti c ON c.filiale_id = f.id WHERE c.data_apertura >= DATE '2018-01-01' GROUP BY f.citta HAVING COUNT(c.id) >= 10 ORDER BY saldo_totale DESC;"
+}

@@ -1,0 +1,12 @@
+{
+  "domain": "finanza",
+  "n_tables": 8,
+  "hierarchy": "multi_entity",
+  "sql_features": [
+    "join",
+    "multi_join"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "ce62e9bc49a200ca"
+}

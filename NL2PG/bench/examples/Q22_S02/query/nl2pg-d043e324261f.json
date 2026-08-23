@@ -1,0 +1,399 @@
+{
+  "schema_ddl": "CREATE TABLE studenti (\n    id INT PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE corsi (\n    id INT PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    titolo TEXT NOT NULL,\n    docente TEXT,\n    crediti INT NOT NULL CHECK (crediti BETWEEN 1 AND 30)\n);\n\nCREATE TABLE esami (\n    id INT PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    data_esame DATE NOT NULL,\n    voto INT NOT NULL CHECK (voto BETWEEN 0 AND 30),\n    lode BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_profile": {
+    "profile": {
+      "studenti": {
+        "row_count": 661,
+        "columns": {
+          "id": {
+            "distinct": 661,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 661
+          },
+          "matricola": {
+            "distinct": 661,
+            "sample": [
+              "MAT20210001",
+              "MAT202100011",
+              "MAT2021000110",
+              "MAT20210001100",
+              "MAT20210001101"
+            ]
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Costa",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 492,
+            "sample": [
+              "2000-02-26",
+              "2000-02-28",
+              "2000-03-24",
+              "2000-03-26",
+              "2000-04-19"
+            ]
+          },
+          "email": {
+            "distinct": 632,
+            "sample": [
+              "alessandro.ricci100@studenti.uniroma1.it",
+              "alessandro.ricci101@studenti.uniroma1.it",
+              "alessandro.ricci102@studenti.uniroma1.it",
+              "alessandro.ricci103@studenti.uniroma1.it",
+              "alessandro.ricci104@studenti.uniroma1.it"
+            ]
+          }
+        }
+      },
+      "corsi": {
+        "row_count": 47,
+        "columns": {
+          "id": {
+            "distinct": 47,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 47
+          },
+          "codice": {
+            "distinct": 47,
+            "sample": [
+              "ECO1050",
+              "ECO10501",
+              "ECO10502",
+              "ECO10503",
+              "ECO10504"
+            ]
+          },
+          "titolo": {
+            "distinct": 8,
+            "sample": [
+              "Analisi Matematica II",
+              "Basi di Dati",
+              "Ingegneria del Software",
+              "Microeconomia",
+              "Programmazione Avanzata"
+            ]
+          },
+          "docente": {
+            "distinct": 10,
+            "sample": [
+              "Prof. Andrea Colombo",
+              "Prof. Carlo Gatti",
+              "Prof. Fabio Marchetti",
+              "Prof. Giorgio Damiani",
+              "Prof. Marco Salvi"
+            ]
+          },
+          "crediti": {
+            "distinct": 4,
+            "sample": [
+              "12",
+              "15",
+              "6",
+              "9"
+            ],
+            "min": 6,
+            "max": 12
+          }
+        }
+      },
+      "esami": {
+        "row_count": 1706,
+        "columns": {
+          "id": {
+            "distinct": 1706,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1706
+          },
+          "studente_id": {
+            "distinct": 618,
+            "sample": [
+              "1",
+              "10",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 661
+          },
+          "corso_id": {
+            "distinct": 47,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 47
+          },
+          "data_esame": {
+            "distinct": 247,
+            "sample": [
+              "2024-12-16",
+              "2024-12-17",
+              "2024-12-18",
+              "2024-12-19",
+              "2024-12-20"
+            ]
+          },
+          "voto": {
+            "distinct": 16,
+            "sample": [
+              "14",
+              "16",
+              "17",
+              "18",
+              "19"
+            ],
+            "min": 16,
+            "max": 30
+          },
+          "lode": {
+            "distinct": 1,
+            "sample": [
+              "False"
+            ],
+            "min": false,
+            "max": false
+          }
+        }
+      }
+    },
+    "preview": {
+      "studenti": [
+        {
+          "id": 48,
+          "matricola": "MAT2021000147",
+          "nome": "Elena",
+          "cognome": "Ricci",
+          "data_nascita": "2003-04-10",
+          "email": "elena.ricci1@example.com"
+        },
+        {
+          "id": 14,
+          "matricola": "MAT2021000113",
+          "nome": "Matteo",
+          "cognome": "Ferrari",
+          "data_nascita": "2001-11-08",
+          "email": "matteo.ferrari1@example.com"
+        },
+        {
+          "id": 58,
+          "matricola": "MAT2021000157",
+          "nome": "Sara",
+          "cognome": "Bianchi",
+          "data_nascita": "2003-01-11",
+          "email": "sara.bianchi1@example.com"
+        },
+        {
+          "id": 64,
+          "matricola": "MAT2021000163",
+          "nome": "Sara",
+          "cognome": "Costa",
+          "data_nascita": "2001-11-21",
+          "email": "sara.costa1@example.com"
+        },
+        {
+          "id": 140,
+          "matricola": "MAT2021000228",
+          "nome": "Chiara",
+          "cognome": "Ferrari",
+          "data_nascita": null,
+          "email": "chiara.ferrari1@example.com"
+        },
+        {
+          "id": 126,
+          "matricola": "MAT2021000214",
+          "nome": "Marco",
+          "cognome": "Gallo",
+          "data_nascita": "2001-04-27",
+          "email": "marco.gallo1@example.com"
+        },
+        {
+          "id": 203,
+          "matricola": "MAT2021000291",
+          "nome": "Giulia",
+          "cognome": "Bianchi",
+          "data_nascita": "2001-11-02",
+          "email": "giulia.bianchi1@example.com"
+        },
+        {
+          "id": 169,
+          "matricola": "MAT2021000257",
+          "nome": "Marco",
+          "cognome": "Costa",
+          "data_nascita": "2002-12-10",
+          "email": "marco.costa1@example.com"
+        }
+      ],
+      "corsi": [
+        {
+          "id": 1,
+          "codice": "INF1010",
+          "titolo": "Basi di Dati",
+          "docente": "Prof.ssa Silvia Greco",
+          "crediti": "15"
+        },
+        {
+          "id": 2,
+          "codice": "INF10101",
+          "titolo": "Basi di Dati",
+          "docente": "Prof.ssa Elena Vitale",
+          "crediti": "6"
+        },
+        {
+          "id": 3,
+          "codice": "INF10102",
+          "titolo": "Basi di Dati",
+          "docente": "Prof.ssa Laura Fontana",
+          "crediti": "15"
+        },
+        {
+          "id": 4,
+          "codice": "INF10103",
+          "titolo": "Basi di Dati",
+          "docente": null,
+          "crediti": "9"
+        },
+        {
+          "id": 5,
+          "codice": "INF10104",
+          "titolo": "Basi di Dati",
+          "docente": "Prof.ssa Silvia Greco",
+          "crediti": "9"
+        },
+        {
+          "id": 6,
+          "codice": "INF10105",
+          "titolo": "Basi di Dati",
+          "docente": "Prof.ssa Elena Vitale",
+          "crediti": "12"
+        },
+        {
+          "id": 7,
+          "codice": "INF1020",
+          "titolo": "Programmazione Avanzata",
+          "docente": "Prof. Marco Salvi",
+          "crediti": "12"
+        },
+        {
+          "id": 8,
+          "codice": "INF10201",
+          "titolo": "Programmazione Avanzata",
+          "docente": "Prof.ssa Elena Vitale",
+          "crediti": "12"
+        }
+      ],
+      "esami": [
+        {
+          "id": 1,
+          "studente_id": 139,
+          "corso_id": 17,
+          "data_esame": "2025-02-06",
+          "voto": "29",
+          "lode": false
+        },
+        {
+          "id": 2,
+          "studente_id": 191,
+          "corso_id": 29,
+          "data_esame": "2024-12-20",
+          "voto": "25",
+          "lode": false
+        },
+        {
+          "id": 3,
+          "studente_id": 240,
+          "corso_id": 37,
+          "data_esame": "2025-02-06",
+          "voto": "27",
+          "lode": false
+        },
+        {
+          "id": 4,
+          "studente_id": 619,
+          "corso_id": 18,
+          "data_esame": "2025-01-04",
+          "voto": "22",
+          "lode": false
+        },
+        {
+          "id": 5,
+          "studente_id": 199,
+          "corso_id": 45,
+          "data_esame": "2025-01-15",
+          "voto": "14",
+          "lode": false
+        },
+        {
+          "id": 6,
+          "studente_id": 89,
+          "corso_id": 8,
+          "data_esame": "2025-01-05",
+          "voto": "24",
+          "lode": false
+        },
+        {
+          "id": 7,
+          "studente_id": 122,
+          "corso_id": 37,
+          "data_esame": "2024-12-28",
+          "voto": "18",
+          "lode": false
+        },
+        {
+          "id": 8,
+          "studente_id": 364,
+          "corso_id": 45,
+          "data_esame": "2025-02-07",
+          "voto": "26",
+          "lode": false
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "distinct_on"
+  ],
+  "query": "SELECT DISTINCT ON (e.corso_id) c.titolo AS titolo_corso, c.docente AS docente_corso, INITCAP(s.nome || ' ' || s.cognome) AS studente_migliore, e.voto AS voto_ottenuto, e.data_esame AS data_esame_top FROM esami e JOIN corsi c ON c.id = e.corso_id JOIN studenti s ON s.id = e.studente_id WHERE e.voto >= 18 ORDER BY e.corso_id, e.voto DESC, e.data_esame ASC, e.id ASC;"
+}

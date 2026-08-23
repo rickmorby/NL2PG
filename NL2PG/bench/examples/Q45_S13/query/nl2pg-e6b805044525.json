@@ -1,0 +1,365 @@
+{
+  "schema_ddl": "CREATE TABLE filiali (\n    id INT PRIMARY KEY,\n    filiale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE ordini (\n    id_ordine INT PRIMARY KEY,\n    filiale_id INT NOT NULL REFERENCES filiali(id),\n    nome_filiale TEXT NOT NULL,\n    cliente TEXT NOT NULL,\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    regione_spedizione TEXT NOT NULL\n);\n\nCREATE TABLE righe_ordine (\n    ordine_id INT NOT NULL REFERENCES ordini(id_ordine),\n    numero_riga INT NOT NULL CHECK (numero_riga > 0),\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);",
+  "data_profile": {
+    "profile": {
+      "filiali": {
+        "row_count": 47,
+        "columns": {
+          "id": {
+            "distinct": 47,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 47
+          },
+          "filiale": {
+            "distinct": 47,
+            "sample": [
+              "Filiale Centro Roma",
+              "Filiale Centro Roma1",
+              "Filiale Centro Roma2",
+              "Filiale Centro Roma3",
+              "Filiale Centro Roma4"
+            ]
+          },
+          "citta": {
+            "distinct": 5,
+            "sample": [
+              "Bologna",
+              "Milano",
+              "Napoli",
+              "Roma",
+              "Torino"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 2909,
+        "columns": {
+          "id_ordine": {
+            "distinct": 2909,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3909
+          },
+          "filiale_id": {
+            "distinct": 47,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 47
+          },
+          "nome_filiale": {
+            "distinct": 5,
+            "sample": [
+              "Filiale Centro Roma",
+              "Filiale Est Bologna",
+              "Sede Nord Milano",
+              "Sede Nord Torino",
+              "Sede Sud Napoli"
+            ]
+          },
+          "cliente": {
+            "distinct": 8,
+            "sample": [
+              "Alpi Componenti SRL",
+              "Elettronica Lazio SNC",
+              "Emilia Pack SpA",
+              "Ferramenta Centrale SAS",
+              "Mediterraneo Food SpA"
+            ]
+          },
+          "data_ordine": {
+            "distinct": 140,
+            "sample": [
+              "2025-12-01",
+              "2025-12-02",
+              "2025-12-03",
+              "2025-12-04",
+              "2025-12-05"
+            ]
+          },
+          "importo_totale": {
+            "distinct": 2776,
+            "sample": [
+              "1000.27",
+              "1001.77",
+              "1001.78",
+              "1002.41",
+              "1005.12"
+            ],
+            "min": 256.0,
+            "max": 5851.88
+          },
+          "regione_spedizione": {
+            "distinct": 4,
+            "sample": [
+              "Centro",
+              "Isole",
+              "Nord",
+              "Sud"
+            ]
+          }
+        }
+      },
+      "righe_ordine": {
+        "row_count": 1864,
+        "columns": {
+          "ordine_id": {
+            "distinct": 1371,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1006",
+              "1007"
+            ],
+            "min": 1001,
+            "max": 3905
+          },
+          "numero_riga": {
+            "distinct": 1864,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1864
+          },
+          "prodotto": {
+            "distinct": 8,
+            "sample": [
+              "Docking Station USB-C",
+              "Laptop Pro 14",
+              "Monitor 27 4K",
+              "Mouse Wireless MX",
+              "SSD Esterno 1TB"
+            ]
+          },
+          "quantita": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "prezzo_unitario": {
+            "distinct": 1773,
+            "sample": [
+              "100.72",
+              "100.82",
+              "100.88",
+              "101.0",
+              "101.38"
+            ],
+            "min": 14.97,
+            "max": 1798.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "filiali": [
+        {
+          "id": 1,
+          "filiale": "Sede Nord Milano",
+          "citta": "Milano"
+        },
+        {
+          "id": 2,
+          "filiale": "Sede Nord Milano1",
+          "citta": "Milano"
+        },
+        {
+          "id": 3,
+          "filiale": "Sede Nord Milano2",
+          "citta": "Milano"
+        },
+        {
+          "id": 4,
+          "filiale": "Sede Nord Milano3",
+          "citta": "Milano"
+        },
+        {
+          "id": 5,
+          "filiale": "Sede Nord Milano4",
+          "citta": "Milano"
+        },
+        {
+          "id": 6,
+          "filiale": "Sede Nord Milano5",
+          "citta": "Milano"
+        },
+        {
+          "id": 7,
+          "filiale": "Sede Nord Milano6",
+          "citta": "Milano"
+        },
+        {
+          "id": 8,
+          "filiale": "Sede Nord Milano7",
+          "citta": "Milano"
+        }
+      ],
+      "ordini": [
+        {
+          "id_ordine": 1001,
+          "filiale_id": 46,
+          "nome_filiale": "Filiale Est Bologna",
+          "cliente": "Alpi Componenti SRL",
+          "data_ordine": "2025-12-16",
+          "importo_totale": 1311.67,
+          "regione_spedizione": "Nord"
+        },
+        {
+          "id_ordine": 1002,
+          "filiale_id": 26,
+          "nome_filiale": "Filiale Est Bologna",
+          "cliente": "Alpi Componenti SRL",
+          "data_ordine": "2026-02-03",
+          "importo_totale": 2018.02,
+          "regione_spedizione": "Centro"
+        },
+        {
+          "id_ordine": 1003,
+          "filiale_id": 33,
+          "nome_filiale": "Sede Nord Milano",
+          "cliente": "Tessili Adriatico SRL",
+          "data_ordine": "2026-02-08",
+          "importo_totale": 2965.23,
+          "regione_spedizione": "Centro"
+        },
+        {
+          "id_ordine": 1004,
+          "filiale_id": 20,
+          "nome_filiale": "Sede Nord Milano",
+          "cliente": "Ferramenta Centrale SAS",
+          "data_ordine": "2026-01-20",
+          "importo_totale": 1567.06,
+          "regione_spedizione": "Nord"
+        },
+        {
+          "id_ordine": 1005,
+          "filiale_id": 35,
+          "nome_filiale": "Sede Sud Napoli",
+          "cliente": "Alpi Componenti SRL",
+          "data_ordine": "2026-01-24",
+          "importo_totale": 1784.86,
+          "regione_spedizione": "Nord"
+        },
+        {
+          "id_ordine": 1006,
+          "filiale_id": 17,
+          "nome_filiale": "Filiale Centro Roma",
+          "cliente": "Tessili Adriatico SRL",
+          "data_ordine": "2026-01-29",
+          "importo_totale": 1506.2,
+          "regione_spedizione": "Sud"
+        },
+        {
+          "id_ordine": 1007,
+          "filiale_id": 7,
+          "nome_filiale": "Sede Nord Milano",
+          "cliente": "Rossi Distribuzione SRL",
+          "data_ordine": "2025-12-26",
+          "importo_totale": 2441.94,
+          "regione_spedizione": "Isole"
+        },
+        {
+          "id_ordine": 1008,
+          "filiale_id": 11,
+          "nome_filiale": "Filiale Centro Roma",
+          "cliente": "Ufficio Più SpA",
+          "data_ordine": "2026-01-24",
+          "importo_totale": 2591.41,
+          "regione_spedizione": "Nord"
+        }
+      ],
+      "righe_ordine": [
+        {
+          "ordine_id": 1457,
+          "numero_riga": 1,
+          "prodotto": "Monitor 27 4K",
+          "quantita": "2",
+          "prezzo_unitario": 1542.45
+        },
+        {
+          "ordine_id": 2550,
+          "numero_riga": 2,
+          "prodotto": "Monitor 27 4K",
+          "quantita": "3",
+          "prezzo_unitario": 1671.41
+        },
+        {
+          "ordine_id": 1142,
+          "numero_riga": 3,
+          "prodotto": "Webcam HD Pro",
+          "quantita": "10",
+          "prezzo_unitario": 1351.61
+        },
+        {
+          "ordine_id": 2084,
+          "numero_riga": 4,
+          "prodotto": "Webcam HD Pro",
+          "quantita": "2",
+          "prezzo_unitario": 1179.79
+        },
+        {
+          "ordine_id": 1067,
+          "numero_riga": 5,
+          "prodotto": "Docking Station USB-C",
+          "quantita": "3",
+          "prezzo_unitario": 980.61
+        },
+        {
+          "ordine_id": 2551,
+          "numero_riga": 6,
+          "prodotto": "Tastiera Meccanica K8",
+          "quantita": "3",
+          "prezzo_unitario": 1798.0
+        },
+        {
+          "ordine_id": 3128,
+          "numero_riga": 7,
+          "prodotto": "Stampante LaserJet",
+          "quantita": "2",
+          "prezzo_unitario": 1576.82
+        },
+        {
+          "ordine_id": 2186,
+          "numero_riga": 8,
+          "prodotto": "Docking Station USB-C",
+          "quantita": "4",
+          "prezzo_unitario": 1077.19
+        }
+      ]
+    }
+  },
+  "feature_sql": [],
+  "query": "SELECT o.cliente, f.filiale, o.data_ordine, o.importo_totale, CASE WHEN o.importo_totale >= 3000 THEN 'Ordine Alto' WHEN o.importo_totale >= 1500 THEN 'Ordine Medio' ELSE 'Ordine Base' END AS classe_ordine, RANK() OVER (ORDER BY o.importo_totale DESC) AS posizione_fatturato FROM ordini o JOIN filiali f ON f.id = o.filiale_id WHERE o.regione_spedizione = 'Nord' AND o.data_ordine >= DATE '2026-01-01' ORDER BY o.importo_totale DESC, o.id_ordine ASC LIMIT 10;"
+}

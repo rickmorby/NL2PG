@@ -1,0 +1,781 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 10,
+    "hierarchy": "path_routing",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [
+      "distractor"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "distractor",
+        "target_value": "iscrizioni_esami",
+        "obsolete_value": "registro_partecipazioni_verifiche",
+        "description": "La prosa aziendale descrive i dati richiesti come 'registro_partecipazioni_verifiche', suggerendo erroneamente tabelle distrattori plausibili ma irrilevanti presenti nello schema ampio (come 'presenze_lezioni', 'aule' o 'laboratori') che condividono colonne con nome comune (es. studente_id, corso_id, data). L'entità corretta è la tabella iscrizioni_esami, raggiungibile solo tramite il percorso di NATURAL JOIN studenti -> corsi -> appelli -> iscrizioni_esami, ignorando le tabelle esca poste lungo percorsi alternativi."
+      }
+    ],
+    "spec_hash": "80457aadd2a0f0df"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE docenti (\n    id INT PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE studenti (\n    id INT PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_immatricolazione DATE NOT NULL,\n    email TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE corsi (\n    id INT PRIMARY KEY,\n    docente_id INT NOT NULL REFERENCES docenti(id),\n    codice TEXT NOT NULL UNIQUE,\n    titolo TEXT NOT NULL,\n    cfu INT NOT NULL CHECK (cfu BETWEEN 1 AND 30),\n    anno_corso INT NOT NULL CHECK (anno_corso BETWEEN 1 AND 3)\n);\n\nCREATE TABLE aule (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    edificio TEXT NOT NULL,\n    capienza INT NOT NULL CHECK (capienza > 0)\n);\n\nCREATE TABLE laboratori (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    edificio TEXT NOT NULL,\n    capienza INT NOT NULL CHECK (capienza > 0),\n    responsabile_id INT REFERENCES docenti(id)\n);\n\nCREATE TABLE appelli (\n    id INT PRIMARY KEY,\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    aula_id INT REFERENCES aule(id),\n    data_appello DATE NOT NULL,\n    ora_inizio TIME NOT NULL,\n    tipo TEXT NOT NULL CHECK (tipo IN ('scritto', 'orale', 'laboratorio'))\n);\n\nCREATE TABLE iscrizioni_esami (\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    appello_id INT NOT NULL REFERENCES appelli(id),\n    data_iscrizione DATE NOT NULL,\n    voto INT CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN NOT NULL DEFAULT FALSE,\n    PRIMARY KEY (studente_id, appello_id)\n);\n\nCREATE TABLE presenze_lezioni (\n    id INT PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    data DATE NOT NULL,\n    presente BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE piani_di_studio (\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    anno_accademico TEXT NOT NULL,\n    PRIMARY KEY (studente_id, corso_id, anno_accademico)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dipartimenti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Informatica",
+            "sede": "Edificio Molo"
+          },
+          {
+            "id": 2,
+            "nome": "Matematica",
+            "sede": "Edificio Centrale"
+          },
+          {
+            "id": 3,
+            "nome": "Fisica",
+            "sede": "Edificio Fisica"
+          },
+          {
+            "id": 4,
+            "nome": "Ingegneria",
+            "sede": "Edificio Macchine"
+          },
+          {
+            "id": 5,
+            "nome": "Economia",
+            "sede": "Edificio Centrale"
+          },
+          {
+            "id": 6,
+            "nome": "Biologia",
+            "sede": "Edificio Valletta"
+          }
+        ],
+        "variations": {
+          "sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Edificio Centrale",
+              "Edificio Molo",
+              "Edificio Fisica",
+              "Edificio Valletta",
+              "Edificio Macchine"
+            ]
+          }
+        }
+      },
+      {
+        "table": "docenti",
+        "nature": "dimension",
+        "min_rows": 80,
+        "max_rows": 150,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "dipartimento_id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "email": "marco.rossi@ateneo.it"
+          },
+          {
+            "id": 2,
+            "dipartimento_id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@ateneo.it"
+          },
+          {
+            "id": 3,
+            "dipartimento_id": 1,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "email": "giulia.verdi@ateneo.it"
+          },
+          {
+            "id": 4,
+            "dipartimento_id": 3,
+            "nome": "Alessandro",
+            "cognome": "Neri",
+            "email": "alessandro.neri@ateneo.it"
+          },
+          {
+            "id": 5,
+            "dipartimento_id": 4,
+            "nome": "Francesca",
+            "cognome": "Gallo",
+            "email": "francesca.gallo@ateneo.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Davide",
+              "Sara",
+              "Luca",
+              "Paolo",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Gallo",
+              "Costa",
+              "Fontana",
+              "Ricci",
+              "Marino",
+              "Greco"
+            ]
+          }
+        }
+      },
+      {
+        "table": "studenti",
+        "nature": "dimension",
+        "min_rows": 250,
+        "max_rows": 450,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "matricola": "VR100001",
+            "nome": "Mario",
+            "cognome": "Rinaldi",
+            "codice_fiscale": "RNLMRA99T01H501K",
+            "data_immatricolazione": "2022-09-26",
+            "email": "mario.rinaldi@studenti.ateneo.it"
+          },
+          {
+            "id": 2,
+            "matricola": "VR100002",
+            "nome": "Chiara",
+            "cognome": "Moretti",
+            "codice_fiscale": "MRTCHR00C45H501Z",
+            "data_immatricolazione": "2022-09-26",
+            "email": "chiara.moretti@studenti.ateneo.it"
+          },
+          {
+            "id": 3,
+            "matricola": "VR100003",
+            "nome": "Davide",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTDVD98L03H501P",
+            "data_immatricolazione": "2021-09-27",
+            "email": "davide.conti@studenti.ateneo.it"
+          },
+          {
+            "id": 4,
+            "matricola": "VR100004",
+            "nome": "Sara",
+            "cognome": "Lombardi",
+            "codice_fiscale": "LMBSRA01D12H501W",
+            "data_immatricolazione": "2023-09-25",
+            "email": "sara.lombardi@studenti.ateneo.it"
+          },
+          {
+            "id": 5,
+            "matricola": "VR100005",
+            "nome": "Luca",
+            "cognome": "Barbieri",
+            "codice_fiscale": "BRBLCU00M08H501J",
+            "data_immatricolazione": "2023-09-25",
+            "email": "luca.barbieri@studenti.ateneo.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Chiara",
+              "Davide",
+              "Sara",
+              "Luca",
+              "Anna",
+              "Federico",
+              "Martina",
+              "Simone",
+              "Elisa"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rinaldi",
+              "Moretti",
+              "Conti",
+              "Lombardi",
+              "Barbieri",
+              "Ferri",
+              "Villa",
+              "Testa",
+              "Grassi",
+              "Pellegrini"
+            ]
+          },
+          "data_immatricolazione": {
+            "axis": "shift",
+            "delta_min": -40.0,
+            "delta_max": 40.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "corsi",
+        "nature": "dimension",
+        "min_rows": 60,
+        "max_rows": 120,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "docente_id": 1,
+            "codice": "INF001",
+            "titolo": "Programmazione I",
+            "cfu": 12,
+            "anno_corso": 1
+          },
+          {
+            "id": 2,
+            "docente_id": 2,
+            "codice": "MAT002",
+            "titolo": "Analisi Matematica I",
+            "cfu": 9,
+            "anno_corso": 1
+          },
+          {
+            "id": 3,
+            "docente_id": 3,
+            "codice": "INF003",
+            "titolo": "Basi di Dati",
+            "cfu": 12,
+            "anno_corso": 2
+          },
+          {
+            "id": 4,
+            "docente_id": 4,
+            "codice": "FIS004",
+            "titolo": "Fisica Generale I",
+            "cfu": 10,
+            "anno_corso": 1
+          },
+          {
+            "id": 5,
+            "docente_id": 5,
+            "codice": "ECO005",
+            "titolo": "Microeconomia",
+            "cfu": 8,
+            "anno_corso": 2
+          },
+          {
+            "id": 6,
+            "docente_id": 2,
+            "codice": "MAT006",
+            "titolo": "Statistica",
+            "cfu": 9,
+            "anno_corso": 2
+          }
+        ],
+        "variations": {
+          "titolo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Programmazione I",
+              "Analisi Matematica I",
+              "Basi di Dati",
+              "Fisica Generale I",
+              "Microeconomia",
+              "Statistica",
+              "Reti di Calcolatori",
+              "Chimica Organica",
+              "Algoritmi e Strutture Dati",
+              "Diritto Privato"
+            ]
+          },
+          "cfu": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "6",
+              "9",
+              "12",
+              "15",
+              "18"
+            ]
+          },
+          "anno_corso": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3"
+            ]
+          }
+        }
+      },
+      {
+        "table": "aule",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Aula Magna",
+            "edificio": "Centrale",
+            "capienza": 200
+          },
+          {
+            "id": 2,
+            "nome": "Aula 101",
+            "edificio": "Centrale",
+            "capienza": 80
+          },
+          {
+            "id": 3,
+            "nome": "Aula 205",
+            "edificio": "Molo",
+            "capienza": 60
+          },
+          {
+            "id": 4,
+            "nome": "Aula Informatica 1",
+            "edificio": "Molo",
+            "capienza": 30
+          },
+          {
+            "id": 5,
+            "nome": "Aula Seminari",
+            "edificio": "Valletta",
+            "capienza": 45
+          }
+        ],
+        "variations": {
+          "edificio": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Centrale",
+              "Molo",
+              "Valletta",
+              "Macchine",
+              "Fisica"
+            ]
+          },
+          "capienza": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "laboratori",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Laboratorio di Calcolatori",
+            "edificio": "Molo",
+            "capienza": 24,
+            "responsabile_id": 1
+          },
+          {
+            "id": 2,
+            "nome": "Laboratorio di Chimica",
+            "edificio": "Valletta",
+            "capienza": 20,
+            "responsabile_id": 3
+          },
+          {
+            "id": 3,
+            "nome": "Laboratorio di Fisica Sperimentale",
+            "edificio": "Fisica",
+            "capienza": 16,
+            "responsabile_id": 4
+          },
+          {
+            "id": 4,
+            "nome": "Laboratorio di Microbiologia",
+            "edificio": "Valletta",
+            "capienza": 18,
+            "responsabile_id": 5
+          }
+        ],
+        "variations": {
+          "edificio": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Molo",
+              "Valletta",
+              "Fisica",
+              "Centrale"
+            ]
+          },
+          "capienza": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "appelli",
+        "nature": "fact",
+        "min_rows": 250,
+        "max_rows": 400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "corso_id": 1,
+            "aula_id": 1,
+            "data_appello": "2026-01-20",
+            "ora_inizio": "09:00",
+            "tipo": "scritto"
+          },
+          {
+            "id": 2,
+            "corso_id": 2,
+            "aula_id": 2,
+            "data_appello": "2026-01-22",
+            "ora_inizio": "11:00",
+            "tipo": "scritto"
+          },
+          {
+            "id": 3,
+            "corso_id": 3,
+            "aula_id": 4,
+            "data_appello": "2026-02-05",
+            "ora_inizio": "14:00",
+            "tipo": "laboratorio"
+          },
+          {
+            "id": 4,
+            "corso_id": 4,
+            "aula_id": 3,
+            "data_appello": "2026-06-15",
+            "ora_inizio": "09:00",
+            "tipo": "scritto"
+          },
+          {
+            "id": 5,
+            "corso_id": 5,
+            "aula_id": 5,
+            "data_appello": "2026-06-18",
+            "ora_inizio": "10:00",
+            "tipo": "orale"
+          },
+          {
+            "id": 6,
+            "corso_id": 6,
+            "aula_id": 2,
+            "data_appello": "2026-09-10",
+            "ora_inizio": "15:00",
+            "tipo": "orale"
+          }
+        ],
+        "variations": {
+          "data_appello": {
+            "axis": "shift",
+            "delta_min": -70.0,
+            "delta_max": 70.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "ora_inizio": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "09:00",
+              "11:00",
+              "14:00",
+              "15:30",
+              "16:00"
+            ]
+          },
+          "tipo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "scritto",
+              "scritto",
+              "orale",
+              "orale",
+              "laboratorio"
+            ]
+          }
+        }
+      },
+      {
+        "table": "iscrizioni_esami",
+        "nature": "fact",
+        "min_rows": 600,
+        "max_rows": 900,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "studente_id": 1,
+            "appello_id": 1,
+            "data_iscrizione": "2026-01-10",
+            "voto": 18,
+            "lode": false
+          },
+          {
+            "studente_id": 2,
+            "appello_id": 2,
+            "data_iscrizione": "2026-01-12",
+            "voto": 20,
+            "lode": false
+          },
+          {
+            "studente_id": 3,
+            "appello_id": 3,
+            "data_iscrizione": "2026-01-15",
+            "voto": 22,
+            "lode": false
+          },
+          {
+            "studente_id": 4,
+            "appello_id": 4,
+            "data_iscrizione": "2026-06-05",
+            "voto": 24,
+            "lode": false
+          },
+          {
+            "studente_id": 5,
+            "appello_id": 5,
+            "data_iscrizione": "2026-06-08",
+            "voto": 26,
+            "lode": false
+          },
+          {
+            "studente_id": 6,
+            "appello_id": 1,
+            "data_iscrizione": "2026-01-11",
+            "voto": 28,
+            "lode": false
+          },
+          {
+            "studente_id": 7,
+            "appello_id": 2,
+            "data_iscrizione": "2026-01-13",
+            "voto": 29,
+            "lode": false
+          },
+          {
+            "studente_id": 8,
+            "appello_id": 3,
+            "data_iscrizione": "2026-01-16",
+            "voto": 30,
+            "lode": true
+          },
+          {
+            "studente_id": 9,
+            "appello_id": 4,
+            "data_iscrizione": "2026-06-06",
+            "voto": null,
+            "lode": false
+          },
+          {
+            "studente_id": 10,
+            "appello_id": 5,
+            "data_iscrizione": "2026-06-09",
+            "voto": null,
+            "lode": false
+          }
+        ],
+        "variations": {
+          "data_iscrizione": {
+            "axis": "shift",
+            "delta_min": -10.0,
+            "delta_max": 5.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "presenze_lezioni",
+        "nature": "fact",
+        "min_rows": 700,
+        "max_rows": 1000,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "studente_id": 1,
+            "corso_id": 1,
+            "data": "2026-03-02",
+            "presente": true
+          },
+          {
+            "id": 2,
+            "studente_id": 2,
+            "corso_id": 2,
+            "data": "2026-03-03",
+            "presente": true
+          },
+          {
+            "id": 3,
+            "studente_id": 3,
+            "corso_id": 3,
+            "data": "2026-03-04",
+            "presente": false
+          },
+          {
+            "id": 4,
+            "studente_id": 4,
+            "corso_id": 4,
+            "data": "2026-04-10",
+            "presente": true
+          },
+          {
+            "id": 5,
+            "studente_id": 5,
+            "corso_id": 5,
+            "data": "2026-04-11",
+            "presente": false
+          }
+        ],
+        "variations": {
+          "data": {
+            "axis": "shift",
+            "delta_min": -50.0,
+            "delta_max": 50.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "presente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "piani_di_studio",
+        "nature": "fact",
+        "min_rows": 400,
+        "max_rows": 600,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "studente_id": 1,
+            "corso_id": 1,
+            "anno_accademico": "2025/2026"
+          },
+          {
+            "studente_id": 2,
+            "corso_id": 2,
+            "anno_accademico": "2025/2026"
+          },
+          {
+            "studente_id": 3,
+            "corso_id": 3,
+            "anno_accademico": "2024/2025"
+          },
+          {
+            "studente_id": 4,
+            "corso_id": 4,
+            "anno_accademico": "2024/2025"
+          },
+          {
+            "studente_id": 5,
+            "corso_id": 5,
+            "anno_accademico": "2023/2024"
+          }
+        ],
+        "variations": {}
+      }
+    ]
+  }
+}

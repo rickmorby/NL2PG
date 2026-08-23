@@ -1,0 +1,287 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "correlated_subquery"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fornitori",
+        "obsolete_value": "anagrafica_partner",
+        "description": "La tabella padre fornitori viene denominata anagrafica_partner nella prosa aziendale; il solver deve mappare la denominazione obsoleta sulla tabella reale del database."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore economico complessivo dell'ordine",
+        "description": "La colonna importo_totale della tabella figlia ordini_acquisto viene indicata nella prosa come 'valore economico complessivo dell'ordine'; occorre riconoscere il sinonimo per filtrare correttamente nelle condizioni della subquery correlata EXISTS."
+      }
+    ],
+    "spec_hash": "06fdf12b3c95a396"
+  },
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    citta TEXT,\n    email TEXT,\n    telefono TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE ordini_acquisto (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT REFERENCES fornitori(id) ON DELETE SET NULL,\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('bozza', 'confermato', 'in_lavorazione', 'evaso', 'annullato'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "fornitori",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+            "partita_iva": "IT01234567890",
+            "indirizzo": "Via Torino 45",
+            "citta": "Milano",
+            "email": "ordini@metalmeccanica-lombarda.it",
+            "telefono": "+39 02 1234567",
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Cartotecnica Emiliana S.r.l.",
+            "partita_iva": "IT09876543210",
+            "indirizzo": "Via Emilia 128",
+            "citta": "Bologna",
+            "email": "info@cartotecnica-emiliana.it",
+            "telefono": "+39 051 7654321",
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Chimica Adriatica S.r.l.",
+            "partita_iva": "IT02345678901",
+            "indirizzo": "Corso Italia 12",
+            "citta": "Ancona",
+            "email": "vendite@chimica-adriatica.it",
+            "telefono": "+39 071 2345678",
+            "attivo": true
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Elettronica Piemontese S.p.A.",
+            "partita_iva": "IT03456789012",
+            "indirizzo": "Via Roma 88",
+            "citta": "Torino",
+            "email": "acquisti@elettronica-piemontese.it",
+            "telefono": "+39 011 3456789",
+            "attivo": false
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Plastica Meridionale S.r.l.",
+            "partita_iva": "IT04567890123",
+            "indirizzo": "Via Napoli 210",
+            "citta": "Napoli",
+            "email": "ufficio@plastica-meridionale.it",
+            "telefono": "+39 081 4567890",
+            "attivo": true
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Metalmeccanica Lombarda S.p.A.",
+              "Cartotecnica Emiliana S.r.l.",
+              "Chimica Adriatica S.r.l.",
+              "Elettronica Piemontese S.p.A.",
+              "Plastica Meridionale S.r.l.",
+              "Forniture Industriali Venete S.r.l.",
+              "Tessile Toscana S.p.A.",
+              "Acciai Pugliesi S.r.l."
+            ]
+          },
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Torino 45",
+              "Via Emilia 128",
+              "Corso Italia 12",
+              "Via Roma 88",
+              "Via Napoli 210",
+              "Via Dante 7",
+              "Piazza Garibaldi 33",
+              "Via Stazione 56"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Bologna",
+              "Ancona",
+              "Torino",
+              "Napoli",
+              "Firenze",
+              "Verona",
+              "Bari",
+              "Genova",
+              "Padova"
+            ]
+          },
+          "email": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "ordini@metalmeccanica-lombarda.it",
+              "info@cartotecnica-emiliana.it",
+              "vendite@chimica-adriatica.it",
+              "acquisti@elettronica-piemontese.it",
+              "ufficio@plastica-meridionale.it",
+              "contatti@forniture-venete.it",
+              "amministrazione@tessile-toscana.it",
+              "info@acciai-pugliesi.it"
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 02 1234567",
+              "+39 051 7654321",
+              "+39 071 2345678",
+              "+39 011 3456789",
+              "+39 081 4567890",
+              "+39 041 5678901",
+              "+39 055 6789012",
+              "+39 080 7890123"
+            ]
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ordini_acquisto",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 4.0,
+        "templates": [
+          {
+            "id": 1001,
+            "numero_ordine": "PO-2026-0001",
+            "fornitore_id": 1,
+            "data_ordine": "2026-01-08",
+            "importo_totale": 12450.75,
+            "stato_ordine": "evaso"
+          },
+          {
+            "id": 1002,
+            "numero_ordine": "PO-2026-0002",
+            "fornitore_id": 2,
+            "data_ordine": "2026-01-15",
+            "importo_totale": 3280.0,
+            "stato_ordine": "evaso"
+          },
+          {
+            "id": 1003,
+            "numero_ordine": "PO-2026-0003",
+            "fornitore_id": 3,
+            "data_ordine": "2026-01-22",
+            "importo_totale": 8760.4,
+            "stato_ordine": "in_lavorazione"
+          },
+          {
+            "id": 1004,
+            "numero_ordine": "PO-2026-0004",
+            "fornitore_id": 1,
+            "data_ordine": "2026-02-03",
+            "importo_totale": 15400.0,
+            "stato_ordine": "confermato"
+          },
+          {
+            "id": 1005,
+            "numero_ordine": "PO-2026-0005",
+            "fornitore_id": 4,
+            "data_ordine": "2026-02-18",
+            "importo_totale": 675.9,
+            "stato_ordine": "bozza"
+          },
+          {
+            "id": 1006,
+            "numero_ordine": "PO-2026-0006",
+            "fornitore_id": 5,
+            "data_ordine": "2026-03-05",
+            "importo_totale": 22100.3,
+            "stato_ordine": "annullato"
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "evaso",
+              "evaso",
+              "evaso",
+              "confermato",
+              "in_lavorazione",
+              "bozza",
+              "annullato"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

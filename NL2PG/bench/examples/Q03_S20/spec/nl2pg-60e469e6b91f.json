@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "top_n"
+  ],
+  "twist": [
+    "rename",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini_produzione",
+      "obsolete_value": "registro_commesse_di_stabilimento",
+      "description": "La tabella ordini_produzione viene denominata registro_commesse_di_stabilimento nella prosa aziendale. Il solver deve inferire che il registro delle commesse citato nei documenti corrisponde alla tabella fisica ordini_produzione."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "stato_ordine",
+      "obsolete_value": "fase del ciclo produttivo",
+      "description": "La colonna ENUM stato_ordine viene descritta nella prosa come 'fase del ciclo produttivo'. Inoltre i valori dell'enum (es. 'in_lavorazione', 'in_attesa', 'completato') sono parafrasati con linguaggio operativo (es. 'commessa aperta in reparto', 'ordine in coda di pianificazione', 'lavorazione chiusa'), richiedendo l'inferenza del tipo ENUM e la mappatura dei valori per costruire correttamente la query Top-N."
+    }
+  ],
+  "spec_hash": "e80a90a65fb684b6"
+}

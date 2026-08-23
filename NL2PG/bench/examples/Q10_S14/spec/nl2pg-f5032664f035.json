@@ -1,0 +1,25 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 1,
+  "hierarchy": "single_table",
+  "sql_features": [],
+  "twist": [
+    "jargon",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "certificazione_energetica",
+      "obsolete_value": "attestato APE",
+      "description": "La colonna certificazione_energetica della tabella immobili viene denominata nella prosa aziendale con il gergo del settore 'attestato APE' (Attestato di Prestazione Energetica). Il solver deve riconoscere che i riferimenti alle classi energetiche citate nel testo (es. 'classe B o migliore') si traducono in condizioni WHERE esplicite sulla scala A-G memorizzata nella colonna, applicando l'ordinamento esterno delle classi non dichiarato nello schema."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "stato",
+      "obsolete_value": "unità pronta consegna senza lavori",
+      "description": "La prosa aziendale descrive lo stato dell'immobile con la perifrasi 'unità pronta consegna senza lavori', che corrisponde al valore canonico 'abitabile' della colonna stato. Il solver deve tradurre questa formulazione commerciale nella condizione concreta stato = 'abitabile', evitando di confonderla con gli altri valori ammessi dalla colonna (es. 'ristrutturare', 'nuova_costruzione')."
+    }
+  ],
+  "spec_hash": "615c7ed4e5c7fe30"
+}

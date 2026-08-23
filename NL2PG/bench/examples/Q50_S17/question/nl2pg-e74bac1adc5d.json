@@ -1,0 +1,4 @@
+{
+  "story": "Presso la Direzione Risorse Umane, l'archivio denominato anagrafica risorse umane raccoglie le schede personali dei dipendenti. In ciascuna scheda sono riportati il nome, il cognome, il codice fiscale, la data di assunzione e lo stato di attività. Parallelamente, il registro progetti raccoglie le iniziative aziendali con budget, date di inizio e fine, e stato di completamento. Il registro assegnazioni progetto raccoglie le allocazioni di personale ai progetti, con data di assegnazione e percentuale di allocazione. Durante una verifica operativa, gli addetti hanno estratto i primi 10 dipendenti attivi ordinati per data di assunzione ascendente, consultando l'archivio anagrafica risorse umane e verificando lo stato di attività.",
+  "question": "Quali sono i primi 10 dipendenti attivi in ordine crescente di data di assunzione, mostrando nome, cognome e data di assunzione?"
+}

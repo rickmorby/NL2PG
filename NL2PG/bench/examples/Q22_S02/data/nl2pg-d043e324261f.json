@@ -1,0 +1,359 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "esami",
+        "obsolete_value": "verbali_di_profitto",
+        "description": "La tabella figlia esami, che registra ogni prova sostenuta tramite la FK studente_id verso studenti e la FK corso_id verso corsi, non viene mai chiamata con il suo nome reale: nella prosa aziendale è indicata esclusivamente come verbali_di_profitto. Il solver deve dedurre che le righe dei verbali corrispondono agli esami e che ogni studente può avere più verbali (cardinalità 1:N), condizione che gonfia i join e rende necessario DISTINCT ON per selezionare un solo verbale per studente."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "voto",
+        "obsolete_value": "esito_trentesimale",
+        "description": "La colonna voto della tabella esami, espressa in scala da 0 a 30 con eventuale lode, è descritta nei documenti aziendali con il gergo accademico esito_trentesimale. Le query che richiedono di individuare, per ciascuno studente, il miglior esimo tramite SELECT DISTINCT ON (studente_id) ... ORDER BY studente_id, esito_trentesimale DESC devono riconoscere che tale perifrasi denota la colonna voto reale del database."
+      }
+    ],
+    "spec_hash": "9efff35336fc61fc"
+  },
+  "schema_ddl": "CREATE TABLE studenti (\n    id INT PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE corsi (\n    id INT PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    titolo TEXT NOT NULL,\n    docente TEXT,\n    crediti INT NOT NULL CHECK (crediti BETWEEN 1 AND 30)\n);\n\nCREATE TABLE esami (\n    id INT PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    data_esame DATE NOT NULL,\n    voto INT NOT NULL CHECK (voto BETWEEN 0 AND 30),\n    lode BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "studenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "matricola": "MAT20210001",
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "data_nascita": "2002-03-15",
+            "email": "marco.rossi@studenti.uniroma1.it"
+          },
+          {
+            "id": 2,
+            "matricola": "MAT20210002",
+            "nome": "Giulia",
+            "cognome": "Bianchi",
+            "data_nascita": "2001-11-02",
+            "email": "giulia.bianchi@studenti.uniroma1.it"
+          },
+          {
+            "id": 3,
+            "matricola": "MAT20210003",
+            "nome": "Luca",
+            "cognome": "Ferrari",
+            "data_nascita": "2003-01-27",
+            "email": "luca.ferrari@studenti.uniroma1.it"
+          },
+          {
+            "id": 4,
+            "matricola": "MAT20210004",
+            "nome": "Sara",
+            "cognome": "Conti",
+            "data_nascita": "2002-07-09",
+            "email": "sara.conti@studenti.uniroma1.it"
+          },
+          {
+            "id": 5,
+            "matricola": "MAT20210005",
+            "nome": "Alessandro",
+            "cognome": "Ricci",
+            "data_nascita": "2001-05-21",
+            "email": "alessandro.ricci@studenti.uniroma1.it"
+          },
+          {
+            "id": 6,
+            "matricola": "MAT20210006",
+            "nome": "Chiara",
+            "cognome": "Moretti",
+            "data_nascita": "2003-09-14",
+            "email": "chiara.moretti@studenti.uniroma1.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Giulia",
+              "Luca",
+              "Sara",
+              "Alessandro",
+              "Chiara",
+              "Matteo",
+              "Francesca",
+              "Davide",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Conti",
+              "Ricci",
+              "Moretti",
+              "Esposito",
+              "Romano",
+              "Gallo",
+              "Costa"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -450.0,
+            "delta_max": 450.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "corsi",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice": "INF1010",
+            "titolo": "Basi di Dati",
+            "docente": "Prof. Paolo Neri",
+            "crediti": 9
+          },
+          {
+            "id": 2,
+            "codice": "INF1020",
+            "titolo": "Programmazione Avanzata",
+            "docente": "Prof.ssa Elena Vitale",
+            "crediti": 12
+          },
+          {
+            "id": 3,
+            "codice": "MAT2010",
+            "titolo": "Analisi Matematica II",
+            "docente": "Prof. Carlo Gatti",
+            "crediti": 12
+          },
+          {
+            "id": 4,
+            "codice": "INF2030",
+            "titolo": "Reti di Calcolatori",
+            "docente": "Prof. Marco Salvi",
+            "crediti": 9
+          },
+          {
+            "id": 5,
+            "codice": "ECO1050",
+            "titolo": "Microeconomia",
+            "docente": "Prof.ssa Laura Fontana",
+            "crediti": 6
+          },
+          {
+            "id": 6,
+            "codice": "INF2040",
+            "titolo": "Sistemi Operativi",
+            "docente": "Prof. Andrea Colombo",
+            "crediti": 9
+          },
+          {
+            "id": 7,
+            "codice": "STA3010",
+            "titolo": "Statistica Applicata",
+            "docente": "Prof.ssa Marta Leoni",
+            "crediti": 6
+          },
+          {
+            "id": 8,
+            "codice": "ING2020",
+            "titolo": "Ingegneria del Software",
+            "docente": "Prof. Fabio Marchetti",
+            "crediti": 12
+          }
+        ],
+        "variations": {
+          "docente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Prof. Paolo Neri",
+              "Prof.ssa Elena Vitale",
+              "Prof. Carlo Gatti",
+              "Prof. Marco Salvi",
+              "Prof.ssa Laura Fontana",
+              "Prof. Andrea Colombo",
+              "Prof.ssa Marta Leoni",
+              "Prof. Fabio Marchetti",
+              "Prof. Giorgio Damiani",
+              "Prof.ssa Silvia Greco"
+            ]
+          },
+          "crediti": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "6",
+              "6",
+              "9",
+              "9",
+              "9",
+              "12",
+              "12",
+              "15"
+            ]
+          }
+        }
+      },
+      {
+        "table": "esami",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "studente_id": 1,
+            "corso_id": 1,
+            "data_esame": "2025-01-20",
+            "voto": 27,
+            "lode": false
+          },
+          {
+            "id": 2,
+            "studente_id": 2,
+            "corso_id": 2,
+            "data_esame": "2025-02-11",
+            "voto": 18,
+            "lode": false
+          },
+          {
+            "id": 3,
+            "studente_id": 3,
+            "corso_id": 3,
+            "data_esame": "2025-06-16",
+            "voto": 30,
+            "lode": false
+          },
+          {
+            "id": 4,
+            "studente_id": 4,
+            "corso_id": 4,
+            "data_esame": "2025-07-04",
+            "voto": 22,
+            "lode": false
+          },
+          {
+            "id": 5,
+            "studente_id": 5,
+            "corso_id": 5,
+            "data_esame": "2025-09-09",
+            "voto": 25,
+            "lode": false
+          },
+          {
+            "id": 6,
+            "studente_id": 6,
+            "corso_id": 6,
+            "data_esame": "2025-01-28",
+            "voto": 16,
+            "lode": false
+          },
+          {
+            "id": 7,
+            "studente_id": 1,
+            "corso_id": 3,
+            "data_esame": "2025-06-24",
+            "voto": 24,
+            "lode": false
+          },
+          {
+            "id": 8,
+            "studente_id": 3,
+            "corso_id": 1,
+            "data_esame": "2025-02-05",
+            "voto": 29,
+            "lode": false
+          }
+        ],
+        "variations": {
+          "data_esame": {
+            "axis": "shift",
+            "delta_min": -35.0,
+            "delta_max": 35.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "voto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "14",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "22",
+              "23",
+              "23",
+              "24",
+              "24",
+              "25",
+              "25",
+              "26",
+              "26",
+              "27",
+              "27",
+              "28",
+              "28",
+              "29",
+              "29",
+              "30",
+              "30"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

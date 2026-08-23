@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "agg_distinct"
+  ],
+  "twist": [
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "dept_mgr",
+      "obsolete_value": "DR (Direttore di Reparto)",
+      "description": "La colonna dept_mgr, che memorizza il codice identificativo del responsabile di reparto, viene indicata nella prosa aziendale esclusivamente con il gergo interno 'DR' (Direttore di Reparto). Il solutore deve riconoscere che l'acronimo gergale DR corrisponde alla colonna dept_mgr dello schema, sulla quale va effettuato il GROUP BY."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "emp_no",
+      "obsolete_value": "matricola",
+      "description": "Nella documentazione aziendale gli impiegati sono identificati tramite il termine sinonimo 'matricola', mai con il nome reale della colonna. Il solutore deve mappare 'matricola' sulla colonna emp_no della tabella, applicando su di essa la funzione COUNT(DISTINCT) richiesta dalla query."
+    }
+  ],
+  "spec_hash": "d555ede595f86286"
+}

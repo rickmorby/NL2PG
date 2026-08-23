@@ -1,0 +1,290 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "in_condition"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "pazienti",
+        "obsolete_value": "anagrafica_assistiti",
+        "description": "La tabella pazienti viene denominata anagrafica_assistiti nella prosa aziendale; il progettista deve ricondurre la perifrasi alla tabella reale del database."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "priorita",
+        "obsolete_value": "livello di triage",
+        "description": "La colonna enumerata priorita della tabella visite_mediche, con valori mutuamente esclusivi dichiarati nel tipo ENUM ('verde', 'gialla', 'rossa'), viene indicata nella prosa aziendale con il gergo clinico 'livello di triage'; le query di filtraggio devono usare WHERE priorita IN ('gialla', 'rossa') sui valori dichiarati dell'ENUM."
+      }
+    ],
+    "spec_hash": "5cd33cdd53744c7c"
+  },
+  "schema_ddl": "CREATE TYPE livello_priorita AS ENUM ('verde', 'gialla', 'rossa');\n\nCREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    telefono TEXT\n);\n\nCREATE TABLE visite_mediche (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    data_visita DATE NOT NULL,\n    ora_visita TIME,\n    motivo TEXT,\n    priorita livello_priorita NOT NULL DEFAULT 'verde',\n    medico TEXT,\n    esito TEXT,\n    CHECK (data_visita >= DATE '1950-01-01')\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "pazienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "data_nascita": "1980-01-15",
+            "telefono": "+39 06 1234567"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA75T42F205X",
+            "data_nascita": "1975-12-02",
+            "telefono": "+39 02 9876543"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI90C55L219Y",
+            "data_nascita": "1990-03-25",
+            "telefono": "+39 010 9988776"
+          },
+          {
+            "id": 4,
+            "nome": "Antonio",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPSNTN68M10D412Z",
+            "data_nascita": "1968-08-10",
+            "telefono": "+39 081 4567890"
+          },
+          {
+            "id": 5,
+            "nome": "Chiara",
+            "cognome": "Ricci",
+            "codice_fiscale": "RCCCHR85D60H501W",
+            "data_nascita": "1985-04-18",
+            "telefono": "+39 055 1122334"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Antonio",
+              "Chiara",
+              "Francesco",
+              "Alessandra",
+              "Luca",
+              "Sara",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Esposito",
+              "Ricci",
+              "Moretti",
+              "Gallo",
+              "Conti",
+              "Ferrari",
+              "Rinaldi"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -4000.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 06 1234567",
+              "+39 02 9876543",
+              "+39 081 4567890",
+              "+39 055 1122334",
+              "+39 010 9988776",
+              "+39 011 3344556"
+            ]
+          }
+        }
+      },
+      {
+        "table": "visite_mediche",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 101,
+            "paziente_id": 1,
+            "data_visita": "2026-01-12",
+            "ora_visita": "09:30:00",
+            "motivo": "Controllo di routine",
+            "priorita": "verde",
+            "medico": "Dr. Ferrari",
+            "esito": "Tutto normale"
+          },
+          {
+            "id": 102,
+            "paziente_id": 2,
+            "data_visita": "2026-01-20",
+            "ora_visita": "11:15:00",
+            "motivo": "Dolore addominale persistente",
+            "priorita": "gialla",
+            "medico": "Dr.ssa Conti",
+            "esito": "Ecografia prescritta"
+          },
+          {
+            "id": 103,
+            "paziente_id": 3,
+            "data_visita": "2026-02-03",
+            "ora_visita": "14:00:00",
+            "motivo": "Difficoltà respiratorie acute",
+            "priorita": "rossa",
+            "medico": "Dr. Moretti",
+            "esito": "Ricovero in reparto"
+          },
+          {
+            "id": 104,
+            "paziente_id": 4,
+            "data_visita": "2026-02-17",
+            "ora_visita": "16:45:00",
+            "motivo": "Consegna referto analisi del sangue",
+            "priorita": "verde",
+            "medico": "Dr.ssa Gallo",
+            "esito": "Valori nei limiti"
+          },
+          {
+            "id": 105,
+            "paziente_id": 5,
+            "data_visita": "2026-03-05",
+            "ora_visita": "10:20:00",
+            "motivo": "Follow-up post-operatorio",
+            "priorita": "gialla",
+            "medico": "Dr. Rinaldi",
+            "esito": "Nuova visita programmata"
+          }
+        ],
+        "variations": {
+          "data_visita": {
+            "axis": "shift",
+            "delta_min": -150.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "ora_visita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "08:30:00",
+              "09:15:00",
+              "10:40:00",
+              "11:50:00",
+              "14:20:00",
+              "16:05:00"
+            ]
+          },
+          "motivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Controllo di routine",
+              "Dolore addominale persistente",
+              "Difficoltà respiratorie acute",
+              "Consegna referto analisi del sangue",
+              "Follow-up post-operatorio",
+              "Vertigini ricorrenti",
+              "Vaccinazione antinfluenzale"
+            ]
+          },
+          "priorita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "verde",
+              "verde",
+              "verde",
+              "gialla",
+              "gialla",
+              "rossa"
+            ]
+          },
+          "medico": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Dr. Ferrari",
+              "Dr.ssa Conti",
+              "Dr. Moretti",
+              "Dr.ssa Gallo",
+              "Dr. Rinaldi"
+            ]
+          },
+          "esito": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Tutto normale",
+              "Terapia prescritta",
+              "Esami approfonditi richiesti",
+              "Ricovero in reparto",
+              "Nuova visita programmata",
+              "Valori nei limiti"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

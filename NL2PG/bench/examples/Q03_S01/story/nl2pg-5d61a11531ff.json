@@ -1,0 +1,186 @@
+{
+  "schema_ddl": "CREATE TABLE immobili (\n    id_immobile INT PRIMARY KEY,\n    tipo TEXT NOT NULL,\n    quartiere TEXT NOT NULL,\n    indirizzo TEXT,\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani BETWEEN 1 AND 30),\n    prezzo NUMERIC(12,2) NOT NULL CHECK (prezzo >= 0),\n    disponibile BOOLEAN NOT NULL DEFAULT TRUE\n);",
+  "data_profile": {
+    "profile": {
+      "immobili": {
+        "row_count": 485,
+        "columns": {
+          "id_immobile": {
+            "distinct": 485,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 485
+          },
+          "tipo": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "attico",
+              "loft",
+              "monolocale",
+              "villa"
+            ]
+          },
+          "quartiere": {
+            "distinct": 6,
+            "sample": [
+              "Brera",
+              "Isola",
+              "Lambrate",
+              "Navigli",
+              "Porta Romana"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 6,
+            "sample": [
+              "Corso di Porta Romana 63",
+              "Via Fiori Chiari 5",
+              "Via Pastrengo 14",
+              "Via Ventura 8",
+              "Via Vigevano 12"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 465,
+            "sample": [
+              "100.06",
+              "100.73",
+              "100.82",
+              "100.91",
+              "101.07"
+            ],
+            "min": 28.85,
+            "max": 334.67
+          },
+          "numero_vani": {
+            "distinct": 468,
+            "sample": [
+              "1",
+              "1.0116464290639038",
+              "1.027858720137344",
+              "1.0582814670690046",
+              "1.0898125418655822"
+            ],
+            "min": 1,
+            "max": 9.0
+          },
+          "prezzo": {
+            "distinct": 475,
+            "sample": [
+              "1004348.73",
+              "1016788.34",
+              "1031103.71",
+              "1032953.86",
+              "1036337.28"
+            ],
+            "min": 142382.77,
+            "max": 1707599.17
+          },
+          "disponibile": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "immobili": [
+        {
+          "id_immobile": 1,
+          "tipo": "loft",
+          "quartiere": "Isola",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 82.44,
+          "numero_vani": 3.2786097491097475,
+          "prezzo": 368126.31,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 2,
+          "tipo": "monolocale",
+          "quartiere": "Sempione",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 108.3,
+          "numero_vani": 4.796579303451773,
+          "prezzo": 556035.73,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 3,
+          "tipo": "loft",
+          "quartiere": "Brera",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 108.06,
+          "numero_vani": 4.737569707443727,
+          "prezzo": 535898.02,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 4,
+          "tipo": "attico",
+          "quartiere": "Navigli",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 106.26,
+          "numero_vani": 4.140461259001199,
+          "prezzo": 595242.83,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 5,
+          "tipo": "appartamento",
+          "quartiere": "Brera",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 71.99,
+          "numero_vani": 4.760210492740626,
+          "prezzo": 624384.35,
+          "disponibile": "true"
+        },
+        {
+          "id_immobile": 6,
+          "tipo": "attico",
+          "quartiere": "Navigli",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 98.47,
+          "numero_vani": 4.30332548139837,
+          "prezzo": 344671.9,
+          "disponibile": "false"
+        },
+        {
+          "id_immobile": 7,
+          "tipo": "villa",
+          "quartiere": "Sempione",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 80.08,
+          "numero_vani": 4.319817890715744,
+          "prezzo": 454386.17,
+          "disponibile": "false"
+        },
+        {
+          "id_immobile": 8,
+          "tipo": "appartamento",
+          "quartiere": "Isola",
+          "indirizzo": "Via Vigevano 12",
+          "superficie_mq": 76.89,
+          "numero_vani": 3.8748752043626906,
+          "prezzo": 444540.27,
+          "disponibile": "false"
+        }
+      ]
+    }
+  },
+  "story": "Nell'ufficio vendite della società immobiliare meneghina, l'archivio denominato schede_alloggi rappresenta il riferimento operativo di tutta l'attività di intermediazione: vi confluiscono le schede descrittive delle unità abitative seguite dallo staff, per un patrimonio complessivo di 485 posizioni. In ciascuna scheda sono annotati l'identificativo progressivo dell'alloggio, la tipologia — appartamento, monolocale, loft, attico oppure villa — il quartiere di ubicazione, l'indirizzo completo, la superficie espressa in metri quadrati, il numero di vani, il valore_di_listino praticato e l'indicazione della disponibilità alla trattativa. In occasione della revisione trimestrale del portafoglio, il direttore commerciale ha richiesto un approfondimento dedicato ai segmenti di pregio: occorreva l'elenco dei 10 alloggi disponibili più costosi fra gli attici e i loft collocati nei quartieri Brera, Navigli e Isola. Gli analisti hanno perciò percorso le voci dell'archivio contrassegnate come disponibili, hanno trattenuto soltanto quelle la cui tipologia risultava attico o loft e hanno circoscritto l'esame ai soli quartieri Brera, Navigli e Isola, lasciando fuori Sempione, Lambrate e Porta Romana, così come le ville, gli appartamenti e i monolocali. Per rendere immediata la lettura al comitato investimenti, ogni valore_di_listino è stato ricondotto a una scala in milioni di euro, arrotondando le cifre della documentazione commerciale; l'elenco è stato infine disposto dal più caro al più economico, così da porre in testa alla classifica i pezzi di maggior prestigio, i cui valori sfiorano il tetto massimo dell'archivio, attestato poco sopra il milione e settecentomila euro. Il responsabile di zona ha osservato come gli attici di Brera e i loft di Isola, pur con metrature assai diverse — dalle soluzioni compatte sotto i cento metri quadrati alle superfici generose oltre i trecento — costituiscano il segmento su cui concentrare le visite concordate con i clienti del mese prossimo."
+}

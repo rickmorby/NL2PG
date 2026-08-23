@@ -1,0 +1,109 @@
+{
+  "schema_ddl": "CREATE TABLE vnd (\n    id SERIAL PRIMARY KEY,\n    clnt TEXT NOT NULL,\n    tot_vnd NUMERIC(12,2) CHECK (tot_vnd >= 0),\n    dt_vnd DATE NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "vnd": {
+        "row_count": 1565,
+        "columns": {
+          "id": {
+            "distinct": 1565,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1565
+          },
+          "clnt": {
+            "distinct": 6,
+            "sample": [
+              "CL001",
+              "CL002",
+              "CL003",
+              "CL004",
+              "CL005"
+            ]
+          },
+          "tot_vnd": {
+            "distinct": 1422,
+            "sample": [
+              "10009.63",
+              "1001.75",
+              "1002.72",
+              "10032.05",
+              "10037.36"
+            ],
+            "min": 267.0,
+            "max": 13502.25
+          },
+          "dt_vnd": {
+            "distinct": 166,
+            "sample": [
+              "2025-11-16",
+              "2025-11-18",
+              "2025-11-19",
+              "2025-11-20",
+              "2025-11-21"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "vnd": [
+        {
+          "id": 1,
+          "clnt": "CL004",
+          "tot_vnd": 4481.43,
+          "dt_vnd": "2025-12-16"
+        },
+        {
+          "id": 2,
+          "clnt": "CL005",
+          "tot_vnd": 2336.26,
+          "dt_vnd": "2026-02-06"
+        },
+        {
+          "id": 3,
+          "clnt": "CL003",
+          "tot_vnd": 1829.08,
+          "dt_vnd": "2026-01-09"
+        },
+        {
+          "id": 4,
+          "clnt": "CL004",
+          "tot_vnd": 4067.49,
+          "dt_vnd": "2026-03-07"
+        },
+        {
+          "id": 5,
+          "clnt": "CL001",
+          "tot_vnd": null,
+          "dt_vnd": "2026-02-20"
+        },
+        {
+          "id": 6,
+          "clnt": "CL006",
+          "tot_vnd": 3544.67,
+          "dt_vnd": "2026-03-14"
+        },
+        {
+          "id": 7,
+          "clnt": "CL005",
+          "tot_vnd": 2841.76,
+          "dt_vnd": "2025-11-22"
+        },
+        {
+          "id": 8,
+          "clnt": "CL006",
+          "tot_vnd": 4500.0,
+          "dt_vnd": "2026-02-05"
+        }
+      ]
+    }
+  },
+  "story": "Nel reparto commerciale, l'archivio denominato vnd custodisce le schede delle transazioni effettuate. Ogni scheda riporta il codice del cliente, l'importo del fatturato e la data in cui la vendita è stata registrata. Durante una verifica operativa, gli addetti hanno estratto le voci relative ai clienti CL001 e CL002, analizzando i dettagli delle operazioni per questi due soggetti. Tra le date esaminate, sono emerse vendite registrate in giorni come il 2025-11-16, il 2025-11-18 e il 2026-02-06, con importi che variavano da 267.0 a 13502.25. In particolare, per il cliente CL004, una delle schede mostrava un fatturato di 4481.43 in data 2025-12-16, mentre per il cliente CL005 si notava un importo di 2336.26 registrato il 2026-02-06."
+}

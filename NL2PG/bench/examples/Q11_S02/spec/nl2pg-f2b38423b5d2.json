@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_di_copertura",
+      "description": "La tabella polizze (figlia di clienti tramite FK cliente_id) viene denominata contratti_di_copertura nella prosa aziendale. Le query devono risolvere il nome reale della tabella per costruire correttamente la subquery annidata non correlata con IN."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_risarcimento",
+      "obsolete_value": "liquidazione del danno",
+      "description": "La colonna importo_risarcimento della tabella sinistri viene indicata nella prosa aziendale con il gergo assicurativo 'liquidazione del danno'. Occorre mappare il termine tecnico di settore alla colonna reale quando si filtrano i sinistri nella subquery interna (SELECT ... FROM sinistri WHERE importo_risarcimento ...)."
+    }
+  ],
+  "spec_hash": "b578cbf60988b4e9"
+}

@@ -1,0 +1,360 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "registrazioni_movimento",
+        "description": "La tabella transazioni, che registra ogni operazione finanziaria con importo, data e tipo operazione soggetto a vincoli CHECK sul dominio dei valori ammessi, viene denominata nella prosa aziendale registrazioni_movimento."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "saldo_disponibile",
+        "obsolete_value": "liquidita_immediata",
+        "description": "La colonna saldo_disponibile della tabella conti, vincolata a valori non negativi tramite CHECK NOT NULL, viene indicata nella documentazione di business con il sinonimo liquidita_immediata."
+      }
+    ],
+    "spec_hash": "4f931ab3e78f99d7"
+  },
+  "schema_ddl": "CREATE DOMAIN tipo_operazione AS TEXT CHECK (VALUE IN ('versamento', 'prelievo', 'bonifico_entrata', 'bonifico_uscita', 'commissione', 'accredito'));\n\nCREATE DOMAIN importo_non_negativo AS NUMERIC(14,2) CHECK (VALUE >= 0);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    iban TEXT NOT NULL UNIQUE,\n    saldo_disponibile NUMERIC(14,2) NOT NULL CHECK (saldo_disponibile >= 0),\n    data_apertura DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    tipo_operazione tipo_operazione NOT NULL,\n    importo importo_non_negativo NOT NULL,\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    descrizione TEXT\n);\n\nCREATE TABLE prestiti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    importo_capitale importo_non_negativo NOT NULL,\n    tasso_interesse NUMERIC(5,2) NOT NULL CHECK (tasso_interesse >= 0),\n    data_erogazione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza > data_erogazione)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 100,
+        "max_rows": 150,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario Rossi",
+            "codice_fiscale": "RSSMRA85M01H501Z",
+            "created_at": "2024-03-15 09:30:00"
+          },
+          {
+            "id": 2,
+            "nome": "Laura Bianchi",
+            "codice_fiscale": "BNCLRA90C45F205Y",
+            "created_at": "2024-05-20 14:15:00"
+          },
+          {
+            "id": 3,
+            "nome": "Giuseppe Verdi",
+            "codice_fiscale": "VRDGPP78T10L219X",
+            "created_at": "2024-08-02 11:45:00"
+          },
+          {
+            "id": 4,
+            "nome": "Anna Neri",
+            "codice_fiscale": "NREANN92D62H501W",
+            "created_at": "2025-01-10 16:20:00"
+          },
+          {
+            "id": 5,
+            "nome": "Luca Ferrari",
+            "codice_fiscale": "FRRLCU88E15G224V",
+            "created_at": "2025-04-18 10:05:00"
+          },
+          {
+            "id": 6,
+            "nome": "Sara Colombo",
+            "codice_fiscale": "CLMSRA93B21F205T",
+            "created_at": "2025-06-30 17:40:00"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giuseppe Verdi",
+              "Anna Neri",
+              "Luca Ferrari",
+              "Sara Colombo",
+              "Marco Gallo",
+              "Elena Fontana",
+              "Davide Moretti",
+              "Chiara Ricci",
+              "Paolo Greco",
+              "Francesca Marino"
+            ]
+          },
+          "created_at": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 120.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "conti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.0,
+        "templates": [
+          {
+            "id": 100,
+            "cliente_id": 1,
+            "iban": "IT60X0542811101000000123456",
+            "saldo_disponibile": 5230.75,
+            "data_apertura": "2024-04-01"
+          },
+          {
+            "id": 101,
+            "cliente_id": 2,
+            "iban": "IT61Z0542811101000000987654",
+            "saldo_disponibile": 18750.0,
+            "data_apertura": "2023-11-12"
+          },
+          {
+            "id": 102,
+            "cliente_id": 3,
+            "iban": "IT62A0326801010000000678901",
+            "saldo_disponibile": 940.5,
+            "data_apertura": "2025-02-20"
+          },
+          {
+            "id": 103,
+            "cliente_id": 4,
+            "iban": "IT63B0301503200000003456789",
+            "saldo_disponibile": 43200.0,
+            "data_apertura": "2023-06-30"
+          },
+          {
+            "id": 104,
+            "cliente_id": 5,
+            "iban": "IT64C0200805001000001122334",
+            "saldo_disponibile": 125.99,
+            "data_apertura": "2025-07-15"
+          }
+        ],
+        "variations": {
+          "saldo_disponibile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "data_apertura": {
+            "axis": "shift",
+            "delta_min": -200.0,
+            "delta_max": 200.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "transazioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 6.0,
+        "templates": [
+          {
+            "id": 10001,
+            "conto_id": 100,
+            "tipo_operazione": "versamento",
+            "importo": 1200.0,
+            "data_transazione": "2026-01-05 10:15:00",
+            "descrizione": "Operazione su conto"
+          },
+          {
+            "id": 10002,
+            "conto_id": 101,
+            "tipo_operazione": "prelievo",
+            "importo": 250.0,
+            "data_transazione": "2026-01-08 18:40:00",
+            "descrizione": "Movimento di conto corrente"
+          },
+          {
+            "id": 10003,
+            "conto_id": 102,
+            "tipo_operazione": "bonifico_entrata",
+            "importo": 1850.75,
+            "data_transazione": "2026-01-12 09:05:00",
+            "descrizione": "Registrazione movimento"
+          },
+          {
+            "id": 10004,
+            "conto_id": 103,
+            "tipo_operazione": "bonifico_uscita",
+            "importo": 780.0,
+            "data_transazione": "2026-01-15 12:30:00",
+            "descrizione": "Voce estratto conto"
+          },
+          {
+            "id": 10005,
+            "conto_id": 104,
+            "tipo_operazione": "commissione",
+            "importo": 2.5,
+            "data_transazione": "2026-01-20 08:00:00",
+            "descrizione": "Operazione su conto"
+          },
+          {
+            "id": 10006,
+            "conto_id": 100,
+            "tipo_operazione": "accredito",
+            "importo": 95.3,
+            "data_transazione": "2026-01-25 14:22:00",
+            "descrizione": "Movimento di conto corrente"
+          },
+          {
+            "id": 10007,
+            "conto_id": 101,
+            "tipo_operazione": "versamento",
+            "importo": 3400.0,
+            "data_transazione": "2026-02-02 11:10:00",
+            "descrizione": "Registrazione movimento"
+          }
+        ],
+        "variations": {
+          "tipo_operazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "versamento",
+              "versamento",
+              "prelievo",
+              "prelievo",
+              "bonifico_entrata",
+              "bonifico_uscita",
+              "commissione",
+              "accredito"
+            ]
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.25,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "data_transazione": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Operazione su conto",
+              "Movimento di conto corrente",
+              "Registrazione movimento",
+              "Voce estratto conto"
+            ]
+          }
+        }
+      },
+      {
+        "table": "prestiti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.4,
+        "templates": [
+          {
+            "id": 500,
+            "cliente_id": 1,
+            "importo_capitale": 15000.0,
+            "tasso_interesse": 6.5,
+            "data_erogazione": "2024-05-10",
+            "data_scadenza": "2029-05-10"
+          },
+          {
+            "id": 501,
+            "cliente_id": 2,
+            "importo_capitale": 45000.0,
+            "tasso_interesse": 4.25,
+            "data_erogazione": "2023-09-01",
+            "data_scadenza": "2033-09-01"
+          },
+          {
+            "id": 502,
+            "cliente_id": 3,
+            "importo_capitale": 8000.0,
+            "tasso_interesse": 8.9,
+            "data_erogazione": "2025-03-15",
+            "data_scadenza": "2028-03-15"
+          },
+          {
+            "id": 503,
+            "cliente_id": 4,
+            "importo_capitale": 120000.0,
+            "tasso_interesse": 3.1,
+            "data_erogazione": "2022-11-20",
+            "data_scadenza": "2037-11-20"
+          }
+        ],
+        "variations": {
+          "importo_capitale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "tasso_interesse": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          },
+          "data_erogazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

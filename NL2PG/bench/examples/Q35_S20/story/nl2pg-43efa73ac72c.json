@@ -1,0 +1,296 @@
+{
+  "schema_ddl": "CREATE TYPE stato_polizza AS ENUM ('attiva', 'sospesa', 'cessata');\n\nCREATE TABLE contratti_assicurativi (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente TEXT NOT NULL,\n    massimale NUMERIC(12, 2) NOT NULL CHECK (massimale > 0),\n    stato_polizza stato_polizza NOT NULL,\n    data_inizio DATE NOT NULL,\n    data_fine DATE CHECK (data_fine IS NULL OR data_fine > data_inizio)\n);\n\nCREATE TABLE sinistri (\n    id SERIAL PRIMARY KEY,\n    contratto_id INT NOT NULL REFERENCES contratti_assicurativi(id),\n    data_sinistro DATE NOT NULL,\n    importo_richiesto NUMERIC(12, 2) NOT NULL CHECK (importo_richiesto > 0),\n    importo_liquidato NUMERIC(12, 2) CHECK (importo_liquidato >= 0 AND importo_liquidato <= importo_richiesto),\n    stato_sinistro TEXT NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "contratti_assicurativi": {
+        "row_count": 758,
+        "columns": {
+          "id": {
+            "distinct": 758,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 758
+          },
+          "numero_polizza": {
+            "distinct": 758,
+            "sample": [
+              "POL-2023-0087",
+              "POL-2023-0087_1",
+              "POL-2023-0087_10",
+              "POL-2023-0087_100",
+              "POL-2023-0087_101"
+            ]
+          },
+          "cliente": {
+            "distinct": 8,
+            "sample": [
+              "Anna Ferrari",
+              "Giulia Verdi",
+              "Laura Bianchi",
+              "Luca Neri",
+              "Marco Greco"
+            ]
+          },
+          "massimale": {
+            "distinct": 731,
+            "sample": [
+              "100000.0",
+              "1013235.46",
+              "103149.66",
+              "103229.85",
+              "103246.56"
+            ],
+            "min": 52580.86,
+            "max": 1247304.71
+          },
+          "stato_polizza": {
+            "distinct": 3,
+            "sample": [
+              "attiva",
+              "cessata",
+              "sospesa"
+            ]
+          },
+          "data_inizio": {
+            "distinct": 566,
+            "sample": [
+              "2021-06-11",
+              "2021-06-20",
+              "2021-06-21",
+              "2021-06-22",
+              "2021-06-26"
+            ]
+          },
+          "data_fine": {
+            "distinct": 2,
+            "sample": [
+              "2024-06-01",
+              "2025-09-20"
+            ]
+          }
+        }
+      },
+      "sinistri": {
+        "row_count": 1821,
+        "columns": {
+          "id": {
+            "distinct": 1821,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1821
+          },
+          "contratto_id": {
+            "distinct": 695,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 758
+          },
+          "data_sinistro": {
+            "distinct": 408,
+            "sample": [
+              "2024-01-12",
+              "2024-01-13",
+              "2024-01-14",
+              "2024-01-15",
+              "2024-01-16"
+            ]
+          },
+          "importo_richiesto": {
+            "distinct": 1757,
+            "sample": [
+              "10045.76",
+              "10076.6",
+              "10094.17",
+              "10124.25",
+              "10128.56"
+            ],
+            "min": 950.0,
+            "max": 67500.0
+          },
+          "importo_liquidato": {
+            "distinct": 4,
+            "sample": [
+              "0.0",
+              "15000.0",
+              "18000.0",
+              "500.0"
+            ],
+            "min": 0.0,
+            "max": 18000.0
+          },
+          "stato_sinistro": {
+            "distinct": 5,
+            "sample": [
+              "aperto",
+              "chiuso",
+              "in valutazione",
+              "liquidato",
+              "respinto"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "contratti_assicurativi": [
+        {
+          "id": 1,
+          "numero_polizza": "POL-2025-0001",
+          "cliente": "Marco Greco",
+          "massimale": 245054.63,
+          "stato_polizza": "attiva",
+          "data_inizio": "2024-12-18",
+          "data_fine": null
+        },
+        {
+          "id": 2,
+          "numero_polizza": "POL-2025-0001_1",
+          "cliente": "Sara Conti",
+          "massimale": 339932.94,
+          "stato_polizza": "attiva",
+          "data_inizio": "2024-02-29",
+          "data_fine": null
+        },
+        {
+          "id": 3,
+          "numero_polizza": "POL-2025-0001_2",
+          "cliente": "Sara Conti",
+          "massimale": 239469.15,
+          "stato_polizza": "attiva",
+          "data_inizio": "2023-01-27",
+          "data_fine": null
+        },
+        {
+          "id": 4,
+          "numero_polizza": "POL-2025-0001_3",
+          "cliente": "Paolo Esposito",
+          "massimale": 357205.72,
+          "stato_polizza": "attiva",
+          "data_inizio": "2023-12-19",
+          "data_fine": null
+        },
+        {
+          "id": 5,
+          "numero_polizza": "POL-2025-0001_4",
+          "cliente": "Luca Neri",
+          "massimale": 226587.6,
+          "stato_polizza": "attiva",
+          "data_inizio": "2023-12-25",
+          "data_fine": null
+        },
+        {
+          "id": 6,
+          "numero_polizza": "POL-2025-0001_5",
+          "cliente": "Laura Bianchi",
+          "massimale": 182002.88,
+          "stato_polizza": "attiva",
+          "data_inizio": "2023-08-31",
+          "data_fine": null
+        },
+        {
+          "id": 7,
+          "numero_polizza": "POL-2025-0001_6",
+          "cliente": "Giulia Verdi",
+          "massimale": 335563.37,
+          "stato_polizza": "attiva",
+          "data_inizio": "2024-01-19",
+          "data_fine": null
+        },
+        {
+          "id": 8,
+          "numero_polizza": "POL-2025-0001_7",
+          "cliente": "Paolo Esposito",
+          "massimale": 113774.15,
+          "stato_polizza": "attiva",
+          "data_inizio": "2023-11-02",
+          "data_fine": null
+        }
+      ],
+      "sinistri": [
+        {
+          "id": 1,
+          "contratto_id": 57,
+          "data_sinistro": "2025-12-24",
+          "importo_richiesto": 13322.35,
+          "importo_liquidato": 0.0,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id": 2,
+          "contratto_id": 529,
+          "data_sinistro": "2026-01-15",
+          "importo_richiesto": 26392.64,
+          "importo_liquidato": 0.0,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id": 3,
+          "contratto_id": 703,
+          "data_sinistro": "2025-12-04",
+          "importo_richiesto": 23305.33,
+          "importo_liquidato": 0.0,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id": 4,
+          "contratto_id": 495,
+          "data_sinistro": "2025-11-22",
+          "importo_richiesto": 19486.53,
+          "importo_liquidato": 0.0,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id": 5,
+          "contratto_id": 740,
+          "data_sinistro": "2026-02-11",
+          "importo_richiesto": 25985.67,
+          "importo_liquidato": 0.0,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id": 6,
+          "contratto_id": 444,
+          "data_sinistro": "2026-01-15",
+          "importo_richiesto": 14811.1,
+          "importo_liquidato": 0.0,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id": 7,
+          "contratto_id": 37,
+          "data_sinistro": "2025-12-19",
+          "importo_richiesto": 14230.78,
+          "importo_liquidato": 0.0,
+          "stato_sinistro": "aperto"
+        },
+        {
+          "id": 8,
+          "contratto_id": 389,
+          "data_sinistro": "2026-02-22",
+          "importo_richiesto": 26334.64,
+          "importo_liquidato": 0.0,
+          "stato_sinistro": "aperto"
+        }
+      ]
+    }
+  },
+  "story": "Presso l'Ufficio Portafoglio della compagnia, l'archivio denominato contratti assicurativi custodisce le schede delle polizze, con 758 posizioni censite. Ogni scheda riporta il cliente, il numero della polizza, il massimale indicato nel gergo interno come limite copertura, la data di inizio, l'eventuale data di fine e la situazione della copertura, nota come flag attivazione copertura. Per la rassegna periodica, gli addetti consultano anche il registro sinistri, dove 1821 pratiche raccolgono la data dell'evento, l'importo richiesto, l'importo liquidato e lo stato della pratica. Nella preparazione dell'elenco dei clienti, ogni posizione dell'archivio contratti assicurativi viene completata da una descrizione testuale della situazione: se flag attivazione copertura indica attiva, si legge copertura operativa; se indica sospesa, si legge copertura temporaneamente sospesa; se indica cessata, si legge copertura cessata. Ad esempio, la posizione POL-2025-0001 intestata a Marco Greco, con limite copertura pari a 245054.63 e decorrenza dal 2024-12-18, risulta copertura operativa. Le verifiche operative proseguono sul registro sinistri, controllando le pratiche con stato aperto e importo liquidato 0.0, da ricondurre alle schede delle polizze ancora attive."
+}

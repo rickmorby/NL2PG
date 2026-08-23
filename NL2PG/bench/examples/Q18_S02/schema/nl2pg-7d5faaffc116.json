@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "lateral"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "movimenti_di_acquisto",
+        "description": "La tabella figlia ordini (che contiene la FK cliente_id verso la tabella padre clienti) viene denominata movimenti_di_acquisto nella prosa aziendale. Il solver deve risalire alla tabella reale ordini per costruire il LEFT JOIN LATERAL."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore transato lordo",
+        "description": "La colonna importo_totale della tabella ordini viene indicata con il gergo aziendale 'valore transato lordo' nei requisiti di business. Il solver deve mappare questa perifrasi alla colonna reale importo_totale, ad esempio per selezionare l'ultimo ordine di ciascun cliente tramite la subquery LATERAL con LIMIT 1."
+      }
+    ],
+    "spec_hash": "05e216641e27f512"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    citta TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato TEXT NOT NULL CHECK (stato IN ('in_attesa', 'pagato', 'spedito', 'consegnato', 'annullato'))\n);\n\nCREATE INDEX idx_ordini_cliente_id ON ordini(cliente_id);\nCREATE INDEX idx_ordini_data_ordine ON ordini(data_ordine);"
+}

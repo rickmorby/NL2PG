@@ -1,0 +1,363 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "sorting"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "pratiche_di_copertura",
+        "description": "La tabella polizze viene denominata pratiche_di_copertura nella prosa aziendale: il risolutore deve mappare la perifrasi al nome reale della tabella nello schema."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "deleted_at",
+        "obsolete_value": "data_ritiro",
+        "description": "La colonna deleted_at (timestamp di cancellazione logica) viene descritta come data_ritiro nella documentazione aziendale: le righe con valore non nullo sono logicamente eliminate e devono essere escluse tramite il predicato deleted_at IS NULL mantenuto nella WHERE, prima dell'ordinamento ORDER BY multi-colonna senza LIMIT."
+      }
+    ],
+    "spec_hash": "96f52999c772d7d5"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id) ON DELETE CASCADE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('vita', 'auto', 'casa', 'salute', 'viaggio')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    capitale_assicurato NUMERIC(12,2) NOT NULL CHECK (capitale_assicurato > 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_polizza TEXT NOT NULL DEFAULT 'attiva' CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta')),\n    deleted_at TIMESTAMP,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    modificato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_scadenza >= data_emissione)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 200,
+        "max_rows": 300,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA85M01H501Z",
+            "email": "mario.rossi@email.it",
+            "citta": "Roma"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA90C45F205X",
+            "email": "laura.bianchi@email.it",
+            "citta": "Milano"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI78A62L219W",
+            "email": null,
+            "citta": "Torino"
+          },
+          {
+            "id": 4,
+            "nome": "Antonio",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPSNTN82D10F839Q",
+            "email": "antonio.esposito@email.it",
+            "citta": "Napoli"
+          },
+          {
+            "id": 5,
+            "nome": "Chiara",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRCHR88B21D963J",
+            "email": "chiara.ferrari@email.it",
+            "citta": "Bologna"
+          },
+          {
+            "id": 6,
+            "nome": "Luca",
+            "cognome": "Russo",
+            "codice_fiscale": "RSOLCU79T15G702B",
+            "email": "luca.russo@email.it",
+            "citta": "Firenze"
+          },
+          {
+            "id": 7,
+            "nome": "Sara",
+            "cognome": "Colombo",
+            "codice_fiscale": "CLMSRA91E53C129D",
+            "email": null,
+            "citta": "Genova"
+          },
+          {
+            "id": 8,
+            "nome": "Marco",
+            "cognome": "Ricci",
+            "codice_fiscale": "RCCMRC83P29E507H",
+            "email": "marco.ricci@email.it",
+            "citta": "Verona"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Antonio",
+              "Chiara",
+              "Luca",
+              "Francesca",
+              "Marco",
+              "Sara",
+              "Alessandro"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Esposito",
+              "Ferrari",
+              "Russo",
+              "Colombo",
+              "Ricci",
+              "Greco",
+              "Conti"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona"
+            ]
+          }
+        }
+      },
+      {
+        "table": "polizze",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.5,
+        "templates": [
+          {
+            "id": 101,
+            "numero_polizza": "POL-2024-000101",
+            "cliente_id": 1,
+            "tipo_polizza": "vita",
+            "premio_annuo": 850.0,
+            "capitale_assicurato": 100000.0,
+            "data_emissione": "2024-01-15",
+            "data_scadenza": "2034-01-15",
+            "stato_polizza": "attiva",
+            "deleted_at": null,
+            "creato_il": "2024-01-15 09:00:00",
+            "modificato_il": "2024-04-15 09:00:00"
+          },
+          {
+            "id": 102,
+            "numero_polizza": "POL-2024-000102",
+            "cliente_id": 2,
+            "tipo_polizza": "auto",
+            "premio_annuo": 420.5,
+            "capitale_assicurato": 25000.0,
+            "data_emissione": "2024-03-10",
+            "data_scadenza": "2025-03-10",
+            "stato_polizza": "scaduta",
+            "deleted_at": null,
+            "creato_il": "2024-03-10 10:15:00",
+            "modificato_il": "2024-06-10 10:15:00"
+          },
+          {
+            "id": 103,
+            "numero_polizza": "POL-2024-000103",
+            "cliente_id": 3,
+            "tipo_polizza": "casa",
+            "premio_annuo": 310.75,
+            "capitale_assicurato": 180000.0,
+            "data_emissione": "2024-05-20",
+            "data_scadenza": "2029-05-20",
+            "stato_polizza": "attiva",
+            "deleted_at": null,
+            "creato_il": "2024-05-20 11:30:00",
+            "modificato_il": "2024-08-20 11:30:00"
+          },
+          {
+            "id": 104,
+            "numero_polizza": "POL-2023-000104",
+            "cliente_id": 4,
+            "tipo_polizza": "salute",
+            "premio_annuo": 1200.0,
+            "capitale_assicurato": 50000.0,
+            "data_emissione": "2023-11-01",
+            "data_scadenza": "2028-11-01",
+            "stato_polizza": "attiva",
+            "deleted_at": "2025-06-15 10:30:00",
+            "creato_il": "2023-11-01 08:45:00",
+            "modificato_il": "2024-02-01 08:45:00"
+          },
+          {
+            "id": 105,
+            "numero_polizza": "POL-2025-000105",
+            "cliente_id": 5,
+            "tipo_polizza": "viaggio",
+            "premio_annuo": 145.0,
+            "capitale_assicurato": 20000.0,
+            "data_emissione": "2025-06-01",
+            "data_scadenza": "2027-06-01",
+            "stato_polizza": "attiva",
+            "deleted_at": null,
+            "creato_il": "2025-06-01 15:40:00",
+            "modificato_il": "2025-09-01 15:40:00"
+          },
+          {
+            "id": 106,
+            "numero_polizza": "POL-2023-000106",
+            "cliente_id": 1,
+            "tipo_polizza": "auto",
+            "premio_annuo": 480.0,
+            "capitale_assicurato": 30000.0,
+            "data_emissione": "2023-06-01",
+            "data_scadenza": "2024-06-01",
+            "stato_polizza": "scaduta",
+            "deleted_at": null,
+            "creato_il": "2023-06-01 14:20:00",
+            "modificato_il": "2023-09-01 14:20:00"
+          },
+          {
+            "id": 107,
+            "numero_polizza": "POL-2025-000107",
+            "cliente_id": 2,
+            "tipo_polizza": "casa",
+            "premio_annuo": 275.4,
+            "capitale_assicurato": 220000.0,
+            "data_emissione": "2025-01-10",
+            "data_scadenza": "2030-01-10",
+            "stato_polizza": "attiva",
+            "deleted_at": null,
+            "creato_il": "2025-01-10 16:05:00",
+            "modificato_il": "2025-04-10 16:05:00"
+          },
+          {
+            "id": 108,
+            "numero_polizza": "POL-2024-000108",
+            "cliente_id": 3,
+            "tipo_polizza": "salute",
+            "premio_annuo": 980.0,
+            "capitale_assicurato": 60000.0,
+            "data_emissione": "2024-09-01",
+            "data_scadenza": "2029-09-01",
+            "stato_polizza": "sospesa",
+            "deleted_at": null,
+            "creato_il": "2024-09-01 12:00:00",
+            "modificato_il": "2025-01-15 12:00:00"
+          },
+          {
+            "id": 109,
+            "numero_polizza": "POL-2022-000109",
+            "cliente_id": 4,
+            "tipo_polizza": "vita",
+            "premio_annuo": 1500.0,
+            "capitale_assicurato": 250000.0,
+            "data_emissione": "2022-10-05",
+            "data_scadenza": "2032-10-05",
+            "stato_polizza": "attiva",
+            "deleted_at": "2025-09-30 17:45:00",
+            "creato_il": "2022-10-05 09:30:00",
+            "modificato_il": "2023-01-05 09:30:00"
+          }
+        ],
+        "variations": {
+          "tipo_polizza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "vita",
+              "auto",
+              "casa",
+              "salute",
+              "viaggio"
+            ]
+          },
+          "premio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "capitale_assicurato": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "creato_il": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "modificato_il": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

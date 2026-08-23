@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "between"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "versioni_polizza",
+        "obsolete_value": "storico_coperture",
+        "description": "La tabella versioni_polizza, che contiene le versioni storiche delle condizioni di ciascuna polizza con i relativi timestamp di validità, viene denominata storico_coperture nella prosa aziendale. Il richiedente deve mappare la perifrasi al nome reale della tabella per costruire correttamente la clausola WHERE col_ts BETWEEN t1 AND t2."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "ts_validita",
+        "obsolete_value": "decorrenza della garanzia",
+        "description": "La colonna ts_validita della tabella versioni_polizza, che indica l'istante temporale di validità di ciascuna versione della polizza, viene indicata nel linguaggio aziendale con il gergo assicurativo 'decorrenza della garanzia'. Le query di intervallo chiuso devono applicare il filtro BETWEEN proprio su ts_validita, riconoscendo il termine di settore come riferimento alla colonna temporale."
+      }
+    ],
+    "spec_hash": "89879c9eb3c10b2d"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    data_nascita DATE\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    ramo TEXT NOT NULL CHECK (ramo IN ('auto', 'casa', 'vita', 'salute')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    data_emissione DATE NOT NULL\n);\n\nCREATE TABLE versioni_polizza (\n    id SERIAL PRIMARY KEY,\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    numero_versione INT NOT NULL,\n    ts_validita TIMESTAMP NOT NULL,\n    data_inizio TIMESTAMP NOT NULL,\n    data_fine TIMESTAMP,\n    premio_versione NUMERIC(10,2) NOT NULL CHECK (premio_versione >= 0),\n    massimale_copertura NUMERIC(12,2) CHECK (massimale_copertura > 0),\n    UNIQUE (polizza_id, numero_versione),\n    CHECK (data_fine IS NULL OR data_fine > data_inizio)\n);\n\nCREATE TABLE garanzie (\n    id SERIAL PRIMARY KEY,\n    versione_polizza_id INT NOT NULL REFERENCES versioni_polizza(id),\n    codice_garanzia TEXT NOT NULL,\n    descrizione TEXT NOT NULL,\n    franchigia NUMERIC(8,2) NOT NULL DEFAULT 0 CHECK (franchigia >= 0),\n    massimale NUMERIC(12,2) CHECK (massimale > 0)\n);"
+}

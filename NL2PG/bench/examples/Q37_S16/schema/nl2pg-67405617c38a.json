@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 6,
+    "hierarchy": "temporal_versioning",
+    "sql_features": [
+      "math_funcs"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "storico_prezzi",
+        "obsolete_value": "registro_variazioni_tariffarie",
+        "description": "La tabella storico_prezzi, che contiene le versioni temporali dei prezzi dei prodotti con validita' da/a, viene denominata registro_variazioni_tariffarie nella prosa aziendale. Le query devono risolvere il nome obsoleto verso la tabella reale dello storico."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "prezzo_unitario",
+        "obsolete_value": "valore tariffario corrente",
+        "description": "La colonna prezzo_unitario della tabella storico_prezzi viene indicata nel linguaggio aziendale come 'valore tariffario corrente'. Il solver deve mappare questo gergo commerciale alla colonna numerica effettiva su cui applicare ABS(POWER(new-old,1)) e ROUND."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "versione",
+        "obsolete_value": "revisione",
+        "description": "Il termine 'revisione' nella prosa aziendale e' ambiguo: indica sia la colonna versione della tabella storico_prezzi (progressivo delle modifiche di prezzo) sia la colonna versione_catalogo della tabella prodotti. Il solver deve disambiguare dal contesto della query quale colonna 'versione' utilizzare per calcolare la durata tra due revisioni consecutive."
+      }
+    ],
+    "spec_hash": "4c540cea62c8614d"
+  },
+  "schema_ddl": "CREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    fornitore_id INT REFERENCES fornitori(id),\n    versione_catalogo INT NOT NULL DEFAULT 1 CHECK (versione_catalogo >= 1),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE storico_prezzi (\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    versione INT NOT NULL CHECK (versione >= 1),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    PRIMARY KEY (prodotto_id, versione),\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    importo_totale NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_totale >= 0)\n);"
+}

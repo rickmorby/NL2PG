@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "ordered_set_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "pazienti",
+        "obsolete_value": "anagrafica_assistiti",
+        "description": "La tabella pazienti viene denominata anagrafica_assistiti nella prosa aziendale; il progettista deve riconoscere che anagrafica_assistiti corrisponde alla tabella fisica pazienti."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "pressione_sistolica_mmhg",
+        "obsolete_value": "PAS",
+        "description": "La colonna pressione_sistolica_mmhg della tabella rilevazioni_vitali è indicata nella documentazione clinica con l'acronimo gergale PAS (Pressione Arteriosa Sistolica); occorre mappare PAS sulla colonna reale."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "data_dimissione",
+        "obsolete_value": "chiusura_episodio",
+        "description": "Il termine dimissione ha doppio significato nel dominio: evento clinico di fine degenza e liberazione del posto letto. La prosa usa chiusura_episodio riferendosi esclusivamente alla colonna data_dimissione della tabella ricoveri, non a un campo separato."
+      }
+    ],
+    "spec_hash": "10616944d7a9a0d3"
+  },
+  "schema_ddl": "CREATE DOMAIN mmhg AS INT CHECK (VALUE BETWEEN 50 AND 260);\n\nCREATE DOMAIN temperatura_corporea AS NUMERIC(4,1) CHECK (VALUE BETWEEN 30.0 AND 45.0);\n\nCREATE DOMAIN battito_cardiaco AS INT CHECK (VALUE BETWEEN 20 AND 250);\n\nCREATE DOMAIN stato_ricovero AS TEXT CHECK (VALUE IN ('in_corso', 'dimesso', 'trasferito', 'deceduto'));\n\nCREATE TABLE reparti (\n    id SERIAL PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano_edificio INT CHECK (piano_edificio >= 0),\n    posti_letto_totali INT NOT NULL CHECK (posti_letto_totali > 0)\n);\n\nCREATE TABLE medici (\n    id SERIAL PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_iscrizione_albo TEXT NOT NULL UNIQUE,\n    specializzazione TEXT\n);\n\nCREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE NOT NULL,\n    sesso CHAR(1) CHECK (sesso IN ('M', 'F')),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE ricoveri (\n    id SERIAL PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    data_ricovero DATE NOT NULL,\n    data_dimissione DATE,\n    stato_ricovero stato_ricovero NOT NULL DEFAULT 'in_corso',\n    motivo_ricovero TEXT,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ricovero)\n);\n\nCREATE TABLE rilevazioni_vitali (\n    id BIGSERIAL PRIMARY KEY,\n    ricovero_id INT NOT NULL REFERENCES ricoveri(id),\n    momento_rilevazione TIMESTAMP NOT NULL,\n    pressione_sistolica_mmhg mmhg NOT NULL,\n    pressione_diastolica_mmhg mmhg NOT NULL,\n    frequenza_cardiaca_bpm battito_cardiaco,\n    temperatura_corporea_celsius temperatura_corporea,\n    saturazione_ossigeno_pct INT CHECK (saturazione_ossigeno_pct BETWEEN 50 AND 100),\n    note_cliniche TEXT,\n    CHECK (pressione_diastolica_mmhg < pressione_sistolica_mmhg)\n);"
+}

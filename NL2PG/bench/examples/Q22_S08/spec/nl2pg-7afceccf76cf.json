@@ -1,0 +1,34 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 6,
+  "hierarchy": "isa",
+  "sql_features": [
+    "distinct_on"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "immobile",
+      "obsolete_value": "anagrafica_unita_edilizie",
+      "description": "La tabella base della gerarchia ISA, 'immobile', viene denominata 'anagrafica_unita_edilizie' nella prosa aziendale. Le query devono risalire al nome reale della tabella per ricomporre la specializzazione tramite join o discriminatore."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "terreno",
+      "obsolete_value": "particella_fondiaria",
+      "description": "Il sottotipo 'terreno' viene indicato nel linguaggio di settore come 'particella_fondiaria'. Il solver deve riconoscere che il termine gergale si riferisce alla tabella sottotipo collegata a 'immobile' tramite FK/discriminatore."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "classe_energetica",
+      "obsolete_value": "classe dell'immobile",
+      "description": "Il termine 'classe' nella prosa aziendale è ambiguo: può indicare una fascia di pregio commerciale oppure l'attributo tecnico 'classe_energetica'. Le query che menzionano 'classe dell'immobile' vanno interpretate come riferite alla colonna classe_energetica, non a una classificazione di mercato."
+    }
+  ],
+  "spec_hash": "0bfde2cfcc730032"
+}

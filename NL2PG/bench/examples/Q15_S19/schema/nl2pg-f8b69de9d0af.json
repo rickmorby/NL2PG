@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 5,
+    "hierarchy": "mixed",
+    "sql_features": [
+      "cte"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_acquirenti",
+        "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; il solver deve mappare la perifrasi al nome reale della tabella nel database."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore_complessivo",
+        "description": "La colonna importo_totale della tabella ordini viene indicata come valore_complessivo nei documenti aziendali; occorre riconoscere il sinonimo per riferirsi alla colonna corretta."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "venditori",
+        "obsolete_value": "rete_commerciale",
+        "description": "La tabella venditori viene indicata con il gergo aziendale rete_commerciale; il termine tecnico interno deve essere tradotto nel nome effettivo della tabella durante la formulazione della query CTE."
+      }
+    ],
+    "spec_hash": "c90c028dc963bf2e"
+  },
+  "schema_ddl": "CREATE TABLE venditori (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    regione TEXT NOT NULL,\n    data_assunzione DATE NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0)\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    venditore_id INT NOT NULL REFERENCES venditori(id),\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    numero_riga INT NOT NULL,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);"
+}

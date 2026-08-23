@@ -1,0 +1,27 @@
+{
+  "domain": "università",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "in_condition"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "std_reg",
+      "obsolete_value": "registro anagrafico degli iscritti",
+      "description": "La tabella std_reg, che contiene i dati degli studenti immatricolati, viene denominata nella prosa aziendale come 'registro anagrafico degli iscritti'. Il solver deve allineare la perifrasi naturale alla sigla reale della tabella prima di formulare la query."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "crs_cd",
+      "obsolete_value": "chiave didattica dell'offerta formativa",
+      "description": "La colonna crs_cd della tabella crs_cat (catalogo dei corsi) è indicata nel gergo interno dell'ateneo come 'chiave didattica dell'offerta formativa'. La condizione WHERE ... IN (v1, v2) dovrà essere applicata su questa colonna utilizzando i codici corso reali presenti nel database."
+    }
+  ],
+  "spec_hash": "ea16e7e633b2ca4d"
+}

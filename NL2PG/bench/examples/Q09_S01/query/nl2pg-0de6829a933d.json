@@ -1,0 +1,217 @@
+{
+  "schema_ddl": "CREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    eta INT CHECK (eta >= 0 AND eta <= 120),\n    sesso TEXT CHECK (sesso IN ('M', 'F', 'Altro')),\n    data_nascita DATE,\n    gruppo_sanguigno TEXT CHECK (gruppo_sanguigno IN ('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-')),\n    altezza_cm NUMERIC(5,2) CHECK (altezza_cm > 0),\n    peso_kg NUMERIC(5,2) CHECK (peso_kg > 0),\n    bmi NUMERIC(4,2) GENERATED ALWAYS AS (ROUND(peso_kg / (altezza_cm * altezza_cm / 10000)::NUMERIC, 2)) STORED\n);",
+  "data_profile": {
+    "profile": {
+      "pazienti": {
+        "row_count": 295,
+        "columns": {
+          "id": {
+            "distinct": 295,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 295
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Alex",
+              "Anna",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 19,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Conti",
+              "Costa",
+              "De Luca"
+            ]
+          },
+          "eta": {
+            "distinct": 10,
+            "sample": [
+              "22",
+              "27",
+              "29",
+              "34",
+              "38"
+            ],
+            "min": 8,
+            "max": 70
+          },
+          "sesso": {
+            "distinct": 3,
+            "sample": [
+              "Altro",
+              "F",
+              "M"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 10,
+            "sample": [
+              "1956-03-30",
+              "1963-02-18",
+              "1974-01-30",
+              "1981-05-09",
+              "1988-03-05"
+            ]
+          },
+          "gruppo_sanguigno": {
+            "distinct": 8,
+            "sample": [
+              "0+",
+              "0-",
+              "A+",
+              "A-",
+              "AB+"
+            ]
+          },
+          "altezza_cm": {
+            "distinct": 259,
+            "sample": [
+              "125.4",
+              "126.44",
+              "126.88",
+              "128.45",
+              "129.3"
+            ],
+            "min": 125.4,
+            "max": 191.0
+          },
+          "peso_kg": {
+            "distinct": 269,
+            "sample": [
+              "27.58",
+              "27.65",
+              "27.94",
+              "28.07",
+              "28.19"
+            ],
+            "min": 27.58,
+            "max": 90.53
+          },
+          "bmi": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      }
+    },
+    "preview": {
+      "pazienti": [
+        {
+          "id": 1,
+          "nome": "Marco",
+          "cognome": "Moretti",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "B+",
+          "altezza_cm": 178.11,
+          "peso_kg": 68.89,
+          "bmi": null
+        },
+        {
+          "id": 2,
+          "nome": "Marco",
+          "cognome": "Ferrari",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "A+",
+          "altezza_cm": 176.74,
+          "peso_kg": 75.0,
+          "bmi": null
+        },
+        {
+          "id": 3,
+          "nome": "Marco",
+          "cognome": "Leone",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": null,
+          "gruppo_sanguigno": "A-",
+          "altezza_cm": 176.0,
+          "peso_kg": 80.05,
+          "bmi": null
+        },
+        {
+          "id": 4,
+          "nome": "Marco",
+          "cognome": "Conti",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "A+",
+          "altezza_cm": null,
+          "peso_kg": 83.04,
+          "bmi": null
+        },
+        {
+          "id": 5,
+          "nome": "Marco",
+          "cognome": "Costa",
+          "eta": null,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "B-",
+          "altezza_cm": 175.1,
+          "peso_kg": 81.88,
+          "bmi": null
+        },
+        {
+          "id": 6,
+          "nome": "Marco",
+          "cognome": "De Luca",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "0-",
+          "altezza_cm": 183.47,
+          "peso_kg": 81.39,
+          "bmi": null
+        },
+        {
+          "id": 7,
+          "nome": "Marco",
+          "cognome": "Bruno",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "AB+",
+          "altezza_cm": 180.44,
+          "peso_kg": 78.56,
+          "bmi": null
+        },
+        {
+          "id": 8,
+          "nome": "Marco",
+          "cognome": "Rizzo",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": null,
+          "altezza_cm": 184.9,
+          "peso_kg": null,
+          "bmi": null
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "group_agg",
+    "having"
+  ],
+  "query": "WITH pazienti_bmi AS (\n    SELECT \n        nome,\n        cognome,\n        eta,\n        sesso,\n        gruppo_sanguigno,\n        altezza_cm,\n        peso_kg,\n        bmi,\n        CASE \n            WHEN bmi < 18.5 THEN 'Sottopeso'\n            WHEN bmi BETWEEN 18.5 AND 24.9 THEN 'Normopeso'\n            WHEN bmi BETWEEN 25 AND 29.9 THEN 'Sovrappeso'\n            ELSE 'Obesità'\n        END AS categoria_peso\n    FROM pazienti\n    WHERE altezza_cm IS NOT NULL AND peso_kg IS NOT NULL\n)\nSELECT \n    categoria_peso,\n    COUNT(*) AS numero_pazienti,\n    ROUND(AVG(eta), 1) AS eta_media,\n    ROUND(AVG(bmi), 2) AS bmi_medio,\n    STRING_AGG(DISTINCT sesso, ', ' ORDER BY sesso) AS sessi_presenti,\n    STRING_AGG(DISTINCT gruppo_sanguigno, ', ' ORDER BY gruppo_sanguigno) AS gruppi_sanguigni_presenti\nFROM pazienti_bmi\nGROUP BY categoria_peso\nHAVING COUNT(*) > 5\nORDER BY bmi_medio;"
+}

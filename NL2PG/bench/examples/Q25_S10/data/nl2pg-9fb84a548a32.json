@@ -1,0 +1,292 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "a604a00a08431fba"
+  },
+  "schema_ddl": "CREATE TABLE operatori (\n    operatore_id INT PRIMARY KEY,\n    nome_operatore TEXT NOT NULL UNIQUE,\n    paese_sede TEXT NOT NULL,\n    data_fondazione DATE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE piani_tariffari (\n    piano_id INT PRIMARY KEY,\n    operatore_id INT NOT NULL REFERENCES operatori(operatore_id),\n    nome_piano TEXT NOT NULL,\n    prezzo_mensile NUMERIC(8,2) NOT NULL CHECK (prezzo_mensile >= 0),\n    giga_inclusi INT NOT NULL CHECK (giga_inclusi >= 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE contratti (\n    contratto_id INT PRIMARY KEY,\n    piano_id INT NOT NULL REFERENCES piani_tariffari(piano_id),\n    numero_telefono TEXT NOT NULL UNIQUE,\n    data_attivazione DATE NOT NULL,\n    stato_contratto TEXT NOT NULL CHECK (stato_contratto IN ('attivo', 'sospeso', 'disattivato')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "operatori",
+        "nature": "lookup",
+        "min_rows": 8,
+        "max_rows": 12,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "operatore_id": 1,
+            "nome_operatore": "TIM",
+            "paese_sede": "Italia",
+            "data_fondazione": "1994-07-01"
+          },
+          {
+            "operatore_id": 2,
+            "nome_operatore": "Vodafone Italia",
+            "paese_sede": "Italia",
+            "data_fondazione": "1995-01-15"
+          },
+          {
+            "operatore_id": 3,
+            "nome_operatore": "WindTre",
+            "paese_sede": "Italia",
+            "data_fondazione": "2016-12-31"
+          },
+          {
+            "operatore_id": 4,
+            "nome_operatore": "Iliad Italia",
+            "paese_sede": "Francia",
+            "data_fondazione": "2018-05-29"
+          },
+          {
+            "operatore_id": 5,
+            "nome_operatore": "Fastweb Mobile",
+            "paese_sede": "Italia",
+            "data_fondazione": "1999-03-10"
+          },
+          {
+            "operatore_id": 6,
+            "nome_operatore": "PosteMobile",
+            "paese_sede": "Italia",
+            "data_fondazione": "2007-11-01"
+          },
+          {
+            "operatore_id": 7,
+            "nome_operatore": "Orange France",
+            "paese_sede": "Francia",
+            "data_fondazione": "1988-04-18"
+          },
+          {
+            "operatore_id": 8,
+            "nome_operatore": "Telefónica Deutschland",
+            "paese_sede": "Germania",
+            "data_fondazione": "1995-02-02"
+          }
+        ],
+        "variations": {
+          "paese_sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Italia",
+              "Italia",
+              "Italia",
+              "Francia",
+              "Germania",
+              "Spagna"
+            ]
+          },
+          "data_fondazione": {
+            "axis": "shift",
+            "delta_min": -1825.0,
+            "delta_max": 365.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "piani_tariffari",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 5.0,
+        "templates": [
+          {
+            "piano_id": 1,
+            "operatore_id": 1,
+            "nome_piano": "Super Basic",
+            "prezzo_mensile": 9.99,
+            "giga_inclusi": 20,
+            "minuti_inclusi": 100
+          },
+          {
+            "piano_id": 2,
+            "operatore_id": 1,
+            "nome_piano": "Unlimited Max",
+            "prezzo_mensile": 29.99,
+            "giga_inclusi": 300,
+            "minuti_inclusi": 1000
+          },
+          {
+            "piano_id": 3,
+            "operatore_id": 2,
+            "nome_piano": "Start Flex",
+            "prezzo_mensile": 7.99,
+            "giga_inclusi": 15,
+            "minuti_inclusi": 50
+          },
+          {
+            "piano_id": 4,
+            "operatore_id": 2,
+            "nome_piano": "Black Premium",
+            "prezzo_mensile": 34.99,
+            "giga_inclusi": 500,
+            "minuti_inclusi": 2000
+          },
+          {
+            "piano_id": 5,
+            "operatore_id": 4,
+            "nome_piano": "Iliad 50",
+            "prezzo_mensile": 9.99,
+            "giga_inclusi": 50,
+            "minuti_inclusi": 300
+          },
+          {
+            "piano_id": 6,
+            "operatore_id": 3,
+            "nome_piano": "Power Business",
+            "prezzo_mensile": 24.99,
+            "giga_inclusi": 200,
+            "minuti_inclusi": 800
+          }
+        ],
+        "variations": {
+          "nome_piano": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Basic",
+              "Smart",
+              "Plus",
+              "Unlimited",
+              "Premium",
+              "Business",
+              "Family",
+              "Young"
+            ]
+          },
+          "prezzo_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "giga_inclusi": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "10",
+              "20",
+              "50",
+              "100",
+              "150",
+              "200",
+              "300",
+              "500"
+            ]
+          },
+          "minuti_inclusi": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "50",
+              "100",
+              "300",
+              "600",
+              "1000",
+              "2000"
+            ]
+          }
+        }
+      },
+      {
+        "table": "contratti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 8.0,
+        "templates": [
+          {
+            "contratto_id": 1,
+            "piano_id": 1,
+            "numero_telefono": "+39 333 1234567",
+            "data_attivazione": "2024-03-15",
+            "stato_contratto": "attivo"
+          },
+          {
+            "contratto_id": 2,
+            "piano_id": 2,
+            "numero_telefono": "+39 320 9876543",
+            "data_attivazione": "2023-11-02",
+            "stato_contratto": "attivo"
+          },
+          {
+            "contratto_id": 3,
+            "piano_id": 3,
+            "numero_telefono": "+39 340 5551234",
+            "data_attivazione": "2025-01-20",
+            "stato_contratto": "sospeso"
+          },
+          {
+            "contratto_id": 4,
+            "piano_id": 4,
+            "numero_telefono": "+39 331 4448899",
+            "data_attivazione": "2022-06-30",
+            "stato_contratto": "disattivato"
+          },
+          {
+            "contratto_id": 5,
+            "piano_id": 5,
+            "numero_telefono": "+39 348 7770011",
+            "data_attivazione": "2025-06-10",
+            "stato_contratto": "attivo"
+          },
+          {
+            "contratto_id": 6,
+            "piano_id": 6,
+            "numero_telefono": "+39 329 2223344",
+            "data_attivazione": "2024-09-01",
+            "stato_contratto": "sospeso"
+          }
+        ],
+        "variations": {
+          "data_attivazione": {
+            "axis": "shift",
+            "delta_min": -500.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_contratto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "attivo",
+              "attivo",
+              "attivo",
+              "sospeso",
+              "disattivato"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "full_outer_join"
+  ],
+  "twist": [
+    "synonym",
+    "rename"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "synonym",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_assicurativi",
+      "description": "La tabella delle polizze viene riferita nel testo con il sinonimo contratti_assicurativi."
+    },
+    {
+      "twist_type": "rename",
+      "target_value": "sinistri",
+      "obsolete_value": "denunce_evento",
+      "description": "La tabella dei sinistri viene ridenominata semanticamente come denunce_evento."
+    }
+  ],
+  "spec_hash": "45c79648af76fee7"
+}

@@ -1,0 +1,21 @@
+{
+  "domain": "logistica",
+  "n_tables": 12,
+  "hierarchy": "path_routing",
+  "sql_features": [
+    "join",
+    "left_outer_join"
+  ],
+  "twist": [
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "corrieri",
+      "obsolete_value": "consorzi_trasporto_terzi",
+      "description": "Lo schema logistico è volutamente ampio (12 tabelle) e contiene molte entità irrilevanti che fungono da distrattori: contratti_corrieri, flotta_veicoli, assegnazioni_autisti, resi e fatture condividono colonne dall'aspetto simile (id_corriere, data_registrazione, importo). Nella prosa aziendale i vettori vengono citati con la perifrasi consorzi_trasporto_terzi, spingendo verso un join errato su contratti_corrieri o assegnazioni_autisti. L'unica tabella con l'anagrafica completa dei corrieri è corrieri: la soluzione corretta richiede di individuare il percorso rilevante (spedizioni -> corrieri) ignorando le tabelle esca, applicando un LEFT JOIN per includere tutte le spedizioni, anche quelle prive di corriere assegnato."
+    }
+  ],
+  "spec_hash": "88b31dfa22719b0e"
+}

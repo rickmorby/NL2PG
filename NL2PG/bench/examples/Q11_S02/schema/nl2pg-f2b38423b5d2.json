@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "subquery"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_di_copertura",
+        "description": "La tabella polizze (figlia di clienti tramite FK cliente_id) viene denominata contratti_di_copertura nella prosa aziendale. Le query devono risolvere il nome reale della tabella per costruire correttamente la subquery annidata non correlata con IN."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_risarcimento",
+        "obsolete_value": "liquidazione del danno",
+        "description": "La colonna importo_risarcimento della tabella sinistri viene indicata nella prosa aziendale con il gergo assicurativo 'liquidazione del danno'. Occorre mappare il termine tecnico di settore alla colonna reale quando si filtrano i sinistri nella subquery interna (SELECT ... FROM sinistri WHERE importo_risarcimento ...)."
+      }
+    ],
+    "spec_hash": "b578cbf60988b4e9"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    data_nascita DATE,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    matricola TEXT NOT NULL UNIQUE,\n    filiale TEXT NOT NULL,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    agente_id INT REFERENCES agenti(id),\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'responsabilita_civile')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    massimale_garantito NUMERIC(12,2) NOT NULL CHECK (massimale_garantito > 0),\n    franchigia NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (franchigia >= 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id INT PRIMARY KEY,\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    numero_pratica TEXT NOT NULL UNIQUE,\n    data_accadimento DATE NOT NULL,\n    data_denuncia DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    importo_risarcimento NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_risarcimento >= 0),\n    stato_sinistro TEXT NOT NULL DEFAULT 'aperto' CHECK (stato_sinistro IN ('aperto', 'in_istruttoria', 'liquidato', 'respinto')),\n    CHECK (data_denuncia >= data_accadimento)\n);"
+}

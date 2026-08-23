@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "disjunctive"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clnt",
+      "obsolete_value": "cliente",
+      "description": "La colonna 'clnt' (sigla per cliente) viene riferita come 'cliente' nella prosa aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "tot_vnd",
+      "obsolete_value": "fatturato",
+      "description": "La colonna 'tot_vnd' (totale vendite) viene chiamata 'fatturato' nel linguaggio aziendale."
+    }
+  ],
+  "spec_hash": "b8d4d221ae723499"
+}

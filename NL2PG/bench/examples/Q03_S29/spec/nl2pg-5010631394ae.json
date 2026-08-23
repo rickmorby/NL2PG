@@ -1,0 +1,11 @@
+{
+  "domain": "logistica",
+  "n_tables": 1,
+  "hierarchy": "single_table",
+  "sql_features": [
+    "top_n"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "34cc0eff2bb1a2cf"
+}

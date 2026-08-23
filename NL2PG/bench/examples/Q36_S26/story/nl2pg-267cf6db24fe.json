@@ -1,0 +1,193 @@
+{
+  "schema_ddl": "CREATE TABLE esami (\n    id INT PRIMARY KEY,\n    matricola_studente TEXT NOT NULL,\n    cognome_studente TEXT NOT NULL,\n    nome_studente TEXT NOT NULL,\n    denominazione_corso TEXT NOT NULL,\n    docente_presidente TEXT NOT NULL,\n    data_appello DATE NOT NULL,\n    voto TEXT NOT NULL CHECK (voto ~ '^(1[8-9]|2[0-9]|30)L?$'),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_profile": {
+    "profile": {
+      "esami": {
+        "row_count": 1833,
+        "columns": {
+          "id": {
+            "distinct": 1833,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1833
+          },
+          "matricola_studente": {
+            "distinct": 8,
+            "sample": [
+              "BO107654",
+              "FI105147",
+              "MI113578",
+              "NA104382",
+              "PA106290"
+            ]
+          },
+          "cognome_studente": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Colombo",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "nome_studente": {
+            "distinct": 10,
+            "sample": [
+              "Alessia",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Francesco"
+            ]
+          },
+          "denominazione_corso": {
+            "distinct": 8,
+            "sample": [
+              "Analisi Matematica I",
+              "Anatomia Umana",
+              "Chimica Organica",
+              "Diritto Privato",
+              "Economia Politica"
+            ]
+          },
+          "docente_presidente": {
+            "distinct": 6,
+            "sample": [
+              "Prof. Alberto Fontana",
+              "Prof. Giovanni Rinaldi",
+              "Prof. Stefano Galli",
+              "Prof.ssa Chiara Lombardi",
+              "Prof.ssa Elena Marchetti"
+            ]
+          },
+          "data_appello": {
+            "distinct": 137,
+            "sample": [
+              "2026-02-04",
+              "2026-02-05",
+              "2026-02-06",
+              "2026-02-07",
+              "2026-02-08"
+            ]
+          },
+          "voto": {
+            "distinct": 14,
+            "sample": [
+              "18",
+              "19",
+              "20",
+              "21",
+              "22"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2026-07-01 12:00:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "esami": [
+        {
+          "id": 1,
+          "matricola_studente": "FI105147",
+          "cognome_studente": "Colombo",
+          "nome_studente": "Francesco",
+          "denominazione_corso": "Fisica Generale",
+          "docente_presidente": "Prof.ssa Elena Marchetti",
+          "data_appello": "2026-02-23",
+          "voto": "26",
+          "created_at": "2026-07-01 12:00:00"
+        },
+        {
+          "id": 2,
+          "matricola_studente": "TO109921",
+          "cognome_studente": "Colombo",
+          "nome_studente": "Martina",
+          "denominazione_corso": "Analisi Matematica I",
+          "docente_presidente": "Prof.ssa Chiara Lombardi",
+          "data_appello": "2026-02-04",
+          "voto": "26",
+          "created_at": "2026-07-01 12:00:00"
+        },
+        {
+          "id": 3,
+          "matricola_studente": "PA106290",
+          "cognome_studente": "Ricci",
+          "nome_studente": "Luca",
+          "denominazione_corso": "Diritto Privato",
+          "docente_presidente": "Prof. Stefano Galli",
+          "data_appello": "2026-03-11",
+          "voto": "27",
+          "created_at": "2026-07-01 12:00:00"
+        },
+        {
+          "id": 4,
+          "matricola_studente": "NA104382",
+          "cognome_studente": "Bianchi",
+          "nome_studente": "Alessia",
+          "denominazione_corso": "Anatomia Umana",
+          "docente_presidente": "Prof. Alberto Fontana",
+          "data_appello": "2026-04-22",
+          "voto": "24",
+          "created_at": "2026-07-01 12:00:00"
+        },
+        {
+          "id": 5,
+          "matricola_studente": "PA106290",
+          "cognome_studente": "Esposito",
+          "nome_studente": "Alessia",
+          "denominazione_corso": "Chimica Organica",
+          "docente_presidente": "Prof.ssa Elena Marchetti",
+          "data_appello": "2026-04-09",
+          "voto": "26",
+          "created_at": "2026-07-01 12:00:00"
+        },
+        {
+          "id": 6,
+          "matricola_studente": "TO109921",
+          "cognome_studente": "Esposito",
+          "nome_studente": "Davide",
+          "denominazione_corso": "Economia Politica",
+          "docente_presidente": "Prof.ssa Chiara Lombardi",
+          "data_appello": "2026-03-20",
+          "voto": "23",
+          "created_at": "2026-07-01 12:00:00"
+        },
+        {
+          "id": 7,
+          "matricola_studente": "VR102345",
+          "cognome_studente": "Marino",
+          "nome_studente": "Giulia",
+          "denominazione_corso": "Anatomia Umana",
+          "docente_presidente": "Prof.ssa Elena Marchetti",
+          "data_appello": "2026-02-10",
+          "voto": "18",
+          "created_at": "2026-07-01 12:00:00"
+        },
+        {
+          "id": 8,
+          "matricola_studente": "RM108733",
+          "cognome_studente": "Rossi",
+          "nome_studente": "Martina",
+          "denominazione_corso": "Diritto Privato",
+          "docente_presidente": "Prof. Giovanni Rinaldi",
+          "data_appello": "2026-02-11",
+          "voto": "28",
+          "created_at": "2026-07-01 12:00:00"
+        }
+      ]
+    }
+  },
+  "story": "Durante la sessione invernale ed estiva dell'anno accademico 2025/2026, gli uffici della Segreteria Studenti dell'ateneo hanno condotto una verifica organizzativa sull'archivio denominato verbali_d_esame, nel quale vengono protocollati tutti i verbali relativi agli appelli sostenuti dagli studenti iscritti. Ciascun verbale reca il numero progressivo di protocollazione, la matricola dello studente — come ad esempio BO107654, FI105147 o MI113578 —, il cognome e il nome dell'allievo, la denominazione dell'insegnamento oggetto della prova, il docente che ha presieduto la commissione, la data dell'appello e l'esito_in_trentesimi conseguito, secondo il gergo accademico con cui la segreteria indica il giudizio espresso sulla scala da 18 a 30, comprensivo dell'eventuale menzione di lode annotata con il suffisso 30L. Ogni verbale riporta inoltre data e ora di immissione negli archivi, ad esempio 2026-07-01 alle ore 12:00:00. In vista della chiusura dei conteggi per la carriera, i funzionari hanno concentrato l'attenzione su due insegnamenti ritenuti particolarmente selettivi: Anatomia Umana e Chimica Organica. Le direttive richiedono che, per ogni studente che abbia sostenuto almeno un appello di Anatomia Umana oppure di Chimica Organica, venga predisposto un prospetto contenente cognome e nome dell'allievo, il numero di prove superate, la media dei voti conseguiti — calcolata trattando la lode 30L alla stregua di un 30 pieno, previa rimozione del suffisso alfanumerico prima della conversione numerica — e il miglior esito ottenuto, con l'elenco finale ordinato per media decrescente. Alcuni casi emersi durante il controllo illustrano bene la situazione: Alessia Bianchi, matricola NA104382, ha riportato un 24 in Anatomia Umana nell'appello del 2026-04-22 presieduto dal Prof. Alberto Fontana; Giulia Marino, matricola VR102345, si è fermata a un 18 nello stesso insegnamento il 2026-02-10 davanti alla commissione guidata dalla Prof.ssa Elena Marchetti; Alessia Esposito, matricola PA106290, ha invece conseguito un 26 in Chimica Organica il 2026-04-09, sempre sotto la presidenza della Prof.ssa Marchetti. La commissione didattica ha infine raccomandato di mantenere uniforme la modalità di lettura dell'esito_in_trentesimi, così che le medie risultino pienamente confrontabili tra i diversi corsi di studio."
+}

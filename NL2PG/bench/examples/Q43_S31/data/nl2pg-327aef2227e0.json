@@ -1,0 +1,362 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 4,
+    "hierarchy": "flat_denormalized",
+    "sql_features": [
+      "sorting"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "piani_tariffari",
+        "obsolete_value": "offerte_commerciali",
+        "description": "La tabella contenente i piani tariffari viene denominata 'offerte_commerciali' nella documentazione aziendale, creando una discrepanza con il nome reale della tabella."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "traffico_dati",
+        "obsolete_value": "throughput_mensile",
+        "description": "La colonna che misura il traffico dati in GB viene indicata come 'throughput_mensile' nei report tecnici, mentre nel database è registrata come 'traffico_dati'."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato_contratto",
+        "obsolete_value": "status",
+        "description": "La colonna 'stato_contratto' (valori: 'attivo', 'sospeso', 'terminato') viene spesso chiamata genericamente 'status' nei documenti, senza specificare il contesto contrattuale, causando ambiguità con altri campi di stato presenti nello schema."
+      }
+    ],
+    "spec_hash": "3ad4787e8d5bed98"
+  },
+  "schema_ddl": "CREATE TABLE offerte_commerciali (\n    id SERIAL PRIMARY KEY,\n    nome_piano TEXT NOT NULL,\n    costo_mensile NUMERIC(10,2) NOT NULL CHECK (costo_mensile >= 0),\n    traffico_dati INT NOT NULL CHECK (traffico_dati >= 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0),\n    sms_inclusi INT NOT NULL CHECK (sms_inclusi >= 0)\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_registrazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    totale_speso NUMERIC(12,2) DEFAULT 0 CHECK (totale_speso >= 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    offerta_id INT NOT NULL REFERENCES offerte_commerciali(id),\n    data_attivazione DATE NOT NULL,\n    data_scadenza DATE,\n    stato_contratto TEXT NOT NULL CHECK (stato_contratto IN ('attivo', 'sospeso', 'terminato')),\n    costo_totale NUMERIC(12,2) \n);\n\nCREATE TABLE fatture (\n    id SERIAL PRIMARY KEY,\n    contratto_id INT NOT NULL REFERENCES contratti(id),\n    data_emissione DATE NOT NULL,\n    importo NUMERIC(10,2) NOT NULL CHECK (importo >= 0),\n    stato_pagamento TEXT NOT NULL CHECK (stato_pagamento IN ('pagato', 'non_pagato', 'parzialmente_pagato')),\n    scadenza_pagamento DATE NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "offerte_commerciali",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_piano": "Base",
+            "costo_mensile": 9.99,
+            "traffico_dati": 10,
+            "minuti_inclusi": 100,
+            "sms_inclusi": 50
+          },
+          {
+            "id": 2,
+            "nome_piano": "Standard",
+            "costo_mensile": 19.99,
+            "traffico_dati": 50,
+            "minuti_inclusi": 500,
+            "sms_inclusi": 200
+          },
+          {
+            "id": 3,
+            "nome_piano": "Premium",
+            "costo_mensile": 29.99,
+            "traffico_dati": 100,
+            "minuti_inclusi": 1000,
+            "sms_inclusi": 500
+          },
+          {
+            "id": 4,
+            "nome_piano": "Illimitato",
+            "costo_mensile": 49.99,
+            "traffico_dati": 0,
+            "minuti_inclusi": 0,
+            "sms_inclusi": 0
+          }
+        ],
+        "variations": {
+          "costo_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.2,
+            "pool": []
+          },
+          "traffico_dati": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.9,
+            "factor_max": 1.1,
+            "pool": []
+          },
+          "minuti_inclusi": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.9,
+            "factor_max": 1.1,
+            "pool": []
+          },
+          "sms_inclusi": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.9,
+            "factor_max": 1.1,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "email": "mario.rossi@example.com",
+            "data_registrazione": "2025-01-15 10:30:00",
+            "totale_speso": 0.0
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@example.com",
+            "data_registrazione": "2025-02-20 14:45:00",
+            "totale_speso": 120.5
+          },
+          {
+            "id": 3,
+            "nome": "Giovanni",
+            "cognome": "Verdi",
+            "email": "giovanni.verdi@example.com",
+            "data_registrazione": "2025-03-10 09:15:00",
+            "totale_speso": 240.0
+          },
+          {
+            "id": 4,
+            "nome": "Anna",
+            "cognome": "Neri",
+            "email": "anna.neri@example.com",
+            "data_registrazione": "2025-04-05 16:20:00",
+            "totale_speso": 89.99
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giovanni",
+              "Anna",
+              "Luca",
+              "Sofia",
+              "Marco",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Esposito",
+              "Rizzo",
+              "Moretti",
+              "Galli"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "totale_speso": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "contratti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "offerta_id": 1,
+            "data_attivazione": "2025-01-16",
+            "data_scadenza": "2026-01-16",
+            "stato_contratto": "attivo"
+          },
+          {
+            "id": 2,
+            "cliente_id": 2,
+            "offerta_id": 2,
+            "data_attivazione": "2025-02-21",
+            "data_scadenza": "2026-02-21",
+            "stato_contratto": "attivo"
+          },
+          {
+            "id": 3,
+            "cliente_id": 3,
+            "offerta_id": 3,
+            "data_attivazione": "2025-03-11",
+            "data_scadenza": null,
+            "stato_contratto": "attivo"
+          },
+          {
+            "id": 4,
+            "cliente_id": 4,
+            "offerta_id": 1,
+            "data_attivazione": "2025-04-06",
+            "data_scadenza": "2025-10-06",
+            "stato_contratto": "terminato"
+          }
+        ],
+        "variations": {
+          "data_attivazione": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 365.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_contratto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "attivo",
+              "attivo",
+              "sospeso",
+              "terminato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "fatture",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.0,
+        "templates": [
+          {
+            "id": 1,
+            "contratto_id": 1,
+            "data_emissione": "2025-02-01",
+            "importo": 9.99,
+            "stato_pagamento": "pagato",
+            "scadenza_pagamento": "2025-02-15"
+          },
+          {
+            "id": 2,
+            "contratto_id": 1,
+            "data_emissione": "2025-03-01",
+            "importo": 9.99,
+            "stato_pagamento": "pagato",
+            "scadenza_pagamento": "2025-03-15"
+          },
+          {
+            "id": 3,
+            "contratto_id": 2,
+            "data_emissione": "2025-03-01",
+            "importo": 19.99,
+            "stato_pagamento": "non_pagato",
+            "scadenza_pagamento": "2025-03-20"
+          },
+          {
+            "id": 4,
+            "contratto_id": 3,
+            "data_emissione": "2025-04-01",
+            "importo": 29.99,
+            "stato_pagamento": "parzialmente_pagato",
+            "scadenza_pagamento": "2025-04-15"
+          }
+        ],
+        "variations": {
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.9,
+            "factor_max": 1.1,
+            "pool": []
+          },
+          "stato_pagamento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "pagato",
+              "pagato",
+              "non_pagato",
+              "parzialmente_pagato"
+            ]
+          },
+          "scadenza_pagamento": {
+            "axis": "shift",
+            "delta_min": 10.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 10,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "subquery"
+    ],
+    "twist": [
+      "distractor",
+      "polysemy",
+      "rename"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "distractor",
+        "target_value": "movimenti_contabili",
+        "obsolete_value": "movimenti_contabili_storici",
+        "description": "Lo schema vasto contiene la tabella movimenti_contabili_storici con struttura e nomi di colonna quasi identici a movimenti_contabili; solo i record di movimenti_contabili rappresentano le scritture valide dell'esercizio corrente e devono essere usati nella subquery interna, ignorando la tabella storica distrattrice."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "totale_documento",
+        "obsolete_value": "valore del documento",
+        "description": "Il termine 'documento' ricorre in più tabelle dello schema (fatture_vendita, note_credito, ordini_acquisto) con semantiche diverse; l'espressione 'valore del documento' usata nella prosa aziendale deve essere risolta esclusivamente sulla colonna totale_documento della tabella fatture_vendita, scartando le colonne omonime delle altre tabelle."
+      },
+      {
+        "twist_type": "rename",
+        "target_value": "registrazioni",
+        "obsolete_value": "scritture contabili",
+        "description": "La tabella registrazioni viene denominata 'scritture contabili' nella prosa aziendale; il solver deve mappare tale perifrasi alla tabella reale registrazioni per costruire correttamente la condizione WHERE col IN (SELECT ...)."
+      }
+    ],
+    "spec_hash": "52b58e14f1861e21"
+  },
+  "schema_ddl": "CREATE TABLE esercizi_contabili (\n    id SERIAL PRIMARY KEY,\n    anno_esercizio INT NOT NULL UNIQUE,\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    chiuso BOOLEAN NOT NULL DEFAULT FALSE,\n    CHECK (data_fine > data_inizio)\n);\n\nCREATE TABLE piano_dei_conti (\n    id SERIAL PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    descrizione_conto TEXT NOT NULL,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'costo', 'ricavo')),\n    saldo_apertura NUMERIC(14,2) NOT NULL DEFAULT 0\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    citta TEXT\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    citta TEXT\n);\n\nCREATE TABLE fatture_vendita (\n    id SERIAL PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi_contabili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_fattura TEXT NOT NULL,\n    data_fattura DATE NOT NULL,\n    totale_documento NUMERIC(14,2) NOT NULL CHECK (totale_documento >= 0),\n    UNIQUE (esercizio_id, numero_fattura)\n);\n\nCREATE TABLE note_credito (\n    id SERIAL PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi_contabili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_nota_credito TEXT NOT NULL,\n    data_nota_credito DATE NOT NULL,\n    totale_documento NUMERIC(14,2) NOT NULL CHECK (totale_documento >= 0),\n    UNIQUE (esercizio_id, numero_nota_credito)\n);\n\nCREATE TABLE ordini_acquisto (\n    id SERIAL PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi_contabili(id),\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    numero_ordine TEXT NOT NULL,\n    data_ordine DATE NOT NULL,\n    totale_documento NUMERIC(14,2) NOT NULL CHECK (totale_documento >= 0),\n    UNIQUE (esercizio_id, numero_ordine)\n);\n\nCREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi_contabili(id),\n    conto_id INT NOT NULL REFERENCES piano_dei_conti(id),\n    data_registrazione DATE NOT NULL,\n    causale TEXT NOT NULL,\n    importo_dare NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (importo_dare >= 0),\n    importo_avere NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (importo_avere >= 0)\n);\n\nCREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    conto_id INT NOT NULL REFERENCES piano_dei_conti(id),\n    data_movimento DATE NOT NULL,\n    importo NUMERIC(14,2) NOT NULL CHECK (importo > 0),\n    dare_avere TEXT NOT NULL CHECK (dare_avere IN ('D', 'A'))\n);\n\nCREATE TABLE movimenti_contabili_storici (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    conto_id INT NOT NULL REFERENCES piano_dei_conti(id),\n    data_movimento DATE NOT NULL,\n    importo NUMERIC(14,2) NOT NULL CHECK (importo > 0),\n    dare_avere TEXT NOT NULL CHECK (dare_avere IN ('D', 'A')),\n    anno_chiusura INT NOT NULL\n);"
+}

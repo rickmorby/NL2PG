@@ -1,0 +1,306 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_risorse_aziendali",
+        "description": "La tabella dipendenti, che contiene i dati anagrafici spezzati nelle colonne first_name e last_name, viene denominata nella prosa aziendale come anagrafica_risorse_aziendali."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "last_name",
+        "obsolete_value": "denominazione familiare",
+        "description": "La colonna last_name della tabella dipendenti viene indicata nella documentazione aziendale con il sinonimo 'denominazione familiare', obbligando a riconoscere che il dato logico del cognome è archiviato su una colonna separata rispetto al nome."
+      }
+    ],
+    "spec_hash": "22b44c63dd806862"
+  },
+  "schema_ddl": "CREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile >= 0)\n);\n\nCREATE TABLE richieste_ferie (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    stato TEXT NOT NULL CHECK (stato IN ('in_attesa', 'approvata', 'rifiutata')),\n    CHECK (data_fine >= data_inizio)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "reparti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_reparto": "Risorse Umane",
+            "sede": "Milano"
+          },
+          {
+            "id": 2,
+            "nome_reparto": "Vendite",
+            "sede": "Roma"
+          },
+          {
+            "id": 3,
+            "nome_reparto": "Information Technology",
+            "sede": "Milano"
+          },
+          {
+            "id": 4,
+            "nome_reparto": "Amministrazione",
+            "sede": "Torino"
+          },
+          {
+            "id": 5,
+            "nome_reparto": "Produzione",
+            "sede": "Napoli"
+          },
+          {
+            "id": 6,
+            "nome_reparto": "Marketing",
+            "sede": "Roma"
+          },
+          {
+            "id": 7,
+            "nome_reparto": "Logistica",
+            "sede": "Bologna"
+          },
+          {
+            "id": 8,
+            "nome_reparto": "Finanza",
+            "sede": "Milano"
+          }
+        ],
+        "variations": {
+          "sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna"
+            ]
+          }
+        }
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 18.0,
+        "templates": [
+          {
+            "id": 1,
+            "reparto_id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "email": "marco.rossi@azienda.it",
+            "data_assunzione": "2019-03-11",
+            "stipendio_mensile": 2450.0
+          },
+          {
+            "id": 2,
+            "reparto_id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@azienda.it",
+            "data_assunzione": "2021-09-01",
+            "stipendio_mensile": 3100.0
+          },
+          {
+            "id": 3,
+            "reparto_id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "email": "giulia.verdi@azienda.it",
+            "data_assunzione": "2018-06-18",
+            "stipendio_mensile": 3850.0
+          },
+          {
+            "id": 4,
+            "reparto_id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "email": "alessandro.conti@azienda.it",
+            "data_assunzione": "2022-01-10",
+            "stipendio_mensile": 1980.0
+          },
+          {
+            "id": 5,
+            "reparto_id": 5,
+            "nome": "Francesca",
+            "cognome": "Moretti",
+            "email": "francesca.moretti@azienda.it",
+            "data_assunzione": "2020-11-23",
+            "stipendio_mensile": 2750.0
+          },
+          {
+            "id": 6,
+            "reparto_id": 6,
+            "nome": "Davide",
+            "cognome": "Gallo",
+            "email": "davide.gallo@azienda.it",
+            "data_assunzione": "2017-04-03",
+            "stipendio_mensile": 4200.0
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Davide",
+              "Sara",
+              "Luca",
+              "Elena",
+              "Matteo",
+              "Chiara",
+              "Andrea"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Conti",
+              "Moretti",
+              "Gallo",
+              "Ferrari",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci",
+              "Marino"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -1100.0,
+            "delta_max": 300.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stipendio_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.45,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "richieste_ferie",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "dipendente_id": 1,
+            "data_inizio": "2026-01-05",
+            "data_fine": "2026-01-09",
+            "stato": "approvata"
+          },
+          {
+            "id": 2,
+            "dipendente_id": 2,
+            "data_inizio": "2026-02-16",
+            "data_fine": "2026-02-27",
+            "stato": "approvata"
+          },
+          {
+            "id": 3,
+            "dipendente_id": 3,
+            "data_inizio": "2026-03-02",
+            "data_fine": "2026-03-06",
+            "stato": "in_attesa"
+          },
+          {
+            "id": 4,
+            "dipendente_id": 4,
+            "data_inizio": "2026-04-06",
+            "data_fine": "2026-04-17",
+            "stato": "rifiutata"
+          },
+          {
+            "id": 5,
+            "dipendente_id": 5,
+            "data_inizio": "2026-05-04",
+            "data_fine": "2026-05-08",
+            "stato": "approvata"
+          },
+          {
+            "id": 6,
+            "dipendente_id": 6,
+            "data_inizio": "2026-06-01",
+            "data_fine": "2026-06-19",
+            "stato": "in_attesa"
+          }
+        ],
+        "variations": {
+          "data_inizio": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_fine": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 21.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "approvata",
+              "approvata",
+              "approvata",
+              "in_attesa",
+              "in_attesa",
+              "rifiutata"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

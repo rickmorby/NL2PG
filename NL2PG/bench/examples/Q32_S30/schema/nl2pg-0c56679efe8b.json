@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 11,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "values"
+    ],
+    "twist": [
+      "rename",
+      "distractor",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti_magazzino",
+        "obsolete_value": "giornale_movimentazioni",
+        "description": "La tabella movimenti_magazzino viene denominata giornale_movimentazioni nella prosa aziendale. Lo schema ERP contiene decine di tabelle con nomi simili (es. movimenti_vendite, movimenti_contabili), ma solo movimenti_magazzino corrisponde al giornale_movimentazioni citato."
+      },
+      {
+        "twist_type": "distractor",
+        "target_value": "articoli",
+        "obsolete_value": "catalogo_prodotti",
+        "description": "Il termine catalogo_prodotti utilizzato nella prosa può essere confuso con le tabelle omonime distrattrici presenti nello schema (articoli_obsoleti, articoli_servizio, archivio_articoli). Solo la tabella articoli contiene l'anagrafica corrente pertinente per il join con la tabella inline costruita tramite FROM (VALUES ...)."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "centri_costo",
+        "obsolete_value": "assorbenti_analitici",
+        "description": "Nella documentazione interna dell'azienda i centri_costo sono indicati con il gergo contabile assorbenti_analitici. Il solver deve riconoscere che tale perifrasi si riferisce esclusivamente alla tabella centri_costo, ignorando le tabelle contabili affini come centri_ricavo e piani_dei_conti."
+      }
+    ],
+    "spec_hash": "55b8225ce7cc5bfd"
+  },
+  "schema_ddl": "CREATE TABLE articoli (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    unita_misura TEXT NOT NULL DEFAULT 'PZ',\n    prezzo_standard NUMERIC(10,2) CHECK (prezzo_standard >= 0),\n    peso_kg NUMERIC(8,3) CHECK (peso_kg >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE articoli_obsoleti (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    data_dismissione DATE NOT NULL,\n    motivo_dismissione TEXT\n);\n\nCREATE TABLE articoli_servizio (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    tariffa_oraria NUMERIC(8,2) CHECK (tariffa_oraria >= 0)\n);\n\nCREATE TABLE archivio_articoli (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL,\n    descrizione TEXT,\n    data_archiviazione DATE NOT NULL,\n    note_archivio TEXT\n);\n\nCREATE TABLE magazzini (\n    id SERIAL PRIMARY KEY,\n    codice_magazzino TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    ubicazione TEXT\n);\n\nCREATE TABLE centri_costo (\n    id SERIAL PRIMARY KEY,\n    codice_centro TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    responsabile TEXT,\n    budget_annuo NUMERIC(12,2) CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE centri_ricavo (\n    id SERIAL PRIMARY KEY,\n    codice_centro TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    target_ricavi_annui NUMERIC(12,2) CHECK (target_ricavi_annui >= 0)\n);\n\nCREATE TABLE piani_dei_conti (\n    id SERIAL PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    descrizione_conto TEXT NOT NULL,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'costo', 'ricavo'))\n);\n\nCREATE TABLE movimenti_magazzino (\n    id BIGSERIAL PRIMARY KEY,\n    articolo_id INT NOT NULL REFERENCES articoli(id),\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    centro_costo_id INT REFERENCES centri_costo(id),\n    data_movimento DATE NOT NULL,\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('carico', 'scarico', 'trasferimento')),\n    quantita NUMERIC(12,3) NOT NULL CHECK (quantita <> 0),\n    costo_unitario NUMERIC(10,2) CHECK (costo_unitario >= 0),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE movimenti_vendite (\n    id BIGSERIAL PRIMARY KEY,\n    articolo_id INT NOT NULL REFERENCES articoli(id),\n    data_vendita DATE NOT NULL,\n    quantita_venduta NUMERIC(12,3) NOT NULL CHECK (quantita_venduta > 0),\n    prezzo_vendita NUMERIC(10,2) NOT NULL CHECK (prezzo_vendita >= 0)\n);\n\nCREATE TABLE movimenti_contabili (\n    id BIGSERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES piani_dei_conti(id),\n    centro_costo_id INT REFERENCES centri_costo(id),\n    data_registrazione DATE NOT NULL,\n    importo_dare NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_dare >= 0),\n    importo_avere NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_avere >= 0)\n);"
+}

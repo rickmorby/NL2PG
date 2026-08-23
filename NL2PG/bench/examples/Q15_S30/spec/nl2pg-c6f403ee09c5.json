@@ -1,0 +1,34 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 9,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "cte"
+  ],
+  "twist": [
+    "distractor",
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "immobili",
+      "obsolete_value": "proprieta / unita_immobiliari",
+      "description": "Lo schema contiene le tabelle immobili (quella rilevante), proprieta e unita_immobiliari con nomi e colonne quasi omonimi (es. prezzo, superficie, codice). Le tabelle distrattrici non partecipano alla query corretta: il solver deve effettuare uno schema linking accurato e selezionare esclusivamente immobili ignorando le omonimie."
+    },
+    {
+      "twist_type": "rename",
+      "target_value": "agenti",
+      "obsolete_value": "consulenti_immobiliari",
+      "description": "La tabella agenti, che registra i mediatori dell'agenzia, viene denominata consulenti_immobiliari nella prosa aziendale. Le query devono risolvere il riferimento alla tabella fisica agenti."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "prezzo_richiesto",
+      "obsolete_value": "valore_di_listino",
+      "description": "La colonna prezzo_richiesto della tabella immobili viene indicata nella documentazione commerciale con il sinonimo valore_di_listino. Le aggregazioni e i confronti richiesti devono mappare tale perifrasi sulla colonna reale prezzo_richiesto."
+    }
+  ],
+  "spec_hash": "59f55f658ef4eede"
+}

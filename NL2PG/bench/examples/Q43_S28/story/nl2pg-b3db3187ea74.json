@@ -1,0 +1,228 @@
+{
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id_reparto INT PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL,\n    budget_annuale NUMERIC(15, 2) CHECK (budget_annuale >= 0)\n);\n\nCREATE TABLE dip (\n    emp_no INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    id_reparto INT NOT NULL REFERENCES dipartimenti(id_reparto),\n    data_assunzione DATE NOT NULL DEFAULT CURRENT_DATE,\n    stipendio_base NUMERIC(12, 2) CHECK (stipendio_base > 0)\n);\n\nCREATE INDEX idx_emp_sorting ON dip (emp_no, data_assunzione);",
+  "data_profile": {
+    "profile": {
+      "dipartimenti": {
+        "row_count": 27,
+        "columns": {
+          "id_reparto": {
+            "distinct": 27,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 27
+          },
+          "nome_dipartimento": {
+            "distinct": 6,
+            "sample": [
+              "Audit Interno",
+              "Compliance",
+              "Investment Banking",
+              "Retail Banking",
+              "Risk Management"
+            ]
+          },
+          "budget_annuale": {
+            "distinct": 25,
+            "sample": [
+              "1181836.83",
+              "1266881.89",
+              "1276283.01",
+              "1420614.93",
+              "1528935.06"
+            ],
+            "min": 209985.06,
+            "max": 1528935.06
+          }
+        }
+      },
+      "dip": {
+        "row_count": 385,
+        "columns": {
+          "emp_no": {
+            "distinct": 385,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 1385
+          },
+          "nome": {
+            "distinct": 7,
+            "sample": [
+              "Andrea",
+              "Elena",
+              "Giulia",
+              "Luca",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "distinct": 6,
+            "sample": [
+              "Bianchi",
+              "Esposito",
+              "Neri",
+              "Romano",
+              "Rossi"
+            ]
+          },
+          "id_reparto": {
+            "distinct": 27,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 27
+          },
+          "data_assunzione": {
+            "distinct": 326,
+            "sample": [
+              "2018-11-22",
+              "2018-11-27",
+              "2018-12-02",
+              "2018-12-06",
+              "2019-01-09"
+            ]
+          },
+          "stipendio_base": {
+            "distinct": 355,
+            "sample": [
+              "37800.0",
+              "37944.24",
+              "37986.23",
+              "38139.75",
+              "38264.8"
+            ],
+            "min": 37800.0,
+            "max": 78000.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "dipartimenti": [
+        {
+          "id_reparto": 1,
+          "nome_dipartimento": "Audit Interno",
+          "budget_annuale": 666684.07
+        },
+        {
+          "id_reparto": 2,
+          "nome_dipartimento": "Risk Management",
+          "budget_annuale": null
+        },
+        {
+          "id_reparto": 3,
+          "nome_dipartimento": "Trading Desk",
+          "budget_annuale": 506074.24
+        },
+        {
+          "id_reparto": 4,
+          "nome_dipartimento": "Risk Management",
+          "budget_annuale": 586389.73
+        },
+        {
+          "id_reparto": 5,
+          "nome_dipartimento": "Trading Desk",
+          "budget_annuale": 622117.26
+        },
+        {
+          "id_reparto": 6,
+          "nome_dipartimento": "Investment Banking",
+          "budget_annuale": 573216.08
+        },
+        {
+          "id_reparto": 7,
+          "nome_dipartimento": "Investment Banking",
+          "budget_annuale": 612429.98
+        },
+        {
+          "id_reparto": 8,
+          "nome_dipartimento": "Investment Banking",
+          "budget_annuale": 374963.17
+        }
+      ],
+      "dip": [
+        {
+          "emp_no": 1001,
+          "nome": "Andrea",
+          "cognome": "Verdi",
+          "id_reparto": 27,
+          "data_assunzione": "2019-08-29",
+          "stipendio_base": 48574.97
+        },
+        {
+          "emp_no": 1002,
+          "nome": "Andrea",
+          "cognome": "Esposito",
+          "id_reparto": 19,
+          "data_assunzione": "2021-01-14",
+          "stipendio_base": 45543.14
+        },
+        {
+          "emp_no": 1003,
+          "nome": "Andrea",
+          "cognome": "Neri",
+          "id_reparto": 19,
+          "data_assunzione": "2019-01-31",
+          "stipendio_base": 52600.62
+        },
+        {
+          "emp_no": 1004,
+          "nome": "Sara",
+          "cognome": "Romano",
+          "id_reparto": 9,
+          "data_assunzione": "2021-01-14",
+          "stipendio_base": 49402.11
+        },
+        {
+          "emp_no": 1005,
+          "nome": "Luca",
+          "cognome": "Verdi",
+          "id_reparto": 18,
+          "data_assunzione": "2020-04-20",
+          "stipendio_base": 42006.61
+        },
+        {
+          "emp_no": 1006,
+          "nome": "Sara",
+          "cognome": "Verdi",
+          "id_reparto": 13,
+          "data_assunzione": "2019-02-12",
+          "stipendio_base": 53242.41
+        },
+        {
+          "emp_no": 1007,
+          "nome": "Andrea",
+          "cognome": "Rossi",
+          "id_reparto": 2,
+          "data_assunzione": "2019-05-13",
+          "stipendio_base": 49067.7
+        },
+        {
+          "emp_no": 1008,
+          "nome": "Sara",
+          "cognome": "Esposito",
+          "id_reparto": 17,
+          "data_assunzione": "2019-12-26",
+          "stipendio_base": 45091.05
+        }
+      ]
+    }
+  },
+  "story": "Nell'ambito della revisione periodica delle risorse umane, la direzione ha avviato un'analisi approfondita per ottimizzare la gestione dei costi fissi. Il punto di partenza è stato l'archivio denominato dipartimenti, che contiene le informazioni strutturali su ogni unità operativa, inclusi i dettagli sul budget annuale assegnato. Parallelamente, è stato consultato l'archivio denominato anagrafica collaboratori, che raccoglie le schede individuali di tutto il personale in forza. Per ogni risorsa, il sistema di gestione traccia la matricola operatore, il nominativo, la data di assunzione e lo stipendio base. L'indagine si è concentrata specificamente su un gruppo selezionato di professionisti, ovvero coloro che portano il nome di Andrea o Sara, applicando una soglia di controllo per gli stipendi base compresi tra 40000 e 60000. Attraverso una verifica incrociata tra i due archivi, è stato possibile associare correttamente ogni collaboratore al proprio ufficio di appartenenza. Il processo ha richiesto di estrarre il nome del dipartimento e l'importo retributivo, quest'ultimo arrotondato per facilitare la lettura dei prospetti. Infine, per garantire una consultazione ordinata, i risultati sono stati disposti privilegiando i livelli retributivi più elevati e, a parità di compenso, seguendo l'ordine alfabetico dei cognomi, assicurando così una visione chiara e coerente dell'organico aziendale."
+}

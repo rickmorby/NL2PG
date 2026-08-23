@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 8,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "cross_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatti_vendite",
+      "obsolete_value": "transazioni_commerciali",
+      "description": "La tabella centrale dei fatti (fatti_vendite) viene denominata 'transazioni_commerciali' nei documenti aziendali."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "dim_prodotti",
+      "obsolete_value": "SKU_master",
+      "description": "La tabella dimensionale dei prodotti (dim_prodotti) è indicata come 'SKU_master' nel gergo interno del dipartimento logistica."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "quantita",
+      "obsolete_value": "volume",
+      "description": "La colonna 'quantita' nella tabella dei fatti assume significati diversi: in contesto vendite indica il numero di unità, mentre in logistica ('volume') può riferirsi al peso o al volume fisico. La query deve disambiguare tramite join con la dimensione corretta."
+    }
+  ],
+  "spec_hash": "e9f220d72a05fc13"
+}

@@ -1,0 +1,344 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "agg_distinct"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "contratti",
+        "obsolete_value": "intestazioni_attivazione",
+        "description": "La tabella contratti, che contiene le righe di attivazione delle linee con il campo deleted_at per la cancellazione logica, viene denominata intestazioni_attivazione nella prosa aziendale. Le query devono risolvere intestazioni_attivazione sulla tabella fisica contratti."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "deleted_at",
+        "obsolete_value": "data_dismissione_linea",
+        "description": "Il timestamp di cancellazione logica deleted_at della tabella contratti viene descritto nei documenti aziendali come data_dismissione_linea. I contratti con data_dismissione_linea valorizzata sono da intendersi dismessi logicamente: per contare solo le linee attive occorre filtrare con deleted_at IS NULL, mentre per i soli contratti dismessi si usa deleted_at IS NOT NULL."
+      }
+    ],
+    "spec_hash": "237e36a3d18c352a"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    email TEXT\n);\n\nCREATE TABLE piani_tariffari (\n    id SERIAL PRIMARY KEY,\n    nome_piano TEXT NOT NULL UNIQUE,\n    canone_mensile NUMERIC(8,2) NOT NULL CHECK (canone_mensile >= 0),\n    giga_inclusi INT NOT NULL DEFAULT 0 CHECK (giga_inclusi >= 0),\n    minuti_inclusi INT NOT NULL DEFAULT 0 CHECK (minuti_inclusi >= 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    piano_id INT NOT NULL REFERENCES piani_tariffari(id),\n    numero_linea TEXT NOT NULL UNIQUE,\n    data_attivazione DATE NOT NULL,\n    deleted_at TIMESTAMP,\n    CONSTRAINT chk_dismissione_coerente CHECK (deleted_at IS NULL OR deleted_at >= data_attivazione)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "citta": "Roma",
+            "email": "mario.rossi@gmail.com"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA85C15F205X",
+            "citta": "Milano",
+            "email": "laura.bianchi@libero.it"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLU90D22L219Y",
+            "citta": "Torino",
+            "email": "giulia.verdi@yahoo.it"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTLSN78B30H501K",
+            "citta": "Napoli",
+            "email": "alessandro.conti@outlook.com"
+          },
+          {
+            "id": 5,
+            "nome": "Chiara",
+            "cognome": "Gallo",
+            "codice_fiscale": "GLLCHR92E05D969W",
+            "citta": "Bologna",
+            "email": "chiara.gallo@gmail.com"
+          },
+          {
+            "id": 6,
+            "nome": "Marco",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRMRC88T10M082Z",
+            "citta": "Firenze",
+            "email": "marco.ferrari@tim.it"
+          },
+          {
+            "id": 7,
+            "nome": "Sara",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPSSRA95H44F839Q",
+            "citta": "Genova",
+            "email": "sara.esposito@vodafone.it"
+          },
+          {
+            "id": 8,
+            "nome": "Luca",
+            "cognome": "Ricci",
+            "codice_fiscale": "RCCLCU83P20A662S",
+            "citta": "Padova",
+            "email": "luca.ricci@gmail.com"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Chiara",
+              "Marco",
+              "Sara",
+              "Luca",
+              "Anna",
+              "Davide",
+              "Francesca",
+              "Stefano"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Conti",
+              "Gallo",
+              "Ferrari",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Padova",
+              "Bari",
+              "Palermo"
+            ]
+          },
+          "email": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "mario.rossi@gmail.com",
+              "laura.bianchi@libero.it",
+              "giulia.verdi@yahoo.it",
+              "alessandro.conti@outlook.com",
+              "chiara.gallo@gmail.com",
+              "marco.ferrari@tim.it",
+              "sara.esposito@vodafone.it",
+              "luca.ricci@fastwebnet.it"
+            ]
+          }
+        }
+      },
+      {
+        "table": "piani_tariffari",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_piano": "Basic Mobile",
+            "canone_mensile": 9.99,
+            "giga_inclusi": 5,
+            "minuti_inclusi": 100
+          },
+          {
+            "id": 2,
+            "nome_piano": "Smart Unlimited",
+            "canone_mensile": 19.99,
+            "giga_inclusi": 50,
+            "minuti_inclusi": 300
+          },
+          {
+            "id": 3,
+            "nome_piano": "Premium Fibra+Mobile",
+            "canone_mensile": 39.99,
+            "giga_inclusi": 100,
+            "minuti_inclusi": 600
+          },
+          {
+            "id": 4,
+            "nome_piano": "Senior Facile",
+            "canone_mensile": 14.5,
+            "giga_inclusi": 10,
+            "minuti_inclusi": 500
+          },
+          {
+            "id": 5,
+            "nome_piano": "Young Promo",
+            "canone_mensile": 7.99,
+            "giga_inclusi": 20,
+            "minuti_inclusi": 200
+          },
+          {
+            "id": 6,
+            "nome_piano": "Business Pro",
+            "canone_mensile": 59.0,
+            "giga_inclusi": 200,
+            "minuti_inclusi": 1000
+          },
+          {
+            "id": 7,
+            "nome_piano": "No Flex Prepagato",
+            "canone_mensile": 0.0,
+            "giga_inclusi": 0,
+            "minuti_inclusi": 0
+          },
+          {
+            "id": 8,
+            "nome_piano": "Family Condiviso",
+            "canone_mensile": 34.9,
+            "giga_inclusi": 150,
+            "minuti_inclusi": 800
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "contratti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "piano_id": 2,
+            "numero_linea": "+39061234567",
+            "data_attivazione": "2024-03-15",
+            "deleted_at": null
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "piano_id": 1,
+            "numero_linea": "+39021234568",
+            "data_attivazione": "2024-06-01",
+            "deleted_at": null
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "piano_id": 3,
+            "numero_linea": "+39011234569",
+            "data_attivazione": "2023-11-20",
+            "deleted_at": "2025-02-10 09:30:00"
+          },
+          {
+            "id": 104,
+            "cliente_id": 4,
+            "piano_id": 2,
+            "numero_linea": "+39081234570",
+            "data_attivazione": "2025-01-10",
+            "deleted_at": null
+          },
+          {
+            "id": 105,
+            "cliente_id": 5,
+            "piano_id": 5,
+            "numero_linea": "+39051234571",
+            "data_attivazione": "2024-09-05",
+            "deleted_at": "2025-08-18 14:45:00"
+          },
+          {
+            "id": 106,
+            "cliente_id": 6,
+            "piano_id": 6,
+            "numero_linea": "+39055234572",
+            "data_attivazione": "2023-05-12",
+            "deleted_at": "2024-07-01 11:15:00"
+          },
+          {
+            "id": 107,
+            "cliente_id": 7,
+            "piano_id": 4,
+            "numero_linea": "+39010234573",
+            "data_attivazione": "2025-04-22",
+            "deleted_at": null
+          },
+          {
+            "id": 108,
+            "cliente_id": 8,
+            "piano_id": 8,
+            "numero_linea": "+39049234574",
+            "data_attivazione": "2024-12-01",
+            "deleted_at": null
+          }
+        ],
+        "variations": {
+          "data_attivazione": {
+            "axis": "shift",
+            "delta_min": -540.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "deleted_at": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 240.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

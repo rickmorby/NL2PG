@@ -1,0 +1,27 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 4,
+  "hierarchy": "polymorphic",
+  "sql_features": [
+    "exists"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "eventi_rete",
+      "obsolete_value": "registro_anomalie",
+      "description": "La tabella eventi_rete, che contiene gli eventi di rete con tre FK opzionali mutuamente esclusive (verso contratti, clienti e impianti) vincolate da un CHECK che impone una sola FK popolata per riga, viene denominata registro_anomalie nella prosa aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "impianti",
+      "obsolete_value": "siti_ricetrasmittenti",
+      "description": "La tabella impianti, che rappresenta le stazioni radio di rete referenziate da una delle FK esclusive della tabella eventi_rete, è indicata nella documentazione tecnica con il gergo del settore come siti_ricetrasmittenti."
+    }
+  ],
+  "spec_hash": "488a56b9b16a3c8e"
+}

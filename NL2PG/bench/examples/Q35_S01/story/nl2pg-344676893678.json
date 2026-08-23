@@ -1,0 +1,145 @@
+{
+  "schema_ddl": "CREATE TABLE scritture_contabili (\n    id_scrittura INT PRIMARY KEY,\n    data_registrazione DATE NOT NULL,\n    conto TEXT NOT NULL,\n    importo_dare NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_dare >= 0),\n    importo_avere NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_avere >= 0),\n    stato_pagamento TEXT NOT NULL CHECK (stato_pagamento IN ('pagato', 'sospeso', 'insoluto'))\n);",
+  "data_profile": {
+    "profile": {
+      "scritture_contabili": {
+        "row_count": 1853,
+        "columns": {
+          "id_scrittura": {
+            "distinct": 1853,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1853
+          },
+          "data_registrazione": {
+            "distinct": 197,
+            "sample": [
+              "2025-11-06",
+              "2025-11-09",
+              "2025-11-10",
+              "2025-11-11",
+              "2025-11-12"
+            ]
+          },
+          "conto": {
+            "distinct": 10,
+            "sample": [
+              "Acquisti di merci",
+              "Banca c/c",
+              "Capitale sociale",
+              "Cassa",
+              "Costi del personale"
+            ]
+          },
+          "importo_dare": {
+            "distinct": 1338,
+            "sample": [
+              "0.0",
+              "1004.98",
+              "10051.7",
+              "10086.93",
+              "10093.05"
+            ],
+            "min": 0.0,
+            "max": 16800.0
+          },
+          "importo_avere": {
+            "distinct": 455,
+            "sample": [
+              "0.0",
+              "1004.23",
+              "1015.08",
+              "1020.22",
+              "1027.09"
+            ],
+            "min": 0.0,
+            "max": 6000.0
+          },
+          "stato_pagamento": {
+            "distinct": 3,
+            "sample": [
+              "insoluto",
+              "pagato",
+              "sospeso"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "scritture_contabili": [
+        {
+          "id_scrittura": 1,
+          "data_registrazione": "2025-12-01",
+          "conto": "Banca c/c",
+          "importo_dare": 2268.84,
+          "importo_avere": 0.0,
+          "stato_pagamento": "insoluto"
+        },
+        {
+          "id_scrittura": 2,
+          "data_registrazione": "2026-01-02",
+          "conto": "Debiti verso fornitori",
+          "importo_dare": 985.68,
+          "importo_avere": 0.0,
+          "stato_pagamento": "insoluto"
+        },
+        {
+          "id_scrittura": 3,
+          "data_registrazione": "2025-12-09",
+          "conto": "Banca c/c",
+          "importo_dare": 4549.44,
+          "importo_avere": 0.0,
+          "stato_pagamento": "insoluto"
+        },
+        {
+          "id_scrittura": 4,
+          "data_registrazione": "2026-02-13",
+          "conto": "Crediti verso clienti",
+          "importo_dare": 1959.01,
+          "importo_avere": 0.0,
+          "stato_pagamento": "pagato"
+        },
+        {
+          "id_scrittura": 5,
+          "data_registrazione": "2025-12-05",
+          "conto": "IVA a credito",
+          "importo_dare": 5836.24,
+          "importo_avere": 0.0,
+          "stato_pagamento": "insoluto"
+        },
+        {
+          "id_scrittura": 6,
+          "data_registrazione": "2026-02-02",
+          "conto": "Crediti verso clienti",
+          "importo_dare": 4106.23,
+          "importo_avere": 0.0,
+          "stato_pagamento": "pagato"
+        },
+        {
+          "id_scrittura": 7,
+          "data_registrazione": "2025-11-11",
+          "conto": "Capitale sociale",
+          "importo_dare": 4014.26,
+          "importo_avere": 0.0,
+          "stato_pagamento": "pagato"
+        },
+        {
+          "id_scrittura": 8,
+          "data_registrazione": "2025-11-24",
+          "conto": "Debiti verso fornitori",
+          "importo_dare": 5269.12,
+          "importo_avere": 0.0,
+          "stato_pagamento": "sospeso"
+        }
+      ]
+    }
+  },
+  "story": "Nella direzione amministrativa dell'azienda, le operazioni di contabilità generale confluiscono nell'archivio denominato registro_movimenti_amministrativi, dove ogni scrittura contabile è annotata con il proprio numero progressivo, la data di registrazione, il conto interessato, gli importi iscritti al dare e quelli iscritti all'avere, oltre alla cosiddetta posizione di liquidazione del debito, che può assumere gli esiti pagato, sospeso oppure insoluto. In occasione della revisione trimestrale, i revisori hanno predisposto un elenco delle scritture non insolute, escludendo dunque tutte le voci la cui posizione di liquidazione del debito risulta insoluto, e limitando l'esame alle sole registrazioni con importo al dare pari ad almeno 1000 euro. Per ciascuna voce selezionata è stata predisposta una classificazione descrittiva ricavata secondo regole interne di valutazione: quando l'esito risulta pagato la pratica viene definita come saldatura perfezionata, mentre quando risulta sospeso viene segnalata come pratica in attesa di definizione. Gli analisti hanno inoltre determinato il saldo netto di ogni movimento, ottenuto dalla differenza tra l'importo al dare e l'importo all'avere, con valore arrotondato. L'elenco è stato disposto in ordine decrescente di saldo netto e, in caso di parità tra due voci, per assicurare un ordinamento univoco si è fatto riferimento al numero progressivo della scrittura. Tra le registrazioni prese in esame figurano, ad esempio, la numero 4 relativa ai crediti verso clienti del 13 febbraio 2026 per 1959,01 euro al dare, già integralmente pagata, e la numero 6, sempre sui crediti verso clienti, del 2 febbraio 2026 per 4106,23 euro anch'essa saldata. Il controllo ha riguardato anche i movimenti riferiti a Banca c/c, Capitale sociale, Debiti verso fornitori, IVA a credito, Acquisti di merci, Cassa e Costi del personale, con date comprese tra il 6 novembre 2025 e la metà di febbraio 2026; nell'intero archivio, che conta 1853 scritture complessive, gli importi al dare arrivano fino a 16800 euro e quelli all'avere fino a 6000 euro."
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "like"
+  ],
+  "twist": [
+    "jargon",
+    "rename"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "clt_mstr",
+      "obsolete_value": "registro anagrafica clienti",
+      "description": "La tabella clt_mstr (master clienti, con colonna cod_cli) è denominata nella prosa aziendale 'registro anagrafica clienti'. Il solver deve allineare il termine naturale del testo alla sigla reale dello schema per costruire correttamente le condizioni LIKE su cod_cli."
+    },
+    {
+      "twist_type": "rename",
+      "target_value": "ord_dtl",
+      "obsolete_value": "movimentazione ordini di vendita",
+      "description": "La tabella ord_dtl (righe dettaglio ordine, con colonne ord_no e art_desc) viene rinominata nella documentazione commerciale come 'movimentazione ordini di vendita'. Le query richieste devono filtrare con WHERE art_desc LIKE 'prefisso%' dopo aver ricondotto la perifrasi alla sigla effettiva."
+    }
+  ],
+  "spec_hash": "6a4cc74086007b41"
+}

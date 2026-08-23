@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "registro_operazioni",
+        "description": "La tabella transazioni viene denominata registro_operazioni nella prosa aziendale. Lo schema non dichiara vincoli REFERENCES: la relazione uno-a-molti tra conti e transazioni deve essere dedotta dalla compatibilità dei nomi di colonna (transazioni.conto_id = conti.id)."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "controvalore dell'operazione",
+        "description": "La colonna importo della tabella transazioni è indicata nella documentazione aziendale con il gergo finanziario 'controvalore dell'operazione'. Le query richieste usano ROW_NUMBER() OVER (PARTITION BY conto_id ORDER BY data_operazione) per classificare le transazioni senza collassare le righe."
+      }
+    ],
+    "spec_hash": "a5fda1ddea5b9c57"
+  },
+  "schema_ddl": "CREATE TABLE conti (\n    id INT PRIMARY KEY,\n    iban TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    valuta TEXT NOT NULL DEFAULT 'EUR',\n    saldo_iniziale NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo_iniziale >= 0),\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL,\n    data_operazione TIMESTAMP NOT NULL,\n    importo NUMERIC(14,2) NOT NULL CHECK (importo <> 0),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('accredito', 'addebito')),\n    causale TEXT\n);"
+}

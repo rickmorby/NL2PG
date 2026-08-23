@@ -1,0 +1,230 @@
+{
+  "schema_ddl": "CREATE TABLE bilanci (\n    esercizio_id INT PRIMARY KEY,\n    anno_esercizio INT NOT NULL UNIQUE CHECK (anno_esercizio BETWEEN 1900 AND 2100),\n    data_chiusura DATE NOT NULL,\n    totale_attivo NUMERIC(14,2) NOT NULL CHECK (totale_attivo >= 0),\n    totale_passivo NUMERIC(14,2) NOT NULL CHECK (totale_passivo >= 0)\n);\n\nCREATE TABLE relazioni_gestione (\n    esercizio_id INT PRIMARY KEY REFERENCES bilanci(esercizio_id),\n    testo_relazione TEXT NOT NULL,\n    data_redazione DATE NOT NULL,\n    redattore TEXT NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "bilanci": {
+        "row_count": 28,
+        "columns": {
+          "esercizio_id": {
+            "distinct": 28,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 28
+          },
+          "anno_esercizio": {
+            "distinct": 28,
+            "sample": [
+              "2015",
+              "2016",
+              "2017",
+              "2018",
+              "2019"
+            ],
+            "min": 2015,
+            "max": 2042
+          },
+          "data_chiusura": {
+            "distinct": 24,
+            "sample": [
+              "2015-12-27",
+              "2015-12-28",
+              "2016-01-04",
+              "2016-01-05",
+              "2016-01-06"
+            ]
+          },
+          "totale_attivo": {
+            "distinct": 28,
+            "sample": [
+              "1877310.76",
+              "2267316.98",
+              "2267907.45",
+              "2338104.02",
+              "2407985.59"
+            ],
+            "min": 1877310.76,
+            "max": 4326726.81
+          },
+          "totale_passivo": {
+            "distinct": 28,
+            "sample": [
+              "2051017.34",
+              "2285859.86",
+              "2324036.05",
+              "2398608.53",
+              "2411411.85"
+            ],
+            "min": 2051017.34,
+            "max": 4240238.72
+          }
+        }
+      },
+      "relazioni_gestione": {
+        "row_count": 28,
+        "columns": {
+          "esercizio_id": {
+            "distinct": 28,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 28
+          },
+          "testo_relazione": {
+            "distinct": 5,
+            "sample": [
+              "Il risultato d'esercizio evidenzia un utile che consente il ripristino delle riserve patrimoniali decurtate negli anni precedenti e una solida posizione finanziaria netta.",
+              "L'esercizio si caratterizza per una contenuta contrazione dei ricavi dovuta alla congiuntura di mercato, compensata da interventi di razionalizzazione dei costi.",
+              "La gestione ha chiuso con risultati in linea con le previsioni di budget; il margine operativo lordo risulta in crescita rispetto all'esercizio precedente.",
+              "La produzione e le vendite hanno raggiunto livelli record grazie all'espansione sulla clientela estera; il fabbisogno finanziario e' stato interamente couerto da mezzi propri.",
+              "Si segnala un incremento degli investimenti in immobilizzazioni tecniche finalizzati all'ammodernamento del parco macchine e all'ampliamento della capacita' produttiva."
+            ]
+          },
+          "data_redazione": {
+            "distinct": 24,
+            "sample": [
+              "2016-03-27",
+              "2016-04-09",
+              "2016-04-12",
+              "2016-04-15",
+              "2016-04-21"
+            ]
+          },
+          "redattore": {
+            "distinct": 4,
+            "sample": [
+              "Dott. Alessandro Ferri",
+              "Dott. Paolo Grassi",
+              "Dott.ssa Elena Vitale",
+              "Rag. Chiara Lombardi"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "bilanci": [
+        {
+          "esercizio_id": 1,
+          "anno_esercizio": 2015,
+          "data_chiusura": "2016-01-06",
+          "totale_attivo": 1877310.76,
+          "totale_passivo": 2791692.89
+        },
+        {
+          "esercizio_id": 2,
+          "anno_esercizio": 2016,
+          "data_chiusura": "2015-12-28",
+          "totale_attivo": 2338104.02,
+          "totale_passivo": 2727835.7
+        },
+        {
+          "esercizio_id": 3,
+          "anno_esercizio": 2017,
+          "data_chiusura": "2015-12-27",
+          "totale_attivo": 2938896.89,
+          "totale_passivo": 2051017.34
+        },
+        {
+          "esercizio_id": 4,
+          "anno_esercizio": 2018,
+          "data_chiusura": "2016-01-04",
+          "totale_attivo": 2407985.59,
+          "totale_passivo": 2889436.27
+        },
+        {
+          "esercizio_id": 5,
+          "anno_esercizio": 2019,
+          "data_chiusura": "2016-01-05",
+          "totale_attivo": 2893829.03,
+          "totale_passivo": 2887419.92
+        },
+        {
+          "esercizio_id": 6,
+          "anno_esercizio": 2020,
+          "data_chiusura": "2016-12-30",
+          "totale_attivo": 2516418.18,
+          "totale_passivo": 2601307.21
+        },
+        {
+          "esercizio_id": 7,
+          "anno_esercizio": 2021,
+          "data_chiusura": "2016-12-31",
+          "totale_attivo": 2267316.98,
+          "totale_passivo": 3141953.97
+        },
+        {
+          "esercizio_id": 8,
+          "anno_esercizio": 2022,
+          "data_chiusura": "2017-01-04",
+          "totale_attivo": 2525528.25,
+          "totale_passivo": 2398608.53
+        }
+      ],
+      "relazioni_gestione": [
+        {
+          "esercizio_id": 8,
+          "testo_relazione": "La gestione ha chiuso con risultati in linea con le previsioni di budget; il margine operativo lordo risulta in crescita rispetto all'esercizio precedente.",
+          "data_redazione": "2016-05-07",
+          "redattore": "Dott. Paolo Grassi"
+        },
+        {
+          "esercizio_id": 28,
+          "testo_relazione": "L'esercizio si caratterizza per una contenuta contrazione dei ricavi dovuta alla congiuntura di mercato, compensata da interventi di razionalizzazione dei costi.",
+          "data_redazione": "2016-04-12",
+          "redattore": "Rag. Chiara Lombardi"
+        },
+        {
+          "esercizio_id": 27,
+          "testo_relazione": "La gestione ha chiuso con risultati in linea con le previsioni di budget; il margine operativo lordo risulta in crescita rispetto all'esercizio precedente.",
+          "data_redazione": "2016-03-27",
+          "redattore": "Dott.ssa Elena Vitale"
+        },
+        {
+          "esercizio_id": 19,
+          "testo_relazione": "La gestione ha chiuso con risultati in linea con le previsioni di budget; il margine operativo lordo risulta in crescita rispetto all'esercizio precedente.",
+          "data_redazione": "2016-04-15",
+          "redattore": "Dott. Alessandro Ferri"
+        },
+        {
+          "esercizio_id": 23,
+          "testo_relazione": "Il risultato d'esercizio evidenzia un utile che consente il ripristino delle riserve patrimoniali decurtate negli anni precedenti e una solida posizione finanziaria netta.",
+          "data_redazione": "2016-04-21",
+          "redattore": "Dott. Paolo Grassi"
+        },
+        {
+          "esercizio_id": 22,
+          "testo_relazione": "Si segnala un incremento degli investimenti in immobilizzazioni tecniche finalizzati all'ammodernamento del parco macchine e all'ampliamento della capacita' produttiva.",
+          "data_redazione": "2016-04-09",
+          "redattore": "Rag. Chiara Lombardi"
+        },
+        {
+          "esercizio_id": 9,
+          "testo_relazione": "La produzione e le vendite hanno raggiunto livelli record grazie all'espansione sulla clientela estera; il fabbisogno finanziario e' stato interamente couerto da mezzi propri.",
+          "data_redazione": "2016-04-25",
+          "redattore": "Rag. Chiara Lombardi"
+        },
+        {
+          "esercizio_id": 16,
+          "testo_relazione": "La gestione ha chiuso con risultati in linea con le previsioni di budget; il margine operativo lordo risulta in crescita rispetto all'esercizio precedente.",
+          "data_redazione": "2017-04-22",
+          "redattore": "Dott. Paolo Grassi"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "natural_join"
+  ],
+  "query": "SELECT b.anno_esercizio,\n       b.totale_attivo,\n       b.totale_passivo,\n       ROUND(b.totale_attivo - b.totale_passivo, 2) AS patrimonio_netto,\n       rg.redattore,\n       rg.data_redazione\nFROM bilanci b\nNATURAL JOIN relazioni_gestione rg\nWHERE b.anno_esercizio BETWEEN 2016 AND 2024\n  AND rg.redattore = 'Dott. Paolo Grassi'\nORDER BY b.totale_attivo DESC, b.anno_esercizio ASC;"
+}

@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 6,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "exists"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobili",
+        "obsolete_value": "unita_abitative",
+        "description": "La tabella immobili, che contiene gli annunci degli edifici con la FK nullable agente_id verso agenti, viene denominata unita_abitative nella prosa aziendale. Il solver deve mappare correttamente il nome perifrastico alla tabella reale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "agente_id",
+        "obsolete_value": "mandato di vendita attivo",
+        "description": "La colonna nullable agente_id della tabella immobili rappresenta l'incarico conferito a un agente. Nella prosa aziendale questa relazione è espressa con il gergo del settore come 'mandato di vendita attivo'; un immobile con agente_id NULL è descritto come 'in libera gestione' o 'senza mandato'. Le query devono trattare questi casi con IS NULL o join esterni oltre al NOT EXISTS."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "visite",
+        "obsolete_value": "appuntamenti di visione",
+        "description": "La tabella visite, figlia di immobili tramite la FK immobile_id che registra i sopralluoghi effettuati dai clienti, viene indicata nella documentazione commerciale come 'appuntamenti di visione'. Per individuare gli immobili mai visitati occorre usare WHERE NOT EXISTS (SELECT 1 FROM visite WHERE visite.immobile_id = immobili.id)."
+      }
+    ],
+    "spec_hash": "939d30c128840a31"
+  },
+  "schema_ddl": "CREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    data_assunzione DATE NOT NULL\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT\n);\n\nCREATE TABLE immobili (\n    id INT PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'attico', 'terreno', 'ufficio')),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    numero_stanze INT CHECK (numero_stanze >= 0),\n    agente_id INT REFERENCES agenti(id),\n    proprietario_id INT REFERENCES clienti(id)\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL REFERENCES immobili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_visita DATE NOT NULL,\n    esito TEXT CHECK (esito IN ('interessato', 'non_interessato', 'da_contattare')),\n    note TEXT\n);\n\nCREATE TABLE offerte (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL REFERENCES immobili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    importo_offerta NUMERIC(12,2) NOT NULL CHECK (importo_offerta > 0),\n    stato_offerta TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_offerta IN ('in_attesa', 'accettata', 'rifiutata', 'ritirata')),\n    data_offerta DATE NOT NULL\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL REFERENCES immobili(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    agente_id INT REFERENCES agenti(id),\n    prezzo_finale NUMERIC(12,2) NOT NULL CHECK (prezzo_finale >= 0),\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('vendita', 'affito')),\n    data_firma DATE NOT NULL\n);"
+}

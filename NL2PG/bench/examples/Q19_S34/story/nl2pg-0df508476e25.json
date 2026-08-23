@@ -1,0 +1,431 @@
+{
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id_dipartimento SERIAL PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL UNIQUE,\n    sede TEXT,\n    budget_annuo NUMERIC(12,2) CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id_dipendente SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    stato_civile TEXT,\n    retribuzione_lorda_annua NUMERIC(12,2) NOT NULL CHECK (retribuzione_lorda_annua > 0),\n    stato_contrattuale TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_contrattuale IN ('attivo', 'sospeso', 'cessato')),\n    data_assunzione DATE NOT NULL,\n    id_dipartimento INT REFERENCES dipartimenti(id_dipartimento) ON DELETE SET NULL ON UPDATE CASCADE\n);\n\nCREATE TABLE contratti (\n    id_contratto SERIAL PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id_dipendente) ON DELETE CASCADE ON UPDATE CASCADE,\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('indeterminato', 'determinato', 'apprendistato', 'part_time')),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    livello_inquadramento TEXT,\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);",
+  "data_profile": {
+    "profile": {
+      "dipartimenti": {
+        "row_count": 36,
+        "columns": {
+          "id_dipartimento": {
+            "distinct": 36,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 36
+          },
+          "nome_dipartimento": {
+            "distinct": 36,
+            "sample": [
+              "Finanza e Controllo",
+              "Finanza e Controllo1",
+              "Finanza e Controllo2",
+              "Finanza e Controllo3",
+              "Finanza e Controllo4"
+            ]
+          },
+          "sede": {
+            "distinct": 6,
+            "sample": [
+              "Bologna",
+              "Milano",
+              "Napoli",
+              "Padova",
+              "Roma"
+            ]
+          },
+          "budget_annuo": {
+            "distinct": 34,
+            "sample": [
+              "1000533.89",
+              "1274263.01",
+              "158749.63",
+              "169347.45",
+              "198419.09"
+            ],
+            "min": 158749.63,
+            "max": 1274263.01
+          }
+        }
+      },
+      "dipendenti": {
+        "row_count": 308,
+        "columns": {
+          "id_dipendente": {
+            "distinct": 308,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 308
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 11,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Esposito",
+              "Ferrari",
+              "Fontana"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 308,
+            "sample": [
+              "BNCLRA88T42F205B",
+              "BNCLRA88T42F205C",
+              "BNCLRA88T42F205D",
+              "BNCLRA88T42F205E",
+              "BNCLRA88T42F205F"
+            ]
+          },
+          "stato_civile": {
+            "distinct": 6,
+            "sample": [
+              "celibe",
+              "coniugata",
+              "coniugato",
+              "divorziato",
+              "nubile"
+            ]
+          },
+          "retribuzione_lorda_annua": {
+            "distinct": 302,
+            "sample": [
+              "100564.24",
+              "100807.52",
+              "103200.0",
+              "20896.34",
+              "21764.63"
+            ],
+            "min": 20896.34,
+            "max": 103200.0
+          },
+          "stato_contrattuale": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "cessato",
+              "sospeso"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 285,
+            "sample": [
+              "2014-04-27",
+              "2014-05-11",
+              "2014-05-13",
+              "2014-05-27",
+              "2014-06-02"
+            ]
+          },
+          "id_dipartimento": {
+            "distinct": 36,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 36
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 468,
+        "columns": {
+          "id_contratto": {
+            "distinct": 468,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 468
+          },
+          "dipendente_id": {
+            "distinct": 243,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 3,
+            "max": 308
+          },
+          "tipo_contratto": {
+            "distinct": 4,
+            "sample": [
+              "apprendistato",
+              "determinato",
+              "indeterminato",
+              "part_time"
+            ]
+          },
+          "data_inizio": {
+            "distinct": 346,
+            "sample": [
+              "2018-12-06",
+              "2018-12-09",
+              "2018-12-14",
+              "2018-12-22",
+              "2018-12-23"
+            ]
+          },
+          "data_fine": {
+            "distinct": 4,
+            "sample": [
+              "2023-02-14",
+              "2024-06-30",
+              "2024-08-31",
+              "2026-05-05"
+            ]
+          },
+          "livello_inquadramento": {
+            "distinct": 8,
+            "sample": [
+              "A1",
+              "A2",
+              "A3",
+              "B1",
+              "B2"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "dipartimenti": [
+        {
+          "id_dipartimento": 1,
+          "nome_dipartimento": "Risorse Umane",
+          "sede": "Milano",
+          "budget_annuo": 222163.15
+        },
+        {
+          "id_dipartimento": 2,
+          "nome_dipartimento": "Risorse Umane1",
+          "sede": "Torino",
+          "budget_annuo": 457381.97
+        },
+        {
+          "id_dipartimento": 3,
+          "nome_dipartimento": "Risorse Umane2",
+          "sede": "Bologna",
+          "budget_annuo": 211231.52
+        },
+        {
+          "id_dipartimento": 4,
+          "nome_dipartimento": "Risorse Umane3",
+          "sede": "Napoli",
+          "budget_annuo": 523371.83
+        },
+        {
+          "id_dipartimento": 5,
+          "nome_dipartimento": "Risorse Umane4",
+          "sede": "Bologna",
+          "budget_annuo": 317478.31
+        },
+        {
+          "id_dipartimento": 6,
+          "nome_dipartimento": "Finanza e Controllo",
+          "sede": "Milano",
+          "budget_annuo": 359011.31
+        },
+        {
+          "id_dipartimento": 7,
+          "nome_dipartimento": "Finanza e Controllo1",
+          "sede": "Bologna",
+          "budget_annuo": 735133.98
+        },
+        {
+          "id_dipartimento": 8,
+          "nome_dipartimento": "Finanza e Controllo2",
+          "sede": "Padova",
+          "budget_annuo": 507403.94
+        }
+      ],
+      "dipendenti": [
+        {
+          "id_dipendente": 1,
+          "nome": "Andrea",
+          "cognome": "Colombo",
+          "codice_fiscale": "RSSMRC85M01H501X",
+          "stato_civile": "divorziato",
+          "retribuzione_lorda_annua": 30529.99,
+          "stato_contrattuale": "attivo",
+          "data_assunzione": "2019-07-23",
+          "id_dipartimento": 33
+        },
+        {
+          "id_dipendente": 2,
+          "nome": "Alessandro",
+          "cognome": "Fontana",
+          "codice_fiscale": "RSSMRC85M01H501B",
+          "stato_civile": "coniugato",
+          "retribuzione_lorda_annua": 30251.59,
+          "stato_contrattuale": "cessato",
+          "data_assunzione": "2019-02-16",
+          "id_dipartimento": 9
+        },
+        {
+          "id_dipendente": 3,
+          "nome": "Davide",
+          "cognome": "Colombo",
+          "codice_fiscale": "RSSMRC85M01H501C",
+          "stato_civile": "nubile",
+          "retribuzione_lorda_annua": 44667.76,
+          "stato_contrattuale": "attivo",
+          "data_assunzione": "2019-02-27",
+          "id_dipartimento": 4
+        },
+        {
+          "id_dipendente": 4,
+          "nome": "Laura",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRC85M01H501D",
+          "stato_civile": "coniugata",
+          "retribuzione_lorda_annua": 31668.38,
+          "stato_contrattuale": "attivo",
+          "data_assunzione": "2018-09-24",
+          "id_dipartimento": 34
+        },
+        {
+          "id_dipendente": 5,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRC85M01H501E",
+          "stato_civile": "coniugata",
+          "retribuzione_lorda_annua": 39053.44,
+          "stato_contrattuale": "attivo",
+          "data_assunzione": "2019-11-05",
+          "id_dipartimento": 12
+        },
+        {
+          "id_dipendente": 6,
+          "nome": "Luca",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRC85M01H501F",
+          "stato_civile": "divorziato",
+          "retribuzione_lorda_annua": 61525.2,
+          "stato_contrattuale": "attivo",
+          "data_assunzione": "2018-04-09",
+          "id_dipartimento": 33
+        },
+        {
+          "id_dipendente": 7,
+          "nome": "Marco",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRC85M01H501G",
+          "stato_civile": "celibe",
+          "retribuzione_lorda_annua": 42582.78,
+          "stato_contrattuale": "sospeso",
+          "data_assunzione": "2018-10-22",
+          "id_dipartimento": 5
+        },
+        {
+          "id_dipendente": 8,
+          "nome": "Francesca",
+          "cognome": "Fontana",
+          "codice_fiscale": "RSSMRC85M01H501H",
+          "stato_civile": "vedovo",
+          "retribuzione_lorda_annua": 34352.83,
+          "stato_contrattuale": "attivo",
+          "data_assunzione": "2018-12-01",
+          "id_dipartimento": 35
+        }
+      ],
+      "contratti": [
+        {
+          "id_contratto": 1,
+          "dipendente_id": 99,
+          "tipo_contratto": "determinato",
+          "data_inizio": "2019-04-18",
+          "data_fine": null,
+          "livello_inquadramento": "D"
+        },
+        {
+          "id_contratto": 2,
+          "dipendente_id": 30,
+          "tipo_contratto": "indeterminato",
+          "data_inizio": "2019-02-23",
+          "data_fine": null,
+          "livello_inquadramento": "B2"
+        },
+        {
+          "id_contratto": 3,
+          "dipendente_id": 94,
+          "tipo_contratto": "indeterminato",
+          "data_inizio": "2018-12-30",
+          "data_fine": null,
+          "livello_inquadramento": "D"
+        },
+        {
+          "id_contratto": 4,
+          "dipendente_id": 204,
+          "tipo_contratto": "indeterminato",
+          "data_inizio": "2018-12-14",
+          "data_fine": null,
+          "livello_inquadramento": "B2"
+        },
+        {
+          "id_contratto": 5,
+          "dipendente_id": 5,
+          "tipo_contratto": "apprendistato",
+          "data_inizio": "2018-12-22",
+          "data_fine": null,
+          "livello_inquadramento": "A2"
+        },
+        {
+          "id_contratto": 6,
+          "dipendente_id": 150,
+          "tipo_contratto": "apprendistato",
+          "data_inizio": "2019-04-25",
+          "data_fine": null,
+          "livello_inquadramento": "C1"
+        },
+        {
+          "id_contratto": 7,
+          "dipendente_id": 270,
+          "tipo_contratto": "indeterminato",
+          "data_inizio": "2019-03-22",
+          "data_fine": null,
+          "livello_inquadramento": "A2"
+        },
+        {
+          "id_contratto": 8,
+          "dipendente_id": 13,
+          "tipo_contratto": "determinato",
+          "data_inizio": "2019-01-09",
+          "data_fine": null,
+          "livello_inquadramento": "A1"
+        }
+      ]
+    }
+  },
+  "story": "Alla Direzione del Personale del gruppo, la riconciliazione periodica dell'organico tra uffici e collaboratori è un appuntamento fisso del controllo di gestione. Tutto parte dall'archivio denominato dipartimenti, che descrive le trentasei strutture aziendali con la rispettiva denominazione, la sede di riferimento — Milano, Torino, Bologna, Napoli, Padova e Roma — e il budget annuo stanziato, con importi che oscillano da circa 158749.63 euro fino a 1274263.01 euro. Accanto ad esso è custodita l'anagrafica_collaboratori, il registro ufficiale dei dipendenti, dove sono censite 308 persone: in ciascuna scheda figurano nome, cognome, codice fiscale, lo stato civile, la retribuzione lorda annua — citata nei documenti HR con l'acronimo di gergo settoriale RAL —, lo stato contrattuale, che può risultare attivo, sospeso oppure cessato, la data di assunzione e l'ufficio di afferenza. Chiudono il quadro i fascicoli del registro contratti, ben 468 in totale, dove sono annotati i vincoli contrattuali nelle forme indeterminato, determinato, apprendistato e part_time, con date di inizio — molte stipulazioni partono da dicembre 2018 — eventuale scadenza e livelli di inquadramento che spaziano dai profili A1 e A2 alle qualifiche più elevate. Durante l'ultima verifica operativa, gli analisti hanno incrociato i tre archivi per comporre una classifica esaustiva: per ogni dipartimento, e parallelamente per il gruppo del personale privo di assegnazione, hanno contato i collaboratori non cessati, calcolato la massa retributiva annua complessiva e isolato quella riferita ai soli dipendenti sospesi. Ogni voce dell'elenco è stata quindi etichettata come dipartimento attivo, dipartimento vuoto oppure dipendente non assegnato, così da mettere in luce tanto le strutture rimaste prive di organico quanto i collaboratori ancora non agganciati a nessun organigramma. La graduatoria finale è stata ordinata per massa retributiva decrescente e, a parità di importo, per denominazione del dipartimento, offrendo alla Direzione una fotografia immediata di dove si concentra la spesa del personale e di quali uffici richiedano interventi di riorganizzazione."
+}

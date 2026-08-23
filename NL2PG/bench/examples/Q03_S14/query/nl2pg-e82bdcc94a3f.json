@@ -1,0 +1,282 @@
+{
+  "schema_ddl": "CREATE DOMAIN codice_stato_spedizione AS TEXT CHECK (VALUE IN ('in_preparazione', 'in_transito', 'consegnata', 'restituita'));\n\nCREATE DOMAIN peso_chilogrammi AS NUMERIC(10,2) CHECK (VALUE > 0);\n\nCREATE DOMAIN cap_postale AS TEXT CHECK (VALUE ~ '^[0-9]{5}$');\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    cap cap_postale NOT NULL\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    destinatario TEXT NOT NULL,\n    indirizzo_destinazione TEXT NOT NULL,\n    peso_kg peso_chilogrammi NOT NULL,\n    stato codice_stato_spedizione NOT NULL DEFAULT 'in_preparazione',\n    data_spedizione DATE NOT NULL,\n    data_consegna DATE,\n    CHECK (data_consegna IS NULL OR data_consegna >= data_spedizione)\n);",
+  "data_profile": {
+    "profile": {
+      "magazzini": {
+        "row_count": 47,
+        "columns": {
+          "id": {
+            "distinct": 47,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 47
+          },
+          "nome": {
+            "distinct": 47,
+            "sample": [
+              "Deposito Firenze Scandicci",
+              "Deposito Firenze Scandicci1",
+              "Deposito Firenze Scandicci2",
+              "Deposito Firenze Scandicci3",
+              "Deposito Firenze Scandicci4"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "cap": {
+            "distinct": 8,
+            "sample": [
+              "00184",
+              "10121",
+              "16121",
+              "20121",
+              "35121"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 681,
+        "columns": {
+          "id": {
+            "distinct": 681,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 1681
+          },
+          "magazzino_id": {
+            "distinct": 47,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 47
+          },
+          "destinatario": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro Conti",
+              "Chiara Moretti",
+              "Davide Greco",
+              "Elena Marchetti",
+              "Fabio De Luca"
+            ]
+          },
+          "indirizzo_destinazione": {
+            "distinct": 10,
+            "sample": [
+              "Corso Buenos Aires 88",
+              "Corso Vittorio Emanuele II 45",
+              "Piazza della Repubblica 5",
+              "Via Dante Alighieri 21",
+              "Via Garibaldi 12"
+            ]
+          },
+          "peso_kg": {
+            "distinct": 555,
+            "sample": [
+              "0.36",
+              "0.41",
+              "0.42",
+              "0.46",
+              "0.49"
+            ],
+            "min": 0.36,
+            "max": 64.36
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "consegnata",
+              "in_preparazione",
+              "in_transito",
+              "restituita"
+            ]
+          },
+          "data_spedizione": {
+            "distinct": 85,
+            "sample": [
+              "2025-11-12",
+              "2025-11-13",
+              "2025-11-14",
+              "2025-11-15",
+              "2025-11-16"
+            ]
+          },
+          "data_consegna": {
+            "distinct": 21,
+            "sample": [
+              "2026-01-13",
+              "2026-01-14",
+              "2026-01-15",
+              "2026-01-16",
+              "2026-01-17"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "magazzini": [
+        {
+          "id": 1,
+          "nome": "Hub Milano Nord",
+          "citta": "Firenze",
+          "cap": "50143"
+        },
+        {
+          "id": 2,
+          "nome": "Hub Milano Nord1",
+          "citta": "Genova",
+          "cap": "20121"
+        },
+        {
+          "id": 3,
+          "nome": "Hub Milano Nord2",
+          "citta": "Napoli",
+          "cap": "20121"
+        },
+        {
+          "id": 4,
+          "nome": "Hub Milano Nord3",
+          "citta": "Genova",
+          "cap": "40121"
+        },
+        {
+          "id": 5,
+          "nome": "Hub Milano Nord4",
+          "citta": "Firenze",
+          "cap": "20121"
+        },
+        {
+          "id": 6,
+          "nome": "Hub Milano Nord5",
+          "citta": "Roma",
+          "cap": "35121"
+        },
+        {
+          "id": 7,
+          "nome": "Deposito Roma Est",
+          "citta": "Roma",
+          "cap": "00184"
+        },
+        {
+          "id": 8,
+          "nome": "Deposito Roma Est1",
+          "citta": "Napoli",
+          "cap": "40121"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 1001,
+          "magazzino_id": 28,
+          "destinatario": "Chiara Moretti",
+          "indirizzo_destinazione": "Corso Buenos Aires 88",
+          "peso_kg": 5.5,
+          "stato": "consegnata",
+          "data_spedizione": "2025-12-09",
+          "data_consegna": "2026-01-18"
+        },
+        {
+          "id": 1002,
+          "magazzino_id": 10,
+          "destinatario": "Mario Rossi",
+          "indirizzo_destinazione": "Via Garibaldi 12",
+          "peso_kg": 2.4,
+          "stato": "consegnata",
+          "data_spedizione": "2026-01-10",
+          "data_consegna": "2026-01-13"
+        },
+        {
+          "id": 1003,
+          "magazzino_id": 46,
+          "destinatario": "Laura Bianchi",
+          "indirizzo_destinazione": "Corso Vittorio Emanuele II 45",
+          "peso_kg": 6.34,
+          "stato": "consegnata",
+          "data_spedizione": "2025-12-14",
+          "data_consegna": "2026-01-14"
+        },
+        {
+          "id": 1004,
+          "magazzino_id": 18,
+          "destinatario": "Elena Marchetti",
+          "indirizzo_destinazione": "Viale Trieste 77",
+          "peso_kg": 4.56,
+          "stato": "consegnata",
+          "data_spedizione": "2025-11-23",
+          "data_consegna": null
+        },
+        {
+          "id": 1005,
+          "magazzino_id": 41,
+          "destinatario": "Luca Esposito",
+          "indirizzo_destinazione": "Via Toledo 120",
+          "peso_kg": 2.29,
+          "stato": "consegnata",
+          "data_spedizione": "2025-12-16",
+          "data_consegna": "2026-01-13"
+        },
+        {
+          "id": 1006,
+          "magazzino_id": 27,
+          "destinatario": "Chiara Moretti",
+          "indirizzo_destinazione": "Viale Trieste 77",
+          "peso_kg": 3.21,
+          "stato": "consegnata",
+          "data_spedizione": "2025-12-07",
+          "data_consegna": "2026-01-17"
+        },
+        {
+          "id": 1007,
+          "magazzino_id": 14,
+          "destinatario": "Davide Greco",
+          "indirizzo_destinazione": "Via Nazionale 140",
+          "peso_kg": 1.66,
+          "stato": "consegnata",
+          "data_spedizione": "2026-01-04",
+          "data_consegna": "2026-01-17"
+        },
+        {
+          "id": 1008,
+          "magazzino_id": 40,
+          "destinatario": "Chiara Moretti",
+          "indirizzo_destinazione": "Via Garibaldi 12",
+          "peso_kg": 1.24,
+          "stato": "consegnata",
+          "data_spedizione": "2026-01-06",
+          "data_consegna": "2026-01-14"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "top_n"
+  ],
+  "query": "SELECT s.destinatario, m.nome AS magazzino_partenza, m.citta AS citta_magazzino, s.peso_kg AS peso_spedizione, s.data_spedizione AS data_partenza, CASE WHEN s.data_consegna IS NULL THEN 'in attesa di consegna' ELSE 'consegnata il ' || s.data_consegna::text END AS esito_consegna FROM spedizioni s JOIN magazzini m ON s.magazzino_id = m.id WHERE s.stato = 'consegnata' AND s.peso_kg BETWEEN 2 AND 20 ORDER BY s.peso_kg DESC, s.data_spedizione ASC LIMIT 10;"
+}

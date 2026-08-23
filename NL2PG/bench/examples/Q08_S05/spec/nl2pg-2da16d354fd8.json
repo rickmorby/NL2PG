@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 3,
+  "hierarchy": "weak_entity_dependency",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [
+    "rename",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "movimenti_finanziari",
+      "obsolete_value": "transazioni_contabili",
+      "description": "La tabella che registra i movimenti finanziari viene denominata 'transazioni_contabili' nei documenti aziendali."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "id_conto",
+      "obsolete_value": "codice_riferimento_conto",
+      "description": "La colonna 'id_conto' (chiave esterna per la tabella conti) viene indicata come 'codice_riferimento_conto' nei report interni."
+    }
+  ],
+  "spec_hash": "7916e12ffadffef2"
+}

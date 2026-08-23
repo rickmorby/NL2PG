@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dettagli_prodotto",
+        "obsolete_value": "specifiche_articolo",
+        "description": "La colonna composita dettagli_prodotto viene denominata specifiche_articolo nella documentazione aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "descrizione",
+        "obsolete_value": "blurb",
+        "description": "Il campo testuale 'descrizione' all'interno del tipo composito viene riferito come 'blurb' nel gergo aziendale."
+      }
+    ],
+    "spec_hash": "24225716e9a98111"
+  },
+  "schema_ddl": "CREATE TYPE specifiche_articolo AS (\n    blurb TEXT,\n    peso_grammi INT,\n    altezza_cm NUMERIC(5,2),\n    larghezza_cm NUMERIC(5,2),\n    profondita_cm NUMERIC(5,2)\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    prezzo NUMERIC(10,2) NOT NULL CHECK (prezzo >= 0),\n    dettagli_prodotto specifiche_articolo,\n    codice_articolo TEXT NOT NULL UNIQUE\n);"
+}

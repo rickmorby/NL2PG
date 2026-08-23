@@ -1,0 +1,422 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 5,
+    "hierarchy": "temporal_versioning",
+    "sql_features": [
+      "row_types"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "storico_prezzi",
+        "obsolete_value": "archivio_listini",
+        "description": "La tabella storico_prezzi, che conserva le versioni temporali dei prezzi dei prodotti (prodotto_id, prezzo_unitario, valid_from, valid_to), viene denominata archivio_listini nella prosa aziendale; il solver deve risalire al nome reale della tabella nello schema."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "prezzo_unitario",
+        "obsolete_value": "tariffa vigente",
+        "description": "La colonna prezzo_unitario della tabella storico_prezzi viene indicata nei documenti aziendali con il sinonimo 'tariffa vigente'; i confronti tra versioni devono riferirsi alla colonna reale prezzo_unitario all'interno delle tuple ROW."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "valid_from",
+        "obsolete_value": "data di efficacia",
+        "description": "La colonna valid_from, che marca l'inizio del periodo di validita' di ciascuna versione di prezzo, viene descritta con il gergo interno 'data di efficacia'; le query richieste devono usare WHERE ROW(prezzo_unitario, valid_from) = ROW(v1, t1) oppure ORDER BY storico_prezzi.valid_from per selezionare la versione corretta nel tempo."
+      }
+    ],
+    "spec_hash": "6c5a2c306779275a"
+  },
+  "schema_ddl": "CREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    codice_sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE storico_prezzi (\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    valid_from TIMESTAMP NOT NULL,\n    valid_to TIMESTAMP,\n    PRIMARY KEY (prodotto_id, valid_from),\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    email TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    citta TEXT\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa',\n    totale NUMERIC(12,2) CHECK (totale >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "categorie",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Elettronica",
+            "descrizione": "Dispositivi elettronici e accessori"
+          },
+          {
+            "id": 2,
+            "nome": "Abbigliamento",
+            "descrizione": "Vestiti, scarpe e accessori moda"
+          },
+          {
+            "id": 3,
+            "nome": "Casa e Giardino",
+            "descrizione": null
+          },
+          {
+            "id": 4,
+            "nome": "Libri",
+            "descrizione": "Libri cartacei e digitali"
+          },
+          {
+            "id": 5,
+            "nome": "Sport",
+            "descrizione": "Attrezzatura sportiva e abbigliamento"
+          }
+        ],
+        "variations": {
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Dispositivi elettronici e accessori",
+              "Vestiti, scarpe e accessori moda",
+              "Articoli per la casa e il giardino",
+              "Libri cartacei e digitali",
+              "Attrezzatura sportiva",
+              "Giocattoli per bambini",
+              "Alimentari e bevande"
+            ]
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_sku": "ELEC-001",
+            "nome": "Smartphone X200",
+            "categoria_id": 1,
+            "attivo": "true",
+            "creato_il": "2024-01-15 10:00:00"
+          },
+          {
+            "id": 2,
+            "codice_sku": "ABB-001",
+            "nome": "Maglietta cotone",
+            "categoria_id": 2,
+            "attivo": "true",
+            "creato_il": "2024-02-20 14:30:00"
+          },
+          {
+            "id": 3,
+            "codice_sku": "CASA-001",
+            "nome": "Lampada da tavolo",
+            "categoria_id": 3,
+            "attivo": "false",
+            "creato_il": "2023-11-05 09:15:00"
+          },
+          {
+            "id": 4,
+            "codice_sku": "LIB-001",
+            "nome": "Romanzo storico",
+            "categoria_id": 4,
+            "attivo": "true",
+            "creato_il": "2024-03-10 16:45:00"
+          },
+          {
+            "id": 5,
+            "codice_sku": "SPORT-001",
+            "nome": "Scarpe running",
+            "categoria_id": 5,
+            "attivo": "true",
+            "creato_il": "2024-04-22 11:20:00"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Smartphone X200",
+              "Maglietta cotone",
+              "Lampada da tavolo",
+              "Romanzo storico",
+              "Scarpe running",
+              "Cuffie wireless",
+              "Giacca invernale",
+              "Tavolo da cucina",
+              "Giallo di Venezia",
+              "Palla da calcio",
+              "Laptop pro 15",
+              "Jeans slim fit"
+            ]
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          },
+          "creato_il": {
+            "axis": "shift",
+            "delta_min": -365.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "storico_prezzi",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.0,
+        "templates": [
+          {
+            "prodotto_id": 1,
+            "prezzo_unitario": 899.99,
+            "valid_from": "2024-01-01 00:00:00",
+            "valid_to": null
+          },
+          {
+            "prodotto_id": 1,
+            "prezzo_unitario": 749.99,
+            "valid_from": "2024-06-01 00:00:00",
+            "valid_to": null
+          },
+          {
+            "prodotto_id": 2,
+            "prezzo_unitario": 29.99,
+            "valid_from": "2024-02-01 00:00:00",
+            "valid_to": "2024-08-01 00:00:00"
+          },
+          {
+            "prodotto_id": 3,
+            "prezzo_unitario": 45.5,
+            "valid_from": "2023-12-01 00:00:00",
+            "valid_to": null
+          },
+          {
+            "prodotto_id": 4,
+            "prezzo_unitario": 12.99,
+            "valid_from": "2024-03-15 00:00:00",
+            "valid_to": "2024-09-15 00:00:00"
+          }
+        ],
+        "variations": {
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.2,
+            "pool": []
+          },
+          "valid_to": {
+            "axis": "shift",
+            "delta_min": 30.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "email": "mario.rossi@example.com",
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "citta": "Roma"
+          },
+          {
+            "id": 2,
+            "email": "laura.bianchi@example.com",
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "citta": "Milano"
+          },
+          {
+            "id": 3,
+            "email": "giulia.verdi@example.com",
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "citta": null
+          },
+          {
+            "id": 4,
+            "email": "marco.neri@example.com",
+            "nome": "Marco",
+            "cognome": "Neri",
+            "citta": "Napoli"
+          },
+          {
+            "id": 5,
+            "email": "elena.gialli@example.com",
+            "nome": "Elena",
+            "cognome": "Gialli",
+            "citta": "Torino"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Marco",
+              "Elena",
+              "Paolo",
+              "Anna",
+              "Luca",
+              "Sofia",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Gialli",
+              "Ferrari",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Napoli",
+              "Torino",
+              "Bologna",
+              "Firenze",
+              "Palermo",
+              "Genova"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "data_ordine": "2024-01-20 10:30:00",
+            "stato_ordine": "chiuso",
+            "totale": 150.5
+          },
+          {
+            "id": 2,
+            "cliente_id": 1,
+            "data_ordine": "2024-03-15 14:20:00",
+            "stato_ordine": "chiuso",
+            "totale": 89.99
+          },
+          {
+            "id": 3,
+            "cliente_id": 2,
+            "data_ordine": "2024-02-10 09:10:00",
+            "stato_ordine": "in_attesa",
+            "totale": 240.0
+          },
+          {
+            "id": 4,
+            "cliente_id": 3,
+            "data_ordine": "2024-04-05 16:50:00",
+            "stato_ordine": "spedito",
+            "totale": 59.9
+          },
+          {
+            "id": 5,
+            "cliente_id": 4,
+            "data_ordine": "2024-05-12 11:40:00",
+            "stato_ordine": "chiuso",
+            "totale": 320.75
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "in_attesa",
+              "in_attesa",
+              "in_attesa",
+              "chiuso",
+              "spedito",
+              "annullato"
+            ]
+          },
+          "totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 3.0,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

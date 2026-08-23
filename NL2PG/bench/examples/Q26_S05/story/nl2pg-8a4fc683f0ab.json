@@ -1,0 +1,470 @@
+{
+  "schema_ddl": "CREATE TABLE depositi (\n    id INT PRIMARY KEY,\n    codice_deposito TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capacita_pallet INT CHECK (capacita_pallet >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    deposito_id INT NOT NULL REFERENCES depositi(id),\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    destinatario TEXT NOT NULL,\n    citta_destinazione TEXT NOT NULL,\n    peso_kg NUMERIC(8,2) CHECK (peso_kg > 0),\n    stato TEXT NOT NULL DEFAULT 'in_preparazione' CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'annullata')),\n    data_partenza DATE,\n    data_consegna_prevista DATE\n);\n\nCREATE TABLE eventi_tracciamento (\n    id_spedizione INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    num_evento INT NOT NULL CHECK (num_evento > 0),\n    tipo_evento TEXT NOT NULL,\n    descrizione TEXT,\n    istante_evento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    operatore TEXT,\n    PRIMARY KEY (id_spedizione, num_evento)\n);",
+  "data_profile": {
+    "profile": {
+      "depositi": {
+        "row_count": 32,
+        "columns": {
+          "id": {
+            "distinct": 32,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 32
+          },
+          "codice_deposito": {
+            "distinct": 32,
+            "sample": [
+              "DEP-BLG-01",
+              "DEP-BLG-011",
+              "DEP-BLG-012",
+              "DEP-BLG-013",
+              "DEP-BLG-014"
+            ]
+          },
+          "nome": {
+            "distinct": 6,
+            "sample": [
+              "Hub Cross-Docking Bologna",
+              "Hub Cross-Docking Firenze",
+              "Hub Cross-Docking Milano Est",
+              "Hub Cross-Docking Napoli Ovest",
+              "Hub Cross-Docking Roma Sud"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "capacita_pallet": {
+            "distinct": 30,
+            "sample": [
+              "10059.31",
+              "10743.92",
+              "10972.17",
+              "11642.6",
+              "12459.54"
+            ],
+            "min": 5329.34,
+            "max": 31597.87
+          },
+          "attivo": {
+            "distinct": 3,
+            "sample": [
+              "True",
+              "false",
+              "true"
+            ],
+            "min": true,
+            "max": true
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 1038,
+        "columns": {
+          "id": {
+            "distinct": 1038,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1138
+          },
+          "deposito_id": {
+            "distinct": 32,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 32
+          },
+          "codice_spedizione": {
+            "distinct": 1038,
+            "sample": [
+              "SPD-2026-00101",
+              "SPD-2026-001011",
+              "SPD-2026-0010110",
+              "SPD-2026-00101100",
+              "SPD-2026-00101101"
+            ]
+          },
+          "destinatario": {
+            "distinct": 10,
+            "sample": [
+              "Anna Conti",
+              "Chiara Lombardi",
+              "Davide Fontana",
+              "Giulia Verdi",
+              "Laura Bianchi"
+            ]
+          },
+          "citta_destinazione": {
+            "distinct": 12,
+            "sample": [
+              "Alessandria",
+              "Bari",
+              "Bergamo",
+              "Brescia",
+              "Modena"
+            ]
+          },
+          "peso_kg": {
+            "distinct": 935,
+            "sample": [
+              "10.09",
+              "10.13",
+              "10.28",
+              "10.42",
+              "10.47"
+            ],
+            "min": 6.36,
+            "max": 917.8
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "annullata",
+              "consegnata",
+              "in_preparazione",
+              "in_transito"
+            ]
+          },
+          "data_partenza": {
+            "distinct": 29,
+            "sample": [
+              "2026-01-13",
+              "2026-01-14",
+              "2026-01-15",
+              "2026-01-16",
+              "2026-01-17"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 41,
+            "sample": [
+              "2026-01-31",
+              "2026-02-01",
+              "2026-02-02",
+              "2026-02-03",
+              "2026-02-04"
+            ]
+          }
+        }
+      },
+      "eventi_tracciamento": {
+        "row_count": 1038,
+        "columns": {
+          "id_spedizione": {
+            "distinct": 648,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1004",
+              "1006"
+            ],
+            "min": 101,
+            "max": 1138
+          },
+          "num_evento": {
+            "distinct": 1038,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1038
+          },
+          "tipo_evento": {
+            "distinct": 8,
+            "sample": [
+              "arrivo_hub",
+              "consegnata",
+              "giacenza",
+              "in_consegna",
+              "in_transito"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Arrivo presso hub di cross-docking Milano Est",
+              "Consegnato al destinatario, firma acquisita",
+              "Indirizzo destinatario incompleto, pacco in giacenza",
+              "Pacco caricato sul mezzo per la consegna finale",
+              "Pacco ritirato dal mittente, voce aperta nel registro movimenti"
+            ]
+          },
+          "istante_evento": {
+            "distinct": 89,
+            "sample": [
+              "2026-01-24 11:45:00",
+              "2026-01-25 11:45:00",
+              "2026-01-26 11:45:00",
+              "2026-01-27 08:15:00",
+              "2026-01-27 11:45:00"
+            ]
+          },
+          "operatore": {
+            "distinct": 6,
+            "sample": [
+              "C. Vitale",
+              "F. Lo Presti",
+              "G. Ferri",
+              "L. Sartori",
+              "M. Bellini"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "depositi": [
+        {
+          "id": 1,
+          "codice_deposito": "DEP-MIL-01",
+          "nome": "Hub Cross-Docking Milano Est",
+          "citta": "Padova",
+          "capacita_pallet": 20542.07,
+          "attivo": "true"
+        },
+        {
+          "id": 2,
+          "codice_deposito": "DEP-MIL-011",
+          "nome": "Hub Cross-Docking Milano Est",
+          "citta": "Bari",
+          "capacita_pallet": 21983.41,
+          "attivo": "true"
+        },
+        {
+          "id": 3,
+          "codice_deposito": "DEP-MIL-012",
+          "nome": "Hub Cross-Docking Milano Est",
+          "citta": "Milano",
+          "capacita_pallet": 14000,
+          "attivo": true
+        },
+        {
+          "id": 4,
+          "codice_deposito": "DEP-MIL-013",
+          "nome": "Hub Cross-Docking Milano Est",
+          "citta": "Firenze",
+          "capacita_pallet": 20426.89,
+          "attivo": "true"
+        },
+        {
+          "id": 5,
+          "codice_deposito": "DEP-MIL-014",
+          "nome": "Hub Cross-Docking Milano Est",
+          "citta": "Verona",
+          "capacita_pallet": 19862.81,
+          "attivo": "true"
+        },
+        {
+          "id": 6,
+          "codice_deposito": "DEP-MIL-015",
+          "nome": "Hub Cross-Docking Milano Est",
+          "citta": "Padova",
+          "capacita_pallet": 14120.72,
+          "attivo": "true"
+        },
+        {
+          "id": 7,
+          "codice_deposito": "DEP-ROM-01",
+          "nome": "Hub Cross-Docking Roma Sud",
+          "citta": "Napoli",
+          "capacita_pallet": 17928.47,
+          "attivo": "true"
+        },
+        {
+          "id": 8,
+          "codice_deposito": "DEP-ROM-011",
+          "nome": "Hub Cross-Docking Roma Sud",
+          "citta": "Genova",
+          "capacita_pallet": 14839.61,
+          "attivo": "false"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 101,
+          "deposito_id": 12,
+          "codice_spedizione": "SPD-2026-00101",
+          "destinatario": "Paolo Rinaldi",
+          "citta_destinazione": "Piacenza",
+          "peso_kg": null,
+          "stato": "annullata",
+          "data_partenza": "2026-01-28",
+          "data_consegna_prevista": "2026-02-20"
+        },
+        {
+          "id": 102,
+          "deposito_id": 7,
+          "codice_spedizione": "SPD-2026-001011",
+          "destinatario": "Marco Gallo",
+          "citta_destinazione": "Treviso",
+          "peso_kg": 106.14,
+          "stato": "consegnata",
+          "data_partenza": "2026-01-31",
+          "data_consegna_prevista": "2026-02-18"
+        },
+        {
+          "id": 103,
+          "deposito_id": 29,
+          "codice_spedizione": "SPD-2026-001012",
+          "destinatario": "Sara Moretti",
+          "citta_destinazione": "Bari",
+          "peso_kg": 50.03,
+          "stato": "consegnata",
+          "data_partenza": "2026-02-02",
+          "data_consegna_prevista": "2026-02-17"
+        },
+        {
+          "id": 104,
+          "deposito_id": 18,
+          "codice_spedizione": "SPD-2026-001013",
+          "destinatario": "Giulia Verdi",
+          "citta_destinazione": "Treviso",
+          "peso_kg": 93.47,
+          "stato": "consegnata",
+          "data_partenza": null,
+          "data_consegna_prevista": "2026-02-09"
+        },
+        {
+          "id": 105,
+          "deposito_id": 8,
+          "codice_spedizione": "SPD-2026-001014",
+          "destinatario": "Davide Fontana",
+          "citta_destinazione": "Bari",
+          "peso_kg": 50.94,
+          "stato": "consegnata",
+          "data_partenza": "2026-01-27",
+          "data_consegna_prevista": "2026-02-06"
+        },
+        {
+          "id": 106,
+          "deposito_id": 28,
+          "codice_spedizione": "SPD-2026-001015",
+          "destinatario": "Mario Rossi",
+          "citta_destinazione": "Brescia",
+          "peso_kg": 74.51,
+          "stato": "consegnata",
+          "data_partenza": null,
+          "data_consegna_prevista": "2026-02-17"
+        },
+        {
+          "id": 107,
+          "deposito_id": 24,
+          "codice_spedizione": "SPD-2026-001016",
+          "destinatario": "Laura Bianchi",
+          "citta_destinazione": "Piacenza",
+          "peso_kg": 119.33,
+          "stato": "consegnata",
+          "data_partenza": "2026-02-01",
+          "data_consegna_prevista": "2026-02-08"
+        },
+        {
+          "id": 108,
+          "deposito_id": 1,
+          "codice_spedizione": "SPD-2026-001017",
+          "destinatario": "Laura Bianchi",
+          "citta_destinazione": "Salerno",
+          "peso_kg": 112.3,
+          "stato": "in_preparazione",
+          "data_partenza": "2026-01-28",
+          "data_consegna_prevista": "2026-02-12"
+        }
+      ],
+      "eventi_tracciamento": [
+        {
+          "id_spedizione": 597,
+          "num_evento": 1,
+          "tipo_evento": "giacenza",
+          "descrizione": "Pacco ritirato dal mittente, voce aperta nel registro movimenti",
+          "istante_evento": "2026-02-03 08:15:00",
+          "operatore": "M. Bellini"
+        },
+        {
+          "id_spedizione": 137,
+          "num_evento": 2,
+          "tipo_evento": "partenza_hub",
+          "descrizione": "Pacco ritirato dal mittente, voce aperta nel registro movimenti",
+          "istante_evento": "2026-02-03 08:15:00",
+          "operatore": "L. Sartori"
+        },
+        {
+          "id_spedizione": 596,
+          "num_evento": 3,
+          "tipo_evento": "consegnata",
+          "descrizione": "Pacco ritirato dal mittente, voce aperta nel registro movimenti",
+          "istante_evento": "2026-01-30 08:15:00",
+          "operatore": "G. Ferri"
+        },
+        {
+          "id_spedizione": 340,
+          "num_evento": 4,
+          "tipo_evento": "consegnata",
+          "descrizione": "Pacco ritirato dal mittente, voce aperta nel registro movimenti",
+          "istante_evento": "2026-02-05 08:15:00",
+          "operatore": "C. Vitale"
+        },
+        {
+          "id_spedizione": 831,
+          "num_evento": 5,
+          "tipo_evento": "giacenza",
+          "descrizione": "Pacco ritirato dal mittente, voce aperta nel registro movimenti",
+          "istante_evento": "2026-01-29 08:15:00",
+          "operatore": "R. DAmato"
+        },
+        {
+          "id_spedizione": 955,
+          "num_evento": 6,
+          "tipo_evento": "in_transito",
+          "descrizione": "Pacco ritirato dal mittente, voce aperta nel registro movimenti",
+          "istante_evento": "2026-01-31 08:15:00",
+          "operatore": "F. Lo Presti"
+        },
+        {
+          "id_spedizione": 699,
+          "num_evento": 7,
+          "tipo_evento": "partenza_hub",
+          "descrizione": "Pacco ritirato dal mittente, voce aperta nel registro movimenti",
+          "istante_evento": "2026-02-03 08:15:00",
+          "operatore": "C. Vitale"
+        },
+        {
+          "id_spedizione": 940,
+          "num_evento": 8,
+          "tipo_evento": "arrivo_hub",
+          "descrizione": "Pacco ritirato dal mittente, voce aperta nel registro movimenti",
+          "istante_evento": "2026-02-06 08:15:00",
+          "operatore": "G. Ferri"
+        }
+      ]
+    }
+  },
+  "story": "Nella rete logistica di Meridiana Trasporti, il controllo di fine gennaio 2026 coinvolge tre archivi gestionali. Il primo è l'archivio dei depositi, che nei documenti operativi viene designato con il gergo del settore come hub di cross-docking: vi sono conservate le schede dei siti di smistamento, ciascuna con il proprio codice (DEP-MIL-01, DEP-BLG-01), la denominazione commerciale (Hub Cross-Docking Milano Est, Hub Cross-Docking Bologna), la città in cui insiste l'impianto, la capacità massima espressa in pallet — dai 14000 posti dell'hub milanese fino a oltre 31597 delle strutture più capienti — e l'indicazione se il sito risulta attivo o dismesso. Il secondo archivio è il registro spedizioni: ogni pratica, numerata progressivamente da 101 a 1138, riporta il codice della spedizione (SPD-2026-00101 e analoghi), il nome del destinatario (Anna Conti, Marco Gallo, Sara Moretti), la città di destinazione (Treviso, Bari, Piacenza, Salerno), il peso in chilogrammi del collo, lo stato dell'ordine — in preparazione, in transito, consegnata oppure annullata — e infine la data di partenza insieme alla data di consegna prevista. Il terzo archivio, intitolato negli atti ufficiali eventi_tracciamento ma noto in magazzino come registro_movimenti, vale a dire il registro movimenti, custodisce la cronistoria di ogni tappa: il numero progressivo dell'evento, la tipologia (arrivo_hub, partenza_hub, giacenza, in_consegna, in_transito, consegnata), una descrizione sintetica del fatto accaduto — ad esempio la dicitura «Pacco ritirato dal mittente, voce aperta nel registro movimenti» — l'istante esatto della registrazione e le iniziali dell'operatore che l'ha sottoscritta (M. Bellini, L. Sartori, G. Ferri, C. Vitale). Durante l'ultimo audit, il team di controllo ha dovuto individuare le spedizioni che, pur non risultando annullate, non hanno alcun evento collegato nel registro movimenti: ordini ancora vivi ma privi di tracciatura, per i quali nessun operatore ha mai aperto una voce. Per ciascuna anomalia è stato indicato il deposito di origine, così da risalire all'hub di cross-docking responsabile, e l'elenco è stato ordinato dalla data di consegna prevista più vicina: le scadenze imminenti, come quella fissata al 2026-01-31 oppure al 2026-02-01, impongono interventi immediati prima del decorso dei termini contrattuali. La direzione qualità ha pertanto disposto che, dalla prossima campagna, ogni spedizione in preparazione o in transito debba contare almeno un evento di tracciamento associato, sotto pena di segnalazione formale al responsabile di hub."
+}

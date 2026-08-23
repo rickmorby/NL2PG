@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "window"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "visite",
+      "obsolete_value": "consulenze_ambulatoriali",
+      "description": "La tabella visite, che registra gli incontri tra pazienti e medici, viene denominata consulenze_ambulatoriali nella prosa aziendale. Le query devono risolvere il nome perifrastico verso la tabella reale visite."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "deleted_at",
+      "obsolete_value": "data_archiviazione_clinica",
+      "description": "La colonna deleted_at, che implementa la cancellazione logica dei record sulla tabella visite, viene indicata nella documentazione aziendale con il gergo data_archiviazione_clinica. Le righe attive sono quelle con deleted_at IS NULL; le query con funzione finestra ROW_NUMBER() OVER (PARTITION BY paziente_id ORDER BY data_visita DESC) devono escludere i record archiviati (deleted_at IS NOT NULL) prima di selezionare l'ultima visita per paziente."
+    }
+  ],
+  "spec_hash": "ec8228ff78a7824f"
+}

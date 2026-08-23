@@ -1,0 +1,306 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "full_outer_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "agenzie",
+        "obsolete_value": "reti_intermediazione",
+        "description": "La tabella genitore agenzie (che contiene le filiali con id_agenzia come chiave primaria) viene denominata reti_intermediazione nella prosa aziendale. Il solver deve risalire al nome reale della tabella tramite la relazione referenziale one-to-many con gli immobili."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "prezzo_richiesto",
+        "obsolete_value": "valore di listino",
+        "description": "La colonna prezzo_richiesto della tabella figlio immobili viene indicata nella documentazione aziendale con il termine gergale del settore immobiliare 'valore di listino'. Il solver deve mappare il gergo commerciale sul nome tecnico della colonna quando aggrega o confronta i valori."
+      }
+    ],
+    "spec_hash": "e5031b9f09c88bd0"
+  },
+  "schema_ddl": "CREATE TABLE agenzie (\n    id_agenzia INT PRIMARY KEY,\n    nome_rete TEXT NOT NULL,\n    citta_sede TEXT NOT NULL,\n    telefono_contatto TEXT,\n    email_ufficio TEXT UNIQUE\n);\n\nCREATE TABLE immobili (\n    id_immobile INT PRIMARY KEY,\n    agenzia_id INT REFERENCES agenzie(id_agenzia) ON DELETE SET NULL ON UPDATE CASCADE,\n    indirizzo TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato_vendita TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_vendita IN ('disponibile', 'riservato', 'venduto'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "agenzie",
+        "nature": "lookup",
+        "min_rows": 20,
+        "max_rows": 30,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_agenzia": 1,
+            "nome_rete": "Aurora Immobiliare",
+            "citta_sede": "Roma",
+            "telefono_contatto": "+39 06 48215501",
+            "email_ufficio": "info@auroraimmobiliare.it"
+          },
+          {
+            "id_agenzia": 2,
+            "nome_rete": "Domus Italia Network",
+            "citta_sede": "Milano",
+            "telefono_contatto": "+39 02 77339014",
+            "email_ufficio": "ufficio@domusitalia.it"
+          },
+          {
+            "id_agenzia": 3,
+            "nome_rete": "KeyHouse Consulting",
+            "citta_sede": "Torino",
+            "telefono_contatto": "+39 011 5567842",
+            "email_ufficio": "segreteria@keyhouse.it"
+          },
+          {
+            "id_agenzia": 4,
+            "nome_rete": "PuntoCasa Sud",
+            "citta_sede": "Napoli",
+            "telefono_contatto": "+39 081 3345678",
+            "email_ufficio": "contatti@puntocasasud.it"
+          },
+          {
+            "id_agenzia": 5,
+            "nome_rete": "Meridiana Case",
+            "citta_sede": "Bologna",
+            "telefono_contatto": "+39 051 2298760",
+            "email_ufficio": "info@meridianacase.it"
+          },
+          {
+            "id_agenzia": 6,
+            "nome_rete": "Alba Property Group",
+            "citta_sede": "Firenze",
+            "telefono_contatto": "+39 055 6612345",
+            "email_ufficio": "ufficio@albaproperty.it"
+          }
+        ],
+        "variations": {
+          "nome_rete": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Aurora Immobiliare",
+              "Domus Italia Network",
+              "KeyHouse Consulting",
+              "PuntoCasa Sud",
+              "Meridiana Case",
+              "Alba Property Group",
+              "Case & Chiavi",
+              "Habitat Reale"
+            ]
+          },
+          "citta_sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Verona",
+              "Genova"
+            ]
+          },
+          "telefono_contatto": {
+            "axis": "fixed",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "immobili",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 16.0,
+        "templates": [
+          {
+            "id_immobile": 1,
+            "agenzia_id": 1,
+            "indirizzo": "Via Garibaldi 24",
+            "comune": "Roma",
+            "tipo_immobile": "appartamento",
+            "superficie_mq": 88.5,
+            "prezzo_richiesto": 245000.0,
+            "stato_vendita": "disponibile"
+          },
+          {
+            "id_immobile": 2,
+            "agenzia_id": 2,
+            "indirizzo": "Corso Buenos Aires 57",
+            "comune": "Milano",
+            "tipo_immobile": "appartamento",
+            "superficie_mq": 72.0,
+            "prezzo_richiesto": 385000.0,
+            "stato_vendita": "riservato"
+          },
+          {
+            "id_immobile": 3,
+            "agenzia_id": 3,
+            "indirizzo": "Via Po 11",
+            "comune": "Torino",
+            "tipo_immobile": "villa",
+            "superficie_mq": 165.0,
+            "prezzo_richiesto": 420000.0,
+            "stato_vendita": "venduto"
+          },
+          {
+            "id_immobile": 4,
+            "agenzia_id": 4,
+            "indirizzo": "Via Toledo 130",
+            "comune": "Napoli",
+            "tipo_immobile": "negozio",
+            "superficie_mq": 58.0,
+            "prezzo_richiesto": 310000.0,
+            "stato_vendita": "disponibile"
+          },
+          {
+            "id_immobile": 5,
+            "agenzia_id": 5,
+            "indirizzo": "Strada Provinciale 45 km 12",
+            "comune": "Bologna",
+            "tipo_immobile": "terreno",
+            "superficie_mq": 2400.0,
+            "prezzo_richiesto": 98000.0,
+            "stato_vendita": "disponibile"
+          },
+          {
+            "id_immobile": 6,
+            "agenzia_id": 1,
+            "indirizzo": "Viale Trieste 89",
+            "comune": "Firenze",
+            "tipo_immobile": "ufficio",
+            "superficie_mq": 140.0,
+            "prezzo_richiesto": 275000.0,
+            "stato_vendita": "riservato"
+          },
+          {
+            "id_immobile": 7,
+            "agenzia_id": 2,
+            "indirizzo": "Via Roma 42",
+            "comune": "Verona",
+            "tipo_immobile": "villa",
+            "superficie_mq": 210.0,
+            "prezzo_richiesto": 520000.0,
+            "stato_vendita": "disponibile"
+          },
+          {
+            "id_immobile": 8,
+            "agenzia_id": 3,
+            "indirizzo": "Piazza Dante 5",
+            "comune": "Genova",
+            "tipo_immobile": "appartamento",
+            "superficie_mq": 95.0,
+            "prezzo_richiesto": 198000.0,
+            "stato_vendita": "venduto"
+          }
+        ],
+        "variations": {
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Garibaldi 24",
+              "Corso Buenos Aires 57",
+              "Via Po 11",
+              "Via Toledo 130",
+              "Viale Trieste 89",
+              "Via Roma 42",
+              "Piazza Dante 5",
+              "Via Mazzini 18",
+              "Largo Argentina 3",
+              "Via Veneto 27"
+            ]
+          },
+          "comune": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Verona",
+              "Genova",
+              "Bari",
+              "Palermo"
+            ]
+          },
+          "tipo_immobile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "appartamento",
+              "appartamento",
+              "appartamento",
+              "villa",
+              "villa",
+              "terreno",
+              "ufficio",
+              "negozio"
+            ]
+          },
+          "superficie_mq": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "prezzo_richiesto": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "stato_vendita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "disponibile",
+              "disponibile",
+              "disponibile",
+              "riservato",
+              "riservato",
+              "venduto"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

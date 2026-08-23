@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 5,
+  "hierarchy": "partitioned",
+  "sql_features": [
+    "top_n"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "movimenti_contabili",
+      "obsolete_value": "prima_nota",
+      "description": "La tabella principale del registro contabile si chiama movimenti_contabili ed è partizionata dichiarativamente con PARTITION BY RANGE sulla colonna data_registrazione. Nella prosa aziendale viene però sempre indicata come prima_nota, quindi il solver deve mappare tale denominazione alla tabella logica reale senza riferirsi esplicitamente alle partizioni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "saldo_residuo",
+      "obsolete_value": "partita aperta",
+      "description": "La colonna saldo_residuo di movimenti_contabili rappresenta l'importo ancora da incassare o pagare. Nel linguaggio aziendale viene descritta esclusivamente come 'partita aperta', un gergo contabile che il solver deve riconoscere per applicare correttamente filtri e ordinamenti (es. ORDER BY saldo_residuo DESC LIMIT n)."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "causali_contabili",
+      "obsolete_value": "codici operazione",
+      "description": "La tabella di lookup causali_contabili contiene i codici delle tipologie di registrazione. Nei documenti aziendali viene citata come 'codici operazione': il solver deve identificare il sinonimo per effettuare correttamente il join con movimenti_contabili quando la query Top-N richiede il raggruppamento o il filtro per tipo di scrittura."
+    }
+  ],
+  "spec_hash": "042b89b439c0dab1"
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 5,
+  "hierarchy": "star",
+  "sql_features": [
+    "grouping_sets"
+  ],
+  "twist": [
+    "jargon",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_registrazione",
+      "obsolete_value": "fase_contabile",
+      "description": "Nel gergo amministrativo, la colonna di tipo ENUM stato_registrazione viene definita come fase_contabile."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "importo_movimento",
+      "obsolete_value": "valore_economico_operazione",
+      "description": "La colonna importo_movimento viene descritta nei documenti della prassi contabile come valore economico dell'operazione."
+    }
+  ],
+  "spec_hash": "9a090f676050c403"
+}

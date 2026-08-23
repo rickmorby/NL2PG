@@ -1,0 +1,194 @@
+{
+  "schema_ddl": "CREATE TYPE stato_transazione AS ENUM ('in_attesa', 'elaborata', 'annullata', 'fallita', 'rimborsata');\n\nCREATE TABLE transazioni_finanziarie (\n    id BIGSERIAL PRIMARY KEY,\n    codice_transazione TEXT NOT NULL UNIQUE,\n    importo NUMERIC(15, 2) NOT NULL CHECK (importo > 0),\n    valuta TEXT NOT NULL CHECK (valuta ~ '^[A-Z]{3}$'),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_transazione stato_transazione NOT NULL,\n    descrizione TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_transazione <= CURRENT_TIMESTAMP)\n);",
+  "data_profile": {
+    "profile": {
+      "transazioni_finanziarie": {
+        "row_count": 1789,
+        "columns": {
+          "id": {
+            "distinct": 1789,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1789
+          },
+          "codice_transazione": {
+            "distinct": 1789,
+            "sample": [
+              "TXN2026010001",
+              "TXN2026010001_1",
+              "TXN2026010001_10",
+              "TXN2026010001_100",
+              "TXN2026010001_101"
+            ]
+          },
+          "importo": {
+            "distinct": 1739,
+            "sample": [
+              "1.23",
+              "1.51",
+              "1.7",
+              "1.73",
+              "1.96"
+            ],
+            "min": 1.23,
+            "max": 12372.76
+          },
+          "valuta": {
+            "distinct": 5,
+            "sample": [
+              "CHF",
+              "EUR",
+              "GBP",
+              "JPY",
+              "USD"
+            ]
+          },
+          "data_transazione": {
+            "distinct": 784,
+            "sample": [
+              "2025-10-13 09:15:00",
+              "2025-10-13 14:30:00",
+              "2025-10-14 09:15:00",
+              "2025-10-14 14:30:00",
+              "2025-10-15 09:15:00"
+            ]
+          },
+          "stato_transazione": {
+            "distinct": 5,
+            "sample": [
+              "annullata",
+              "elaborata",
+              "fallita",
+              "in_attesa",
+              "rimborsata"
+            ]
+          },
+          "descrizione": {
+            "distinct": 14,
+            "sample": [
+              "Acquisto libro",
+              "Acquisto software",
+              "Bonifico internazionale",
+              "Deposito contanti",
+              "Donazione"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          },
+          "updated_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "transazioni_finanziarie": [
+        {
+          "id": 1,
+          "codice_transazione": "TXN2026010001",
+          "importo": 2352.68,
+          "valuta": "CHF",
+          "data_transazione": "2025-12-27 14:30:00",
+          "stato_transazione": "elaborata",
+          "descrizione": "Rimborso acquisto online",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "codice_transazione": "TXN2026010001_1",
+          "importo": 745.6,
+          "valuta": "GBP",
+          "data_transazione": "2025-11-06 14:30:00",
+          "stato_transazione": "in_attesa",
+          "descrizione": null,
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "codice_transazione": "TXN2026010001_2",
+          "importo": 4528.48,
+          "valuta": "USD",
+          "data_transazione": "2026-01-10 14:30:00",
+          "stato_transazione": "elaborata",
+          "descrizione": "Rimborso acquisto online",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "codice_transazione": "TXN2026010001_3",
+          "importo": 4210.25,
+          "valuta": "EUR",
+          "data_transazione": "2025-10-14 14:30:00",
+          "stato_transazione": "rimborsata",
+          "descrizione": "Acquisto libro",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "codice_transazione": "TXN2026010001_4",
+          "importo": 2259.9,
+          "valuta": "USD",
+          "data_transazione": "2025-12-15 14:30:00",
+          "stato_transazione": "elaborata",
+          "descrizione": "Storno prenotazione hotel",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "codice_transazione": "TXN2026010001_5",
+          "importo": 5082.5,
+          "valuta": "JPY",
+          "data_transazione": "2025-10-28 14:30:00",
+          "stato_transazione": "rimborsata",
+          "descrizione": "Trasferimento fondi",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "codice_transazione": "TXN2026010001_6",
+          "importo": 1416.43,
+          "valuta": "EUR",
+          "data_transazione": "2025-11-19 14:30:00",
+          "stato_transazione": "elaborata",
+          "descrizione": "Ricarica telefonica",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "codice_transazione": "TXN2026010001_7",
+          "importo": 4935.75,
+          "valuta": "JPY",
+          "data_transazione": "2025-10-31 14:30:00",
+          "stato_transazione": "elaborata",
+          "descrizione": "Storno prenotazione hotel",
+          "created_at": "2000-01-01",
+          "updated_at": "2000-01-01"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "scalar_agg"
+  ],
+  "query": "SELECT COUNT(*) FILTER (WHERE stato_transazione = 'elaborata') AS conteggio_transazioni_elaborate, COUNT(*) FILTER (WHERE stato_transazione = 'rimborsata') AS conteggio_transazioni_rimborsate, SUM(importo) FILTER (WHERE valuta = 'EUR' AND data_transazione BETWEEN DATE '2026-01-31' - INTERVAL '30 days' AND DATE '2026-01-31') AS totale_euro_ultimi_30_giorni, ROUND(AVG(importo) FILTER (WHERE stato_transazione IN ('elaborata', 'rimborsata')), 2) AS media_importo_transazioni_concluse FROM transazioni_finanziarie WHERE data_transazione >= '2025-10-01';"
+}

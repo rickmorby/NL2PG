@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 1,
+  "hierarchy": "single_table",
+  "sql_features": [
+    "sorting"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "prenotazioni",
+      "obsolete_value": "agenda_prenotazioni",
+      "description": "La tabella prenotazioni viene denominata agenda_prenotazioni nella prosa aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "updated_at",
+      "obsolete_value": "data_ultima_modifica",
+      "description": "La colonna updated_at viene indicata come data_ultima_modifica nel gergo sanitario."
+    }
+  ],
+  "spec_hash": "95e119df13cb1b29"
+}

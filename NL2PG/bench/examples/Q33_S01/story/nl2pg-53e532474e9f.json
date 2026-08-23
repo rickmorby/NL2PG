@@ -1,0 +1,237 @@
+{
+  "schema_ddl": "CREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    codice_tracciamento TEXT NOT NULL UNIQUE,\n    stato_spedizione TEXT NOT NULL CHECK (stato_spedizione <> ''),\n    nome_destinatario TEXT NOT NULL,\n    citta_destinazione TEXT NOT NULL,\n    cap_destinazione TEXT,\n    peso_chilogrammi NUMERIC(8,2) CHECK (peso_chilogrammi > 0),\n    data_ritiro DATE NOT NULL,\n    data_consegna_prevista DATE,\n    data_consegna_effettiva DATE,\n    costo_spedizione NUMERIC(10,2) CHECK (costo_spedizione >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "spedizioni": {
+        "row_count": 2871,
+        "columns": {
+          "id": {
+            "distinct": 2871,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2871
+          },
+          "codice_tracciamento": {
+            "distinct": 2871,
+            "sample": [
+              "TRK-2026-000101",
+              "TRK-2026-0001011",
+              "TRK-2026-00010110",
+              "TRK-2026-000101100",
+              "TRK-2026-000101101"
+            ]
+          },
+          "stato_spedizione": {
+            "distinct": 7,
+            "sample": [
+              "consegnata",
+              "fallita",
+              "in_preparazione",
+              "in_transito",
+              "restituita"
+            ]
+          },
+          "nome_destinatario": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro Greco",
+              "Chiara Fontana",
+              "Davide Rinaldi",
+              "Elena Ferrari",
+              "Francesca Marino"
+            ]
+          },
+          "citta_destinazione": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "cap_destinazione": {
+            "distinct": 8,
+            "sample": [
+              "00185",
+              "10121",
+              "16121",
+              "20121",
+              "40124"
+            ]
+          },
+          "peso_chilogrammi": {
+            "distinct": 2382,
+            "sample": [
+              "0.17",
+              "0.25",
+              "0.26",
+              "0.27",
+              "0.29"
+            ],
+            "min": 0.17,
+            "max": 574.8
+          },
+          "data_ritiro": {
+            "distinct": 56,
+            "sample": [
+              "2026-01-03",
+              "2026-01-04",
+              "2026-01-05",
+              "2026-01-06",
+              "2026-01-07"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 86,
+            "sample": [
+              "2026-01-10",
+              "2026-01-13",
+              "2026-01-14",
+              "2026-01-15",
+              "2026-01-16"
+            ]
+          },
+          "data_consegna_effettiva": {
+            "distinct": 39,
+            "sample": [
+              "2026-01-09",
+              "2026-01-10",
+              "2026-01-11",
+              "2026-01-12",
+              "2026-01-13"
+            ]
+          },
+          "costo_spedizione": {
+            "distinct": 2136,
+            "sample": [
+              "10.0",
+              "10.03",
+              "10.04",
+              "10.08",
+              "10.09"
+            ],
+            "min": 4.25,
+            "max": 136.6
+          }
+        }
+      }
+    },
+    "preview": {
+      "spedizioni": [
+        {
+          "id": 1,
+          "codice_tracciamento": "TRK-2026-000101",
+          "stato_spedizione": "in_preparazione",
+          "nome_destinatario": "Matteo Galli",
+          "citta_destinazione": "Bologna",
+          "cap_destinazione": "16121",
+          "peso_chilogrammi": 15.39,
+          "data_ritiro": "2026-01-07",
+          "data_consegna_prevista": "2026-01-21",
+          "data_consegna_effettiva": "2026-01-09",
+          "costo_spedizione": 13.71
+        },
+        {
+          "id": 2,
+          "codice_tracciamento": "TRK-2026-0001011",
+          "stato_spedizione": "consegnata",
+          "nome_destinatario": "Alessandro Greco",
+          "citta_destinazione": "Roma",
+          "cap_destinazione": "90133",
+          "peso_chilogrammi": 19.62,
+          "data_ritiro": "2026-01-08",
+          "data_consegna_prevista": "2026-01-25",
+          "data_consegna_effettiva": "2026-01-12",
+          "costo_spedizione": 19.59
+        },
+        {
+          "id": 3,
+          "codice_tracciamento": "TRK-2026-0001012",
+          "stato_spedizione": "consegnata",
+          "nome_destinatario": "Valentina Serra",
+          "citta_destinazione": "Genova",
+          "cap_destinazione": "40124",
+          "peso_chilogrammi": 11.1,
+          "data_ritiro": "2026-01-06",
+          "data_consegna_prevista": "2026-01-26",
+          "data_consegna_effettiva": null,
+          "costo_spedizione": 11.79
+        },
+        {
+          "id": 4,
+          "codice_tracciamento": "TRK-2026-0001013",
+          "stato_spedizione": "in_preparazione",
+          "nome_destinatario": "Elena Ferrari",
+          "citta_destinazione": "Milano",
+          "cap_destinazione": "90133",
+          "peso_chilogrammi": 5.99,
+          "data_ritiro": "2026-01-07",
+          "data_consegna_prevista": "2026-01-20",
+          "data_consegna_effettiva": "2026-01-12",
+          "costo_spedizione": 15.27
+        },
+        {
+          "id": 5,
+          "codice_tracciamento": "TRK-2026-0001014",
+          "stato_spedizione": "consegnata",
+          "nome_destinatario": "Valentina Serra",
+          "citta_destinazione": "Genova",
+          "cap_destinazione": "00185",
+          "peso_chilogrammi": 28.18,
+          "data_ritiro": "2026-01-08",
+          "data_consegna_prevista": "2026-01-21",
+          "data_consegna_effettiva": "2026-01-16",
+          "costo_spedizione": 19.19
+        },
+        {
+          "id": 6,
+          "codice_tracciamento": "TRK-2026-0001015",
+          "stato_spedizione": "fallita",
+          "nome_destinatario": "Sara Colombo",
+          "citta_destinazione": "Firenze",
+          "cap_destinazione": "50123",
+          "peso_chilogrammi": 22.91,
+          "data_ritiro": "2026-01-07",
+          "data_consegna_prevista": "2026-01-25",
+          "data_consegna_effettiva": "2026-01-09",
+          "costo_spedizione": 25.8
+        },
+        {
+          "id": 7,
+          "codice_tracciamento": "TRK-2026-0001016",
+          "stato_spedizione": "smistata",
+          "nome_destinatario": "Alessandro Greco",
+          "citta_destinazione": "Milano",
+          "cap_destinazione": "80132",
+          "peso_chilogrammi": 28.78,
+          "data_ritiro": "2026-01-05",
+          "data_consegna_prevista": "2026-01-26",
+          "data_consegna_effettiva": "2026-01-12",
+          "costo_spedizione": 16.87
+        },
+        {
+          "id": 8,
+          "codice_tracciamento": "TRK-2026-0001017",
+          "stato_spedizione": "consegnata",
+          "nome_destinatario": "Davide Rinaldi",
+          "citta_destinazione": "Milano",
+          "cap_destinazione": "40124",
+          "peso_chilogrammi": null,
+          "data_ritiro": "2026-01-07",
+          "data_consegna_prevista": "2026-01-17",
+          "data_consegna_effettiva": "2026-01-13",
+          "costo_spedizione": 25.22
+        }
+      ]
+    }
+  },
+  "story": "Alla sede operativa di Meridiana Trasporti, il capo servizio movimentazioni ha avviato la consueta revisione trimestrale dei flussi di consegna. Il punto di riferimento è l'archivio denominato registro_movimentazioni, l'archivio spedizioni su cui poggia l'intera attività del vettore: ogni scheda in esso conservata descrive un collo con il proprio codice di tracciamento, il flag di avanzamento flotta che ne indica lo stato operativo, il nome del destinatario, la città di destinazione insieme al relativo CAP, il peso espresso in chilogrammi, la data di ritiro dal mittente, la consegna prevista, la consegna effettivamente completata e il costo sostenuto per il servizio. Nell'archivio compaiono destinatari come Alessandro Greco o Valentina Serra, città quali Milano, Roma, Genova, Bologna e Napoli, colli leggerissimi da pochi etti e carichi pesanti fino a 574.8 chilogrammi, con costi che oscillano tra 4.25 e 136.6 euro. Alcune voci, ad esempio quella del collo TRK-2026-000101 ritirato il 2026-01-07 con destinazione Bologna, mostrano quanto il codice di tracciamento segua uno schema rigoroso e progressivo. La richiesta del direttore è stata precisa: per ogni città di destinazione occorre contare le spedizioni il cui codice di tracciamento inizia con 'TRK-2026-0001' e il cui flag di avanzamento flotta risulta 'consegnata' oppure 'in_transito'. Accanto al conteggio bisogna riportare il costo medio di spedizione arrotondato a due decimali e quante consegne sono andate a buon fine, presentando l'elenco ordinato dalla città con più spedizioni tracciate a quella con meno. Gli addetti hanno quindi sfogliato il registro_movimentazioni, isolando le voci conformi al prefisso richiesto e distinguendo i colli ancora in viaggio da quelli chiusi con esito positivo; le consegne fallite o restituite al mittente sono rimaste fuori dal computo, così come i colli fermi in preparazione o smistati negli hub regionali. Il quadro risultante consentirà alla direzione commerciale di capire dove rafforzare flotta e corrieri nei prossimi mesi."
+}

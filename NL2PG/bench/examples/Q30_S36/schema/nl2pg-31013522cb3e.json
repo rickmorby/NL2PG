@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "row_types"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "registro_operativita",
+        "description": "La tabella transazioni, che memorizza le operazioni di acquisto e vendita con la colonna composita prezzo_esecuzione di tipo dato_prezzo definito tramite CREATE TYPE, viene denominata registro_operativita nella prosa aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "prezzo_esecuzione.valore",
+        "obsolete_value": "controvalore di esecuzione",
+        "description": "Il campo valore della colonna composita prezzo_esecuzione (accessibile con la sintassi (prezzo_esecuzione).valore nelle SELECT e filtrabile con WHERE ROW((t.prezzo_esecuzione).valore, t.prezzo_esecuzione.valuta) = ROW(v1, v2)) viene indicato nella documentazione finanziaria con il gergo 'controvalore di esecuzione'."
+      }
+    ],
+    "spec_hash": "d8ed77df6842e21c"
+  },
+  "schema_ddl": "CREATE TYPE dato_prezzo AS (\n    valore NUMERIC(18,6),\n    valuta TEXT\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    numero_conto TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    divisa_conto TEXT NOT NULL DEFAULT 'EUR',\n    saldo_disponibile NUMERIC(16,2) NOT NULL DEFAULT 0 CHECK (saldo_disponibile >= 0),\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE strumenti_finanziari (\n    id INT PRIMARY KEY,\n    codice_isin TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    emittente TEXT NOT NULL,\n    mercato_quotazione TEXT NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    strumento_id INT NOT NULL REFERENCES strumenti_finanziari(id),\n    tipo_operazione TEXT NOT NULL CHECK (tipo_operazione IN ('acquisto', 'vendita')),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_esecuzione dato_prezzo NOT NULL,\n    istante_esecuzione TIMESTAMP NOT NULL,\n    CHECK ((prezzo_esecuzione).valore >= 0),\n    CHECK ((prezzo_esecuzione).valuta IS NOT NULL AND char_length((prezzo_esecuzione).valuta) = 3)\n);"
+}

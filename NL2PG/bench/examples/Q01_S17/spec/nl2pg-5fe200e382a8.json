@@ -1,0 +1,25 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_attivi",
+      "description": "La tabella polizze viene denominata contratti_attivi nella terminologia aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "liquidazioni",
+      "obsolete_value": "indennizzi_erogati",
+      "description": "Il termine liquidazioni viene indicato come indennizzi_erogati nei report direzionali."
+    }
+  ],
+  "spec_hash": "86cbfb32be33966a"
+}

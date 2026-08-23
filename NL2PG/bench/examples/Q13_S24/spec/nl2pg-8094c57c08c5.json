@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 5,
+  "hierarchy": "one_to_many_with_referential_actions",
+  "sql_features": [
+    "exists"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini_cliente",
+      "obsolete_value": "registro_commesse",
+      "description": "La tabella ordini_cliente viene indicata nella prosa aziendale con il termine storico di registro_commesse."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_evasione",
+      "obsolete_value": "pipeline_evase",
+      "description": "Il campo stato_evasione viene definito con il gergo aziendale pipeline_evase."
+    }
+  ],
+  "spec_hash": "c7a137ee414fe71a"
+}

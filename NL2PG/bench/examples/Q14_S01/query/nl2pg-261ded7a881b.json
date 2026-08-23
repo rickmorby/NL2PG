@@ -1,0 +1,221 @@
+{
+  "schema_ddl": "CREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    contraente TEXT NOT NULL,\n    ramo TEXT NOT NULL,\n    tipo_copertura TEXT NOT NULL CHECK (tipo_copertura IN ('vita', 'auto', 'casa', 'salute', 'responsabilita_civile')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    somma_assicurata NUMERIC(12,2) NOT NULL CHECK (somma_assicurata > 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_polizza TEXT NOT NULL DEFAULT 'attiva' CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta', 'annullata')),\n    CHECK (data_scadenza > data_emissione)\n);",
+  "data_profile": {
+    "profile": {
+      "polizze": {
+        "row_count": 507,
+        "columns": {
+          "id": {
+            "distinct": 507,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 507
+          },
+          "numero_polizza": {
+            "distinct": 507,
+            "sample": [
+              "POL-2025-000101",
+              "POL-2025-0001011",
+              "POL-2025-00010110",
+              "POL-2025-00010111",
+              "POL-2025-00010112"
+            ]
+          },
+          "contraente": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro Conti",
+              "Anna Fumagalli",
+              "Chiara Moretti",
+              "Edil Costruzioni SPA",
+              "Ferramenta Lombardi SRL"
+            ]
+          },
+          "ramo": {
+            "distinct": 5,
+            "sample": [
+              "Ramo I - Vita",
+              "Ramo II - Salute",
+              "Ramo III - Casa",
+              "Ramo X - Auto",
+              "Ramo XIII - RC"
+            ]
+          },
+          "tipo_copertura": {
+            "distinct": 5,
+            "sample": [
+              "auto",
+              "casa",
+              "responsabilita_civile",
+              "salute",
+              "vita"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 498,
+            "sample": [
+              "1000.84",
+              "1001.23",
+              "1001.99",
+              "1002.65",
+              "1005.35"
+            ],
+            "min": 204.0,
+            "max": 3735.11
+          },
+          "somma_assicurata": {
+            "distinct": 497,
+            "sample": [
+              "100000.0",
+              "1000000.0",
+              "100786.29",
+              "101089.42",
+              "101649.76"
+            ],
+            "min": 9000.0,
+            "max": 1989077.4
+          },
+          "data_emissione": {
+            "distinct": 394,
+            "sample": [
+              "2020-11-07",
+              "2020-11-10",
+              "2020-11-22",
+              "2020-11-24",
+              "2020-11-26"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 354,
+            "sample": [
+              "2025-11-05",
+              "2025-11-06",
+              "2025-11-07",
+              "2025-11-09",
+              "2025-11-10"
+            ]
+          },
+          "stato_polizza": {
+            "distinct": 4,
+            "sample": [
+              "annullata",
+              "attiva",
+              "scaduta",
+              "sospesa"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "polizze": [
+        {
+          "id": 1,
+          "numero_polizza": "POL-2025-000101",
+          "contraente": "Ferramenta Lombardi SRL",
+          "ramo": "Ramo I - Vita",
+          "tipo_copertura": "vita",
+          "premio_annuo": 959.91,
+          "somma_assicurata": 72083.14,
+          "data_emissione": "2023-01-23",
+          "data_scadenza": "2028-04-07",
+          "stato_polizza": "attiva"
+        },
+        {
+          "id": 2,
+          "numero_polizza": "POL-2025-0001011",
+          "contraente": "Anna Fumagalli",
+          "ramo": "Ramo I - Vita",
+          "tipo_copertura": "vita",
+          "premio_annuo": 1202.25,
+          "somma_assicurata": 52106.17,
+          "data_emissione": "2023-08-28",
+          "data_scadenza": "2028-06-10",
+          "stato_polizza": "scaduta"
+        },
+        {
+          "id": 3,
+          "numero_polizza": "POL-2025-0001012",
+          "contraente": "Sara Gallo",
+          "ramo": "Ramo I - Vita",
+          "tipo_copertura": "vita",
+          "premio_annuo": 1361.21,
+          "somma_assicurata": 96887.77,
+          "data_emissione": "2023-03-13",
+          "data_scadenza": "2028-05-22",
+          "stato_polizza": "annullata"
+        },
+        {
+          "id": 4,
+          "numero_polizza": "POL-2025-0001013",
+          "contraente": "Paolo Neri",
+          "ramo": "Ramo I - Vita",
+          "tipo_copertura": "vita",
+          "premio_annuo": 848.25,
+          "somma_assicurata": 152369.76,
+          "data_emissione": "2022-12-20",
+          "data_scadenza": "2028-05-27",
+          "stato_polizza": "attiva"
+        },
+        {
+          "id": 5,
+          "numero_polizza": "POL-2025-0001014",
+          "contraente": "Chiara Moretti",
+          "ramo": "Ramo I - Vita",
+          "tipo_copertura": "vita",
+          "premio_annuo": 1352.84,
+          "somma_assicurata": 165580.61,
+          "data_emissione": "2023-05-07",
+          "data_scadenza": "2028-04-12",
+          "stato_polizza": "attiva"
+        },
+        {
+          "id": 6,
+          "numero_polizza": "POL-2025-0001015",
+          "contraente": "Paolo Neri",
+          "ramo": "Ramo I - Vita",
+          "tipo_copertura": "vita",
+          "premio_annuo": 876.67,
+          "somma_assicurata": 90666.29,
+          "data_emissione": "2023-03-07",
+          "data_scadenza": "2028-04-04",
+          "stato_polizza": "sospesa"
+        },
+        {
+          "id": 7,
+          "numero_polizza": "POL-2025-0001016",
+          "contraente": "Sara Gallo",
+          "ramo": "Ramo I - Vita",
+          "tipo_copertura": "vita",
+          "premio_annuo": 1372.71,
+          "somma_assicurata": 176369.29,
+          "data_emissione": "2022-09-22",
+          "data_scadenza": "2028-05-09",
+          "stato_polizza": "annullata"
+        },
+        {
+          "id": 8,
+          "numero_polizza": "POL-2025-0001017",
+          "contraente": "Laura Bianchi",
+          "ramo": "Ramo I - Vita",
+          "tipo_copertura": "vita",
+          "premio_annuo": 783.71,
+          "somma_assicurata": 162558.66,
+          "data_emissione": "2023-02-26",
+          "data_scadenza": "2028-04-10",
+          "stato_polizza": "attiva"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "set_op"
+  ],
+  "query": "SELECT 'Attive' AS tipologia_portafoglio, contraente, COUNT(*) AS numero_polizze, ROUND(SUM(premio_annuo), 2) AS premio_totale_annuo FROM polizze WHERE stato_polizza = 'attiva' GROUP BY contraente UNION ALL SELECT 'Sospese' AS tipologia_portafoglio, contraente, COUNT(*) AS numero_polizze, ROUND(SUM(premio_annuo), 2) AS premio_totale_annuo FROM polizze WHERE stato_polizza = 'sospesa' GROUP BY contraente;"
+}

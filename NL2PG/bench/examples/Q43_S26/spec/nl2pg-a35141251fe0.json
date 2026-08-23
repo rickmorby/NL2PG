@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "sorting"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "registrazioni",
+      "obsolete_value": "scritture_di_prima_nota",
+      "description": "La tabella registrazioni, che contiene il giornale delle operazioni contabili dell'esercizio, viene denominata nella prosa aziendale come scritture_di_prima_nota. Le query devono risolvere questa denominazione verso il nome fisico reale della tabella."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo",
+      "obsolete_value": "valore_nominalmente_espresso",
+      "description": "La colonna importo della tabella movimenti_contabili è fisicamente di tipo TEXT pur contenendo valori logicamente numerici (es. '1250.50'); il gergo contabile della documentazione la indica come valore_nominalmente_espresso. Per ordinare correttamente i risultati con ORDER BY è obbligatorio applicare CAST(importo AS NUMERIC), altrimenti l'ordinamento lessicografico del testo produrrebbe sequenze errate (es. '950' dopo '1250')."
+    }
+  ],
+  "spec_hash": "d8394b786178cad0"
+}

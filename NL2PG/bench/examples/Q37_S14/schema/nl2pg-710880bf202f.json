@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "math_funcs"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti",
+        "obsolete_value": "giornale_liquidita",
+        "description": "La tabella movimenti viene denominata giornale_liquidita nella prosa aziendale. L'agente deve risalire alla tabella reale movimenti per calcolare gli importi, applicando funzioni matematiche come ROUND o ABS sui valori monetari."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "tasso_annuo",
+        "obsolete_value": "TAEG contrattualizzato",
+        "description": "La colonna tasso_annuo della tabella conti è indicata nella documentazione con il gergo finanziario TAEG contrattualizzato. Occorre mappare questo termine tecnico di settore alla colonna reale tasso_annuo quando si eseguono calcoli con POWER o ROUND."
+      }
+    ],
+    "spec_hash": "6e371e7eff5494e8"
+  },
+  "schema_ddl": "CREATE DOMAIN importo_monetario AS NUMERIC(14,2) CHECK (VALUE >= 0);\n\nCREATE DOMAIN tasso_percentuale AS NUMERIC(7,4) CHECK (VALUE >= 0 AND VALUE <= 100);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    iban TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    tasso_annuo tasso_percentuale NOT NULL,\n    saldo_iniziale importo_monetario NOT NULL DEFAULT 0,\n    stato_conto TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_conto IN ('attivo', 'sospeso', 'chiuso')),\n    aperto_il DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE movimenti (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('versamento', 'prelievo', 'bonifico_entrata', 'bonifico_uscita', 'interessi_maturati', 'commissione')),\n    importo importo_monetario NOT NULL,\n    data_movimento DATE NOT NULL,\n    descrizione TEXT,\n    registrato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);"
+}

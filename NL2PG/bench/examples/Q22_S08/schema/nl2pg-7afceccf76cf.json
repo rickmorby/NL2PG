@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 6,
+    "hierarchy": "isa",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobile",
+        "obsolete_value": "anagrafica_unita_edilizie",
+        "description": "La tabella base della gerarchia ISA, 'immobile', viene denominata 'anagrafica_unita_edilizie' nella prosa aziendale. Le query devono risalire al nome reale della tabella per ricomporre la specializzazione tramite join o discriminatore."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "terreno",
+        "obsolete_value": "particella_fondiaria",
+        "description": "Il sottotipo 'terreno' viene indicato nel linguaggio di settore come 'particella_fondiaria'. Il solver deve riconoscere che il termine gergale si riferisce alla tabella sottotipo collegata a 'immobile' tramite FK/discriminatore."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "classe_energetica",
+        "obsolete_value": "classe dell'immobile",
+        "description": "Il termine 'classe' nella prosa aziendale è ambiguo: può indicare una fascia di pregio commerciale oppure l'attributo tecnico 'classe_energetica'. Le query che menzionano 'classe dell'immobile' vanno interpretate come riferite alla colonna classe_energetica, non a una classificazione di mercato."
+      }
+    ],
+    "spec_hash": "0bfde2cfcc730032"
+  },
+  "schema_ddl": "CREATE TYPE tipo_unita AS ENUM ('terreno', 'abitazione');\n\nCREATE TYPE tipo_classe_energetica AS ENUM ('A4', 'A3', 'A2', 'A1', 'A', 'B', 'C', 'D', 'E', 'F', 'G');\n\nCREATE TABLE proprietario (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    telefono TEXT,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE immobile (\n    id SERIAL PRIMARY KEY,\n    proprietario_id INT NOT NULL REFERENCES proprietario(id) ON DELETE RESTRICT ON UPDATE CASCADE,\n    indirizzo TEXT NOT NULL,\n    civico TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    tipo_unita tipo_unita NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE terreno (\n    id INT PRIMARY KEY REFERENCES immobile(id) ON DELETE CASCADE ON UPDATE CASCADE,\n    particella_catastale TEXT NOT NULL,\n    foglio_catastale TEXT NOT NULL,\n    mappale TEXT NOT NULL,\n    subalterno TEXT,\n    edificabile BOOLEAN NOT NULL DEFAULT FALSE,\n    destinazione_uso TEXT NOT NULL,\n    UNIQUE (foglio_catastale, particella_catastale, mappale, subalterno)\n);\n\nCREATE TABLE abitazione (\n    id INT PRIMARY KEY REFERENCES immobile(id) ON DELETE CASCADE ON UPDATE CASCADE,\n    numero_vani INT NOT NULL CHECK (numero_vani > 0),\n    piano INT NOT NULL DEFAULT 0,\n    classe_energetica tipo_classe_energetica NOT NULL,\n    anno_costruzione INT CHECK (anno_costruzione BETWEEN 1700 AND 2100),\n    riscaldamento_autonomo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE agenzia (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE incarico_vendita (\n    id SERIAL PRIMARY KEY,\n    immobile_id INT NOT NULL REFERENCES immobile(id) ON DELETE CASCADE ON UPDATE CASCADE,\n    agenzia_id INT NOT NULL REFERENCES agenzia(id) ON DELETE RESTRICT ON UPDATE CASCADE,\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto > 0),\n    provvigione_percentuale NUMERIC(4,2) NOT NULL DEFAULT 3.00 CHECK (provvigione_percentuale >= 0 AND provvigione_percentuale <= 100),\n    data_incarico DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato_incarico TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_incarico IN ('attivo', 'sospeso', 'concluso', 'ritirato'))\n);"
+}

@@ -1,0 +1,534 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id_cliente INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE depositi (\n    id_deposito INT PRIMARY KEY,\n    nome_deposito TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL CHECK (cap ~ '^[0-9]{5}$')\n);\n\nCREATE TABLE corrieri (\n    id_corriere INT PRIMARY KEY,\n    nome_corriere TEXT NOT NULL,\n    cognome_corriere TEXT NOT NULL,\n    targa TEXT NOT NULL UNIQUE,\n    CHECK (LENGTH(TRIM(nome_corriere)) > 0),\n    CHECK (LENGTH(TRIM(cognome_corriere)) > 0)\n);\n\nCREATE TABLE spedizioni (\n    id_spedizione INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id_cliente),\n    deposito_id INT NOT NULL REFERENCES depositi(id_deposito),\n    corriere_id INT NOT NULL REFERENCES corrieri(id_corriere),\n    nome_destinatario TEXT NOT NULL,\n    cognome_destinatario TEXT NOT NULL,\n    indirizzo_destinatario TEXT NOT NULL,\n    citta_destinatario TEXT NOT NULL,\n    stato TEXT NOT NULL CHECK (stato IN ('IN_PREPARAZIONE', 'IN_TRANSITO', 'CONSEGNATA', 'FALLITA')),\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    data_spedizione DATE NOT NULL,\n    CHECK (LENGTH(TRIM(nome_destinatario)) > 0),\n    CHECK (LENGTH(TRIM(cognome_destinatario)) > 0)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 541,
+        "columns": {
+          "id_cliente": {
+            "distinct": 541,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 541
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Alfa Distribuzione Srl",
+              "Beta Retail SpA",
+              "Delta Elettronica SpA",
+              "Epsilon Cartaria Srl",
+              "Gamma Food Industries Srl"
+            ]
+          },
+          "partita_iva": {
+            "distinct": 541,
+            "sample": [
+              "IT01234567890",
+              "IT012345678901",
+              "IT0123456789010",
+              "IT01234567890100",
+              "IT01234567890101"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      "depositi": {
+        "row_count": 24,
+        "columns": {
+          "id_deposito": {
+            "distinct": 24,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 24
+          },
+          "nome_deposito": {
+            "distinct": 5,
+            "sample": [
+              "Deposito Centrale Milano",
+              "Deposito Est Bologna",
+              "Hub Ovest Roma",
+              "Hub Sud Napoli",
+              "Magazzino Nord Torino"
+            ]
+          },
+          "citta": {
+            "distinct": 5,
+            "sample": [
+              "Bologna",
+              "Milano",
+              "Napoli",
+              "Roma",
+              "Torino"
+            ]
+          },
+          "cap": {
+            "distinct": 5,
+            "sample": [
+              "00185",
+              "10121",
+              "20121",
+              "40121",
+              "80121"
+            ]
+          }
+        }
+      },
+      "corrieri": {
+        "row_count": 15,
+        "columns": {
+          "id_corriere": {
+            "distinct": 15,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 15
+          },
+          "nome_corriere": {
+            "distinct": 7,
+            "sample": [
+              "Anna",
+              "Fabio",
+              "Luca",
+              "Marco",
+              "Paolo"
+            ]
+          },
+          "cognome_corriere": {
+            "distinct": 8,
+            "sample": [
+              "Conti",
+              "De Luca",
+              "Ferrari",
+              "Greco",
+              "Lombardi"
+            ]
+          },
+          "targa": {
+            "distinct": 15,
+            "sample": [
+              "AB123CD",
+              "AB123CD1",
+              "AB123CD2",
+              "EZ456GH",
+              "EZ456GH1"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 2026,
+        "columns": {
+          "id_spedizione": {
+            "distinct": 2026,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3026
+          },
+          "cliente_id": {
+            "distinct": 528,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 541
+          },
+          "deposito_id": {
+            "distinct": 24,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 24
+          },
+          "corriere_id": {
+            "distinct": 15,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 15
+          },
+          "nome_destinatario": {
+            "distinct": 10,
+            "sample": [
+              "Alessia",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Federico"
+            ]
+          },
+          "cognome_destinatario": {
+            "distinct": 10,
+            "sample": [
+              "Barbieri",
+              "Colombo",
+              "Costa",
+              "Esposito",
+              "Fontana"
+            ]
+          },
+          "indirizzo_destinatario": {
+            "distinct": 8,
+            "sample": [
+              "Corso Vittorio Emanuele II 8",
+              "Largo Buenos Aires 6",
+              "Piazza della Repubblica 3",
+              "Via Cavour 9",
+              "Via Dante Alighieri 51"
+            ]
+          },
+          "citta_destinatario": {
+            "distinct": 10,
+            "sample": [
+              "Bergamo",
+              "Brescia",
+              "Firenze",
+              "Genova",
+              "Modena"
+            ]
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "CONSEGNATA",
+              "FALLITA",
+              "IN_PREPARAZIONE",
+              "IN_TRANSITO"
+            ]
+          },
+          "peso_kg": {
+            "distinct": 1556,
+            "sample": [
+              "0.64",
+              "0.65",
+              "0.66",
+              "0.67",
+              "0.68"
+            ],
+            "min": 0.64,
+            "max": 107.25
+          },
+          "data_spedizione": {
+            "distinct": 113,
+            "sample": [
+              "2025-11-24",
+              "2025-11-25",
+              "2025-11-26",
+              "2025-11-27",
+              "2025-11-28"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id_cliente": 1,
+          "ragione_sociale": "Alfa Distribuzione Srl",
+          "partita_iva": "IT01234567890",
+          "citta": "Roma"
+        },
+        {
+          "id_cliente": 2,
+          "ragione_sociale": "Omega Ferramenta Snc",
+          "partita_iva": "IT012345678901",
+          "citta": "Bologna"
+        },
+        {
+          "id_cliente": 3,
+          "ragione_sociale": "Gamma Food Industries Srl",
+          "partita_iva": "IT012345678902",
+          "citta": "Roma"
+        },
+        {
+          "id_cliente": 4,
+          "ragione_sociale": "Delta Elettronica SpA",
+          "partita_iva": "IT012345678903",
+          "citta": "Milano"
+        },
+        {
+          "id_cliente": 5,
+          "ragione_sociale": "Sigma Chimica SpA",
+          "partita_iva": "IT012345678904",
+          "citta": "Bologna"
+        },
+        {
+          "id_cliente": 6,
+          "ragione_sociale": "Omega Ferramenta Snc",
+          "partita_iva": "IT012345678905",
+          "citta": "Verona"
+        },
+        {
+          "id_cliente": 7,
+          "ragione_sociale": "Alfa Distribuzione Srl",
+          "partita_iva": "IT012345678906",
+          "citta": "Torino"
+        },
+        {
+          "id_cliente": 8,
+          "ragione_sociale": "Alfa Distribuzione Srl",
+          "partita_iva": "IT012345678907",
+          "citta": "Genova"
+        }
+      ],
+      "depositi": [
+        {
+          "id_deposito": 1,
+          "nome_deposito": "Deposito Centrale Milano",
+          "citta": "Milano",
+          "cap": "20121"
+        },
+        {
+          "id_deposito": 2,
+          "nome_deposito": "Deposito Centrale Milano",
+          "citta": "Milano",
+          "cap": "20121"
+        },
+        {
+          "id_deposito": 3,
+          "nome_deposito": "Deposito Centrale Milano",
+          "citta": "Milano",
+          "cap": "20121"
+        },
+        {
+          "id_deposito": 4,
+          "nome_deposito": "Deposito Centrale Milano",
+          "citta": "Milano",
+          "cap": "20121"
+        },
+        {
+          "id_deposito": 5,
+          "nome_deposito": "Deposito Centrale Milano",
+          "citta": "Milano",
+          "cap": "20121"
+        },
+        {
+          "id_deposito": 6,
+          "nome_deposito": "Hub Sud Napoli",
+          "citta": "Napoli",
+          "cap": "80121"
+        },
+        {
+          "id_deposito": 7,
+          "nome_deposito": "Hub Sud Napoli",
+          "citta": "Napoli",
+          "cap": "80121"
+        },
+        {
+          "id_deposito": 8,
+          "nome_deposito": "Hub Sud Napoli",
+          "citta": "Napoli",
+          "cap": "80121"
+        }
+      ],
+      "corrieri": [
+        {
+          "id_corriere": 1,
+          "nome_corriere": "Luca",
+          "cognome_corriere": "Marchetti",
+          "targa": "AB123CD"
+        },
+        {
+          "id_corriere": 2,
+          "nome_corriere": "Fabio",
+          "cognome_corriere": "Moretti",
+          "targa": "AB123CD1"
+        },
+        {
+          "id_corriere": 3,
+          "nome_corriere": "Simone",
+          "cognome_corriere": "Ferrari",
+          "targa": "AB123CD2"
+        },
+        {
+          "id_corriere": 4,
+          "nome_corriere": "Luca",
+          "cognome_corriere": "Conti",
+          "targa": "EZ456GH"
+        },
+        {
+          "id_corriere": 5,
+          "nome_corriere": "Paolo",
+          "cognome_corriere": "De Luca",
+          "targa": "EZ456GH1"
+        },
+        {
+          "id_corriere": 6,
+          "nome_corriere": "Sara",
+          "cognome_corriere": "Greco",
+          "targa": "EZ456GH2"
+        },
+        {
+          "id_corriere": 7,
+          "nome_corriere": "Fabio",
+          "cognome_corriere": "Moretti",
+          "targa": "FT789IL"
+        },
+        {
+          "id_corriere": 8,
+          "nome_corriere": "Paolo",
+          "cognome_corriere": "Conti",
+          "targa": "FT789IL1"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id_spedizione": 1001,
+          "cliente_id": 326,
+          "deposito_id": 4,
+          "corriere_id": 12,
+          "nome_destinatario": "Giulia",
+          "cognome_destinatario": "Testa",
+          "indirizzo_destinatario": "Corso Vittorio Emanuele II 8",
+          "citta_destinatario": "Padova",
+          "stato": "CONSEGNATA",
+          "peso_kg": 25.33,
+          "data_spedizione": "2026-01-13"
+        },
+        {
+          "id_spedizione": 1002,
+          "cliente_id": 63,
+          "deposito_id": 6,
+          "corriere_id": 2,
+          "nome_destinatario": "Matteo",
+          "cognome_destinatario": "Villa",
+          "indirizzo_destinatario": "Via Cavour 9",
+          "citta_destinatario": "Trento",
+          "stato": "FALLITA",
+          "peso_kg": 13.07,
+          "data_spedizione": "2025-12-04"
+        },
+        {
+          "id_spedizione": 1003,
+          "cliente_id": 82,
+          "deposito_id": 17,
+          "corriere_id": 15,
+          "nome_destinatario": "Federico",
+          "cognome_destinatario": "Colombo",
+          "indirizzo_destinatario": "Via Garibaldi 24",
+          "citta_destinatario": "Brescia",
+          "stato": "CONSEGNATA",
+          "peso_kg": 25.67,
+          "data_spedizione": "2026-01-14"
+        },
+        {
+          "id_spedizione": 1004,
+          "cliente_id": 443,
+          "deposito_id": 13,
+          "corriere_id": 11,
+          "nome_destinatario": "Giulia",
+          "cognome_destinatario": "Romano",
+          "indirizzo_destinatario": "Via Garibaldi 24",
+          "citta_destinatario": "Verona",
+          "stato": "CONSEGNATA",
+          "peso_kg": 12.5,
+          "data_spedizione": "2026-01-08"
+        },
+        {
+          "id_spedizione": 1005,
+          "cliente_id": 265,
+          "deposito_id": 10,
+          "corriere_id": 2,
+          "nome_destinatario": "Chiara",
+          "cognome_destinatario": "Gallo",
+          "indirizzo_destinatario": "Via Cavour 9",
+          "citta_destinatario": "Parma",
+          "stato": "IN_TRANSITO",
+          "peso_kg": 24.3,
+          "data_spedizione": "2025-12-12"
+        },
+        {
+          "id_spedizione": 1006,
+          "cliente_id": 246,
+          "deposito_id": 21,
+          "corriere_id": 8,
+          "nome_destinatario": "Davide",
+          "cognome_destinatario": "Romano",
+          "indirizzo_destinatario": "Via Cavour 9",
+          "citta_destinatario": "Bergamo",
+          "stato": "FALLITA",
+          "peso_kg": 18.37,
+          "data_spedizione": "2025-12-24"
+        },
+        {
+          "id_spedizione": 1007,
+          "cliente_id": 52,
+          "deposito_id": 15,
+          "corriere_id": 4,
+          "nome_destinatario": "Elena",
+          "cognome_destinatario": "Colombo",
+          "indirizzo_destinatario": "Via Garibaldi 24",
+          "citta_destinatario": "Bergamo",
+          "stato": "CONSEGNATA",
+          "peso_kg": 20.77,
+          "data_spedizione": "2025-12-07"
+        },
+        {
+          "id_spedizione": 1008,
+          "cliente_id": 80,
+          "deposito_id": 14,
+          "corriere_id": 11,
+          "nome_destinatario": "Giulia",
+          "cognome_destinatario": "Romano",
+          "indirizzo_destinatario": "Via Garibaldi 24",
+          "citta_destinatario": "Verona",
+          "stato": "CONSEGNATA",
+          "peso_kg": 12.5,
+          "data_spedizione": "2026-01-08"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "string_funcs"
+  ],
+  "query": "SELECT INITCAP(CONCAT(cr.nome_corriere, ' ', cr.cognome_corriere)) AS nome_completo_corriere, UPPER(cr.targa) AS targa_veicolo, COUNT(*) FILTER (WHERE s.stato = 'CONSEGNATA') AS spedizioni_consegnate, COUNT(*) FILTER (WHERE s.stato = 'FALLITA') AS spedizioni_fallite FROM corrieri cr JOIN spedizioni s ON s.corriere_id = cr.id_corriere WHERE s.stato IN ('CONSEGNATA', 'FALLITA') GROUP BY cr.nome_corriere, cr.cognome_corriere, cr.targa HAVING COUNT(*) FILTER (WHERE s.stato = 'CONSEGNATA') > 0 ORDER BY spedizioni_consegnate DESC, cr.targa ASC LIMIT 5;"
+}

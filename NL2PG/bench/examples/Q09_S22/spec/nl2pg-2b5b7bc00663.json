@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 9,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "having"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatti_ordini_produzione",
+      "obsolete_value": "registro_flussi_output",
+      "description": "La tabella centrale dei fatti viene denominata nel linguaggio aziendale come registro_flussi_output."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_avanzamento_lavori",
+      "obsolete_value": "bucket_di_completamento",
+      "description": "Il campo relativo allo stato di avanzamento viene indicato internamente come bucket_di_completamento."
+    }
+  ],
+  "spec_hash": "06361e7fde239391"
+}

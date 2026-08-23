@@ -1,0 +1,34 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "filtered_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "chiamate",
+      "obsolete_value": "registro_traffico_voce",
+      "description": "La tabella chiamate, che registra gli eventi di traffico voce dei clienti, viene denominata registro_traffico_voce nella prosa aziendale. Le query devono risolvere il nome perifrastico sulla tabella fisica chiamate."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "durata_minuti",
+      "obsolete_value": "MOC",
+      "description": "La colonna durata_minuti della tabella chiamate, fisicamente di tipo TEXT pur contenendo valori numerici da castare con CAST(durata_minuti AS NUMERIC), è indicata nella documentazione con il gergo di settore MOC (Minutes Of Consumption)."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "utenze",
+      "description": "La tabella clienti, anagrafica degli abbonati del gestore, è sinonimizzata come utenze nella prosa aziendale. Le query devono mappare il termine utenze sulla tabella fisica clienti."
+    }
+  ],
+  "spec_hash": "ae9dbf09779a380e"
+}

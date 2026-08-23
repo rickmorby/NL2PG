@@ -1,0 +1,541 @@
+{
+  "schema_ddl": "CREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile >= 0)\n);\n\nCREATE TABLE progetti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    budget NUMERIC(12,2) NOT NULL CHECK (budget >= 0),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    dipendente_responsabile_id INT REFERENCES dipendenti(id),\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE registrazioni_ore (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    progetto_id INT NOT NULL REFERENCES progetti(id),\n    data_registrazione DATE NOT NULL,\n    ore_lavorate NUMERIC(4,1) NOT NULL CHECK (ore_lavorate > 0 AND ore_lavorate <= 24),\n    descrizione_attivita TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "reparti": {
+        "row_count": 29,
+        "columns": {
+          "id": {
+            "distinct": 29,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 29
+          },
+          "nome": {
+            "distinct": 11,
+            "sample": [
+              "Acquisti",
+              "Amministrazione",
+              "Assistenza Clienti",
+              "Finanza e Controllo",
+              "Logistica"
+            ]
+          },
+          "sede": {
+            "distinct": 6,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          }
+        }
+      },
+      "dipendenti": {
+        "row_count": 314,
+        "columns": {
+          "id": {
+            "distinct": 314,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 314
+          },
+          "reparto_id": {
+            "distinct": 29,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 29
+          },
+          "nome": {
+            "distinct": 15,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Anna",
+              "Chiara",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "distinct": 15,
+            "sample": [
+              "Barbieri",
+              "Bianchi",
+              "Conti",
+              "Costa",
+              "Esposito"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 314,
+            "sample": [
+              "BNCLRA90C45F205B",
+              "BNCLRA90C45F205C",
+              "BNCLRA90C45F205D",
+              "BNCLRA90C45F205E",
+              "BNCLRA90C45F205F"
+            ]
+          },
+          "email": {
+            "distinct": 314,
+            "sample": [
+              "alessandro.conti10@azienda.it",
+              "alessandro.conti11@azienda.it",
+              "alessandro.conti12@azienda.it",
+              "alessandro.conti13@azienda.it",
+              "alessandro.conti14@azienda.it"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 288,
+            "sample": [
+              "2017-01-06",
+              "2017-01-09",
+              "2017-02-10",
+              "2017-02-27",
+              "2017-03-13"
+            ]
+          },
+          "stipendio_mensile": {
+            "distinct": 305,
+            "sample": [
+              "1865.25",
+              "1892.49",
+              "1938.34",
+              "1951.06",
+              "1952.85"
+            ],
+            "min": 1865.25,
+            "max": 4480.0
+          }
+        }
+      },
+      "progetti": {
+        "row_count": 128,
+        "columns": {
+          "id": {
+            "distinct": 128,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 228
+          },
+          "nome": {
+            "distinct": 11,
+            "sample": [
+              "App Mobile Fidelizzazione",
+              "Automazione Magazzino",
+              "Cybersecurity Audit",
+              "Dashboard Analitiche",
+              "Gestione Contratti Fornitori"
+            ]
+          },
+          "budget": {
+            "distinct": 127,
+            "sample": [
+              "101933.64",
+              "106191.0",
+              "107862.16",
+              "108000.0",
+              "111005.89"
+            ],
+            "min": 50455.75,
+            "max": 395119.6
+          },
+          "data_inizio": {
+            "distinct": 114,
+            "sample": [
+              "2023-10-23",
+              "2023-10-25",
+              "2023-10-26",
+              "2023-11-01",
+              "2023-11-07"
+            ]
+          },
+          "data_fine": {
+            "distinct": 75,
+            "sample": [
+              "2024-12-01",
+              "2024-12-04",
+              "2024-12-09",
+              "2024-12-11",
+              "2024-12-17"
+            ]
+          },
+          "dipendente_responsabile_id": {
+            "distinct": 92,
+            "sample": [
+              "101",
+              "104",
+              "114",
+              "117",
+              "118"
+            ],
+            "min": 3,
+            "max": 314
+          }
+        }
+      },
+      "registrazioni_ore": {
+        "row_count": 580,
+        "columns": {
+          "id": {
+            "distinct": 580,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 1580
+          },
+          "dipendente_id": {
+            "distinct": 266,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 313
+          },
+          "progetto_id": {
+            "distinct": 126,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 228
+          },
+          "data_registrazione": {
+            "distinct": 325,
+            "sample": [
+              "2024-03-13",
+              "2024-03-15",
+              "2024-03-18",
+              "2024-03-21",
+              "2024-03-25"
+            ]
+          },
+          "ore_lavorate": {
+            "distinct": 452,
+            "sample": [
+              "10.0",
+              "10.01",
+              "10.02",
+              "10.06",
+              "10.07"
+            ],
+            "min": 2.08,
+            "max": 16.2
+          },
+          "descrizione_attivita": {
+            "distinct": 14,
+            "sample": [
+              "Analisi requisiti",
+              "Analisi requisiti CRM",
+              "Code review",
+              "Configurazione ambiente cloud",
+              "Debug e correzioni"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "reparti": [
+        {
+          "id": 1,
+          "nome": "Risorse Umane",
+          "sede": "Bologna"
+        },
+        {
+          "id": 2,
+          "nome": "Acquisti",
+          "sede": "Torino"
+        },
+        {
+          "id": 3,
+          "nome": "Risorse Umane",
+          "sede": "Napoli"
+        },
+        {
+          "id": 4,
+          "nome": "Assistenza Clienti",
+          "sede": "Firenze"
+        },
+        {
+          "id": 5,
+          "nome": "Sviluppo Software",
+          "sede": "Milano"
+        },
+        {
+          "id": 6,
+          "nome": "Risorse Umane",
+          "sede": "Torino"
+        },
+        {
+          "id": 7,
+          "nome": "Marketing",
+          "sede": "Milano"
+        },
+        {
+          "id": 8,
+          "nome": "Sviluppo Software",
+          "sede": "Firenze"
+        }
+      ],
+      "dipendenti": [
+        {
+          "id": 44,
+          "reparto_id": 15,
+          "nome": "Andrea",
+          "cognome": "Costa",
+          "codice_fiscale": "RSSMRA85M01H545S",
+          "email": "andrea.costa1@azienda.it",
+          "data_assunzione": "2019-02-21",
+          "stipendio_mensile": 3958.2
+        },
+        {
+          "id": 3,
+          "reparto_id": 28,
+          "nome": "Andrea",
+          "cognome": "Greco",
+          "codice_fiscale": "RSSMRA85M01H501C",
+          "email": "andrea.greco1@azienda.it",
+          "data_assunzione": "2019-02-28",
+          "stipendio_mensile": 4023.74
+        },
+        {
+          "id": 2,
+          "reparto_id": 27,
+          "nome": "Andrea",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRA85M01H501B",
+          "email": "andrea.marino1@azienda.it",
+          "data_assunzione": "2019-05-07",
+          "stipendio_mensile": 3559.09
+        },
+        {
+          "id": 25,
+          "reparto_id": 20,
+          "nome": "Andrea",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRA85M01H501Y",
+          "email": "andrea.marino2@azienda.it",
+          "data_assunzione": "2018-10-12",
+          "stipendio_mensile": 2834.99
+        },
+        {
+          "id": 42,
+          "reparto_id": 18,
+          "nome": "Andrea",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRA85M01H543Q",
+          "email": "andrea.marino3@azienda.it",
+          "data_assunzione": "2018-06-15",
+          "stipendio_mensile": 3980.0
+        },
+        {
+          "id": 10,
+          "reparto_id": 11,
+          "nome": "Andrea",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRA85M01H501J",
+          "email": "andrea.ricci1@azienda.it",
+          "data_assunzione": "2019-09-05",
+          "stipendio_mensile": 3472.68
+        },
+        {
+          "id": 24,
+          "reparto_id": 13,
+          "nome": "Anna",
+          "cognome": "Costa",
+          "codice_fiscale": "RSSMRA85M01H501X",
+          "email": "anna.costa1@azienda.it",
+          "data_assunzione": "2019-01-19",
+          "stipendio_mensile": 3487.08
+        },
+        {
+          "id": 18,
+          "reparto_id": 15,
+          "nome": "Anna",
+          "cognome": "Lombardi",
+          "codice_fiscale": "RSSMRA85M01H501R",
+          "email": "anna.lombardi1@azienda.it",
+          "data_assunzione": "2018-10-22",
+          "stipendio_mensile": 4355.33
+        }
+      ],
+      "progetti": [
+        {
+          "id": 101,
+          "nome": "Gestione Contratti Fornitori",
+          "budget": 125295.13,
+          "data_inizio": "2023-12-23",
+          "data_fine": "2025-02-02",
+          "dipendente_responsabile_id": 144
+        },
+        {
+          "id": 102,
+          "nome": "Ottimizzazione Supply Chain",
+          "budget": 147896.06,
+          "data_inizio": "2023-11-08",
+          "data_fine": "2024-12-20",
+          "dipendente_responsabile_id": 26
+        },
+        {
+          "id": 103,
+          "nome": "Gestione Contratti Fornitori",
+          "budget": 248056.28,
+          "data_inizio": "2023-11-01",
+          "data_fine": "2025-01-11",
+          "dipendente_responsabile_id": 170
+        },
+        {
+          "id": 104,
+          "nome": "Gestione Contratti Fornitori",
+          "budget": 263941.39,
+          "data_inizio": "2023-12-04",
+          "data_fine": "2025-01-31",
+          "dipendente_responsabile_id": 66
+        },
+        {
+          "id": 105,
+          "nome": "Ottimizzazione Supply Chain",
+          "budget": 106191.0,
+          "data_inizio": "2023-12-30",
+          "data_fine": "2025-03-19",
+          "dipendente_responsabile_id": 276
+        },
+        {
+          "id": 106,
+          "nome": "Integrazione ERP",
+          "budget": 238456.66,
+          "data_inizio": "2023-12-10",
+          "data_fine": "2025-01-07",
+          "dipendente_responsabile_id": 249
+        },
+        {
+          "id": 107,
+          "nome": "Ottimizzazione Supply Chain",
+          "budget": 160142.74,
+          "data_inizio": "2024-01-02",
+          "data_fine": "2024-12-24",
+          "dipendente_responsabile_id": 240
+        },
+        {
+          "id": 108,
+          "nome": "Sistema Ticketing",
+          "budget": 198147.01,
+          "data_inizio": "2024-01-25",
+          "data_fine": "2025-03-08",
+          "dipendente_responsabile_id": 57
+        }
+      ],
+      "registrazioni_ore": [
+        {
+          "id": 1001,
+          "dipendente_id": 7,
+          "progetto_id": 154,
+          "data_registrazione": "2024-03-18",
+          "ore_lavorate": 8.3,
+          "descrizione_attivita": "Sviluppo funzionalita"
+        },
+        {
+          "id": 1002,
+          "dipendente_id": 214,
+          "progetto_id": 148,
+          "data_registrazione": "2024-03-26",
+          "ore_lavorate": 9.81,
+          "descrizione_attivita": "Riunione di team"
+        },
+        {
+          "id": 1003,
+          "dipendente_id": 128,
+          "progetto_id": 122,
+          "data_registrazione": "2024-07-21",
+          "ore_lavorate": 5.94,
+          "descrizione_attivita": "Code review"
+        },
+        {
+          "id": 1004,
+          "dipendente_id": 34,
+          "progetto_id": 174,
+          "data_registrazione": "2024-04-28",
+          "ore_lavorate": 4.06,
+          "descrizione_attivita": "Riunione di team"
+        },
+        {
+          "id": 1005,
+          "dipendente_id": 284,
+          "progetto_id": 114,
+          "data_registrazione": "2024-06-08",
+          "ore_lavorate": 4.79,
+          "descrizione_attivita": "Testing e QA"
+        },
+        {
+          "id": 1006,
+          "dipendente_id": 27,
+          "progetto_id": 146,
+          "data_registrazione": "2024-07-24",
+          "ore_lavorate": 7.59,
+          "descrizione_attivita": "Analisi requisiti"
+        },
+        {
+          "id": 1007,
+          "dipendente_id": 6,
+          "progetto_id": 183,
+          "data_registrazione": "2024-07-16",
+          "ore_lavorate": 3.89,
+          "descrizione_attivita": "Sviluppo funzionalita"
+        },
+        {
+          "id": 1008,
+          "dipendente_id": 98,
+          "progetto_id": 213,
+          "data_registrazione": "2024-04-01",
+          "ore_lavorate": 5.61,
+          "descrizione_attivita": "Analisi requisiti"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "disjunctive"
+  ],
+  "query": "SELECT DISTINCT d.nome, d.cognome, d.data_assunzione, d.stipendio_mensile, r.nome AS nome_reparto, r.sede AS sede_reparto FROM dipendenti d JOIN reparti r ON d.reparto_id = r.id WHERE (r.sede = 'Milano' OR r.sede = 'Torino') AND d.stipendio_mensile >= 3500.00 ORDER BY d.cognome ASC, d.nome ASC;"
+}

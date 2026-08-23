@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "boolean_predicate"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "pazienti",
+      "obsolete_value": "schede_cliniche",
+      "description": "La tabella pazienti viene denominata schede_cliniche nella prosa aziendale. Le query devono quindi risolvere il riferimento schede_cliniche verso la tabella fisica pazienti, unica entità autonoma dello schema con PK id_paziente e nessuna relazione."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "ricoverato",
+      "obsolete_value": "ospedalizzato",
+      "description": "La colonna booleana ricoverato viene indicata nella prosa aziendale con il sinonimo ospedalizzato. Le query di filtraggio con WHERE ricoverato IS TRUE, NOT ricoverato oppure ricoverato devono interpretare il termine ospedalizzato come riferimento alla colonna booleana ricoverato."
+    }
+  ],
+  "spec_hash": "56b3da1403946814"
+}

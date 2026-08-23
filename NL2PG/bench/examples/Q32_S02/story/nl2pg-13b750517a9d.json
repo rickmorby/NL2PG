@@ -1,0 +1,278 @@
+{
+  "schema_ddl": "CREATE TABLE conti (\n    id INT PRIMARY KEY,\n    iban TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    valuta CHAR(3) NOT NULL DEFAULT 'EUR',\n    saldo_iniziale NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo_iniziale >= 0),\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    data_valuta DATE NOT NULL,\n    importo NUMERIC(14,2) NOT NULL CHECK (importo <> 0),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('accredito', 'addebito')),\n    causale TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "conti": {
+        "row_count": 789,
+        "columns": {
+          "id": {
+            "distinct": 789,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 789
+          },
+          "iban": {
+            "distinct": 789,
+            "sample": [
+              "IT02L1234512345000002345678",
+              "IT02L12345123450000023456781",
+              "IT02L123451234500000234567810",
+              "IT02L1234512345000002345678100",
+              "IT02L1234512345000002345678101"
+            ]
+          },
+          "denominazione": {
+            "distinct": 10,
+            "sample": [
+              "Arancio Costruzioni Spa",
+              "Bianchi & Figli Spa",
+              "Blu Servizi Digitali SRL",
+              "Celeste Trasporti SRL",
+              "Gialli Food Export SRL"
+            ]
+          },
+          "valuta": {
+            "distinct": 4,
+            "sample": [
+              "CHF",
+              "EUR",
+              "GBP",
+              "USD"
+            ]
+          },
+          "saldo_iniziale": {
+            "distinct": 761,
+            "sample": [
+              "100795.59",
+              "10136.18",
+              "101561.1",
+              "10160.3",
+              "1017.14"
+            ],
+            "min": 440.0,
+            "max": 193002.0
+          },
+          "data_apertura": {
+            "distinct": 624,
+            "sample": [
+              "2015-11-05",
+              "2015-11-28",
+              "2015-12-03",
+              "2015-12-09",
+              "2015-12-13"
+            ]
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 4000
+          },
+          "conto_id": {
+            "distinct": 773,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 789
+          },
+          "data_valuta": {
+            "distinct": 305,
+            "sample": [
+              "2025-09-10",
+              "2025-09-11",
+              "2025-09-12",
+              "2025-09-13",
+              "2025-09-14"
+            ]
+          },
+          "importo": {
+            "distinct": 2857,
+            "sample": [
+              "-1002.03",
+              "-1004.06",
+              "-1005.33",
+              "-1005.89",
+              "-1007.74"
+            ],
+            "min": -7875.0,
+            "max": 37926.47
+          },
+          "tipo_movimento": {
+            "distinct": 2,
+            "sample": [
+              "accredito",
+              "addebito"
+            ]
+          },
+          "causale": {
+            "distinct": 11,
+            "sample": [
+              "Bonifico cliente",
+              "Bonifico estero",
+              "Bonifico fornitori",
+              "Canone leasing",
+              "Commissioni bancarie"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "conti": [
+        {
+          "id": 1,
+          "iban": "IT60X0542811101000000012345",
+          "denominazione": "Rossi Impianti SRL",
+          "valuta": "GBP",
+          "saldo_iniziale": 48919.91,
+          "data_apertura": "2018-09-27"
+        },
+        {
+          "id": 2,
+          "iban": "IT60X05428111010000000123451",
+          "denominazione": "Arancio Costruzioni Spa",
+          "valuta": "USD",
+          "saldo_iniziale": 16706.74,
+          "data_apertura": "2018-04-06"
+        },
+        {
+          "id": 3,
+          "iban": "IT60X05428111010000000123452",
+          "denominazione": "Arancio Costruzioni Spa",
+          "valuta": "EUR",
+          "saldo_iniziale": 9516.08,
+          "data_apertura": "2019-04-29"
+        },
+        {
+          "id": 4,
+          "iban": "IT60X05428111010000000123453",
+          "denominazione": "Bianchi & Figli Spa",
+          "valuta": "EUR",
+          "saldo_iniziale": 20387.67,
+          "data_apertura": "2017-10-18"
+        },
+        {
+          "id": 5,
+          "iban": "IT60X05428111010000000123454",
+          "denominazione": "Bianchi & Figli Spa",
+          "valuta": "EUR",
+          "saldo_iniziale": 5836.68,
+          "data_apertura": "2017-06-25"
+        },
+        {
+          "id": 6,
+          "iban": "IT60X05428111010000000123455",
+          "denominazione": "Verdi Logistica SRL",
+          "valuta": "EUR",
+          "saldo_iniziale": 14041.24,
+          "data_apertura": "2019-01-26"
+        },
+        {
+          "id": 7,
+          "iban": "IT60X05428111010000000123456",
+          "denominazione": "Celeste Trasporti SRL",
+          "valuta": "USD",
+          "saldo_iniziale": 7379.67,
+          "data_apertura": "2018-04-11"
+        },
+        {
+          "id": 8,
+          "iban": "IT60X05428111010000000123457",
+          "denominazione": "Bianchi & Figli Spa",
+          "valuta": "EUR",
+          "saldo_iniziale": 13045.26,
+          "data_apertura": "2018-10-06"
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 1001,
+          "conto_id": 340,
+          "data_valuta": "2025-12-15",
+          "importo": 3681.02,
+          "tipo_movimento": "accredito",
+          "causale": "Incasso RIBA"
+        },
+        {
+          "id": 1002,
+          "conto_id": 411,
+          "data_valuta": "2025-10-03",
+          "importo": 1177.13,
+          "tipo_movimento": "accredito",
+          "causale": "Pagamento fattura"
+        },
+        {
+          "id": 1003,
+          "conto_id": 335,
+          "data_valuta": "2026-04-13",
+          "importo": 2386.36,
+          "tipo_movimento": "accredito",
+          "causale": "Stipendi dipendenti"
+        },
+        {
+          "id": 1004,
+          "conto_id": 516,
+          "data_valuta": "2025-12-24",
+          "importo": 2797.2,
+          "tipo_movimento": "accredito",
+          "causale": "Pagamento fattura"
+        },
+        {
+          "id": 1005,
+          "conto_id": 325,
+          "data_valuta": "2025-12-09",
+          "importo": 2209.09,
+          "tipo_movimento": "accredito",
+          "causale": "Bonifico fornitori"
+        },
+        {
+          "id": 1006,
+          "conto_id": 630,
+          "data_valuta": "2026-05-01",
+          "importo": 4763.9,
+          "tipo_movimento": "accredito",
+          "causale": "Pagamento fattura"
+        },
+        {
+          "id": 1007,
+          "conto_id": 38,
+          "data_valuta": "2025-09-24",
+          "importo": 3570.41,
+          "tipo_movimento": "accredito",
+          "causale": "Commissioni bancarie"
+        },
+        {
+          "id": 1008,
+          "conto_id": 502,
+          "data_valuta": "2026-01-16",
+          "importo": 6118.36,
+          "tipo_movimento": "accredito",
+          "causale": "Incasso RIBA"
+        }
+      ]
+    }
+  },
+  "story": "Nella Direzione Amministrativa e Finanziaria del gruppo, il libro mastro elettronico ruota attorno all'archivio denominato conti, dove ogni rapporto bancario è descritto da una scheda recante l'IBAN, la denominazione dell'intestatario — dalle Arancio Costruzioni Spa ai Bianchi & Figli Spa, passando per Blu Servizi Digitali SRL, Celeste Trasporti SRL e Gialli Food Export SRL — la valuta di conto, il saldo iniziale e la data di apertura del rapporto. L'archivio raccoglie 789 rapporti, con saldi iniziali che oscillano da 440.00 fino a 193002.00 e aperture documentate a partire dal 2015-11-05. Accanto ad esso, il registro dei flussi_di_cassa annota giorno per giorno gli accrediti e gli addebiti: ciascuna voce riporta la data valuta, il controvalore dell'operazione, la tipologia di movimento e la causale gestionale, che spazia da 'Bonifico cliente' a 'Bonifico estero', da 'Canone leasing' a 'Commissioni bancarie', senza dimenticare 'Incasso RIBA', 'Pagamento fattura', 'Stipendi dipendenti' e 'Bonifico fornitori'. Ogni movimento richiama inoltre il numero del conto di riferimento, così da poter risalire alla scheda corrispondente nell'archivio conti e ricostruire l'intera storia del rapporto. In vista della revisione semestrale, l'ufficio vigilanza ha avviato un controllo mirato sui saldi: sono stati presi in esame esclusivamente i conti aperti in EUR, USD o GBP, mentre i rapporti in franchi svizzeri (CHF) sono stati esclusi dal perimetro. Per ciascuna delle tre divise è stata predisposta una lista di soglie minime di vigilanza: 15000.00 euro per i conti in EUR, 20000.00 dollari per quelli in USD e 12500.00 sterline per quelli in GBP. Gli analisti hanno quindi confrontato il saldo iniziale di ogni conto con la soglia prevista per la propria valuta, calcolando lo scostamento arrotondato a 2 decimali e attribuendo lo stato 'sopra soglia' oppure 'sotto soglia'. L'esito del controllo è stato infine ordinato dallo scostamento maggiore al minore, così che i responsabili potessero concentrare subito l'attenzione sui rapporti più distanti dalla soglia di vigilanza e programmare gli eventuali interventi correttivi prima della chiusura dell'esercizio."
+}

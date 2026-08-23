@@ -1,0 +1,211 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_di_copertura",
+        "description": "La tabella autonoma polizze viene denominata contratti_di_copertura nella prosa aziendale; il solver deve riconoscere che i 'contratti di copertura' citati nei requisiti corrispondono fisicamente alla tabella polizze."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "premio_annuo",
+        "obsolete_value": "imposta_tecnica_periodica",
+        "description": "La colonna premio_annuo viene indicata con il gergo assicurativo imposta_tecnica_periodica; le query richieste devono aggregare o filtrare sulla colonna reale premio_annuo interpretando correttamente la perifrasi settoriale."
+      }
+    ],
+    "spec_hash": "1018b313e610327e"
+  },
+  "schema_ddl": "CREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    contraente TEXT NOT NULL,\n    ramo TEXT NOT NULL,\n    tipo_copertura TEXT NOT NULL CHECK (tipo_copertura IN ('vita', 'auto', 'casa', 'salute', 'responsabilita_civile')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    somma_assicurata NUMERIC(12,2) NOT NULL CHECK (somma_assicurata > 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_polizza TEXT NOT NULL DEFAULT 'attiva' CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta', 'annullata')),\n    CHECK (data_scadenza > data_emissione)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "polizze",
+        "nature": "dimension",
+        "min_rows": 300,
+        "max_rows": 500,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_polizza": "POL-2025-000101",
+            "contraente": "Mario Rossi",
+            "ramo": "Ramo I - Vita",
+            "tipo_copertura": "vita",
+            "premio_annuo": 850.0,
+            "somma_assicurata": 100000.0,
+            "data_emissione": "2023-03-15",
+            "data_scadenza": "2028-03-15",
+            "stato_polizza": "attiva"
+          },
+          {
+            "id": 2,
+            "numero_polizza": "POL-2025-000102",
+            "contraente": "Laura Bianchi",
+            "ramo": "Ramo X - Auto",
+            "tipo_copertura": "auto",
+            "premio_annuo": 620.5,
+            "somma_assicurata": 25000.0,
+            "data_emissione": "2024-01-20",
+            "data_scadenza": "2027-01-20",
+            "stato_polizza": "attiva"
+          },
+          {
+            "id": 3,
+            "numero_polizza": "POL-2025-000103",
+            "contraente": "Giulia Verdi",
+            "ramo": "Ramo III - Casa",
+            "tipo_copertura": "casa",
+            "premio_annuo": 340.0,
+            "somma_assicurata": 180000.0,
+            "data_emissione": "2022-11-05",
+            "data_scadenza": "2025-11-05",
+            "stato_polizza": "scaduta"
+          },
+          {
+            "id": 4,
+            "numero_polizza": "POL-2025-000104",
+            "contraente": "Alessandro Conti",
+            "ramo": "Ramo II - Salute",
+            "tipo_copertura": "salute",
+            "premio_annuo": 1200.0,
+            "somma_assicurata": 50000.0,
+            "data_emissione": "2024-06-01",
+            "data_scadenza": "2029-06-01",
+            "stato_polizza": "attiva"
+          },
+          {
+            "id": 5,
+            "numero_polizza": "POL-2025-000105",
+            "contraente": "Ferramenta Lombardi SRL",
+            "ramo": "Ramo XIII - RC",
+            "tipo_copertura": "responsabilita_civile",
+            "premio_annuo": 2100.0,
+            "somma_assicurata": 1000000.0,
+            "data_emissione": "2023-09-10",
+            "data_scadenza": "2026-09-10",
+            "stato_polizza": "sospesa"
+          },
+          {
+            "id": 6,
+            "numero_polizza": "POL-2025-000106",
+            "contraente": "Chiara Moretti",
+            "ramo": "Ramo I - Vita",
+            "tipo_copertura": "vita",
+            "premio_annuo": 1500.75,
+            "somma_assicurata": 250000.0,
+            "data_emissione": "2021-05-18",
+            "data_scadenza": "2031-05-18",
+            "stato_polizza": "attiva"
+          },
+          {
+            "id": 7,
+            "numero_polizza": "POL-2025-000107",
+            "contraente": "Luca Ferrari",
+            "ramo": "Ramo X - Auto",
+            "tipo_copertura": "auto",
+            "premio_annuo": 480.25,
+            "somma_assicurata": 18000.0,
+            "data_emissione": "2024-02-28",
+            "data_scadenza": "2027-02-28",
+            "stato_polizza": "annullata"
+          },
+          {
+            "id": 8,
+            "numero_polizza": "POL-2025-000108",
+            "contraente": "Sara Gallo",
+            "ramo": "Ramo II - Salute",
+            "tipo_copertura": "salute",
+            "premio_annuo": 980.0,
+            "somma_assicurata": 75000.0,
+            "data_emissione": "2023-12-12",
+            "data_scadenza": "2028-12-12",
+            "stato_polizza": "attiva"
+          }
+        ],
+        "variations": {
+          "contraente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Alessandro Conti",
+              "Ferramenta Lombardi SRL",
+              "Chiara Moretti",
+              "Luca Ferrari",
+              "Sara Gallo",
+              "Edil Costruzioni SPA",
+              "Paolo Neri",
+              "Anna Fumagalli",
+              "Trasporti Veloci SNC"
+            ]
+          },
+          "premio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "somma_assicurata": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -200.0,
+            "delta_max": 200.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_polizza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attiva",
+              "attiva",
+              "attiva",
+              "attiva",
+              "attiva",
+              "scaduta",
+              "sospesa",
+              "annullata"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

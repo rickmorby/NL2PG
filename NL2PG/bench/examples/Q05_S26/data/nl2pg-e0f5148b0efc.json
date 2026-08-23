@@ -1,0 +1,369 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "58071b28e656bbfc"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL,\n    budget_annuo NUMERIC(12,2) NOT NULL CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile > 0),\n    data_assunzione DATE NOT NULL\n);\n\nCREATE TABLE progetti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    costo_orario_standard NUMERIC(12,2) NOT NULL,\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE registrazioni_ore (\n    id SERIAL PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    progetto_id INT NOT NULL REFERENCES progetti(id),\n    data_registrazione DATE NOT NULL,\n    ore_lavorate TEXT NOT NULL CHECK (ore_lavorate ~ '^[0-9]+(\\.[0-9]{1,2})?$'),\n    descrizione_attivita TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dipartimenti",
+        "nature": "lookup",
+        "min_rows": 8,
+        "max_rows": 12,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Information Technology",
+            "sede": "Milano",
+            "budget_annuo": 1500000.0
+          },
+          {
+            "id": 2,
+            "nome": "Risorse Umane",
+            "sede": "Roma",
+            "budget_annuo": 450000.0
+          },
+          {
+            "id": 3,
+            "nome": "Finanza e Controllo",
+            "sede": "Torino",
+            "budget_annuo": 920000.0
+          },
+          {
+            "id": 4,
+            "nome": "Marketing",
+            "sede": "Milano",
+            "budget_annuo": 610000.0
+          },
+          {
+            "id": 5,
+            "nome": "Vendite",
+            "sede": "Napoli",
+            "budget_annuo": 780000.0
+          },
+          {
+            "id": 6,
+            "nome": "Operazioni e Logistica",
+            "sede": "Bologna",
+            "budget_annuo": 540000.0
+          }
+        ],
+        "variations": {
+          "sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze"
+            ]
+          },
+          "budget_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 10.0,
+        "templates": [
+          {
+            "id": 1,
+            "matricola": "MAT001",
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "dipartimento_id": 1,
+            "stipendio_mensile": 3200.0,
+            "data_assunzione": "2019-03-15"
+          },
+          {
+            "id": 2,
+            "matricola": "MAT002",
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA85C12F205X",
+            "dipartimento_id": 2,
+            "stipendio_mensile": 2750.5,
+            "data_assunzione": "2020-07-01"
+          },
+          {
+            "id": 3,
+            "matricola": "MAT003",
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI92D05L219Y",
+            "dipartimento_id": 1,
+            "stipendio_mensile": 2980.0,
+            "data_assunzione": "2021-01-11"
+          },
+          {
+            "id": 4,
+            "matricola": "MAT004",
+            "nome": "Luca",
+            "cognome": "Neri",
+            "codice_fiscale": "NERLCA88E20G224Z",
+            "dipartimento_id": 3,
+            "stipendio_mensile": 3520.0,
+            "data_assunzione": "2018-10-02"
+          },
+          {
+            "id": 5,
+            "matricola": "MAT005",
+            "nome": "Sara",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTSRA90F14H503W",
+            "dipartimento_id": 2,
+            "stipendio_mensile": 2610.0,
+            "data_assunzione": "2022-05-23"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Luca",
+              "Sara",
+              "Marco",
+              "Anna",
+              "Paolo",
+              "Elena",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Conti",
+              "Moretti",
+              "Ricci",
+              "Greco",
+              "Fontana",
+              "Marino"
+            ]
+          },
+          "stipendio_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -600.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "progetti",
+        "nature": "dimension",
+        "min_rows": 20,
+        "max_rows": 40,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Piattaforma CRM Interno",
+            "dipartimento_id": 1,
+            "costo_orario_standard": "45.50",
+            "data_inizio": "2025-01-15",
+            "data_fine": "2025-12-31"
+          },
+          {
+            "id": 2,
+            "nome": "Migrazione Cloud",
+            "dipartimento_id": 1,
+            "costo_orario_standard": "52.00",
+            "data_inizio": "2025-03-01",
+            "data_fine": "2026-03-31"
+          },
+          {
+            "id": 3,
+            "nome": "Sistema Payroll Integrato",
+            "dipartimento_id": 2,
+            "costo_orario_standard": "48.75",
+            "data_inizio": "2025-06-10",
+            "data_fine": null
+          },
+          {
+            "id": 4,
+            "nome": "Portale Dipendenti",
+            "dipartimento_id": 2,
+            "costo_orario_standard": "40.00",
+            "data_inizio": "2025-09-01",
+            "data_fine": "2026-06-30"
+          },
+          {
+            "id": 5,
+            "nome": "Automazione Report Finanziari",
+            "dipartimento_id": 3,
+            "costo_orario_standard": "44.25",
+            "data_inizio": "2025-02-20",
+            "data_fine": "2025-11-30"
+          }
+        ],
+        "variations": {
+          "costo_orario_standard": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "38.00",
+              "42.50",
+              "45.50",
+              "48.75",
+              "52.00",
+              "55.00"
+            ]
+          },
+          "data_inizio": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "registrazioni_ore",
+        "nature": "fact",
+        "min_rows": 400,
+        "max_rows": 900,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1001,
+            "dipendente_id": 1,
+            "progetto_id": 1,
+            "data_registrazione": "2025-10-06",
+            "ore_lavorate": "8",
+            "descrizione_attivita": "Sviluppo moduli backend"
+          },
+          {
+            "id": 1002,
+            "dipendente_id": 2,
+            "progetto_id": 2,
+            "data_registrazione": "2025-10-07",
+            "ore_lavorate": "6.5",
+            "descrizione_attivita": "Configurazione ambiente cloud"
+          },
+          {
+            "id": 1003,
+            "dipendente_id": 3,
+            "progetto_id": 1,
+            "data_registrazione": "2025-10-08",
+            "ore_lavorate": "7.25",
+            "descrizione_attivita": "Code review e testing"
+          },
+          {
+            "id": 1004,
+            "dipendente_id": 4,
+            "progetto_id": 3,
+            "data_registrazione": "2025-10-09",
+            "ore_lavorate": "8",
+            "descrizione_attivita": "Analisi requisiti payroll"
+          },
+          {
+            "id": 1005,
+            "dipendente_id": 5,
+            "progetto_id": 4,
+            "data_registrazione": "2025-10-10",
+            "ore_lavorate": "4.5",
+            "descrizione_attivita": "Design interfaccia portale"
+          }
+        ],
+        "variations": {
+          "ore_lavorate": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "4",
+              "5",
+              "6",
+              "6.5",
+              "7",
+              "7.5",
+              "8"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 120.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "descrizione_attivita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Sviluppo funzionalita'",
+              "Riunione di team",
+              "Debug e correzioni",
+              "Documentazione tecnica",
+              "Testing e QA",
+              "Analisi requisiti",
+              "Refactoring codice",
+              "Supporto utenti"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

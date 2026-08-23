@@ -1,0 +1,271 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "math_funcs"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti",
+        "obsolete_value": "giornale_liquidita",
+        "description": "La tabella movimenti viene denominata giornale_liquidita nella prosa aziendale. L'agente deve risalire alla tabella reale movimenti per calcolare gli importi, applicando funzioni matematiche come ROUND o ABS sui valori monetari."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "tasso_annuo",
+        "obsolete_value": "TAEG contrattualizzato",
+        "description": "La colonna tasso_annuo della tabella conti è indicata nella documentazione con il gergo finanziario TAEG contrattualizzato. Occorre mappare questo termine tecnico di settore alla colonna reale tasso_annuo quando si eseguono calcoli con POWER o ROUND."
+      }
+    ],
+    "spec_hash": "6e371e7eff5494e8"
+  },
+  "schema_ddl": "CREATE DOMAIN importo_monetario AS NUMERIC(14,2) CHECK (VALUE >= 0);\n\nCREATE DOMAIN tasso_percentuale AS NUMERIC(7,4) CHECK (VALUE >= 0 AND VALUE <= 100);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    iban TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    tasso_annuo tasso_percentuale NOT NULL,\n    saldo_iniziale importo_monetario NOT NULL DEFAULT 0,\n    stato_conto TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_conto IN ('attivo', 'sospeso', 'chiuso')),\n    aperto_il DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE movimenti (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('versamento', 'prelievo', 'bonifico_entrata', 'bonifico_uscita', 'interessi_maturati', 'commissione')),\n    importo importo_monetario NOT NULL,\n    data_movimento DATE NOT NULL,\n    descrizione TEXT,\n    registrato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "conti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 220,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "iban": "IT60X0542811101000000012345",
+            "intestatario": "Mario Rossi",
+            "tasso_annuo": 1.25,
+            "saldo_iniziale": 5000.0,
+            "stato_conto": "attivo",
+            "aperto_il": "2024-03-15"
+          },
+          {
+            "id": 2,
+            "iban": "IT02L1234567890123456789012",
+            "intestatario": "Laura Bianchi",
+            "tasso_annuo": 2.1,
+            "saldo_iniziale": 18500.75,
+            "stato_conto": "attivo",
+            "aperto_il": "2023-11-02"
+          },
+          {
+            "id": 3,
+            "iban": "IT31A0760103000000009876543",
+            "intestatario": "Rossi & Figli SRL",
+            "tasso_annuo": 0.85,
+            "saldo_iniziale": 42000.0,
+            "stato_conto": "attivo",
+            "aperto_il": "2024-06-20"
+          },
+          {
+            "id": 4,
+            "iban": "IT44B0301503200000003512345",
+            "intestatario": "Giulia Verdi",
+            "tasso_annuo": 3.4,
+            "saldo_iniziale": 980.5,
+            "stato_conto": "sospeso",
+            "aperto_il": "2025-01-10"
+          },
+          {
+            "id": 5,
+            "iban": "IT55C0542811101000000998877",
+            "intestatario": "Cooperativa Aurora",
+            "tasso_annuo": 1.9,
+            "saldo_iniziale": 125000.0,
+            "stato_conto": "attivo",
+            "aperto_il": "2022-09-05"
+          },
+          {
+            "id": 6,
+            "iban": "IT66D0100003245000001112223",
+            "intestatario": "Luca Neri",
+            "tasso_annuo": 0.01,
+            "saldo_iniziale": 350.0,
+            "stato_conto": "chiuso",
+            "aperto_il": "2023-04-18"
+          }
+        ],
+        "variations": {
+          "intestatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco Bianchi",
+              "Elena Ferrari",
+              "Giovanni Conti",
+              "Francesca Moretti",
+              "Tecnologie Alfa SRL",
+              "Società Agricola Il Campo",
+              "Studio Legale Vitali",
+              "Bar Tramonto di P. Gialli"
+            ]
+          },
+          "tasso_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.8,
+            "pool": []
+          },
+          "saldo_iniziale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 4.0,
+            "pool": []
+          },
+          "stato_conto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "attivo",
+              "attivo",
+              "attivo",
+              "attivo",
+              "sospeso",
+              "chiuso"
+            ]
+          },
+          "aperto_il": {
+            "axis": "shift",
+            "delta_min": -850.0,
+            "delta_max": -25.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "movimenti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 6.0,
+        "templates": [
+          {
+            "id": 1001,
+            "conto_id": 1,
+            "tipo_movimento": "versamento",
+            "importo": 1200.0,
+            "data_movimento": "2026-01-08",
+            "descrizione": "Operazione su conto",
+            "registrato_il": "2026-01-08 10:15:00"
+          },
+          {
+            "id": 1002,
+            "conto_id": 2,
+            "tipo_movimento": "prelievo",
+            "importo": 200.0,
+            "data_movimento": "2026-01-12",
+            "descrizione": "Movimento di tesoreria",
+            "registrato_il": "2026-01-12 18:42:00"
+          },
+          {
+            "id": 1003,
+            "conto_id": 3,
+            "tipo_movimento": "bonifico_entrata",
+            "importo": 3400.5,
+            "data_movimento": "2026-01-20",
+            "descrizione": "Registrazione operazione",
+            "registrato_il": "2026-01-20 09:05:00"
+          },
+          {
+            "id": 1004,
+            "conto_id": 1,
+            "tipo_movimento": "bonifico_uscita",
+            "importo": 750.25,
+            "data_movimento": "2026-02-03",
+            "descrizione": "Operazione bancaria",
+            "registrato_il": "2026-02-03 11:30:00"
+          },
+          {
+            "id": 1005,
+            "conto_id": 4,
+            "tipo_movimento": "interessi_maturati",
+            "importo": 12.87,
+            "data_movimento": "2026-01-01",
+            "descrizione": "Voce movimento conto",
+            "registrato_il": "2026-01-01 00:05:00"
+          },
+          {
+            "id": 1006,
+            "conto_id": 5,
+            "tipo_movimento": "commissione",
+            "importo": 2.5,
+            "data_movimento": "2026-02-10",
+            "descrizione": "Operazione su conto",
+            "registrato_il": "2026-02-10 23:58:00"
+          }
+        ],
+        "variations": {
+          "tipo_movimento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "versamento",
+              "versamento",
+              "versamento",
+              "prelievo",
+              "prelievo",
+              "bonifico_entrata",
+              "bonifico_entrata",
+              "bonifico_uscita",
+              "bonifico_uscita",
+              "interessi_maturati",
+              "commissione"
+            ]
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.5,
+            "pool": []
+          },
+          "data_movimento": {
+            "axis": "shift",
+            "delta_min": -40.0,
+            "delta_max": 15.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Operazione su conto",
+              "Movimento di tesoreria",
+              "Registrazione operazione",
+              "Operazione bancaria",
+              "Voce movimento conto"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

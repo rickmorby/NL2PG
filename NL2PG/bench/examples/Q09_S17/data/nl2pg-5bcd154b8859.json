@@ -1,0 +1,432 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "2707a59f4d344de0"
+  },
+  "schema_ddl": "CREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_albo TEXT NOT NULL UNIQUE,\n    specializzazione TEXT NOT NULL,\n    email TEXT UNIQUE,\n    deleted_at TIMESTAMPTZ\n);\n\nCREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT,\n    deleted_at TIMESTAMPTZ\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    data_visita DATE NOT NULL,\n    ora_visita TIME NOT NULL DEFAULT '09:00',\n    tipo_visita TEXT NOT NULL CHECK (tipo_visita IN ('prima_visita', 'controllo', 'urgenza', 'follow_up')),\n    diagnosi TEXT,\n    costo NUMERIC(10,2) NOT NULL CHECK (costo >= 0),\n    durata_minuti INT CHECK (durata_minuti > 0),\n    deleted_at TIMESTAMPTZ\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "medici",
+        "nature": "dimension",
+        "min_rows": 60,
+        "max_rows": 100,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Alessandro",
+            "cognome": "Bianchi",
+            "numero_albo": "RM001234",
+            "specializzazione": "Cardiologia",
+            "email": "a.bianchi@clinicasantanna.it"
+          },
+          {
+            "id": 2,
+            "nome": "Francesca",
+            "cognome": "Ricci",
+            "numero_albo": "MI002345",
+            "specializzazione": "Dermatologia",
+            "email": "f.ricci@poliambulatoriomilano.it"
+          },
+          {
+            "id": 3,
+            "nome": "Marco",
+            "cognome": "Moretti",
+            "numero_albo": "TO003456",
+            "specializzazione": "Ortopedia",
+            "email": "m.moretti@ospedalemolinette.it"
+          },
+          {
+            "id": 4,
+            "nome": "Giulia",
+            "cognome": "Greco",
+            "numero_albo": "NA004567",
+            "specializzazione": "Pediatria",
+            "email": "g.greco@centromediconapoli.it"
+          },
+          {
+            "id": 5,
+            "nome": "Luca",
+            "cognome": "Conti",
+            "numero_albo": "FI005678",
+            "specializzazione": "Neurologia",
+            "email": "l.conti@istitutoneurofi.it"
+          },
+          {
+            "id": 6,
+            "nome": "Chiara",
+            "cognome": "Gallo",
+            "numero_albo": "BO006789",
+            "specializzazione": "Medicina Generale",
+            "email": "c.gallo@medicidifamiglia.it",
+            "deleted_at": "2025-09-30 18:00:00+02"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Alessandro",
+              "Francesca",
+              "Marco",
+              "Giulia",
+              "Luca",
+              "Chiara",
+              "Stefano",
+              "Elena",
+              "Andrea",
+              "Paola"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Bianchi",
+              "Ricci",
+              "Moretti",
+              "Greco",
+              "Conti",
+              "Gallo",
+              "Fontana",
+              "Serra",
+              "Marino",
+              "Rinaldi"
+            ]
+          },
+          "specializzazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Cardiologia",
+              "Dermatologia",
+              "Ortopedia",
+              "Pediatria",
+              "Neurologia",
+              "Oculistica",
+              "Medicina Generale",
+              "Ginecologia"
+            ]
+          }
+        }
+      },
+      {
+        "table": "pazienti",
+        "nature": "dimension",
+        "min_rows": 300,
+        "max_rows": 500,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "data_nascita": "1980-01-15",
+            "telefono": "+39 333 1234567"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA75C42F205X",
+            "data_nascita": "1975-03-12",
+            "telefono": "+39 347 9876543"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI92D58H501Z",
+            "data_nascita": "1992-04-18",
+            "telefono": "+39 320 4567890"
+          },
+          {
+            "id": 4,
+            "nome": "Antonio",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPSNTN68M05F839W",
+            "data_nascita": "1968-08-05",
+            "telefono": "+39 339 2345678"
+          },
+          {
+            "id": 5,
+            "nome": "Sara",
+            "cognome": "Colombo",
+            "codice_fiscale": "CLMSRA01T56F205Y",
+            "data_nascita": "2001-12-16",
+            "telefono": "+39 328 8765432"
+          },
+          {
+            "id": 6,
+            "nome": "Davide",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRDDVD10R19D969T",
+            "data_nascita": "2010-09-19",
+            "telefono": "+39 331 3456789"
+          },
+          {
+            "id": 7,
+            "nome": "Elena",
+            "cognome": "Mancini",
+            "codice_fiscale": "MNCLNE55S44H501K",
+            "data_nascita": "1955-11-04",
+            "deleted_at": "2025-08-15 12:00:00+02"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Antonio",
+              "Sara",
+              "Davide",
+              "Francesco",
+              "Anna",
+              "Roberto",
+              "Chiara",
+              "Simone",
+              "Valentina"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Esposito",
+              "Colombo",
+              "Ferrari",
+              "Mancini",
+              "Barbieri",
+              "Lombardi",
+              "Caruso",
+              "Villa",
+              "Testa"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -400.0,
+            "delta_max": 400.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 333 1234567",
+              "+39 347 9876543",
+              "+39 320 4567890",
+              "+39 339 2345678",
+              "+39 328 8765432",
+              "+39 331 3456789",
+              "+39 340 5678901"
+            ]
+          }
+        }
+      },
+      {
+        "table": "visite",
+        "nature": "fact",
+        "min_rows": 900,
+        "max_rows": 1400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "paziente_id": 1,
+            "medico_id": 1,
+            "data_visita": "2025-11-10",
+            "ora_visita": "09:00",
+            "tipo_visita": "prima_visita",
+            "diagnosi": "Ipertensione arteriosa di nuova diagnosi",
+            "costo": 120.0,
+            "durata_minuti": 45
+          },
+          {
+            "id": 2,
+            "paziente_id": 2,
+            "medico_id": 2,
+            "data_visita": "2025-12-05",
+            "ora_visita": "10:30",
+            "tipo_visita": "controllo",
+            "diagnosi": "Diabete tipo 2 in compenso",
+            "costo": 70.0,
+            "durata_minuti": 30
+          },
+          {
+            "id": 3,
+            "paziente_id": 3,
+            "medico_id": 3,
+            "data_visita": "2026-01-15",
+            "ora_visita": "14:00",
+            "tipo_visita": "urgenza",
+            "diagnosi": "Frattura da stress al polso destro",
+            "costo": 150.0,
+            "durata_minuti": 60
+          },
+          {
+            "id": 4,
+            "paziente_id": 4,
+            "medico_id": 1,
+            "data_visita": "2026-02-20",
+            "ora_visita": "11:15",
+            "tipo_visita": "follow_up",
+            "diagnosi": "Controllo post-operatorio in esito positivo",
+            "costo": 60.0,
+            "durata_minuti": 20
+          },
+          {
+            "id": 5,
+            "paziente_id": 5,
+            "medico_id": 4,
+            "data_visita": "2026-03-08",
+            "ora_visita": "08:30",
+            "tipo_visita": "prima_visita",
+            "diagnosi": "Cefalea tensiva ricorrente",
+            "costo": 110.0,
+            "durata_minuti": 40
+          },
+          {
+            "id": 6,
+            "paziente_id": 6,
+            "medico_id": 2,
+            "data_visita": "2026-03-22",
+            "ora_visita": "16:45",
+            "tipo_visita": "controllo",
+            "diagnosi": "Dermatite atopica in miglioramento",
+            "costo": 75.0,
+            "durata_minuti": 25
+          },
+          {
+            "id": 7,
+            "paziente_id": 7,
+            "medico_id": 3,
+            "data_visita": "2025-10-02",
+            "ora_visita": "09:45",
+            "tipo_visita": "controllo",
+            "diagnosi": "Rinofaringite virale",
+            "costo": 65.0,
+            "durata_minuti": 15,
+            "deleted_at": "2025-10-10 08:00:00+01"
+          }
+        ],
+        "variations": {
+          "data_visita": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 120.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "ora_visita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "08:30",
+              "09:00",
+              "09:45",
+              "10:30",
+              "11:15",
+              "14:00",
+              "15:30",
+              "16:45"
+            ]
+          },
+          "tipo_visita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "prima_visita",
+              "controllo",
+              "controllo",
+              "controllo",
+              "follow_up",
+              "follow_up",
+              "urgenza"
+            ]
+          },
+          "diagnosi": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ipertensione arteriosa di nuova diagnosi",
+              "Diabete tipo 2 in compenso",
+              "Frattura da stress al polso destro",
+              "Controllo post-operatorio in esito positivo",
+              "Cefalea tensiva ricorrente",
+              "Dermatite atopica in miglioramento",
+              "Rinofaringite virale",
+              "Lombalgia meccanica",
+              "Bronchite acuta",
+              "Dislipidemia in trattamento"
+            ]
+          },
+          "costo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "durata_minuti": {
+            "axis": "shift",
+            "delta_min": -10.0,
+            "delta_max": 20.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

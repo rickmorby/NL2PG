@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 4,
+    "hierarchy": "implicit",
+    "sql_features": [
+      "exists"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "pazienti",
+        "obsolete_value": "anagrafica_assistiti",
+        "description": "La tabella pazienti viene denominata anagrafica_assistiti nella prosa aziendale. Le query devono risolvere il riferimento alla tabella reale pazienti tramite la colonna id, collegata concettualmente a paziente_id nelle tabelle visite e ricoveri senza vincolo REFERENCES dichiarato."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "referti",
+        "obsolete_value": "documentazione_diagnostica",
+        "description": "La tabella referti viene indicata con il gergo clinico documentazione_diagnostica. Le query che verificano l'esistenza di referti per una visita devono mappare tale perifrasi sulla tabella referti, associandola tramite visita_id compatibile con visite.id."
+      }
+    ],
+    "spec_hash": "7bba1c1c08332e36"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    CHECK (LENGTH(codice_fiscale) = 16)\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL,\n    data_visita DATE NOT NULL,\n    motivo_visita TEXT,\n    esito TEXT,\n    CHECK (paziente_id > 0)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL,\n    data_ingresso DATE NOT NULL,\n    data_dimissione DATE,\n    reparto TEXT NOT NULL,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ingresso)\n);\n\nCREATE TABLE referti (\n    id INT PRIMARY KEY,\n    visita_id INT NOT NULL,\n    data_referto DATE NOT NULL,\n    contenuto TEXT NOT NULL,\n    medico_redattore TEXT NOT NULL,\n    CHECK (visita_id > 0)\n);"
+}

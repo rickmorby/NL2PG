@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 2,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "correlated_subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "vendite",
+      "obsolete_value": "movimenti_commerciali",
+      "description": "La tabella reale vendite viene chiamata movimenti_commerciali nella prosa aziendale, quindi il testo fa riferimento a una denominazione obsoleta ma mappabile sulla tabella vendite."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "cliente_id",
+      "obsolete_value": "codice_controparte",
+      "description": "La colonna cliente_id della tabella vendite viene indicata nel gergo interno come codice_controparte; la correlazione EXISTS deve comunque usare cliente_id come chiave compatibile con clienti.id."
+    }
+  ],
+  "spec_hash": "3f0164271cf55e4a"
+}

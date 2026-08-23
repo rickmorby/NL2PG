@@ -1,0 +1,34 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 5,
+  "hierarchy": "temporal_versioning",
+  "sql_features": [
+    "row_types"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "storico_prezzi",
+      "obsolete_value": "archivio_listini",
+      "description": "La tabella storico_prezzi, che conserva le versioni temporali dei prezzi dei prodotti (prodotto_id, prezzo_unitario, valid_from, valid_to), viene denominata archivio_listini nella prosa aziendale; il solver deve risalire al nome reale della tabella nello schema."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "prezzo_unitario",
+      "obsolete_value": "tariffa vigente",
+      "description": "La colonna prezzo_unitario della tabella storico_prezzi viene indicata nei documenti aziendali con il sinonimo 'tariffa vigente'; i confronti tra versioni devono riferirsi alla colonna reale prezzo_unitario all'interno delle tuple ROW."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "valid_from",
+      "obsolete_value": "data di efficacia",
+      "description": "La colonna valid_from, che marca l'inizio del periodo di validita' di ciascuna versione di prezzo, viene descritta con il gergo interno 'data di efficacia'; le query richieste devono usare WHERE ROW(prezzo_unitario, valid_from) = ROW(v1, t1) oppure ORDER BY storico_prezzi.valid_from per selezionare la versione corretta nel tempo."
+    }
+  ],
+  "spec_hash": "6c5a2c306779275a"
+}

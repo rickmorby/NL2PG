@@ -1,0 +1,348 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 3,
+    "hierarchy": "audit_columns",
+    "sql_features": [],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "movimenti_merce",
+        "description": "La tabella principale del database si chiama realmente 'spedizioni' e contiene le colonne di audit created_at, created_by, updated_at e updated_by oltre ai dati operativi (codice_spedizione, stato, peso_kg). Nella prosa aziendale however viene sistematicamente denominata 'movimenti_merce': i task dovranno risolvere questa corrispondenza per interrogare correttamente la tabella giusta."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "updated_at",
+        "obsolete_value": "ultima_movimentazione",
+        "description": "La colonna di audit 'updated_at', che registra l'istante dell'ultimo aggiornamento della spedizione, viene indicata nella documentazione aziendale con il gergo logistico 'ultima_movimentazione'. Le query su recency e responsabilità (es. WHERE updated_at BETWEEN t1 AND t2 o confronti con NOW() - INTERVAL) dovranno mappare questa perifrasi gergale alla reale colonna timestamp 'updated_at'."
+      }
+    ],
+    "spec_hash": "871c92ddb9b793f2"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT\n);\n\nCREATE TABLE vettori (\n    id INT PRIMARY KEY,\n    nome_vettore TEXT NOT NULL,\n    telefono TEXT,\n    nazione TEXT NOT NULL DEFAULT 'IT'\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    vettore_id INT REFERENCES vettori(id),\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg >= 0),\n    data_spedizione DATE NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    created_by TEXT NOT NULL,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_by TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Rossi Logistica Srl",
+            "partita_iva": "IT01234567890",
+            "citta": "Roma",
+            "email": "info@rossilogistica.it"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Bianchi Trasporti Spa",
+            "partita_iva": "IT09876543210",
+            "citta": "Milano",
+            "email": "contatto@bianchitrasporti.it"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Verdi Express Srl",
+            "partita_iva": "IT05432167890",
+            "citta": "Torino",
+            "email": "support@verdiexpress.it"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Neri Cargo Srl",
+            "partita_iva": "IT01122334455",
+            "citta": "Napoli",
+            "email": "info@nericargo.it"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Gialli Logistics Spa",
+            "partita_iva": "IT09988776655",
+            "citta": "Bologna",
+            "email": null
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi Logistica Srl",
+              "Bianchi Trasporti Spa",
+              "Verdi Express Srl",
+              "Neri Cargo Srl",
+              "Gialli Logistics Spa",
+              "Blu Freight Srl",
+              "Arancio Delivery Spa",
+              "Viola Cargo Srl"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Palermo"
+            ]
+          },
+          "email": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "info@rossilogistica.it",
+              "contatto@bianchitrasporti.it",
+              "support@verdiexpress.it",
+              "info@nericargo.it",
+              "None"
+            ]
+          }
+        }
+      },
+      {
+        "table": "vettori",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_vettore": "TNT Express",
+            "telefono": "+39 02 1234567",
+            "nazione": "IT"
+          },
+          {
+            "id": 2,
+            "nome_vettore": "DHL Logistics",
+            "telefono": "+39 06 7654321",
+            "nazione": "IT"
+          },
+          {
+            "id": 3,
+            "nome_vettore": "Bartolini Spa",
+            "telefono": "+39 051 1112233",
+            "nazione": "IT"
+          },
+          {
+            "id": 4,
+            "nome_vettore": "FedEx Italia",
+            "telefono": "+39 02 9876543",
+            "nazione": "IT"
+          },
+          {
+            "id": 5,
+            "nome_vettore": "GLS Corriere Espresso",
+            "telefono": "+39 06 5554433",
+            "nazione": "IT"
+          }
+        ],
+        "variations": {
+          "nome_vettore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "TNT Express",
+              "DHL Logistics",
+              "Bartolini Spa",
+              "FedEx Italia",
+              "GLS Corriere Espresso",
+              "SDA Express",
+              "UPS Italia"
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 02 1234567",
+              "+39 06 7654321",
+              "+39 051 1112233",
+              "+39 02 9876543",
+              "+39 06 5554433",
+              "+39 011 2223344"
+            ]
+          },
+          "nazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "IT",
+              "IT",
+              "IT",
+              "DE",
+              "FR"
+            ]
+          }
+        }
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_spedizione": "SPD-2026-00001",
+            "cliente_id": 1,
+            "vettore_id": 1,
+            "stato": "consegnata",
+            "peso_kg": 12.5,
+            "data_spedizione": "2026-01-15",
+            "created_at": "2026-01-15 09:00:00",
+            "created_by": "mario.rossi",
+            "updated_at": "2026-01-18 14:30:00",
+            "updated_by": "mario.rossi"
+          },
+          {
+            "id": 2,
+            "codice_spedizione": "SPD-2026-00002",
+            "cliente_id": 2,
+            "vettore_id": 2,
+            "stato": "in_transito",
+            "peso_kg": 35.0,
+            "data_spedizione": "2026-01-20",
+            "created_at": "2026-01-20 10:15:00",
+            "created_by": "laura.bianchi",
+            "updated_at": "2026-01-20 10:15:00",
+            "updated_by": null
+          },
+          {
+            "id": 3,
+            "codice_spedizione": "SPD-2026-00003",
+            "cliente_id": 3,
+            "vettore_id": 3,
+            "stato": "in_preparazione",
+            "peso_kg": 8.2,
+            "data_spedizione": "2026-02-01",
+            "created_at": "2026-02-01 08:00:00",
+            "created_by": "giulia.verdi",
+            "updated_at": "2026-02-01 08:00:00",
+            "updated_by": null
+          },
+          {
+            "id": 4,
+            "codice_spedizione": "SPD-2026-00004",
+            "cliente_id": 1,
+            "vettore_id": 4,
+            "stato": "rimandata",
+            "peso_kg": 22.75,
+            "data_spedizione": "2026-02-10",
+            "created_at": "2026-02-10 11:30:00",
+            "created_by": "mario.rossi",
+            "updated_at": "2026-02-12 16:00:00",
+            "updated_by": "admin.logistica"
+          },
+          {
+            "id": 5,
+            "codice_spedizione": "SPD-2026-00005",
+            "cliente_id": 4,
+            "vettore_id": 2,
+            "stato": "consegnata",
+            "peso_kg": 5.0,
+            "data_spedizione": "2026-02-15",
+            "created_at": "2026-02-15 09:45:00",
+            "created_by": "neri.cargo",
+            "updated_at": "2026-02-17 10:00:00",
+            "updated_by": "neri.cargo"
+          }
+        ],
+        "variations": {
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "in_preparazione",
+              "in_transito",
+              "consegnata",
+              "consegnata",
+              "consegnata",
+              "rimandata"
+            ]
+          },
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "data_spedizione": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "created_by": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "mario.rossi",
+              "laura.bianchi",
+              "giulia.verdi",
+              "admin.logistica",
+              "operatore1",
+              "operatore2"
+            ]
+          },
+          "updated_by": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "mario.rossi",
+              "laura.bianchi",
+              "giulia.verdi",
+              "admin.logistica",
+              "None"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

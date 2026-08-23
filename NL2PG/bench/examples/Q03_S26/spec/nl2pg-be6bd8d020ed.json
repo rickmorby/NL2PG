@@ -1,0 +1,11 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "top_n"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "e11b1f311a7bb3ad"
+}

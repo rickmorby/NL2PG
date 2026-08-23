@@ -1,0 +1,715 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT\n);\n\nCREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT\n);\n\nCREATE TABLE vettori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    tipo_mezzo TEXT NOT NULL CHECK (tipo_mezzo IN ('furgone', 'camion', 'tir', 'nave', 'aereo'))\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    magazzino_partenza_id INT REFERENCES magazzini(id),\n    id_vettore INT REFERENCES vettori(id),\n    peso_kg NUMERIC(10,2) NOT NULL CHECK (peso_kg > 0),\n    data_spedizione DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    costo_spedizione NUMERIC(10,2) CHECK (costo_spedizione >= 0)\n);\n\nCREATE TABLE colli (\n    id INT PRIMARY KEY,\n    id_spedizione INT NOT NULL REFERENCES spedizioni(id),\n    numero_collo INT NOT NULL,\n    descrizione TEXT,\n    lunghezza_cm NUMERIC(6,2) CHECK (lunghezza_cm > 0),\n    larghezza_cm NUMERIC(6,2) CHECK (larghezza_cm > 0),\n    altezza_cm NUMERIC(6,2) CHECK (altezza_cm > 0),\n    UNIQUE (id_spedizione, numero_collo)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 764,
+        "columns": {
+          "id": {
+            "distinct": 764,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 764
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "AgroFood Sud S.r.l.",
+              "Cartotecnica Gamma S.p.A.",
+              "Chimica Delta S.p.A.",
+              "Farmaceutici Epsilon S.p.A.",
+              "Metalmeccanica Beta S.r.l."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 764,
+            "sample": [
+              "IT02345678901",
+              "IT023456789011",
+              "IT0234567890110",
+              "IT02345678901100",
+              "IT02345678901101"
+            ]
+          },
+          "citta": {
+            "distinct": 13,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Brescia",
+              "Brindisi",
+              "Firenze"
+            ]
+          },
+          "email": {
+            "distinct": 8,
+            "sample": [
+              "acquisti@metbeta.it",
+              "amministrazione@cartgamma.it",
+              "export@farmepsilon.it",
+              "info@tecalfa.it",
+              "logistica@chimicadelta.it"
+            ]
+          }
+        }
+      },
+      "magazzini": {
+        "row_count": 12,
+        "columns": {
+          "id": {
+            "distinct": 12,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "2"
+            ],
+            "min": 1,
+            "max": 12
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Deposito Centro Bologna",
+              "Hub Interporto Brescia",
+              "Hub Nord Milano",
+              "Magazzino Ovest Torino",
+              "Terminal Adriatico Pescara"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 6,
+            "sample": [
+              "Corso Francia 210",
+              "Strada Statale 11 km 42",
+              "Via Campania Logistica 4",
+              "Via dei Trasporti 33",
+              "Via del Porto 7"
+            ]
+          },
+          "citta": {
+            "distinct": 5,
+            "sample": [
+              "Brescia",
+              "Padova",
+              "Pescara",
+              "Torino",
+              "Verona"
+            ]
+          },
+          "cap": {
+            "distinct": 6,
+            "sample": [
+              "10152",
+              "20151",
+              "35127",
+              "37141",
+              "40132"
+            ]
+          }
+        }
+      },
+      "vettori": {
+        "row_count": 19,
+        "columns": {
+          "id": {
+            "distinct": 19,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 19
+          },
+          "ragione_sociale": {
+            "distinct": 7,
+            "sample": [
+              "Giroveloce Distribuzione S.r.l.",
+              "Intermodal Express S.r.l.",
+              "Logistica Nazionale S.p.A.",
+              "Mediterraneo Shipping S.p.A.",
+              "Speedy Parcel Service S.r.l."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 19,
+            "sample": [
+              "IT05432109876",
+              "IT054321098761",
+              "IT054321098762",
+              "IT06543210987",
+              "IT065432109871"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+39 010 3456789",
+              "+39 011 6789012",
+              "+39 02 5678901",
+              "+39 06 2345678",
+              "+39 081 4567890"
+            ]
+          },
+          "tipo_mezzo": {
+            "distinct": 5,
+            "sample": [
+              "aereo",
+              "camion",
+              "furgone",
+              "nave",
+              "tir"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 1437,
+        "columns": {
+          "id": {
+            "distinct": 1437,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1537
+          },
+          "cliente_id": {
+            "distinct": 657,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 764
+          },
+          "magazzino_partenza_id": {
+            "distinct": 12,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "2"
+            ],
+            "min": 1,
+            "max": 12
+          },
+          "id_vettore": {
+            "distinct": 19,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 19
+          },
+          "peso_kg": {
+            "distinct": 1365,
+            "sample": [
+              "100.0",
+              "100.14",
+              "100.36",
+              "100.93",
+              "1000.41"
+            ],
+            "min": 27.05,
+            "max": 8001.88
+          },
+          "data_spedizione": {
+            "distinct": 134,
+            "sample": [
+              "2025-11-03",
+              "2025-11-04",
+              "2025-11-05",
+              "2025-11-06",
+              "2025-11-07"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 43,
+            "sample": [
+              "2026-03-05",
+              "2026-03-06",
+              "2026-03-07",
+              "2026-03-08",
+              "2026-03-09"
+            ]
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "consegnata",
+              "in_preparazione",
+              "in_transito",
+              "rimandata"
+            ]
+          },
+          "costo_spedizione": {
+            "distinct": 1283,
+            "sample": [
+              "100.14",
+              "100.15",
+              "100.3",
+              "100.41",
+              "100.56"
+            ],
+            "min": 37.65,
+            "max": 2250.0
+          }
+        }
+      },
+      "colli": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "id_spedizione": {
+            "distinct": 1437,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1537
+          },
+          "numero_collo": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "descrizione": {
+            "distinct": 10,
+            "sample": [
+              "Attrezzatura industriale",
+              "Bidoni chimici",
+              "Casse alimentari",
+              "Cavi e accessori",
+              "Componenti elettronici"
+            ]
+          },
+          "lunghezza_cm": {
+            "distinct": 2452,
+            "sample": [
+              "100.0",
+              "100.17",
+              "100.53",
+              "100.72",
+              "100.86"
+            ],
+            "min": 31.5,
+            "max": 240.0
+          },
+          "larghezza_cm": {
+            "distinct": 2272,
+            "sample": [
+              "100.25",
+              "100.29",
+              "100.53",
+              "100.63",
+              "100.72"
+            ],
+            "min": 24.5,
+            "max": 128.0
+          },
+          "altezza_cm": {
+            "distinct": 2407,
+            "sample": [
+              "100.0",
+              "100.07",
+              "100.33",
+              "100.37",
+              "100.39"
+            ],
+            "min": 17.5,
+            "max": 160.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Mobili Rossi S.r.l.",
+          "partita_iva": "IT02345678901",
+          "citta": "Bologna",
+          "email": "acquisti@metbeta.it"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Chimica Delta S.p.A.",
+          "partita_iva": "IT023456789011",
+          "citta": "Firenze",
+          "email": "ufficio@agrofoodsud.it"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Metalmeccanica Beta S.r.l.",
+          "partita_iva": "IT023456789012",
+          "citta": "Torino",
+          "email": "logistica@chimicadelta.it"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Mobili Rossi S.r.l.",
+          "partita_iva": "IT023456789013",
+          "citta": "Treviso",
+          "email": "export@farmepsilon.it"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Tecnologie Alfa S.p.A.",
+          "partita_iva": "IT023456789014",
+          "citta": "Napoli",
+          "email": "acquisti@metbeta.it"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Tecnologie Alfa S.p.A.",
+          "partita_iva": "IT023456789015",
+          "citta": "Padova",
+          "email": "amministrazione@cartgamma.it"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Tecnologie Alfa S.p.A.",
+          "partita_iva": "IT023456789016",
+          "citta": "Treviso",
+          "email": "export@farmepsilon.it"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Cartotecnica Gamma S.p.A.",
+          "partita_iva": "IT023456789017",
+          "citta": "Padova",
+          "email": "export@farmepsilon.it"
+        }
+      ],
+      "magazzini": [
+        {
+          "id": 1,
+          "nome": "Hub Interporto Brescia",
+          "indirizzo": "Via Campania Logistica 4",
+          "citta": "Brescia",
+          "cap": "37141"
+        },
+        {
+          "id": 2,
+          "nome": "Hub Nord Milano",
+          "indirizzo": "Via dei Trasporti 33",
+          "citta": "Brescia",
+          "cap": "80146"
+        },
+        {
+          "id": 3,
+          "nome": "Magazzino Ovest Torino",
+          "indirizzo": "Corso Francia 210",
+          "citta": "Padova",
+          "cap": "80146"
+        },
+        {
+          "id": 4,
+          "nome": "Hub Interporto Brescia",
+          "indirizzo": "Via del Porto 7",
+          "citta": "Verona",
+          "cap": "37141"
+        },
+        {
+          "id": 5,
+          "nome": "Deposito Centro Bologna",
+          "indirizzo": "Strada Statale 11 km 42",
+          "citta": "Padova",
+          "cap": null
+        },
+        {
+          "id": 6,
+          "nome": "Terminal Adriatico Pescara",
+          "indirizzo": "Via del Porto 7",
+          "citta": "Torino",
+          "cap": "20151"
+        },
+        {
+          "id": 7,
+          "nome": "Hub Interporto Brescia",
+          "indirizzo": "Via Campania Logistica 4",
+          "citta": "Brescia",
+          "cap": "20151"
+        },
+        {
+          "id": 8,
+          "nome": "Terminal Adriatico Pescara",
+          "indirizzo": "Via dell'Industria 12",
+          "citta": "Padova",
+          "cap": "40132"
+        }
+      ],
+      "vettori": [
+        {
+          "id": 1,
+          "ragione_sociale": "Mediterraneo Shipping S.p.A.",
+          "partita_iva": "IT09876543210",
+          "telefono": "+39 010 3456789",
+          "tipo_mezzo": "aereo"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Trasporti Rapidi S.r.l.",
+          "partita_iva": "IT098765432101",
+          "telefono": "+39 010 3456789",
+          "tipo_mezzo": "tir"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Trasporti Rapidi S.r.l.",
+          "partita_iva": "IT098765432102",
+          "telefono": "+39 010 3456789",
+          "tipo_mezzo": "camion"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Logistica Nazionale S.p.A.",
+          "partita_iva": "IT098765432103",
+          "telefono": "+39 081 4567890",
+          "tipo_mezzo": "nave"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Intermodal Express S.r.l.",
+          "partita_iva": "IT08765432109",
+          "telefono": "+39 010 3456789",
+          "tipo_mezzo": "furgone"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Trasporti Rapidi S.r.l.",
+          "partita_iva": "IT087654321091",
+          "telefono": "+39 02 5678901",
+          "tipo_mezzo": "furgone"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Speedy Parcel Service S.r.l.",
+          "partita_iva": "IT087654321092",
+          "telefono": null,
+          "tipo_mezzo": "nave"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "TransEuropa Freight S.p.A.",
+          "partita_iva": "IT087654321093",
+          "telefono": "+39 02 5678901",
+          "tipo_mezzo": "nave"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 101,
+          "cliente_id": 9,
+          "magazzino_partenza_id": 4,
+          "id_vettore": null,
+          "peso_kg": 244.12,
+          "data_spedizione": "2025-12-17",
+          "data_consegna_prevista": "2026-03-15",
+          "stato": "consegnata",
+          "costo_spedizione": 211.66
+        },
+        {
+          "id": 102,
+          "cliente_id": 145,
+          "magazzino_partenza_id": null,
+          "id_vettore": 16,
+          "peso_kg": 150.68,
+          "data_spedizione": "2026-02-26",
+          "data_consegna_prevista": "2026-03-08",
+          "stato": "in_transito",
+          "costo_spedizione": 113.94
+        },
+        {
+          "id": 103,
+          "cliente_id": 150,
+          "magazzino_partenza_id": 7,
+          "id_vettore": 16,
+          "peso_kg": 146.08,
+          "data_spedizione": "2026-02-26",
+          "data_consegna_prevista": "2026-03-06",
+          "stato": "in_transito",
+          "costo_spedizione": 317.82
+        },
+        {
+          "id": 104,
+          "cliente_id": 754,
+          "magazzino_partenza_id": 1,
+          "id_vettore": 4,
+          "peso_kg": 416.14,
+          "data_spedizione": "2025-12-28",
+          "data_consegna_prevista": "2026-03-23",
+          "stato": "in_transito",
+          "costo_spedizione": 223.36
+        },
+        {
+          "id": 105,
+          "cliente_id": 676,
+          "magazzino_partenza_id": 6,
+          "id_vettore": 12,
+          "peso_kg": 480.8,
+          "data_spedizione": "2026-01-25",
+          "data_consegna_prevista": "2026-03-07",
+          "stato": "in_preparazione",
+          "costo_spedizione": 269.87
+        },
+        {
+          "id": 106,
+          "cliente_id": 344,
+          "magazzino_partenza_id": 8,
+          "id_vettore": 12,
+          "peso_kg": 481.75,
+          "data_spedizione": "2025-11-08",
+          "data_consegna_prevista": "2026-03-25",
+          "stato": "consegnata",
+          "costo_spedizione": 131.52
+        },
+        {
+          "id": 107,
+          "cliente_id": 605,
+          "magazzino_partenza_id": 5,
+          "id_vettore": 16,
+          "peso_kg": 480.0,
+          "data_spedizione": "2026-02-09",
+          "data_consegna_prevista": "2026-03-13",
+          "stato": "consegnata",
+          "costo_spedizione": 280.56
+        },
+        {
+          "id": 108,
+          "cliente_id": 334,
+          "magazzino_partenza_id": 5,
+          "id_vettore": 13,
+          "peso_kg": 245.5,
+          "data_spedizione": "2026-03-02",
+          "data_consegna_prevista": "2026-03-05",
+          "stato": "consegnata",
+          "costo_spedizione": 189.9
+        }
+      ],
+      "colli": [
+        {
+          "id": 1,
+          "id_spedizione": 706,
+          "numero_collo": 1,
+          "descrizione": "Mobile smontato",
+          "lunghezza_cm": 90.87,
+          "larghezza_cm": 46.72,
+          "altezza_cm": 32.85
+        },
+        {
+          "id": 2,
+          "id_spedizione": 1352,
+          "numero_collo": 2,
+          "descrizione": "Documenti e campioni",
+          "lunghezza_cm": null,
+          "larghezza_cm": 59.16,
+          "altezza_cm": 51.37
+        },
+        {
+          "id": 3,
+          "id_spedizione": 716,
+          "numero_collo": 3,
+          "descrizione": "Materiale cartotecnico",
+          "lunghezza_cm": 93.07,
+          "larghezza_cm": 59.69,
+          "altezza_cm": 47.89
+        },
+        {
+          "id": 4,
+          "id_spedizione": 1245,
+          "numero_collo": 4,
+          "descrizione": "Documenti e campioni",
+          "lunghezza_cm": 49.21,
+          "larghezza_cm": 46.44,
+          "altezza_cm": 53.54
+        },
+        {
+          "id": 5,
+          "id_spedizione": 114,
+          "numero_collo": 5,
+          "descrizione": "Casse alimentari",
+          "lunghezza_cm": 62.05,
+          "larghezza_cm": 36.04,
+          "altezza_cm": 55.04
+        },
+        {
+          "id": 6,
+          "id_spedizione": 335,
+          "numero_collo": 6,
+          "descrizione": "Casse alimentari",
+          "lunghezza_cm": 64.57,
+          "larghezza_cm": 40.31,
+          "altezza_cm": 48.95
+        },
+        {
+          "id": 7,
+          "id_spedizione": 493,
+          "numero_collo": 7,
+          "descrizione": "Componenti elettronici",
+          "lunghezza_cm": 73.11,
+          "larghezza_cm": 52.79,
+          "altezza_cm": 46.38
+        },
+        {
+          "id": 8,
+          "id_spedizione": 1256,
+          "numero_collo": 8,
+          "descrizione": "Componenti elettronici",
+          "lunghezza_cm": 65.29,
+          "larghezza_cm": 28.4,
+          "altezza_cm": 45.43
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "conjunctive"
+  ],
+  "query": "SELECT c.ragione_sociale AS cliente, m.nome AS magazzino_partenza, v.ragione_sociale AS vettore, v.tipo_mezzo AS mezzo, s.peso_kg, s.costo_spedizione, s.data_spedizione FROM spedizioni s JOIN clienti c ON s.cliente_id = c.id JOIN magazzini m ON s.magazzino_partenza_id = m.id JOIN vettori v ON s.id_vettore = v.id WHERE s.stato = 'in_transito' AND m.citta = 'Brescia' AND s.peso_kg > 500.00 AND s.costo_spedizione > 200.00 ORDER BY s.costo_spedizione DESC, s.id ASC;"
+}

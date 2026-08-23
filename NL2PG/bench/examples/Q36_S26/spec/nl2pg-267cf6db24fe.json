@@ -1,0 +1,27 @@
+{
+  "domain": "università",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "string_funcs"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "esami",
+      "obsolete_value": "verbali_d_esame",
+      "description": "L'unica tabella dello schema, fisicamente denominata esami, viene indicata nella prosa aziendale come verbali_d_esame. Il risolutore deve mappare la perifrasi sulla tabella reale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "voto",
+      "obsolete_value": "esito_in_trentesimi",
+      "description": "La colonna voto è fisicamente di tipo TEXT pur contenente valori logicamente numerici (es. '28', '30L'). Nella prosa viene indicata con il gergo accademico esito_in_trentesimi. Le query devono manipolare la colonna con funzioni stringa (UPPER/SUBSTRING) e convertire la parte numerica tramite CAST(voto AS NUMERIC), gestendo anche eventuali suffissi alfanumerici come la lode ('30L')."
+    }
+  ],
+  "spec_hash": "ad2b22aa03c4d0f4"
+}

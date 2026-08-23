@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "distinct"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "registro_partenze",
+      "description": "La tabella reale spedizioni viene indicata nella prosa aziendale come registro_partenze, mantenendo però la stessa struttura e gli stessi dati."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "deleted_at",
+      "obsolete_value": "data_disattivazione",
+      "description": "Il timestamp di cancellazione logica deleted_at viene chiamato data_disattivazione; una spedizione è considerata visibile solo quando data_disattivazione è NULL, ovvero deleted_at IS NULL."
+    }
+  ],
+  "spec_hash": "9f1e8671f96c711a"
+}

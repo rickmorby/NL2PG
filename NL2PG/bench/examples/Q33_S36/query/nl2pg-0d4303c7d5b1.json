@@ -1,0 +1,130 @@
+{
+  "schema_ddl": "CREATE TYPE specifiche_articolo AS (\n    blurb TEXT,\n    peso_grammi INT,\n    altezza_cm NUMERIC(5,2),\n    larghezza_cm NUMERIC(5,2),\n    profondita_cm NUMERIC(5,2)\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    prezzo NUMERIC(10,2) NOT NULL CHECK (prezzo >= 0),\n    dettagli_prodotto specifiche_articolo,\n    codice_articolo TEXT NOT NULL UNIQUE\n);",
+  "data_profile": {
+    "profile": {
+      "prodotti": {
+        "row_count": 306,
+        "columns": {
+          "id": {
+            "distinct": 306,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 306
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Cuffie Bluetooth Pro",
+              "Hub USB-C",
+              "Lampada LED Smart",
+              "Monitor 27 Pollici",
+              "Mouse Ergonomico"
+            ]
+          },
+          "prezzo": {
+            "distinct": 292,
+            "sample": [
+              "102.02",
+              "102.84",
+              "103.12",
+              "103.2",
+              "104.83"
+            ],
+            "min": 27.6,
+            "max": 348.6
+          },
+          "dettagli_prodotto": {
+            "distinct": 10,
+            "sample": [
+              "(\"Cuffie over ear con cancellazione rumore\",210,19.00,16.50,8.00)",
+              "(\"Hub multipporta in alluminio\",140,12.00,6.00,1.80)",
+              "(\"Lampada RGB controllabile da app\",180,22.00,10.00,10.00)",
+              "(\"Monitor IPS QHD\",5200,61.50,36.50,18.00)",
+              "(\"Mouse verticale wireless\",95,11.00,7.20,6.50)"
+            ]
+          },
+          "codice_articolo": {
+            "distinct": 306,
+            "sample": [
+              "SKU-AU-0102",
+              "SKU-AU-0102_1",
+              "SKU-AU-0102_10",
+              "SKU-AU-0102_11",
+              "SKU-AU-0102_12"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "prodotti": [
+        {
+          "id": 1,
+          "nome": "Smartwatch Classico",
+          "prezzo": 264.45,
+          "dettagli_prodotto": "(\"Orologio smart con cassa in acciaio\",120,4.50,4.50,1.20)",
+          "codice_articolo": "SKU-SW-0001"
+        },
+        {
+          "id": 2,
+          "nome": "Smartwatch Classico",
+          "prezzo": 178.7,
+          "dettagli_prodotto": "(\"Orologio smart con cassa in acciaio\",120,4.50,4.50,1.20)",
+          "codice_articolo": "SKU-SW-0001_1"
+        },
+        {
+          "id": 3,
+          "nome": "Smartwatch Classico",
+          "prezzo": 178.3,
+          "dettagli_prodotto": "(\"Orologio smart con cassa in acciaio\",120,4.50,4.50,1.20)",
+          "codice_articolo": "SKU-SW-0001_2"
+        },
+        {
+          "id": 4,
+          "nome": "Smartwatch Classico",
+          "prezzo": 266.88,
+          "dettagli_prodotto": "(\"Orologio smart con cassa in acciaio\",120,4.50,4.50,1.20)",
+          "codice_articolo": "SKU-SW-0001_3"
+        },
+        {
+          "id": 5,
+          "nome": "Smartwatch Classico",
+          "prezzo": 274.17,
+          "dettagli_prodotto": "(\"Orologio smart con cassa in acciaio\",120,4.50,4.50,1.20)",
+          "codice_articolo": "SKU-SW-0001_4"
+        },
+        {
+          "id": 6,
+          "nome": "Smartwatch Classico",
+          "prezzo": 164.13,
+          "dettagli_prodotto": "(\"Orologio smart con cassa in acciaio\",120,4.50,4.50,1.20)",
+          "codice_articolo": "SKU-SW-0001_5"
+        },
+        {
+          "id": 7,
+          "nome": "Smartwatch Classico",
+          "prezzo": 265.92,
+          "dettagli_prodotto": "(\"Orologio smart con cassa in acciaio\",120,4.50,4.50,1.20)",
+          "codice_articolo": "SKU-SW-0001_6"
+        },
+        {
+          "id": 8,
+          "nome": "Smartwatch Classico",
+          "prezzo": 278.54,
+          "dettagli_prodotto": "(\"Orologio smart con cassa in acciaio\",120,4.50,4.50,1.20)",
+          "codice_articolo": "SKU-SW-0001_7"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "like"
+  ],
+  "query": "SELECT nome AS nome_prodotto, prezzo, (dettagli_prodotto).blurb AS descrizione, (dettagli_prodotto).peso_grammi AS peso FROM prodotti WHERE nome LIKE 'Smartwatch%' ORDER BY prezzo DESC;"
+}

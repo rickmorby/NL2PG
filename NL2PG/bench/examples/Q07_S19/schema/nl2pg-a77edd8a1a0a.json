@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 8,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "join",
+      "multi_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "ce62e9bc49a200ca"
+  },
+  "schema_ddl": "CREATE TABLE valute (\n    id SERIAL PRIMARY KEY,\n    codice_valuta CHAR(3) NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    simbolo TEXT NOT NULL\n);\n\nCREATE TABLE conti_correnti (\n    id SERIAL PRIMARY KEY,\n    numero_conto TEXT NOT NULL UNIQUE,\n    nome_conto TEXT NOT NULL,\n    valuta_id INT NOT NULL REFERENCES valute(id),\n    saldo NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    data_apertura DATE NOT NULL,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE indirizzi (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    nazione TEXT NOT NULL,\n    tipo_indirizzo TEXT NOT NULL CHECK (tipo_indirizzo IN ('residenza', 'domicilio', 'lavoro'))\n);\n\nCREATE TABLE transazioni (\n    id SERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti_correnti(id),\n    tipo_transazione TEXT NOT NULL CHECK (tipo_transazione IN ('versamento', 'prelievo', 'bonifico', 'addebito')),\n    importo NUMERIC(15,2) NOT NULL CHECK (importo > 0),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    descrizione TEXT,\n    stato TEXT NOT NULL DEFAULT 'completata' CHECK (stato IN ('completata', 'in_attesa', 'annullata'))\n);\n\nCREATE TABLE bonifici (\n    id SERIAL PRIMARY KEY,\n    transazione_id INT NOT NULL REFERENCES transazioni(id),\n    conto_destinatario TEXT NOT NULL,\n    nome_destinatario TEXT NOT NULL,\n    causale TEXT NOT NULL,\n    data_esecuzione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE categorie_spesa (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    budget_mensile NUMERIC(12,2) CHECK (budget_mensile >= 0)\n);\n\nCREATE TABLE movimenti_spesa (\n    id SERIAL PRIMARY KEY,\n    transazione_id INT NOT NULL REFERENCES transazioni(id),\n    categoria_id INT NOT NULL REFERENCES categorie_spesa(id),\n    note TEXT\n);"
+}

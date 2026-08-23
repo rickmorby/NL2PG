@@ -1,0 +1,168 @@
+{
+  "schema_ddl": "CREATE TABLE metodo_veneziano (\n    id SERIAL PRIMARY KEY,\n    data_registrazione DATE NOT NULL,\n    dare NUMERIC(15,2) NOT NULL CHECK (dare >= 0),\n    avere NUMERIC(15,2) NOT NULL CHECK (avere >= 0),\n    giacenza NUMERIC(15,2) GENERATED ALWAYS AS (dare - avere) STORED,\n    descrizione TEXT,\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_profile": {
+    "profile": {
+      "metodo_veneziano": {
+        "row_count": 2682,
+        "columns": {
+          "id": {
+            "distinct": 2682,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2682
+          },
+          "data_registrazione": {
+            "distinct": 175,
+            "sample": [
+              "2025-11-11",
+              "2025-11-12",
+              "2025-11-13",
+              "2025-11-14",
+              "2025-11-15"
+            ]
+          },
+          "dare": {
+            "distinct": 2536,
+            "sample": [
+              "1000.0",
+              "1000.9",
+              "1003.08",
+              "1003.41",
+              "1007.59"
+            ],
+            "min": 250.0,
+            "max": 9000.0
+          },
+          "avere": {
+            "distinct": 2549,
+            "sample": [
+              "1000.68",
+              "1001.74",
+              "1002.86",
+              "1003.09",
+              "1003.26"
+            ],
+            "min": 60.0,
+            "max": 6250.0
+          },
+          "giacenza": {
+            "distinct": 0,
+            "sample": []
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Acquisto materiali",
+              "Anticipo cliente",
+              "Fattura emessa",
+              "Incasso cliente",
+              "Pagamento fornitore"
+            ]
+          },
+          "created_at": {
+            "distinct": 0,
+            "sample": []
+          },
+          "updated_at": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      }
+    },
+    "preview": {
+      "metodo_veneziano": [
+        {
+          "id": 1,
+          "data_registrazione": "2026-03-01",
+          "dare": 1690.29,
+          "avere": 628.4,
+          "giacenza": null,
+          "descrizione": "Acquisto materiali",
+          "created_at": null,
+          "updated_at": null
+        },
+        {
+          "id": 2,
+          "data_registrazione": "2026-02-26",
+          "dare": 2677.99,
+          "avere": 269.23,
+          "giacenza": null,
+          "descrizione": "Acquisto materiali",
+          "created_at": null,
+          "updated_at": null
+        },
+        {
+          "id": 3,
+          "data_registrazione": "2026-01-27",
+          "dare": 1821.11,
+          "avere": 860.88,
+          "giacenza": null,
+          "descrizione": "Acquisto materiali",
+          "created_at": null,
+          "updated_at": null
+        },
+        {
+          "id": 4,
+          "data_registrazione": "2025-11-23",
+          "dare": 2385.48,
+          "avere": 592.9,
+          "giacenza": null,
+          "descrizione": "Anticipo cliente",
+          "created_at": null,
+          "updated_at": null
+        },
+        {
+          "id": 5,
+          "data_registrazione": "2025-11-14",
+          "dare": 2572.29,
+          "avere": 814.35,
+          "giacenza": null,
+          "descrizione": "Incasso cliente",
+          "created_at": null,
+          "updated_at": null
+        },
+        {
+          "id": 6,
+          "data_registrazione": "2026-02-24",
+          "dare": 1873.43,
+          "avere": 1193.6,
+          "giacenza": null,
+          "descrizione": "Pagamento fornitore",
+          "created_at": null,
+          "updated_at": null
+        },
+        {
+          "id": 7,
+          "data_registrazione": "2026-01-21",
+          "dare": 1397.45,
+          "avere": 472.51,
+          "giacenza": null,
+          "descrizione": "Fattura emessa",
+          "created_at": null,
+          "updated_at": null
+        },
+        {
+          "id": 8,
+          "data_registrazione": "2025-12-29",
+          "dare": 549.49,
+          "avere": 775.8,
+          "giacenza": null,
+          "descrizione": "Incasso cliente",
+          "created_at": null,
+          "updated_at": null
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "window"
+  ],
+  "query": "SELECT descrizione, SUM(dare) AS totale_dare, SUM(avere) AS totale_avere, ROW_NUMBER() OVER (PARTITION BY descrizione ORDER BY data_registrazione DESC) AS riga_ordinata_per_data FROM metodo_veneziano WHERE data_registrazione BETWEEN '2025-11-01' AND '2026-03-31' GROUP BY descrizione, data_registrazione ORDER BY totale_dare DESC;"
+}

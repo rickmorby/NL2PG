@@ -1,0 +1,409 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "giornale_movimenti",
+        "description": "La tabella fisica 'transazioni' viene denominata 'giornale_movimenti' nella prosa aziendale. Le query devono aggregare le righe di questa tabella raggruppando per conto o cliente, senza che il nome originale compaia nel testo del task."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo",
+        "obsolete_value": "controvalore",
+        "description": "La colonna 'importo' della tabella transazioni è indicata nei documenti aziendali come 'controvalore'. Le clausole SUM(importo) e i confronti numerici in HAVING devono riferirsi alla colonna reale 'importo'."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "fido_concesso",
+        "obsolete_value": "massimale di credito accordato dalla banca",
+        "description": "La colonna 'fido_concesso' della tabella conti è descritta con la perifrasi 'massimale di credito accordato dalla banca'. Il filtro HAVING richiesto (es. confrontare aggregati sul fido) deve essere ricondotto semanticamente alla colonna reale."
+      }
+    ],
+    "spec_hash": "fc58d59b20496cee"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_apertura_relazione DATE NOT NULL\n);\n\nCREATE TABLE filiali (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    codice_abi TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    filiale_id INT NOT NULL,\n    iban TEXT NOT NULL UNIQUE,\n    fido_concesso NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (fido_concesso >= 0),\n    saldo NUMERIC(12,2) NOT NULL DEFAULT 0,\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL,\n    data_transazione DATE NOT NULL,\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('accredito', 'addebito')),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    descrizione TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 200,
+        "max_rows": 300,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario Rossi",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "data_apertura_relazione": "2018-03-15"
+          },
+          {
+            "id": 2,
+            "nome": "Laura Bianchi",
+            "codice_fiscale": "BNCLRA75C22F205X",
+            "data_apertura_relazione": "2019-07-02"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia Verdi",
+            "codice_fiscale": "VRDGLI92D14L219K",
+            "data_apertura_relazione": "2020-01-20"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro Neri",
+            "codice_fiscale": "NRLALS85E05G273Z",
+            "data_apertura_relazione": "2017-11-10"
+          },
+          {
+            "id": 5,
+            "nome": "Chiara Moretti",
+            "codice_fiscale": "MRTCHR90B28H501P",
+            "data_apertura_relazione": "2021-05-30"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Alessandro Neri",
+              "Chiara Moretti",
+              "Luca Ferrari",
+              "Sara Conti",
+              "Paolo Gatti",
+              "Elena Marchetti",
+              "Davide Fontana",
+              "Francesca Rinaldi",
+              "Marco De Luca"
+            ]
+          },
+          "data_apertura_relazione": {
+            "axis": "shift",
+            "delta_min": -900.0,
+            "delta_max": 600.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "filiali",
+        "nature": "lookup",
+        "min_rows": 10,
+        "max_rows": 16,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Agenzia Centro",
+            "citta": "Roma",
+            "codice_abi": "03069"
+          },
+          {
+            "id": 2,
+            "nome": "Agenzia Duomo",
+            "citta": "Milano",
+            "codice_abi": "05696"
+          },
+          {
+            "id": 3,
+            "nome": "Agenzia Porta Nuova",
+            "citta": "Torino",
+            "codice_abi": "01015"
+          },
+          {
+            "id": 4,
+            "nome": "Agenzia Toledo",
+            "citta": "Napoli",
+            "codice_abi": "01005"
+          },
+          {
+            "id": 5,
+            "nome": "Agenzia Indipendenza",
+            "citta": "Bologna",
+            "codice_abi": "00500"
+          },
+          {
+            "id": 6,
+            "nome": "Agenzia Signoria",
+            "citta": "Firenze",
+            "codice_abi": "06170"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Agenzia Centro",
+              "Agenzia Duomo",
+              "Agenzia Porta Nuova",
+              "Agenzia Toledo",
+              "Agenzia Indipendenza",
+              "Agenzia Signoria",
+              "Agenzia Garibaldi",
+              "Agenzia Mazzini",
+              "Agenzia Vittorio Veneto",
+              "Agenzia Stazione"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona"
+            ]
+          }
+        }
+      },
+      {
+        "table": "conti",
+        "nature": "dimension",
+        "min_rows": 280,
+        "max_rows": 380,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "filiale_id": 1,
+            "iban": "IT60X0542811101000000123456",
+            "fido_concesso": 5000.0,
+            "saldo": 12500.5,
+            "data_apertura": "2019-04-10"
+          },
+          {
+            "id": 2,
+            "cliente_id": 2,
+            "filiale_id": 2,
+            "iban": "IT61Z0542811101000000987654",
+            "fido_concesso": 2500.0,
+            "saldo": -320.75,
+            "data_apertura": "2020-08-21"
+          },
+          {
+            "id": 3,
+            "cliente_id": 3,
+            "filiale_id": 3,
+            "iban": "IT62Y0542811101000000555555",
+            "fido_concesso": 10000.0,
+            "saldo": 48200.0,
+            "data_apertura": "2018-01-15"
+          },
+          {
+            "id": 4,
+            "cliente_id": 4,
+            "filiale_id": 4,
+            "iban": "IT63W0542811101000000444444",
+            "fido_concesso": 0.0,
+            "saldo": 750.25,
+            "data_apertura": "2021-11-02"
+          },
+          {
+            "id": 5,
+            "cliente_id": 5,
+            "filiale_id": 5,
+            "iban": "IT64V0542811101000000333333",
+            "fido_concesso": 1500.0,
+            "saldo": -1890.4,
+            "data_apertura": "2017-06-30"
+          },
+          {
+            "id": 6,
+            "cliente_id": 6,
+            "filiale_id": 6,
+            "iban": "IT65U0542811101000000222222",
+            "fido_concesso": 7500.0,
+            "saldo": 23400.8,
+            "data_apertura": "2019-09-17"
+          }
+        ],
+        "variations": {
+          "fido_concesso": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "saldo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "data_apertura": {
+            "axis": "shift",
+            "delta_min": -700.0,
+            "delta_max": 500.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "transazioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "conto_id": 1,
+            "data_transazione": "2025-01-10",
+            "tipo_movimento": "accredito",
+            "importo": 2500.0,
+            "descrizione": "Accredito stipendio"
+          },
+          {
+            "id": 2,
+            "conto_id": 2,
+            "data_transazione": "2025-01-12",
+            "tipo_movimento": "addebito",
+            "importo": 89.9,
+            "descrizione": "Pagamento utenze luce"
+          },
+          {
+            "id": 3,
+            "conto_id": 3,
+            "data_transazione": "2025-02-03",
+            "tipo_movimento": "accredito",
+            "importo": 1200.0,
+            "descrizione": "Bonifico ricevuto da cliente"
+          },
+          {
+            "id": 4,
+            "conto_id": 4,
+            "data_transazione": "2025-02-18",
+            "tipo_movimento": "addebito",
+            "importo": 45.5,
+            "descrizione": "Prelievo ATM"
+          },
+          {
+            "id": 5,
+            "conto_id": 5,
+            "data_transazione": "2025-03-05",
+            "tipo_movimento": "addebito",
+            "importo": 320.0,
+            "descrizione": "Canone affitto mensile"
+          },
+          {
+            "id": 6,
+            "conto_id": 6,
+            "data_transazione": "2025-03-22",
+            "tipo_movimento": "accredito",
+            "importo": 780.25,
+            "descrizione": "Rimborso spese"
+          },
+          {
+            "id": 7,
+            "conto_id": 7,
+            "data_transazione": "2025-04-14",
+            "tipo_movimento": "addebito",
+            "importo": 129.99,
+            "descrizione": "Acquisto elettronica"
+          },
+          {
+            "id": 8,
+            "conto_id": 8,
+            "data_transazione": "2025-05-01",
+            "tipo_movimento": "accredito",
+            "importo": 3400.0,
+            "descrizione": "Versamento contanti"
+          }
+        ],
+        "variations": {
+          "data_transazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "tipo_movimento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "accredito",
+              "accredito",
+              "addebito",
+              "addebito"
+            ]
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Accredito stipendio",
+              "Pagamento utenze luce",
+              "Bonifico ricevuto da cliente",
+              "Prelievo ATM",
+              "Canone affitto mensile",
+              "Rimborso spese",
+              "Acquisto elettronica",
+              "Versamento contanti",
+              "Pagamento POS supermercato",
+              "Addebito bolletta gas",
+              "Bonifico in uscita fornitore",
+              "Accredito dividendi"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

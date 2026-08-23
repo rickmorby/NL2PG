@@ -1,0 +1,11 @@
+{
+  "domain": "università",
+  "n_tables": 2,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "group_agg"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "2ed79d907c78c944"
+}

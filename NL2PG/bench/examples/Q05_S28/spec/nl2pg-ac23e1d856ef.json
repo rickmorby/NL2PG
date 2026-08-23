@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "group_agg"
+  ],
+  "twist": [
+    "jargon",
+    "rename"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "spedizioni",
+      "obsolete_value": "movimentazioni_logistiche",
+      "description": "La tabella 'spedizioni' viene indicata nel linguaggio aziendale come 'movimentazioni_logistiche', un termine tecnico interno al dominio logistico."
+    },
+    {
+      "twist_type": "rename",
+      "target_value": "peso_kg",
+      "obsolete_value": "peso_lordo",
+      "description": "La colonna 'peso_kg' nella tabella 'spedizioni' è denominata 'peso_lordo' nei report aziendali, introducendo una discrepanza tra il nome tecnico e quello operativo."
+    }
+  ],
+  "spec_hash": "59d0b46576e3032e"
+}

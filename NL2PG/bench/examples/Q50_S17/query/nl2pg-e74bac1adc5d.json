@@ -1,0 +1,465 @@
+{
+  "schema_ddl": "CREATE TABLE anagrafica_risorse_umane (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE,\n    attivo BOOLEAN DEFAULT TRUE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE progetti (\n    id INT PRIMARY KEY,\n    nome_progetto TEXT NOT NULL,\n    budget NUMERIC(12,2) CHECK (budget >= 0),\n    data_inizio DATE,\n    data_fine DATE,\n    completato BOOLEAN DEFAULT FALSE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE assegnazioni_progetto (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES anagrafica_risorse_umane(id),\n    progetto_id INT NOT NULL REFERENCES progetti(id),\n    data_assegnazione DATE DEFAULT CURRENT_DATE,\n    percentuale_allocazione NUMERIC(5,2) CHECK (percentuale_allocazione > 0 AND percentuale_allocazione <= 100),\n    attiva BOOLEAN DEFAULT TRUE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_profile": {
+    "profile": {
+      "anagrafica_risorse_umane": {
+        "row_count": 226,
+        "columns": {
+          "id": {
+            "distinct": 226,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 226
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Francesca",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Fontana",
+              "Gialli",
+              "Greco"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 226,
+            "sample": [
+              "BNCLRA85B02F205X",
+              "BNCLRA85B02F205X_1",
+              "BNCLRA85B02F205X_10",
+              "BNCLRA85B02F205X_11",
+              "BNCLRA85B02F205X_12"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 189,
+            "sample": [
+              "2018-11-20",
+              "2018-12-07",
+              "2018-12-26",
+              "2019-01-05",
+              "2019-01-14"
+            ]
+          },
+          "attivo": {
+            "distinct": 2,
+            "sample": [
+              "False",
+              "True"
+            ],
+            "min": false,
+            "max": true
+          },
+          "eliminato": {
+            "distinct": 1,
+            "sample": [
+              "False"
+            ],
+            "min": false,
+            "max": false
+          }
+        }
+      },
+      "progetti": {
+        "row_count": 482,
+        "columns": {
+          "id": {
+            "distinct": 482,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 482
+          },
+          "nome_progetto": {
+            "distinct": 10,
+            "sample": [
+              "Automazione Processi HR",
+              "Business Intelligence",
+              "Digitalizzazione Archivio",
+              "Formazione Cybersecurity",
+              "Implementazione CRM"
+            ]
+          },
+          "budget": {
+            "distinct": 451,
+            "sample": [
+              "100134.49",
+              "101358.0",
+              "101814.49",
+              "101920.53",
+              "103661.02"
+            ],
+            "min": 24000.0,
+            "max": 330000.0
+          },
+          "data_inizio": {
+            "distinct": 172,
+            "sample": [
+              "2024-11-11",
+              "2024-11-13",
+              "2024-11-14",
+              "2024-11-15",
+              "2024-11-18"
+            ]
+          },
+          "data_fine": {
+            "distinct": 251,
+            "sample": [
+              "2025-05-20",
+              "2025-05-26",
+              "2025-05-28",
+              "2025-05-30",
+              "2025-06-01"
+            ]
+          },
+          "completato": {
+            "distinct": 2,
+            "sample": [
+              "False",
+              "True"
+            ],
+            "min": false,
+            "max": true
+          },
+          "eliminato": {
+            "distinct": 1,
+            "sample": [
+              "False"
+            ],
+            "min": false,
+            "max": false
+          }
+        }
+      },
+      "assegnazioni_progetto": {
+        "row_count": 2702,
+        "columns": {
+          "id": {
+            "distinct": 2702,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2702
+          },
+          "dipendente_id": {
+            "distinct": 226,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 226
+          },
+          "progetto_id": {
+            "distinct": 477,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 482
+          },
+          "data_assegnazione": {
+            "distinct": 549,
+            "sample": [
+              "2024-07-19",
+              "2024-07-20",
+              "2024-07-22",
+              "2024-07-23",
+              "2024-07-24"
+            ]
+          },
+          "percentuale_allocazione": {
+            "distinct": 2111,
+            "sample": [
+              "100.0",
+              "12.5",
+              "12.57",
+              "12.59",
+              "12.6"
+            ],
+            "min": 12.5,
+            "max": 100.0
+          },
+          "attiva": {
+            "distinct": 2,
+            "sample": [
+              "False",
+              "True"
+            ],
+            "min": false,
+            "max": true
+          },
+          "eliminato": {
+            "distinct": 1,
+            "sample": [
+              "False"
+            ],
+            "min": false,
+            "max": false
+          }
+        }
+      }
+    },
+    "preview": {
+      "anagrafica_risorse_umane": [
+        {
+          "id": 1,
+          "nome": "Chiara",
+          "cognome": "Colombo",
+          "codice_fiscale": "RSSMRA80A01H501U",
+          "data_assunzione": "2020-10-05",
+          "attivo": true,
+          "eliminato": false
+        },
+        {
+          "id": 2,
+          "nome": "Chiara",
+          "cognome": "Neri",
+          "codice_fiscale": "RSSMRA80A01H501U_1",
+          "data_assunzione": "2019-10-09",
+          "attivo": true,
+          "eliminato": false
+        },
+        {
+          "id": 3,
+          "nome": "Laura",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA80A01H501U_2",
+          "data_assunzione": "2019-08-24",
+          "attivo": true,
+          "eliminato": false
+        },
+        {
+          "id": 4,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H501U_3",
+          "data_assunzione": "2020-03-15",
+          "attivo": true,
+          "eliminato": false
+        },
+        {
+          "id": 5,
+          "nome": "Chiara",
+          "cognome": "Romano",
+          "codice_fiscale": "RSSMRA80A01H501U_4",
+          "data_assunzione": "2021-01-19",
+          "attivo": true,
+          "eliminato": false
+        },
+        {
+          "id": 6,
+          "nome": "Giulia",
+          "cognome": "Neri",
+          "codice_fiscale": "RSSMRA80A01H501U_5",
+          "data_assunzione": "2020-04-22",
+          "attivo": true,
+          "eliminato": false
+        },
+        {
+          "id": 7,
+          "nome": "Sara",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRA80A01H501U_6",
+          "data_assunzione": "2019-09-05",
+          "attivo": true,
+          "eliminato": false
+        },
+        {
+          "id": 8,
+          "nome": "Laura",
+          "cognome": "Greco",
+          "codice_fiscale": "RSSMRA80A01H501U_7",
+          "data_assunzione": "2021-02-28",
+          "attivo": true,
+          "eliminato": false
+        }
+      ],
+      "progetti": [
+        {
+          "id": 1,
+          "nome_progetto": "Ottimizzazione Supply Chain",
+          "budget": 149242.05,
+          "data_inizio": null,
+          "data_fine": "2025-09-18",
+          "completato": true,
+          "eliminato": false
+        },
+        {
+          "id": 2,
+          "nome_progetto": "Digitalizzazione Archivio",
+          "budget": 174667.53,
+          "data_inizio": null,
+          "data_fine": "2025-10-26",
+          "completato": true,
+          "eliminato": false
+        },
+        {
+          "id": 3,
+          "nome_progetto": "Business Intelligence",
+          "budget": 160859.56,
+          "data_inizio": "2024-11-13",
+          "data_fine": "2025-07-03",
+          "completato": true,
+          "eliminato": false
+        },
+        {
+          "id": 4,
+          "nome_progetto": "Sicurezza Rete",
+          "budget": 154375.45,
+          "data_inizio": "2024-12-30",
+          "data_fine": "2025-12-08",
+          "completato": true,
+          "eliminato": false
+        },
+        {
+          "id": 5,
+          "nome_progetto": "Automazione Processi HR",
+          "budget": 160067.07,
+          "data_inizio": "2024-11-22",
+          "data_fine": "2025-09-25",
+          "completato": true,
+          "eliminato": false
+        },
+        {
+          "id": 6,
+          "nome_progetto": "Formazione Cybersecurity",
+          "budget": 201853.71,
+          "data_inizio": "2024-12-09",
+          "data_fine": "2025-07-19",
+          "completato": null,
+          "eliminato": false
+        },
+        {
+          "id": 7,
+          "nome_progetto": "Ottimizzazione Supply Chain",
+          "budget": 151041.09,
+          "data_inizio": "2024-12-19",
+          "data_fine": "2025-11-23",
+          "completato": true,
+          "eliminato": false
+        },
+        {
+          "id": 8,
+          "nome_progetto": "Implementazione CRM",
+          "budget": 195058.09,
+          "data_inizio": "2025-01-07",
+          "data_fine": "2025-11-22",
+          "completato": true,
+          "eliminato": false
+        }
+      ],
+      "assegnazioni_progetto": [
+        {
+          "id": 1,
+          "dipendente_id": 33,
+          "progetto_id": 282,
+          "data_assegnazione": "2025-03-17",
+          "percentuale_allocazione": 70.33,
+          "attiva": true,
+          "eliminato": false
+        },
+        {
+          "id": 2,
+          "dipendente_id": 94,
+          "progetto_id": 375,
+          "data_assegnazione": "2025-03-07",
+          "percentuale_allocazione": 80.64,
+          "attiva": true,
+          "eliminato": false
+        },
+        {
+          "id": 3,
+          "dipendente_id": 162,
+          "progetto_id": 431,
+          "data_assegnazione": "2025-05-25",
+          "percentuale_allocazione": 96.58,
+          "attiva": true,
+          "eliminato": false
+        },
+        {
+          "id": 4,
+          "dipendente_id": 1,
+          "progetto_id": 182,
+          "data_assegnazione": "2025-06-24",
+          "percentuale_allocazione": 59.83,
+          "attiva": null,
+          "eliminato": false
+        },
+        {
+          "id": 5,
+          "dipendente_id": 94,
+          "progetto_id": 168,
+          "data_assegnazione": "2025-04-05",
+          "percentuale_allocazione": 91.26,
+          "attiva": true,
+          "eliminato": false
+        },
+        {
+          "id": 6,
+          "dipendente_id": 162,
+          "progetto_id": 410,
+          "data_assegnazione": "2025-06-27",
+          "percentuale_allocazione": 52.53,
+          "attiva": true,
+          "eliminato": false
+        },
+        {
+          "id": 7,
+          "dipendente_id": 177,
+          "progetto_id": 157,
+          "data_assegnazione": "2024-09-03",
+          "percentuale_allocazione": 55.58,
+          "attiva": true,
+          "eliminato": false
+        },
+        {
+          "id": 8,
+          "dipendente_id": 81,
+          "progetto_id": 429,
+          "data_assegnazione": "2024-12-19",
+          "percentuale_allocazione": 89.3,
+          "attiva": true,
+          "eliminato": false
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "boolean_predicate"
+  ],
+  "query": "SELECT nome, cognome, data_assunzione FROM anagrafica_risorse_umane WHERE attivo IS TRUE ORDER BY data_assunzione ASC LIMIT 10;"
+}

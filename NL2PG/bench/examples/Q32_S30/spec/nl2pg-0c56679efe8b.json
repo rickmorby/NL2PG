@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 11,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "values"
+  ],
+  "twist": [
+    "rename",
+    "distractor",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "movimenti_magazzino",
+      "obsolete_value": "giornale_movimentazioni",
+      "description": "La tabella movimenti_magazzino viene denominata giornale_movimentazioni nella prosa aziendale. Lo schema ERP contiene decine di tabelle con nomi simili (es. movimenti_vendite, movimenti_contabili), ma solo movimenti_magazzino corrisponde al giornale_movimentazioni citato."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "articoli",
+      "obsolete_value": "catalogo_prodotti",
+      "description": "Il termine catalogo_prodotti utilizzato nella prosa può essere confuso con le tabelle omonime distrattrici presenti nello schema (articoli_obsoleti, articoli_servizio, archivio_articoli). Solo la tabella articoli contiene l'anagrafica corrente pertinente per il join con la tabella inline costruita tramite FROM (VALUES ...)."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "centri_costo",
+      "obsolete_value": "assorbenti_analitici",
+      "description": "Nella documentazione interna dell'azienda i centri_costo sono indicati con il gergo contabile assorbenti_analitici. Il solver deve riconoscere che tale perifrasi si riferisce esclusivamente alla tabella centri_costo, ignorando le tabelle contabili affini come centri_ricavo e piani_dei_conti."
+    }
+  ],
+  "spec_hash": "55b8225ce7cc5bfd"
+}

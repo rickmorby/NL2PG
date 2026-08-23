@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "exists"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fornitori",
+      "obsolete_value": "anagrafica_partner",
+      "description": "La tabella padre fornitori viene denominata anagrafica_partner nella prosa aziendale; l'utente deve riconoscere che le richieste su 'anagrafica_partner' si riferiscono alla tabella fornitori."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "scorta_minima",
+      "obsolete_value": "stock di sicurezza",
+      "description": "La colonna scorta_minima della tabella articoli viene indicata con il gergo ERP/logistico 'stock di sicurezza'; le query che menzionano tale termine devono risolvere la colonna scorta_minima."
+    }
+  ],
+  "spec_hash": "0ad98d9b4bb39e17"
+}

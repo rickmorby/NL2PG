@@ -1,0 +1,27 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 3,
+  "hierarchy": "flat_partitioned",
+  "sql_features": [
+    "offset_fetch"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "immobili",
+      "obsolete_value": "schede_catastali",
+      "description": "La tabella logica partizionata immobili viene denominata nella prosa aziendale come schede_catastali; il risolutore deve mappare la perifrasi sulla tabella partizionata corretta."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "prezzo_richiesto",
+      "obsolete_value": "valore di listino",
+      "description": "La colonna prezzo_richiesto della tabella partizionata immobili è indicata nei documenti aziendali con il gergo del settore immobiliare 'valore di listino'; le query di paginazione con ORDER BY e OFFSET/FETCH devono ordinare e filtrare su tale colonna."
+    }
+  ],
+  "spec_hash": "ca2cb4ae62fe333a"
+}

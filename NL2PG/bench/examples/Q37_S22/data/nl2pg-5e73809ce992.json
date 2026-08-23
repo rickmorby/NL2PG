@@ -1,0 +1,556 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 6,
+    "hierarchy": "star_schema",
+    "sql_features": [
+      "math_funcs"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fatti_spedizioni",
+        "obsolete_value": "registro_movimenti_di_flotta",
+        "description": "La tabella dei fatti centrale fatti_spedizioni, che contiene le misure quantitative come peso_kg, costo_trasporto e distanza_km, viene denominata nella prosa aziendale registro_movimenti_di_flotta. Le query devono riconoscere che ogni riga del registro corrisponde a una singola spedizione registrata nel data warehouse."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "giorni_transito",
+        "obsolete_value": "lead time di consegna",
+        "description": "La colonna giorni_transito presente nella tabella dei fatti viene espressa nella documentazione aziendale con il gergo logistico lead time di consegna. I calcoli con ROUND o ABS su questa misura devono riferirsi alla colonna reale giorni_transito, joinando le dimensioni sulle chiavi esterne."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "dim_vettori",
+        "obsolete_value": "anagrafica_partner_di_trasporto",
+        "description": "La tabella dimensionale dim_vettori, che descrive i corrieri incaricati delle spedizioni, viene indicata nella prosa aziendale come anagrafica_partner_di_trasporto. Le query che aggregano o filtrano per vettore devono risalire alla tabella dim_vettori tramite la chiave esterna id_vettore della tabella dei fatti."
+      }
+    ],
+    "spec_hash": "3b02df5124ed77c1"
+  },
+  "schema_ddl": "CREATE TABLE dim_vettori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT,\n    email_operativa TEXT,\n    citta_sede TEXT NOT NULL\n);\n\nCREATE TABLE dim_clienti (\n    id INT PRIMARY KEY,\n    codice_cliente TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    citta_fatturazione TEXT NOT NULL,\n    provincia_fatturazione TEXT\n);\n\nCREATE TABLE dim_mezzi (\n    id INT PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    tipo_mezzo TEXT NOT NULL,\n    capacita_carico_kg NUMERIC(10,2) NOT NULL CHECK (capacita_carico_kg > 0),\n    anno_immatricolazione INT NOT NULL CHECK (anno_immatricolazione BETWEEN 1970 AND 2100)\n);\n\nCREATE TABLE dim_magazzini (\n    id INT PRIMARY KEY,\n    codice_magazzino TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL\n);\n\nCREATE TABLE dim_destinazioni (\n    id INT PRIMARY KEY,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    regione TEXT NOT NULL,\n    zona_logistica TEXT NOT NULL\n);\n\nCREATE TABLE fatti_spedizioni (\n    id BIGINT PRIMARY KEY,\n    data_spedizione DATE NOT NULL,\n    id_vettore INT NOT NULL REFERENCES dim_vettori(id),\n    cliente_id INT NOT NULL REFERENCES dim_clienti(id),\n    mezzo_id INT NOT NULL REFERENCES dim_mezzi(id),\n    magazzino_partenza_id INT NOT NULL REFERENCES dim_magazzini(id),\n    destinazione_id INT NOT NULL REFERENCES dim_destinazioni(id),\n    peso_kg NUMERIC(10,2) NOT NULL CHECK (peso_kg >= 0),\n    costo_trasporto NUMERIC(12,2) NOT NULL CHECK (costo_trasporto >= 0),\n    distanza_km NUMERIC(10,2) NOT NULL CHECK (distanza_km >= 0),\n    giorni_transito INT NOT NULL CHECK (giorni_transito >= 0),\n    numero_colli INT NOT NULL DEFAULT 1 CHECK (numero_colli > 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dim_vettori",
+        "nature": "lookup",
+        "min_rows": 8,
+        "max_rows": 14,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Bartolini Trasporti S.p.A.",
+            "partita_iva": "IT00435870341",
+            "telefono_contatto": "+39 051 3456789",
+            "email_operativa": "operazioni@bartolini-trasporti.it",
+            "citta_sede": "Bologna"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "GLS Italia S.r.l.",
+            "partita_iva": "IT03456780123",
+            "telefono_contatto": "+39 02 9876543",
+            "email_operativa": "spedizioni@gls-italia.it",
+            "citta_sede": "Milano"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "DHL Express Italia S.r.l.",
+            "partita_iva": "IT07654321098",
+            "telefono_contatto": "+39 02 1234567",
+            "email_operativa": "hub@dhl-express-italia.it",
+            "citta_sede": "Milano"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "BRT Bartolini S.p.A.",
+            "partita_iva": "IT02298765432",
+            "telefono_contatto": "+39 051 2345678",
+            "email_operativa": "flotta@brt-bartolini.it",
+            "citta_sede": "Bologna"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "TNT Global Logistics S.r.l.",
+            "partita_iva": "IT09876543210",
+            "telefono_contatto": "+39 06 5551234",
+            "email_operativa": "operativita@tnt-logistics.it",
+            "citta_sede": "Roma"
+          },
+          {
+            "id": 6,
+            "ragione_sociale": "Fercam Italia S.r.l.",
+            "partita_iva": "IT01122334455",
+            "telefono_contatto": "+39 0461 778899",
+            "email_operativa": "trasporti@fercam-italia.it",
+            "citta_sede": "Trento"
+          },
+          {
+            "id": 7,
+            "ragione_sociale": "Savino Del Bene S.p.A.",
+            "partita_iva": "IT00456789123",
+            "telefono_contatto": "+39 055 6677889",
+            "email_operativa": "network@savino-del-bene.it",
+            "citta_sede": "Scandicci"
+          },
+          {
+            "id": 8,
+            "ragione_sociale": "Kuehne+Nagel Italia S.r.l.",
+            "partita_iva": "IT03344556677",
+            "telefono_contatto": "+39 02 4455667",
+            "email_operativa": "cargo@kuehne-nagel-italia.it",
+            "citta_sede": "Milano"
+          },
+          {
+            "id": 9,
+            "ragione_sociale": "DB Schenker Italia S.p.A.",
+            "partita_iva": "IT05566778899",
+            "telefono_contatto": "+39 02 3344556",
+            "email_operativa": "fleet@db-schenker-italia.it",
+            "citta_sede": "Milano"
+          },
+          {
+            "id": 10,
+            "ragione_sociale": "Autotrasporti Messina & Figli S.r.l.",
+            "partita_iva": "IT01239876123",
+            "telefono_contatto": "+39 081 2233445",
+            "email_operativa": "info@messinafigli-autotrasporti.it",
+            "citta_sede": "Napoli"
+          }
+        ],
+        "variations": {
+          "citta_sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Bologna",
+              "Milano",
+              "Roma",
+              "Torino",
+              "Padova",
+              "Verona",
+              "Napoli",
+              "Brescia"
+            ]
+          }
+        }
+      },
+      {
+        "table": "dim_clienti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 250,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_cliente": "CL-00001",
+            "denominazione": "Alimentari Rossi S.r.l.",
+            "citta_fatturazione": "Roma",
+            "provincia_fatturazione": "RM"
+          },
+          {
+            "id": 2,
+            "codice_cliente": "CL-00002",
+            "denominazione": "Ferramenta Bianchi S.p.A.",
+            "citta_fatturazione": "Milano",
+            "provincia_fatturazione": "MI"
+          },
+          {
+            "id": 3,
+            "codice_cliente": "CL-00003",
+            "denominazione": "Cartoleria Verdi & C. S.n.c.",
+            "citta_fatturazione": "Torino",
+            "provincia_fatturazione": "TO"
+          },
+          {
+            "id": 4,
+            "codice_cliente": "CL-00004",
+            "denominazione": "Elettrodomestici Conti S.p.A.",
+            "citta_fatturazione": "Napoli",
+            "provincia_fatturazione": "NA"
+          },
+          {
+            "id": 5,
+            "codice_cliente": "CL-00005",
+            "denominazione": "Abbigliamento Moda Nova S.r.l.",
+            "citta_fatturazione": "Firenze",
+            "provincia_fatturazione": "FI"
+          },
+          {
+            "id": 6,
+            "codice_cliente": "CL-00006",
+            "denominazione": "Chimica Lombarda S.p.A.",
+            "citta_fatturazione": "Brescia",
+            "provincia_fatturazione": "BS"
+          },
+          {
+            "id": 7,
+            "codice_cliente": "CL-00007",
+            "denominazione": "Vini e Distillati Toscani S.r.l.",
+            "citta_fatturazione": "Siena",
+            "provincia_fatturazione": "SI"
+          },
+          {
+            "id": 8,
+            "codice_cliente": "CL-00008",
+            "denominazione": "Componenti Meccanici Emiliani S.p.A.",
+            "citta_fatturazione": "Modena",
+            "provincia_fatturazione": "MO"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "dim_mezzi",
+        "nature": "lookup",
+        "min_rows": 10,
+        "max_rows": 18,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "targa": "FT512KL",
+            "tipo_mezzo": "furgone",
+            "capacita_carico_kg": 3500.0,
+            "anno_immatricolazione": 2019
+          },
+          {
+            "id": 2,
+            "targa": "GB774NM",
+            "tipo_mezzo": "camion",
+            "capacita_carico_kg": 12000.0,
+            "anno_immatricolazione": 2017
+          },
+          {
+            "id": 3,
+            "targa": "HD209PQ",
+            "tipo_mezzo": "semirimorchio",
+            "capacita_carico_kg": 24000.0,
+            "anno_immatricolazione": 2021
+          },
+          {
+            "id": 4,
+            "targa": "LE883RS",
+            "tipo_mezzo": "autocarro",
+            "capacita_carico_kg": 7500.0,
+            "anno_immatricolazione": 2015
+          },
+          {
+            "id": 5,
+            "targa": "MF640TV",
+            "tipo_mezzo": "camion",
+            "capacita_carico_kg": 16000.0,
+            "anno_immatricolazione": 2020
+          },
+          {
+            "id": 6,
+            "targa": "NG117UW",
+            "tipo_mezzo": "furgone",
+            "capacita_carico_kg": 4200.0,
+            "anno_immatricolazione": 2022
+          },
+          {
+            "id": 7,
+            "targa": "PR958XZ",
+            "tipo_mezzo": "semirimorchio",
+            "capacita_carico_kg": 26000.0,
+            "anno_immatricolazione": 2018
+          },
+          {
+            "id": 8,
+            "targa": "QT306AB",
+            "tipo_mezzo": "autocarro",
+            "capacita_carico_kg": 9000.0,
+            "anno_immatricolazione": 2023
+          }
+        ],
+        "variations": {
+          "tipo_mezzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "furgone",
+              "camion",
+              "semirimorchio",
+              "autocarro"
+            ]
+          },
+          "capacita_carico_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "anno_immatricolazione": {
+            "axis": "shift",
+            "delta_min": -3.0,
+            "delta_max": 1.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "dim_magazzini",
+        "nature": "lookup",
+        "min_rows": 5,
+        "max_rows": 9,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_magazzino": "MAG-NORD-01",
+            "indirizzo": "Via Industriale 14",
+            "citta": "Bergamo",
+            "cap": "24100"
+          },
+          {
+            "id": 2,
+            "codice_magazzino": "MAG-CENTRO-01",
+            "indirizzo": "Via dei Magazzini 8",
+            "citta": "Firenze",
+            "cap": "50100"
+          },
+          {
+            "id": 3,
+            "codice_magazzino": "MAG-SUD-01",
+            "indirizzo": "Zona ASI Lotto 22",
+            "citta": "Caserta",
+            "cap": "81100"
+          },
+          {
+            "id": 4,
+            "codice_magazzino": "MAG-NORD-02",
+            "indirizzo": "Corso Europa 101",
+            "citta": "Monza",
+            "cap": "20900"
+          },
+          {
+            "id": 5,
+            "codice_magazzino": "MAG-ISOLE-01",
+            "indirizzo": "Via Porto Empedocle 45",
+            "citta": "Catania",
+            "cap": "95100"
+          },
+          {
+            "id": 6,
+            "codice_magazzino": "MAG-CENTRO-02",
+            "indirizzo": "Via Salaria Km 18,500",
+            "citta": "Roma",
+            "cap": "00100"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "dim_destinazioni",
+        "nature": "dimension",
+        "min_rows": 80,
+        "max_rows": 140,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "citta": "Roma",
+            "provincia": "RM",
+            "regione": "Lazio",
+            "zona_logistica": "Centro"
+          },
+          {
+            "id": 2,
+            "citta": "Milano",
+            "provincia": "MI",
+            "regione": "Lombardia",
+            "zona_logistica": "Nord"
+          },
+          {
+            "id": 3,
+            "citta": "Napoli",
+            "provincia": "NA",
+            "regione": "Campania",
+            "zona_logistica": "Sud"
+          },
+          {
+            "id": 4,
+            "citta": "Torino",
+            "provincia": "TO",
+            "regione": "Piemonte",
+            "zona_logistica": "Nord"
+          },
+          {
+            "id": 5,
+            "citta": "Palermo",
+            "provincia": "PA",
+            "regione": "Sicilia",
+            "zona_logistica": "Isole"
+          },
+          {
+            "id": 6,
+            "citta": "Bologna",
+            "provincia": "BO",
+            "regione": "Emilia-Romagna",
+            "zona_logistica": "Nord"
+          },
+          {
+            "id": 7,
+            "citta": "Firenze",
+            "provincia": "FI",
+            "regione": "Toscana",
+            "zona_logistica": "Centro"
+          },
+          {
+            "id": 8,
+            "citta": "Bari",
+            "provincia": "BA",
+            "regione": "Puglia",
+            "zona_logistica": "Sud"
+          },
+          {
+            "id": 9,
+            "citta": "Genova",
+            "provincia": "GE",
+            "regione": "Liguria",
+            "zona_logistica": "Nord"
+          },
+          {
+            "id": 10,
+            "citta": "Cagliari",
+            "provincia": "CA",
+            "regione": "Sardegna",
+            "zona_logistica": "Isole"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "fatti_spedizioni",
+        "nature": "fact",
+        "min_rows": 1200,
+        "max_rows": 1800,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1001,
+            "data_spedizione": "2026-01-12",
+            "peso_kg": 850.0,
+            "costo_trasporto": 320.5,
+            "distanza_km": 480.0,
+            "giorni_transito": 2,
+            "numero_colli": 4
+          },
+          {
+            "id": 1002,
+            "data_spedizione": "2026-01-28",
+            "peso_kg": 12500.0,
+            "costo_trasporto": 1450.0,
+            "distanza_km": 920.0,
+            "giorni_transito": 4,
+            "numero_colli": 12
+          },
+          {
+            "id": 1003,
+            "data_spedizione": "2026-02-09",
+            "peso_kg": 45.75,
+            "costo_trasporto": 68.9,
+            "distanza_km": 130.0,
+            "giorni_transito": 1,
+            "numero_colli": 1
+          },
+          {
+            "id": 1004,
+            "data_spedizione": "2026-03-17",
+            "peso_kg": 3200.0,
+            "costo_trasporto": 780.25,
+            "distanza_km": 610.0,
+            "giorni_transito": 3,
+            "numero_colli": 8
+          },
+          {
+            "id": 1005,
+            "data_spedizione": "2026-04-22",
+            "peso_kg": 15600.0,
+            "costo_trasporto": 2100.0,
+            "distanza_km": 1150.0,
+            "giorni_transito": 5,
+            "numero_colli": 24
+          },
+          {
+            "id": 1006,
+            "data_spedizione": "2026-05-30",
+            "peso_kg": 640.0,
+            "costo_trasporto": 295.0,
+            "distanza_km": 340.0,
+            "giorni_transito": 2,
+            "numero_colli": 3
+          }
+        ],
+        "variations": {
+          "data_spedizione": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "costo_trasporto": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.9,
+            "pool": []
+          },
+          "distanza_km": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.2,
+            "pool": []
+          },
+          "giorni_transito": {
+            "axis": "shift",
+            "delta_min": -1.0,
+            "delta_max": 3.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "numero_colli": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 4.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,419 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 4,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fatture_vendita",
+        "obsolete_value": "registro_documenti_attivi",
+        "description": "La tabella fisica fatture_vendita viene denominata registro_documenti_attivi nella prosa aziendale. Il solver deve risalire al nome reale della tabella per costruire correttamente il percorso di join PK/FK verso righe_fattura e movimenti_contabili."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_totale",
+        "obsolete_value": "imponibile consolidato",
+        "description": "La colonna importo_totale della tabella righe_fattura è indicata nella narrativa con il gergo contabile 'imponibile consolidato'. Il solver deve mappare il termine tecnico-contabile alla colonna reale quando ordina le righe per selezionare la prima voce per gruppo con DISTINCT ON."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "data_emissione",
+        "obsolete_value": "data di registrazione documentale",
+        "description": "La colonna data_emissione della tabella fatture_vendita è descritta nella prosa come 'data di registrazione documentale'. Il solver deve riconoscere il sinonimo e utilizzarlo come chiave di ordinamento coerente all'interno di DISTINCT ON per determinare quale riga vince in ciascun gruppo."
+      }
+    ],
+    "spec_hash": "6e8a39dec48f2d21"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE fatture_vendita (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_documento TEXT NOT NULL UNIQUE,\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_fattura TEXT NOT NULL DEFAULT 'emessa' CHECK (stato_fattura IN ('bozza', 'emessa', 'pagata', 'annullata')),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE righe_fattura (\n    id SERIAL PRIMARY KEY,\n    fattura_id INT NOT NULL REFERENCES fatture_vendita(id) ON DELETE CASCADE,\n    numero_riga INT NOT NULL,\n    descrizione TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(12,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo_totale NUMERIC(14,2) NOT NULL CHECK (importo_totale >= 0),\n    UNIQUE (fattura_id, numero_riga)\n);\n\nCREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    fattura_id INT NOT NULL REFERENCES fatture_vendita(id) ON DELETE CASCADE,\n    codice_conto TEXT NOT NULL,\n    descrizione_movimento TEXT NOT NULL,\n    sezione_prima_nota TEXT NOT NULL CHECK (sezione_prima_nota IN ('dare', 'avere')),\n    importo_movimento NUMERIC(14,2) NOT NULL CHECK (importo_movimento >= 0),\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Alfa Servizi SRL",
+            "partita_iva": "IT01234567890",
+            "citta": "Milano"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Beta Costruzioni SpA",
+            "partita_iva": "IT09876543210",
+            "citta": "Roma"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Gamma Logistica SNC",
+            "partita_iva": "IT05566778899",
+            "citta": "Torino"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Delta Informatica SRL",
+            "partita_iva": "IT04455667788",
+            "citta": "Napoli"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Epsilon Arredamenti SAS",
+            "partita_iva": "IT03344556677",
+            "citta": "Bologna"
+          },
+          {
+            "id": 6,
+            "ragione_sociale": "Zeta Trasporti SRL",
+            "partita_iva": "IT02233445566",
+            "citta": "Firenze"
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Alfa Servizi SRL",
+              "Beta Costruzioni SpA",
+              "Gamma Logistica SNC",
+              "Delta Informatica SRL",
+              "Epsilon Arredamenti SAS",
+              "Zeta Trasporti SRL",
+              "Omega Facility Management SRL",
+              "Sigma Consulenze SpA",
+              "Kappa Edilizia SNC",
+              "Iota Tecnologie SRL"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona"
+            ]
+          }
+        }
+      },
+      {
+        "table": "fatture_vendita",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 4.0,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "numero_documento": "FT/2026/0001",
+            "data_emissione": "2026-01-10",
+            "data_scadenza": "2026-03-11",
+            "stato_fattura": "pagata",
+            "creato_il": "2026-01-10 09:15:00"
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "numero_documento": "FT/2026/0002",
+            "data_emissione": "2026-01-18",
+            "data_scadenza": "2026-03-19",
+            "stato_fattura": "emessa",
+            "creato_il": "2026-01-18 11:30:00"
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "numero_documento": "FT/2026/0003",
+            "data_emissione": "2026-01-25",
+            "data_scadenza": "2026-03-26",
+            "stato_fattura": "bozza",
+            "creato_il": "2026-01-25 14:45:00"
+          },
+          {
+            "id": 104,
+            "cliente_id": 4,
+            "numero_documento": "FT/2026/0004",
+            "data_emissione": "2026-02-02",
+            "data_scadenza": "2026-04-03",
+            "stato_fattura": "annullata",
+            "creato_il": "2026-02-02 16:20:00"
+          },
+          {
+            "id": 105,
+            "cliente_id": 5,
+            "numero_documento": "FT/2026/0005",
+            "data_emissione": "2026-02-08",
+            "data_scadenza": "2026-04-09",
+            "stato_fattura": "pagata",
+            "creato_il": "2026-02-08 10:05:00"
+          }
+        ],
+        "variations": {
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_fattura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "pagata",
+              "pagata",
+              "pagata",
+              "emessa",
+              "emessa",
+              "bozza",
+              "annullata"
+            ]
+          }
+        }
+      },
+      {
+        "table": "righe_fattura",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 501,
+            "fattura_id": 101,
+            "numero_riga": 1,
+            "descrizione": "Consulenza tecnica mensile",
+            "quantita": 8,
+            "prezzo_unitario": 65.0,
+            "importo_totale": 520.0
+          },
+          {
+            "id": 502,
+            "fattura_id": 102,
+            "numero_riga": 2,
+            "descrizione": "Licenza software annuale",
+            "quantita": 3,
+            "prezzo_unitario": 240.0,
+            "importo_totale": 720.0
+          },
+          {
+            "id": 503,
+            "fattura_id": 103,
+            "numero_riga": 3,
+            "descrizione": "Manutenzione impianto HVAC",
+            "quantita": 2,
+            "prezzo_unitario": 450.0,
+            "importo_totale": 900.0
+          },
+          {
+            "id": 504,
+            "fattura_id": 104,
+            "numero_riga": 1,
+            "descrizione": "Noleggio furgone settimanale",
+            "quantita": 2,
+            "prezzo_unitario": 190.0,
+            "importo_totale": 380.0
+          },
+          {
+            "id": 505,
+            "fattura_id": 105,
+            "numero_riga": 2,
+            "descrizione": "Fornitura cartucce toner",
+            "quantita": 12,
+            "prezzo_unitario": 18.5,
+            "importo_totale": 222.0
+          }
+        ],
+        "variations": {
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Consulenza tecnica mensile",
+              "Licenza software annuale",
+              "Manutenzione impianto HVAC",
+              "Noleggio furgone settimanale",
+              "Fornitura cartucce toner",
+              "Assistenza hardware onsite",
+              "Canone hosting cloud",
+              "Formazione personale",
+              "Trasporto merce nazionale",
+              "Installazione rete LAN"
+            ]
+          },
+          "quantita": {
+            "axis": "shift",
+            "delta_min": -1.0,
+            "delta_max": 3.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "importo_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "movimenti_contabili",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.0,
+        "templates": [
+          {
+            "id": 701,
+            "fattura_id": 101,
+            "codice_conto": "1010",
+            "descrizione_movimento": "Incasso fattura da cliente",
+            "sezione_prima_nota": "dare",
+            "importo_movimento": 520.0,
+            "data_registrazione": "2026-01-12"
+          },
+          {
+            "id": 702,
+            "fattura_id": 102,
+            "codice_conto": "4010",
+            "descrizione_movimento": "Ricavo servizi fatturati",
+            "sezione_prima_nota": "avere",
+            "importo_movimento": 720.0,
+            "data_registrazione": "2026-01-18"
+          },
+          {
+            "id": 703,
+            "fattura_id": 103,
+            "codice_conto": "1010",
+            "descrizione_movimento": "Anticipo cliente via bonifico",
+            "sezione_prima_nota": "dare",
+            "importo_movimento": 450.0,
+            "data_registrazione": "2026-01-27"
+          },
+          {
+            "id": 704,
+            "fattura_id": 104,
+            "codice_conto": "6050",
+            "descrizione_movimento": "Storno nota di credito",
+            "sezione_prima_nota": "avere",
+            "importo_movimento": 380.0,
+            "data_registrazione": "2026-02-03"
+          }
+        ],
+        "variations": {
+          "codice_conto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1010",
+              "1020",
+              "4010",
+              "4020",
+              "6050",
+              "6100"
+            ]
+          },
+          "descrizione_movimento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Incasso fattura da cliente",
+              "Ricavo servizi fatturati",
+              "Anticipo cliente via bonifico",
+              "Storno nota di credito",
+              "Saldo RIBA ricevuto",
+              "Accredito rimessa diretta",
+              "Rettifica importo documento",
+              "Rateizzo parziale fattura"
+            ]
+          },
+          "sezione_prima_nota": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "dare",
+              "dare",
+              "avere",
+              "avere"
+            ]
+          },
+          "importo_movimento": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -20.0,
+            "delta_max": 20.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

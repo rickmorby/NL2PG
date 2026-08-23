@@ -1,0 +1,579 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 5,
+    "hierarchy": "exclusive_arc",
+    "sql_features": [
+      "boolean_predicate"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "candidati",
+        "obsolete_value": "talent_pool_esterno",
+        "description": "La tabella candidati, che partecipa all'arco esclusivo della tabella documenti insieme a dipendenti, viene denominata talent_pool_esterno nella prosa aziendale. Il nome reale nel database resta candidati."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "attivo",
+        "obsolete_value": "in forza",
+        "description": "Il flag booleano attivo della tabella dipendenti viene espresso con il gergo HR 'in forza'. Le query richieste dovranno tradurre questa espressione nel predicato WHERE dipendenti.attivo IS TRUE."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "superata",
+        "obsolete_value": "verdetto favorevole",
+        "description": "La colonna booleana superata della tabella valutazioni è descritta nei documenti aziendali con il sinonimo 'verdetto favorevole'. Le query dovranno mappare tale perifrasi sul predicato WHERE valutazioni.superata IS TRUE."
+      }
+    ],
+    "spec_hash": "c9029e80594ea393"
+  },
+  "schema_ddl": "CREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_annuo NUMERIC(10,2) CHECK (stipendio_annuo > 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE candidati (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    fonte_reclutamento TEXT,\n    data_candidatura DATE NOT NULL\n);\n\nCREATE TABLE colloqui (\n    id INT PRIMARY KEY,\n    candidato_id INT NOT NULL REFERENCES candidati(id),\n    data_colloquio TIMESTAMP NOT NULL,\n    modalita TEXT NOT NULL,\n    esito TEXT CHECK (esito IN ('positivo', 'negativo', 'da_definire'))\n);\n\nCREATE TABLE valutazioni (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    periodo TEXT NOT NULL,\n    punteggio NUMERIC(4,1) CHECK (punteggio BETWEEN 0 AND 100),\n    superata BOOLEAN NOT NULL DEFAULT FALSE,\n    note TEXT\n);\n\nCREATE TABLE documenti (\n    id INT PRIMARY KEY,\n    nome_file TEXT NOT NULL,\n    tipo_documento TEXT NOT NULL,\n    dimensione_byte BIGINT CHECK (dimensione_byte >= 0),\n    data_caricamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    dipendente_id INT REFERENCES dipendenti(id),\n    candidato_id INT REFERENCES candidati(id),\n    CHECK ((dipendente_id IS NULL) <> (candidato_id IS NULL))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 200,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRC85M01H501X",
+            "data_assunzione": "2019-03-11",
+            "stipendio_annuo": 38500.0,
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA90T42F205Y",
+            "data_assunzione": "2020-09-01",
+            "stipendio_annuo": 45200.0,
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI88A15L219Z",
+            "data_assunzione": "2018-01-22",
+            "stipendio_annuo": 52000.0,
+            "attivo": false
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTLSN79C05G273W",
+            "data_assunzione": "2021-06-14",
+            "stipendio_annuo": 33800.0,
+            "attivo": true
+          },
+          {
+            "id": 5,
+            "nome": "Sara",
+            "cognome": "Moretti",
+            "codice_fiscale": "MRTSRA92D58H501Q",
+            "data_assunzione": "2022-02-07",
+            "stipendio_annuo": 29750.0,
+            "attivo": true
+          },
+          {
+            "id": 6,
+            "nome": "Davide",
+            "cognome": "Fontana",
+            "codice_fiscale": "FNTDVD87E21M052R",
+            "data_assunzione": "2017-11-30",
+            "stipendio_annuo": 61000.0,
+            "attivo": false
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Sara",
+              "Davide",
+              "Chiara",
+              "Luca",
+              "Francesca",
+              "Matteo",
+              "Anna",
+              "Stefano"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Conti",
+              "Moretti",
+              "Fontana",
+              "Ricci",
+              "Greco",
+              "Marino",
+              "Costa",
+              "Lombardi",
+              "Ferri"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 120.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stipendio_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "candidati",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 250,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Elena",
+            "cognome": "Gallo",
+            "email": "elena.gallo@example.com",
+            "telefono": "+39 333 1234567",
+            "fonte_reclutamento": "LinkedIn",
+            "data_candidatura": "2025-10-03"
+          },
+          {
+            "id": 2,
+            "nome": "Paolo",
+            "cognome": "Rinaldi",
+            "email": "paolo.rinaldi@example.com",
+            "telefono": "+39 347 9876543",
+            "fonte_reclutamento": "sito_aziendale",
+            "data_candidatura": "2025-11-12"
+          },
+          {
+            "id": 3,
+            "nome": "Martina",
+            "cognome": "De Luca",
+            "email": "martina.deluca@example.com",
+            "telefono": "+39 320 5551122",
+            "fonte_reclutamento": "segnalazione_interna",
+            "data_candidatura": "2025-12-01"
+          },
+          {
+            "id": 4,
+            "nome": "Fabio",
+            "cognome": "Barone",
+            "email": "fabio.barone@example.com",
+            "telefono": "+39 348 7778899",
+            "fonte_reclutamento": "LinkedIn",
+            "data_candidatura": "2026-01-08"
+          },
+          {
+            "id": 5,
+            "nome": "Chiara",
+            "cognome": "Villa",
+            "email": "chiara.villa@example.com",
+            "telefono": "+39 331 4445566",
+            "fonte_reclutamento": "annuncio_indeed",
+            "data_candidatura": "2026-01-20"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Elena",
+              "Paolo",
+              "Martina",
+              "Fabio",
+              "Chiara",
+              "Simone",
+              "Valentina",
+              "Andrea",
+              "Roberta",
+              "Nicola",
+              "Ilaria",
+              "Tommaso"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Gallo",
+              "Rinaldi",
+              "De Luca",
+              "Barone",
+              "Villa",
+              "Serra",
+              "Pellegrini",
+              "Amato",
+              "Orlando",
+              "Testa",
+              "Bruno",
+              "Salvi"
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 333 1112223",
+              "+39 340 9988776",
+              "+39 328 4567890",
+              "+39 349 2345678",
+              "+39 335 6677889"
+            ]
+          },
+          "fonte_reclutamento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "LinkedIn",
+              "LinkedIn",
+              "Indeed",
+              "sito_aziendale",
+              "segnalazione_interna",
+              "universita",
+              "agenzia_headhunting"
+            ]
+          },
+          "data_candidatura": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "colloqui",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.0,
+        "templates": [
+          {
+            "id": 101,
+            "candidato_id": 1,
+            "data_colloquio": "2025-10-10 10:00:00",
+            "modalita": "presenza",
+            "esito": "positivo"
+          },
+          {
+            "id": 102,
+            "candidato_id": 2,
+            "data_colloquio": "2025-11-18 14:30:00",
+            "modalita": "videochiamata",
+            "esito": "negativo"
+          },
+          {
+            "id": 103,
+            "candidato_id": 3,
+            "data_colloquio": "2025-12-05 09:15:00",
+            "modalita": "telefonico",
+            "esito": "da_definire"
+          },
+          {
+            "id": 104,
+            "candidato_id": 4,
+            "data_colloquio": "2026-01-12 16:00:00",
+            "modalita": "videochiamata",
+            "esito": "positivo"
+          },
+          {
+            "id": 105,
+            "candidato_id": 5,
+            "data_colloquio": "2026-01-25 11:45:00",
+            "modalita": "presenza",
+            "esito": "da_definire"
+          }
+        ],
+        "variations": {
+          "data_colloquio": {
+            "axis": "shift",
+            "delta_min": -20.0,
+            "delta_max": 20.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "modalita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "presenza",
+              "videochiamata",
+              "videochiamata",
+              "telefonico"
+            ]
+          },
+          "esito": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "positivo",
+              "positivo",
+              "negativo",
+              "da_definire"
+            ]
+          }
+        }
+      },
+      {
+        "table": "valutazioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 201,
+            "dipendente_id": 1,
+            "periodo": "2024-H1",
+            "punteggio": 72.5,
+            "superata": true,
+            "note": "Buon contributo agli obiettivi di team"
+          },
+          {
+            "id": 202,
+            "dipendente_id": 2,
+            "periodo": "2024-H1",
+            "punteggio": 61.0,
+            "superata": false,
+            "note": "Da migliorare la gestione delle scadenze"
+          },
+          {
+            "id": 203,
+            "dipendente_id": 3,
+            "periodo": "2024-H2",
+            "punteggio": 79.8,
+            "superata": true,
+            "note": "Performance solida e costante"
+          },
+          {
+            "id": 204,
+            "dipendente_id": 4,
+            "periodo": "2024-H2",
+            "punteggio": 54.2,
+            "superata": false,
+            "note": "Obiettivi trimestrali non raggiunti"
+          },
+          {
+            "id": 205,
+            "dipendente_id": 5,
+            "periodo": "2025-H1",
+            "punteggio": 68.9,
+            "superata": true,
+            "note": "In crescita rispetto al periodo precedente"
+          }
+        ],
+        "variations": {
+          "periodo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "2023-H1",
+              "2023-H2",
+              "2024-H1",
+              "2024-H2",
+              "2025-H1",
+              "2025-H2"
+            ]
+          },
+          "punteggio": {
+            "axis": "shift",
+            "delta_min": -20.0,
+            "delta_max": 20.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "superata": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false",
+              "false"
+            ]
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Buon contributo agli obiettivi di team",
+              "Da migliorare la gestione delle scadenze",
+              "Performance solida e costante",
+              "Obiettivi trimestrali non raggiunti",
+              "In crescita rispetto al periodo precedente",
+              "Ottima collaborazione interfunzionale",
+              "Necessario percorso di formazione mirato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "documenti",
+        "nature": "fact",
+        "min_rows": 250,
+        "max_rows": 450,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 301,
+            "nome_file": "contratto_assunzione_rossi.pdf",
+            "tipo_documento": "contratto",
+            "dimensione_byte": 245760,
+            "data_caricamento": "2019-03-12 09:00:00",
+            "dipendente_id": 1,
+            "candidato_id": null
+          },
+          {
+            "id": 302,
+            "nome_file": "cv_elena_gallo.pdf",
+            "tipo_documento": "cv",
+            "dimensione_byte": 512000,
+            "data_caricamento": "2025-10-04 15:30:00",
+            "dipendente_id": null,
+            "candidato_id": 1
+          },
+          {
+            "id": 303,
+            "nome_file": "certificato_medico_bianchi.pdf",
+            "tipo_documento": "certificato_medico",
+            "dimensione_byte": 131072,
+            "data_caricamento": "2020-09-02 10:15:00",
+            "dipendente_id": 2,
+            "candidato_id": null
+          },
+          {
+            "id": 304,
+            "nome_file": "lettera_motivazionale_rinaldi.pdf",
+            "tipo_documento": "lettera_motivazionale",
+            "dimensione_byte": 98304,
+            "data_caricamento": "2025-11-13 11:00:00",
+            "dipendente_id": null,
+            "candidato_id": 2
+          },
+          {
+            "id": 305,
+            "nome_file": "valutazione_periodica_verdi.pdf",
+            "tipo_documento": "valutazione",
+            "dimensione_byte": 184320,
+            "data_caricamento": "2021-12-20 17:45:00",
+            "dipendente_id": 3,
+            "candidato_id": null
+          },
+          {
+            "id": 306,
+            "nome_file": "portfolio_deluca.pdf",
+            "tipo_documento": "portfolio",
+            "dimensione_byte": 2097152,
+            "data_caricamento": "2025-12-02 13:20:00",
+            "dipendente_id": null,
+            "candidato_id": 3
+          }
+        ],
+        "variations": {
+          "dimensione_byte": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "data_caricamento": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

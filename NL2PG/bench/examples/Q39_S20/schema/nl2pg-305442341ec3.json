@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "between"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_di_copertura",
+        "description": "La tabella polizze viene denominata contratti_di_copertura nella prosa aziendale. Le query devono risolvere il nome reale della tabella per applicare filtri con BETWEEN sulla colonna enumerata tipo_polizza."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "tipo_polizza",
+        "obsolete_value": "tier di sottoscrizione",
+        "description": "La colonna enumerata tipo_polizza, dichiarata come ENUM('base','standard','premium') con valori mutuamente esclusivi, viene indicata nel linguaggio aziendale come tier di sottoscrizione. Le query devono usare BETWEEN 'base' AND 'standard' rispettando l'ordine di definizione del tipo ENUM."
+      }
+    ],
+    "spec_hash": "28a925e9a402078f"
+  },
+  "schema_ddl": "CREATE TYPE tipo_polizza AS ENUM ('base', 'standard', 'premium');\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE agenti (\n    id SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    agente_id INT NOT NULL REFERENCES agenti(id),\n    tipo_polizza tipo_polizza NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    capitale_assicurato NUMERIC(12,2) NOT NULL CHECK (capitale_assicurato >= 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza >= data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id SERIAL PRIMARY KEY,\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    numero_sinistro TEXT NOT NULL UNIQUE,\n    data_accadimento DATE NOT NULL,\n    data_denuncia DATE NOT NULL,\n    importo_danno NUMERIC(12,2) NOT NULL CHECK (importo_danno >= 0),\n    descrizione TEXT\n);"
+}

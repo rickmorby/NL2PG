@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 3,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "any_all"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_acquirenti",
+        "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; la relazione implicita con ordini e' deducibile dalla colonna cliente_id presente in ordini, senza REFERENCES dichiarate."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "totale_ordine",
+        "obsolete_value": "valore_complessivo",
+        "description": "La colonna totale_ordine della tabella ordini viene indicata nella prosa aziendale come valore_complessivo; le query con ANY/ALL devono confrontare tale importo con gli importi della tabella dettagli_ordine tramite ordine_id."
+      }
+    ],
+    "spec_hash": "857219c4c0c399ed"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    data_registrazione DATE DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    totale_ordine NUMERIC(12,2) NOT NULL CHECK (totale_ordine >= 0),\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'pagato', 'spedito', 'consegnato', 'annullato'))\n);\n\nCREATE TABLE dettagli_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL,\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);"
+}

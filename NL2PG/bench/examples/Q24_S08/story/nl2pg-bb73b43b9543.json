@@ -1,0 +1,260 @@
+{
+  "schema_ddl": "CREATE TABLE persone (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_nascita DATE NOT NULL\n);\n\nCREATE TABLE studenti (\n    id INT PRIMARY KEY REFERENCES persone(id),\n    matricola TEXT NOT NULL UNIQUE,\n    corso_di_laurea TEXT NOT NULL,\n    anno_corso INT NOT NULL CHECK (anno_corso BETWEEN 1 AND 6),\n    data_immatricolazione DATE NOT NULL,\n    CHECK (data_immatricolazione >= '1950-01-01')\n);",
+  "data_profile": {
+    "profile": {
+      "persone": {
+        "row_count": 244,
+        "columns": {
+          "id": {
+            "distinct": 244,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 244
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Esposito",
+              "Ferrari",
+              "Greco"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 244,
+            "sample": [
+              "BNCGLI03D45H501B",
+              "BNCGLI03D45H501C",
+              "BNCGLI03D45H501D",
+              "BNCGLI03D45H501E",
+              "BNCGLI03D45H501F"
+            ]
+          },
+          "email": {
+            "distinct": 228,
+            "sample": [
+              "andrea.russo10@example.it",
+              "andrea.russo11@example.it",
+              "andrea.russo12@example.it",
+              "andrea.russo13@example.it",
+              "andrea.russo14@example.it"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 223,
+            "sample": [
+              "1999-11-08",
+              "1999-11-14",
+              "1999-12-16",
+              "1999-12-23",
+              "2000-02-02"
+            ]
+          }
+        }
+      },
+      "studenti": {
+        "row_count": 244,
+        "columns": {
+          "id": {
+            "distinct": 244,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 244
+          },
+          "matricola": {
+            "distinct": 244,
+            "sample": [
+              "VR123456",
+              "VR1234561",
+              "VR12345610",
+              "VR12345611",
+              "VR12345612"
+            ]
+          },
+          "corso_di_laurea": {
+            "distinct": 8,
+            "sample": [
+              "Architettura",
+              "Economia Aziendale",
+              "Fisica",
+              "Giurisprudenza",
+              "Ingegneria Informatica"
+            ]
+          },
+          "anno_corso": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "data_immatricolazione": {
+            "distinct": 223,
+            "sample": [
+              "2020-01-18",
+              "2020-01-21",
+              "2020-01-26",
+              "2020-02-01",
+              "2020-02-02"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "persone": [
+        {
+          "id": 1,
+          "nome": "Luca",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRC02T15H501X",
+          "email": "marco.rossi@example.it",
+          "data_nascita": "2003-04-30"
+        },
+        {
+          "id": 2,
+          "nome": "Andrea",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRC02T15H501B",
+          "email": "marco.rossi1@example.it",
+          "data_nascita": "2004-03-01"
+        },
+        {
+          "id": 3,
+          "nome": "Andrea",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC02T15H501C",
+          "email": null,
+          "data_nascita": "2001-11-29"
+        },
+        {
+          "id": 4,
+          "nome": "Marco",
+          "cognome": "Russo",
+          "codice_fiscale": "RSSMRC02T15H501D",
+          "email": "marco.rossi3@example.it",
+          "data_nascita": "2003-02-22"
+        },
+        {
+          "id": 5,
+          "nome": "Chiara",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRC02T15H501E",
+          "email": "marco.rossi4@example.it",
+          "data_nascita": "2002-07-08"
+        },
+        {
+          "id": 6,
+          "nome": "Elena",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC02T15H501F",
+          "email": "marco.rossi5@example.it",
+          "data_nascita": "2000-11-22"
+        },
+        {
+          "id": 7,
+          "nome": "Luca",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC02T15H501G",
+          "email": "marco.rossi6@example.it",
+          "data_nascita": "2002-01-30"
+        },
+        {
+          "id": 8,
+          "nome": "Marco",
+          "cognome": "Romano",
+          "codice_fiscale": "RSSMRC02T15H501H",
+          "email": "marco.rossi7@example.it",
+          "data_nascita": "2003-04-13"
+        }
+      ],
+      "studenti": [
+        {
+          "id": 85,
+          "matricola": "VR123456",
+          "corso_di_laurea": "Lettere Moderne",
+          "anno_corso": "3",
+          "data_immatricolazione": "2022-10-17"
+        },
+        {
+          "id": 117,
+          "matricola": "VR1234561",
+          "corso_di_laurea": "Lettere Moderne",
+          "anno_corso": "5",
+          "data_immatricolazione": "2022-11-28"
+        },
+        {
+          "id": 21,
+          "matricola": "VR1234562",
+          "corso_di_laurea": "Psicologia",
+          "anno_corso": "2",
+          "data_immatricolazione": "2022-08-29"
+        },
+        {
+          "id": 132,
+          "matricola": "VR1234563",
+          "corso_di_laurea": "Fisica",
+          "anno_corso": "2",
+          "data_immatricolazione": "2022-10-28"
+        },
+        {
+          "id": 194,
+          "matricola": "VR1234564",
+          "corso_di_laurea": "Ingegneria Informatica",
+          "anno_corso": "1",
+          "data_immatricolazione": "2022-02-20"
+        },
+        {
+          "id": 158,
+          "matricola": "VR1234565",
+          "corso_di_laurea": "Fisica",
+          "anno_corso": "2",
+          "data_immatricolazione": "2022-12-25"
+        },
+        {
+          "id": 152,
+          "matricola": "VR1234566",
+          "corso_di_laurea": "Ingegneria Informatica",
+          "anno_corso": "1",
+          "data_immatricolazione": "2023-01-29"
+        },
+        {
+          "id": 220,
+          "matricola": "VR1234567",
+          "corso_di_laurea": "Fisica",
+          "anno_corso": "1",
+          "data_immatricolazione": "2022-05-27"
+        }
+      ]
+    }
+  },
+  "story": "Presso la Segreteria Didattica dell'ateneo, l'archivio denominato persone custodisce le schede anagrafiche dell'intera comunità accademica: per ogni persona vi sono annotati il nome, il cognome, il codice fiscale, l'indirizzo di posta elettronica e la data di nascita. In parallelo, il registro studenti descrive i percorsi universitari, riportando per ciascuno il numero di matricola, il corso di laurea seguito, l'anno di corso frequentato e la data di immatricolazione; per regolamento interno, nessuna immatricolazione può inoltre risalire a una data anteriore al 1950-01-01. In occasione della revisione semestrale degli elenchi, gli addetti d'ufficio hanno predisposto un controllo dedicato alle persone il cui cognome risulta essere Rossi oppure Bianchi. L'elenco è stato costruito partendo dalle schede dell'archivio persone e, ogni volta che la medesima persona compariva anche nel registro studenti, vi sono stati aggiunti il numero di matricola e il corso di laurea: chi porta ad esempio la matricola VR123456 e segue Fisica appare così completo di tutti i riferimenti del proprio percorso, mentre un altro iscritto a Ingegneria Informatica figura con la relativa data di immatricolazione, come quella del 2022-10-17. Quando invece la persona non risultava iscritta, la voce è stata comunque mantenuta nell'elenco, corredandola di un'indicazione testuale dello stato di immatricolazione che distingue esplicitamente gli immatricolati da coloro che non hanno ancora un percorso attivo. Le voci sono state infine disposte in ordine alfabetico per cognome e, a parità di cognome, per nome e per codice fiscale, così da rendere immediata la consultazione durante i sopralluoghi d'ufficio."
+}

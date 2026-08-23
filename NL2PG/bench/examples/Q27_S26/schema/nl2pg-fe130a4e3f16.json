@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "grouping_sets"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "movimenti_cassa",
+        "description": "La tabella fisica 'transazioni' (che contiene le righe di vendita con data e importo memorizzati come TEXT) viene denominata 'movimenti_cassa' nella prosa aziendale. Il solver deve mappare la perifrasi al nome reale della tabella legacy."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "controvalore",
+        "description": "La colonna 'importo' (tipo fisico TEXT contenente valori logicamente numerici da convertire con CAST(importo AS NUMERIC)) viene indicata nel linguaggio contabile aziendale come 'controvalore'. Il solver deve riconoscere il gergo settoriale per aggregare correttamente la colonna nei GROUPING SETS ((regione), (canale), ())."
+      }
+    ],
+    "spec_hash": "c5149fd3bb3fba4c"
+  },
+  "schema_ddl": "CREATE TABLE negozi (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE transazioni (\n    id INT PRIMARY KEY,\n    negozio_id INT NOT NULL REFERENCES negozi(id),\n    data_transazione TEXT NOT NULL,\n    importo NUMERIC(12,2) NOT NULL,\n    regione TEXT NOT NULL,\n    canale TEXT NOT NULL,\n    CHECK (data_transazione ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'),\n    CHECK (canale IN ('online', 'store', 'rivenditori'))\n);"
+}

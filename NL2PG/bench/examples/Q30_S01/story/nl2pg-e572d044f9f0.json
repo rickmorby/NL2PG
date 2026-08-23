@@ -1,0 +1,163 @@
+{
+  "schema_ddl": "CREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    cliente_nome TEXT NOT NULL,\n    data_ordine DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa',\n    note TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "ordini": {
+        "row_count": 2392,
+        "columns": {
+          "id": {
+            "distinct": 2392,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2392
+          },
+          "numero_ordine": {
+            "distinct": 2392,
+            "sample": [
+              "ORD-2026-0001",
+              "ORD-2026-00011",
+              "ORD-2026-000110",
+              "ORD-2026-0001100",
+              "ORD-2026-0001101"
+            ]
+          },
+          "cliente_nome": {
+            "distinct": 8,
+            "sample": [
+              "Alessandro Neri",
+              "Chiara Moretti",
+              "Giulia Verdi",
+              "Laura Bianchi",
+              "Luca Ferrari"
+            ]
+          },
+          "data_ordine": {
+            "distinct": 147,
+            "sample": [
+              "2025-12-01",
+              "2025-12-02",
+              "2025-12-03",
+              "2025-12-04",
+              "2025-12-05"
+            ]
+          },
+          "importo_totale": {
+            "distinct": 2279,
+            "sample": [
+              "100.43",
+              "1005.68",
+              "1006.69",
+              "1013.47",
+              "1015.37"
+            ],
+            "min": 38.36,
+            "max": 7226.88
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "confermato",
+              "evaso",
+              "in_attesa",
+              "spedito"
+            ]
+          },
+          "note": {
+            "distinct": 5,
+            "sample": [
+              "",
+              "Consegna urgente richiesta dal cliente",
+              "Ordine annullato prima della spedizione",
+              "Pagamento concordato a rate",
+              "Sconto fedelta' applicato"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "ordini": [
+        {
+          "id": 1,
+          "numero_ordine": "ORD-2026-0001",
+          "cliente_nome": "Paolo Gatti",
+          "data_ordine": "2026-02-12",
+          "importo_totale": 1951.2,
+          "stato_ordine": "spedito",
+          "note": null
+        },
+        {
+          "id": 2,
+          "numero_ordine": "ORD-2026-00011",
+          "cliente_nome": "Sara Conti",
+          "data_ordine": "2026-02-04",
+          "importo_totale": 2680.45,
+          "stato_ordine": "confermato",
+          "note": null
+        },
+        {
+          "id": 3,
+          "numero_ordine": "ORD-2026-00012",
+          "cliente_nome": "Luca Ferrari",
+          "data_ordine": "2026-02-01",
+          "importo_totale": 2549.64,
+          "stato_ordine": "in_attesa",
+          "note": null
+        },
+        {
+          "id": 4,
+          "numero_ordine": "ORD-2026-00013",
+          "cliente_nome": "Luca Ferrari",
+          "data_ordine": "2026-02-22",
+          "importo_totale": 830.84,
+          "stato_ordine": "confermato",
+          "note": null
+        },
+        {
+          "id": 5,
+          "numero_ordine": "ORD-2026-00014",
+          "cliente_nome": "Laura Bianchi",
+          "data_ordine": "2026-01-22",
+          "importo_totale": 1758.46,
+          "stato_ordine": "annullato",
+          "note": null
+        },
+        {
+          "id": 6,
+          "numero_ordine": "ORD-2026-00015",
+          "cliente_nome": "Alessandro Neri",
+          "data_ordine": "2025-12-03",
+          "importo_totale": 2498.8,
+          "stato_ordine": "in_attesa",
+          "note": null
+        },
+        {
+          "id": 7,
+          "numero_ordine": "ORD-2026-00016",
+          "cliente_nome": "Luca Ferrari",
+          "data_ordine": "2025-12-26",
+          "importo_totale": 1739.47,
+          "stato_ordine": "confermato",
+          "note": null
+        },
+        {
+          "id": 8,
+          "numero_ordine": "ORD-2026-00017",
+          "cliente_nome": "Giulia Verdi",
+          "data_ordine": "2025-12-23",
+          "importo_totale": 3015.49,
+          "stato_ordine": "confermato",
+          "note": null
+        }
+      ]
+    }
+  },
+  "story": "Presso la direzione commerciale di Meridiana Distribuzione, il registro_movimenti_commerciali costituisce l'archivio ufficiale in cui vengono custodite tutte le pratiche d'ordine gestite dall'ufficio vendite, noto agli addetti anche con la denominazione d'uso di archivio ordini. Ciascuna voce del registro riporta un numero progressivo interno, il nominativo del cliente, la data di registrazione della pratica, il controvalore della chiusura d'ordine, lo stato di avanzamento e le annotazioni lasciate dagli operatori. Nel corso dell'esercizio sono transitati clienti abituali come Luca Ferrari, Giulia Verdi, Sara Conti, Paolo Gatti, Alessandro Neri, Laura Bianchi e Chiara Moretti, con posizioni che oscillano dal minimo di 38.36 euro fino a punte di 7226.88 euro. In occasione della revisione trimestrale, il capo ufficio ha richiesto una classifica dei primi 15 movimenti più significativi: sono state ammesse esclusivamente le pratiche contrassegnate come confermato oppure spedito, mentre quelle marcate come in_attesa, evaso o annullato sono rimaste fuori dalla selezione, come nel caso della pratica di Laura Bianchi del 2026-01-22, fermata con l'annotazione 'Ordine annullato prima della spedizione'. Il periodo osservato copre l'arco dal 2025-12-01 al 2026-02-28, ovvero da dicembre 2025 a febbraio 2026. Sono stati inoltre considerati soltanto i movimenti con controvalore della chiusura d'ordine pari ad almeno 500 euro e con numerazione riconducibile al prefisso ORD-2026, come il codice ORD-2026-0001 intestato a Paolo Gatti e spedito il 2026-02-12 per 1951.20 euro. La graduatoria è stata costruita in ordine decrescente di controvalore della chiusura d'ordine: spiccano i 3015.49 euro di Giulia Verdi registrati il 2025-12-23, i 2680.45 euro di Sara Conti del 2026-02-04 e i 2549.64 euro di Luca Ferrari del 2026-02-01, quest'ultimo però fermo in_attesa e pertanto escluso nonostante l'importo. Per ciascuna voce ammessa, gli analisti hanno infine ricostruito il dettaglio composito che abbina lo stato della pratica alla relativa nota operativa, effettuando verifiche combinate sulla coppia data di registrazione e controvalore della chiusura d'ordine: annotazioni ricorrenti come 'Pagamento concordato a rate', 'Sconto fedelta' applicato' e 'Consegna urgente richiesta dal cliente' hanno permesso di qualificare ogni posizione prima dell'invio della classifica alla direzione generale."
+}

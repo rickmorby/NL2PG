@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "filtered_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "transazioni_di_vendita",
+        "description": "La tabella ordini, che contiene i record di acquisto con la colonna di cancellazione logica deleted_at, viene denominata transazioni_di_vendita nella prosa aziendale. Il solver deve mappare correttamente il nome perifrastico alla tabella reale prima di applicare GROUP BY e COUNT(*) FILTER."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "deleted_at",
+        "obsolete_value": "timestamp di archiviazione del record",
+        "description": "La colonna deleted_at, che marca la cancellazione logica delle righe, viene indicata nel testo aziendale con il gergo 'timestamp di archiviazione del record'. Le query richieste devono contare solo le righe attive tramite COUNT(*) FILTER (WHERE deleted_at IS NULL) oppure isolare quelle eliminate logicamente con COUNT(*) FILTER (WHERE deleted_at IS NOT NULL), all'interno del GROUP BY sulla colonna di raggruppamento."
+      }
+    ],
+    "spec_hash": "61e4e3da3f94e3d3"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0),\n    indirizzo_spedizione TEXT NOT NULL,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE righe_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    subtotale_riga NUMERIC(12,2) GENERATED ALWAYS AS (ROUND(quantita * prezzo_unitario, 2)) STORED\n);"
+}

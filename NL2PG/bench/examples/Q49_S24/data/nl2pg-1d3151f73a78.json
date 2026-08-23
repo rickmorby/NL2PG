@@ -1,0 +1,483 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 6,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "is_distinct_from"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_personale",
+        "description": "La tabella dipendenti viene denominata anagrafica_personale nella prosa aziendale. Le query devono risalire alla tabella fisica dipendenti tramite la perifrasi fornita."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "sede_id",
+        "obsolete_value": "codice_hub_operativo",
+        "description": "La colonna sede_id della tabella dipendenti, resa NULL dalla regola referenziale ON DELETE SET NULL quando una sede viene eliminata, viene indicata nei documenti aziendali con il gergo codice_hub_operativo. Il confronto tra la colonna corrente e quella storica richiede IS DISTINCT FROM per gestire correttamente i NULL prodotti dall'azione referenziale."
+      }
+    ],
+    "spec_hash": "fa6aa06490d6eb78"
+  },
+  "schema_ddl": "CREATE TABLE sedi (\n    id INT PRIMARY KEY,\n    nome_sede TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) CHECK (stipendio_mensile > 0),\n    sede_id INT REFERENCES sedi(id) ON DELETE SET NULL\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL,\n    sede_id INT REFERENCES sedi(id) ON DELETE CASCADE,\n    responsabile_id INT REFERENCES dipendenti(id) ON DELETE SET NULL\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON UPDATE CASCADE ON DELETE CASCADE,\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('tempo_indeterminato', 'tempo_determinato', 'part_time', 'apprendistato')),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    retribuzione_annua NUMERIC(12,2) CHECK (retribuzione_annua > 0),\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE presenze (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON DELETE CASCADE,\n    data_presenza DATE NOT NULL,\n    ora_ingresso TIME NOT NULL,\n    ora_uscita TIME,\n    CHECK (ora_uscita IS NULL OR ora_uscita > ora_ingresso)\n);\n\nCREATE TABLE ferie (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON DELETE CASCADE,\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    giorni INT NOT NULL CHECK (giorni > 0),\n    stato_richiesta TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_richiesta IN ('in_attesa', 'approvata', 'rifiutata')),\n    CHECK (data_fine >= data_inizio)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "sedi",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_sede": "Hub Milano Centrale",
+            "citta": "Milano",
+            "indirizzo": "Via Torino 42",
+            "telefono": "+39 02 1234567"
+          },
+          {
+            "id": 2,
+            "nome_sede": "Hub Roma EUR",
+            "citta": "Roma",
+            "indirizzo": "Viale Europa 88",
+            "telefono": "+39 06 2345678"
+          },
+          {
+            "id": 3,
+            "nome_sede": "Sede Napoli Centro Direzionale",
+            "citta": "Napoli",
+            "indirizzo": "Via Cinthia 15",
+            "telefono": "+39 081 3456789"
+          },
+          {
+            "id": 4,
+            "nome_sede": "Hub Torino Lingotto",
+            "citta": "Torino",
+            "indirizzo": "Corso Unione Sovietica 210",
+            "telefono": "+39 011 4567890"
+          },
+          {
+            "id": 5,
+            "nome_sede": "Sede Bologna Fiera",
+            "citta": "Bologna",
+            "indirizzo": "Viale Aldo Moro 30",
+            "telefono": "+39 051 5678901"
+          },
+          {
+            "id": 6,
+            "nome_sede": "Hub Firenze Novoli",
+            "citta": "Firenze",
+            "indirizzo": "Viale Guidoni 101",
+            "telefono": "+39 055 6789012"
+          },
+          {
+            "id": 7,
+            "nome_sede": "Sede Bari Centro",
+            "citta": "Bari",
+            "indirizzo": "Via Sparano 12",
+            "telefono": "+39 080 7890123"
+          },
+          {
+            "id": 8,
+            "nome_sede": "Sede Palermo Liberta",
+            "citta": "Palermo",
+            "indirizzo": "Via della Liberta 77",
+            "telefono": "+39 091 8901234"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 20.0,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Bellini",
+            "codice_fiscale": "BLLMRC85M01F205X",
+            "data_assunzione": "2019-04-15",
+            "stipendio_mensile": 2450.0
+          },
+          {
+            "id": 2,
+            "nome": "Giulia",
+            "cognome": "Ferraro",
+            "codice_fiscale": "FRAGLI90C44H501K",
+            "data_assunzione": "2021-09-01",
+            "stipendio_mensile": 2780.5
+          },
+          {
+            "id": 3,
+            "nome": "Alessandro",
+            "cognome": "Moretti",
+            "codice_fiscale": "MRTLSN78T15G273D",
+            "data_assunzione": "2018-02-12",
+            "stipendio_mensile": 3150.0
+          },
+          {
+            "id": 4,
+            "nome": "Francesca",
+            "cognome": "De Luca",
+            "codice_fiscale": "DLCFNC92D68Z210P",
+            "data_assunzione": "2023-06-19",
+            "stipendio_mensile": 1980.75
+          },
+          {
+            "id": 5,
+            "nome": "Luca",
+            "cognome": "Sartori",
+            "codice_fiscale": "SRTLCU88L05L219W",
+            "data_assunzione": "2020-11-02",
+            "stipendio_mensile": 2620.0
+          },
+          {
+            "id": 6,
+            "nome": "Chiara",
+            "cognome": "Vitale",
+            "codice_fiscale": "VTLCRH95B21C129Y",
+            "data_assunzione": "2022-03-14",
+            "stipendio_mensile": 2240.25
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Chiara",
+              "Davide",
+              "Sara",
+              "Matteo",
+              "Elena",
+              "Andrea",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Conti",
+              "Barbieri",
+              "Fontana"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -900.0,
+            "delta_max": 400.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stipendio_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "reparti",
+        "nature": "explicit",
+        "min_rows": 30,
+        "max_rows": 60,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_reparto": "Vendite",
+            "sede_id": 1,
+            "responsabile_id": 1
+          },
+          {
+            "id": 2,
+            "nome_reparto": "Amministrazione",
+            "sede_id": 1,
+            "responsabile_id": 2
+          },
+          {
+            "id": 3,
+            "nome_reparto": "IT",
+            "sede_id": 2,
+            "responsabile_id": 3
+          },
+          {
+            "id": 4,
+            "nome_reparto": "Logistica",
+            "sede_id": 3,
+            "responsabile_id": 4
+          },
+          {
+            "id": 5,
+            "nome_reparto": "Risorse Umane",
+            "sede_id": 2,
+            "responsabile_id": 5
+          },
+          {
+            "id": 6,
+            "nome_reparto": "Produzione",
+            "sede_id": 4,
+            "responsabile_id": 6
+          }
+        ],
+        "variations": {
+          "nome_reparto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Vendite",
+              "Amministrazione",
+              "IT",
+              "Logistica",
+              "Risorse Umane",
+              "Produzione",
+              "Marketing",
+              "Acquisti",
+              "Qualita",
+              "Customer Service"
+            ]
+          }
+        }
+      },
+      {
+        "table": "contratti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.6,
+        "templates": [
+          {
+            "id": 1,
+            "tipo_contratto": "tempo_indeterminato",
+            "data_inizio": "2021-03-01",
+            "data_fine": null,
+            "retribuzione_annua": 36000.0
+          },
+          {
+            "id": 2,
+            "tipo_contratto": "tempo_determinato",
+            "data_inizio": "2023-01-16",
+            "data_fine": "2024-12-31",
+            "retribuzione_annua": 28500.0
+          },
+          {
+            "id": 3,
+            "tipo_contratto": "part_time",
+            "data_inizio": "2022-09-01",
+            "data_fine": null,
+            "retribuzione_annua": 18000.0
+          },
+          {
+            "id": 4,
+            "tipo_contratto": "apprendistato",
+            "data_inizio": "2024-02-01",
+            "data_fine": "2026-01-31",
+            "retribuzione_annua": 22000.0
+          },
+          {
+            "id": 5,
+            "tipo_contratto": "tempo_determinato",
+            "data_inizio": "2020-06-15",
+            "data_fine": "2022-06-14",
+            "retribuzione_annua": 31000.0
+          },
+          {
+            "id": 6,
+            "tipo_contratto": "tempo_indeterminato",
+            "data_inizio": "2019-10-07",
+            "data_fine": null,
+            "retribuzione_annua": 33500.0
+          }
+        ],
+        "variations": {
+          "tipo_contratto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "tempo_indeterminato",
+              "tempo_indeterminato",
+              "tempo_indeterminato",
+              "tempo_determinato",
+              "tempo_determinato",
+              "part_time",
+              "apprendistato"
+            ]
+          },
+          "retribuzione_annua": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.4,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "presenze",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 10.0,
+        "templates": [
+          {
+            "id": 1,
+            "data_presenza": "2026-03-02",
+            "ora_ingresso": "08:32",
+            "ora_uscita": "17:41"
+          },
+          {
+            "id": 2,
+            "data_presenza": "2026-03-03",
+            "ora_ingresso": "09:04",
+            "ora_uscita": "18:22"
+          },
+          {
+            "id": 3,
+            "data_presenza": "2026-03-04",
+            "ora_ingresso": "08:47",
+            "ora_uscita": "17:55"
+          },
+          {
+            "id": 4,
+            "data_presenza": "2026-03-05",
+            "ora_ingresso": "08:15",
+            "ora_uscita": "16:58"
+          },
+          {
+            "id": 5,
+            "data_presenza": "2026-03-06",
+            "ora_ingresso": "09:21",
+            "ora_uscita": "18:35"
+          },
+          {
+            "id": 6,
+            "data_presenza": "2026-03-09",
+            "ora_ingresso": "08:38",
+            "ora_uscita": null
+          }
+        ],
+        "variations": {
+          "data_presenza": {
+            "axis": "shift",
+            "delta_min": -70.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ferie",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.5,
+        "templates": [
+          {
+            "id": 1,
+            "data_inizio": "2026-08-10",
+            "data_fine": "2026-08-21",
+            "giorni": 10,
+            "stato_richiesta": "approvata"
+          },
+          {
+            "id": 2,
+            "data_inizio": "2026-04-06",
+            "data_fine": "2026-04-07",
+            "giorni": 2,
+            "stato_richiesta": "approvata"
+          },
+          {
+            "id": 3,
+            "data_inizio": "2026-12-23",
+            "data_fine": "2026-12-24",
+            "giorni": 2,
+            "stato_richiesta": "in_attesa"
+          },
+          {
+            "id": 4,
+            "data_inizio": "2026-05-04",
+            "data_fine": "2026-05-08",
+            "giorni": 5,
+            "stato_richiesta": "rifiutata"
+          },
+          {
+            "id": 5,
+            "data_inizio": "2026-07-13",
+            "data_fine": "2026-07-17",
+            "giorni": 5,
+            "stato_richiesta": "approvata"
+          },
+          {
+            "id": 6,
+            "data_inizio": "2026-02-16",
+            "data_fine": "2026-02-18",
+            "giorni": 3,
+            "stato_richiesta": "in_attesa"
+          }
+        ],
+        "variations": {
+          "stato_richiesta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "approvata",
+              "approvata",
+              "approvata",
+              "approvata",
+              "in_attesa",
+              "rifiutata"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

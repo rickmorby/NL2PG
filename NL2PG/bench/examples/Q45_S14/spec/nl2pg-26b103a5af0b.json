@@ -1,0 +1,25 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [],
+  "twist": [
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "immobili",
+      "obsolete_value": "unità catastali",
+      "description": "La tabella immobili viene indicata nella prosa aziendale con il gergo tecnico del settore 'unità catastali', termine tipicamente usato dagli agenti immobiliari per riferirsi agli immobili censiti. Il lettore deve ricondurre la perifrasi gergale alla tabella reale immobili."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "canone",
+      "obsolete_value": "corrispettivo",
+      "description": "La colonna canone della tabella contratti viene denominata 'corrispettivo' nella documentazione aziendale, sinonimo contrattuale usato per indicare l'importo periodico dovuto. Le query devono mappare 'corrispettivo' sulla colonna canone."
+    }
+  ],
+  "spec_hash": "f77df4585fad3323"
+}

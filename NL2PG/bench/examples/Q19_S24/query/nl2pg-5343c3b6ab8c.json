@@ -1,0 +1,301 @@
+{
+  "schema_ddl": "CREATE TABLE agenzie (\n    id_agenzia INT PRIMARY KEY,\n    nome_rete TEXT NOT NULL,\n    citta_sede TEXT NOT NULL,\n    telefono_contatto TEXT,\n    email_ufficio TEXT UNIQUE\n);\n\nCREATE TABLE immobili (\n    id_immobile INT PRIMARY KEY,\n    agenzia_id INT REFERENCES agenzie(id_agenzia) ON DELETE SET NULL ON UPDATE CASCADE,\n    indirizzo TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato_vendita TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_vendita IN ('disponibile', 'riservato', 'venduto'))\n);",
+  "data_profile": {
+    "profile": {
+      "agenzie": {
+        "row_count": 25,
+        "columns": {
+          "id_agenzia": {
+            "distinct": 25,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 25
+          },
+          "nome_rete": {
+            "distinct": 8,
+            "sample": [
+              "Alba Property Group",
+              "Aurora Immobiliare",
+              "Case & Chiavi",
+              "Domus Italia Network",
+              "Habitat Reale"
+            ]
+          },
+          "citta_sede": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "telefono_contatto": {
+            "distinct": 6,
+            "sample": [
+              "+39 011 5567842",
+              "+39 02 77339014",
+              "+39 051 2298760",
+              "+39 055 6612345",
+              "+39 06 48215501"
+            ]
+          },
+          "email_ufficio": {
+            "distinct": 22,
+            "sample": [
+              "contatti1@puntocasasud.it",
+              "contatti2@puntocasasud.it",
+              "contatti3@puntocasasud.it",
+              "contatti@puntocasasud.it",
+              "info1@auroraimmobiliare.it"
+            ]
+          }
+        }
+      },
+      "immobili": {
+        "row_count": 378,
+        "columns": {
+          "id_immobile": {
+            "distinct": 378,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 378
+          },
+          "agenzia_id": {
+            "distinct": 25,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 25
+          },
+          "indirizzo": {
+            "distinct": 11,
+            "sample": [
+              "Corso Buenos Aires 57",
+              "Largo Argentina 3",
+              "Piazza Dante 5",
+              "Strada Provinciale 45 km 12",
+              "Via Garibaldi 24"
+            ]
+          },
+          "comune": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "tipo_immobile": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "negozio",
+              "terreno",
+              "ufficio",
+              "villa"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 352,
+            "sample": [
+              "100.01",
+              "100.76",
+              "101.92",
+              "102.14",
+              "102.26"
+            ],
+            "min": 35.29,
+            "max": 4320.0
+          },
+          "prezzo_richiesto": {
+            "distinct": 374,
+            "sample": [
+              "113313.3",
+              "116837.25",
+              "117359.23",
+              "118645.75",
+              "118800.0"
+            ],
+            "min": 59779.26,
+            "max": 936000.0
+          },
+          "stato_vendita": {
+            "distinct": 3,
+            "sample": [
+              "disponibile",
+              "riservato",
+              "venduto"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "agenzie": [
+        {
+          "id_agenzia": 1,
+          "nome_rete": "Case & Chiavi",
+          "citta_sede": "Milano",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 2,
+          "nome_rete": "Aurora Immobiliare",
+          "citta_sede": "Firenze",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info1@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 3,
+          "nome_rete": "PuntoCasa Sud",
+          "citta_sede": "Milano",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info2@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 4,
+          "nome_rete": "KeyHouse Consulting",
+          "citta_sede": "Torino",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info3@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 5,
+          "nome_rete": "Case & Chiavi",
+          "citta_sede": "Bologna",
+          "telefono_contatto": "+39 06 48215501",
+          "email_ufficio": "info4@auroraimmobiliare.it"
+        },
+        {
+          "id_agenzia": 6,
+          "nome_rete": "Aurora Immobiliare",
+          "citta_sede": "Torino",
+          "telefono_contatto": "+39 02 77339014",
+          "email_ufficio": "ufficio@domusitalia.it"
+        },
+        {
+          "id_agenzia": 7,
+          "nome_rete": "Habitat Reale",
+          "citta_sede": "Torino",
+          "telefono_contatto": "+39 02 77339014",
+          "email_ufficio": "ufficio1@domusitalia.it"
+        },
+        {
+          "id_agenzia": 8,
+          "nome_rete": "KeyHouse Consulting",
+          "citta_sede": "Verona",
+          "telefono_contatto": "+39 02 77339014",
+          "email_ufficio": "ufficio2@domusitalia.it"
+        }
+      ],
+      "immobili": [
+        {
+          "id_immobile": 1,
+          "agenzia_id": 18,
+          "indirizzo": "Via Toledo 130",
+          "comune": "Milano",
+          "tipo_immobile": "appartamento",
+          "superficie_mq": 124.8,
+          "prezzo_richiesto": 276239.16,
+          "stato_vendita": "riservato"
+        },
+        {
+          "id_immobile": 2,
+          "agenzia_id": 2,
+          "indirizzo": "Corso Buenos Aires 57",
+          "comune": "Roma",
+          "tipo_immobile": "villa",
+          "superficie_mq": 73.77,
+          "prezzo_richiesto": 258469.4,
+          "stato_vendita": "disponibile"
+        },
+        {
+          "id_immobile": 3,
+          "agenzia_id": 5,
+          "indirizzo": "Piazza Dante 5",
+          "comune": "Napoli",
+          "tipo_immobile": "villa",
+          "superficie_mq": 58.89,
+          "prezzo_richiesto": 204925.24,
+          "stato_vendita": "disponibile"
+        },
+        {
+          "id_immobile": 4,
+          "agenzia_id": 24,
+          "indirizzo": "Via Mazzini 18",
+          "comune": "Firenze",
+          "tipo_immobile": "negozio",
+          "superficie_mq": 89.4,
+          "prezzo_richiesto": 154346.89,
+          "stato_vendita": "venduto"
+        },
+        {
+          "id_immobile": 5,
+          "agenzia_id": 12,
+          "indirizzo": "Via Toledo 130",
+          "comune": "Verona",
+          "tipo_immobile": "villa",
+          "superficie_mq": 141.38,
+          "prezzo_richiesto": 154843.94,
+          "stato_vendita": "venduto"
+        },
+        {
+          "id_immobile": 6,
+          "agenzia_id": 2,
+          "indirizzo": "Largo Argentina 3",
+          "comune": "Bologna",
+          "tipo_immobile": "villa",
+          "superficie_mq": 150.61,
+          "prezzo_richiesto": 194064.42,
+          "stato_vendita": "venduto"
+        },
+        {
+          "id_immobile": 7,
+          "agenzia_id": 11,
+          "indirizzo": "Via Veneto 27",
+          "comune": "Bari",
+          "tipo_immobile": "negozio",
+          "superficie_mq": 78.17,
+          "prezzo_richiesto": 338320.74,
+          "stato_vendita": "riservato"
+        },
+        {
+          "id_immobile": 8,
+          "agenzia_id": 13,
+          "indirizzo": "Viale Trieste 89",
+          "comune": "Bologna",
+          "tipo_immobile": "villa",
+          "superficie_mq": 137.64,
+          "prezzo_richiesto": 415947.63,
+          "stato_vendita": "venduto"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "full_outer_join"
+  ],
+  "query": "WITH agenzie_target AS (\n    SELECT id_agenzia, nome_rete, citta_sede, email_ufficio\n    FROM agenzie\n    WHERE citta_sede IN ('Milano', 'Torino', 'Bologna')\n       OR nome_rete LIKE '%Immobiliare%'\n),\nportafoglio_disponibile AS (\n    SELECT agenzia_id,\n           COUNT(*) AS numero_immobili,\n           ROUND(AVG(prezzo_richiesto), 2) AS prezzo_medio_richiesto,\n           SUM(superficie_mq) AS superficie_complessiva_mq\n    FROM immobili\n    WHERE stato_vendita = 'disponibile'\n      AND prezzo_richiesto BETWEEN 100000 AND 500000\n    GROUP BY agenzia_id\n)\nSELECT COALESCE(a.nome_rete, 'Agenzia non registrata') AS rete_commerciale,\n       COALESCE(a.citta_sede, 'Non specificata') AS citta_riferimento,\n       COALESCE(p.numero_immobili, 0) AS immobili_disponibili,\n       COALESCE(p.prezzo_medio_richiesto, 0) AS prezzo_medio_richiesto,\n       COALESCE(p.superficie_complessiva_mq, 0) AS superficie_complessiva_mq,\n       CASE\n           WHEN a.id_agenzia IS NULL THEN 'immobili privi di agenzia'\n           WHEN p.agenzia_id IS NULL THEN 'agenzia senza disponibilita'\n           ELSE 'portafoglio attivo'\n       END AS stato_portafoglio\nFROM agenzie_target a\nFULL OUTER JOIN portafoglio_disponibile p\n    ON a.id_agenzia = p.agenzia_id\nORDER BY immobili_disponibili DESC, a.email_ufficio ASC NULLS LAST, p.agenzia_id ASC NULLS LAST;"
+}

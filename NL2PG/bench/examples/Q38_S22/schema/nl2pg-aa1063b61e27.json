@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 6,
+    "hierarchy": "star_schema",
+    "sql_features": [
+      "any_all"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_assicurativi",
+        "description": "La tabella principale delle polizze è denominata contratti_assicurativi nel linguaggio aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "premio",
+        "obsolete_value": "costo_copertura",
+        "description": "Il termine tecnico 'premio' (importo pagato per la polizza) viene spesso sostituito con 'costo_copertura' nei documenti interni."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "sinistro",
+        "obsolete_value": "evento",
+        "description": "La parola 'sinistro' (incidente coperto dalla polizza) può essere ambigua e confusa con 'evento' in contesti generici."
+      }
+    ],
+    "spec_hash": "0a87587e4e0afcbe"
+  },
+  "schema_ddl": "CREATE TABLE tempo (\n    id INT PRIMARY KEY,\n    data DATE NOT NULL,\n    giorno_settimana TEXT NOT NULL,\n    mese TEXT NOT NULL,\n    anno INT NOT NULL,\n    trimestre INT NOT NULL CHECK (trimestre BETWEEN 1 AND 4)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    sesso TEXT CHECK (sesso IN ('M', 'F', 'Altro'))\n);\n\nCREATE TABLE veicoli (\n    id INT PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    modello TEXT NOT NULL,\n    marca TEXT NOT NULL,\n    anno_immatricolazione INT CHECK (anno_immatricolazione BETWEEN 1900 AND EXTRACT(YEAR FROM CURRENT_DATE))\n);\n\nCREATE TABLE contratti_assicurativi (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    veicolo_id INT NOT NULL REFERENCES veicoli(id),\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL CHECK (data_fine > data_inizio),\n    costo_copertura NUMERIC(10,2) NOT NULL CHECK (costo_copertura > 0),\n    tipo_copertura TEXT NOT NULL CHECK (tipo_copertura IN ('RC Auto', 'Kasko', 'Furto e Incendio', 'Infortuni', 'Altro'))\n);\n\nCREATE TABLE sinistri (\n    id INT PRIMARY KEY,\n    contratto_id INT NOT NULL REFERENCES contratti_assicurativi(id),\n    data_evento DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    importo_risarcimento NUMERIC(10,2) CHECK (importo_risarcimento >= 0),\n    stato TEXT NOT NULL CHECK (stato IN ('Aperto', 'In Valutazione', 'Chiuso', 'Rifiutato'))\n);\n\nCREATE TABLE fatti_sinistri (\n    id INT PRIMARY KEY,\n    tempo_id INT NOT NULL REFERENCES tempo(id),\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    veicolo_id INT NOT NULL REFERENCES veicoli(id),\n    contratto_id INT NOT NULL REFERENCES contratti_assicurativi(id),\n    sinistro_id INT NOT NULL REFERENCES sinistri(id),\n    conteggio_sinistri INT NOT NULL DEFAULT 1,\n    totale_risarcimenti NUMERIC(12,2) NOT NULL DEFAULT 0,\n    CHECK (conteggio_sinistri >= 0 AND totale_risarcimenti >= 0)\n);"
+}

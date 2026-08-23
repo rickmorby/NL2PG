@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 4,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "values"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "movimenti_di_merce",
+        "description": "La tabella spedizioni viene denominata movimenti_di_merce nella prosa aziendale; il solver deve risalire alla corrispondenza per costruire il join con la tabella inline VALUES."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "magazzini",
+        "obsolete_value": "hub di smistamento",
+        "description": "La tabella magazzini viene indicata con il gergo logistico 'hub di smistamento'; occorre riconoscere che si tratta della stessa entità per filtrare o aggregare correttamente sulle chiavi pertinenti."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "peso_kg",
+        "obsolete_value": "massa del carico",
+        "description": "La colonna peso_kg della tabella colli viene riferita nella documentazione come 'massa del carico'; il solver deve mappare il sinonimo sulla colonna reale quando la tabella VALUES fornisce soglie o categorie di peso da confrontare."
+      }
+    ],
+    "spec_hash": "b8fdae65cb932613"
+  },
+  "schema_ddl": "CREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    codice_hub TEXT NOT NULL UNIQUE,\n    nome_impianto TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capienza_massima_colli INT NOT NULL CHECK (capienza_massima_colli > 0)\n);\n\nCREATE TABLE corrieri (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    magazzino_partenza_id INT NOT NULL REFERENCES magazzini(id),\n    magazzino_arrivo_id INT NOT NULL REFERENCES magazzini(id),\n    corriere_id INT REFERENCES corrieri(id),\n    data_spedizione DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    CHECK (data_consegna_prevista IS NULL OR data_consegna_prevista >= data_spedizione)\n);\n\nCREATE TABLE colli (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    volume_litri NUMERIC(8,2) CHECK (volume_litri >= 0),\n    descrizione_contenuto TEXT NOT NULL\n);"
+}

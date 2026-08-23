@@ -1,0 +1,34 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 2,
+  "hierarchy": "one_to_one",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "linee",
+      "obsolete_value": "registro_numerazioni_attive",
+      "description": "La tabella linee, contenente le numerazioni telefoniche con la colonna autoriferita per la catena di sostituzione del numero, viene denominata registro_numerazioni_attive nella prosa aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "linea_precedente_id",
+      "obsolete_value": "identificativo_storico_di_origine",
+      "description": "La colonna autoriferita linea_precedente_id, chiave per il self-join che collega ciascuna numerazione alla numerazione da cui deriva (es. portabilità o rimpiazzo SIM), viene indicata nella documentazione come identificativo_storico_di_origine."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "contratti",
+      "obsolete_value": "documentazione_amministrativa_della_fornitura",
+      "description": "La tabella contratti, estensione 1:1 delle linee tramite FK con vincolo UNIQUE, viene descritta nella prosa aziendale come documentazione_amministrativa_della_fornitura."
+    }
+  ],
+  "spec_hash": "040f128a7bc82742"
+}

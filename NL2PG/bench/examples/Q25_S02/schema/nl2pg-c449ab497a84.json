@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "1ed842980fa794f1"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    data_registrazione DATE DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    prezzo NUMERIC(10,2) CHECK (prezzo >= 0),\n    quantita_disponibile INT CHECK (quantita_disponibile >= 0)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT NOT NULL DEFAULT 'in attesa' CHECK (stato IN ('in attesa','spedito','consegnato','annullato'))\n);\n\nCREATE TABLE dettagli_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);"
+}

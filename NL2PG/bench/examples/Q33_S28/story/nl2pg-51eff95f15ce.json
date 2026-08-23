@@ -1,0 +1,262 @@
+{
+  "schema_ddl": "CREATE TABLE clt_mstr (\n    cod_cli TEXT PRIMARY KEY,\n    rag_soc TEXT NOT NULL,\n    ind_cli TEXT,\n    cap_cli TEXT,\n    citta_cli TEXT NOT NULL\n);\n\nCREATE TABLE dettagli_ordini (\n    ord_no INT NOT NULL,\n    riga_no INT NOT NULL,\n    cod_cli TEXT NOT NULL REFERENCES clt_mstr(cod_cli),\n    art_desc TEXT NOT NULL,\n    qta_ord INT NOT NULL CHECK (qta_ord > 0),\n    prz_unit NUMERIC(10,2) NOT NULL CHECK (prz_unit >= 0),\n    PRIMARY KEY (ord_no, riga_no)\n);",
+  "data_profile": {
+    "profile": {
+      "clt_mstr": {
+        "row_count": 429,
+        "columns": {
+          "cod_cli": {
+            "distinct": 429,
+            "sample": [
+              "C1001",
+              "C10011",
+              "C100110",
+              "C100111",
+              "C100112"
+            ]
+          },
+          "rag_soc": {
+            "distinct": 10,
+            "sample": [
+              "Alimentari Rossi SRL",
+              "Bar Centrale SAS",
+              "Distribuzione Alimentare Nord SRL",
+              "Enoteca Bottiglia d'Oro",
+              "Gastronomia Bella Napoli"
+            ]
+          },
+          "ind_cli": {
+            "distinct": 8,
+            "sample": [
+              "Corso Vittorio Emanuele 45",
+              "Piazza Duomo 5",
+              "Via Dante 14",
+              "Via Garibaldi 33",
+              "Via Mazzini 21"
+            ]
+          },
+          "cap_cli": {
+            "distinct": 5,
+            "sample": [
+              "00184",
+              "10124",
+              "20121",
+              "35121",
+              "80134"
+            ]
+          },
+          "citta_cli": {
+            "distinct": 5,
+            "sample": [
+              "Milano",
+              "Napoli",
+              "Padova",
+              "Roma",
+              "Torino"
+            ]
+          }
+        }
+      },
+      "ord_dtl": {
+        "row_count": 1742,
+        "columns": {
+          "ord_no": {
+            "distinct": 1742,
+            "sample": [
+              "10001",
+              "10002",
+              "10003",
+              "10004",
+              "10005"
+            ],
+            "min": 10001,
+            "max": 11742
+          },
+          "riga_no": {
+            "distinct": 1742,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1742
+          },
+          "cod_cli": {
+            "distinct": 420,
+            "sample": [
+              "C1001",
+              "C10011",
+              "C100110",
+              "C100111",
+              "C100112"
+            ]
+          },
+          "art_desc": {
+            "distinct": 10,
+            "sample": [
+              "ACETO Balsamico 250ml",
+              "CAFFE Arabica 500g",
+              "CAFFE Decaffeinato 250g",
+              "CAFFE Miscela Espresso 1kg",
+              "OLIO EVO Toscano 750ml"
+            ]
+          },
+          "qta_ord": {
+            "distinct": 1668,
+            "sample": [
+              "10",
+              "10.03357068803917",
+              "10.085378268739639",
+              "10.18308920415677",
+              "10.212203773057357"
+            ],
+            "min": 6,
+            "max": 70.0
+          },
+          "prz_unit": {
+            "distinct": 995,
+            "sample": [
+              "0.88",
+              "0.89",
+              "0.9",
+              "0.91",
+              "0.92"
+            ],
+            "min": 0.88,
+            "max": 27.75
+          }
+        }
+      }
+    },
+    "preview": {
+      "clt_mstr": [
+        {
+          "cod_cli": "C1001",
+          "rag_soc": "Gastronomia Bella Napoli",
+          "ind_cli": "Via Toledo 88",
+          "cap_cli": null,
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10011",
+          "rag_soc": "Hotel Belvedere SPA",
+          "ind_cli": null,
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10012",
+          "rag_soc": "Ristorante Da Gennaro",
+          "ind_cli": "Via Mazzini 21",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10013",
+          "rag_soc": "Pizzeria La Margherita",
+          "ind_cli": "Via Garibaldi 33",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10014",
+          "rag_soc": "Distribuzione Alimentare Nord SRL",
+          "ind_cli": "Piazza Duomo 5",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10015",
+          "rag_soc": "Gastronomia Bella Napoli",
+          "ind_cli": "Via Po 7",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10016",
+          "rag_soc": "Enoteca Bottiglia d'Oro",
+          "ind_cli": "Corso Vittorio Emanuele 45",
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        },
+        {
+          "cod_cli": "C10017",
+          "rag_soc": "Alimentari Rossi SRL",
+          "ind_cli": null,
+          "cap_cli": "00184",
+          "citta_cli": "Roma"
+        }
+      ],
+      "ord_dtl": [
+        {
+          "ord_no": 10001,
+          "riga_no": 1,
+          "cod_cli": "C200168",
+          "art_desc": "PASTA Penne Rigate 500g",
+          "qta_ord": 22.50610297746558,
+          "prz_unit": 23.05
+        },
+        {
+          "ord_no": 10002,
+          "riga_no": 2,
+          "cod_cli": "C100118",
+          "art_desc": "VINO Chianti DOCG 750ml",
+          "qta_ord": 14.019018184895707,
+          "prz_unit": 20.24
+        },
+        {
+          "ord_no": 10003,
+          "riga_no": 3,
+          "cod_cli": "C10022",
+          "art_desc": "VINO Chianti DOCG 750ml",
+          "qta_ord": 28.364839635023774,
+          "prz_unit": 20.32
+        },
+        {
+          "ord_no": 10004,
+          "riga_no": 4,
+          "cod_cli": "C100233",
+          "art_desc": "PASTA Spaghetti 500g",
+          "qta_ord": 37.78809326196264,
+          "prz_unit": 18.35
+        },
+        {
+          "ord_no": 10005,
+          "riga_no": 5,
+          "cod_cli": "C100213",
+          "art_desc": "PASTA Spaghetti 500g",
+          "qta_ord": 26.414090579861973,
+          "prz_unit": 25.19
+        },
+        {
+          "ord_no": 10006,
+          "riga_no": 6,
+          "cod_cli": "C100384",
+          "art_desc": "PASTA Penne Rigate 500g",
+          "qta_ord": 31.32079615763118,
+          "prz_unit": 14.8
+        },
+        {
+          "ord_no": 10007,
+          "riga_no": 7,
+          "cod_cli": "C100353",
+          "art_desc": "PASTA Penne Rigate 500g",
+          "qta_ord": 15.172366423499355,
+          "prz_unit": 24.19
+        },
+        {
+          "ord_no": 10008,
+          "riga_no": 8,
+          "cod_cli": "C200161",
+          "art_desc": "CAFFE Arabica 500g",
+          "qta_ord": 36.586860657182044,
+          "prz_unit": 15.27
+        }
+      ]
+    }
+  },
+  "story": "Presso la direzione commerciale di una società di distribuzione alimentare che rifornisce ristoranti, bar ed enoteche, il registro anagrafica clienti — identificato negli archivi gestionali con la sigla clt_mstr — conserva le schede di tutti i clienti serviti: per ciascuno sono annotati il codice identificativo, la ragione sociale, l'indirizzo della sede, il cap e la città di riferimento. Accanto ad esso, la movimentazione ordini di vendita, nota in gestione con la sigla ord_dtl, annota ogni prelievo di merce registrato: il numero progressivo dell'ordine — che parte da 10001 —, la posizione occupata dall'articolo all'interno dello stesso, il codice del cliente destinatario, la descrizione dell'articolo richiesto, la quantità ordinata e il prezzo unitario praticato. In occasione della revisione trimestrale delle vendite, l'ufficio analisi ha predisposto una classifica riservata ai clienti con sede a Roma. Gli operatori sono partiti dal registro anagrafica clienti, selezionando le schede in cui la città indicata è proprio Roma — molte delle quali recano il cap 00184 — e hanno successivamente ricondotto tali codici cliente alla movimentazione ordini di vendita. Tra gli articoli movimentati sono stati presi in considerazione esclusivamente i caffè, cioè le voci la cui descrizione inizia con la sigla CAFFE, come CAFFE Arabica 500g oppure CAFFE Miscela Espresso 1kg; aceto balsamico, olio extravergine toscano e vino Chianti presenti nei medesimi ordini sono stati deliberatamente esclusi dal computo. Per ogni cliente romano è stato quindi determinato il valore complessivo dei soli caffè, ottenuto moltiplicando quantità e prezzo unitario di ciascuna voce e sommando i risultati, con importo finale arrotondato all'euro; accanto al valore è stata riportata anche la quantità totale ordinata. La graduatoria, ordinata per valore decrescente, è stata limitata ai primi 10 clienti, ciascuno corredato dalla propria posizione in classifica. Sul gradino più alto si è piazzato un esercizio del centro storico capitolino, mentre realtà come Gastronomia Bella Napoli e Alimentari Rossi SRL hanno confermato la loro costante presenza tra i maggiori volumi di caffè ordinati."
+}

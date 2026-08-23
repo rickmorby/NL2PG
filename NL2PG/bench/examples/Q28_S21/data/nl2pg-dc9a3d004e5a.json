@@ -1,0 +1,444 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "ecb0ed0d4f727a13"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    sede TEXT\n);\n\nCREATE TABLE corsi (\n    id INT PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    titolo TEXT NOT NULL,\n    cfu INT NOT NULL CHECK (cfu BETWEEN 1 AND 30),\n    periodo_lezioni DATERANGE NOT NULL,\n    CONSTRAINT corso_periodo_valido CHECK (NOT isempty(periodo_lezioni))\n);\n\nCREATE TABLE studenti (\n    id INT PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE iscrizioni (\n    id INT PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    data_iscrizione DATE NOT NULL,\n    voto NUMERIC(4,1) CHECK (voto IS NULL OR voto BETWEEN 18 AND 30)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "dipartimenti",
+        "nature": "lookup",
+        "min_rows": 10,
+        "max_rows": 12,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Informatica",
+            "sede": "Padova"
+          },
+          {
+            "id": 2,
+            "nome": "Matematica",
+            "sede": "Bologna"
+          },
+          {
+            "id": 3,
+            "nome": "Fisica e Astronomia",
+            "sede": "Milano"
+          },
+          {
+            "id": 4,
+            "nome": "Ingegneria dell'Informazione",
+            "sede": "Roma"
+          },
+          {
+            "id": 5,
+            "nome": "Economia e Management",
+            "sede": "Torino"
+          },
+          {
+            "id": 6,
+            "nome": "Giurisprudenza",
+            "sede": "Napoli"
+          },
+          {
+            "id": 7,
+            "nome": "Medicina e Chirurgia",
+            "sede": "Padova"
+          },
+          {
+            "id": 8,
+            "nome": "Biologia",
+            "sede": "Bologna"
+          },
+          {
+            "id": 9,
+            "nome": "Lettere e Filosofia",
+            "sede": "Roma"
+          },
+          {
+            "id": 10,
+            "nome": "Psicologia",
+            "sede": "Milano"
+          }
+        ],
+        "variations": {
+          "sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Padova",
+              "Bologna",
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      {
+        "table": "corsi",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 10.0,
+        "templates": [
+          {
+            "id": 1,
+            "dipartimento_id": 1,
+            "titolo": "Programmazione I",
+            "cfu": 12,
+            "periodo_lezioni": "[2025-10-01,2026-01-15)"
+          },
+          {
+            "id": 2,
+            "dipartimento_id": 1,
+            "titolo": "Algoritmi e Strutture Dati",
+            "cfu": 9,
+            "periodo_lezioni": "[2026-03-02,2026-06-10)"
+          },
+          {
+            "id": 3,
+            "dipartimento_id": 2,
+            "titolo": "Analisi Matematica I",
+            "cfu": 12,
+            "periodo_lezioni": "[2025-10-01,2026-01-20)"
+          },
+          {
+            "id": 4,
+            "dipartimento_id": 2,
+            "titolo": "Geometria",
+            "cfu": 6,
+            "periodo_lezioni": "[2026-03-03,2026-06-05)"
+          },
+          {
+            "id": 5,
+            "dipartimento_id": 3,
+            "titolo": "Fisica Generale I",
+            "cfu": 15,
+            "periodo_lezioni": "[2025-09-29,2026-01-16)"
+          },
+          {
+            "id": 6,
+            "dipartimento_id": 4,
+            "titolo": "Reti di Calcolatori",
+            "cfu": 9,
+            "periodo_lezioni": "[2026-03-02,2026-06-12)"
+          },
+          {
+            "id": 7,
+            "dipartimento_id": 5,
+            "titolo": "Microeconomia",
+            "cfu": 8,
+            "periodo_lezioni": "[2025-10-02,2026-01-18)"
+          },
+          {
+            "id": 8,
+            "dipartimento_id": 6,
+            "titolo": "Diritto Privato",
+            "cfu": 12,
+            "periodo_lezioni": "[2025-10-01,2026-01-22)"
+          },
+          {
+            "id": 9,
+            "dipartimento_id": 7,
+            "titolo": "Anatomia Umana",
+            "cfu": 10,
+            "periodo_lezioni": "[2025-10-06,2026-01-30)"
+          },
+          {
+            "id": 10,
+            "dipartimento_id": 8,
+            "titolo": "Genetica Molecolare",
+            "cfu": 6,
+            "periodo_lezioni": "[2026-03-03,2026-06-08)"
+          }
+        ],
+        "variations": {
+          "titolo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Programmazione I",
+              "Algoritmi e Strutture Dati",
+              "Basi di Dati",
+              "Sistemi Operativi",
+              "Analisi Matematica I",
+              "Fisica Generale",
+              "Chimica Organica",
+              "Anatomia Umana",
+              "Diritto Privato",
+              "Microeconomia",
+              "Statistica",
+              "Lingua Inglese",
+              "Storia Contemporanea",
+              "Psicologia Generale",
+              "Reti di Calcolatori"
+            ]
+          },
+          "cfu": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "6",
+              "9",
+              "12",
+              "15",
+              "18"
+            ]
+          },
+          "periodo_lezioni": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "[2025-10-01,2026-01-15)",
+              "[2025-10-02,2026-01-20)",
+              "[2025-09-29,2026-01-16)",
+              "[2026-03-02,2026-06-10)",
+              "[2026-03-03,2026-06-12)",
+              "[2026-02-23,2026-05-29)"
+            ]
+          }
+        }
+      },
+      {
+        "table": "studenti",
+        "nature": "dimension",
+        "min_rows": 250,
+        "max_rows": 400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "matricola": "VR100001",
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "data_nascita": "2003-04-12",
+            "email": "marco.rossi@studenti.univr.it"
+          },
+          {
+            "id": 2,
+            "matricola": "VR100002",
+            "nome": "Giulia",
+            "cognome": "Bianchi",
+            "data_nascita": "2002-11-03",
+            "email": "giulia.bianchi@studenti.univr.it"
+          },
+          {
+            "id": 3,
+            "matricola": "VR100003",
+            "nome": "Luca",
+            "cognome": "Verdi",
+            "data_nascita": "2004-01-25",
+            "email": "luca.verdi@studenti.univr.it"
+          },
+          {
+            "id": 4,
+            "matricola": "VR100004",
+            "nome": "Sara",
+            "cognome": "Esposito",
+            "data_nascita": "2003-07-19",
+            "email": "sara.esposito@studenti.univr.it"
+          },
+          {
+            "id": 5,
+            "matricola": "VR100005",
+            "nome": "Alessandro",
+            "cognome": "Romano",
+            "data_nascita": "2002-09-08",
+            "email": "alessandro.romano@studenti.univr.it"
+          },
+          {
+            "id": 6,
+            "matricola": "VR100006",
+            "nome": "Chiara",
+            "cognome": "Ferrari",
+            "data_nascita": "2004-03-30",
+            "email": "chiara.ferrari@studenti.univr.it"
+          },
+          {
+            "id": 7,
+            "matricola": "VR100007",
+            "nome": "Davide",
+            "cognome": "Conti",
+            "data_nascita": "2003-12-14",
+            "email": "davide.conti@studenti.univr.it"
+          },
+          {
+            "id": 8,
+            "matricola": "VR100008",
+            "nome": "Elena",
+            "cognome": "Ricci",
+            "data_nascita": "2002-06-21",
+            "email": "elena.ricci@studenti.univr.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Giulia",
+              "Luca",
+              "Sara",
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesco",
+              "Martina",
+              "Andrea",
+              "Alice"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Esposito",
+              "Romano",
+              "Ferrari",
+              "Conti",
+              "Ricci",
+              "Marino",
+              "Greco",
+              "Bruno",
+              "Gallo"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -800.0,
+            "delta_max": 800.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "iscrizioni",
+        "nature": "fact",
+        "min_rows": 800,
+        "max_rows": 1500,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "studente_id": 1,
+            "corso_id": 1,
+            "data_iscrizione": "2025-09-15",
+            "voto": 27.0
+          },
+          {
+            "id": 2,
+            "studente_id": 2,
+            "corso_id": 2,
+            "data_iscrizione": "2025-09-18",
+            "voto": 22.5
+          },
+          {
+            "id": 3,
+            "studente_id": 3,
+            "corso_id": 3,
+            "data_iscrizione": "2025-09-20",
+            "voto": null
+          },
+          {
+            "id": 4,
+            "studente_id": 4,
+            "corso_id": 4,
+            "data_iscrizione": "2026-02-10",
+            "voto": 30.0
+          },
+          {
+            "id": 5,
+            "studente_id": 5,
+            "corso_id": 5,
+            "data_iscrizione": "2025-09-12",
+            "voto": 18.5
+          },
+          {
+            "id": 6,
+            "studente_id": 6,
+            "corso_id": 6,
+            "data_iscrizione": "2026-02-12",
+            "voto": null
+          },
+          {
+            "id": 7,
+            "studente_id": 7,
+            "corso_id": 7,
+            "data_iscrizione": "2025-09-22",
+            "voto": 25.0
+          },
+          {
+            "id": 8,
+            "studente_id": 8,
+            "corso_id": 8,
+            "data_iscrizione": "2026-02-15",
+            "voto": 28.5
+          }
+        ],
+        "variations": {
+          "data_iscrizione": {
+            "axis": "shift",
+            "delta_min": -15.0,
+            "delta_max": 15.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "voto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "18.0",
+              "19.5",
+              "21.0",
+              "22.5",
+              "24.0",
+              "25.5",
+              "27.0",
+              "28.5",
+              "30.0"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

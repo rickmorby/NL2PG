@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "58071b28e656bbfc"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL,\n    budget_annuo NUMERIC(12,2) NOT NULL CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile > 0),\n    data_assunzione DATE NOT NULL\n);\n\nCREATE TABLE progetti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    costo_orario_standard NUMERIC(12,2) NOT NULL,\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE registrazioni_ore (\n    id SERIAL PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    progetto_id INT NOT NULL REFERENCES progetti(id),\n    data_registrazione DATE NOT NULL,\n    ore_lavorate TEXT NOT NULL CHECK (ore_lavorate ~ '^[0-9]+(\\.[0-9]{1,2})?$'),\n    descrizione_attivita TEXT\n);"
+}

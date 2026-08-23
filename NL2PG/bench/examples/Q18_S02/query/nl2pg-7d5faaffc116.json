@@ -1,0 +1,281 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    citta TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato TEXT NOT NULL CHECK (stato IN ('in_attesa', 'pagato', 'spedito', 'consegnato', 'annullato'))\n);\n\nCREATE INDEX idx_ordini_cliente_id ON ordini(cliente_id);\nCREATE INDEX idx_ordini_data_ordine ON ordini(data_ordine);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 546,
+        "columns": {
+          "id": {
+            "distinct": 546,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 546
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Esposito",
+              "Ferrari",
+              "Greco"
+            ]
+          },
+          "email": {
+            "distinct": 546,
+            "sample": [
+              "alessandro.ferrari100@example.com",
+              "alessandro.ferrari101@example.com",
+              "alessandro.ferrari102@example.com",
+              "alessandro.ferrari103@example.com",
+              "alessandro.ferrari104@example.com"
+            ]
+          },
+          "telefono": {
+            "distinct": 3,
+            "sample": [
+              "+39 02 9876543",
+              "+39 06 1234567",
+              "+39 081 5551234"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 340,
+            "sample": [
+              "2022-12-15",
+              "2022-12-17",
+              "2022-12-19",
+              "2022-12-21",
+              "2022-12-23"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1645,
+        "columns": {
+          "id": {
+            "distinct": 1645,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1745
+          },
+          "cliente_id": {
+            "distinct": 525,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 546
+          },
+          "data_ordine": {
+            "distinct": 992,
+            "sample": [
+              "2024-11-11 10:30:00",
+              "2024-11-12 10:30:00",
+              "2024-11-13 10:30:00",
+              "2024-11-14 10:30:00",
+              "2024-11-15 10:30:00"
+            ]
+          },
+          "importo_totale": {
+            "distinct": 1563,
+            "sample": [
+              "100.02",
+              "100.1",
+              "100.25",
+              "100.48",
+              "100.61"
+            ],
+            "min": 16.5,
+            "max": 960.0
+          },
+          "stato": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "consegnato",
+              "in_attesa",
+              "pagato",
+              "spedito"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 11,
+          "nome": "Alessandro",
+          "cognome": "Ferrari",
+          "email": "alessandro.ferrari1@example.com",
+          "telefono": "+39 06 1234567",
+          "citta": "Torino",
+          "data_registrazione": "2023-01-31"
+        },
+        {
+          "id": 1,
+          "nome": "Alessandro",
+          "cognome": "Rossi",
+          "email": "alessandro.rossi1@example.com",
+          "telefono": "+39 06 1234567",
+          "citta": "Genova",
+          "data_registrazione": "2023-01-06"
+        },
+        {
+          "id": 25,
+          "nome": "Alessandro",
+          "cognome": "Rossi",
+          "email": "alessandro.rossi2@example.com",
+          "telefono": "+39 06 1234567",
+          "citta": "Roma",
+          "data_registrazione": "2023-01-05"
+        },
+        {
+          "id": 23,
+          "nome": "Chiara",
+          "cognome": "Colombo",
+          "email": "chiara.colombo1@example.com",
+          "telefono": "+39 06 1234567",
+          "citta": "Genova",
+          "data_registrazione": "2023-02-26"
+        },
+        {
+          "id": 14,
+          "nome": "Chiara",
+          "cognome": "Ricci",
+          "email": "chiara.ricci1@example.com",
+          "telefono": "+39 06 1234567",
+          "citta": "Roma",
+          "data_registrazione": "2023-04-30"
+        },
+        {
+          "id": 30,
+          "nome": "Chiara",
+          "cognome": "Ricci",
+          "email": "chiara.ricci2@example.com",
+          "telefono": "+39 06 1234567",
+          "citta": "Napoli",
+          "data_registrazione": "2023-05-18"
+        },
+        {
+          "id": 5,
+          "nome": "Davide",
+          "cognome": "Greco",
+          "email": "davide.greco1@example.com",
+          "telefono": "+39 06 1234567",
+          "citta": "Padova",
+          "data_registrazione": "2023-03-18"
+        },
+        {
+          "id": 21,
+          "nome": "Davide",
+          "cognome": "Ricci",
+          "email": "davide.ricci1@example.com",
+          "telefono": "+39 06 1234567",
+          "citta": "Padova",
+          "data_registrazione": "2023-03-28"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 101,
+          "cliente_id": 468,
+          "data_ordine": "2024-12-06 10:30:00",
+          "importo_totale": 190.0,
+          "stato": "annullato"
+        },
+        {
+          "id": 102,
+          "cliente_id": 149,
+          "data_ordine": "2024-11-24 10:30:00",
+          "importo_totale": 317.12,
+          "stato": "consegnato"
+        },
+        {
+          "id": 103,
+          "cliente_id": 189,
+          "data_ordine": "2025-02-08 10:30:00",
+          "importo_totale": 273.98,
+          "stato": "spedito"
+        },
+        {
+          "id": 104,
+          "cliente_id": 175,
+          "data_ordine": "2025-06-06 10:30:00",
+          "importo_totale": 83.7,
+          "stato": "annullato"
+        },
+        {
+          "id": 105,
+          "cliente_id": 230,
+          "data_ordine": "2024-11-30 10:30:00",
+          "importo_totale": 371.67,
+          "stato": "annullato"
+        },
+        {
+          "id": 106,
+          "cliente_id": 409,
+          "data_ordine": "2025-02-11 10:30:00",
+          "importo_totale": 137.75,
+          "stato": "consegnato"
+        },
+        {
+          "id": 107,
+          "cliente_id": 87,
+          "data_ordine": "2025-07-15 10:30:00",
+          "importo_totale": 185.91,
+          "stato": "consegnato"
+        },
+        {
+          "id": 108,
+          "cliente_id": 493,
+          "data_ordine": "2025-05-03 10:30:00",
+          "importo_totale": 243.36,
+          "stato": "consegnato"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "lateral"
+  ],
+  "query": "SELECT c.nome, c.cognome, c.citta, ultimo_ordine.data_ordine AS data_ultimo_ordine_consegnato, ultimo_ordine.importo_totale AS importo_ultimo_ordine FROM clienti AS c LEFT JOIN LATERAL (SELECT o.data_ordine, o.importo_totale FROM ordini AS o WHERE o.cliente_id = c.id AND o.stato = 'consegnato' ORDER BY o.data_ordine DESC LIMIT 1) AS ultimo_ordine ON TRUE WHERE c.citta = 'Milano' ORDER BY ultimo_ordine.importo_totale DESC NULLS LAST, c.id"
+}

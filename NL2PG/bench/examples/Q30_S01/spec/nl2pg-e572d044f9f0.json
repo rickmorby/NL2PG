@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 1,
+  "hierarchy": "none",
+  "sql_features": [
+    "row_types"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "registro_movimenti_commerciali",
+      "description": "La singola tabella autonoma ordini viene denominata registro_movimenti_commerciali nella prosa aziendale. L'utente deve risalire alla tabella fisica ordini per costruire i confronti di tuple ROW(c1,c2) = ROW(v1,v2) tramite WHERE o gli ordinamenti ORDER BY (col).campo."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_totale",
+      "obsolete_value": "controvalore della chiusura d'ordine",
+      "description": "La colonna importo_totale della tabella ordini è indicata nel linguaggio aziendale con il gergo commerciale 'controvalore della chiusura d'ordine'. Le query che filtrano con ROW(data_ordine, importo_totale) = ROW(v1, v2) devono mappare tale perifrasi sulla colonna reale importo_totale."
+    }
+  ],
+  "spec_hash": "6a293ba826e00607"
+}

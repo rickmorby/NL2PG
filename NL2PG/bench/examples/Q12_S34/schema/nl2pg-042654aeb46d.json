@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "correlated_subquery"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fornitori",
+        "obsolete_value": "anagrafica_partner",
+        "description": "La tabella padre fornitori viene denominata anagrafica_partner nella prosa aziendale; il solver deve mappare la denominazione obsoleta sulla tabella reale del database."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore economico complessivo dell'ordine",
+        "description": "La colonna importo_totale della tabella figlia ordini_acquisto viene indicata nella prosa come 'valore economico complessivo dell'ordine'; occorre riconoscere il sinonimo per filtrare correttamente nelle condizioni della subquery correlata EXISTS."
+      }
+    ],
+    "spec_hash": "06fdf12b3c95a396"
+  },
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    citta TEXT,\n    email TEXT,\n    telefono TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE ordini_acquisto (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT REFERENCES fornitori(id) ON DELETE SET NULL,\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('bozza', 'confermato', 'in_lavorazione', 'evaso', 'annullato'))\n);"
+}

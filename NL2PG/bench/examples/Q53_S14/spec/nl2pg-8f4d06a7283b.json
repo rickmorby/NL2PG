@@ -1,0 +1,34 @@
+{
+  "domain": "sanità",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "ordered_set_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "pazienti",
+      "obsolete_value": "anagrafica_assistiti",
+      "description": "La tabella pazienti viene denominata anagrafica_assistiti nella prosa aziendale; il progettista deve riconoscere che anagrafica_assistiti corrisponde alla tabella fisica pazienti."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "pressione_sistolica_mmhg",
+      "obsolete_value": "PAS",
+      "description": "La colonna pressione_sistolica_mmhg della tabella rilevazioni_vitali è indicata nella documentazione clinica con l'acronimo gergale PAS (Pressione Arteriosa Sistolica); occorre mappare PAS sulla colonna reale."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "data_dimissione",
+      "obsolete_value": "chiusura_episodio",
+      "description": "Il termine dimissione ha doppio significato nel dominio: evento clinico di fine degenza e liberazione del posto letto. La prosa usa chiusura_episodio riferendosi esclusivamente alla colonna data_dimissione della tabella ricoveri, non a un campo separato."
+    }
+  ],
+  "spec_hash": "10616944d7a9a0d3"
+}

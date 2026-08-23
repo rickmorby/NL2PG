@@ -1,0 +1,666 @@
+{
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id INT PRIMARY KEY,\n    codice_dipartimento TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    sede TEXT\n);\n\nCREATE TABLE docenti (\n    id INT PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    ruolo TEXT NOT NULL CHECK (ruolo IN ('ordinario', 'associato', 'ricercatore'))\n);\n\nCREATE TABLE studenti (\n    id INT PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_immatricolazione DATE NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE corsi (\n    id INT PRIMARY KEY,\n    docente_id INT NOT NULL REFERENCES docenti(id),\n    corso_prerequisito_id INT REFERENCES corsi(id),\n    titolo TEXT NOT NULL,\n    crediti INT NOT NULL CHECK (crediti BETWEEN 1 AND 30),\n    semestre INT NOT NULL CHECK (semestre IN (1, 2)),\n    anno_accademico TEXT NOT NULL\n);\n\nCREATE TABLE iscrizioni (\n    id INT PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    data_esame DATE NOT NULL,\n    voto INT NOT NULL CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN NOT NULL DEFAULT FALSE,\n    UNIQUE (studente_id, corso_id, data_esame)\n);",
+  "data_profile": {
+    "profile": {
+      "dipartimenti": {
+        "row_count": 9,
+        "columns": {
+          "id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "codice_dipartimento": {
+            "distinct": 9,
+            "sample": [
+              "DIP-BIO",
+              "DIP-CHI",
+              "DIP-ECO",
+              "DIP-FIS",
+              "DIP-GIU"
+            ]
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Biologia",
+              "Chimica",
+              "Economia",
+              "Fisica",
+              "Giurisprudenza"
+            ]
+          },
+          "sede": {
+            "distinct": 5,
+            "sample": [
+              "Edificio A - Piano 1",
+              "Edificio A - Piano 2",
+              "Edificio B - Piano 2",
+              "Edificio C - Piano 3",
+              "Edificio D - Piano 1"
+            ]
+          }
+        }
+      },
+      "docenti": {
+        "row_count": 65,
+        "columns": {
+          "id": {
+            "distinct": 65,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 65
+          },
+          "dipartimento_id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Anna",
+              "Elena",
+              "Giorgio",
+              "Luca",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "distinct": 8,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Ferrari",
+              "Gallo",
+              "Greco"
+            ]
+          },
+          "email": {
+            "distinct": 65,
+            "sample": [
+              "anna.gallo1@ateneo.it",
+              "anna.gallo2@ateneo.it",
+              "anna.gallo3@ateneo.it",
+              "anna.gallo4@ateneo.it",
+              "anna.gallo5@ateneo.it"
+            ]
+          },
+          "ruolo": {
+            "distinct": 3,
+            "sample": [
+              "associato",
+              "ordinario",
+              "ricercatore"
+            ]
+          }
+        }
+      },
+      "studenti": {
+        "row_count": 337,
+        "columns": {
+          "id": {
+            "distinct": 337,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 337
+          },
+          "matricola": {
+            "distinct": 337,
+            "sample": [
+              "VR100001",
+              "VR1000011",
+              "VR10000110",
+              "VR10000111",
+              "VR10000112"
+            ]
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessia",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Federico"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Amato",
+              "Caruso",
+              "De Luca",
+              "Esposito",
+              "Fontana"
+            ]
+          },
+          "data_immatricolazione": {
+            "distinct": 5,
+            "sample": [
+              "2021-09-27",
+              "2022-09-26",
+              "2023-09-25",
+              "2024-09-23",
+              "2025-09-22"
+            ]
+          },
+          "email": {
+            "distinct": 315,
+            "sample": [
+              "vr10000110@studenti.ateneo.it",
+              "vr10000111@studenti.ateneo.it",
+              "vr10000112@studenti.ateneo.it",
+              "vr10000113@studenti.ateneo.it",
+              "vr10000114@studenti.ateneo.it"
+            ]
+          }
+        }
+      },
+      "corsi": {
+        "row_count": 317,
+        "columns": {
+          "id": {
+            "distinct": 317,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 317
+          },
+          "docente_id": {
+            "distinct": 65,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 65
+          },
+          "corso_prerequisito_id": {
+            "distinct": 155,
+            "sample": [
+              "1",
+              "10",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 1,
+            "max": 280
+          },
+          "titolo": {
+            "distinct": 6,
+            "sample": [
+              "Analisi Matematica I",
+              "Analisi Matematica II",
+              "Chimica Generale",
+              "Chimica Organica",
+              "Programmazione I"
+            ]
+          },
+          "crediti": {
+            "distinct": 4,
+            "sample": [
+              "12",
+              "15",
+              "6",
+              "9"
+            ],
+            "min": 6,
+            "max": 12
+          },
+          "semestre": {
+            "distinct": 2,
+            "sample": [
+              "1",
+              "2"
+            ],
+            "min": 1,
+            "max": 2
+          },
+          "anno_accademico": {
+            "distinct": 3,
+            "sample": [
+              "2023/2024",
+              "2024/2025",
+              "2025/2026"
+            ]
+          }
+        }
+      },
+      "iscrizioni": {
+        "row_count": 1493,
+        "columns": {
+          "id": {
+            "distinct": 1493,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1493
+          },
+          "studente_id": {
+            "distinct": 337,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 337
+          },
+          "corso_id": {
+            "distinct": 317,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 317
+          },
+          "data_esame": {
+            "distinct": 1493,
+            "sample": [
+              "2025-01-28",
+              "2025-01-29",
+              "2025-01-30",
+              "2025-01-31",
+              "2025-02-01"
+            ]
+          },
+          "voto": {
+            "distinct": 13,
+            "sample": [
+              "18",
+              "19",
+              "20",
+              "21",
+              "22"
+            ],
+            "min": 19,
+            "max": 30
+          },
+          "lode": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "dipartimenti": [
+        {
+          "id": 1,
+          "codice_dipartimento": "DIP-INF",
+          "nome": "Informatica",
+          "sede": "Edificio A - Piano 2"
+        },
+        {
+          "id": 2,
+          "codice_dipartimento": "DIP-INF1",
+          "nome": "Informatica",
+          "sede": "Edificio B - Piano 2"
+        },
+        {
+          "id": 3,
+          "codice_dipartimento": "DIP-MAT",
+          "nome": "Matematica",
+          "sede": "Edificio C - Piano 3"
+        },
+        {
+          "id": 4,
+          "codice_dipartimento": "DIP-FIS",
+          "nome": "Fisica",
+          "sede": "Edificio C - Piano 3"
+        },
+        {
+          "id": 5,
+          "codice_dipartimento": "DIP-CHI",
+          "nome": "Chimica",
+          "sede": "Edificio A - Piano 2"
+        },
+        {
+          "id": 6,
+          "codice_dipartimento": "DIP-BIO",
+          "nome": "Biologia",
+          "sede": "Edificio A - Piano 1"
+        },
+        {
+          "id": 7,
+          "codice_dipartimento": "DIP-ECO",
+          "nome": "Economia",
+          "sede": "Edificio D - Piano 1"
+        },
+        {
+          "id": 8,
+          "codice_dipartimento": "DIP-LET",
+          "nome": "Lettere",
+          "sede": "Edificio D - Piano 1"
+        }
+      ],
+      "docenti": [
+        {
+          "id": 1,
+          "dipartimento_id": 6,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "email": "marco.bianchi@ateneo.it",
+          "ruolo": "associato"
+        },
+        {
+          "id": 2,
+          "dipartimento_id": 5,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "email": "marco.bianchi1@ateneo.it",
+          "ruolo": "ordinario"
+        },
+        {
+          "id": 3,
+          "dipartimento_id": 9,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "email": "marco.bianchi2@ateneo.it",
+          "ruolo": "ordinario"
+        },
+        {
+          "id": 4,
+          "dipartimento_id": 2,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "email": "marco.bianchi3@ateneo.it",
+          "ruolo": "associato"
+        },
+        {
+          "id": 5,
+          "dipartimento_id": 2,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "email": "marco.bianchi4@ateneo.it",
+          "ruolo": "associato"
+        },
+        {
+          "id": 6,
+          "dipartimento_id": 5,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "email": "marco.bianchi5@ateneo.it",
+          "ruolo": "ricercatore"
+        },
+        {
+          "id": 7,
+          "dipartimento_id": 2,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "email": "marco.bianchi6@ateneo.it",
+          "ruolo": "associato"
+        },
+        {
+          "id": 8,
+          "dipartimento_id": 7,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "email": "marco.bianchi7@ateneo.it",
+          "ruolo": "associato"
+        }
+      ],
+      "studenti": [
+        {
+          "id": 1,
+          "matricola": "VR100001",
+          "nome": "Sofia",
+          "cognome": "Greco",
+          "data_immatricolazione": "2025-09-22",
+          "email": "vr100001@studenti.ateneo.it"
+        },
+        {
+          "id": 2,
+          "matricola": "VR1000011",
+          "nome": "Chiara",
+          "cognome": "Serra",
+          "data_immatricolazione": "2022-09-26",
+          "email": "vr1000011@studenti.ateneo.it"
+        },
+        {
+          "id": 3,
+          "matricola": "VR1000012",
+          "nome": "Alessia",
+          "cognome": "Villa",
+          "data_immatricolazione": "2021-09-27",
+          "email": "vr1000012@studenti.ateneo.it"
+        },
+        {
+          "id": 4,
+          "matricola": "VR1000013",
+          "nome": "Matteo",
+          "cognome": "Rossi",
+          "data_immatricolazione": "2021-09-27",
+          "email": "vr1000013@studenti.ateneo.it"
+        },
+        {
+          "id": 5,
+          "matricola": "VR1000014",
+          "nome": "Davide",
+          "cognome": "De Luca",
+          "data_immatricolazione": "2022-09-26",
+          "email": "vr1000014@studenti.ateneo.it"
+        },
+        {
+          "id": 6,
+          "matricola": "VR1000015",
+          "nome": "Giulia",
+          "cognome": "Lombardi",
+          "data_immatricolazione": "2023-09-25",
+          "email": "vr1000015@studenti.ateneo.it"
+        },
+        {
+          "id": 7,
+          "matricola": "VR1000016",
+          "nome": "Sofia",
+          "cognome": "Rossi",
+          "data_immatricolazione": "2023-09-25",
+          "email": "vr1000016@studenti.ateneo.it"
+        },
+        {
+          "id": 8,
+          "matricola": "VR1000017",
+          "nome": "Valentina",
+          "cognome": "Caruso",
+          "data_immatricolazione": "2024-09-23",
+          "email": "vr1000017@studenti.ateneo.it"
+        }
+      ],
+      "corsi": [
+        {
+          "id": 1,
+          "docente_id": 39,
+          "corso_prerequisito_id": null,
+          "titolo": "Programmazione I",
+          "crediti": "9",
+          "semestre": "1",
+          "anno_accademico": "2023/2024"
+        },
+        {
+          "id": 2,
+          "docente_id": 11,
+          "corso_prerequisito_id": 1,
+          "titolo": "Programmazione I",
+          "crediti": "6",
+          "semestre": "2",
+          "anno_accademico": "2024/2025"
+        },
+        {
+          "id": 3,
+          "docente_id": 1,
+          "corso_prerequisito_id": 2,
+          "titolo": "Programmazione I",
+          "crediti": "6",
+          "semestre": "2",
+          "anno_accademico": "2024/2025"
+        },
+        {
+          "id": 4,
+          "docente_id": 40,
+          "corso_prerequisito_id": 1,
+          "titolo": "Programmazione I",
+          "crediti": "9",
+          "semestre": "2",
+          "anno_accademico": "2024/2025"
+        },
+        {
+          "id": 5,
+          "docente_id": 50,
+          "corso_prerequisito_id": 4,
+          "titolo": "Programmazione I",
+          "crediti": "9",
+          "semestre": "2",
+          "anno_accademico": "2024/2025"
+        },
+        {
+          "id": 6,
+          "docente_id": 35,
+          "corso_prerequisito_id": 3,
+          "titolo": "Programmazione I",
+          "crediti": "12",
+          "semestre": "1",
+          "anno_accademico": "2024/2025"
+        },
+        {
+          "id": 7,
+          "docente_id": 14,
+          "corso_prerequisito_id": 4,
+          "titolo": "Programmazione I",
+          "crediti": "12",
+          "semestre": "1",
+          "anno_accademico": "2023/2024"
+        },
+        {
+          "id": 8,
+          "docente_id": 50,
+          "corso_prerequisito_id": 4,
+          "titolo": "Programmazione I",
+          "crediti": "6",
+          "semestre": "1",
+          "anno_accademico": "2024/2025"
+        }
+      ],
+      "iscrizioni": [
+        {
+          "id": 1,
+          "studente_id": 329,
+          "corso_id": 26,
+          "data_esame": "2025-01-28",
+          "voto": "23",
+          "lode": "false"
+        },
+        {
+          "id": 2,
+          "studente_id": 162,
+          "corso_id": 76,
+          "data_esame": "2025-01-29",
+          "voto": "23",
+          "lode": "true"
+        },
+        {
+          "id": 3,
+          "studente_id": 202,
+          "corso_id": 135,
+          "data_esame": "2025-01-30",
+          "voto": "27",
+          "lode": "false"
+        },
+        {
+          "id": 4,
+          "studente_id": 174,
+          "corso_id": 218,
+          "data_esame": "2025-01-31",
+          "voto": "23",
+          "lode": "false"
+        },
+        {
+          "id": 5,
+          "studente_id": 196,
+          "corso_id": 267,
+          "data_esame": "2025-02-01",
+          "voto": "18",
+          "lode": "false"
+        },
+        {
+          "id": 6,
+          "studente_id": 53,
+          "corso_id": 79,
+          "data_esame": "2025-02-02",
+          "voto": "30",
+          "lode": "false"
+        },
+        {
+          "id": 7,
+          "studente_id": 37,
+          "corso_id": 167,
+          "data_esame": "2025-02-03",
+          "voto": "18",
+          "lode": "false"
+        },
+        {
+          "id": 8,
+          "studente_id": 93,
+          "corso_id": 155,
+          "data_esame": "2025-02-04",
+          "voto": "20",
+          "lode": "false"
+        }
+      ]
+    }
+  },
+  "story": "Alla Segreteria Didattica dell'ateneo è giunto il momento della verifica annuale sugli archivi gestionali. Il primo archivio, denominato dipartimenti, custodisce le schede dei 9 dipartimenti, ciascuna corredata dal codice identificativo — come DIP-INF per Informatica o DIP-MAT per Matematica — dal nome e dalla sede, ad esempio Edificio C - Piano 3. Accanto ad esso si trova il registro docenti, che raccoglie le schede dei 65 professori con nome, cognome, indirizzo di posta elettronica istituzionale e ruolo ricoperto, che può essere ordinario, associato oppure ricercatore. Il cuore del controllo ha riguardato l'archivio dell'offerta formativa, intitolato offerta_didattica e un tempo noto semplicemente come corsi: ogni insegnamento vi è descritto dal titolo, dal numero di CFU — i Crediti Formativi Universitari, che nell'ateneo ammontano a 6, 9 o 12 — dal semestre di svolgimento, 1 o 2, e dall'anno accademico di riferimento, che spazia dal 2023/2024 al 2025/2026. In molte schede compare inoltre l'indicazione dell'insegnamento propedeutico, ripreso dalla stessa offerta_didattica: gli addetti hanno quindi posto l'archivio a confronto con se stesso, abbinando a ogni corso il prerequisito corrispondente. Per l'anno accademico 2024/2025 gli operatori hanno così predisposto l'elenco degli insegnamenti che richiedono una propedeuticità, riportando per ciascuno titolo, CFU e semestre insieme al titolo e ai CFU del rispettivo prerequisito, e disponendo l'elenco per titolo del corso e, a parità di titolo, dai CFU più alti verso i più bassi. Il quadro si completa con il registro studenti, che annota matricole come VR100001, nome, cognome, data di immatricolazione — ad esempio 2022-09-26 — ed eventuale posta elettronica sul dominio studenti.ateneo.it, e con l'archivio delle verbalizzazioni, storicamente denominato iscrizioni, dove sono annotate le prove sostenute: lo studente coinvolto, l'insegnamento superato, la data dell'appello, il voto conseguito, compreso tra 18 e 30, e l'eventuale lode. Incrociando verbalizzazioni e offerta_didattica, la commissione ha infine verificato quanti iscritti abbiano maturato le propedeuticità richieste prima degli appelli apertisi il 2025-01-28."
+}

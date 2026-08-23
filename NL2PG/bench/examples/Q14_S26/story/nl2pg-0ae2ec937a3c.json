@@ -1,0 +1,158 @@
+{
+  "schema_ddl": "CREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    data_registrazione TEXT NOT NULL,\n    numero_conto TEXT NOT NULL,\n    descrizione_scrittura TEXT NOT NULL,\n    importo NUMERIC(12,2) NOT NULL,\n    tipo_scrittura TEXT NOT NULL,\n    documento_riferimento TEXT,\n    CHECK (data_registrazione ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'),\n    CHECK (tipo_scrittura IN ('attivo', 'passivo'))\n);",
+  "data_profile": {
+    "profile": {
+      "movimenti_contabili": {
+        "row_count": 831,
+        "columns": {
+          "id": {
+            "distinct": 831,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 831
+          },
+          "data_registrazione": {
+            "distinct": 19,
+            "sample": [
+              "2026-01-05",
+              "2026-01-06",
+              "2026-01-08",
+              "2026-01-10",
+              "2026-01-13"
+            ]
+          },
+          "numero_conto": {
+            "distinct": 9,
+            "sample": [
+              "1001",
+              "1010",
+              "1502",
+              "2401",
+              "2801"
+            ]
+          },
+          "descrizione_scrittura": {
+            "distinct": 14,
+            "sample": [
+              "Acquisto materiali di consumo",
+              "Apertura cassa iniziale esercizio",
+              "Fattura acquisto n. 88 da Fornitore Beta",
+              "Fattura vendita n. 12 a Cliente Alfa",
+              "Fattura vendita servizi di consulenza"
+            ]
+          },
+          "importo": {
+            "distinct": 8,
+            "sample": [
+              "1200.00",
+              "156.40",
+              "1840.50",
+              "2500.00",
+              "3200.00"
+            ]
+          },
+          "tipo_scrittura": {
+            "distinct": 2,
+            "sample": [
+              "attivo",
+              "passivo"
+            ]
+          },
+          "documento_riferimento": {
+            "distinct": 17,
+            "sample": [
+              "BC-2026-004",
+              "BC-2026-005",
+              "DDT-2026-011",
+              "DDT-2026-019",
+              "FATT-2026-001"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "movimenti_contabili": [
+        {
+          "id": 1,
+          "data_registrazione": "2026-02-04",
+          "numero_conto": "2401",
+          "descrizione_scrittura": "Incasso fattura cliente",
+          "importo": "2500.00",
+          "tipo_scrittura": "passivo",
+          "documento_riferimento": "FATT-2026-043"
+        },
+        {
+          "id": 2,
+          "data_registrazione": "2026-03-03",
+          "numero_conto": "1502",
+          "descrizione_scrittura": "Versamento bancario da cassa",
+          "importo": "2500.00",
+          "tipo_scrittura": "passivo",
+          "documento_riferimento": "NC-2026-003"
+        },
+        {
+          "id": 3,
+          "data_registrazione": "2026-01-13",
+          "numero_conto": "1001",
+          "descrizione_scrittura": "Prelievo cassa per spese minori",
+          "importo": "2500.00",
+          "tipo_scrittura": "attivo",
+          "documento_riferimento": "RC-2026-002"
+        },
+        {
+          "id": 4,
+          "data_registrazione": "2026-05-28",
+          "numero_conto": "1010",
+          "descrizione_scrittura": "Pagamento fattura fornitore",
+          "importo": "2500.00",
+          "tipo_scrittura": "passivo",
+          "documento_riferimento": null
+        },
+        {
+          "id": 5,
+          "data_registrazione": "2026-01-22",
+          "numero_conto": "5001",
+          "descrizione_scrittura": "Versamento bancario da cassa",
+          "importo": "2500.00",
+          "tipo_scrittura": "attivo",
+          "documento_riferimento": null
+        },
+        {
+          "id": 6,
+          "data_registrazione": "2026-04-24",
+          "numero_conto": "1502",
+          "descrizione_scrittura": "Acquisto materiali di consumo",
+          "importo": "2500.00",
+          "tipo_scrittura": "attivo",
+          "documento_riferimento": "FATT-2026-001"
+        },
+        {
+          "id": 7,
+          "data_registrazione": "2026-05-28",
+          "numero_conto": "6410",
+          "descrizione_scrittura": "Versamento bancario da cassa",
+          "importo": "2500.00",
+          "tipo_scrittura": "attivo",
+          "documento_riferimento": "BC-2026-005"
+        },
+        {
+          "id": 8,
+          "data_registrazione": "2026-02-04",
+          "numero_conto": "1010",
+          "descrizione_scrittura": "Pagamento fattura fornitore",
+          "importo": "2500.00",
+          "tipo_scrittura": "attivo",
+          "documento_riferimento": "DDT-2026-011"
+        }
+      ]
+    }
+  },
+  "story": "Presso la Ragioneria della ditta Meridiana Arredamenti, l'esercizio 2026 è stato scandito da una prassi consolidata: ogni operazione economica trova posto nel registro_scritture, l'archivio contabile ufficiale dove vengono annotate tutte le scritture dell'anno. Ciascuna voce di questo archivio conserva la data di registrazione, il numero di conto interessato, la descrizione della scrittura, il controvalore della scrittura, la natura dell'operazione — attivo oppure passivo — e, quando esiste, il documento di riferimento che ne attesta l'origine amministrativa. Nel corso dei mesi sono confluite nell'archivio 831 voci, dalle aperture di cassa iniziali dell'esercizio alle fatture di vendita, dagli acquisti di materiali di consumo ai versamenti bancari, con annotazioni già presenti nelle prime giornate dell'anno, datate 2026-01-05, 2026-01-06, 2026-01-08 e 2026-01-10.\n\nA metà anno il capo ragioniere ha richiesto un controllo comparativo: per ciascun numero di conto occorreva determinare quante scritture erano state registrate e quale fosse il totale complessivo dei controvalori accumulati. Il prospetto è stato impostato riunendo in un unico fascicolo due sezioni gemelle: nella prima figurano le scritture di tipo attivo, nella seconda quelle di tipo passivo, così che la Direzione possa leggere fianco a fianco i due versanti della gestione senza dover consultare dossier separati.\n\nSul versante attivo spicca il conto 1001 della cassa, dove in data 2026-01-13 risulta un prelievo per spese minori di 2500.00 coperto dal giustificativo RC-2026-002; lo affiancano il conto 5001, toccato da un versamento bancario da cassa del 2026-01-22, il conto 6410 con l'operazione del 2026-05-28 attestata dal documento BC-2026-005, e il conto 1010 dell'istituto di credito, dove il 2026-02-04 compare un pagamento fattura fornitore di 2500.00 accompagnato dal documento di trasporto DDT-2026-011. Sul versante passivo emergono invece il conto 2401 dei clienti, con l'incasso della fattura del 2026-02-04 pari a 2500.00 sotto il riferimento FATT-2026-043, e il conto 1502, interessato sia dal versamento bancario da cassa del 2026-03-03 chiuso con la nota di credito NC-2026-003, sia dall'acquisto di materiali di consumo del 2026-04-24 coperto dalla fattura FATT-2026-001. Completano il quadro il conto 2801 dei fornitori e un ulteriore pagamento fattura fornitore sul conto 1010 in data 2026-05-28, rimasto privo di documento allegato.\n\nTra le altre annotazioni esaminate durante il controllo figurano importi come 1200.00 per l'apertura cassa iniziale dell'esercizio, 156.40 per piccoli acquisti di cancelleria, 1840.50 per la fattura vendita n. 12 a Cliente Alfa e 3200.00 per la fattura vendita servizi di consulenza, oltre alla fattura acquisto n. 88 rivolta a Fornitore Beta e a riferimenti documentali quali BC-2026-004 e DDT-2026-019. Il confronto conclusivo è stato illustrato alla Direzione durante la riunione di bilancio, evidenziando come le scritture di tipo attivo e quelle di tipo passivo si bilancino nel racconto complessivo dell'esercizio, e come il registro_scritture continui a rappresentare la memoria affidabile della vita economica dell'impresa."
+}

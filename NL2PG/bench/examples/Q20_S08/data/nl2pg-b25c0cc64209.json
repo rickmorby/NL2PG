@@ -1,0 +1,457 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 5,
+    "hierarchy": "isa",
+    "sql_features": [
+      "right_outer_join"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "contratti_fibra",
+        "obsolete_value": "pratiche_attivazione_fibra",
+        "description": "La tabella del sottotipo contratti_fibra viene denominata pratiche_attivazione_fibra nella prosa aziendale. Il risolutore deve capire che ogni pratica_attivazione_fibra citata nei requisiti corrisponde a una riga della tabella contratti_fibra, collegata alla tabella base contratti tramite la chiave esterna id_contratto."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "utenze",
+        "description": "Il termine utenze è usato nella documentazione aziendale come sinonimo completo della tabella clienti. Ogni riferimento alle utenze attive o registrate va mappato sui record della tabella clienti, senza introdurre entità aggiuntive."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "traffico_dati_gb",
+        "obsolete_value": "bucket dati mensile",
+        "description": "Il gergo tecnico delle telecomunicazioni 'bucket dati mensile' indica la colonna traffico_dati_gb presente nelle tabelle dei sottotipi contratti_mobile e contratti_fibra. La prosa usa questa espressione settoriale per riferirsi al volume di gigabyte inclusi nel piano, e il risolutore deve tradurla correttamente sul nome reale della colonna."
+      }
+    ],
+    "spec_hash": "11196cecb70e0d42"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE,\n    utenza_attiva BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE piani_tariffari (\n    id SERIAL PRIMARY KEY,\n    nome_piano TEXT NOT NULL UNIQUE,\n    tecnologia TEXT NOT NULL CHECK (tecnologia IN ('mobile', 'fibra')),\n    prezzo_mensile NUMERIC(8,2) NOT NULL CHECK (prezzo_mensile >= 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    piano_id INT REFERENCES piani_tariffari(id),\n    data_attivazione DATE NOT NULL,\n    data_disdetta DATE,\n    stato_contratto TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_contratto IN ('attivo', 'sospeso', 'cessato')),\n    CHECK (data_disdetta IS NULL OR data_disdetta >= data_attivazione)\n);\n\nCREATE TABLE contratti_mobile (\n    id_contratto INT PRIMARY KEY REFERENCES contratti(id),\n    numero_msisdn TEXT NOT NULL UNIQUE,\n    traffico_dati_gb INT NOT NULL CHECK (traffico_dati_gb >= 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0)\n);\n\nCREATE TABLE contratti_fibra (\n    id_contratto INT PRIMARY KEY REFERENCES contratti(id),\n    traffico_dati_gb INT NOT NULL CHECK (traffico_dati_gb >= 0),\n    velocita_download_mbps INT NOT NULL CHECK (velocita_download_mbps > 0),\n    indirizzo_installazione TEXT NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 250,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "MRSRSS85M01H501X",
+            "citta": "Roma",
+            "data_registrazione": "2023-01-15",
+            "utenza_attiva": true
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "LRABNC90T42F205Y",
+            "citta": "Milano",
+            "data_registrazione": "2023-03-22",
+            "utenza_attiva": true
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "GLIVRD88C55L219Z",
+            "citta": "Torino",
+            "data_registrazione": "2023-06-10",
+            "utenza_attiva": false
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "codice_fiscale": "LSSCNT79A15G224W",
+            "citta": "Napoli",
+            "data_registrazione": "2024-02-01",
+            "utenza_attiva": true
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Moretti",
+            "codice_fiscale": "FRCMRT92D60H501K",
+            "citta": "Bologna",
+            "data_registrazione": "2024-05-18",
+            "utenza_attiva": true
+          },
+          {
+            "id": 6,
+            "nome": "Luca",
+            "cognome": "Ricci",
+            "codice_fiscale": "LCARCC87E20D969P",
+            "citta": "Firenze",
+            "data_registrazione": "2024-09-30",
+            "utenza_attiva": false
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Sara",
+              "Davide",
+              "Anna",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Conti",
+              "Moretti",
+              "Ricci",
+              "Gallo",
+              "Fontana",
+              "Marino",
+              "Costa"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "utenza_attiva": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "piani_tariffari",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_piano": "Mobile Smart 10GB",
+            "tecnologia": "mobile",
+            "prezzo_mensile": 9.99
+          },
+          {
+            "id": 2,
+            "nome_piano": "Mobile Plus 30GB",
+            "tecnologia": "mobile",
+            "prezzo_mensile": 14.99
+          },
+          {
+            "id": 3,
+            "nome_piano": "Mobile Unlimited",
+            "tecnologia": "mobile",
+            "prezzo_mensile": 24.99
+          },
+          {
+            "id": 4,
+            "nome_piano": "Mobile Senior 5GB",
+            "tecnologia": "mobile",
+            "prezzo_mensile": 7.99
+          },
+          {
+            "id": 5,
+            "nome_piano": "Fibra Home 100",
+            "tecnologia": "fibra",
+            "prezzo_mensile": 27.99
+          },
+          {
+            "id": 6,
+            "nome_piano": "Fibra Home 300",
+            "tecnologia": "fibra",
+            "prezzo_mensile": 32.99
+          },
+          {
+            "id": 7,
+            "nome_piano": "Fibra Ultra Gigabit",
+            "tecnologia": "fibra",
+            "prezzo_mensile": 39.99
+          },
+          {
+            "id": 8,
+            "nome_piano": "Fibra Basic 50",
+            "tecnologia": "fibra",
+            "prezzo_mensile": 22.99
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "contratti",
+        "nature": "fact",
+        "min_rows": 350,
+        "max_rows": 500,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "piano_id": 1,
+            "data_attivazione": "2023-02-01",
+            "data_disdetta": null,
+            "stato_contratto": "attivo"
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "piano_id": 5,
+            "data_attivazione": "2023-04-15",
+            "data_disdetta": null,
+            "stato_contratto": "attivo"
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "piano_id": 2,
+            "data_attivazione": "2023-07-01",
+            "data_disdetta": "2024-08-20",
+            "stato_contratto": "cessato"
+          },
+          {
+            "id": 104,
+            "cliente_id": 4,
+            "piano_id": 6,
+            "data_attivazione": "2024-01-10",
+            "data_disdetta": null,
+            "stato_contratto": "sospeso"
+          },
+          {
+            "id": 105,
+            "cliente_id": 5,
+            "piano_id": 3,
+            "data_attivazione": "2024-03-05",
+            "data_disdetta": null,
+            "stato_contratto": "attivo"
+          },
+          {
+            "id": 106,
+            "cliente_id": 6,
+            "piano_id": 7,
+            "data_attivazione": "2024-06-12",
+            "data_disdetta": "2025-01-31",
+            "stato_contratto": "cessato"
+          },
+          {
+            "id": 107,
+            "cliente_id": 1,
+            "piano_id": 5,
+            "data_attivazione": "2024-11-01",
+            "data_disdetta": null,
+            "stato_contratto": "attivo"
+          }
+        ],
+        "variations": {
+          "data_attivazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_disdetta": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "contratti_mobile",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.45,
+        "templates": [
+          {
+            "id_contratto": 101,
+            "numero_msisdn": "+393331234567",
+            "traffico_dati_gb": 12,
+            "minuti_inclusi": 300
+          },
+          {
+            "id_contratto": 102,
+            "numero_msisdn": "+393479876543",
+            "traffico_dati_gb": 25,
+            "minuti_inclusi": 600
+          },
+          {
+            "id_contratto": 104,
+            "numero_msisdn": "+393201112233",
+            "traffico_dati_gb": 8,
+            "minuti_inclusi": 150
+          },
+          {
+            "id_contratto": 105,
+            "numero_msisdn": "+393334445566",
+            "traffico_dati_gb": 50,
+            "minuti_inclusi": 1000
+          },
+          {
+            "id_contratto": 107,
+            "numero_msisdn": "+393667778899",
+            "traffico_dati_gb": 3,
+            "minuti_inclusi": 120
+          }
+        ],
+        "variations": {
+          "traffico_dati_gb": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "minuti_inclusi": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "contratti_fibra",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.35,
+        "templates": [
+          {
+            "id_contratto": 102,
+            "traffico_dati_gb": 300,
+            "velocita_download_mbps": 100,
+            "indirizzo_installazione": "Via Garibaldi 12, Milano"
+          },
+          {
+            "id_contratto": 103,
+            "traffico_dati_gb": 800,
+            "velocita_download_mbps": 300,
+            "indirizzo_installazione": "Corso Vittorio Emanuele II 45, Torino"
+          },
+          {
+            "id_contratto": 106,
+            "traffico_dati_gb": 1000,
+            "velocita_download_mbps": 1000,
+            "indirizzo_installazione": "Piazza Dante 3, Napoli"
+          },
+          {
+            "id_contratto": 108,
+            "traffico_dati_gb": 150,
+            "velocita_download_mbps": 50,
+            "indirizzo_installazione": "Via dei Mille 78, Roma"
+          },
+          {
+            "id_contratto": 110,
+            "traffico_dati_gb": 500,
+            "velocita_download_mbps": 300,
+            "indirizzo_installazione": "Viale Trieste 21, Bologna"
+          }
+        ],
+        "variations": {
+          "traffico_dati_gb": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "velocita_download_mbps": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "50",
+              "100",
+              "300",
+              "1000"
+            ]
+          },
+          "indirizzo_installazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Roma 14, Roma",
+              "Via Torino 28, Milano",
+              "Corso Francia 7, Torino",
+              "Via Toledo 112, Napoli",
+              "Via Indipendenza 33, Bologna",
+              "Via Camerlata 9, Como"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

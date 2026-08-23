@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "is_null"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipartimenti",
+      "obsolete_value": "aree_funzionali",
+      "description": "La tabella che definisce i dipartimenti aziendali è denominata nel sistema legacy come aree_funzionali."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "dipartimento_id",
+      "obsolete_value": "centro_di_costo_riferimento",
+      "description": "Il campo chiave esterna che collega i dipendenti ai dipartimenti viene indicato nel gergo contabile come centro_di_costo_riferimento."
+    }
+  ],
+  "spec_hash": "c54a2ca4cb6c0c05"
+}

@@ -1,0 +1,769 @@
+{
+  "schema_ddl": "CREATE TABLE sedi (\n    id INT PRIMARY KEY,\n    nome_sede TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) CHECK (stipendio_mensile > 0),\n    sede_id INT REFERENCES sedi(id) ON DELETE SET NULL\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL,\n    sede_id INT REFERENCES sedi(id) ON DELETE CASCADE,\n    responsabile_id INT REFERENCES dipendenti(id) ON DELETE SET NULL\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON UPDATE CASCADE ON DELETE CASCADE,\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('tempo_indeterminato', 'tempo_determinato', 'part_time', 'apprendistato')),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    retribuzione_annua NUMERIC(12,2) CHECK (retribuzione_annua > 0),\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE presenze (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON DELETE CASCADE,\n    data_presenza DATE NOT NULL,\n    ora_ingresso TIME NOT NULL,\n    ora_uscita TIME,\n    CHECK (ora_uscita IS NULL OR ora_uscita > ora_ingresso)\n);\n\nCREATE TABLE ferie (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON DELETE CASCADE,\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    giorni INT NOT NULL CHECK (giorni > 0),\n    stato_richiesta TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_richiesta IN ('in_attesa', 'approvata', 'rifiutata')),\n    CHECK (data_fine >= data_inizio)\n);",
+  "data_profile": {
+    "profile": {
+      "sedi": {
+        "row_count": 47,
+        "columns": {
+          "id": {
+            "distinct": 47,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 47
+          },
+          "nome_sede": {
+            "distinct": 8,
+            "sample": [
+              "Hub Firenze Novoli",
+              "Hub Milano Centrale",
+              "Hub Roma EUR",
+              "Hub Torino Lingotto",
+              "Sede Bari Centro"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 8,
+            "sample": [
+              "Corso Unione Sovietica 210",
+              "Via Cinthia 15",
+              "Via Sparano 12",
+              "Via Torino 42",
+              "Via della Liberta 77"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "+39 011 4567890",
+              "+39 02 1234567",
+              "+39 051 5678901",
+              "+39 055 6789012",
+              "+39 06 2345678"
+            ]
+          }
+        }
+      },
+      "dipendenti": {
+        "row_count": 922,
+        "columns": {
+          "id": {
+            "distinct": 922,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 922
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "distinct": 18,
+            "sample": [
+              "Barbieri",
+              "Bellini",
+              "Bianchi",
+              "Colombo",
+              "Conti"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 922,
+            "sample": [
+              "BLLMRC85M01F205B",
+              "BLLMRC85M01F205C",
+              "BLLMRC85M01F205D",
+              "BLLMRC85M01F205E",
+              "BLLMRC85M01F205F"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 762,
+            "sample": [
+              "2015-08-27",
+              "2015-09-06",
+              "2015-09-10",
+              "2015-09-14",
+              "2015-09-16"
+            ]
+          },
+          "stipendio_mensile": {
+            "distinct": 851,
+            "sample": [
+              "1485.56",
+              "1492.32",
+              "1548.26",
+              "1557.73",
+              "1563.56"
+            ],
+            "min": 1485.56,
+            "max": 4725.0
+          },
+          "sede_id": {
+            "distinct": 47,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 47
+          }
+        }
+      },
+      "reparti": {
+        "row_count": 57,
+        "columns": {
+          "id": {
+            "distinct": 57,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 57
+          },
+          "nome_reparto": {
+            "distinct": 10,
+            "sample": [
+              "Acquisti",
+              "Amministrazione",
+              "Customer Service",
+              "IT",
+              "Logistica"
+            ]
+          },
+          "sede_id": {
+            "distinct": 34,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "14"
+            ],
+            "min": 1,
+            "max": 47
+          },
+          "responsabile_id": {
+            "distinct": 51,
+            "sample": [
+              "100",
+              "109",
+              "127",
+              "13",
+              "146"
+            ],
+            "min": 13,
+            "max": 913
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 1340,
+        "columns": {
+          "id": {
+            "distinct": 1340,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1340
+          },
+          "dipendente_id": {
+            "distinct": 717,
+            "sample": [
+              "1",
+              "100",
+              "102",
+              "103",
+              "104"
+            ],
+            "min": 1,
+            "max": 922
+          },
+          "tipo_contratto": {
+            "distinct": 4,
+            "sample": [
+              "apprendistato",
+              "part_time",
+              "tempo_determinato",
+              "tempo_indeterminato"
+            ]
+          },
+          "data_inizio": {
+            "distinct": 6,
+            "sample": [
+              "2019-10-07",
+              "2020-06-15",
+              "2021-03-01",
+              "2022-09-01",
+              "2023-01-16"
+            ]
+          },
+          "data_fine": {
+            "distinct": 3,
+            "sample": [
+              "2022-06-14",
+              "2024-12-31",
+              "2026-01-31"
+            ]
+          },
+          "retribuzione_annua": {
+            "distinct": 1215,
+            "sample": [
+              "14400.0",
+              "14407.81",
+              "14419.38",
+              "14614.66",
+              "14723.21"
+            ],
+            "min": 14400.0,
+            "max": 50381.88
+          }
+        }
+      },
+      "presenze": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "dipendente_id": {
+            "distinct": 885,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 921
+          },
+          "data_presenza": {
+            "distinct": 78,
+            "sample": [
+              "2025-12-22",
+              "2025-12-23",
+              "2025-12-24",
+              "2025-12-25",
+              "2025-12-26"
+            ]
+          },
+          "ora_ingresso": {
+            "distinct": 6,
+            "sample": [
+              "08:15",
+              "08:32",
+              "08:38",
+              "08:47",
+              "09:04"
+            ]
+          },
+          "ora_uscita": {
+            "distinct": 5,
+            "sample": [
+              "16:58",
+              "17:41",
+              "17:55",
+              "18:22",
+              "18:35"
+            ]
+          }
+        }
+      },
+      "ferie": {
+        "row_count": 1388,
+        "columns": {
+          "id": {
+            "distinct": 1388,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1388
+          },
+          "dipendente_id": {
+            "distinct": 711,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "103"
+            ],
+            "min": 1,
+            "max": 922
+          },
+          "data_inizio": {
+            "distinct": 6,
+            "sample": [
+              "2026-02-16",
+              "2026-04-06",
+              "2026-05-04",
+              "2026-07-13",
+              "2026-08-10"
+            ]
+          },
+          "data_fine": {
+            "distinct": 6,
+            "sample": [
+              "2026-02-18",
+              "2026-04-07",
+              "2026-05-08",
+              "2026-07-17",
+              "2026-08-21"
+            ]
+          },
+          "giorni": {
+            "distinct": 4,
+            "sample": [
+              "10",
+              "2",
+              "3",
+              "5"
+            ],
+            "min": 2,
+            "max": 10
+          },
+          "stato_richiesta": {
+            "distinct": 3,
+            "sample": [
+              "approvata",
+              "in_attesa",
+              "rifiutata"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "sedi": [
+        {
+          "id": 1,
+          "nome_sede": "Hub Milano Centrale",
+          "citta": "Milano",
+          "indirizzo": "Via Torino 42",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 2,
+          "nome_sede": "Hub Milano Centrale",
+          "citta": "Milano",
+          "indirizzo": "Via Torino 42",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 3,
+          "nome_sede": "Hub Milano Centrale",
+          "citta": "Milano",
+          "indirizzo": "Via Torino 42",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 4,
+          "nome_sede": "Hub Milano Centrale",
+          "citta": "Milano",
+          "indirizzo": "Via Torino 42",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 5,
+          "nome_sede": "Hub Milano Centrale",
+          "citta": "Milano",
+          "indirizzo": "Via Torino 42",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 6,
+          "nome_sede": "Hub Milano Centrale",
+          "citta": "Milano",
+          "indirizzo": "Via Torino 42",
+          "telefono": "+39 02 1234567"
+        },
+        {
+          "id": 7,
+          "nome_sede": "Hub Roma EUR",
+          "citta": "Roma",
+          "indirizzo": "Viale Europa 88",
+          "telefono": "+39 06 2345678"
+        },
+        {
+          "id": 8,
+          "nome_sede": "Hub Roma EUR",
+          "citta": "Roma",
+          "indirizzo": "Viale Europa 88",
+          "telefono": "+39 06 2345678"
+        }
+      ],
+      "dipendenti": [
+        {
+          "id": 1,
+          "nome": "Marco",
+          "cognome": "Fontana",
+          "codice_fiscale": "BLLMRC85M01F205X",
+          "data_assunzione": "2017-03-08",
+          "stipendio_mensile": 2205.93,
+          "sede_id": 41
+        },
+        {
+          "id": 2,
+          "nome": "Matteo",
+          "cognome": "Conti",
+          "codice_fiscale": "BLLMRC85M01F205B",
+          "data_assunzione": "2019-07-26",
+          "stipendio_mensile": 2172.31,
+          "sede_id": 20
+        },
+        {
+          "id": 3,
+          "nome": "Andrea",
+          "cognome": "Russo",
+          "codice_fiscale": "BLLMRC85M01F205C",
+          "data_assunzione": "2017-05-28",
+          "stipendio_mensile": 2252.41,
+          "sede_id": 44
+        },
+        {
+          "id": 4,
+          "nome": "Luca",
+          "cognome": "Ferrari",
+          "codice_fiscale": "BLLMRC85M01F205D",
+          "data_assunzione": "2018-01-19",
+          "stipendio_mensile": 2018.16,
+          "sede_id": 16
+        },
+        {
+          "id": 5,
+          "nome": "Francesca",
+          "cognome": "Ferrari",
+          "codice_fiscale": "BLLMRC85M01F205E",
+          "data_assunzione": "2017-05-12",
+          "stipendio_mensile": 3199.59,
+          "sede_id": 41
+        },
+        {
+          "id": 6,
+          "nome": "Luca",
+          "cognome": "Marino",
+          "codice_fiscale": "BLLMRC85M01F205F",
+          "data_assunzione": "2017-01-29",
+          "stipendio_mensile": 2784.39,
+          "sede_id": 12
+        },
+        {
+          "id": 7,
+          "nome": "Matteo",
+          "cognome": "Colombo",
+          "codice_fiscale": "BLLMRC85M01F205G",
+          "data_assunzione": "2016-12-12",
+          "stipendio_mensile": 2315.13,
+          "sede_id": 34
+        },
+        {
+          "id": 8,
+          "nome": "Luca",
+          "cognome": "Esposito",
+          "codice_fiscale": "BLLMRC85M01F205H",
+          "data_assunzione": "2016-11-02",
+          "stipendio_mensile": 3650.35,
+          "sede_id": 13
+        }
+      ],
+      "reparti": [
+        {
+          "id": 1,
+          "nome_reparto": "Qualita",
+          "sede_id": 16,
+          "responsabile_id": 863
+        },
+        {
+          "id": 2,
+          "nome_reparto": "Logistica",
+          "sede_id": 6,
+          "responsabile_id": 891
+        },
+        {
+          "id": 3,
+          "nome_reparto": "IT",
+          "sede_id": 47,
+          "responsabile_id": 401
+        },
+        {
+          "id": 4,
+          "nome_reparto": "Vendite",
+          "sede_id": 15,
+          "responsabile_id": 580
+        },
+        {
+          "id": 5,
+          "nome_reparto": "Amministrazione",
+          "sede_id": 34,
+          "responsabile_id": 814
+        },
+        {
+          "id": 6,
+          "nome_reparto": "IT",
+          "sede_id": 24,
+          "responsabile_id": 100
+        },
+        {
+          "id": 7,
+          "nome_reparto": "Customer Service",
+          "sede_id": 2,
+          "responsabile_id": 913
+        },
+        {
+          "id": 8,
+          "nome_reparto": "Customer Service",
+          "sede_id": 30,
+          "responsabile_id": null
+        }
+      ],
+      "contratti": [
+        {
+          "id": 1,
+          "dipendente_id": 93,
+          "tipo_contratto": "tempo_indeterminato",
+          "data_inizio": "2021-03-01",
+          "data_fine": null,
+          "retribuzione_annua": 33698.98
+        },
+        {
+          "id": 2,
+          "dipendente_id": 120,
+          "tipo_contratto": "apprendistato",
+          "data_inizio": "2021-03-01",
+          "data_fine": null,
+          "retribuzione_annua": 39307.12
+        },
+        {
+          "id": 3,
+          "dipendente_id": 372,
+          "tipo_contratto": "tempo_determinato",
+          "data_inizio": "2021-03-01",
+          "data_fine": null,
+          "retribuzione_annua": 40869.83
+        },
+        {
+          "id": 4,
+          "dipendente_id": 698,
+          "tipo_contratto": "tempo_determinato",
+          "data_inizio": "2021-03-01",
+          "data_fine": null,
+          "retribuzione_annua": 33214.64
+        },
+        {
+          "id": 5,
+          "dipendente_id": 798,
+          "tipo_contratto": "tempo_indeterminato",
+          "data_inizio": "2021-03-01",
+          "data_fine": null,
+          "retribuzione_annua": 36000.0
+        },
+        {
+          "id": 6,
+          "dipendente_id": 474,
+          "tipo_contratto": "tempo_indeterminato",
+          "data_inizio": "2021-03-01",
+          "data_fine": null,
+          "retribuzione_annua": 46947.3
+        },
+        {
+          "id": 7,
+          "dipendente_id": 481,
+          "tipo_contratto": "apprendistato",
+          "data_inizio": "2021-03-01",
+          "data_fine": null,
+          "retribuzione_annua": null
+        },
+        {
+          "id": 8,
+          "dipendente_id": 113,
+          "tipo_contratto": "tempo_indeterminato",
+          "data_inizio": "2021-03-01",
+          "data_fine": null,
+          "retribuzione_annua": 33124.18
+        }
+      ],
+      "presenze": [
+        {
+          "id": 1,
+          "dipendente_id": 867,
+          "data_presenza": "2026-02-15",
+          "ora_ingresso": "08:32",
+          "ora_uscita": "17:41"
+        },
+        {
+          "id": 2,
+          "dipendente_id": 39,
+          "data_presenza": "2025-12-31",
+          "ora_ingresso": "08:32",
+          "ora_uscita": "17:41"
+        },
+        {
+          "id": 3,
+          "dipendente_id": 289,
+          "data_presenza": "2026-01-10",
+          "ora_ingresso": "08:32",
+          "ora_uscita": "17:41"
+        },
+        {
+          "id": 4,
+          "dipendente_id": 440,
+          "data_presenza": "2026-03-02",
+          "ora_ingresso": "08:32",
+          "ora_uscita": "17:41"
+        },
+        {
+          "id": 5,
+          "dipendente_id": 897,
+          "data_presenza": "2026-02-08",
+          "ora_ingresso": "08:32",
+          "ora_uscita": "17:41"
+        },
+        {
+          "id": 6,
+          "dipendente_id": 806,
+          "data_presenza": "2026-01-27",
+          "ora_ingresso": "08:32",
+          "ora_uscita": "17:41"
+        },
+        {
+          "id": 7,
+          "dipendente_id": 220,
+          "data_presenza": "2026-01-17",
+          "ora_ingresso": "08:32",
+          "ora_uscita": "17:41"
+        },
+        {
+          "id": 8,
+          "dipendente_id": 458,
+          "data_presenza": "2026-02-18",
+          "ora_ingresso": "08:32",
+          "ora_uscita": "17:41"
+        }
+      ],
+      "ferie": [
+        {
+          "id": 1,
+          "dipendente_id": 502,
+          "data_inizio": "2026-08-10",
+          "data_fine": "2026-08-21",
+          "giorni": 10,
+          "stato_richiesta": "approvata"
+        },
+        {
+          "id": 2,
+          "dipendente_id": 413,
+          "data_inizio": "2026-08-10",
+          "data_fine": "2026-08-21",
+          "giorni": 10,
+          "stato_richiesta": "in_attesa"
+        },
+        {
+          "id": 3,
+          "dipendente_id": 817,
+          "data_inizio": "2026-08-10",
+          "data_fine": "2026-08-21",
+          "giorni": 10,
+          "stato_richiesta": "approvata"
+        },
+        {
+          "id": 4,
+          "dipendente_id": 702,
+          "data_inizio": "2026-08-10",
+          "data_fine": "2026-08-21",
+          "giorni": 10,
+          "stato_richiesta": "approvata"
+        },
+        {
+          "id": 5,
+          "dipendente_id": 546,
+          "data_inizio": "2026-08-10",
+          "data_fine": "2026-08-21",
+          "giorni": 10,
+          "stato_richiesta": "approvata"
+        },
+        {
+          "id": 6,
+          "dipendente_id": 805,
+          "data_inizio": "2026-08-10",
+          "data_fine": "2026-08-21",
+          "giorni": 10,
+          "stato_richiesta": "approvata"
+        },
+        {
+          "id": 7,
+          "dipendente_id": 729,
+          "data_inizio": "2026-08-10",
+          "data_fine": "2026-08-21",
+          "giorni": 10,
+          "stato_richiesta": "approvata"
+        },
+        {
+          "id": 8,
+          "dipendente_id": 456,
+          "data_inizio": "2026-08-10",
+          "data_fine": "2026-08-21",
+          "giorni": 10,
+          "stato_richiesta": "approvata"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "is_distinct_from"
+  ],
+  "query": "SELECT INITCAP(d.nome) || ' ' || UPPER(d.cognome) AS dipendente, s.citta AS citta_sede, c.tipo_contratto AS tipo_contratto, CASE WHEN c.data_fine IS NULL THEN 'a tempo indeterminato' ELSE 'scadenza ' || c.data_fine::TEXT END AS regime_scadenza, ROUND(c.retribuzione_annua / 12, 2) AS mensilita_media FROM contratti c JOIN dipendenti d ON d.id = c.dipendente_id LEFT JOIN sedi s ON s.id = d.sede_id WHERE c.tipo_contratto IN ('tempo_indeterminato', 'tempo_determinato') AND c.retribuzione_annua BETWEEN 20000 AND 45000 AND c.retribuzione_annua IS NOT NULL AND c.data_fine IS DISTINCT FROM DATE '2024-12-31' ORDER BY mensilita_media DESC, c.id ASC;"
+}

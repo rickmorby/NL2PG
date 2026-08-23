@@ -1,0 +1,34 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "recursive_cte"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "movimenti_transazionali",
+      "description": "La tabella ordini viene denominata movimenti_transazionali nella prosa aziendale. Il risolutore deve mappare 'movimenti_transazionali' alla tabella reale ordini, che contiene le colonne id, utente_id, ordine_padre_id, totale e stato, senza alcun vincolo REFERENCES dichiarato."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "totale",
+      "obsolete_value": "valore_complessivo",
+      "description": "La colonna totale della tabella ordini viene indicata nei documenti aziendali con il sinonimo 'valore_complessivo'. Le query di aggregazione lungo la catena ricorsiva degli ordini devono riferirsi alla colonna reale totale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "articoli_ordine",
+      "obsolete_value": "righe SKU",
+      "description": "La prosa commerciale usa il gergo del settore retail 'righe SKU' per indicare la tabella articoli_ordine (colonne id, ordine_id, prodotto, quantita, prezzo_unitario). Il risolutore deve riconoscere che ogni 'riga SKU' corrisponde a una riga della tabella articoli_ordine collegata concettualmente tramite la colonna compatibile ordine_id."
+    }
+  ],
+  "spec_hash": "aa785fa039c41a23"
+}

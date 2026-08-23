@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "sorting"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dip",
+        "obsolete_value": "anagrafica_collaboratori",
+        "description": "La tabella dip, che rappresenta l'archivio dei dipendenti finanziari, viene chiamata anagrafica_collaboratori nella prosa aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "emp_no",
+        "obsolete_value": "matricola_operatore",
+        "description": "La colonna emp_no viene indicata con il gergo aziendale matricola_operatore, pur rimanendo il campo tecnico da usare per l'ordinamento."
+      }
+    ],
+    "spec_hash": "04e513520a52c30d"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id_reparto INT PRIMARY KEY,\n    nome_dipartimento TEXT NOT NULL,\n    budget_annuale NUMERIC(15, 2) CHECK (budget_annuale >= 0)\n);\n\nCREATE TABLE dip (\n    emp_no INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    id_reparto INT NOT NULL REFERENCES dipartimenti(id_reparto),\n    data_assunzione DATE NOT NULL DEFAULT CURRENT_DATE,\n    stipendio_base NUMERIC(12, 2) CHECK (stipendio_base > 0)\n);\n\nCREATE INDEX idx_emp_sorting ON dip (emp_no, data_assunzione);"
+}

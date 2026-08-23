@@ -1,0 +1,27 @@
+{
+  "domain": "università",
+  "n_tables": 2,
+  "hierarchy": "one_to_one",
+  "sql_features": [
+    "distinct_on"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "docenti",
+      "obsolete_value": "personale_accademico",
+      "description": "La tabella docenti viene denominata personale_accademico nella documentazione aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "id_dipartimento",
+      "obsolete_value": "codice_struttura",
+      "description": "Il campo id_dipartimento viene riferito come codice_struttura nel gergo universitario."
+    }
+  ],
+  "spec_hash": "24a6ac1ff3471ba0"
+}

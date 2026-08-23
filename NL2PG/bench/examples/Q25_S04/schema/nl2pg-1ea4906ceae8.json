@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "c626465d24ef1022"
+  },
+  "schema_ddl": "CREATE TABLE bilanci (\n    esercizio_id INT PRIMARY KEY,\n    anno_esercizio INT NOT NULL UNIQUE CHECK (anno_esercizio BETWEEN 1900 AND 2100),\n    data_chiusura DATE NOT NULL,\n    totale_attivo NUMERIC(14,2) NOT NULL CHECK (totale_attivo >= 0),\n    totale_passivo NUMERIC(14,2) NOT NULL CHECK (totale_passivo >= 0)\n);\n\nCREATE TABLE relazioni_gestione (\n    esercizio_id INT PRIMARY KEY REFERENCES bilanci(esercizio_id),\n    testo_relazione TEXT NOT NULL,\n    data_redazione DATE NOT NULL,\n    redattore TEXT NOT NULL\n);"
+}

@@ -1,0 +1,34 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 6,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "offset_fetch"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "registrazione_movimenti",
+      "description": "La tabella ordini viene denominata registrazione_movimenti nella prosa aziendale. Le query di paginazione per recency (ORDER BY updated_at DESC OFFSET n ROWS FETCH FIRST m ROWS ONLY) devono risolvere il nome reale della tabella, che include le colonne di audit created_at, created_by, updated_at, updated_by."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "acquirenti",
+      "description": "La tabella clienti viene indicata con il sinonimo acquirenti nei documenti aziendali. Il solver deve mappare acquirenti alla tabella clienti per filtrare o aggregare i risultati paginati per data di ultimo aggiornamento."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "updated_at",
+      "obsolete_value": "timestamp di ultimo tocco",
+      "description": "La colonna di audit updated_at viene indicata con il gergo aziendale 'timestamp di ultimo tocco'. Le richieste di paginazione per recency si riferiscono a questa colonna con la perifrasi, richiedendone la risoluzione verso updated_at per l'ordinamento DESC con OFFSET/FETCH."
+    }
+  ],
+  "spec_hash": "905495840300f98a"
+}

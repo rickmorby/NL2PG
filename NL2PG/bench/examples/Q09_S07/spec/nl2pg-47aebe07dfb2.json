@@ -1,0 +1,12 @@
+{
+  "domain": "erp",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "group_agg",
+    "having"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "922e14f1acf2e410"
+}

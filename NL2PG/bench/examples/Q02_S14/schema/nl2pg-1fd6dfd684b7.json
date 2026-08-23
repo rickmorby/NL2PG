@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "transazioni",
+        "obsolete_value": "registrazioni_movimento",
+        "description": "La tabella transazioni, che registra ogni operazione finanziaria con importo, data e tipo operazione soggetto a vincoli CHECK sul dominio dei valori ammessi, viene denominata nella prosa aziendale registrazioni_movimento."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "saldo_disponibile",
+        "obsolete_value": "liquidita_immediata",
+        "description": "La colonna saldo_disponibile della tabella conti, vincolata a valori non negativi tramite CHECK NOT NULL, viene indicata nella documentazione di business con il sinonimo liquidita_immediata."
+      }
+    ],
+    "spec_hash": "4f931ab3e78f99d7"
+  },
+  "schema_ddl": "CREATE DOMAIN tipo_operazione AS TEXT CHECK (VALUE IN ('versamento', 'prelievo', 'bonifico_entrata', 'bonifico_uscita', 'commissione', 'accredito'));\n\nCREATE DOMAIN importo_non_negativo AS NUMERIC(14,2) CHECK (VALUE >= 0);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    iban TEXT NOT NULL UNIQUE,\n    saldo_disponibile NUMERIC(14,2) NOT NULL CHECK (saldo_disponibile >= 0),\n    data_apertura DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    tipo_operazione tipo_operazione NOT NULL,\n    importo importo_non_negativo NOT NULL,\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    descrizione TEXT\n);\n\nCREATE TABLE prestiti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    importo_capitale importo_non_negativo NOT NULL,\n    tasso_interesse NUMERIC(5,2) NOT NULL CHECK (tasso_interesse >= 0),\n    data_erogazione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza > data_erogazione)\n);"
+}

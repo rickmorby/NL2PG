@@ -1,0 +1,28 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "group_agg",
+    "having"
+  ],
+  "twist": [
+    "synonym",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "acquirenti registrati",
+      "description": "La tabella clienti viene indicata nella prosa aziendale con il sinonimo 'acquirenti registrati'. Il solver deve risolvere il sinonimo e mapparlo alla tabella reale clienti quando costruisce le query di aggregazione."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "totale_ordine",
+      "obsolete_value": "valore complessivo dell'acquisto",
+      "description": "La colonna totale_ordine della tabella ordini viene perifrastata nella prosa aziendale come 'valore complessivo dell'acquisto'. Le clausole HAVING che filtrano i gruppi per soglia di spesa devono riferirsi alla colonna reale totale_ordine, deducendo inoltre i vincoli CHECK/NOT NULL/UNIQUE dal testo."
+    }
+  ],
+  "spec_hash": "6ec1972cb15e4574"
+}

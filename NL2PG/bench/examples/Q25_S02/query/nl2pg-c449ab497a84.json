@@ -1,0 +1,450 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    data_registrazione DATE DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    prezzo NUMERIC(10,2) CHECK (prezzo >= 0),\n    quantita_disponibile INT CHECK (quantita_disponibile >= 0)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT NOT NULL DEFAULT 'in attesa' CHECK (stato IN ('in attesa','spedito','consegnato','annullato'))\n);\n\nCREATE TABLE dettagli_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 749,
+        "columns": {
+          "id": {
+            "distinct": 749,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 749
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Anna Celesti",
+              "Elena Gialli",
+              "Giulia Verdi",
+              "Laura Bianchi",
+              "Luca Marrone"
+            ]
+          },
+          "email": {
+            "distinct": 713,
+            "sample": [
+              "elena.gialli@example.com",
+              "elena.gialli@example.com_1",
+              "elena.gialli@example.com_10",
+              "elena.gialli@example.com_100",
+              "elena.gialli@example.com_101"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "3331234567",
+              "3339876543",
+              "3345551234",
+              "3351112233",
+              "3364445566"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 270,
+            "sample": [
+              "2024-07-14",
+              "2024-07-21",
+              "2024-07-23",
+              "2024-07-28",
+              "2024-07-30"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 699,
+        "columns": {
+          "id": {
+            "distinct": 699,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 699
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alimentatore",
+              "Cavo HDMI",
+              "Cuffie bluetooth",
+              "Hub USB-C",
+              "Laptop"
+            ]
+          },
+          "prezzo": {
+            "distinct": 650,
+            "sample": [
+              "100.2",
+              "100.45",
+              "1005.97",
+              "1007.1",
+              "101.07"
+            ],
+            "min": 21.4,
+            "max": 1255.7
+          },
+          "quantita_disponibile": {
+            "distinct": 13,
+            "sample": [
+              "10",
+              "100",
+              "120",
+              "15",
+              "20"
+            ],
+            "min": 15,
+            "max": 120
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 2054,
+        "columns": {
+          "id": {
+            "distinct": 2054,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2054
+          },
+          "cliente_id": {
+            "distinct": 705,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 749
+          },
+          "data_ordine": {
+            "distinct": 281,
+            "sample": [
+              "2024-09-17",
+              "2024-09-18",
+              "2024-09-19",
+              "2024-09-20",
+              "2024-09-21"
+            ]
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "annullato",
+              "consegnato",
+              "in attesa",
+              "spedito"
+            ]
+          }
+        }
+      },
+      "dettagli_ordine": {
+        "row_count": 1960,
+        "columns": {
+          "id": {
+            "distinct": 1960,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1960
+          },
+          "ordine_id": {
+            "distinct": 1260,
+            "sample": [
+              "1000",
+              "1001",
+              "1003",
+              "1004",
+              "1010"
+            ],
+            "min": 4,
+            "max": 2054
+          },
+          "prodotto_id": {
+            "distinct": 662,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 699
+          },
+          "quantita": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "prezzo_unitario": {
+            "distinct": 1771,
+            "sample": [
+              "100.52",
+              "100.9",
+              "100.96",
+              "1002.52",
+              "1006.11"
+            ],
+            "min": 20.99,
+            "max": 1169.99
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 51,
+          "nome": "Elena Gialli",
+          "email": "elenagialli1@example.com",
+          "telefono": "3381234567",
+          "data_registrazione": "2025-01-24"
+        },
+        {
+          "id": 78,
+          "nome": "Elena Gialli",
+          "email": "elenagialli2@example.com",
+          "telefono": "3381234567",
+          "data_registrazione": "2025-01-23"
+        },
+        {
+          "id": 70,
+          "nome": "Marco Blu",
+          "email": "marcoblu1@example.com",
+          "telefono": "3381234567",
+          "data_registrazione": "2025-02-09"
+        },
+        {
+          "id": 137,
+          "nome": "Anna Celesti",
+          "email": "annacelesti1@example.com",
+          "telefono": "3331234567",
+          "data_registrazione": "2024-11-30"
+        },
+        {
+          "id": 143,
+          "nome": "Elena Gialli",
+          "email": "elenagialli3@example.com",
+          "telefono": "3381234567",
+          "data_registrazione": "2024-10-11"
+        },
+        {
+          "id": 107,
+          "nome": "Laura Bianchi",
+          "email": "laurabianchi1@example.com",
+          "telefono": "3381234567",
+          "data_registrazione": "2024-09-10"
+        },
+        {
+          "id": 234,
+          "nome": "Giulia Verdi",
+          "email": "giuliaverdi1@example.com",
+          "telefono": "3377778899",
+          "data_registrazione": "2024-09-01"
+        },
+        {
+          "id": 191,
+          "nome": "Sara Viola",
+          "email": "saraviola1@example.com",
+          "telefono": "3364445566",
+          "data_registrazione": "2024-08-29"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "nome": "Laptop",
+          "prezzo": 1217.03,
+          "quantita_disponibile": "10"
+        },
+        {
+          "id": 2,
+          "nome": "Monitor 27\"",
+          "prezzo": 1072.29,
+          "quantita_disponibile": "20"
+        },
+        {
+          "id": 3,
+          "nome": "SSD esterno",
+          "prezzo": 987.89,
+          "quantita_disponibile": "20"
+        },
+        {
+          "id": 4,
+          "nome": "Webcam HD",
+          "prezzo": 749.91,
+          "quantita_disponibile": "100"
+        },
+        {
+          "id": 5,
+          "nome": "SSD esterno",
+          "prezzo": 854.66,
+          "quantita_disponibile": "30"
+        },
+        {
+          "id": 6,
+          "nome": "Hub USB-C",
+          "prezzo": 1005.97,
+          "quantita_disponibile": "25"
+        },
+        {
+          "id": 7,
+          "nome": "Cavo HDMI",
+          "prezzo": 717.09,
+          "quantita_disponibile": "80"
+        },
+        {
+          "id": 8,
+          "nome": "Mouse wireless",
+          "prezzo": 1071.31,
+          "quantita_disponibile": "10"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 1,
+          "cliente_id": 379,
+          "data_ordine": "2024-11-25",
+          "stato": "annullato"
+        },
+        {
+          "id": 2,
+          "cliente_id": 687,
+          "data_ordine": "2025-01-18",
+          "stato": "spedito"
+        },
+        {
+          "id": 3,
+          "cliente_id": 164,
+          "data_ordine": "2024-10-25",
+          "stato": "spedito"
+        },
+        {
+          "id": 4,
+          "cliente_id": 21,
+          "data_ordine": "2025-01-06",
+          "stato": "in attesa"
+        },
+        {
+          "id": 5,
+          "cliente_id": 550,
+          "data_ordine": "2024-11-30",
+          "stato": "in attesa"
+        },
+        {
+          "id": 6,
+          "cliente_id": 12,
+          "data_ordine": "2025-01-01",
+          "stato": "in attesa"
+        },
+        {
+          "id": 7,
+          "cliente_id": 36,
+          "data_ordine": "2024-12-25",
+          "stato": "annullato"
+        },
+        {
+          "id": 8,
+          "cliente_id": 299,
+          "data_ordine": "2025-01-20",
+          "stato": "annullato"
+        }
+      ],
+      "dettagli_ordine": [
+        {
+          "id": 1,
+          "ordine_id": 1879,
+          "prodotto_id": 110,
+          "quantita": "1",
+          "prezzo_unitario": 1010.6
+        },
+        {
+          "id": 2,
+          "ordine_id": 344,
+          "prodotto_id": 303,
+          "quantita": "5",
+          "prezzo_unitario": 727.48
+        },
+        {
+          "id": 3,
+          "ordine_id": 422,
+          "prodotto_id": 323,
+          "quantita": "3",
+          "prezzo_unitario": 934.84
+        },
+        {
+          "id": 4,
+          "ordine_id": 54,
+          "prodotto_id": 600,
+          "quantita": "2",
+          "prezzo_unitario": 799.73
+        },
+        {
+          "id": 5,
+          "ordine_id": 1123,
+          "prodotto_id": 469,
+          "quantita": "10",
+          "prezzo_unitario": 1082.32
+        },
+        {
+          "id": 6,
+          "ordine_id": 2002,
+          "prodotto_id": 65,
+          "quantita": "1",
+          "prezzo_unitario": 1064.55
+        },
+        {
+          "id": 7,
+          "ordine_id": 1739,
+          "prodotto_id": 363,
+          "quantita": "5",
+          "prezzo_unitario": 639.03
+        },
+        {
+          "id": 8,
+          "ordine_id": 98,
+          "prodotto_id": 373,
+          "quantita": "1",
+          "prezzo_unitario": 959.58
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "natural_join"
+  ],
+  "query": "WITH clienti_base AS (SELECT id AS cliente_id, nome FROM clienti WHERE nome IS NOT NULL), ordini_consegnati AS (SELECT cliente_id, stato FROM ordini WHERE stato = 'consegnato') SELECT c.nome, COUNT(*) AS numero_ordini_consegnati FROM clienti_base c NATURAL JOIN ordini_consegnati o GROUP BY c.nome ORDER BY numero_ordini_consegnati DESC;"
+}

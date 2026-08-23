@@ -1,0 +1,27 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 5,
+  "hierarchy": "flat",
+  "sql_features": [
+    "between"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_personale",
+      "description": "La tabella dipendenti viene indicata nella prosa aziendale come anagrafica_personale, mantenendo però la struttura denormalizzata principale per il filtro con BETWEEN."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stipendio_annuo",
+      "obsolete_value": "RAL",
+      "description": "Il campo stipendio_annuo viene chiamato con il gergo aziendale RAL, ovvero Retribuzione Annua Lorda, creando una differenza tra linguaggio naturale e nome reale della colonna."
+    }
+  ],
+  "spec_hash": "1dbec3c4a21318a5"
+}

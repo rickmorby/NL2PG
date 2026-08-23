@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "in_condition"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "pazienti",
+      "obsolete_value": "anagrafica_assistiti",
+      "description": "La tabella pazienti viene denominata anagrafica_assistiti nella prosa aziendale; il progettista deve ricondurre la perifrasi alla tabella reale del database."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "priorita",
+      "obsolete_value": "livello di triage",
+      "description": "La colonna enumerata priorita della tabella visite_mediche, con valori mutuamente esclusivi dichiarati nel tipo ENUM ('verde', 'gialla', 'rossa'), viene indicata nella prosa aziendale con il gergo clinico 'livello di triage'; le query di filtraggio devono usare WHERE priorita IN ('gialla', 'rossa') sui valori dichiarati dell'ENUM."
+    }
+  ],
+  "spec_hash": "5cd33cdd53744c7c"
+}

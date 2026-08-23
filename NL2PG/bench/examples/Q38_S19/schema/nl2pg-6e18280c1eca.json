@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 5,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "any_all"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "vettori",
+        "obsolete_value": "partner_di_trasporto",
+        "description": "La tabella vettori, che contiene i trasportatori abilitati con la relativa PK vettore_id, viene denominata partner_di_trasporto nella prosa aziendale. Le query devono risolvere il nome perifrastico verso la tabella reale vettori."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "spedizioni",
+        "obsolete_value": "lettere_di_vettura",
+        "description": "La tabella spedizioni, che registra ogni consegna con spedizione_id, vettore_id, magazzino_id e cliente_id, viene indicata con il gergo di settore lettere_di_vettura (waybill). Il solver deve mappare il termine tecnico alla tabella spedizioni per costruire le subquery ANY/ALL sulle chiavi."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "magazzini",
+        "obsolete_value": "depositi_merce",
+        "description": "La tabella magazzini, con PK magazzino_id e attributi come capacita_pallet e citta, viene chiamata depositi_merce nella documentazione. Le condizioni quantificate (es. WHERE capacita_pallet > ANY (SELECT ...)) devono riferirsi alla tabella reale magazzini."
+      }
+    ],
+    "spec_hash": "a2447056f8a3196d"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    cliente_id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE vettori (\n    vettore_id INT PRIMARY KEY,\n    denominazione TEXT NOT NULL,\n    codice_abilitazione TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT\n);\n\nCREATE TABLE magazzini (\n    magazzino_id INT PRIMARY KEY,\n    nome_deposito TEXT NOT NULL,\n    capacita_pallet INT NOT NULL CHECK (capacita_pallet > 0),\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE spedizioni (\n    spedizione_id INT PRIMARY KEY,\n    vettore_id INT NOT NULL REFERENCES vettori(vettore_id),\n    magazzino_id INT NOT NULL REFERENCES magazzini(magazzino_id),\n    cliente_id INT NOT NULL REFERENCES clienti(cliente_id),\n    data_spedizione DATE NOT NULL,\n    peso_totale_kg NUMERIC(10,2) NOT NULL CHECK (peso_totale_kg >= 0),\n    stato_consegna TEXT NOT NULL CHECK (stato_consegna IN ('pianificata', 'in_transito', 'consegnata', 'fallita'))\n);\n\nCREATE TABLE colli (\n    collo_id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(spedizione_id),\n    peso_collo_kg NUMERIC(8,2) NOT NULL CHECK (peso_collo_kg > 0),\n    descrizione_contenuto TEXT\n);"
+}

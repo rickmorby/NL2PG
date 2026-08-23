@@ -1,0 +1,27 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "between"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "registro_transazioni",
+      "description": "La tabella principale partizionata per RANGE sulla colonna data_ordine si chiama fisicamente 'ordini', ma nella prosa aziendale viene denominata 'registro_transazioni'. Il solver deve mappare la perifrasi al nome reale della tabella."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "data_ordine",
+      "obsolete_value": "finestra di check-out",
+      "description": "La colonna 'data_ordine', chiave di partizione dichiarativa della tabella ordini, è descritta nel testo con il gergo del settore e-commerce come 'finestra di check-out'. Il filtro WHERE ... BETWEEN v1 AND v2 richiesto per abilitare il partition pruning deve essere formulato su 'data_ordine', non sul termine gergale."
+    }
+  ],
+  "spec_hash": "48b581a260e17ea7"
+}

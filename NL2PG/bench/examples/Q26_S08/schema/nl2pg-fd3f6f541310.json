@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 4,
+    "hierarchy": "isa",
+    "sql_features": [
+      "anti_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sinistri",
+        "obsolete_value": "pratiche_liquidazione",
+        "description": "La tabella sinistri, che registra gli eventi dannosi collegati alle polizze tramite FK su polizze.id_polizza, viene denominata pratiche_liquidazione nella prosa aziendale. Le query anti-join (NOT EXISTS / NOT IN) per individuare le polizze prive di eventi dannosi devono quindi risolvere pratiche_liquidazione verso la tabella fisica sinistri."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "premio_annuo",
+        "obsolete_value": "quietanza di premio",
+        "description": "La colonna premio_annuo della tabella base polizze viene indicata nella documentazione con il gergo assicurativo 'quietanza di premio'. Il solver deve riconoscere che il termine tecnico del settore si riferisce alla colonna premio_annuo quando filtra o aggrega i valori delle polizze ricomposte dalla gerarchia ISA (join tra polizze e sottotipi polizze_auto/polizze_vita)."
+      }
+    ],
+    "spec_hash": "0b728b9e62a05980"
+  },
+  "schema_ddl": "CREATE TABLE polizze (\n    id_polizza SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_polizza TEXT NOT NULL DEFAULT 'attiva' CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta', 'stornata')),\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE polizze_auto (\n    id_polizza INT PRIMARY KEY REFERENCES polizze(id_polizza),\n    targa TEXT NOT NULL UNIQUE,\n    marca_veicolo TEXT NOT NULL,\n    modello_veicolo TEXT,\n    anno_immatricolazione INT NOT NULL CHECK (anno_immatricolazione BETWEEN 1950 AND 2100),\n    potenza_kw NUMERIC(6,2) CHECK (potenza_kw > 0)\n);\n\nCREATE TABLE polizze_vita (\n    id_polizza INT PRIMARY KEY REFERENCES polizze(id_polizza),\n    capitale_assicurato NUMERIC(12,2) NOT NULL CHECK (capitale_assicurato > 0),\n    eta_assicurato INT NOT NULL CHECK (eta_assicurato BETWEEN 0 AND 120),\n    beneficiario TEXT NOT NULL\n);\n\nCREATE TABLE sinistri (\n    id_sinistro SERIAL PRIMARY KEY,\n    id_polizza INT NOT NULL REFERENCES polizze(id_polizza),\n    data_accadimento DATE NOT NULL,\n    descrizione_danno TEXT,\n    importo_risarcimento NUMERIC(12,2) CHECK (importo_risarcimento >= 0),\n    stato_sinistro TEXT NOT NULL DEFAULT 'aperto' CHECK (stato_sinistro IN ('aperto', 'in_valutazione', 'liquidato', 'respinto'))\n);"
+}

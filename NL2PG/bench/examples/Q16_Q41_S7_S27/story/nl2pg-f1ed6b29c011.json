@@ -1,0 +1,198 @@
+{
+  "schema_ddl": "CREATE TABLE operatori_sanitari (\n    id_operatore INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    ruolo TEXT NOT NULL CHECK (ruolo IN ('medico', 'infermiere', 'tecnico_sanitario', 'amministrativo')),\n    unita_operativa TEXT NOT NULL,\n    data_assunzione DATE NOT NULL,\n    email TEXT UNIQUE,\n    id_supervisore INT REFERENCES operatori_sanitari(id_operatore),\n    CHECK (id_supervisore IS NULL OR id_supervisore <> id_operatore)\n);",
+  "data_profile": {
+    "profile": {
+      "operatori_sanitari": {
+        "row_count": 393,
+        "columns": {
+          "id_operatore": {
+            "distinct": 393,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 393
+          },
+          "nome": {
+            "distinct": 14,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Anna",
+              "Chiara",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "distinct": 14,
+            "sample": [
+              "Bruno",
+              "Conti",
+              "Costa",
+              "De Luca",
+              "Esposito"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 393,
+            "sample": [
+              "BNCPLO72E08Z210B",
+              "BNCPLO72E08Z210C",
+              "BNCPLO72E08Z210D",
+              "BNCPLO72E08Z210E",
+              "BNCPLO72E08Z210F"
+            ]
+          },
+          "ruolo": {
+            "distinct": 4,
+            "sample": [
+              "amministrativo",
+              "infermiere",
+              "medico",
+              "tecnico_sanitario"
+            ]
+          },
+          "unita_operativa": {
+            "distinct": 8,
+            "sample": [
+              "Amministrazione",
+              "Cardiologia",
+              "Chirurgia Generale",
+              "Laboratorio Analisi",
+              "Medicina Interna"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 367,
+            "sample": [
+              "2005-07-07",
+              "2005-11-19",
+              "2005-12-04",
+              "2005-12-05",
+              "2006-01-03"
+            ]
+          },
+          "email": {
+            "distinct": 377,
+            "sample": [
+              "alessandro.ferrari10@ospedale.it",
+              "alessandro.ferrari11@ospedale.it",
+              "alessandro.ferrari12@ospedale.it",
+              "alessandro.ferrari13@ospedale.it",
+              "alessandro.ferrari14@ospedale.it"
+            ]
+          },
+          "id_supervisore": {
+            "distinct": 192,
+            "sample": [
+              "1",
+              "10",
+              "101",
+              "103",
+              "104"
+            ],
+            "min": 1,
+            "max": 383
+          }
+        }
+      }
+    },
+    "preview": {
+      "operatori_sanitari": [
+        {
+          "id_operatore": 19,
+          "nome": "Chiara",
+          "cognome": "Esposito",
+          "codice_fiscale": "FRRLSN75M12H501S",
+          "ruolo": "infermiere",
+          "unita_operativa": "Chirurgia Generale",
+          "data_assunzione": "2009-06-11",
+          "email": "chiara.esposito1@example.com",
+          "id_supervisore": 7
+        },
+        {
+          "id_operatore": 9,
+          "nome": "Stefano",
+          "cognome": "Esposito",
+          "codice_fiscale": "FRRLSN75M12H501I",
+          "ruolo": "tecnico_sanitario",
+          "unita_operativa": "Pronto Soccorso",
+          "data_assunzione": "2009-12-29",
+          "email": "stefano.esposito1@example.com",
+          "id_supervisore": 3
+        },
+        {
+          "id_operatore": 76,
+          "nome": "Andrea",
+          "cognome": "Rossi",
+          "codice_fiscale": "CLMMRA80A45F231A",
+          "ruolo": "amministrativo",
+          "unita_operativa": "Amministrazione",
+          "data_assunzione": "2010-01-07",
+          "email": "andrea.rossi1@example.com",
+          "id_supervisore": 22
+        },
+        {
+          "id_operatore": 122,
+          "nome": "Laura",
+          "cognome": "Esposito",
+          "codice_fiscale": "RCCGLI85B62H501W",
+          "ruolo": "medico",
+          "unita_operativa": "Chirurgia Generale",
+          "data_assunzione": "2016-07-09",
+          "email": "laura.esposito1@example.com",
+          "id_supervisore": 96
+        },
+        {
+          "id_operatore": 119,
+          "nome": "Marco",
+          "cognome": "Esposito",
+          "codice_fiscale": "RCCGLI85B62H501T",
+          "ruolo": "infermiere",
+          "unita_operativa": "Radiologia",
+          "data_assunzione": "2016-04-05",
+          "email": "marco.esposito1@example.com",
+          "id_supervisore": 76
+        },
+        {
+          "id_operatore": 73,
+          "nome": "Marco",
+          "cognome": "Giordano",
+          "codice_fiscale": "CLMMRA80A45F205W",
+          "ruolo": "tecnico_sanitario",
+          "unita_operativa": "Radiologia",
+          "data_assunzione": "2012-06-02",
+          "email": "marco.giordano1@example.com",
+          "id_supervisore": 54
+        },
+        {
+          "id_operatore": 175,
+          "nome": "Andrea",
+          "cognome": "Conti",
+          "codice_fiscale": "MRTLCU78C10G300B",
+          "ruolo": "tecnico_sanitario",
+          "unita_operativa": "Laboratorio Analisi",
+          "data_assunzione": "2017-08-21",
+          "email": "andrea.conti1@example.com",
+          "id_supervisore": 138
+        },
+        {
+          "id_operatore": 131,
+          "nome": "Stefano",
+          "cognome": "Costa",
+          "codice_fiscale": "RCCGLI85B62H533G",
+          "ruolo": "infermiere",
+          "unita_operativa": "Chirurgia Generale",
+          "data_assunzione": "2013-06-15",
+          "email": "stefano.costa1@example.com",
+          "id_supervisore": 113
+        }
+      ]
+    }
+  },
+  "story": "Nella Segreteria del Personale dell'Ospedale Civico, l'archivio denominato operatori_sanitari custodisce le schede professionali di tutto il personale in servizio. In ciascuna scheda sono annotati il nome e il cognome del professionista, il codice fiscale personale, la qualifica rivestita — che può essere quella di medico, infermiere, tecnico sanitario oppure amministrativo — l'unità operativa di appartenenza, la data di assunzione e l'indirizzo di posta elettronica istituzionale. Ogni scheda riporta inoltre il riferimento gerarchico interno, cioè l'indicazione del collega da cui il professionista dipende all'interno dell'organigramma; i vertici dell'organizzazione sono gli unici a non avere alcun riferimento di questo tipo. In occasione della revisione annuale dell'organigramma, gli incaricati della Segreteria hanno ripercorso ricorsivamente la catena delle dipendenze partendo proprio dai vertici privi di riferimento gerarchico interno, attribuendo a ciascun professionista un livello di distanza dalla radice: zero per chi guida, uno per i collaboratori diretti, due per i loro sottoposti, e così via scendendo di grado in grado. Il controllo è stato circoscritto agli operatori inquadrati nelle unità operative Cardiologia e Radiologia, lasciando fuori le altre sezioni come Medicina Interna, Pediatria o Laboratorio Analisi. Per ciascuno degli operatori coinvolti sono stati trascritti nella relazione finale il nome, il cognome, la qualifica rivestita, l'unità operativa di appartenenza e il livello gerarchico conseguito, disponendo l'elenco in ordine di profondità, dal vertice verso i gradini più bassi della piramide organizzativa."
+}

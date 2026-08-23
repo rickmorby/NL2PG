@@ -1,0 +1,417 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    indirizzo TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE fatture (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    numero_fattura TEXT NOT NULL UNIQUE,\n    data_emissione DATE NOT NULL,\n    importo NUMERIC(12,2) NOT NULL,\n    stato_fattura TEXT NOT NULL DEFAULT 'emessa' CHECK (stato_fattura IN ('emessa', 'pagata', 'annullata')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE righe_fattura (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL REFERENCES fatture(id),\n    descrizione TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    aliquota_iva NUMERIC(5,2) NOT NULL DEFAULT 22.00 CHECK (aliquota_iva >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 117,
+        "columns": {
+          "id": {
+            "distinct": 117,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 117
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Alfa Servizi Edili S.a.s.",
+              "Bianchi Logistica S.p.A.",
+              "Conti Trasporti S.p.A.",
+              "Delta Food Distribuzione S.r.l.",
+              "Moretti Arredamenti S.n.c."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 117,
+            "sample": [
+              "IT01234567890",
+              "IT012345678901",
+              "IT0123456789010",
+              "IT0123456789011",
+              "IT0123456789012"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 6,
+            "sample": [
+              "Corso Vittorio Emanuele II 12, 00186 Roma",
+              "Piazza Duomo 3, 20121 Milano",
+              "Via Emilia 112, 41121 Modena",
+              "Via Garibaldi 8, 16121 Genova",
+              "Via Torino 45, 20123 Milano"
+            ]
+          },
+          "created_at": {
+            "distinct": 103,
+            "sample": [
+              "2025-04-07 16:20:00",
+              "2025-04-12 16:20:00",
+              "2025-04-13 16:20:00",
+              "2025-04-14 16:20:00",
+              "2025-04-16 16:20:00"
+            ]
+          }
+        }
+      },
+      "fatture": {
+        "row_count": 359,
+        "columns": {
+          "id": {
+            "distinct": 359,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 459
+          },
+          "cliente_id": {
+            "distinct": 112,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 117
+          },
+          "numero_fattura": {
+            "distinct": 359,
+            "sample": [
+              "2026/001",
+              "2026/0011",
+              "2026/00110",
+              "2026/00111",
+              "2026/00112"
+            ]
+          },
+          "data_emissione": {
+            "distinct": 117,
+            "sample": [
+              "2025-11-29",
+              "2025-12-02",
+              "2025-12-05",
+              "2025-12-07",
+              "2025-12-08"
+            ]
+          },
+          "importo": {
+            "distinct": 10,
+            "sample": [
+              "1250.00",
+              "15600.00",
+              "1999.99",
+              "310.45",
+              "3200.75"
+            ]
+          },
+          "stato_fattura": {
+            "distinct": 3,
+            "sample": [
+              "annullata",
+              "emessa",
+              "pagata"
+            ]
+          },
+          "created_at": {
+            "distinct": 241,
+            "sample": [
+              "2025-11-28 10:30:00",
+              "2025-11-29 10:30:00",
+              "2025-11-30 10:30:00",
+              "2025-12-01 10:30:00",
+              "2025-12-03 10:30:00"
+            ]
+          }
+        }
+      },
+      "righe_fattura": {
+        "row_count": 1102,
+        "columns": {
+          "id": {
+            "distinct": 1102,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 2102
+          },
+          "fattura_id": {
+            "distinct": 345,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 459
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Assistenza remota h.10",
+              "Consulenza tecnica mensile",
+              "Corso formazione avanzata",
+              "Fornitura cartucce toner",
+              "Licenza software annuale"
+            ]
+          },
+          "quantita": {
+            "distinct": 8,
+            "sample": [
+              "1",
+              "10",
+              "12",
+              "2",
+              "24"
+            ],
+            "min": 1,
+            "max": 12
+          },
+          "prezzo_unitario": {
+            "distinct": 1054,
+            "sample": [
+              "10.24",
+              "10.28",
+              "10.32",
+              "10.34",
+              "10.36"
+            ],
+            "min": 3.25,
+            "max": 2116.03
+          },
+          "aliquota_iva": {
+            "distinct": 5,
+            "sample": [
+              "10.0",
+              "10.00",
+              "22.0",
+              "22.00",
+              "4.00"
+            ],
+            "min": 10.0,
+            "max": 22.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "ragione_sociale": "Conti Trasporti S.p.A.",
+          "partita_iva": "IT01234567890",
+          "indirizzo": "Piazza Duomo 3, 20121 Milano",
+          "created_at": "2025-07-25 09:15:00"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Moretti Arredamenti S.n.c.",
+          "partita_iva": "IT012345678901",
+          "indirizzo": "Via Emilia 112, 41121 Modena",
+          "created_at": "2025-06-04 09:15:00"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Rossi Serramenti S.r.l.",
+          "partita_iva": "IT012345678902",
+          "indirizzo": "Via Torino 45, 20123 Milano",
+          "created_at": "2025-10-02 09:15:00"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Ricci Consulenza del Lavoro S.r.l.",
+          "partita_iva": "IT012345678903",
+          "indirizzo": "Via Garibaldi 8, 16121 Genova",
+          "created_at": "2025-07-22 09:15:00"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Moretti Arredamenti S.n.c.",
+          "partita_iva": "IT012345678904",
+          "indirizzo": "Corso Vittorio Emanuele II 12, 00186 Roma",
+          "created_at": "2025-07-11 09:15:00"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Verdi Informatica S.r.l.",
+          "partita_iva": "IT012345678905",
+          "indirizzo": "Piazza Duomo 3, 20121 Milano",
+          "created_at": "2025-09-26 09:15:00"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Rossi Serramenti S.r.l.",
+          "partita_iva": "IT012345678906",
+          "indirizzo": "Viale Trieste 77, 35121 Padova",
+          "created_at": "2025-09-17 09:15:00"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Bianchi Logistica S.p.A.",
+          "partita_iva": "IT012345678907",
+          "indirizzo": "Viale Trieste 77, 35121 Padova",
+          "created_at": "2025-06-22 09:15:00"
+        }
+      ],
+      "fatture": [
+        {
+          "id": 101,
+          "cliente_id": 70,
+          "numero_fattura": "2026/001",
+          "data_emissione": "2025-12-18",
+          "importo": "3200.75",
+          "stato_fattura": "annullata",
+          "created_at": "2025-12-27 10:30:00"
+        },
+        {
+          "id": 102,
+          "cliente_id": 78,
+          "numero_fattura": "2026/0011",
+          "data_emissione": "2025-12-08",
+          "importo": "1250.00",
+          "stato_fattura": "emessa",
+          "created_at": "2025-12-09 10:30:00"
+        },
+        {
+          "id": 103,
+          "cliente_id": 75,
+          "numero_fattura": "2026/0012",
+          "data_emissione": "2026-01-12",
+          "importo": "1250.00",
+          "stato_fattura": "pagata",
+          "created_at": "2026-01-12 10:30:00"
+        },
+        {
+          "id": 104,
+          "cliente_id": 78,
+          "numero_fattura": "2026/0013",
+          "data_emissione": "2026-01-02",
+          "importo": "15600.00",
+          "stato_fattura": "emessa",
+          "created_at": "2025-11-30 10:30:00"
+        },
+        {
+          "id": 105,
+          "cliente_id": 37,
+          "numero_fattura": "2026/0014",
+          "data_emissione": "2026-01-14",
+          "importo": "750.00",
+          "stato_fattura": "annullata",
+          "created_at": "2025-12-07 10:30:00"
+        },
+        {
+          "id": 106,
+          "cliente_id": 49,
+          "numero_fattura": "2026/0015",
+          "data_emissione": "2026-01-12",
+          "importo": "1999.99",
+          "stato_fattura": "pagata",
+          "created_at": "2025-12-10 10:30:00"
+        },
+        {
+          "id": 107,
+          "cliente_id": 81,
+          "numero_fattura": "2026/0016",
+          "data_emissione": "2026-02-17",
+          "importo": "64.25",
+          "stato_fattura": "pagata",
+          "created_at": "2025-11-29 10:30:00"
+        },
+        {
+          "id": 108,
+          "cliente_id": 24,
+          "numero_fattura": "2026/0017",
+          "data_emissione": "2026-01-12",
+          "importo": "15600.00",
+          "stato_fattura": "emessa",
+          "created_at": "2025-12-22 10:30:00"
+        }
+      ],
+      "righe_fattura": [
+        {
+          "id": 1001,
+          "fattura_id": 364,
+          "descrizione": "Corso formazione avanzata",
+          "quantita": "4",
+          "prezzo_unitario": 1600.39,
+          "aliquota_iva": "4.00"
+        },
+        {
+          "id": 1002,
+          "fattura_id": 169,
+          "descrizione": "Consulenza tecnica mensile",
+          "quantita": 1,
+          "prezzo_unitario": 850.0,
+          "aliquota_iva": 22.0
+        },
+        {
+          "id": 1003,
+          "fattura_id": 102,
+          "descrizione": "Manutenzione ordinaria impianto",
+          "quantita": "2",
+          "prezzo_unitario": 1858.87,
+          "aliquota_iva": "22.00"
+        },
+        {
+          "id": 1004,
+          "fattura_id": 441,
+          "descrizione": "Corso formazione avanzata",
+          "quantita": "1",
+          "prezzo_unitario": 2086.74,
+          "aliquota_iva": "22.00"
+        },
+        {
+          "id": 1005,
+          "fattura_id": 146,
+          "descrizione": "Fornitura cartucce toner",
+          "quantita": "24",
+          "prezzo_unitario": 1843.24,
+          "aliquota_iva": "22.00"
+        },
+        {
+          "id": 1006,
+          "fattura_id": 287,
+          "descrizione": "Corso formazione avanzata",
+          "quantita": "2",
+          "prezzo_unitario": 1332.03,
+          "aliquota_iva": "22.00"
+        },
+        {
+          "id": 1007,
+          "fattura_id": 297,
+          "descrizione": "Noleggio furgone 7 giorni",
+          "quantita": "24",
+          "prezzo_unitario": 999.57,
+          "aliquota_iva": "22.00"
+        },
+        {
+          "id": 1008,
+          "fattura_id": 298,
+          "descrizione": "Corso formazione avanzata",
+          "quantita": "24",
+          "prezzo_unitario": 2090.81,
+          "aliquota_iva": "22.00"
+        }
+      ]
+    }
+  },
+  "story": "Nell'amministrazione commerciale della società di servizi, il responsabile di settore ha avviato la verifica trimestrale sulla documentazione di vendita. Il punto di partenza è l'archivio denominato clienti, dove sono custodite le schede anagrafiche dei committenti: per ciascuna sono annotati la ragione sociale, la partita IVA, l'indirizzo della sede operativa e la data di apertura della scheda; vi figurano realtà come Conti Trasporti S.p.A., Bianchi Logistica S.p.A. e Moretti Arredamenti S.n.c., per un totale di 117 schede. Accanto ad esso è tenuto il registro intitolato registrazioni di addebito emesse, che raccoglie i documenti di vendita progressivamente numerati, dal 2026/001 in avanti, ciascuno corredato dalla data di emissione, dall'esposizione contabile lorda del documento e dallo stato di lavorazione, che può risultare emessa, pagata oppure annullata. Completa il quadro l'elenco denominato righe_fattura, spesso citato negli atti interni come righe fattura, nel quale vengono annotate, per ogni registrazione di addebito, la descrizione della prestazione resa, la quantità erogata, il prezzo unitario applicato e l'aliquota IVA, che nella prassi ordinaria si attesta al 22.00, salvo particolari agevolazioni al 4.00 o al 10.00. Durante il controllo, gli incaricati hanno innanzitutto isolato le registrazioni di addebito attive, ossia quelle nello stato emessa oppure pagata, scartando espressamente quelle annullate; hanno poi esaminato le voci collegate nell'elenco righe_fattura, trattenendo soltanto le prestazioni erogate in quantità compresa tra 1 e 12 ed escludendo dunque le fornizioni ripetute in 24 unità o oltre. Per ciascuna voce hanno letto la dicitura del servizio — corsi di formazione avanzata, consulenze tecniche mensili, manutenzioni ordinarie degli impianti, noleggi di furgoni, forniture di cartucce toner, licenze software annuali e assistenze remote — e hanno predisposto un prospetto riepilogativo dei tipi di prestazione di consulenza e formazione, privo di duplicazioni e disposto in ordine alfabetico, da sottoporre alla direzione amministrativa in vista della chiusura di bilancio."
+}

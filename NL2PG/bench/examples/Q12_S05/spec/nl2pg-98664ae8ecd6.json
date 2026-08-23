@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 4,
+  "hierarchy": "identifying_one_to_many",
+  "sql_features": [
+    "correlated_subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "colli",
+      "obsolete_value": "unita_di_movimentazione",
+      "description": "La tabella entita debole colli (con chiave parziale numero_collo dipendente dalla PK di spedizioni) viene denominata unita_di_movimentazione nella prosa aziendale. Il risolutore deve riconoscere che le unita_di_movimentazione corrispondono ai colli e che ogni collo e identificabile solo insieme alla sua spedizione proprietaria."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_consegna",
+      "obsolete_value": "fase del ciclo di vita del carico",
+      "description": "La colonna stato_consegna della tabella spedizioni viene indicata nel testo aziendale come fase del ciclo di vita del carico. Le query che filtrano per consegne completate o in transito devono mappare questo gergo logistico sul valore effettivo della colonna stato_consegna all'interno delle condizioni della subquery correlata EXISTS."
+    }
+  ],
+  "spec_hash": "94bab583852c0f1a"
+}

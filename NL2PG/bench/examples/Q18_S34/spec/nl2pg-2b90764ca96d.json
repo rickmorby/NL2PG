@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "lateral"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_di_copertura",
+      "description": "La tabella fisica 'polizze' (con FK nullable id_cliente verso 'clienti') viene denominata 'contratti_di_copertura' nella prosa aziendale. Il progettista deve riconoscere che i riferimenti ai contratti di copertura corrispondono alla tabella polizze."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_liquidato",
+      "obsolete_value": "somma_erogata_a_saldo_evento",
+      "description": "La colonna 'importo_liquidato' della tabella 'liquidazioni' viene indicata nel linguaggio settoriale come 'somma erogata a saldo evento'. Le query devono mappare questa perifrasi gergale del settore assicurativo sulla colonna reale importo_liquidato."
+    }
+  ],
+  "spec_hash": "b437e9bee4a7cef2"
+}

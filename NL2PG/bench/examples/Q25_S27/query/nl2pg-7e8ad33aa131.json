@@ -1,0 +1,803 @@
+{
+  "schema_ddl": "CREATE TABLE agenti (\n    agente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    data_assunzione DATE NOT NULL\n);\n\nCREATE TABLE clienti (\n    cliente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    budget_massimo NUMERIC(12,2) CHECK (budget_massimo >= 0)\n);\n\nCREATE TABLE immobili (\n    immobile_id INT PRIMARY KEY,\n    agente_id INT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia CHAR(2),\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani > 0),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato_immobile TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_immobile IN ('disponibile', 'riservato', 'venduto', 'affittato'))\n);\n\nCREATE TABLE visite (\n    visita_id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    agente_id INT NOT NULL,\n    immobile_id INT NOT NULL,\n    data_visita DATE NOT NULL,\n    ora_visita TIME NOT NULL,\n    esito_visita TEXT CHECK (esito_visita IN ('interessato', 'non_interessato', 'da_rivalutare')),\n    note TEXT\n);\n\nCREATE TABLE contratti (\n    contratto_id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    agente_id INT NOT NULL,\n    immobile_id INT NOT NULL,\n    data_firma DATE NOT NULL,\n    prezzo_finale NUMERIC(12,2) NOT NULL CHECK (prezzo_finale >= 0),\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('vendita', 'affitto'))\n);",
+  "data_profile": {
+    "profile": {
+      "agenti": {
+        "row_count": 770,
+        "columns": {
+          "agente_id": {
+            "distinct": 770,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 770
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Giuseppe"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bellini",
+              "Colombo",
+              "Ferri",
+              "Fontana",
+              "Gallo"
+            ]
+          },
+          "email": {
+            "distinct": 770,
+            "sample": [
+              "andrea.colombo100@agenzia.it",
+              "andrea.colombo101@agenzia.it",
+              "andrea.colombo102@agenzia.it",
+              "andrea.colombo103@agenzia.it",
+              "andrea.colombo104@agenzia.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+39 010 2233445",
+              "+39 011 4567890",
+              "+39 02 9876543",
+              "+39 06 1234567",
+              "+39 081 3344556"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 640,
+            "sample": [
+              "2016-11-02",
+              "2016-11-04",
+              "2016-11-12",
+              "2016-11-14",
+              "2016-12-15"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 782,
+        "columns": {
+          "cliente_id": {
+            "distinct": 782,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 782
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Antonio",
+              "Federica",
+              "Francesca",
+              "Matteo"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Amato",
+              "Barbieri",
+              "Costa",
+              "De Luca",
+              "Gatti"
+            ]
+          },
+          "email": {
+            "distinct": 782,
+            "sample": [
+              "alessandro.marino100@gmail.com",
+              "alessandro.marino101@gmail.com",
+              "alessandro.marino102@gmail.com",
+              "alessandro.marino103@gmail.com",
+              "alessandro.marino104@gmail.com"
+            ]
+          },
+          "telefono": {
+            "distinct": 6,
+            "sample": [
+              "+39 320 4445566",
+              "+39 328 7778899",
+              "+39 331 2223344",
+              "+39 333 1112223",
+              "+39 340 6667788"
+            ]
+          },
+          "budget_massimo": {
+            "distinct": 718,
+            "sample": [
+              "100135.83",
+              "1005714.58",
+              "1010272.54",
+              "1015438.91",
+              "101585.85"
+            ],
+            "min": 38000.0,
+            "max": 1144000.0
+          }
+        }
+      },
+      "immobili": {
+        "row_count": 606,
+        "columns": {
+          "immobile_id": {
+            "distinct": 606,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 606
+          },
+          "agente_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "indirizzo": {
+            "distinct": 14,
+            "sample": [
+              "Corso Buenos Aires 30",
+              "Corso Vittorio Emanuele II 42",
+              "Piazza Navona 5",
+              "Via Brera 8",
+              "Via Cavour 12"
+            ]
+          },
+          "citta": {
+            "distinct": 6,
+            "sample": [
+              "Catania",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "provincia": {
+            "distinct": 6,
+            "sample": [
+              "CT",
+              "FI",
+              "MI",
+              "NA",
+              "RM"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 575,
+            "sample": [
+              "100.03",
+              "100.16",
+              "100.27",
+              "100.44",
+              "100.54"
+            ],
+            "min": 37.2,
+            "max": 233.6
+          },
+          "numero_vani": {
+            "distinct": 581,
+            "sample": [
+              "1.016131360775772",
+              "1.0291670420322547",
+              "1.032105070359059",
+              "1.0325894883418012",
+              "1.0620641848574042"
+            ],
+            "min": 1.016131360775772,
+            "max": 6.980974591749268
+          },
+          "prezzo_richiesto": {
+            "distinct": 583,
+            "sample": [
+              "122500.0",
+              "123502.74",
+              "127105.31",
+              "129204.85",
+              "129820.13"
+            ],
+            "min": 122500.0,
+            "max": 613866.61
+          },
+          "stato_immobile": {
+            "distinct": 4,
+            "sample": [
+              "affittato",
+              "disponibile",
+              "riservato",
+              "venduto"
+            ]
+          }
+        }
+      },
+      "visite": {
+        "row_count": 2980,
+        "columns": {
+          "visita_id": {
+            "distinct": 2980,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2980
+          },
+          "cliente_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "agente_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "immobile_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "data_visita": {
+            "distinct": 140,
+            "sample": [
+              "2025-11-21",
+              "2025-11-22",
+              "2025-11-23",
+              "2025-11-24",
+              "2025-11-25"
+            ]
+          },
+          "ora_visita": {
+            "distinct": 13,
+            "sample": [
+              "09:00:00",
+              "09:30:00",
+              "10:00:00",
+              "10:30:00",
+              "11:00:00"
+            ]
+          },
+          "esito_visita": {
+            "distinct": 3,
+            "sample": [
+              "da_rivalutare",
+              "interessato",
+              "non_interessato"
+            ]
+          },
+          "note": {
+            "distinct": 11,
+            "sample": [
+              "Cliente molto interessato, richiede una seconda visita",
+              "Disponibile per avviare la trattativa rapidamente",
+              "Immobile troppo piccolo rispetto alle aspettative",
+              "In attesa della decisione del coniuge",
+              "Interessato ma attende la valutazione finanziaria"
+            ]
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 1158,
+        "columns": {
+          "contratto_id": {
+            "distinct": 1158,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1158
+          },
+          "cliente_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "6"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "agente_id": {
+            "distinct": 4,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 4
+          },
+          "immobile_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "6"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "data_firma": {
+            "distinct": 87,
+            "sample": [
+              "2026-01-21",
+              "2026-01-22",
+              "2026-01-23",
+              "2026-01-24",
+              "2026-01-25"
+            ]
+          },
+          "prezzo_finale": {
+            "distinct": 1115,
+            "sample": [
+              "202300.0",
+              "202556.24",
+              "203159.26",
+              "203185.9",
+              "203541.97"
+            ],
+            "min": 612.0,
+            "max": 425283.28
+          },
+          "tipo_contratto": {
+            "distinct": 2,
+            "sample": [
+              "affitto",
+              "vendita"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "agenti": [
+        {
+          "agente_id": 10,
+          "nome": "Andrea",
+          "cognome": "Bellini",
+          "email": "andrea.bellini1@agenzia.it",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2019-03-28"
+        },
+        {
+          "agente_id": 31,
+          "nome": "Andrea",
+          "cognome": "Bellini",
+          "email": "andrea.bellini2@agenzia.it",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2019-06-22"
+        },
+        {
+          "agente_id": 7,
+          "nome": "Andrea",
+          "cognome": "Colombo",
+          "email": "andrea.colombo1@agenzia.it",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2016-11-12"
+        },
+        {
+          "agente_id": 16,
+          "nome": "Andrea",
+          "cognome": "Gallo",
+          "email": "andrea.gallo1@agenzia.it",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2016-12-19"
+        },
+        {
+          "agente_id": 33,
+          "nome": "Andrea",
+          "cognome": "Greco",
+          "email": "andrea.greco1@agenzia.it",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2017-10-03"
+        },
+        {
+          "agente_id": 14,
+          "nome": "Andrea",
+          "cognome": "Longo",
+          "email": "andrea.longo1@agenzia.it",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2017-08-09"
+        },
+        {
+          "agente_id": 22,
+          "nome": "Andrea",
+          "cognome": "Mancini",
+          "email": "andrea.mancini1@agenzia.it",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2018-09-26"
+        },
+        {
+          "agente_id": 35,
+          "nome": "Andrea",
+          "cognome": "Rinaldi",
+          "email": "andrea.rinaldi1@agenzia.it",
+          "telefono": "+39 06 1234567",
+          "data_assunzione": "2017-06-22"
+        }
+      ],
+      "clienti": [
+        {
+          "cliente_id": 1,
+          "nome": "Antonio",
+          "cognome": "Villa",
+          "email": "antonio.villa1@gmail.com",
+          "telefono": "+39 333 1112223",
+          "budget_massimo": 575604.7
+        },
+        {
+          "cliente_id": 5,
+          "nome": "Federica",
+          "cognome": "Lombardi",
+          "email": "federica.lombardi1@gmail.com",
+          "telefono": "+39 333 1112223",
+          "budget_massimo": 140000.0
+        },
+        {
+          "cliente_id": 4,
+          "nome": "Monica",
+          "cognome": "Pellegrini",
+          "email": "monica.pellegrini1@gmail.com",
+          "telefono": "+39 333 1112223",
+          "budget_massimo": 421635.21
+        },
+        {
+          "cliente_id": 2,
+          "nome": "Roberto",
+          "cognome": "Amato",
+          "email": "roberto.amato1@gmail.com",
+          "telefono": "+39 333 1112223",
+          "budget_massimo": 471609.55
+        },
+        {
+          "cliente_id": 3,
+          "nome": "Silvia",
+          "cognome": "De Luca",
+          "email": "silvia.deluca1@gmail.com",
+          "telefono": "+39 333 1112223",
+          "budget_massimo": 501647.13
+        },
+        {
+          "cliente_id": 6,
+          "nome": "Silvia",
+          "cognome": "De Luca",
+          "email": "silvia.deluca2@gmail.com",
+          "telefono": "+39 333 1112223",
+          "budget_massimo": 374076.62
+        },
+        {
+          "cliente_id": 119,
+          "nome": "Alessandro",
+          "cognome": "Amato",
+          "email": "alessandro.amato2@gmail.com",
+          "telefono": "+39 333 1112223",
+          "budget_massimo": 451582.35
+        },
+        {
+          "cliente_id": 129,
+          "nome": "Alessandro",
+          "cognome": "Marino",
+          "email": "alessandro.marino7@gmail.com",
+          "telefono": "+39 333 1112223",
+          "budget_massimo": 350000.0
+        }
+      ],
+      "immobili": [
+        {
+          "immobile_id": 1,
+          "agente_id": 1,
+          "indirizzo": "Via Cavour 12",
+          "citta": "Roma",
+          "provincia": "RM",
+          "superficie_mq": 79.28,
+          "numero_vani": 2.4770865254382506,
+          "prezzo_richiesto": 431134.56,
+          "stato_immobile": "disponibile"
+        },
+        {
+          "immobile_id": 2,
+          "agente_id": 1,
+          "indirizzo": "Piazza Navona 5",
+          "citta": "Roma",
+          "provincia": "RM",
+          "superficie_mq": 58.49,
+          "numero_vani": 2.541127751159613,
+          "prezzo_richiesto": 374986.19,
+          "stato_immobile": "disponibile"
+        },
+        {
+          "immobile_id": 3,
+          "agente_id": 1,
+          "indirizzo": "Piazza Navona 5",
+          "citta": "Roma",
+          "provincia": "RM",
+          "superficie_mq": 116.47,
+          "numero_vani": 4.648104322039872,
+          "prezzo_richiesto": 296204.43,
+          "stato_immobile": "disponibile"
+        },
+        {
+          "immobile_id": 4,
+          "agente_id": 1,
+          "indirizzo": "Corso Buenos Aires 30",
+          "citta": "Roma",
+          "provincia": "RM",
+          "superficie_mq": 82.72,
+          "numero_vani": 3.1102731216977104,
+          "prezzo_richiesto": 504127.68,
+          "stato_immobile": "venduto"
+        },
+        {
+          "immobile_id": 5,
+          "agente_id": 1,
+          "indirizzo": "Via Dante 9",
+          "citta": "Roma",
+          "provincia": null,
+          "superficie_mq": 140.93,
+          "numero_vani": 3.8477517674264785,
+          "prezzo_richiesto": 516801.78,
+          "stato_immobile": "riservato"
+        },
+        {
+          "immobile_id": 6,
+          "agente_id": 1,
+          "indirizzo": "Via Torino 44",
+          "citta": "Roma",
+          "provincia": "RM",
+          "superficie_mq": 124.8,
+          "numero_vani": 4.158226884305213,
+          "prezzo_richiesto": 545246.76,
+          "stato_immobile": "venduto"
+        },
+        {
+          "immobile_id": 7,
+          "agente_id": 1,
+          "indirizzo": "Via Cavour 12",
+          "citta": "Roma",
+          "provincia": "RM",
+          "superficie_mq": 143.51,
+          "numero_vani": 2.660780753806189,
+          "prezzo_richiesto": 539606.14,
+          "stato_immobile": "disponibile"
+        },
+        {
+          "immobile_id": 8,
+          "agente_id": 1,
+          "indirizzo": "Via Torino 44",
+          "citta": "Roma",
+          "provincia": "RM",
+          "superficie_mq": 91.13,
+          "numero_vani": 4.876945325897736,
+          "prezzo_richiesto": 529481.81,
+          "stato_immobile": "riservato"
+        }
+      ],
+      "visite": [
+        {
+          "visita_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "immobile_id": 1,
+          "data_visita": "2025-12-14",
+          "ora_visita": "14:30:00",
+          "esito_visita": "non_interessato",
+          "note": "Nessuna nota particolare da segnalare"
+        },
+        {
+          "visita_id": 2,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "immobile_id": 1,
+          "data_visita": "2026-02-10",
+          "ora_visita": "11:00:00",
+          "esito_visita": "interessato",
+          "note": "Nessuna nota particolare da segnalare"
+        },
+        {
+          "visita_id": 3,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "immobile_id": 1,
+          "data_visita": "2026-01-22",
+          "ora_visita": "10:30:00",
+          "esito_visita": "non_interessato",
+          "note": "Ottima impressione generale dell'immobile"
+        },
+        {
+          "visita_id": 4,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "immobile_id": 1,
+          "data_visita": "2025-12-01",
+          "ora_visita": "10:30:00",
+          "esito_visita": "non_interessato",
+          "note": "Ottima impressione generale dell'immobile"
+        },
+        {
+          "visita_id": 5,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "immobile_id": 1,
+          "data_visita": "2025-12-08",
+          "ora_visita": "14:30:00",
+          "esito_visita": "interessato",
+          "note": "Nessuna nota particolare da segnalare"
+        },
+        {
+          "visita_id": 6,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "immobile_id": 1,
+          "data_visita": "2025-12-19",
+          "ora_visita": "10:30:00",
+          "esito_visita": "non_interessato",
+          "note": "Interessato ma attende la valutazione finanziaria"
+        },
+        {
+          "visita_id": 7,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "immobile_id": 1,
+          "data_visita": "2026-01-10",
+          "ora_visita": "10:00:00",
+          "esito_visita": "interessato",
+          "note": "Cliente molto interessato, richiede una seconda visita"
+        },
+        {
+          "visita_id": 8,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "immobile_id": 1,
+          "data_visita": "2026-01-07",
+          "ora_visita": "16:30:00",
+          "esito_visita": "non_interessato",
+          "note": "Richieste ulteriori informazioni su spese condominiali e costi"
+        }
+      ],
+      "contratti": [
+        {
+          "contratto_id": 1,
+          "cliente_id": 3,
+          "agente_id": 3,
+          "immobile_id": 3,
+          "data_firma": "2026-01-23",
+          "prezzo_finale": 226171.04,
+          "tipo_contratto": "vendita"
+        },
+        {
+          "contratto_id": 2,
+          "cliente_id": 3,
+          "agente_id": 3,
+          "immobile_id": 3,
+          "data_firma": "2026-02-20",
+          "prezzo_finale": 238000.0,
+          "tipo_contratto": "vendita"
+        },
+        {
+          "contratto_id": 3,
+          "cliente_id": 3,
+          "agente_id": 3,
+          "immobile_id": 3,
+          "data_firma": "2026-02-17",
+          "prezzo_finale": 254203.67,
+          "tipo_contratto": "vendita"
+        },
+        {
+          "contratto_id": 4,
+          "cliente_id": 3,
+          "agente_id": 3,
+          "immobile_id": 3,
+          "data_firma": "2026-02-16",
+          "prezzo_finale": 228366.5,
+          "tipo_contratto": "vendita"
+        },
+        {
+          "contratto_id": 5,
+          "cliente_id": 3,
+          "agente_id": 3,
+          "immobile_id": 3,
+          "data_firma": "2026-02-01",
+          "prezzo_finale": 257842.01,
+          "tipo_contratto": "vendita"
+        },
+        {
+          "contratto_id": 6,
+          "cliente_id": 3,
+          "agente_id": 3,
+          "immobile_id": 3,
+          "data_firma": "2026-02-20",
+          "prezzo_finale": 245667.43,
+          "tipo_contratto": "vendita"
+        },
+        {
+          "contratto_id": 7,
+          "cliente_id": 3,
+          "agente_id": 3,
+          "immobile_id": 3,
+          "data_firma": "2026-03-02",
+          "prezzo_finale": 210160.28,
+          "tipo_contratto": "vendita"
+        },
+        {
+          "contratto_id": 8,
+          "cliente_id": 3,
+          "agente_id": 3,
+          "immobile_id": 3,
+          "data_firma": "2026-02-18",
+          "prezzo_finale": 234794.16,
+          "tipo_contratto": "vendita"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "natural_join"
+  ],
+  "query": "SELECT a.nome, a.cognome, COUNT(*) AS immobili_disponibili, ROUND(AVG(i.prezzo_richiesto), 2) AS prezzo_medio_richiesto, ROUND(AVG(i.superficie_mq), 2) AS superficie_media_mq FROM agenti a NATURAL JOIN immobili i WHERE i.citta = 'Milano' AND i.stato_immobile = 'disponibile' GROUP BY a.nome, a.cognome, a.agente_id ORDER BY immobili_disponibili DESC, prezzo_medio_richiesto DESC, a.agente_id ASC;"
+}

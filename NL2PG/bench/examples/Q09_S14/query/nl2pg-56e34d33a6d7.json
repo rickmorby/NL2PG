@@ -1,0 +1,384 @@
+{
+  "schema_ddl": "CREATE DOMAIN importo_non_negativo AS NUMERIC(12,2) CHECK (VALUE >= 0);\n\nCREATE DOMAIN stato_ordine AS TEXT CHECK (VALUE IN ('in_attesa', 'pagato', 'spedito', 'consegnato', 'annullato'));\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    totale_ordine importo_non_negativo NOT NULL,\n    stato_ordine stato_ordine NOT NULL DEFAULT 'in_attesa',\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    corriere TEXT NOT NULL,\n    costo_spedizione importo_non_negativo NOT NULL DEFAULT 0,\n    data_spedizione DATE,\n    data_consegna_prevista DATE,\n    CHECK (data_consegna_prevista IS NULL OR data_spedizione IS NULL OR data_consegna_prevista >= data_spedizione)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 503,
+        "columns": {
+          "id": {
+            "distinct": 503,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 503
+          },
+          "nome": {
+            "distinct": 14,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "distinct": 13,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Colombo",
+              "Conti",
+              "Esposito"
+            ]
+          },
+          "email": {
+            "distinct": 503,
+            "sample": [
+              "alessandro.conti10@example.com",
+              "alessandro.conti11@example.com",
+              "alessandro.conti12@example.com",
+              "alessandro.conti13@example.com",
+              "alessandro.conti14@example.com"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 270,
+            "sample": [
+              "2024-07-24",
+              "2024-07-27",
+              "2024-08-02",
+              "2024-08-03",
+              "2024-08-07"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1939,
+        "columns": {
+          "id": {
+            "distinct": 1939,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 2939
+          },
+          "cliente_id": {
+            "distinct": 492,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 502
+          },
+          "totale_ordine": {
+            "distinct": 1831,
+            "sample": [
+              "100.17",
+              "100.45",
+              "100.48",
+              "100.63",
+              "100.65"
+            ],
+            "min": 16.35,
+            "max": 960.0
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "consegnato",
+              "in_attesa",
+              "pagato",
+              "spedito"
+            ]
+          },
+          "data_ordine": {
+            "distinct": 120,
+            "sample": [
+              "2025-12-03",
+              "2025-12-04",
+              "2025-12-05",
+              "2025-12-06",
+              "2025-12-07"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 2119,
+        "columns": {
+          "id": {
+            "distinct": 2119,
+            "sample": [
+              "5001",
+              "5002",
+              "5003",
+              "5004",
+              "5005"
+            ],
+            "min": 5001,
+            "max": 7119
+          },
+          "ordine_id": {
+            "distinct": 1291,
+            "sample": [
+              "1002",
+              "1003",
+              "1004",
+              "1005",
+              "1007"
+            ],
+            "min": 1002,
+            "max": 2939
+          },
+          "corriere": {
+            "distinct": 6,
+            "sample": [
+              "BRT",
+              "Bartolini",
+              "DHL",
+              "GLS",
+              "Poste Italiane"
+            ]
+          },
+          "costo_spedizione": {
+            "distinct": 1279,
+            "sample": [
+              "10.0",
+              "10.01",
+              "10.03",
+              "10.04",
+              "10.05"
+            ],
+            "min": 2.95,
+            "max": 31.25
+          },
+          "data_spedizione": {
+            "distinct": 25,
+            "sample": [
+              "2026-01-11",
+              "2026-01-12",
+              "2026-01-13",
+              "2026-01-14",
+              "2026-01-15"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 4,
+            "sample": [
+              "2026-01-18",
+              "2026-01-24",
+              "2026-02-10",
+              "2026-02-27"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 22,
+          "nome": "Andrea",
+          "cognome": "Esposito",
+          "email": "andrea.esposito1@example.com",
+          "data_registrazione": "2024-11-25"
+        },
+        {
+          "id": 273,
+          "nome": "Andrea",
+          "cognome": "Colombo",
+          "email": "andrea.colombo2@example.com",
+          "data_registrazione": "2025-02-10"
+        },
+        {
+          "id": 339,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "email": "alessandro.conti1@example.com",
+          "data_registrazione": "2025-05-09"
+        },
+        {
+          "id": 171,
+          "nome": "Andrea",
+          "cognome": "Bruno",
+          "email": "andrea.bruno1@example.com",
+          "data_registrazione": "2024-08-08"
+        },
+        {
+          "id": 380,
+          "nome": "Andrea",
+          "cognome": "Bruno",
+          "email": "andrea.bruno2@example.com",
+          "data_registrazione": "2025-05-20"
+        },
+        {
+          "id": 446,
+          "nome": "Andrea",
+          "cognome": "Bruno",
+          "email": "andrea.bruno3@example.com",
+          "data_registrazione": "2025-06-05"
+        },
+        {
+          "id": 161,
+          "nome": "Andrea",
+          "cognome": "Colombo",
+          "email": "andrea.colombo1@example.com",
+          "data_registrazione": "2025-03-26"
+        },
+        {
+          "id": 500,
+          "nome": "Andrea",
+          "cognome": "Colombo",
+          "email": "andrea.colombo3@example.com",
+          "data_registrazione": "2025-04-27"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 1001,
+          "cliente_id": 451,
+          "totale_ordine": 95.96,
+          "stato_ordine": "consegnato",
+          "data_ordine": "2026-01-12"
+        },
+        {
+          "id": 1002,
+          "cliente_id": 434,
+          "totale_ordine": 108.59,
+          "stato_ordine": "annullato",
+          "data_ordine": "2026-01-15"
+        },
+        {
+          "id": 1003,
+          "cliente_id": 303,
+          "totale_ordine": 315.89,
+          "stato_ordine": "consegnato",
+          "data_ordine": "2026-01-19"
+        },
+        {
+          "id": 1004,
+          "cliente_id": 151,
+          "totale_ordine": 187.43,
+          "stato_ordine": "consegnato",
+          "data_ordine": "2025-12-13"
+        },
+        {
+          "id": 1005,
+          "cliente_id": 248,
+          "totale_ordine": 114.63,
+          "stato_ordine": "annullato",
+          "data_ordine": "2025-12-20"
+        },
+        {
+          "id": 1006,
+          "cliente_id": 234,
+          "totale_ordine": 281.83,
+          "stato_ordine": "consegnato",
+          "data_ordine": "2026-01-17"
+        },
+        {
+          "id": 1007,
+          "cliente_id": 253,
+          "totale_ordine": 81.96,
+          "stato_ordine": "in_attesa",
+          "data_ordine": "2025-12-22"
+        },
+        {
+          "id": 1008,
+          "cliente_id": 337,
+          "totale_ordine": 352.78,
+          "stato_ordine": "annullato",
+          "data_ordine": "2026-01-28"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 5001,
+          "ordine_id": 1580,
+          "corriere": "BRT",
+          "costo_spedizione": 5.25,
+          "data_spedizione": "2026-01-12",
+          "data_consegna_prevista": "2026-01-18"
+        },
+        {
+          "id": 5002,
+          "ordine_id": 2884,
+          "corriere": "GLS",
+          "costo_spedizione": 19.0,
+          "data_spedizione": "2026-01-14",
+          "data_consegna_prevista": "2026-01-18"
+        },
+        {
+          "id": 5003,
+          "ordine_id": 2294,
+          "corriere": "Poste Italiane",
+          "costo_spedizione": 4.62,
+          "data_spedizione": "2026-01-13",
+          "data_consegna_prevista": "2026-01-18"
+        },
+        {
+          "id": 5004,
+          "ordine_id": 1239,
+          "corriere": "DHL",
+          "costo_spedizione": 6.18,
+          "data_spedizione": "2026-01-13",
+          "data_consegna_prevista": "2026-01-18"
+        },
+        {
+          "id": 5005,
+          "ordine_id": 2526,
+          "corriere": "SDA",
+          "costo_spedizione": 5.01,
+          "data_spedizione": "2026-01-13",
+          "data_consegna_prevista": "2026-01-18"
+        },
+        {
+          "id": 5006,
+          "ordine_id": 1143,
+          "corriere": "GLS",
+          "costo_spedizione": 10.53,
+          "data_spedizione": "2026-01-12",
+          "data_consegna_prevista": "2026-01-18"
+        },
+        {
+          "id": 5007,
+          "ordine_id": 1690,
+          "corriere": "Poste Italiane",
+          "costo_spedizione": 15.59,
+          "data_spedizione": "2026-01-14",
+          "data_consegna_prevista": "2026-01-18"
+        },
+        {
+          "id": 5008,
+          "ordine_id": 1606,
+          "corriere": "Poste Italiane",
+          "costo_spedizione": 10.38,
+          "data_spedizione": "2026-01-12",
+          "data_consegna_prevista": "2026-01-18"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "group_agg",
+    "having"
+  ],
+  "query": "SELECT c.email AS email_cliente, c.nome || ' ' || c.cognome AS cliente, COUNT(*) AS numero_ordini_consegnati, ROUND(SUM(o.totale_ordine), 2) AS spesa_totale, ROUND(AVG(o.totale_ordine), 2) AS scontrino_medio FROM clienti c JOIN ordini o ON o.cliente_id = c.id WHERE o.stato_ordine = 'consegnato' GROUP BY c.email, c.nome, c.cognome HAVING SUM(o.totale_ordine) > 150 ORDER BY spesa_totale DESC;"
+}

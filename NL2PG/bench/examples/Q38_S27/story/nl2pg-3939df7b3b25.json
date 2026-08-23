@@ -1,0 +1,381 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    data_registrazione DATE DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    totale_ordine NUMERIC(12,2) NOT NULL CHECK (totale_ordine >= 0),\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'pagato', 'spedito', 'consegnato', 'annullato'))\n);\n\nCREATE TABLE dettagli_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL,\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 566,
+        "columns": {
+          "id": {
+            "distinct": 566,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 566
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Davide",
+              "Elena",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "email": {
+            "distinct": 566,
+            "sample": [
+              "alessandro.conti10@example.com",
+              "alessandro.conti11@example.com",
+              "alessandro.conti12@example.com",
+              "alessandro.conti13@example.com",
+              "alessandro.conti14@example.com"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 276,
+            "sample": [
+              "2024-07-19",
+              "2024-07-25",
+              "2024-07-27",
+              "2024-07-28",
+              "2024-07-29"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1718,
+        "columns": {
+          "id": {
+            "distinct": 1718,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1818
+          },
+          "cliente_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "data_ordine": {
+            "distinct": 132,
+            "sample": [
+              "2025-11-26",
+              "2025-11-27",
+              "2025-11-28",
+              "2025-11-29",
+              "2025-11-30"
+            ]
+          },
+          "totale_ordine": {
+            "distinct": 1625,
+            "sample": [
+              "100.03",
+              "100.07",
+              "100.1",
+              "100.21",
+              "100.22"
+            ],
+            "min": 28.9,
+            "max": 630.8
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "consegnato",
+              "in_attesa",
+              "pagato",
+              "spedito"
+            ]
+          }
+        }
+      },
+      "dettagli_ordine": {
+        "row_count": 413,
+        "columns": {
+          "id": {
+            "distinct": 413,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 1413
+          },
+          "ordine_id": {
+            "distinct": 4,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "min": 101,
+            "max": 104
+          },
+          "prodotto": {
+            "distinct": 8,
+            "sample": [
+              "Cuffie Wireless Pro",
+              "Hub USB-C 7 porte",
+              "Monitor 27 pollici 4K",
+              "Mouse Ottico USB",
+              "Power Bank 20000mAh"
+            ]
+          },
+          "quantita": {
+            "distinct": 4,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 2
+          },
+          "prezzo_unitario": {
+            "distinct": 386,
+            "sample": [
+              "100.16",
+              "101.2",
+              "101.4",
+              "101.42",
+              "102.0"
+            ],
+            "min": 20.97,
+            "max": 369.07
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 41,
+          "nome": "Alessandro",
+          "cognome": "Colombo",
+          "email": "alessandro.colombo1@example.com",
+          "citta": null,
+          "data_registrazione": "2024-09-20"
+        },
+        {
+          "id": 24,
+          "nome": "Alessandro",
+          "cognome": "Esposito",
+          "email": "alessandro.esposito1@example.com",
+          "citta": "Bologna",
+          "data_registrazione": "2024-07-25"
+        },
+        {
+          "id": 301,
+          "nome": "Alessandro",
+          "cognome": "Ferrari",
+          "email": "alessandro.ferrari4@example.com",
+          "citta": "Napoli",
+          "data_registrazione": "2025-02-12"
+        },
+        {
+          "id": 335,
+          "nome": "Alessandro",
+          "cognome": "Ferrari",
+          "email": "alessandro.ferrari5@example.com",
+          "citta": "Genova",
+          "data_registrazione": "2025-04-20"
+        },
+        {
+          "id": 454,
+          "nome": "Alessandro",
+          "cognome": "Moretti",
+          "email": "alessandro.moretti1@example.com",
+          "citta": "Firenze",
+          "data_registrazione": "2025-04-25"
+        },
+        {
+          "id": 490,
+          "nome": "Alessandro",
+          "cognome": "Ricci",
+          "email": "alessandro.ricci1@example.com",
+          "citta": "Firenze",
+          "data_registrazione": "2025-02-09"
+        },
+        {
+          "id": 530,
+          "nome": "Alessandro",
+          "cognome": "Ricci",
+          "email": "alessandro.ricci2@example.com",
+          "citta": "Roma",
+          "data_registrazione": "2025-08-06"
+        },
+        {
+          "id": 146,
+          "nome": "Alessandro",
+          "cognome": "Romano",
+          "email": "alessandro.romano1@example.com",
+          "citta": "Verona",
+          "data_registrazione": "2024-10-30"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 101,
+          "cliente_id": 1,
+          "data_ordine": "2026-01-29",
+          "totale_ordine": 146.91,
+          "stato_ordine": "spedito"
+        },
+        {
+          "id": 102,
+          "cliente_id": 1,
+          "data_ordine": "2025-12-06",
+          "totale_ordine": 220.62,
+          "stato_ordine": "consegnato"
+        },
+        {
+          "id": 103,
+          "cliente_id": 1,
+          "data_ordine": "2025-11-28",
+          "totale_ordine": 258.52,
+          "stato_ordine": "consegnato"
+        },
+        {
+          "id": 104,
+          "cliente_id": 1,
+          "data_ordine": "2025-12-26",
+          "totale_ordine": 169.15,
+          "stato_ordine": "in_attesa"
+        },
+        {
+          "id": 105,
+          "cliente_id": 1,
+          "data_ordine": "2026-02-20",
+          "totale_ordine": 142.22,
+          "stato_ordine": "spedito"
+        },
+        {
+          "id": 106,
+          "cliente_id": 1,
+          "data_ordine": "2025-12-29",
+          "totale_ordine": 70.98,
+          "stato_ordine": "pagato"
+        },
+        {
+          "id": 107,
+          "cliente_id": 1,
+          "data_ordine": "2026-01-30",
+          "totale_ordine": 251.51,
+          "stato_ordine": "spedito"
+        },
+        {
+          "id": 108,
+          "cliente_id": 1,
+          "data_ordine": "2026-01-26",
+          "totale_ordine": 104.32,
+          "stato_ordine": "in_attesa"
+        }
+      ],
+      "dettagli_ordine": [
+        {
+          "id": 1001,
+          "ordine_id": 101,
+          "prodotto": "Monitor 27 pollici 4K",
+          "quantita": "1",
+          "prezzo_unitario": 24.36
+        },
+        {
+          "id": 1002,
+          "ordine_id": 101,
+          "prodotto": "Monitor 27 pollici 4K",
+          "quantita": "2",
+          "prezzo_unitario": 45.01
+        },
+        {
+          "id": 1003,
+          "ordine_id": 101,
+          "prodotto": "Hub USB-C 7 porte",
+          "quantita": "2",
+          "prezzo_unitario": 32.46
+        },
+        {
+          "id": 1004,
+          "ordine_id": 101,
+          "prodotto": "Cuffie Wireless Pro",
+          "quantita": 2,
+          "prezzo_unitario": 45.0
+        },
+        {
+          "id": 1005,
+          "ordine_id": 101,
+          "prodotto": "Cuffie Wireless Pro",
+          "quantita": 2,
+          "prezzo_unitario": 45.0
+        },
+        {
+          "id": 1006,
+          "ordine_id": 101,
+          "prodotto": "SSD NVMe 1TB",
+          "quantita": "2",
+          "prezzo_unitario": 87.12
+        },
+        {
+          "id": 1007,
+          "ordine_id": 101,
+          "prodotto": "Tastiera Meccanica RGB",
+          "quantita": "4",
+          "prezzo_unitario": 34.72
+        },
+        {
+          "id": 1008,
+          "ordine_id": 101,
+          "prodotto": "Webcam Full HD",
+          "quantita": "2",
+          "prezzo_unitario": 39.83
+        }
+      ]
+    }
+  },
+  "story": "Nell'ufficio vendite di un negozio online specializzato in accessori tecnologici, il responsabile del servizio clienti ha avviato la consueta verifica trimestrale sulla qualità degli acquisti evasi. Il punto di partenza è l'archivio denominato anagrafica_acquirenti, dove sono custodite le schede degli acquirenti registrati: per ciascuno si annotano il nome, il cognome, l'indirizzo di posta elettronica, la città di residenza e la data in cui la registrazione è avvenuta. Accanto a questo archivio opera il registro intitolato ordini, che traccia ogni transazione con la data dell'ordine, l'importo complessivo — indicato negli atti interni come valore_complessivo — e lo stato dell'evasione, che può risultare in_attesa, pagato, spedito, consegnato oppure annullato. A completare il quadro contribuisce la sezione dettagli_ordine, dove vengono descritti i singoli prodotti acquistati, le quantità richieste e il prezzo unitario praticato; ogni voce riporta inoltre il riferimento numerico all'ordine di appartenenza, così come nel registro ordini ciascun movimento indica il codice dell'acquirente desunto dall'anagrafica_acquirenti. Durante l'ultima revisione, gli analisti hanno voluto individuare gli ordini consegnati il cui valore_complessivo risultasse superiore a quello di tutti gli ordini annullati: soltanto gli importi capaci di superare ogni singolo movimento finito nello stato annullato potevano entrare nell'elenco definitivo. Per ciascun movimento selezionato, il prospetto espone il nome, il cognome e la città dell'acquirente, recuperati mettendo in relazione il registro ordini con l'anagrafica_acquirenti attraverso il rimando al cliente; l'elenco viene quindi disposto per importo decrescente e, a parità di cifra, per data d'ordine crescente, così da evidenziare subito le operazioni più consistenti. Un esempio concreto rende bene l'idea: l'ordine numero 101, registrato il 2026-01-29 per un acquirente di Roma, ha raggiunto un valore_complessivo di 146.91 euro ed è stato spedito dopo aver incluso voci come il Monitor 27 pollici 4K e le Cuffie Wireless Pro; l'ordine 102, chiuso il 2025-12-06 nello stato consegnato, ha toccato quota 220.62 euro, mentre l'ordine 103, anch'esso consegnato e datato 2025-11-28, ha superato i 258.52 euro. Gli importi degli ordini annullati, confrontati uno per uno, sono risultati tutti inferiori a tali cifre, sancendo l'ammissione di questi movimenti nella lista. Il reparto logistica usa il prospetto per premiare gli acquirenti più affidabili, mentre l'ufficio amministrazione incrocia quantità e prezzi unitari della sezione dettagli_ordine per riconciliare i valori con la contabilità generale."
+}

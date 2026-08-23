@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "correlated_subquery"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fornitori",
+      "obsolete_value": "anagrafica_partner",
+      "description": "La tabella padre fornitori viene denominata anagrafica_partner nella prosa aziendale; il solver deve mappare la denominazione obsoleta sulla tabella reale del database."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "importo_totale",
+      "obsolete_value": "valore economico complessivo dell'ordine",
+      "description": "La colonna importo_totale della tabella figlia ordini_acquisto viene indicata nella prosa come 'valore economico complessivo dell'ordine'; occorre riconoscere il sinonimo per filtrare correttamente nelle condizioni della subquery correlata EXISTS."
+    }
+  ],
+  "spec_hash": "06fdf12b3c95a396"
+}

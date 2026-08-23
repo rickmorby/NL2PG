@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [
+      "sorting"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "prenotazioni",
+        "obsolete_value": "agenda_prenotazioni",
+        "description": "La tabella prenotazioni viene denominata agenda_prenotazioni nella prosa aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "updated_at",
+        "obsolete_value": "data_ultima_modifica",
+        "description": "La colonna updated_at viene indicata come data_ultima_modifica nel gergo sanitario."
+      }
+    ],
+    "spec_hash": "95e119df13cb1b29"
+  },
+  "schema_ddl": "CREATE TABLE prenotazioni (\n    id BIGSERIAL PRIMARY KEY,\n    paziente_id INT NOT NULL,\n    medico_id INT NOT NULL,\n    ambulatorio_id INT NOT NULL,\n    data_ora_prenotazione TIMESTAMP NOT NULL,\n    motivo_visita TEXT NOT NULL,\n    stato_prenotazione TEXT NOT NULL CHECK (stato_prenotazione IN ('prenotata', 'confermata', 'annullata', 'completata')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_ora_prenotazione > CURRENT_TIMESTAMP - INTERVAL '5 years'),\n    CHECK (data_ora_prenotazione < CURRENT_TIMESTAMP + INTERVAL '1 year')\n);"
+}

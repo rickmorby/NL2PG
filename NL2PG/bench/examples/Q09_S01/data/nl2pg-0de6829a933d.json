@@ -1,0 +1,202 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "group_agg",
+      "having"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "e8ce4a47b17a5c9f"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    eta INT CHECK (eta >= 0 AND eta <= 120),\n    sesso TEXT CHECK (sesso IN ('M', 'F', 'Altro')),\n    data_nascita DATE,\n    gruppo_sanguigno TEXT CHECK (gruppo_sanguigno IN ('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-')),\n    altezza_cm NUMERIC(5,2) CHECK (altezza_cm > 0),\n    peso_kg NUMERIC(5,2) CHECK (peso_kg > 0),\n    bmi NUMERIC(4,2) GENERATED ALWAYS AS (ROUND(peso_kg / (altezza_cm * altezza_cm / 10000)::NUMERIC, 2)) STORED\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "pazienti",
+        "nature": "dimension",
+        "min_rows": 200,
+        "max_rows": 400,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "eta": 34,
+            "sesso": "M",
+            "data_nascita": "1992-03-12",
+            "gruppo_sanguigno": "A+",
+            "altezza_cm": 178.0,
+            "peso_kg": 76.5
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "eta": 29,
+            "sesso": "F",
+            "data_nascita": "1997-04-25",
+            "gruppo_sanguigno": "B+",
+            "altezza_cm": 165.0,
+            "peso_kg": 58.0
+          },
+          {
+            "id": 3,
+            "nome": "Giuseppe",
+            "cognome": "Verdi",
+            "eta": 63,
+            "sesso": "M",
+            "data_nascita": "1963-02-18",
+            "gruppo_sanguigno": "0+",
+            "altezza_cm": 172.0,
+            "peso_kg": 82.3
+          },
+          {
+            "id": 4,
+            "nome": "Anna",
+            "cognome": "Neri",
+            "eta": 45,
+            "sesso": "F",
+            "data_nascita": "1981-05-09",
+            "gruppo_sanguigno": "AB+",
+            "altezza_cm": 160.0,
+            "peso_kg": 63.0
+          },
+          {
+            "id": 5,
+            "nome": "Luca",
+            "cognome": "Ferrari",
+            "eta": 22,
+            "sesso": "M",
+            "data_nascita": "2004-06-01",
+            "gruppo_sanguigno": "A-",
+            "altezza_cm": 182.0,
+            "peso_kg": 71.8
+          },
+          {
+            "id": 6,
+            "nome": "Francesca",
+            "cognome": "Romano",
+            "eta": 52,
+            "sesso": "F",
+            "data_nascita": "1974-01-30",
+            "gruppo_sanguigno": "B-",
+            "altezza_cm": 158.0,
+            "peso_kg": 67.2
+          },
+          {
+            "id": 7,
+            "nome": "Alessandro",
+            "cognome": "Greco",
+            "eta": 8,
+            "sesso": "M",
+            "data_nascita": "2017-12-25",
+            "gruppo_sanguigno": "0-",
+            "altezza_cm": 132.0,
+            "peso_kg": 30.5
+          },
+          {
+            "id": 8,
+            "nome": "Giulia",
+            "cognome": "Conti",
+            "eta": 38,
+            "sesso": "F",
+            "data_nascita": "1988-03-05",
+            "gruppo_sanguigno": "A+",
+            "altezza_cm": 168.0,
+            "peso_kg": 60.4
+          },
+          {
+            "id": 9,
+            "nome": "Alex",
+            "cognome": "Merini",
+            "eta": 27,
+            "sesso": "Altro",
+            "data_nascita": "1999-05-20",
+            "gruppo_sanguigno": "AB-",
+            "altezza_cm": 175.0,
+            "peso_kg": 68.0
+          },
+          {
+            "id": 10,
+            "nome": "Paola",
+            "cognome": "Gallo",
+            "eta": 70,
+            "sesso": "F",
+            "data_nascita": "1956-03-30",
+            "gruppo_sanguigno": "0+",
+            "altezza_cm": 155.0,
+            "peso_kg": 70.1
+          }
+        ],
+        "variations": {
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Neri",
+              "Ferrari",
+              "Romano",
+              "Greco",
+              "Conti",
+              "Gallo",
+              "Moretti",
+              "Lombardi",
+              "Rizzo",
+              "Costa",
+              "De Luca",
+              "Mancini",
+              "Bruno",
+              "Marino",
+              "Leone"
+            ]
+          },
+          "gruppo_sanguigno": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "A+",
+              "A+",
+              "0+",
+              "0+",
+              "B+",
+              "AB+",
+              "A-",
+              "0-",
+              "B-",
+              "AB-"
+            ]
+          },
+          "altezza_cm": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.95,
+            "factor_max": 1.05,
+            "pool": []
+          },
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.9,
+            "factor_max": 1.1,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

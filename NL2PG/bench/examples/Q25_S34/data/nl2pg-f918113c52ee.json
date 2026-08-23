@@ -1,0 +1,344 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clienti",
+        "obsolete_value": "anagrafica_acquirenti",
+        "description": "La tabella clienti viene denominata anagrafica_acquirenti nella prosa aziendale; il risolutore deve mappare la perifrasi al nome fisico della tabella."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo",
+        "obsolete_value": "valore_complessivo",
+        "description": "La colonna importo della tabella ordini è indicata come valore_complessivo nei documenti commerciali; si tratta di un sinonimo puro che non altera la semantica del dato."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "cliente_id IS NULL",
+        "obsolete_value": "scontrini muti",
+        "description": "Gli ordini con la FK opzionale cliente_id a NULL (vendite senza cliente registrato) sono chiamati scontrini muti nel gergo dei punti vendita; le query devono individuarli tramite IS NULL o join esterni, poiché il NATURAL JOIN/USING li escluderebbe implicitamente."
+      }
+    ],
+    "spec_hash": "7b8ef9be4b83f75b"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    cliente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    citta TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    ordine_id INT PRIMARY KEY,\n    cliente_id INT REFERENCES clienti(cliente_id),\n    importo NUMERIC(10,2) NOT NULL CHECK (importo >= 0),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato IN ('in_attesa', 'evaso', 'annullato'))\n);\n\nCREATE TABLE righe_ordini (\n    riga_id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(ordine_id),\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 250,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "cliente_id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "email": "mario.rossi@example.com",
+            "citta": "Roma",
+            "data_registrazione": "2024-01-15"
+          },
+          {
+            "cliente_id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@example.com",
+            "citta": "Milano",
+            "data_registrazione": "2024-02-20"
+          },
+          {
+            "cliente_id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "email": "giulia.verdi@example.com",
+            "citta": "Torino",
+            "data_registrazione": "2024-03-05"
+          },
+          {
+            "cliente_id": 4,
+            "nome": "Alessandro",
+            "cognome": "Ferrari",
+            "email": "alessandro.ferrari@example.com",
+            "citta": "Napoli",
+            "data_registrazione": "2024-04-12"
+          },
+          {
+            "cliente_id": 5,
+            "nome": "Chiara",
+            "cognome": "Conti",
+            "email": "chiara.conti@example.com",
+            "citta": "Bologna",
+            "data_registrazione": "2024-05-30"
+          },
+          {
+            "cliente_id": 6,
+            "nome": "Luca",
+            "cognome": "Moretti",
+            "email": "luca.moretti@example.com",
+            "citta": "Firenze",
+            "data_registrazione": "2024-06-18"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Chiara",
+              "Luca",
+              "Francesca",
+              "Davide",
+              "Sara",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Ferrari",
+              "Conti",
+              "Moretti",
+              "Esposito",
+              "Romano",
+              "Gallo",
+              "Fontana"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Padova"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "ordine_id": 1,
+            "cliente_id": 1,
+            "importo": 150.5,
+            "data_ordine": "2025-01-15",
+            "stato": "evaso"
+          },
+          {
+            "ordine_id": 2,
+            "cliente_id": 2,
+            "importo": 89.0,
+            "data_ordine": "2025-02-03",
+            "stato": "evaso"
+          },
+          {
+            "ordine_id": 3,
+            "cliente_id": 3,
+            "importo": 240.75,
+            "data_ordine": "2025-03-21",
+            "stato": "annullato"
+          },
+          {
+            "ordine_id": 4,
+            "cliente_id": null,
+            "importo": 45.9,
+            "data_ordine": "2025-05-10",
+            "stato": "evaso"
+          },
+          {
+            "ordine_id": 5,
+            "cliente_id": 1,
+            "importo": 320.0,
+            "data_ordine": "2025-07-08",
+            "stato": "in_attesa"
+          },
+          {
+            "ordine_id": 6,
+            "cliente_id": null,
+            "importo": 12.5,
+            "data_ordine": "2025-09-14",
+            "stato": "in_attesa"
+          }
+        ],
+        "variations": {
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "evaso",
+              "evaso",
+              "evaso",
+              "evaso",
+              "in_attesa",
+              "annullato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "righe_ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.5,
+        "templates": [
+          {
+            "riga_id": 1,
+            "ordine_id": 1,
+            "prodotto": "Laptop Ultrabook 14\"",
+            "quantita": 1,
+            "prezzo_unitario": 899.0
+          },
+          {
+            "riga_id": 2,
+            "ordine_id": 1,
+            "prodotto": "Mouse wireless",
+            "quantita": 2,
+            "prezzo_unitario": 24.9
+          },
+          {
+            "riga_id": 3,
+            "ordine_id": 2,
+            "prodotto": "Cuffie Bluetooth",
+            "quantita": 1,
+            "prezzo_unitario": 79.99
+          },
+          {
+            "riga_id": 4,
+            "ordine_id": 3,
+            "prodotto": "Monitor 27\" 4K",
+            "quantita": 1,
+            "prezzo_unitario": 229.0
+          },
+          {
+            "riga_id": 5,
+            "ordine_id": 4,
+            "prodotto": "Tastiera meccanica",
+            "quantita": 1,
+            "prezzo_unitario": 89.5
+          },
+          {
+            "riga_id": 6,
+            "ordine_id": 5,
+            "prodotto": "Webcam Full HD",
+            "quantita": 3,
+            "prezzo_unitario": 49.99
+          }
+        ],
+        "variations": {
+          "prodotto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Laptop Ultrabook 14\"",
+              "Mouse wireless",
+              "Cuffie Bluetooth",
+              "Monitor 27\" 4K",
+              "Tastiera meccanica",
+              "Webcam Full HD",
+              "SSD NVMe 1TB",
+              "Hub USB-C",
+              "Stampante laser",
+              "Router Wi-Fi 6"
+            ]
+          },
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "1",
+              "1",
+              "2",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

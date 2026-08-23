@@ -1,0 +1,32 @@
+{
+  "domain": "contabilità",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [],
+  "twist": [
+    "rename",
+    "jargon",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "conti",
+      "obsolete_value": "anagrafica_conti",
+      "description": "La tabella conti viene denominata anagrafica_conti nella prosa aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "categoria_contabile",
+      "obsolete_value": "classificazione_contabile",
+      "description": "La colonna categoria_contabile viene indicata con il termine gergale classificazione_contabile."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "scritture_contabili",
+      "obsolete_value": "registrazioni_a_libro_giornale",
+      "description": "La tabella scritture_contabili viene descritta come registrazioni_a_libro_giornale."
+    }
+  ],
+  "spec_hash": "3dc898becf7ae404"
+}

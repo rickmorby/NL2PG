@@ -1,0 +1,21 @@
+{
+  "domain": "logistica",
+  "n_tables": 3,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "join",
+    "left_outer_join"
+  ],
+  "twist": [
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "polysemy",
+      "target_value": "stato",
+      "obsolete_value": "stato di avanzamento / stato territoriale",
+      "description": "Il termine 'stato' è volutamente ambiguo nella prosa aziendale: nella tabella spedizioni la colonna stato codifica lo stato di avanzamento della spedizione (es. 'in_preparazione', 'in_transito', 'consegnata'), mentre nella prosa 'stato' può riferirsi anche allo stato territoriale (regione/provincia) del destinatario memorizzato nella tabella destinatari. Il solver deve disambiguare dal contesto della domanda quale accezione utilizzare, in particolare quando la query richiede di elencare tutte le spedizioni (incluse quelle senza corrispondenza nei corrieri) con LEFT JOIN riempiendo i valori mancanti con NULL."
+    }
+  ],
+  "spec_hash": "fac4b13150296001"
+}

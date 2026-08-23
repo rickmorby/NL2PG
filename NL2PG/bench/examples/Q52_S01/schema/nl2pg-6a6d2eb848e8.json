@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "offset_fetch"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_assicurativi",
+        "description": "La tabella polizze viene denominata contratti_assicurativi nella documentazione aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "premio_annuo",
+        "obsolete_value": "costo_copertura",
+        "description": "Il campo premio_annuo viene riferito come costo_copertura nei report interni."
+      }
+    ],
+    "spec_hash": "6616b5f7ecd67f24"
+  },
+  "schema_ddl": "CREATE TABLE contratti_assicurativi (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente TEXT NOT NULL,\n    premio_annuo NUMERIC(12,2) NOT NULL CHECK (premio_annuo > 0),\n    data_sottoscrizione DATE NOT NULL,\n    data_scadenza DATE NOT NULL CHECK (data_scadenza > data_sottoscrizione),\n    stato TEXT NOT NULL DEFAULT 'attivo' CHECK (stato IN ('attivo', 'sospeso', 'scaduto', 'annullato')),\n    tipo_copertura TEXT NOT NULL CHECK (tipo_copertura IN ('auto', 'casa', 'salute', 'vita', 'responsabilità civile'))\n);"
+}

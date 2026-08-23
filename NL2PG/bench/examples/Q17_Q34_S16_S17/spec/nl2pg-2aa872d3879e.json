@@ -1,0 +1,20 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 1,
+  "hierarchy": "single_entity",
+  "sql_features": [
+    "window"
+  ],
+  "twist": [
+    "distractor"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "distractor",
+      "target_value": "eventi_stato_linea",
+      "obsolete_value": "registro_variazioni_offerta_commerciale",
+      "description": "La prosa aziendale presenta la tabella eventi_stato_linea come se fosse un registro delle variazioni dell'offerta commerciale, citando attributi inesistenti come costo_canone, codice_promozione e nome_piano_tariffario. Questi elementi sono puri distrattori: nessuna di queste colonne esiste nello schema reale (che contiene solo id_evento, numero_linea, stato_precedente, stato_nuovo, timestamp_evento, flag_eliminato) e devono essere ignorati. La query deve concentrarsi esclusivamente sull'analisi dei cambiamenti di stato sequenziali tramite funzioni window (LAG/LEAD partizionate per numero_linea e ordinate per timestamp_evento), ricostruendo i periodi di validità (valid_from dal timestamp dell'evento, valid_to dal timestamp dell'evento successivo) ed escludendo le righe soft-delete con flag_eliminato = TRUE."
+    }
+  ],
+  "spec_hash": "1675ba12a4a3044e"
+}

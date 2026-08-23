@@ -1,0 +1,34 @@
+{
+  "domain": "sanità",
+  "n_tables": 5,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "ordered_set_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "pazienti",
+      "obsolete_value": "anagrafica_assistiti",
+      "description": "La tabella pazienti viene denominata anagrafica_assistiti nei documenti aziendali."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "valore_esame",
+      "obsolete_value": "risultato_laboratorio",
+      "description": "Il campo valore_esame (TEXT) contiene valori numerici e viene riferito come risultato_laboratorio nel gergo medico."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "data_registrazione",
+      "obsolete_value": "timestamp",
+      "description": "Il campo data_registrazione (TEXT) può essere interpretato come data o timestamp, generando ambiguità semantica."
+    }
+  ],
+  "spec_hash": "aabc426495660049"
+}

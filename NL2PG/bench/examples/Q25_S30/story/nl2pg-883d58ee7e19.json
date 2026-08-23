@@ -1,0 +1,1165 @@
+{
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE docenti (\n    id INT PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE studenti (\n    id INT PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_immatricolazione DATE NOT NULL,\n    email TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE corsi (\n    id INT PRIMARY KEY,\n    docente_id INT NOT NULL REFERENCES docenti(id),\n    codice TEXT NOT NULL UNIQUE,\n    titolo TEXT NOT NULL,\n    cfu INT NOT NULL CHECK (cfu BETWEEN 1 AND 30),\n    anno_corso INT NOT NULL CHECK (anno_corso BETWEEN 1 AND 3)\n);\n\nCREATE TABLE aule (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    edificio TEXT NOT NULL,\n    capienza INT NOT NULL CHECK (capienza > 0)\n);\n\nCREATE TABLE laboratori (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    edificio TEXT NOT NULL,\n    capienza INT NOT NULL CHECK (capienza > 0),\n    responsabile_id INT REFERENCES docenti(id)\n);\n\nCREATE TABLE appelli (\n    id INT PRIMARY KEY,\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    aula_id INT REFERENCES aule(id),\n    data_appello DATE NOT NULL,\n    ora_inizio TIME NOT NULL,\n    tipo TEXT NOT NULL CHECK (tipo IN ('scritto', 'orale', 'laboratorio'))\n);\n\nCREATE TABLE iscrizioni_esami (\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    appello_id INT NOT NULL REFERENCES appelli(id),\n    data_iscrizione DATE NOT NULL,\n    voto INT CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN NOT NULL DEFAULT FALSE,\n    PRIMARY KEY (studente_id, appello_id)\n);\n\nCREATE TABLE presenze_lezioni (\n    id INT PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    data DATE NOT NULL,\n    presente BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE piani_di_studio (\n    studente_id INT NOT NULL REFERENCES studenti(id),\n    corso_id INT NOT NULL REFERENCES corsi(id),\n    anno_accademico TEXT NOT NULL,\n    PRIMARY KEY (studente_id, corso_id, anno_accademico)\n);",
+  "data_profile": {
+    "profile": {
+      "dipartimenti": {
+        "row_count": 41,
+        "columns": {
+          "id": {
+            "distinct": 41,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 41
+          },
+          "nome": {
+            "distinct": 41,
+            "sample": [
+              "Biologia",
+              "Biologia1",
+              "Biologia2",
+              "Biologia3",
+              "Biologia4"
+            ]
+          },
+          "sede": {
+            "distinct": 5,
+            "sample": [
+              "Edificio Centrale",
+              "Edificio Fisica",
+              "Edificio Macchine",
+              "Edificio Molo",
+              "Edificio Valletta"
+            ]
+          }
+        }
+      },
+      "docenti": {
+        "row_count": 550,
+        "columns": {
+          "id": {
+            "distinct": 550,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 550
+          },
+          "dipartimento_id": {
+            "distinct": 41,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 41
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Davide",
+              "Elena",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Costa",
+              "Fontana",
+              "Gallo",
+              "Greco"
+            ]
+          },
+          "email": {
+            "distinct": 550,
+            "sample": [
+              "alessandro.neri100@ateneo.it",
+              "alessandro.neri101@ateneo.it",
+              "alessandro.neri102@ateneo.it",
+              "alessandro.neri103@ateneo.it",
+              "alessandro.neri104@ateneo.it"
+            ]
+          }
+        }
+      },
+      "studenti": {
+        "row_count": 334,
+        "columns": {
+          "id": {
+            "distinct": 334,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 334
+          },
+          "matricola": {
+            "distinct": 334,
+            "sample": [
+              "VR100001",
+              "VR1000011",
+              "VR10000110",
+              "VR10000111",
+              "VR10000112"
+            ]
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Anna",
+              "Chiara",
+              "Davide",
+              "Elisa",
+              "Federico"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Barbieri",
+              "Conti",
+              "Ferri",
+              "Grassi",
+              "Lombardi"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 334,
+            "sample": [
+              "BRBLCU00M08H501B",
+              "BRBLCU00M08H501C",
+              "BRBLCU00M08H501D",
+              "BRBLCU00M08H501E",
+              "BRBLCU00M08H501F"
+            ]
+          },
+          "data_immatricolazione": {
+            "distinct": 181,
+            "sample": [
+              "2021-08-20",
+              "2021-08-21",
+              "2021-08-23",
+              "2021-08-24",
+              "2021-08-28"
+            ]
+          },
+          "email": {
+            "distinct": 334,
+            "sample": [
+              "chiara.moretti10@studenti.ateneo.it",
+              "chiara.moretti11@studenti.ateneo.it",
+              "chiara.moretti12@studenti.ateneo.it",
+              "chiara.moretti13@studenti.ateneo.it",
+              "chiara.moretti14@studenti.ateneo.it"
+            ]
+          }
+        }
+      },
+      "corsi": {
+        "row_count": 367,
+        "columns": {
+          "id": {
+            "distinct": 367,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 367
+          },
+          "docente_id": {
+            "distinct": 264,
+            "sample": [
+              "100",
+              "102",
+              "105",
+              "107",
+              "108"
+            ],
+            "min": 2,
+            "max": 550
+          },
+          "codice": {
+            "distinct": 367,
+            "sample": [
+              "ECO005",
+              "ECO0051",
+              "ECO00510",
+              "ECO00511",
+              "ECO00512"
+            ]
+          },
+          "titolo": {
+            "distinct": 10,
+            "sample": [
+              "Algoritmi e Strutture Dati",
+              "Analisi Matematica I",
+              "Basi di Dati",
+              "Chimica Organica",
+              "Diritto Privato"
+            ]
+          },
+          "cfu": {
+            "distinct": 6,
+            "sample": [
+              "10",
+              "12",
+              "15",
+              "18",
+              "6"
+            ],
+            "min": 9,
+            "max": 12
+          },
+          "anno_corso": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 2
+          }
+        }
+      },
+      "aule": {
+        "row_count": 11,
+        "columns": {
+          "id": {
+            "distinct": 11,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 11
+          },
+          "nome": {
+            "distinct": 11,
+            "sample": [
+              "Aula 101",
+              "Aula 1011",
+              "Aula 205",
+              "Aula 2051",
+              "Aula Informatica 1"
+            ]
+          },
+          "edificio": {
+            "distinct": 5,
+            "sample": [
+              "Centrale",
+              "Fisica",
+              "Macchine",
+              "Molo",
+              "Valletta"
+            ]
+          },
+          "capienza": {
+            "distinct": 11,
+            "sample": [
+              "17.44",
+              "190.74",
+              "266.89",
+              "30",
+              "30.92"
+            ],
+            "min": 17.44,
+            "max": 300.0
+          }
+        }
+      },
+      "laboratori": {
+        "row_count": 21,
+        "columns": {
+          "id": {
+            "distinct": 21,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 21
+          },
+          "nome": {
+            "distinct": 21,
+            "sample": [
+              "Laboratorio di Calcolatori",
+              "Laboratorio di Calcolatori1",
+              "Laboratorio di Calcolatori2",
+              "Laboratorio di Calcolatori3",
+              "Laboratorio di Calcolatori4"
+            ]
+          },
+          "edificio": {
+            "distinct": 4,
+            "sample": [
+              "Centrale",
+              "Fisica",
+              "Molo",
+              "Valletta"
+            ]
+          },
+          "capienza": {
+            "distinct": 21,
+            "sample": [
+              "12.64",
+              "13.51",
+              "14.66",
+              "15.0",
+              "17.85"
+            ],
+            "min": 12.64,
+            "max": 35.96
+          },
+          "responsabile_id": {
+            "distinct": 19,
+            "sample": [
+              "100",
+              "136",
+              "157",
+              "165",
+              "176"
+            ],
+            "min": 100,
+            "max": 522
+          }
+        }
+      },
+      "appelli": {
+        "row_count": 2493,
+        "columns": {
+          "id": {
+            "distinct": 2493,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2493
+          },
+          "corso_id": {
+            "distinct": 367,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 367
+          },
+          "aula_id": {
+            "distinct": 11,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 11
+          },
+          "data_appello": {
+            "distinct": 368,
+            "sample": [
+              "2025-11-11",
+              "2025-11-12",
+              "2025-11-13",
+              "2025-11-14",
+              "2025-11-15"
+            ]
+          },
+          "ora_inizio": {
+            "distinct": 7,
+            "sample": [
+              "09:00",
+              "10:00",
+              "11:00",
+              "14:00",
+              "15:00"
+            ]
+          },
+          "tipo": {
+            "distinct": 3,
+            "sample": [
+              "laboratorio",
+              "orale",
+              "scritto"
+            ]
+          }
+        }
+      },
+      "iscrizioni_esami": {
+        "row_count": 334,
+        "columns": {
+          "studente_id": {
+            "distinct": 211,
+            "sample": [
+              "1",
+              "10",
+              "102",
+              "105",
+              "107"
+            ],
+            "min": 1,
+            "max": 333
+          },
+          "appello_id": {
+            "distinct": 309,
+            "sample": [
+              "1003",
+              "1040",
+              "1050",
+              "1057",
+              "106"
+            ],
+            "min": 2,
+            "max": 2492
+          },
+          "data_iscrizione": {
+            "distinct": 39,
+            "sample": [
+              "2026-01-01",
+              "2026-01-02",
+              "2026-01-03",
+              "2026-01-04",
+              "2026-01-05"
+            ]
+          },
+          "voto": {
+            "distinct": 8,
+            "sample": [
+              "18",
+              "20",
+              "22",
+              "24",
+              "26"
+            ],
+            "min": 18,
+            "max": 30
+          },
+          "lode": {
+            "distinct": 2,
+            "sample": [
+              "False",
+              "True"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "presenze_lezioni": {
+        "row_count": 2472,
+        "columns": {
+          "id": {
+            "distinct": 2472,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2472
+          },
+          "studente_id": {
+            "distinct": 333,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 334
+          },
+          "corso_id": {
+            "distinct": 367,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 367
+          },
+          "data": {
+            "distinct": 141,
+            "sample": [
+              "2026-01-11",
+              "2026-01-12",
+              "2026-01-13",
+              "2026-01-14",
+              "2026-01-15"
+            ]
+          },
+          "presente": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "piani_di_studio": {
+        "row_count": 334,
+        "columns": {
+          "studente_id": {
+            "distinct": 205,
+            "sample": [
+              "101",
+              "102",
+              "104",
+              "107",
+              "109"
+            ],
+            "min": 3,
+            "max": 334
+          },
+          "corso_id": {
+            "distinct": 219,
+            "sample": [
+              "1",
+              "100",
+              "101",
+              "102",
+              "104"
+            ],
+            "min": 1,
+            "max": 367
+          },
+          "anno_accademico": {
+            "distinct": 334,
+            "sample": [
+              "2023/2024",
+              "2023/20241",
+              "2023/202410",
+              "2023/202411",
+              "2023/202412"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "dipartimenti": [
+        {
+          "id": 1,
+          "nome": "Informatica",
+          "sede": "Edificio Macchine"
+        },
+        {
+          "id": 2,
+          "nome": "Informatica1",
+          "sede": "Edificio Molo"
+        },
+        {
+          "id": 3,
+          "nome": "Informatica2",
+          "sede": "Edificio Fisica"
+        },
+        {
+          "id": 4,
+          "nome": "Informatica3",
+          "sede": "Edificio Macchine"
+        },
+        {
+          "id": 5,
+          "nome": "Informatica4",
+          "sede": "Edificio Macchine"
+        },
+        {
+          "id": 6,
+          "nome": "Informatica5",
+          "sede": "Edificio Macchine"
+        },
+        {
+          "id": 7,
+          "nome": "Informatica6",
+          "sede": "Edificio Fisica"
+        },
+        {
+          "id": 8,
+          "nome": "Matematica",
+          "sede": "Edificio Centrale"
+        }
+      ],
+      "docenti": [
+        {
+          "id": 45,
+          "dipartimento_id": 18,
+          "nome": "Alessandro",
+          "cognome": "Fontana",
+          "email": "alessandro.fontana1@ateneo.it"
+        },
+        {
+          "id": 2,
+          "dipartimento_id": 4,
+          "nome": "Alessandro",
+          "cognome": "Ricci",
+          "email": "alessandro.ricci1@ateneo.it"
+        },
+        {
+          "id": 7,
+          "dipartimento_id": 8,
+          "nome": "Davide",
+          "cognome": "Costa",
+          "email": "davide.costa1@ateneo.it"
+        },
+        {
+          "id": 44,
+          "dipartimento_id": 13,
+          "nome": "Davide",
+          "cognome": "Costa",
+          "email": "davide.costa2@ateneo.it"
+        },
+        {
+          "id": 16,
+          "dipartimento_id": 11,
+          "nome": "Davide",
+          "cognome": "Marino",
+          "email": "davide.marino1@ateneo.it"
+        },
+        {
+          "id": 41,
+          "dipartimento_id": 21,
+          "nome": "Davide",
+          "cognome": "Verdi",
+          "email": "davide.verdi1@ateneo.it"
+        },
+        {
+          "id": 12,
+          "dipartimento_id": 29,
+          "nome": "Elena",
+          "cognome": "Gallo",
+          "email": "elena.gallo1@ateneo.it"
+        },
+        {
+          "id": 46,
+          "dipartimento_id": 27,
+          "nome": "Elena",
+          "cognome": "Gallo",
+          "email": "elena.gallo2@ateneo.it"
+        }
+      ],
+      "studenti": [
+        {
+          "id": 3,
+          "matricola": "VR1000012",
+          "nome": "Chiara",
+          "cognome": "Lombardi",
+          "codice_fiscale": "RNLMRA99T01H501C",
+          "data_immatricolazione": "2022-09-10",
+          "email": "chiara.lombardi1@studenti.ateneo.it"
+        },
+        {
+          "id": 10,
+          "matricola": "VR1000019",
+          "nome": "Davide",
+          "cognome": "Barbieri",
+          "codice_fiscale": "RNLMRA99T01H501J",
+          "data_immatricolazione": "2022-10-08",
+          "email": "davide.barbieri1@studenti.ateneo.it"
+        },
+        {
+          "id": 7,
+          "matricola": "VR1000016",
+          "nome": "Davide",
+          "cognome": "Testa",
+          "codice_fiscale": "RNLMRA99T01H501G",
+          "data_immatricolazione": "2022-10-23",
+          "email": "davide.testa1@studenti.ateneo.it"
+        },
+        {
+          "id": 8,
+          "matricola": "VR1000017",
+          "nome": "Mario",
+          "cognome": "Pellegrini",
+          "codice_fiscale": "RNLMRA99T01H501H",
+          "data_immatricolazione": "2022-09-25",
+          "email": "mario.pellegrini1@studenti.ateneo.it"
+        },
+        {
+          "id": 6,
+          "matricola": "VR1000015",
+          "nome": "Sara",
+          "cognome": "Barbieri",
+          "codice_fiscale": "RNLMRA99T01H501F",
+          "data_immatricolazione": "2022-09-03",
+          "email": "sara.barbieri1@studenti.ateneo.it"
+        },
+        {
+          "id": 9,
+          "matricola": "VR1000018",
+          "nome": "Sara",
+          "cognome": "Conti",
+          "codice_fiscale": "RNLMRA99T01H501I",
+          "data_immatricolazione": "2022-10-23",
+          "email": "sara.conti1@studenti.ateneo.it"
+        },
+        {
+          "id": 1,
+          "matricola": "VR100001",
+          "nome": "Sara",
+          "cognome": "Pellegrini",
+          "codice_fiscale": "RNLMRA99T01H501K",
+          "data_immatricolazione": "2022-09-01",
+          "email": "sara.pellegrini1@studenti.ateneo.it"
+        },
+        {
+          "id": 2,
+          "matricola": "VR1000011",
+          "nome": "Simone",
+          "cognome": "Ferri",
+          "codice_fiscale": "RNLMRA99T01H501B",
+          "data_immatricolazione": "2022-09-01",
+          "email": "simone.ferri1@studenti.ateneo.it"
+        }
+      ],
+      "corsi": [
+        {
+          "id": 1,
+          "docente_id": 398,
+          "codice": "INF001",
+          "titolo": "Programmazione I",
+          "cfu": "18",
+          "anno_corso": "3"
+        },
+        {
+          "id": 2,
+          "docente_id": 488,
+          "codice": "INF0011",
+          "titolo": "Reti di Calcolatori",
+          "cfu": "9",
+          "anno_corso": "2"
+        },
+        {
+          "id": 3,
+          "docente_id": 222,
+          "codice": "INF0012",
+          "titolo": "Analisi Matematica I",
+          "cfu": "18",
+          "anno_corso": "1"
+        },
+        {
+          "id": 4,
+          "docente_id": 462,
+          "codice": "INF0013",
+          "titolo": "Microeconomia",
+          "cfu": "12",
+          "anno_corso": "1"
+        },
+        {
+          "id": 5,
+          "docente_id": 108,
+          "codice": "INF0014",
+          "titolo": "Chimica Organica",
+          "cfu": "15",
+          "anno_corso": "3"
+        },
+        {
+          "id": 6,
+          "docente_id": 284,
+          "codice": "INF0015",
+          "titolo": "Reti di Calcolatori",
+          "cfu": "18",
+          "anno_corso": "2"
+        },
+        {
+          "id": 7,
+          "docente_id": 475,
+          "codice": "INF0016",
+          "titolo": "Programmazione I",
+          "cfu": "12",
+          "anno_corso": "3"
+        },
+        {
+          "id": 8,
+          "docente_id": 65,
+          "codice": "INF0017",
+          "titolo": "Fisica Generale I",
+          "cfu": "9",
+          "anno_corso": "2"
+        }
+      ],
+      "aule": [
+        {
+          "id": 1,
+          "nome": "Aula Magna",
+          "edificio": "Molo",
+          "capienza": 190.74
+        },
+        {
+          "id": 2,
+          "nome": "Aula Magna1",
+          "edificio": "Valletta",
+          "capienza": 266.89
+        },
+        {
+          "id": 3,
+          "nome": "Aula Magna2",
+          "edificio": "Macchine",
+          "capienza": 300.0
+        },
+        {
+          "id": 4,
+          "nome": "Aula 101",
+          "edificio": "Fisica",
+          "capienza": 40.0
+        },
+        {
+          "id": 5,
+          "nome": "Aula 1011",
+          "edificio": "Fisica",
+          "capienza": 51.23
+        },
+        {
+          "id": 6,
+          "nome": "Aula 205",
+          "edificio": "Fisica",
+          "capienza": 75.9
+        },
+        {
+          "id": 7,
+          "nome": "Aula 2051",
+          "edificio": "Molo",
+          "capienza": 61.8
+        },
+        {
+          "id": 8,
+          "nome": "Aula Informatica 1",
+          "edificio": "Centrale",
+          "capienza": 17.44
+        }
+      ],
+      "laboratori": [
+        {
+          "id": 1,
+          "nome": "Laboratorio di Calcolatori",
+          "edificio": "Molo",
+          "capienza": 30.54,
+          "responsabile_id": null
+        },
+        {
+          "id": 2,
+          "nome": "Laboratorio di Calcolatori1",
+          "edificio": "Centrale",
+          "capienza": 21.0,
+          "responsabile_id": 348
+        },
+        {
+          "id": 3,
+          "nome": "Laboratorio di Calcolatori2",
+          "edificio": "Centrale",
+          "capienza": 23.18,
+          "responsabile_id": 522
+        },
+        {
+          "id": 4,
+          "nome": "Laboratorio di Calcolatori3",
+          "edificio": "Molo",
+          "capienza": 34.61,
+          "responsabile_id": 100
+        },
+        {
+          "id": 5,
+          "nome": "Laboratorio di Calcolatori4",
+          "edificio": "Molo",
+          "capienza": 25.95,
+          "responsabile_id": 261
+        },
+        {
+          "id": 6,
+          "nome": "Laboratorio di Calcolatori5",
+          "edificio": "Fisica",
+          "capienza": 35.96,
+          "responsabile_id": 347
+        },
+        {
+          "id": 7,
+          "nome": "Laboratorio di Chimica",
+          "edificio": "Molo",
+          "capienza": 29.13,
+          "responsabile_id": 387
+        },
+        {
+          "id": 8,
+          "nome": "Laboratorio di Chimica1",
+          "edificio": "Centrale",
+          "capienza": 29.27,
+          "responsabile_id": 385
+        }
+      ],
+      "appelli": [
+        {
+          "id": 1,
+          "corso_id": 335,
+          "aula_id": 3,
+          "data_appello": "2025-12-01",
+          "ora_inizio": "14:00",
+          "tipo": "orale"
+        },
+        {
+          "id": 2,
+          "corso_id": 19,
+          "aula_id": 7,
+          "data_appello": "2026-01-07",
+          "ora_inizio": "09:00",
+          "tipo": "laboratorio"
+        },
+        {
+          "id": 3,
+          "corso_id": 174,
+          "aula_id": 1,
+          "data_appello": "2025-12-07",
+          "ora_inizio": "11:00",
+          "tipo": "orale"
+        },
+        {
+          "id": 4,
+          "corso_id": 364,
+          "aula_id": 5,
+          "data_appello": "2026-03-20",
+          "ora_inizio": "14:00",
+          "tipo": "orale"
+        },
+        {
+          "id": 5,
+          "corso_id": 219,
+          "aula_id": 4,
+          "data_appello": "2025-12-08",
+          "ora_inizio": "11:00",
+          "tipo": "orale"
+        },
+        {
+          "id": 6,
+          "corso_id": 345,
+          "aula_id": 4,
+          "data_appello": "2026-03-31",
+          "ora_inizio": "15:30",
+          "tipo": "orale"
+        },
+        {
+          "id": 7,
+          "corso_id": 235,
+          "aula_id": 11,
+          "data_appello": "2026-01-22",
+          "ora_inizio": "11:00",
+          "tipo": "scritto"
+        },
+        {
+          "id": 8,
+          "corso_id": 329,
+          "aula_id": 8,
+          "data_appello": "2026-02-18",
+          "ora_inizio": "11:00",
+          "tipo": "laboratorio"
+        }
+      ],
+      "iscrizioni_esami": [
+        {
+          "studente_id": 293,
+          "appello_id": 1567,
+          "data_iscrizione": "2026-01-05",
+          "voto": 18,
+          "lode": false
+        },
+        {
+          "studente_id": 125,
+          "appello_id": 94,
+          "data_iscrizione": "2026-01-07",
+          "voto": 18,
+          "lode": false
+        },
+        {
+          "studente_id": 20,
+          "appello_id": 1492,
+          "data_iscrizione": "2026-01-09",
+          "voto": 18,
+          "lode": false
+        },
+        {
+          "studente_id": 117,
+          "appello_id": 2030,
+          "data_iscrizione": "2026-01-05",
+          "voto": 18,
+          "lode": false
+        },
+        {
+          "studente_id": 188,
+          "appello_id": 56,
+          "data_iscrizione": "2026-01-08",
+          "voto": 18,
+          "lode": false
+        },
+        {
+          "studente_id": 330,
+          "appello_id": 270,
+          "data_iscrizione": "2026-01-07",
+          "voto": 18,
+          "lode": false
+        },
+        {
+          "studente_id": 54,
+          "appello_id": 1003,
+          "data_iscrizione": "2026-01-12",
+          "voto": 18,
+          "lode": false
+        },
+        {
+          "studente_id": 258,
+          "appello_id": 880,
+          "data_iscrizione": "2026-01-04",
+          "voto": 18,
+          "lode": false
+        }
+      ],
+      "presenze_lezioni": [
+        {
+          "id": 1,
+          "studente_id": 148,
+          "corso_id": 77,
+          "data": "2026-04-08",
+          "presente": "true"
+        },
+        {
+          "id": 2,
+          "studente_id": 116,
+          "corso_id": 210,
+          "data": "2026-02-25",
+          "presente": "true"
+        },
+        {
+          "id": 3,
+          "studente_id": 180,
+          "corso_id": 359,
+          "data": "2026-02-13",
+          "presente": "false"
+        },
+        {
+          "id": 4,
+          "studente_id": 129,
+          "corso_id": 183,
+          "data": "2026-03-12",
+          "presente": "true"
+        },
+        {
+          "id": 5,
+          "studente_id": 89,
+          "corso_id": 185,
+          "data": "2026-04-07",
+          "presente": "true"
+        },
+        {
+          "id": 6,
+          "studente_id": 93,
+          "corso_id": 273,
+          "data": "2026-03-22",
+          "presente": "true"
+        },
+        {
+          "id": 7,
+          "studente_id": 212,
+          "corso_id": 360,
+          "data": "2026-04-05",
+          "presente": "true"
+        },
+        {
+          "id": 8,
+          "studente_id": 309,
+          "corso_id": 303,
+          "data": "2026-02-09",
+          "presente": "true"
+        }
+      ],
+      "piani_di_studio": [
+        {
+          "studente_id": 115,
+          "corso_id": 25,
+          "anno_accademico": "2025/2026"
+        },
+        {
+          "studente_id": 192,
+          "corso_id": 112,
+          "anno_accademico": "2025/20261"
+        },
+        {
+          "studente_id": 255,
+          "corso_id": 80,
+          "anno_accademico": "2025/20262"
+        },
+        {
+          "studente_id": 43,
+          "corso_id": 325,
+          "anno_accademico": "2025/20263"
+        },
+        {
+          "studente_id": 59,
+          "corso_id": 145,
+          "anno_accademico": "2025/20264"
+        },
+        {
+          "studente_id": 109,
+          "corso_id": 156,
+          "anno_accademico": "2025/20265"
+        },
+        {
+          "studente_id": 20,
+          "corso_id": 43,
+          "anno_accademico": "2025/20266"
+        },
+        {
+          "studente_id": 139,
+          "corso_id": 325,
+          "anno_accademico": "2025/20267"
+        }
+      ]
+    }
+  },
+  "story": "Nella sede rettorale dell'Ateneo, la Segreteria Studenti ha aperto la consueta campagna di verifica sulla regolarità delle frequenze. Tutto parte dall'archivio denominato dipartimenti, dove risultano censite le strutture didattiche con le rispettive sedi, dall'Edificio Centrale all'Edificio Macchine; ciascuna struttura conta sul proprio organico di professori, raccolti nel registro docenti insieme a nome, cognome e indirizzo di posta elettronica istituzionale. Il fulcro dell'indagine è costituito dagli studenti: l'anagrafica studenti custodisce per ciascun iscritto la matricola, come la VR100001, il nome, il cognome, il codice fiscale, la data di immatricolazione e l'email di ateneo. Tra i casati più ricorrenti figurano Ferri, Conti e Barbieri, e proprio su questi tre cognomi il Direttore ha chiesto di focalizzare i lavori. L'offerta formativa è descritta nell'archivio corsi: per ogni insegnamento sono riportati il codice, ad esempio INF001 per Programmazione I, il titolo, i crediti formativi compresi tra 9 e 12 e l'anno di corso, dal primo al terzo. Le lezioni si tengono nelle aule censite nel registro aule, dalla Aula Magna dell'Edificio Molo alle sale più raccolte come l'Aula Informatica 1 del Centrale, con capienze che arrivano fino a 300 posti; accanto ad esse, i laboratori, dal Laboratorio di Calcolatori al Laboratorio di Chimica, dispongono di capienze più contenute e di un responsabile individuato tra i docenti. Gli esami sono calendarizzati nel registro appelli, che indica il corso di riferimento, l'aula assegnata, la data dello svolgimento, l'ora di inizio, spesso alle 09:00 oppure alle 14:00, e la natura della prova: scritto, orale o laboratorio. Le adesioni degli studenti confluiscono nel registro_partecipazioni_verifiche, l'archivio operativo noto anche come iscrizioni_esami, dove sono annotate la data di adesione, numerose a partire dal 2026-01-01, il voto conseguito, oscillante tra 18 e 30, e l'eventuale menzione di lode. In parallelo, il registro presenze_lezioni annota giorno per giorno la presenza o l'assenza di ciascuno studente nelle lezioni dei vari corsi, mentre il quadro completo degli studi emerge dai piani_di_studio, che legano ogni allievo agli insegnamenti prescelti per l'anno accademico, come il 2025/2026. Su queste basi gli operatori hanno redatto la classifica dei primi 15 studenti con cognome Ferri, Conti o Barbieri, ordinata per percentuale di presenze decrescente, indicando per ciascuno il totale delle lezioni registrate, quelle effettivamente frequentate e il numero di insegnamenti inclusi nel proprio piano di studio; un riscontro utile anche per incrociare i risultati con i punteggi emersi dalle prove, come il 18 ottenuto in più di una sede d'esame."
+}

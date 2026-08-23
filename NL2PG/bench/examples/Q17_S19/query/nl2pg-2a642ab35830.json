@@ -1,0 +1,918 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    stato TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato TEXT NOT NULL DEFAULT 'in_lavorazione' CHECK (stato IN ('in_lavorazione', 'spedito', 'annullato')),\n    indirizzo_spedizione TEXT NOT NULL,\n    note TEXT\n);\n\nCREATE TABLE dettagli_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0)\n);\n\nCREATE TABLE pagamenti (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    metodo_pagamento TEXT NOT NULL CHECK (metodo_pagamento IN ('carta_credito', 'bonifico', 'paypal', 'contrassegno')),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo >= 0),\n    esito TEXT NOT NULL DEFAULT 'in_attesa' CHECK (esito IN ('completato', 'rifiutato', 'in_attesa')),\n    data_pagamento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_profile": {
+    "profile": {
+      "categorie": {
+        "row_count": 46,
+        "columns": {
+          "id": {
+            "distinct": 46,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 46
+          },
+          "nome": {
+            "distinct": 46,
+            "sample": [
+              "Abbigliamento",
+              "Abbigliamento1",
+              "Abbigliamento2",
+              "Abbigliamento3",
+              "Abbigliamento4"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Articoli per la casa e piccoli elettrodomestici",
+              "Attrezzatura sportiva e outdoor",
+              "Cosmetici e prodotti per la cura personale",
+              "Dispositivi elettronici di consumo",
+              "Libri cartacei, ebook e multimedialita"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 138,
+        "columns": {
+          "id": {
+            "distinct": 138,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 138
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Colombo",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "email": {
+            "distinct": 138,
+            "sample": [
+              "alessandro.ferrari10@example.com",
+              "alessandro.ferrari11@example.com",
+              "alessandro.ferrari12@example.com",
+              "alessandro.ferrari13@example.com",
+              "alessandro.ferrari14@example.com"
+            ]
+          },
+          "telefono": {
+            "distinct": 10,
+            "sample": [
+              "3209988776",
+              "3312233445",
+              "3331122334",
+              "3357788990",
+              "3406677889"
+            ]
+          },
+          "via": {
+            "distinct": 8,
+            "sample": [
+              "Corso Buenos Aires 42",
+              "Via Indipendenza 23",
+              "Via Maqueda 55",
+              "Via Mercerie 31",
+              "Via Po 8"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Palermo"
+            ]
+          },
+          "cap": {
+            "distinct": 8,
+            "sample": [
+              "00184",
+              "10124",
+              "20124",
+              "30121",
+              "40121"
+            ]
+          },
+          "provincia": {
+            "distinct": 8,
+            "sample": [
+              "BO",
+              "FI",
+              "MI",
+              "NA",
+              "PA"
+            ]
+          },
+          "stato": {
+            "distinct": 8,
+            "sample": [
+              "Campania",
+              "Emilia-Romagna",
+              "Lazio",
+              "Lombardia",
+              "Piemonte"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 119,
+            "sample": [
+              "2023-11-24",
+              "2023-12-23",
+              "2024-01-06",
+              "2024-01-15",
+              "2024-01-21"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 143,
+        "columns": {
+          "id": {
+            "distinct": 143,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 143
+          },
+          "sku": {
+            "distinct": 143,
+            "sample": [
+              "SKU-ABB-010",
+              "SKU-ABB-0101",
+              "SKU-ABB-01010",
+              "SKU-ABB-01011",
+              "SKU-ABB-01012"
+            ]
+          },
+          "nome": {
+            "distinct": 7,
+            "sample": [
+              "Cuffie Bluetooth SoundPro",
+              "Felpa con cappuccio Urban",
+              "Frullatore Vortex 800W",
+              "Profumo Ambra Nera",
+              "Romanzo Il Gabbiano di Mare"
+            ]
+          },
+          "descrizione": {
+            "distinct": 7,
+            "sample": [
+              "Cancellazione attiva del rumore, 30 ore di autonomia",
+              "Cotone organico, taglie S-XXL",
+              "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+              "Eau de parfum 100 ml, fuori produzione",
+              "Edizione tascabile, 320 pagine"
+            ]
+          },
+          "categoria_id": {
+            "distinct": 46,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 46
+          },
+          "prezzo_unitario": {
+            "distinct": 141,
+            "sample": [
+              "10.14",
+              "100.47",
+              "101.04",
+              "101.31",
+              "101.83"
+            ],
+            "min": 10.14,
+            "max": 479.84
+          },
+          "giacenza_magazzino": {
+            "distinct": 141,
+            "sample": [
+              "101.92363482132761",
+              "104.98290616056036",
+              "105.55236652439527",
+              "106.7580216013676",
+              "106.87419722074404"
+            ],
+            "min": 5.0,
+            "max": 503.01722983244713
+          },
+          "attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1355,
+        "columns": {
+          "id": {
+            "distinct": 1355,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1355
+          },
+          "numero_ordine": {
+            "distinct": 1355,
+            "sample": [
+              "ORD-2026-00001",
+              "ORD-2026-000011",
+              "ORD-2026-0000110",
+              "ORD-2026-00001100",
+              "ORD-2026-00001101"
+            ]
+          },
+          "cliente_id": {
+            "distinct": 138,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 138
+          },
+          "data_ordine": {
+            "distinct": 456,
+            "sample": [
+              "2025-11-26 09:15:00",
+              "2025-11-27 09:15:00",
+              "2025-11-28 09:15:00",
+              "2025-11-29 09:15:00",
+              "2025-11-29 14:40:00"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "annullato",
+              "in_lavorazione",
+              "spedito"
+            ]
+          },
+          "indirizzo_spedizione": {
+            "distinct": 8,
+            "sample": [
+              "Corso Buenos Aires 42, 20124 Milano",
+              "Via Indipendenza 23, 40121 Bologna",
+              "Via Maqueda 55, 90133 Palermo",
+              "Via Mercerie 31, 30121 Venezia",
+              "Via Po 8, 10124 Torino"
+            ]
+          },
+          "note": {
+            "distinct": 5,
+            "sample": [
+              "",
+              "Cliente ha annullato il giorno successivo",
+              "Consegna al piano",
+              "Consegna in portineria",
+              "Telefonare prima della consegna"
+            ]
+          }
+        }
+      },
+      "dettagli_ordine": {
+        "row_count": 2559,
+        "columns": {
+          "id": {
+            "distinct": 2559,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2559
+          },
+          "ordine_id": {
+            "distinct": 1141,
+            "sample": [
+              "1",
+              "10",
+              "1000",
+              "1001",
+              "1002"
+            ],
+            "min": 1,
+            "max": 1355
+          },
+          "prodotto_id": {
+            "distinct": 143,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 143
+          },
+          "quantita": {
+            "distinct": 4,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 4
+          },
+          "prezzo_unitario": {
+            "distinct": 2197,
+            "sample": [
+              "100.06",
+              "100.08",
+              "100.17",
+              "100.22",
+              "100.25"
+            ],
+            "min": 12.67,
+            "max": 404.87
+          },
+          "importo_totale": {
+            "distinct": 2289,
+            "sample": [
+              "134.85",
+              "135.07",
+              "135.41",
+              "135.54",
+              "135.86"
+            ],
+            "min": 37.42,
+            "max": 809.73
+          }
+        }
+      },
+      "pagamenti": {
+        "row_count": 1339,
+        "columns": {
+          "id": {
+            "distinct": 1339,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1339
+          },
+          "ordine_id": {
+            "distinct": 842,
+            "sample": [
+              "10",
+              "100",
+              "1001",
+              "1002",
+              "1005"
+            ],
+            "min": 2,
+            "max": 1352
+          },
+          "metodo_pagamento": {
+            "distinct": 4,
+            "sample": [
+              "bonifico",
+              "carta_credito",
+              "contrassegno",
+              "paypal"
+            ]
+          },
+          "importo": {
+            "distinct": 1246,
+            "sample": [
+              "125.86",
+              "127.22",
+              "128.53",
+              "128.62",
+              "128.79"
+            ],
+            "min": 34.94,
+            "max": 779.74
+          },
+          "esito": {
+            "distinct": 3,
+            "sample": [
+              "completato",
+              "in_attesa",
+              "rifiutato"
+            ]
+          },
+          "data_pagamento": {
+            "distinct": 25,
+            "sample": [
+              "2026-01-05 09:16:00",
+              "2026-01-06 09:16:00",
+              "2026-01-07 09:16:00",
+              "2026-01-08 09:16:00",
+              "2026-01-08 14:41:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "categorie": [
+        {
+          "id": 1,
+          "nome": "Elettronica",
+          "descrizione": "Dispositivi elettronici di consumo"
+        },
+        {
+          "id": 2,
+          "nome": "Elettronica1",
+          "descrizione": "Dispositivi elettronici di consumo"
+        },
+        {
+          "id": 3,
+          "nome": "Elettronica2",
+          "descrizione": "Dispositivi elettronici di consumo"
+        },
+        {
+          "id": 4,
+          "nome": "Elettronica3",
+          "descrizione": "Dispositivi elettronici di consumo"
+        },
+        {
+          "id": 5,
+          "nome": "Elettronica4",
+          "descrizione": "Dispositivi elettronici di consumo"
+        },
+        {
+          "id": 6,
+          "nome": "Elettronica5",
+          "descrizione": "Dispositivi elettronici di consumo"
+        },
+        {
+          "id": 7,
+          "nome": "Elettronica6",
+          "descrizione": "Dispositivi elettronici di consumo"
+        },
+        {
+          "id": 8,
+          "nome": "Elettronica7",
+          "descrizione": null
+        }
+      ],
+      "clienti": [
+        {
+          "id": 11,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi1@example.com",
+          "telefono": "3484455667",
+          "via": "Via del Corso 15",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "stato": "Lazio",
+          "data_registrazione": "2024-07-03"
+        },
+        {
+          "id": 25,
+          "nome": "Alessandro",
+          "cognome": "Ricci",
+          "email": "alessandro.ricci1@example.com",
+          "telefono": "3331122334",
+          "via": "Corso Buenos Aires 42",
+          "citta": "Milano",
+          "cap": "20124",
+          "provincia": "MI",
+          "stato": "Lombardia",
+          "data_registrazione": "2024-03-07"
+        },
+        {
+          "id": 31,
+          "nome": "Alessandro",
+          "cognome": "Rossi",
+          "email": "alessandro.rossi1@example.com",
+          "telefono": "3484455667",
+          "via": "Corso Buenos Aires 42",
+          "citta": "Milano",
+          "cap": "20124",
+          "provincia": "MI",
+          "stato": "Lombardia",
+          "data_registrazione": "2024-03-29"
+        },
+        {
+          "id": 5,
+          "nome": "Andrea",
+          "cognome": "Esposito",
+          "email": "andrea.esposito1@example.com",
+          "telefono": "3661122998",
+          "via": "Via del Corso 15",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "stato": "Lazio",
+          "data_registrazione": "2024-06-17"
+        },
+        {
+          "id": 21,
+          "nome": "Andrea",
+          "cognome": "Rossi",
+          "email": "andrea.rossi1@example.com",
+          "telefono": "3406677889",
+          "via": "Corso Buenos Aires 42",
+          "citta": "Milano",
+          "cap": "20124",
+          "provincia": "MI",
+          "stato": "Lombardia",
+          "data_registrazione": "2024-03-30"
+        },
+        {
+          "id": 22,
+          "nome": "Andrea",
+          "cognome": "Rossi",
+          "email": "andrea.rossi2@example.com",
+          "telefono": "3312233445",
+          "via": "Corso Buenos Aires 42",
+          "citta": "Milano",
+          "cap": "20124",
+          "provincia": "MI",
+          "stato": "Lombardia",
+          "data_registrazione": "2024-05-08"
+        },
+        {
+          "id": 29,
+          "nome": "Chiara",
+          "cognome": "Bianchi",
+          "email": "chiara.bianchi1@example.com",
+          "telefono": "3484455667",
+          "via": "Corso Buenos Aires 42",
+          "citta": "Milano",
+          "cap": "20124",
+          "provincia": "MI",
+          "stato": "Lombardia",
+          "data_registrazione": "2024-01-21"
+        },
+        {
+          "id": 33,
+          "nome": "Chiara",
+          "cognome": "Ricci",
+          "email": "chiara.ricci1@example.com",
+          "telefono": "3475566778",
+          "via": "Corso Buenos Aires 42",
+          "citta": "Milano",
+          "cap": "20124",
+          "provincia": "MI",
+          "stato": "Lombardia",
+          "data_registrazione": "2024-05-28"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "sku": "SKU-ELE-001",
+          "nome": "Smartphone Nova X5",
+          "descrizione": "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+          "categoria_id": 23,
+          "prezzo_unitario": 207.06,
+          "giacenza_magazzino": 238.31012264732544,
+          "attivo": "true"
+        },
+        {
+          "id": 2,
+          "sku": "SKU-ELE-0011",
+          "nome": "Smartphone Nova X5",
+          "descrizione": "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+          "categoria_id": 28,
+          "prezzo_unitario": 479.84,
+          "giacenza_magazzino": 348.75681424129175,
+          "attivo": "true"
+        },
+        {
+          "id": 3,
+          "sku": "SKU-ELE-0012",
+          "nome": "Smartphone Nova X5",
+          "descrizione": "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+          "categoria_id": 39,
+          "prezzo_unitario": 299.9,
+          "giacenza_magazzino": 140,
+          "attivo": true
+        },
+        {
+          "id": 4,
+          "sku": "SKU-ELE-0013",
+          "nome": "Smartphone Nova X5",
+          "descrizione": "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+          "categoria_id": 23,
+          "prezzo_unitario": 287.7,
+          "giacenza_magazzino": 309.1516661306026,
+          "attivo": "true"
+        },
+        {
+          "id": 5,
+          "sku": "SKU-ELE-0014",
+          "nome": "Smartphone Nova X5",
+          "descrizione": "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+          "categoria_id": 29,
+          "prezzo_unitario": 196.21,
+          "giacenza_magazzino": 105.55236652439527,
+          "attivo": "true"
+        },
+        {
+          "id": 6,
+          "sku": "SKU-ELE-0015",
+          "nome": "Smartphone Nova X5",
+          "descrizione": "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+          "categoria_id": 46,
+          "prezzo_unitario": 298.7,
+          "giacenza_magazzino": 238.92279803537133,
+          "attivo": "true"
+        },
+        {
+          "id": 7,
+          "sku": "SKU-ELE-0016",
+          "nome": "Smartphone Nova X5",
+          "descrizione": "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+          "categoria_id": 15,
+          "prezzo_unitario": 179.94,
+          "giacenza_magazzino": 238.14679499748894,
+          "attivo": "true"
+        },
+        {
+          "id": 8,
+          "sku": "SKU-ELE-0017",
+          "nome": "Smartphone Nova X5",
+          "descrizione": "Display 6.5 pollici, 128 GB, fotocamera 48 MP",
+          "categoria_id": 24,
+          "prezzo_unitario": 468.12,
+          "giacenza_magazzino": 359.67810319291914,
+          "attivo": "true"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 1,
+          "numero_ordine": "ORD-2026-00001",
+          "cliente_id": 109,
+          "data_ordine": "2026-01-03 09:15:00",
+          "stato": "in_lavorazione",
+          "indirizzo_spedizione": "Via Toledo 120, 80134 Napoli",
+          "note": "Consegna in portineria"
+        },
+        {
+          "id": 2,
+          "numero_ordine": "ORD-2026-000011",
+          "cliente_id": 60,
+          "data_ordine": "2026-02-11 09:15:00",
+          "stato": "in_lavorazione",
+          "indirizzo_spedizione": "Corso Buenos Aires 42, 20124 Milano",
+          "note": "Consegna in portineria"
+        },
+        {
+          "id": 3,
+          "numero_ordine": "ORD-2026-000012",
+          "cliente_id": 114,
+          "data_ordine": "2026-01-13 09:15:00",
+          "stato": "spedito",
+          "indirizzo_spedizione": "Via Toledo 120, 80134 Napoli",
+          "note": "Consegna in portineria"
+        },
+        {
+          "id": 4,
+          "numero_ordine": "ORD-2026-000013",
+          "cliente_id": 120,
+          "data_ordine": "2026-01-03 09:15:00",
+          "stato": "spedito",
+          "indirizzo_spedizione": "Via dei Calzaiuoli 7, 50122 Firenze",
+          "note": ""
+        },
+        {
+          "id": 5,
+          "numero_ordine": "ORD-2026-000014",
+          "cliente_id": 78,
+          "data_ordine": "2025-11-30 09:15:00",
+          "stato": "in_lavorazione",
+          "indirizzo_spedizione": "Via Po 8, 10124 Torino",
+          "note": "Consegna al piano"
+        },
+        {
+          "id": 6,
+          "numero_ordine": "ORD-2026-000015",
+          "cliente_id": 99,
+          "data_ordine": "2026-01-05 09:15:00",
+          "stato": "spedito",
+          "indirizzo_spedizione": "Via del Corso 15, 00184 Roma",
+          "note": "Consegna in portineria"
+        },
+        {
+          "id": 7,
+          "numero_ordine": "ORD-2026-000016",
+          "cliente_id": 95,
+          "data_ordine": "2025-12-28 09:15:00",
+          "stato": "in_lavorazione",
+          "indirizzo_spedizione": "Via Toledo 120, 80134 Napoli",
+          "note": ""
+        },
+        {
+          "id": 8,
+          "numero_ordine": "ORD-2026-000017",
+          "cliente_id": 101,
+          "data_ordine": "2026-01-04 09:15:00",
+          "stato": "annullato",
+          "indirizzo_spedizione": "Via Indipendenza 23, 40121 Bologna",
+          "note": ""
+        }
+      ],
+      "dettagli_ordine": [
+        {
+          "id": 1,
+          "ordine_id": 728,
+          "prodotto_id": 84,
+          "quantita": "1",
+          "prezzo_unitario": 359.85,
+          "importo_totale": 604.15
+        },
+        {
+          "id": 2,
+          "ordine_id": 1031,
+          "prodotto_id": 116,
+          "quantita": "3",
+          "prezzo_unitario": 371.53,
+          "importo_totale": 510.59
+        },
+        {
+          "id": 3,
+          "ordine_id": 1124,
+          "prodotto_id": 140,
+          "quantita": "4",
+          "prezzo_unitario": 370.19,
+          "importo_totale": 485.87
+        },
+        {
+          "id": 4,
+          "ordine_id": 403,
+          "prodotto_id": 98,
+          "quantita": "2",
+          "prezzo_unitario": 374.61,
+          "importo_totale": 809.59
+        },
+        {
+          "id": 5,
+          "ordine_id": 1080,
+          "prodotto_id": 40,
+          "quantita": "1",
+          "prezzo_unitario": 316.08,
+          "importo_totale": 782.22
+        },
+        {
+          "id": 6,
+          "ordine_id": 117,
+          "prodotto_id": 127,
+          "quantita": "4",
+          "prezzo_unitario": 287.91,
+          "importo_totale": 663.71
+        },
+        {
+          "id": 7,
+          "ordine_id": 585,
+          "prodotto_id": 2,
+          "quantita": "2",
+          "prezzo_unitario": 337.98,
+          "importo_totale": 561.08
+        },
+        {
+          "id": 8,
+          "ordine_id": 1124,
+          "prodotto_id": 36,
+          "quantita": "2",
+          "prezzo_unitario": 278.92,
+          "importo_totale": 709.78
+        }
+      ],
+      "pagamenti": [
+        {
+          "id": 1,
+          "ordine_id": 597,
+          "metodo_pagamento": "bonifico",
+          "importo": 714.74,
+          "esito": "completato",
+          "data_pagamento": "2026-01-07 09:16:00"
+        },
+        {
+          "id": 2,
+          "ordine_id": 118,
+          "metodo_pagamento": "carta_credito",
+          "importo": 449.7,
+          "esito": "completato",
+          "data_pagamento": "2026-01-06 09:16:00"
+        },
+        {
+          "id": 3,
+          "ordine_id": 288,
+          "metodo_pagamento": "bonifico",
+          "importo": 697.14,
+          "esito": "completato",
+          "data_pagamento": "2026-01-08 09:16:00"
+        },
+        {
+          "id": 4,
+          "ordine_id": 769,
+          "metodo_pagamento": "bonifico",
+          "importo": 654.87,
+          "esito": "completato",
+          "data_pagamento": "2026-01-06 09:16:00"
+        },
+        {
+          "id": 5,
+          "ordine_id": 349,
+          "metodo_pagamento": "paypal",
+          "importo": 477.01,
+          "esito": "completato",
+          "data_pagamento": "2026-01-07 09:16:00"
+        },
+        {
+          "id": 6,
+          "ordine_id": 360,
+          "metodo_pagamento": "carta_credito",
+          "importo": 708.7,
+          "esito": "completato",
+          "data_pagamento": "2026-01-07 09:16:00"
+        },
+        {
+          "id": 7,
+          "ordine_id": 321,
+          "metodo_pagamento": "carta_credito",
+          "importo": 690.58,
+          "esito": "completato",
+          "data_pagamento": "2026-01-08 09:16:00"
+        },
+        {
+          "id": 8,
+          "ordine_id": 410,
+          "metodo_pagamento": "paypal",
+          "importo": 473.74,
+          "esito": "completato",
+          "data_pagamento": "2026-01-05 09:16:00"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "window"
+  ],
+  "query": "SELECT c.citta, COUNT(o.id) AS numero_ordini_spediti, RANK() OVER (ORDER BY COUNT(o.id) DESC) AS posizione FROM clienti c JOIN ordini o ON c.id = o.cliente_id WHERE o.stato = 'spedito' GROUP BY c.citta ORDER BY posizione, c.citta;"
+}

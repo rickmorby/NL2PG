@@ -1,0 +1,27 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 4,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "window"
+  ],
+  "twist": [
+    "rename",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fatti_ordini",
+      "obsolete_value": "registro_transazioni",
+      "description": "La tabella dei fatti degli ordini viene chiamata registro_transazioni nella documentazione aziendale legacy."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "data_ordine",
+      "obsolete_value": "giorno_di_registrazione_acquisto",
+      "description": "La colonna data_ordine viene indicata nella richiesta con la perifrasi giorno_di_registrazione_acquisto."
+    }
+  ],
+  "spec_hash": "50a3e8122792ccbc"
+}

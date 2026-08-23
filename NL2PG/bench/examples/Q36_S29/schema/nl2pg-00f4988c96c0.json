@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "string_funcs"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "corrieri",
+        "obsolete_value": "operatori_di_trasporto",
+        "description": "La tabella corrieri (id_corriere, nome_corriere, cognome_corriere, targa) viene denominata operatori_di_trasporto nella prosa aziendale. L'utente deve risalire al nome reale della tabella per costruire correttamente la query."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "spedizioni",
+        "obsolete_value": "carichi_in_transito",
+        "description": "La tabella spedizioni (id_spedizione, nome_destinatario, cognome_destinatario, stato) viene indicata nella documentazione aziendale con il gergo operativo carichi_in_transito. Il dato anagrafico del destinatario è archiviato spezzato su due colonne separate (nome_destinatario e cognome_destinatario), quindi la risposta richiede la ricomposizione tramite CONCAT(nome_destinatario, ' ', cognome_destinatario) e la formattazione con UPPER/SUBSTRING nella SELECT."
+      }
+    ],
+    "spec_hash": "f54063b7ae1e9a0d"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id_cliente INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE depositi (\n    id_deposito INT PRIMARY KEY,\n    nome_deposito TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL CHECK (cap ~ '^[0-9]{5}$')\n);\n\nCREATE TABLE corrieri (\n    id_corriere INT PRIMARY KEY,\n    nome_corriere TEXT NOT NULL,\n    cognome_corriere TEXT NOT NULL,\n    targa TEXT NOT NULL UNIQUE,\n    CHECK (LENGTH(TRIM(nome_corriere)) > 0),\n    CHECK (LENGTH(TRIM(cognome_corriere)) > 0)\n);\n\nCREATE TABLE spedizioni (\n    id_spedizione INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id_cliente),\n    deposito_id INT NOT NULL REFERENCES depositi(id_deposito),\n    corriere_id INT NOT NULL REFERENCES corrieri(id_corriere),\n    nome_destinatario TEXT NOT NULL,\n    cognome_destinatario TEXT NOT NULL,\n    indirizzo_destinatario TEXT NOT NULL,\n    citta_destinatario TEXT NOT NULL,\n    stato TEXT NOT NULL CHECK (stato IN ('IN_PREPARAZIONE', 'IN_TRANSITO', 'CONSEGNATA', 'FALLITA')),\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    data_spedizione DATE NOT NULL,\n    CHECK (LENGTH(TRIM(nome_destinatario)) > 0),\n    CHECK (LENGTH(TRIM(cognome_destinatario)) > 0)\n);"
+}

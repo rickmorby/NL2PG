@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 3,
+  "hierarchy": "weak_entity",
+  "sql_features": [
+    "exists"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "righe_ordine",
+      "obsolete_value": "movimenti_di_carico",
+      "description": "La tabella debole righe_ordine viene denominata movimenti_di_carico nella prosa aziendale. Ogni riga e' identificabile solo insieme al suo ordine proprietario tramite la chiave composta (ordine_id, numero_riga), quindi le query devono unire movimenti_di_carico a ordini_acquisto prima di applicare filtri o verifiche di esistenza."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "numero_riga",
+      "obsolete_value": "progressivo_posizione",
+      "description": "La colonna numero_riga, che costituisce la chiave parziale dell'entita' debole dipendente dalla PK di ordini_acquisto, e' indicata nei documenti aziendali con il gergo ERP 'progressivo_posizione'. Il solver deve riconoscere che progressivo_posizione corrisponde alla seconda componente della chiave composta di righe_ordine."
+    }
+  ],
+  "spec_hash": "f695057f509b79c8"
+}

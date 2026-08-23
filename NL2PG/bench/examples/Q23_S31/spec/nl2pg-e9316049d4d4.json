@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 4,
+  "hierarchy": "denormalized",
+  "sql_features": [
+    "filtered_agg"
+  ],
+  "twist": [
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_spedizione",
+      "obsolete_value": "flusso_di_avanzamento_logistico",
+      "description": "Il campo che indica lo stato attuale della spedizione viene riferito nel linguaggio aziendale come flusso di avanzamento logistico."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "tipo_trasporto",
+      "obsolete_value": "modalità",
+      "description": "Il termine 'modalità' viene utilizzato per indicare il tipo_trasporto, creando potenziale confusione con le modalità di pagamento presenti in altri moduli del sistema."
+    }
+  ],
+  "spec_hash": "d52a88dee5284385"
+}

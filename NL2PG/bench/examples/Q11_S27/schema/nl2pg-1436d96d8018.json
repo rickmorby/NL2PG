@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 4,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "subquery"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobili",
+        "obsolete_value": "schede_catastali",
+        "description": "La tabella immobili viene denominata schede_catastali nella prosa aziendale. Lo schema non dichiara vincoli REFERENCES, quindi la relazione tra schede_catastali e le altre tabelle deve essere dedotta solo dai nomi di colonna compatibili (es. contratti.immobile_id = immobili.id)."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "contratti",
+        "obsolete_value": "compromessi stipulati",
+        "description": "La tabella contratti è indicata nel testo aziendale con il gergo del settore immobiliare come compromessi stipulati. Il risolutore deve riconoscere che si tratta della stessa entità per costruire correttamente la subquery non correlata del tipo WHERE immobile_id IN (SELECT id FROM immobili WHERE condizione)."
+      }
+    ],
+    "spec_hash": "239194b92d093df8"
+  },
+  "schema_ddl": "CREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    provincia TEXT,\n    cap TEXT,\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    numero_vani INT CHECK (numero_vani > 0),\n    tipologia TEXT NOT NULL CHECK (tipologia IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    stato TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato IN ('disponibile', 'riservato', 'venduto')),\n    prezzo_richiesto NUMERIC(12,2) CHECK (prezzo_richiesto >= 0),\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE agenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    matricola TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    immobile_id INT NOT NULL,\n    cliente_id INT NOT NULL,\n    agente_id INT,\n    data_stipula DATE NOT NULL,\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('compromesso', 'definitivo', 'opzione')),\n    prezzo_concordato NUMERIC(12,2) CHECK (prezzo_concordato >= 0),\n    note TEXT\n);"
+}

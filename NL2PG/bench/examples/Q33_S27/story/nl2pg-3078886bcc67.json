@@ -1,0 +1,687 @@
+{
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    codice_fornitore TEXT NOT NULL UNIQUE,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    email_contatto TEXT,\n    telefono_contatto TEXT,\n    indirizzo_sede TEXT,\n    citta_sede TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE articoli (\n    id INT PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    fornitore_id INT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    unita_misura TEXT NOT NULL DEFAULT 'PZ',\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0)\n);\n\nCREATE TABLE ordini_acquisto (\n    id INT PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    fornitore_id INT NOT NULL,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine LIKE 'APERTO%' OR stato_ordine LIKE 'IN_EVASIONE%' OR stato_ordine LIKE 'CHIUSO%'),\n    data_ordine DATE NOT NULL,\n    data_consegna_prevista DATE,\n    note_ordine TEXT\n);\n\nCREATE TABLE righe_ordine_acquisto (\n    id INT PRIMARY KEY,\n    ordine_acquisto_id INT NOT NULL,\n    articolo_id INT NOT NULL,\n    quantita_ordinata INT NOT NULL CHECK (quantita_ordinata > 0),\n    quantita_ricevuta INT NOT NULL DEFAULT 0 CHECK (quantita_ricevuta >= 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100)\n);",
+  "data_profile": {
+    "profile": {
+      "fornitori": {
+        "row_count": 188,
+        "columns": {
+          "id": {
+            "distinct": 188,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 188
+          },
+          "codice_fornitore": {
+            "distinct": 188,
+            "sample": [
+              "FORN-00001",
+              "FORN-000011",
+              "FORN-0000110",
+              "FORN-0000111",
+              "FORN-0000112"
+            ]
+          },
+          "ragione_sociale": {
+            "distinct": 10,
+            "sample": [
+              "Acciai Speciali Friuli S.p.A.",
+              "Cartotecnia Emiliana S.p.A.",
+              "Componenti Meccanici Veneti S.r.l.",
+              "Elettroforniture Centro S.r.l.",
+              "Ferramenta Piemontese S.n.c."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 188,
+            "sample": [
+              "IT01234567891",
+              "IT012345678911",
+              "IT0123456789110",
+              "IT0123456789111",
+              "IT0123456789112"
+            ]
+          },
+          "email_contatto": {
+            "distinct": 10,
+            "sample": [
+              "acquisti@fornitore-industriale.it",
+              "amministrazione@forniture-tecniche.it",
+              "amministrazione@imballaggisud.it",
+              "info@partner-logistics.com",
+              "info@plasticaelettronica.it"
+            ]
+          },
+          "telefono_contatto": {
+            "distinct": 8,
+            "sample": [
+              "+39 010 9988776",
+              "+39 011 3344556",
+              "+39 02 88451234",
+              "+39 045 6678899",
+              "+39 051 2233445"
+            ]
+          },
+          "indirizzo_sede": {
+            "distinct": 8,
+            "sample": [
+              "Corso Europa 45",
+              "Via Emilia 112",
+              "Via Nazionale 5",
+              "Via Porto 17",
+              "Via San Secondo 8"
+            ]
+          },
+          "citta_sede": {
+            "distinct": 8,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli"
+            ]
+          },
+          "attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "articoli": {
+        "row_count": 800,
+        "columns": {
+          "id": {
+            "distinct": 800,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 800
+          },
+          "codice_articolo": {
+            "distinct": 800,
+            "sample": [
+              "ART-00001",
+              "ART-000011",
+              "ART-0000110",
+              "ART-00001100",
+              "ART-00001101"
+            ]
+          },
+          "descrizione": {
+            "distinct": 12,
+            "sample": [
+              "Articolo di consumo industriale",
+              "Cavo elettrico H07V-K 2.5mmq",
+              "Componente standard di magazzino",
+              "Film stretch trasparente 50cm",
+              "Fornitura di serie catalogo 2026"
+            ]
+          },
+          "categoria": {
+            "distinct": 8,
+            "sample": [
+              "Componenti meccanici",
+              "Elettrico",
+              "Ferramenta",
+              "Imballaggi",
+              "Lubrificanti"
+            ]
+          },
+          "fornitore_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "prezzo_unitario": {
+            "distinct": 554,
+            "sample": [
+              "0.08",
+              "0.09",
+              "0.1",
+              "0.11",
+              "0.12"
+            ],
+            "min": 0.08,
+            "max": 577.99
+          },
+          "unita_misura": {
+            "distinct": 5,
+            "sample": [
+              "CF",
+              "KG",
+              "LT",
+              "MT",
+              "PZ"
+            ]
+          },
+          "giacenza_magazzino": {
+            "distinct": 770,
+            "sample": [
+              "10.23",
+              "10.33",
+              "10.74",
+              "10.97",
+              "10004.84"
+            ],
+            "min": 2.17,
+            "max": 37500.0
+          }
+        }
+      },
+      "ordini_acquisto": {
+        "row_count": 519,
+        "columns": {
+          "id": {
+            "distinct": 519,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 619
+          },
+          "numero_ordine": {
+            "distinct": 519,
+            "sample": [
+              "OC-2026-00101",
+              "OC-2026-001011",
+              "OC-2026-0010110",
+              "OC-2026-0010111",
+              "OC-2026-0010112"
+            ]
+          },
+          "fornitore_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "stato_ordine": {
+            "distinct": 3,
+            "sample": [
+              "APERTO",
+              "CHIUSO",
+              "IN_EVASIONE"
+            ]
+          },
+          "data_ordine": {
+            "distinct": 69,
+            "sample": [
+              "2026-01-06",
+              "2026-01-07",
+              "2026-01-08",
+              "2026-01-09",
+              "2026-01-10"
+            ]
+          },
+          "data_consegna_prevista": {
+            "distinct": 71,
+            "sample": [
+              "2026-02-05",
+              "2026-02-06",
+              "2026-02-07",
+              "2026-02-08",
+              "2026-02-09"
+            ]
+          },
+          "note_ordine": {
+            "distinct": 6,
+            "sample": [
+              "Consegna presso magazzino centrale",
+              "Contatto logistica interno 214",
+              "Ordine quadro annuale",
+              "Priorità alta - linea di produzione",
+              "Trasporto incluso nel prezzo"
+            ]
+          }
+        }
+      },
+      "righe_ordine_acquisto": {
+        "row_count": 1168,
+        "columns": {
+          "id": {
+            "distinct": 1168,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1168
+          },
+          "ordine_acquisto_id": {
+            "distinct": 5,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 105
+          },
+          "articolo_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "quantita_ordinata": {
+            "distinct": 1115,
+            "sample": [
+              "10",
+              "10.0",
+              "10.02",
+              "10.03",
+              "10.1"
+            ],
+            "min": 10.0,
+            "max": 1998.88
+          },
+          "quantita_ricevuta": {
+            "distinct": 828,
+            "sample": [
+              "0",
+              "0.0",
+              "10",
+              "10.0",
+              "180.1"
+            ],
+            "min": 0.0,
+            "max": 850
+          },
+          "prezzo_unitario": {
+            "distinct": 472,
+            "sample": [
+              "0.11",
+              "0.12",
+              "0.13",
+              "0.14",
+              "0.15"
+            ],
+            "min": 0.11,
+            "max": 347.34
+          },
+          "sconto_percentuale": {
+            "distinct": 9,
+            "sample": [
+              "0",
+              "10.0",
+              "10.00",
+              "2.5",
+              "2.50"
+            ],
+            "min": 0,
+            "max": 10.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "fornitori": [
+        {
+          "id": 1,
+          "codice_fornitore": "FORN-00001",
+          "ragione_sociale": "Ferramenta Piemontese S.n.c.",
+          "partita_iva": "IT01234567891",
+          "email_contatto": "vendite@supply-chain.it",
+          "telefono_contatto": "+39 06 55219876",
+          "indirizzo_sede": "Via Emilia 112",
+          "citta_sede": "Bari",
+          "attivo": "true"
+        },
+        {
+          "id": 2,
+          "codice_fornitore": "FORN-000011",
+          "ragione_sociale": "Gomme Tecniche Sardegna S.r.l.",
+          "partita_iva": "IT012345678911",
+          "email_contatto": "vendite@supply-chain.it",
+          "telefono_contatto": "+39 055 7712233",
+          "indirizzo_sede": "Via San Secondo 8",
+          "citta_sede": "Verona",
+          "attivo": "true"
+        },
+        {
+          "id": 3,
+          "codice_fornitore": "FORN-000012",
+          "ragione_sociale": "Elettroforniture Centro S.r.l.",
+          "partita_iva": "IT012345678912",
+          "email_contatto": "acquisti@fornitore-industriale.it",
+          "telefono_contatto": "+39 010 9988776",
+          "indirizzo_sede": null,
+          "citta_sede": "Firenze",
+          "attivo": "false"
+        },
+        {
+          "id": 4,
+          "codice_fornitore": "FORN-000013",
+          "ragione_sociale": "Componenti Meccanici Veneti S.r.l.",
+          "partita_iva": "IT012345678913",
+          "email_contatto": "ordini@grossisti-riuniti.it",
+          "telefono_contatto": "+39 055 7712233",
+          "indirizzo_sede": "Via dell'Industria 12",
+          "citta_sede": "Milano",
+          "attivo": "true"
+        },
+        {
+          "id": 5,
+          "codice_fornitore": "FORN-000014",
+          "ragione_sociale": "Metalmeccanica Lombarda S.p.A.",
+          "partita_iva": "IT012345678914",
+          "email_contatto": null,
+          "telefono_contatto": null,
+          "indirizzo_sede": "Via San Secondo 8",
+          "citta_sede": "Roma",
+          "attivo": "true"
+        },
+        {
+          "id": 6,
+          "codice_fornitore": "FORN-000015",
+          "ragione_sociale": "Plastica Elettronica S.r.l.",
+          "partita_iva": "IT012345678915",
+          "email_contatto": "vendite@supply-chain.it",
+          "telefono_contatto": "+39 045 6678899",
+          "indirizzo_sede": "Via Porto 17",
+          "citta_sede": "Napoli",
+          "attivo": "true"
+        },
+        {
+          "id": 7,
+          "codice_fornitore": "FORN-000016",
+          "ragione_sociale": "Ferramenta Piemontese S.n.c.",
+          "partita_iva": "IT012345678916",
+          "email_contatto": "sales@componenti-pro.it",
+          "telefono_contatto": "+39 045 6678899",
+          "indirizzo_sede": "Via Emilia 112",
+          "citta_sede": null,
+          "attivo": "true"
+        },
+        {
+          "id": 8,
+          "codice_fornitore": "FORN-000017",
+          "ragione_sociale": "Imballaggi Sud S.r.l.",
+          "partita_iva": "IT012345678917",
+          "email_contatto": "info@partner-logistics.com",
+          "telefono_contatto": "+39 02 88451234",
+          "indirizzo_sede": null,
+          "citta_sede": "Torino",
+          "attivo": "true"
+        }
+      ],
+      "articoli": [
+        {
+          "id": 1,
+          "codice_articolo": "ART-00001",
+          "descrizione": "Fornitura di serie catalogo 2026",
+          "categoria": "Elettrico",
+          "fornitore_id": 1,
+          "prezzo_unitario": 0.14,
+          "unita_misura": "PZ",
+          "giacenza_magazzino": 19209.89
+        },
+        {
+          "id": 2,
+          "codice_articolo": "ART-000011",
+          "descrizione": "Materiale di primo impianto",
+          "categoria": "Utensili",
+          "fornitore_id": 1,
+          "prezzo_unitario": 0.08,
+          "unita_misura": "PZ",
+          "giacenza_magazzino": 8334.91
+        },
+        {
+          "id": 3,
+          "codice_articolo": "ART-000012",
+          "descrizione": "Articolo di consumo industriale",
+          "categoria": "Lubrificanti",
+          "fornitore_id": 1,
+          "prezzo_unitario": 0.3,
+          "unita_misura": "PZ",
+          "giacenza_magazzino": 12511.3
+        },
+        {
+          "id": 4,
+          "codice_articolo": "ART-000013",
+          "descrizione": "Ricambio aftermarket omologato",
+          "categoria": "Elettrico",
+          "fornitore_id": 1,
+          "prezzo_unitario": 0.21,
+          "unita_misura": "PZ",
+          "giacenza_magazzino": 10248.97
+        },
+        {
+          "id": 5,
+          "codice_articolo": "ART-000014",
+          "descrizione": "Vite esagonale M8x40 zincata",
+          "categoria": "Ferramenta",
+          "fornitore_id": 1,
+          "prezzo_unitario": 0.15,
+          "unita_misura": "PZ",
+          "giacenza_magazzino": 12500
+        },
+        {
+          "id": 6,
+          "codice_articolo": "ART-000015",
+          "descrizione": "Ricambio originale certificato",
+          "categoria": "Sicurezza",
+          "fornitore_id": 1,
+          "prezzo_unitario": 0.15,
+          "unita_misura": "KG",
+          "giacenza_magazzino": 10432.71
+        },
+        {
+          "id": 7,
+          "codice_articolo": "ART-000016",
+          "descrizione": "Fornitura di serie catalogo 2026",
+          "categoria": "Lubrificanti",
+          "fornitore_id": 1,
+          "prezzo_unitario": 0.3,
+          "unita_misura": "KG",
+          "giacenza_magazzino": 9457.43
+        },
+        {
+          "id": 8,
+          "codice_articolo": "ART-000017",
+          "descrizione": "Ricambio originale certificato",
+          "categoria": "Imballaggi",
+          "fornitore_id": 1,
+          "prezzo_unitario": 0.17,
+          "unita_misura": "MT",
+          "giacenza_magazzino": 10554.19
+        }
+      ],
+      "ordini_acquisto": [
+        {
+          "id": 101,
+          "numero_ordine": "OC-2026-00101",
+          "fornitore_id": 1,
+          "stato_ordine": "CHIUSO",
+          "data_ordine": "2026-01-08",
+          "data_consegna_prevista": "2026-02-21",
+          "note_ordine": "Verificare disponibilità a magazzino"
+        },
+        {
+          "id": 102,
+          "numero_ordine": "OC-2026-001011",
+          "fornitore_id": 1,
+          "stato_ordine": "IN_EVASIONE",
+          "data_ordine": "2026-01-15",
+          "data_consegna_prevista": "2026-02-08",
+          "note_ordine": "Contatto logistica interno 214"
+        },
+        {
+          "id": 103,
+          "numero_ordine": "OC-2026-001012",
+          "fornitore_id": 1,
+          "stato_ordine": "CHIUSO",
+          "data_ordine": "2026-01-12",
+          "data_consegna_prevista": "2026-02-18",
+          "note_ordine": "Consegna presso magazzino centrale"
+        },
+        {
+          "id": 104,
+          "numero_ordine": "OC-2026-001013",
+          "fornitore_id": 1,
+          "stato_ordine": "IN_EVASIONE",
+          "data_ordine": "2026-01-06",
+          "data_consegna_prevista": "2026-02-11",
+          "note_ordine": "Trasporto incluso nel prezzo"
+        },
+        {
+          "id": 105,
+          "numero_ordine": "OC-2026-001014",
+          "fornitore_id": 1,
+          "stato_ordine": "CHIUSO",
+          "data_ordine": "2026-01-14",
+          "data_consegna_prevista": "2026-02-20",
+          "note_ordine": null
+        },
+        {
+          "id": 106,
+          "numero_ordine": "OC-2026-001015",
+          "fornitore_id": 1,
+          "stato_ordine": "IN_EVASIONE",
+          "data_ordine": "2026-01-13",
+          "data_consegna_prevista": "2026-02-16",
+          "note_ordine": null
+        },
+        {
+          "id": 107,
+          "numero_ordine": "OC-2026-001016",
+          "fornitore_id": 1,
+          "stato_ordine": "IN_EVASIONE",
+          "data_ordine": "2026-01-13",
+          "data_consegna_prevista": "2026-02-07",
+          "note_ordine": "Trasporto incluso nel prezzo"
+        },
+        {
+          "id": 108,
+          "numero_ordine": "OC-2026-001017",
+          "fornitore_id": 1,
+          "stato_ordine": "APERTO",
+          "data_ordine": "2026-01-11",
+          "data_consegna_prevista": "2026-02-06",
+          "note_ordine": "Priorità alta - linea di produzione"
+        }
+      ],
+      "righe_ordine_acquisto": [
+        {
+          "id": 1,
+          "ordine_acquisto_id": 101,
+          "articolo_id": 1,
+          "quantita_ordinata": 597.62,
+          "quantita_ricevuta": 455.25,
+          "prezzo_unitario": 0.15,
+          "sconto_percentuale": "0"
+        },
+        {
+          "id": 2,
+          "ordine_acquisto_id": 101,
+          "articolo_id": 1,
+          "quantita_ordinata": 734.21,
+          "quantita_ricevuta": 481.55,
+          "prezzo_unitario": 0.16,
+          "sconto_percentuale": "10.00"
+        },
+        {
+          "id": 3,
+          "ordine_acquisto_id": 101,
+          "articolo_id": 1,
+          "quantita_ordinata": 880.16,
+          "quantita_ricevuta": 495.66,
+          "prezzo_unitario": 0.17,
+          "sconto_percentuale": "5.00"
+        },
+        {
+          "id": 4,
+          "ordine_acquisto_id": 101,
+          "articolo_id": 1,
+          "quantita_ordinata": 848.31,
+          "quantita_ricevuta": 491.95,
+          "prezzo_unitario": 0.14,
+          "sconto_percentuale": "5.00"
+        },
+        {
+          "id": 5,
+          "ordine_acquisto_id": 101,
+          "articolo_id": 1,
+          "quantita_ordinata": 812.91,
+          "quantita_ricevuta": 474.84,
+          "prezzo_unitario": 0.12,
+          "sconto_percentuale": "0"
+        },
+        {
+          "id": 6,
+          "ordine_acquisto_id": 101,
+          "articolo_id": 1,
+          "quantita_ordinata": 818.35,
+          "quantita_ricevuta": 452.08,
+          "prezzo_unitario": 0.17,
+          "sconto_percentuale": "5.00"
+        },
+        {
+          "id": 7,
+          "ordine_acquisto_id": 101,
+          "articolo_id": 1,
+          "quantita_ordinata": 970.59,
+          "quantita_ricevuta": 478.45,
+          "prezzo_unitario": 0.14,
+          "sconto_percentuale": "0"
+        },
+        {
+          "id": 8,
+          "ordine_acquisto_id": 101,
+          "articolo_id": 1,
+          "quantita_ordinata": 746.64,
+          "quantita_ricevuta": 453.3,
+          "prezzo_unitario": 0.13,
+          "sconto_percentuale": "0"
+        }
+      ]
+    }
+  },
+  "story": "Nell'ufficio Acquisti di un gruppo manifatturiero, la contabilità del ciclo passivo poggia su quattro archivi gestionali saldamente collegati tra loro. Il primo è l'archivio denominato anagrafica_passivo, un tempo noto semplicemente come fornitori, dove riposano le schede dei partner commerciali: per ciascuno si conservano il codice identificativo, la ragione sociale, la partita IVA, i recapiti di posta elettronica e telefonico, l'indirizzo e la città della sede operativa, insieme a un contrassegno che dichiara se il partner risulta attivo oppure sospeso. Accanto ad esso, l'archivio articoli custodisce le schede tecniche dei beni rifornibili, con codice articolo, descrizione, categoria merceologica, prezzo unitario, unità di misura e giacenza di magazzino, oltre al rimando al fornitore di riferimento. Il registro ordini_acquisto, cuore del flusso documentale, annota per ogni documento il numero ordine, il fornitore intestatario, l'indicatore avanzamento ciclo passivo — che può assumere le condizioni APERTO, IN_EVASIONE o CHIUSO — la data dell'ordine, la data di consegna prevista e le note operative, come «Contatto logistica interno 214», «Trasporto incluso nel prezzo» o «Priorità alta - linea di produzione». Il dettaglio economico-quantitativo vive infine nell'archivio righe_ordine_acquisto, che per ciascun documento elenca l'articolo richiesto, la quantità ordinata, la quantità ricevuta, il prezzo unitario pattuito e lo sconto percentuale concordato. In occasione della revisione trimestrale, il responsabile approvvigionamenti ha predisposto un estratto del registro ordini_acquisto corredato dall'anagrafica completa del fornitore intestatario: codice, ragione sociale, partita IVA, contatti e sede. L'elenco è stato limitato ai soli partner con contrassegno di attività pari a true e raggiungibili tramite il dominio di posta centralizzato supply-chain.it, escludendo così i riferimenti frammentari o non più presidiati. Per sostenere la pianificazione dei carichi al ricevimento, le voci sono state disposte in sequenza crescente per data di consegna prevista e, a parità di scadenza, per numero ordine: in apertura compaiono documenti come OC-2026-001017, emesso il 2026-01-11 con arrivo atteso il 2026-02-06, seguiti a breve distanza dagli ordini del 2026-01-15 con consegna prevista al 2026-02-08, mentre i documenti già CHIUSO a fine gennaio restano in coda per l'archiviazione definitiva."
+}

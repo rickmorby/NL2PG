@@ -1,0 +1,27 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 5,
+  "hierarchy": "star",
+  "sql_features": [
+    "multi_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_acquirenti",
+      "description": "La tabella dimensionale clienti viene denominata anagrafica_acquirenti nella prosa aziendale. Le query devono risolvere il riferimento alla tabella reale clienti per joinare la tabella dei fatti righe_ordine sulla chiave cliente_id."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_totale",
+      "obsolete_value": "GMV",
+      "description": "La colonna importo_totale della tabella dei fatti righe_ordine viene indicata con il gergo e-commerce GMV (Gross Merchandise Value). Le query di aggregazione devono mappare GMV sulla colonna reale importo_totale quando calcolano ricavi per prodotto, cliente o periodo."
+    }
+  ],
+  "spec_hash": "80f3887df766226a"
+}

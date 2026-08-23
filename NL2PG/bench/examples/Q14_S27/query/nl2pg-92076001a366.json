@@ -1,0 +1,835 @@
+{
+  "schema_ddl": "CREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_abilitazione TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    data_abilitazione DATE NOT NULL\n);\n\nCREATE TABLE immobili (\n    id INT PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia CHAR(2),\n    cap TEXT,\n    tipologia TEXT NOT NULL CHECK (tipologia IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato IN ('disponibile', 'riservato', 'venduto'))\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    tipo_cliente TEXT NOT NULL DEFAULT 'privato' CHECK (tipo_cliente IN ('privato', 'azienda'))\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL,\n    cliente_id INT NOT NULL,\n    agente_id INT NOT NULL,\n    data_stipula DATE NOT NULL,\n    prezzo_finale NUMERIC(12,2) NOT NULL CHECK (prezzo_finale >= 0),\n    provvigione_agente NUMERIC(10,2) CHECK (provvigione_agente >= 0),\n    notaio TEXT\n);\n\nCREATE TABLE offerte (\n    id INT PRIMARY KEY,\n    immobile_id INT NOT NULL,\n    cliente_id INT NOT NULL,\n    agente_id INT,\n    data_presentazione DATE NOT NULL,\n    importo_offerto NUMERIC(12,2) NOT NULL CHECK (importo_offerto >= 0),\n    esito TEXT NOT NULL DEFAULT 'in_attesa' CHECK (esito IN ('in_attesa', 'accettata', 'rifiutata'))\n);",
+  "data_profile": {
+    "profile": {
+      "agenti": {
+        "row_count": 214,
+        "columns": {
+          "id": {
+            "distinct": 214,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 214
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Colombo",
+              "Costa",
+              "Ferrari",
+              "Fontana",
+              "Gallo"
+            ]
+          },
+          "codice_abilitazione": {
+            "distinct": 214,
+            "sample": [
+              "AB2018001",
+              "AB20180011",
+              "AB201800110",
+              "AB201800111",
+              "AB201800112"
+            ]
+          },
+          "email": {
+            "distinct": 201,
+            "sample": [
+              "elena.moretti10@agenzia.it",
+              "elena.moretti12@agenzia.it",
+              "elena.moretti13@agenzia.it",
+              "elena.moretti14@agenzia.it",
+              "elena.moretti15@agenzia.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+39 011 5566778",
+              "+39 02 9876543",
+              "+39 055 2233445",
+              "+39 06 1234567",
+              "+39 081 3344556"
+            ]
+          },
+          "data_abilitazione": {
+            "distinct": 205,
+            "sample": [
+              "2015-03-21",
+              "2015-03-25",
+              "2015-05-22",
+              "2015-06-26",
+              "2015-07-14"
+            ]
+          }
+        }
+      },
+      "immobili": {
+        "row_count": 779,
+        "columns": {
+          "id": {
+            "distinct": 779,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 879
+          },
+          "indirizzo": {
+            "distinct": 14,
+            "sample": [
+              "Corso Buenos Aires 45",
+              "Corso Vittorio Emanuele II 48",
+              "Piazza della Repubblica 15",
+              "Strada Vicinale dei Boschi 3",
+              "Via Carducci 14"
+            ]
+          },
+          "citta": {
+            "distinct": 6,
+            "sample": [
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Perugia",
+              "Roma"
+            ]
+          },
+          "provincia": {
+            "distinct": 6,
+            "sample": [
+              "FI",
+              "MI",
+              "NA",
+              "PG",
+              "RM"
+            ]
+          },
+          "cap": {
+            "distinct": 6,
+            "sample": [
+              "00186",
+              "06123",
+              "10121",
+              "20124",
+              "50139"
+            ]
+          },
+          "tipologia": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "negozio",
+              "terreno",
+              "ufficio",
+              "villa"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 744,
+            "sample": [
+              "100.6",
+              "100.76",
+              "101.08",
+              "101.19",
+              "101.58"
+            ],
+            "min": 42.0,
+            "max": 2640.0
+          },
+          "prezzo_richiesto": {
+            "distinct": 748,
+            "sample": [
+              "100298.93",
+              "1008259.55",
+              "1022276.71",
+              "1029354.62",
+              "1030543.9"
+            ],
+            "min": 90000.0,
+            "max": 1152000.0
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "disponibile",
+              "riservato",
+              "venduto"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 553,
+        "columns": {
+          "id": {
+            "distinct": 553,
+            "sample": [
+              "201",
+              "202",
+              "203",
+              "204",
+              "205"
+            ],
+            "min": 201,
+            "max": 753
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Alessandro",
+              "Federica",
+              "GreenHome",
+              "Rossi Costruzioni",
+              "Valentina"
+            ]
+          },
+          "cognome": {
+            "distinct": 5,
+            "sample": [
+              "Conti",
+              "Lombardi",
+              "Marino",
+              "S.p.A.",
+              "S.r.l."
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 553,
+            "sample": [
+              "09876543210",
+              "09876543211",
+              "09876543212",
+              "09876543213",
+              "09876543214"
+            ]
+          },
+          "email": {
+            "distinct": 5,
+            "sample": [
+              "alessandro.conti@gmail.com",
+              "amministrazione@greenhome.it",
+              "federica.marino@yahoo.it",
+              "info@rossicostruzioni.it",
+              "valentina.lombardi@libero.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 9,
+            "sample": [
+              "+39 051 6677889",
+              "+39 06 5544332",
+              "+39 320 9990001",
+              "+39 329 4445556",
+              "+39 333 1112223"
+            ]
+          },
+          "tipo_cliente": {
+            "distinct": 2,
+            "sample": [
+              "azienda",
+              "privato"
+            ]
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 2435,
+        "columns": {
+          "id": {
+            "distinct": 2435,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3435
+          },
+          "immobile_id": {
+            "distinct": 5,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 101,
+            "max": 105
+          },
+          "cliente_id": {
+            "distinct": 5,
+            "sample": [
+              "201",
+              "202",
+              "203",
+              "204",
+              "205"
+            ],
+            "min": 201,
+            "max": 205
+          },
+          "agente_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "data_stipula": {
+            "distinct": 567,
+            "sample": [
+              "2024-09-16",
+              "2024-09-18",
+              "2024-09-19",
+              "2024-09-21",
+              "2024-09-22"
+            ]
+          },
+          "prezzo_finale": {
+            "distinct": 2324,
+            "sample": [
+              "232500.0",
+              "232664.68",
+              "232985.98",
+              "233024.02",
+              "233725.78"
+            ],
+            "min": 232500.0,
+            "max": 713000.0
+          },
+          "provvigione_agente": {
+            "distinct": 2181,
+            "sample": [
+              "10001.2",
+              "10007.15",
+              "10012.0",
+              "10015.77",
+              "10017.38"
+            ],
+            "min": 7440.0,
+            "max": 22320.0
+          },
+          "notaio": {
+            "distinct": 4,
+            "sample": [
+              "Notaio Bianchi",
+              "Notaio Carli",
+              "Notaio Esposito",
+              "Notaio Verri"
+            ]
+          }
+        }
+      },
+      "offerte": {
+        "row_count": 2202,
+        "columns": {
+          "id": {
+            "distinct": 2202,
+            "sample": [
+              "5001",
+              "5002",
+              "5003",
+              "5004",
+              "5005"
+            ],
+            "min": 5001,
+            "max": 7202
+          },
+          "immobile_id": {
+            "distinct": 5,
+            "sample": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "106"
+            ],
+            "min": 101,
+            "max": 106
+          },
+          "cliente_id": {
+            "distinct": 5,
+            "sample": [
+              "201",
+              "202",
+              "203",
+              "204",
+              "205"
+            ],
+            "min": 201,
+            "max": 205
+          },
+          "agente_id": {
+            "distinct": 4,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "data_presentazione": {
+            "distinct": 656,
+            "sample": [
+              "2024-06-15",
+              "2024-06-19",
+              "2024-06-21",
+              "2024-06-22",
+              "2024-06-26"
+            ]
+          },
+          "importo_offerto": {
+            "distinct": 2100,
+            "sample": [
+              "100074.99",
+              "100122.88",
+              "100259.51",
+              "100350.29",
+              "100380.76"
+            ],
+            "min": 99400.0,
+            "max": 544500.0
+          },
+          "esito": {
+            "distinct": 3,
+            "sample": [
+              "accettata",
+              "in_attesa",
+              "rifiutata"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "agenti": [
+        {
+          "id": 60,
+          "nome": "Chiara",
+          "cognome": "Colombo",
+          "codice_abilitazione": "AB201904216",
+          "email": "chiara.colombo1@example.com",
+          "telefono": "+39 02 9876543",
+          "data_abilitazione": "2019-07-01"
+        },
+        {
+          "id": 14,
+          "nome": "Francesca",
+          "cognome": "Ricci",
+          "codice_abilitazione": "AB201800113",
+          "email": "francesca.ricci1@example.com",
+          "telefono": "+39 06 1234567",
+          "data_abilitazione": "2016-06-02"
+        },
+        {
+          "id": 1,
+          "nome": "Luca",
+          "cognome": "Mancini",
+          "codice_abilitazione": "AB2018001",
+          "email": "luca.mancini1@example.com",
+          "telefono": "+39 06 1234567",
+          "data_abilitazione": "2015-05-22"
+        },
+        {
+          "id": 4,
+          "nome": "Sara",
+          "cognome": "Colombo",
+          "codice_abilitazione": "AB20180013",
+          "email": "sara.colombo1@example.com",
+          "telefono": "+39 06 1234567",
+          "data_abilitazione": "2018-10-31"
+        },
+        {
+          "id": 88,
+          "nome": "Andrea",
+          "cognome": "Mancini",
+          "codice_abilitazione": "AB20200181",
+          "email": "andrea.mancini1@example.com",
+          "telefono": "+39 011 5566778",
+          "data_abilitazione": "2022-05-04"
+        },
+        {
+          "id": 124,
+          "nome": "Elena",
+          "cognome": "Romano",
+          "codice_abilitazione": "AB202001837",
+          "email": "elena.romano1@example.com",
+          "telefono": "+39 011 5566778",
+          "data_abilitazione": "2019-09-14"
+        },
+        {
+          "id": 106,
+          "nome": "Giulia",
+          "cognome": "Ferrari",
+          "codice_abilitazione": "AB202001819",
+          "email": "giulia.ferrari1@example.com",
+          "telefono": "+39 011 5566778",
+          "data_abilitazione": "2021-05-14"
+        },
+        {
+          "id": 133,
+          "nome": "Luca",
+          "cognome": "Moretti",
+          "codice_abilitazione": "AB20210333",
+          "email": "luca.moretti1@example.com",
+          "telefono": "+39 081 3344556",
+          "data_abilitazione": "2020-10-24"
+        }
+      ],
+      "immobili": [
+        {
+          "id": 101,
+          "indirizzo": "Via Garibaldi 22",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "00186",
+          "tipologia": "appartamento",
+          "superficie_mq": 181.44,
+          "prezzo_richiesto": 252318.12,
+          "stato": "disponibile"
+        },
+        {
+          "id": 102,
+          "indirizzo": "Corso Vittorio Emanuele II 48",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "00186",
+          "tipologia": "appartamento",
+          "superficie_mq": 121.16,
+          "prezzo_richiesto": 543630.16,
+          "stato": "disponibile"
+        },
+        {
+          "id": 103,
+          "indirizzo": "Via Mazzini 31",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "00186",
+          "tipologia": "villa",
+          "superficie_mq": 101.91,
+          "prezzo_richiesto": 247042.64,
+          "stato": "riservato"
+        },
+        {
+          "id": 104,
+          "indirizzo": "Via Dante Alighieri 7",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "00186",
+          "tipologia": "appartamento",
+          "superficie_mq": 67.16,
+          "prezzo_richiesto": 265053.11,
+          "stato": "disponibile"
+        },
+        {
+          "id": 105,
+          "indirizzo": "Via Verdi 9",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "00186",
+          "tipologia": "ufficio",
+          "superficie_mq": 111.09,
+          "prezzo_richiesto": 399623.04,
+          "stato": "venduto"
+        },
+        {
+          "id": 106,
+          "indirizzo": "Via Leopardi 5",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "00186",
+          "tipologia": "ufficio",
+          "superficie_mq": 57.35,
+          "prezzo_richiesto": 406895.88,
+          "stato": "venduto"
+        },
+        {
+          "id": 107,
+          "indirizzo": "Corso Vittorio Emanuele II 48",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "00186",
+          "tipologia": "appartamento",
+          "superficie_mq": 129.44,
+          "prezzo_richiesto": 332523.32,
+          "stato": "riservato"
+        },
+        {
+          "id": 108,
+          "indirizzo": "Corso Vittorio Emanuele II 48",
+          "citta": "Roma",
+          "provincia": "RM",
+          "cap": "00186",
+          "tipologia": "appartamento",
+          "superficie_mq": 79.79,
+          "prezzo_richiesto": 232591.45,
+          "stato": "disponibile"
+        }
+      ],
+      "clienti": [
+        {
+          "id": 201,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "codice_fiscale": "CNTLSN85M01H501X",
+          "email": "alessandro.conti@gmail.com",
+          "telefono": "+39 329 4445556",
+          "tipo_cliente": "privato"
+        },
+        {
+          "id": 202,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "codice_fiscale": "CNTLSN85M01H501B",
+          "email": "alessandro.conti@gmail.com",
+          "telefono": "+39 351 2223334",
+          "tipo_cliente": "privato"
+        },
+        {
+          "id": 203,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "codice_fiscale": "CNTLSN85M01H501C",
+          "email": "alessandro.conti@gmail.com",
+          "telefono": "+39 340 5556667",
+          "tipo_cliente": "privato"
+        },
+        {
+          "id": 204,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "codice_fiscale": "CNTLSN85M01H501D",
+          "email": "alessandro.conti@gmail.com",
+          "telefono": "+39 333 1112223",
+          "tipo_cliente": "privato"
+        },
+        {
+          "id": 205,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "codice_fiscale": "CNTLSN85M01H501E",
+          "email": "alessandro.conti@gmail.com",
+          "telefono": "+39 351 2223334",
+          "tipo_cliente": "privato"
+        },
+        {
+          "id": 206,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "codice_fiscale": "CNTLSN85M01H501F",
+          "email": "alessandro.conti@gmail.com",
+          "telefono": "+39 351 2223334",
+          "tipo_cliente": "privato"
+        },
+        {
+          "id": 207,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "codice_fiscale": "CNTLSN85M01H501G",
+          "email": "alessandro.conti@gmail.com",
+          "telefono": null,
+          "tipo_cliente": "privato"
+        },
+        {
+          "id": 208,
+          "nome": "Alessandro",
+          "cognome": "Conti",
+          "codice_fiscale": "CNTLSN85M01H501H",
+          "email": "alessandro.conti@gmail.com",
+          "telefono": "+39 340 5556667",
+          "tipo_cliente": "privato"
+        }
+      ],
+      "contratti": [
+        {
+          "id": 1001,
+          "immobile_id": 101,
+          "cliente_id": 201,
+          "agente_id": 1,
+          "data_stipula": "2025-04-28",
+          "prezzo_finale": 355853.13,
+          "provvigione_agente": 9018.48,
+          "notaio": "Notaio Bianchi"
+        },
+        {
+          "id": 1002,
+          "immobile_id": 101,
+          "cliente_id": 201,
+          "agente_id": 1,
+          "data_stipula": "2025-08-18",
+          "prezzo_finale": 354604.69,
+          "provvigione_agente": 10449.8,
+          "notaio": "Notaio Esposito"
+        },
+        {
+          "id": 1003,
+          "immobile_id": 101,
+          "cliente_id": 201,
+          "agente_id": 1,
+          "data_stipula": "2024-10-22",
+          "prezzo_finale": 317584.67,
+          "provvigione_agente": 9020.87,
+          "notaio": "Notaio Bianchi"
+        },
+        {
+          "id": 1004,
+          "immobile_id": 101,
+          "cliente_id": 201,
+          "agente_id": 1,
+          "data_stipula": "2025-07-04",
+          "prezzo_finale": 250873.22,
+          "provvigione_agente": 10183.62,
+          "notaio": "Notaio Esposito"
+        },
+        {
+          "id": 1005,
+          "immobile_id": 101,
+          "cliente_id": 201,
+          "agente_id": 1,
+          "data_stipula": "2025-08-21",
+          "prezzo_finale": 244754.31,
+          "provvigione_agente": 10950.93,
+          "notaio": "Notaio Esposito"
+        },
+        {
+          "id": 1006,
+          "immobile_id": 101,
+          "cliente_id": 201,
+          "agente_id": 1,
+          "data_stipula": "2025-01-30",
+          "prezzo_finale": 247333.25,
+          "provvigione_agente": 8290.37,
+          "notaio": "Notaio Verri"
+        },
+        {
+          "id": 1007,
+          "immobile_id": 101,
+          "cliente_id": 201,
+          "agente_id": 1,
+          "data_stipula": "2025-02-10",
+          "prezzo_finale": 348461.39,
+          "provvigione_agente": 7962.57,
+          "notaio": "Notaio Carli"
+        },
+        {
+          "id": 1008,
+          "immobile_id": 101,
+          "cliente_id": 201,
+          "agente_id": 1,
+          "data_stipula": "2025-03-15",
+          "prezzo_finale": 310000.0,
+          "provvigione_agente": 9300.0,
+          "notaio": "Notaio Bianchi"
+        }
+      ],
+      "offerte": [
+        {
+          "id": 5001,
+          "immobile_id": 101,
+          "cliente_id": 202,
+          "agente_id": 1,
+          "data_presentazione": "2024-07-28",
+          "importo_offerto": 316378.71,
+          "esito": "accettata"
+        },
+        {
+          "id": 5002,
+          "immobile_id": 101,
+          "cliente_id": 202,
+          "agente_id": 1,
+          "data_presentazione": "2024-09-07",
+          "importo_offerto": 322808.8,
+          "esito": "accettata"
+        },
+        {
+          "id": 5003,
+          "immobile_id": 101,
+          "cliente_id": 202,
+          "agente_id": 1,
+          "data_presentazione": "2024-06-21",
+          "importo_offerto": 274952.59,
+          "esito": "rifiutata"
+        },
+        {
+          "id": 5004,
+          "immobile_id": 101,
+          "cliente_id": 202,
+          "agente_id": 1,
+          "data_presentazione": "2025-08-14",
+          "importo_offerto": 300616.5,
+          "esito": "accettata"
+        },
+        {
+          "id": 5005,
+          "immobile_id": 101,
+          "cliente_id": 202,
+          "agente_id": null,
+          "data_presentazione": "2025-07-25",
+          "importo_offerto": 312746.32,
+          "esito": "accettata"
+        },
+        {
+          "id": 5006,
+          "immobile_id": 101,
+          "cliente_id": 202,
+          "agente_id": 1,
+          "data_presentazione": "2025-01-26",
+          "importo_offerto": 208056.25,
+          "esito": "accettata"
+        },
+        {
+          "id": 5007,
+          "immobile_id": 101,
+          "cliente_id": 202,
+          "agente_id": 1,
+          "data_presentazione": "2024-07-03",
+          "importo_offerto": 279993.79,
+          "esito": "accettata"
+        },
+        {
+          "id": 5008,
+          "immobile_id": 101,
+          "cliente_id": 202,
+          "agente_id": 1,
+          "data_presentazione": "2024-12-25",
+          "importo_offerto": 259256.19,
+          "esito": "rifiutata"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "set_op"
+  ],
+  "query": "SELECT i.citta AS area_riferimento, 'immobili_disponibili' AS tipo_record, COUNT(*) AS numero_record, ROUND(AVG(i.prezzo_richiesto), 2) AS valore_medio FROM immobili i WHERE i.stato = 'disponibile' AND i.indirizzo LIKE 'Via%' GROUP BY i.citta UNION ALL SELECT c.notaio AS area_riferimento, 'contratti_stipulati' AS tipo_record, COUNT(*) AS numero_record, ROUND(AVG(c.prezzo_finale), 2) AS valore_medio FROM contratti c WHERE c.notaio IS NOT NULL AND c.data_stipula BETWEEN '2024-09-01' AND '2025-09-30' GROUP BY c.notaio UNION ALL SELECT o.esito AS area_riferimento, 'offerte_presentate' AS tipo_record, COUNT(*) AS numero_record, ROUND(AVG(o.importo_offerto), 2) AS valore_medio FROM offerte o WHERE o.esito IN ('accettata', 'rifiutata') AND o.data_presentazione >= '2024-06-01' GROUP BY o.esito ORDER BY tipo_record, numero_record DESC;"
+}

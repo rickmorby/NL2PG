@@ -1,0 +1,326 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 4,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "ordini",
+        "obsolete_value": "richieste_acquisto",
+        "description": "La tabella 'ordini' viene denominata 'richieste_acquisto' nei documenti aziendali, creando ambiguità con il processo di approvvigionamento."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "magazzino",
+        "obsolete_value": "centro_logistico",
+        "description": "La tabella 'magazzino' è indicata come 'centro_logistico' nei report interni, utilizzando un termine più tecnico e meno intuitivo."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "quantita",
+        "obsolete_value": "unita",
+        "description": "La colonna 'quantita' nelle tabelle di inventario e ordini viene chiamata 'unita', che può riferirsi sia a unità di misura che a quantità effettive, generando confusione."
+      }
+    ],
+    "spec_hash": "1606e86eae48d0c8"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT CHECK (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$')\n);\n\nCREATE TABLE richieste_acquisto (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_richiesta TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato TEXT NOT NULL CHECK (stato IN ('pendente', 'confermato', 'evaso', 'annullato')),\n    totale DECIMAL(10, 2) NOT NULL CHECK (totale >= 0)\n);\n\nCREATE TABLE centro_logistico (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_max INT NOT NULL CHECK (capacita_max > 0)\n);\n\nCREATE TABLE inventario (\n    id SERIAL PRIMARY KEY,\n    centro_logistico_id INT NOT NULL REFERENCES centro_logistico(id),\n    prodotto_id INT NOT NULL,\n    unita INT NOT NULL CHECK (unita >= 0),\n    prezzo_unitario DECIMAL(10, 2) NOT NULL CHECK (prezzo_unitario >= 0),\n    valore_totale DECIMAL(10, 2) GENERATED ALWAYS AS (unita * prezzo_unitario) STORED\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario Rossi Srl",
+            "codice_fiscale": "RSSMRA78A01H501X",
+            "email": "mario.rossi@azienda.it"
+          },
+          {
+            "id": 2,
+            "nome": "Laura Bianchi Spa",
+            "codice_fiscale": "BNCLRA85B02H501Y",
+            "email": "laura.bianchi@azienda.it"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia Verdi & Co",
+            "codice_fiscale": "VRDGLI90C03H501Z",
+            "email": "giulia.verdi@azienda.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi Srl",
+              "Laura Bianchi Spa",
+              "Giulia Verdi & Co",
+              "Paolo Neri Ltd",
+              "Anna Gialli Srl",
+              "Luca Blu Spa"
+            ]
+          },
+          "codice_fiscale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "RSSMRA78A01H501X",
+              "BNCLRA85B02H501Y",
+              "VRDGLI90C03H501Z",
+              "NRRPL074A04H501W",
+              "GLLNNA82B05H501V",
+              "BLULCA79C06H501U"
+            ]
+          },
+          "email": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "mario.rossi@azienda.it",
+              "laura.bianchi@azienda.it",
+              "giulia.verdi@azienda.it",
+              "paolo.neri@azienda.it",
+              "anna.gialli@azienda.it",
+              "luca.blu@azienda.it"
+            ]
+          }
+        }
+      },
+      {
+        "table": "richieste_acquisto",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 4.0,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "data_richiesta": "2026-01-15 09:00:00",
+            "stato": "pendente",
+            "totale": 1500.5
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "data_richiesta": "2026-01-16 10:30:00",
+            "stato": "confermato",
+            "totale": 2800.0
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "data_richiesta": "2026-02-01 14:15:00",
+            "stato": "evaso",
+            "totale": 3200.75
+          },
+          {
+            "id": 104,
+            "cliente_id": 1,
+            "data_richiesta": "2026-02-10 11:20:00",
+            "stato": "annullato",
+            "totale": 500.0
+          }
+        ],
+        "variations": {
+          "data_richiesta": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "pendente",
+              "confermato",
+              "evaso",
+              "annullato"
+            ]
+          },
+          "totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "centro_logistico",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Magazzino Nord",
+            "indirizzo": "Via Industriale 10, Milano",
+            "capacita_max": 5000
+          },
+          {
+            "id": 2,
+            "nome": "Magazzino Sud",
+            "indirizzo": "Via Portuale 25, Napoli",
+            "capacita_max": 3000
+          },
+          {
+            "id": 3,
+            "nome": "Magazzino Centro",
+            "indirizzo": "Via Roma 5, Roma",
+            "capacita_max": 4000
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Magazzino Nord",
+              "Magazzino Sud",
+              "Magazzino Centro",
+              "Magazzino Est",
+              "Magazzino Ovest"
+            ]
+          },
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Industriale 10, Milano",
+              "Via Portuale 25, Napoli",
+              "Via Roma 5, Roma",
+              "Via Torino 15, Torino",
+              "Via Venezia 30, Venezia"
+            ]
+          },
+          "capacita_max": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "5000",
+              "3000",
+              "4000",
+              "2500",
+              "6000"
+            ]
+          }
+        }
+      },
+      {
+        "table": "inventario",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 8.0,
+        "templates": [
+          {
+            "id": 1,
+            "centro_logistico_id": 1,
+            "prodotto_id": 101,
+            "unita": 100,
+            "prezzo_unitario": 15.5
+          },
+          {
+            "id": 2,
+            "centro_logistico_id": 1,
+            "prodotto_id": 102,
+            "unita": 50,
+            "prezzo_unitario": 25.0
+          },
+          {
+            "id": 3,
+            "centro_logistico_id": 2,
+            "prodotto_id": 103,
+            "unita": 200,
+            "prezzo_unitario": 10.25
+          },
+          {
+            "id": 4,
+            "centro_logistico_id": 3,
+            "prodotto_id": 104,
+            "unita": 75,
+            "prezzo_unitario": 30.0
+          }
+        ],
+        "variations": {
+          "prodotto_id": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "101",
+              "102",
+              "103",
+              "104",
+              "105",
+              "106",
+              "107",
+              "108"
+            ]
+          },
+          "unita": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.1,
+            "factor_max": 5.0,
+            "pool": []
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,568 @@
+{
+  "schema_ddl": "CREATE TABLE piani_tariffari (\n    id INT PRIMARY KEY,\n    nome_piano TEXT NOT NULL UNIQUE,\n    gestore TEXT NOT NULL,\n    canone_mensile NUMERIC(8,2) NOT NULL CHECK (canone_mensile >= 0),\n    minuti_inclusi INT NOT NULL DEFAULT 0 CHECK (minuti_inclusi >= 0)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta_residenza TEXT,\n    email TEXT UNIQUE,\n    data_attivazione_contratto TEXT\n);\n\nCREATE TABLE abbonamenti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    piano_id INT NOT NULL REFERENCES piani_tariffari(id),\n    numero_msisdn TEXT NOT NULL UNIQUE,\n    stato TEXT NOT NULL CHECK (stato IN ('attivo', 'sospeso', 'disdetto')),\n    data_sottoscrizione TEXT\n);\n\nCREATE TABLE chiamate (\n    id BIGINT PRIMARY KEY,\n    abbonamento_id INT NOT NULL REFERENCES abbonamenti(id),\n    data_chiamata TEXT NOT NULL,\n    ora_inizio TEXT,\n    durata_minuti TEXT NOT NULL,\n    tipo_chiamata TEXT NOT NULL CHECK (tipo_chiamata IN ('uscita', 'entrata', 'persa', 'inoltrata')),\n    costo_euro NUMERIC(12,2),\n    CHECK (durata_minuti ~ '^[0-9]+([.][0-9]+)?$'),\n    CHECK (data_chiamata ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$')\n);",
+  "data_profile": {
+    "profile": {
+      "piani_tariffari": {
+        "row_count": 32,
+        "columns": {
+          "id": {
+            "distinct": 32,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 32
+          },
+          "nome_piano": {
+            "distinct": 32,
+            "sample": [
+              "Business Pro",
+              "Business Pro1",
+              "Business Pro2",
+              "Business Pro3",
+              "Business Pro4"
+            ]
+          },
+          "gestore": {
+            "distinct": 3,
+            "sample": [
+              "NovaTel",
+              "OmniMobile",
+              "TeleCom Italia"
+            ]
+          },
+          "canone_mensile": {
+            "distinct": 32,
+            "sample": [
+              "10.35",
+              "10.8",
+              "11.68",
+              "12.07",
+              "12.11"
+            ],
+            "min": 8.48,
+            "max": 33.82
+          },
+          "minuti_inclusi": {
+            "distinct": 32,
+            "sample": [
+              "100",
+              "104.91",
+              "1188.35",
+              "1269.05",
+              "127.01"
+            ],
+            "min": 48.06,
+            "max": 2949.22
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 672,
+        "columns": {
+          "id": {
+            "distinct": 672,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 672
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Barbieri",
+              "Bianchi",
+              "Conti",
+              "Ferrari",
+              "Fontana"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 672,
+            "sample": [
+              "BNCLRA85C42F205B",
+              "BNCLRA85C42F205C",
+              "BNCLRA85C42F205D",
+              "BNCLRA85C42F205E",
+              "BNCLRA85C42F205F"
+            ]
+          },
+          "citta_residenza": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "email": {
+            "distinct": 633,
+            "sample": [
+              "alessandro.ferrari100@example.com",
+              "alessandro.ferrari101@example.com",
+              "alessandro.ferrari102@example.com",
+              "alessandro.ferrari103@example.com",
+              "alessandro.ferrari104@example.com"
+            ]
+          },
+          "data_attivazione_contratto": {
+            "distinct": 6,
+            "sample": [
+              "2021-06-30",
+              "2022-11-02",
+              "2023-03-15",
+              "2023-09-12",
+              "2024-01-20"
+            ]
+          }
+        }
+      },
+      "abbonamenti": {
+        "row_count": 577,
+        "columns": {
+          "id": {
+            "distinct": 577,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 577
+          },
+          "cliente_id": {
+            "distinct": 383,
+            "sample": [
+              "1",
+              "100",
+              "105",
+              "106",
+              "107"
+            ],
+            "min": 1,
+            "max": 672
+          },
+          "piano_id": {
+            "distinct": 32,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 32
+          },
+          "numero_msisdn": {
+            "distinct": 577,
+            "sample": [
+              "+393201122334",
+              "+3932011223341",
+              "+39320112233410",
+              "+39320112233411",
+              "+39320112233412"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "disdetto",
+              "sospeso"
+            ]
+          },
+          "data_sottoscrizione": {
+            "distinct": 6,
+            "sample": [
+              "2021-07-15",
+              "2022-12-10",
+              "2023-01-25",
+              "2023-04-01",
+              "2024-02-18"
+            ]
+          }
+        }
+      },
+      "chiamate": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "abbonamento_id": {
+            "distinct": 575,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 577
+          },
+          "data_chiamata": {
+            "distinct": 6,
+            "sample": [
+              "2026-01-10",
+              "2026-01-11",
+              "2026-01-12",
+              "2026-01-13",
+              "2026-01-14"
+            ]
+          },
+          "ora_inizio": {
+            "distinct": 15,
+            "sample": [
+              "07:42:15",
+              "08:30:05",
+              "08:30:45",
+              "09:15:30",
+              "11:05:33"
+            ]
+          },
+          "durata_minuti": {
+            "distinct": 13,
+            "sample": [
+              "0.0",
+              "0.4",
+              "1.2",
+              "1.8",
+              "12.0"
+            ]
+          },
+          "tipo_chiamata": {
+            "distinct": 4,
+            "sample": [
+              "entrata",
+              "inoltrata",
+              "persa",
+              "uscita"
+            ]
+          },
+          "costo_euro": {
+            "distinct": 10,
+            "sample": [
+              "0.00",
+              "0.10",
+              "0.18",
+              "0.25",
+              "0.35"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "piani_tariffari": [
+        {
+          "id": 1,
+          "nome_piano": "Easy Base",
+          "gestore": "TeleCom Italia",
+          "canone_mensile": 9.49,
+          "minuti_inclusi": 127.01
+        },
+        {
+          "id": 2,
+          "nome_piano": "Easy Base1",
+          "gestore": "TeleCom Italia",
+          "canone_mensile": 10.8,
+          "minuti_inclusi": 87.75
+        },
+        {
+          "id": 3,
+          "nome_piano": "Easy Base2",
+          "gestore": "TeleCom Italia",
+          "canone_mensile": 12.59,
+          "minuti_inclusi": 104.91
+        },
+        {
+          "id": 4,
+          "nome_piano": "Easy Base3",
+          "gestore": "TeleCom Italia",
+          "canone_mensile": 8.75,
+          "minuti_inclusi": 75.38
+        },
+        {
+          "id": 5,
+          "nome_piano": "Easy Base4",
+          "gestore": "TeleCom Italia",
+          "canone_mensile": 9.6,
+          "minuti_inclusi": 130.79
+        },
+        {
+          "id": 6,
+          "nome_piano": "Easy Base5",
+          "gestore": "TeleCom Italia",
+          "canone_mensile": 9.99,
+          "minuti_inclusi": 100
+        },
+        {
+          "id": 7,
+          "nome_piano": "Smart Plus",
+          "gestore": "TeleCom Italia",
+          "canone_mensile": 12.11,
+          "minuti_inclusi": 445.45
+        },
+        {
+          "id": 8,
+          "nome_piano": "Smart Plus1",
+          "gestore": "TeleCom Italia",
+          "canone_mensile": 15.49,
+          "minuti_inclusi": 449.56
+        }
+      ],
+      "clienti": [
+        {
+          "id": 66,
+          "nome": "Davide",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA80A01H567O",
+          "citta_residenza": null,
+          "email": "davide.rossi1@example.com",
+          "data_attivazione_contratto": "2023-03-15"
+        },
+        {
+          "id": 54,
+          "nome": "Laura",
+          "cognome": "Russo",
+          "codice_fiscale": "RSSMRA80A01H555C",
+          "citta_residenza": "Bologna",
+          "email": "laura.russo1@example.com",
+          "data_attivazione_contratto": "2023-03-15"
+        },
+        {
+          "id": 53,
+          "nome": "Marco",
+          "cognome": "Verdi",
+          "codice_fiscale": "RSSMRA80A01H554B",
+          "citta_residenza": "Bologna",
+          "email": "marco.verdi1@example.com",
+          "data_attivazione_contratto": "2023-03-15"
+        },
+        {
+          "id": 103,
+          "nome": "Elena",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRA80A01H604Z",
+          "citta_residenza": "Bologna",
+          "email": "elena.ferrari1@example.com",
+          "data_attivazione_contratto": "2023-03-15"
+        },
+        {
+          "id": 147,
+          "nome": "Elena",
+          "cognome": "Gallo",
+          "codice_fiscale": "BNCLRA85C42F240J",
+          "citta_residenza": "Palermo",
+          "email": "elena.gallo1@example.com",
+          "data_attivazione_contratto": "2022-11-02"
+        },
+        {
+          "id": 143,
+          "nome": "Elena",
+          "cognome": "Russo",
+          "codice_fiscale": "BNCLRA85C42F236F",
+          "citta_residenza": null,
+          "email": "elena.russo1@example.com",
+          "data_attivazione_contratto": "2022-11-02"
+        },
+        {
+          "id": 140,
+          "nome": "Marco",
+          "cognome": "Gallo",
+          "codice_fiscale": "BNCLRA85C42F233C",
+          "citta_residenza": "Verona",
+          "email": "marco.gallo1@example.com",
+          "data_attivazione_contratto": "2022-11-02"
+        },
+        {
+          "id": 108,
+          "nome": "Sara",
+          "cognome": "Barbieri",
+          "codice_fiscale": "RSSMRA80A01H609E",
+          "citta_residenza": "Milano",
+          "email": "sara.barbieri1@example.com",
+          "data_attivazione_contratto": "2023-03-15"
+        }
+      ],
+      "abbonamenti": [
+        {
+          "id": 1,
+          "cliente_id": 189,
+          "piano_id": 23,
+          "numero_msisdn": "+393331234501",
+          "stato": "disdetto",
+          "data_sottoscrizione": "2023-04-01"
+        },
+        {
+          "id": 2,
+          "cliente_id": 340,
+          "piano_id": 24,
+          "numero_msisdn": "+3933312345011",
+          "stato": "disdetto",
+          "data_sottoscrizione": "2023-04-01"
+        },
+        {
+          "id": 3,
+          "cliente_id": 659,
+          "piano_id": 5,
+          "numero_msisdn": "+3933312345012",
+          "stato": "sospeso",
+          "data_sottoscrizione": "2023-04-01"
+        },
+        {
+          "id": 4,
+          "cliente_id": 305,
+          "piano_id": 23,
+          "numero_msisdn": "+3933312345013",
+          "stato": "sospeso",
+          "data_sottoscrizione": null
+        },
+        {
+          "id": 5,
+          "cliente_id": 634,
+          "piano_id": 28,
+          "numero_msisdn": "+3933312345014",
+          "stato": "disdetto",
+          "data_sottoscrizione": "2023-04-01"
+        },
+        {
+          "id": 6,
+          "cliente_id": 663,
+          "piano_id": 27,
+          "numero_msisdn": "+3933312345015",
+          "stato": "attivo",
+          "data_sottoscrizione": "2023-04-01"
+        },
+        {
+          "id": 7,
+          "cliente_id": 81,
+          "piano_id": 17,
+          "numero_msisdn": "+3933312345016",
+          "stato": "attivo",
+          "data_sottoscrizione": "2023-04-01"
+        },
+        {
+          "id": 8,
+          "cliente_id": 329,
+          "piano_id": 10,
+          "numero_msisdn": "+3933312345017",
+          "stato": "attivo",
+          "data_sottoscrizione": "2023-04-01"
+        }
+      ],
+      "chiamate": [
+        {
+          "id": 1,
+          "abbonamento_id": 293,
+          "data_chiamata": "2026-01-10",
+          "ora_inizio": "08:30:05",
+          "durata_minuti": "18.7",
+          "tipo_chiamata": "uscita",
+          "costo_euro": "0.50"
+        },
+        {
+          "id": 2,
+          "abbonamento_id": 547,
+          "data_chiamata": "2026-01-10",
+          "ora_inizio": "07:42:15",
+          "durata_minuti": "3.5",
+          "tipo_chiamata": "entrata",
+          "costo_euro": "1.20"
+        },
+        {
+          "id": 3,
+          "abbonamento_id": 574,
+          "data_chiamata": "2026-01-10",
+          "ora_inizio": "14:22:18",
+          "durata_minuti": "3.5",
+          "tipo_chiamata": "entrata",
+          "costo_euro": "0.25"
+        },
+        {
+          "id": 4,
+          "abbonamento_id": 367,
+          "data_chiamata": "2026-01-10",
+          "ora_inizio": "14:22:18",
+          "durata_minuti": "1.2",
+          "tipo_chiamata": "entrata",
+          "costo_euro": "0.00"
+        },
+        {
+          "id": 5,
+          "abbonamento_id": 124,
+          "data_chiamata": "2026-01-10",
+          "ora_inizio": null,
+          "durata_minuti": "3.5",
+          "tipo_chiamata": "uscita",
+          "costo_euro": "0.35"
+        },
+        {
+          "id": 6,
+          "abbonamento_id": 396,
+          "data_chiamata": "2026-01-10",
+          "ora_inizio": "22:03:29",
+          "durata_minuti": "0.0",
+          "tipo_chiamata": "uscita",
+          "costo_euro": "0.00"
+        },
+        {
+          "id": 7,
+          "abbonamento_id": 350,
+          "data_chiamata": "2026-01-10",
+          "ora_inizio": "16:40:52",
+          "durata_minuti": "5.0",
+          "tipo_chiamata": "uscita",
+          "costo_euro": "0.10"
+        },
+        {
+          "id": 8,
+          "abbonamento_id": 186,
+          "data_chiamata": "2026-01-10",
+          "ora_inizio": "20:15:07",
+          "durata_minuti": "12.0",
+          "tipo_chiamata": "uscita",
+          "costo_euro": "0.10"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "filtered_agg"
+  ],
+  "query": "SELECT p.gestore, COUNT(*) AS totale_chiamate, COUNT(*) FILTER (WHERE c.tipo_chiamata = 'uscita') AS chiamate_in_uscita, COUNT(*) FILTER (WHERE c.tipo_chiamata = 'entrata') AS chiamate_in_entrata, COUNT(*) FILTER (WHERE c.tipo_chiamata = 'persa') AS chiamate_perse, ROUND(SUM(c.costo_euro::NUMERIC) FILTER (WHERE a.stato = 'attivo'), 2) AS ricavo_abbonamenti_attivi_euro, ROUND(AVG(c.durata_minuti::NUMERIC), 2) AS durata_media_minuti FROM chiamate c JOIN abbonamenti a ON c.abbonamento_id = a.id JOIN piani_tariffari p ON a.piano_id = p.id WHERE c.data_chiamata >= '2026-01-12' GROUP BY p.gestore ORDER BY ricavo_abbonamenti_attivi_euro DESC;"
+}

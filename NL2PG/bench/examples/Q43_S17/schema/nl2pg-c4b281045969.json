@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "sorting"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "pratiche_di_copertura",
+        "description": "La tabella polizze viene denominata pratiche_di_copertura nella prosa aziendale: il risolutore deve mappare la perifrasi al nome reale della tabella nello schema."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "deleted_at",
+        "obsolete_value": "data_ritiro",
+        "description": "La colonna deleted_at (timestamp di cancellazione logica) viene descritta come data_ritiro nella documentazione aziendale: le righe con valore non nullo sono logicamente eliminate e devono essere escluse tramite il predicato deleted_at IS NULL mantenuto nella WHERE, prima dell'ordinamento ORDER BY multi-colonna senza LIMIT."
+      }
+    ],
+    "spec_hash": "96f52999c772d7d5"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL REFERENCES clienti(id) ON DELETE CASCADE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('vita', 'auto', 'casa', 'salute', 'viaggio')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    capitale_assicurato NUMERIC(12,2) NOT NULL CHECK (capitale_assicurato > 0),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    stato_polizza TEXT NOT NULL DEFAULT 'attiva' CHECK (stato_polizza IN ('attiva', 'sospesa', 'scaduta')),\n    deleted_at TIMESTAMP,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    modificato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_scadenza >= data_emissione)\n);"
+}

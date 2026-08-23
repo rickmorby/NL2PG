@@ -1,0 +1,167 @@
+{
+  "schema_ddl": "CREATE TABLE emp (\n    emp_no INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_reparto INT NOT NULL,\n    responsabile_reparto INT,\n    salario NUMERIC(10,2) CHECK (salario >= 0),\n    data_assunzione DATE NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "emp": {
+        "row_count": 107,
+        "columns": {
+          "emp_no": {
+            "distinct": 107,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 107
+          },
+          "nome": {
+            "distinct": 16,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Anna",
+              "Chiara",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "distinct": 16,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Colombo",
+              "Conti",
+              "Esposito"
+            ]
+          },
+          "numero_reparto": {
+            "distinct": 6,
+            "sample": [
+              "10",
+              "20",
+              "30",
+              "40",
+              "50"
+            ],
+            "min": 10,
+            "max": 60
+          },
+          "responsabile_reparto": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "salario": {
+            "distinct": 100,
+            "sample": [
+              "39830.0",
+              "40590.22",
+              "40761.84",
+              "41879.07",
+              "42203.96"
+            ],
+            "min": 39830.0,
+            "max": 83214.11
+          },
+          "data_assunzione": {
+            "distinct": 101,
+            "sample": [
+              "2009-10-11",
+              "2009-10-19",
+              "2009-11-07",
+              "2009-11-27",
+              "2009-11-30"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "emp": [
+        {
+          "emp_no": 1,
+          "nome": "Laura",
+          "cognome": "Verdi",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": null,
+          "data_assunzione": "2011-12-05"
+        },
+        {
+          "emp_no": 2,
+          "nome": "Luca",
+          "cognome": "Fontana",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 42948.59,
+          "data_assunzione": "2012-02-10"
+        },
+        {
+          "emp_no": 3,
+          "nome": "Sara",
+          "cognome": "Marino",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 50468.21,
+          "data_assunzione": "2012-10-23"
+        },
+        {
+          "emp_no": 4,
+          "nome": "Marco",
+          "cognome": "Marino",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 81792.39,
+          "data_assunzione": "2012-11-18"
+        },
+        {
+          "emp_no": 5,
+          "nome": "Francesca",
+          "cognome": "Colombo",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 53880.55,
+          "data_assunzione": "2011-08-07"
+        },
+        {
+          "emp_no": 6,
+          "nome": "Alessandro",
+          "cognome": "Neri",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 49521.01,
+          "data_assunzione": "2011-04-13"
+        },
+        {
+          "emp_no": 7,
+          "nome": "Elena",
+          "cognome": "Verdi",
+          "numero_reparto": 10,
+          "responsabile_reparto": null,
+          "salario": 52795.75,
+          "data_assunzione": "2011-08-05"
+        },
+        {
+          "emp_no": 8,
+          "nome": "Elena",
+          "cognome": "Marino",
+          "numero_reparto": 10,
+          "responsabile_reparto": 1,
+          "salario": 65772.63,
+          "data_assunzione": "2012-09-20"
+        }
+      ]
+    }
+  },
+  "story": "Presso la Direzione delle Risorse Umane del gruppo industriale, l'archivio denominato emp raccoglie le schede anagrafiche e contrattuali di tutto il personale in forza. Ciascuna scheda riporta la matricola univoca assegnata al momento dell'assunzione, il nome e il cognome del collaboratore, il codice numerico del reparto di destinazione, il riferimento al DR (Direttore di Reparto) che coordina l'unità organizzativa, l'importo dello stipendio pattuito e la data di ingresso in azienda. L'archivio conta oggi 107 posizioni attive, con matricole progressive dalla 1 alla 107, e copre sei reparti contrassegnati dai codici da 10 a 60.\n\nIn occasione della consuntivazione annuale delle retribuzioni, il responsabile amministrativo ha avviato una verifica mirata: occorreva individuare, reparto per reparto, i collaboratori il cui salario risulta compreso tra 40000 e 80000 euro e il cui nome rientra nell'elenco dei nominativi più diffusi in azienda, vale a dire Alessandro, Andrea, Anna, Chiara e Davide. Sono stati esclusi dall'analisi sia i profili retribuiti sotto la soglia minima, come alcune assunzioni datate che fermano il contatore a 39830 euro, sia le posizioni apicali che oltrepassano il tetto massimo, spingendosi fino a 83214.11 euro.\n\nPer ciascun dipendente selezionato, gli analisti hanno determinato la posizione salariale all'interno del proprio reparto, disponendo gli importi dal più alto al più basso: chi percepisce la retribuzione maggiore occupa la prima posizione dell'area, seguito dagli altri in sequenza decrescente. Accanto alla collocazione individuale, il prospetto espone le statistiche d'insieme ripartite sotto la responsabilità di ogni DR (Direttore di Reparto): quanti nomi diversi risultano registrati nell'unità, quanti cognomi distinti compaiono tra le schede e quale sia lo stipendio medio, quest'ultimo calcolato considerando soltanto i collaboratori con retribuzione effettivamente nota e trascurando le rare schede in cui l'importo non è ancora stato valorizzato.\n\nIl prospetto conclusivo è stato disposto prima per posizione nel reparto, poi per importo decrescente e, in caso di perfetta parità, per matricola crescente, così da garantire un elenco privo di ambiguità. Parallelamente, l'ufficio organizzazione sta rivedendo le date di assunzione storiche, molte delle quali risalgono al periodo avviatosi nell'autunno 2009, e sta completando l'attribuzione del codice del direttore nelle poche unità dove il riferimento era rimasto in sospeso in attesa di nomina. Gli estratti definitivi, insieme alle relative note di sintesi, saranno restituiti all'archivio emp e inviati a ciascun DR (Direttore di Reparto) per programmare le prossime trattative retributive e pianificare eventuali adeguamenti di carriera."
+}

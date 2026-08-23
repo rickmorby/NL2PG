@@ -1,0 +1,182 @@
+{
+  "schema_ddl": "CREATE DOMAIN importo_premio AS NUMERIC(12,2) CHECK (VALUE > 0);\n\nCREATE DOMAIN stato_polizza AS TEXT CHECK (VALUE IN ('attiva', 'sospesa', 'scaduta'));\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL,\n    regione TEXT NOT NULL,\n    premio_annuo importo_premio NOT NULL,\n    stato stato_polizza NOT NULL,\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza > data_emissione)\n);",
+  "data_profile": {
+    "profile": {
+      "polizze": {
+        "row_count": 1353,
+        "columns": {
+          "id": {
+            "distinct": 1353,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1353
+          },
+          "numero_polizza": {
+            "distinct": 1353,
+            "sample": [
+              "POL-2025-000001",
+              "POL-2025-0000011",
+              "POL-2025-00000110",
+              "POL-2025-000001100",
+              "POL-2025-000001101"
+            ]
+          },
+          "tipo_polizza": {
+            "distinct": 5,
+            "sample": [
+              "auto",
+              "casa",
+              "salute",
+              "viaggio",
+              "vita"
+            ]
+          },
+          "regione": {
+            "distinct": 10,
+            "sample": [
+              "Calabria",
+              "Campania",
+              "Emilia-Romagna",
+              "Lazio",
+              "Lombardia"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 1287,
+            "sample": [
+              "1000.32",
+              "1000.35",
+              "1000.39",
+              "1000.4",
+              "1003.92"
+            ],
+            "min": 108.95,
+            "max": 3126.88
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "attiva",
+              "scaduta",
+              "sospesa"
+            ]
+          },
+          "data_emissione": {
+            "distinct": 506,
+            "sample": [
+              "2022-12-06",
+              "2022-12-07",
+              "2022-12-08",
+              "2022-12-10",
+              "2022-12-11"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 6,
+            "sample": [
+              "2025-05-05",
+              "2026-01-15",
+              "2026-02-10",
+              "2026-03-20",
+              "2026-06-01"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "polizze": [
+        {
+          "id": 1,
+          "numero_polizza": "POL-2025-000001",
+          "tipo_polizza": "viaggio",
+          "regione": "Calabria",
+          "premio_annuo": 679.25,
+          "stato": "scaduta",
+          "data_emissione": "2024-12-27",
+          "data_scadenza": "2026-01-15"
+        },
+        {
+          "id": 2,
+          "numero_polizza": "POL-2025-0000011",
+          "tipo_polizza": "viaggio",
+          "regione": "Campania",
+          "premio_annuo": 718.32,
+          "stato": "attiva",
+          "data_emissione": "2024-10-24",
+          "data_scadenza": "2026-01-15"
+        },
+        {
+          "id": 3,
+          "numero_polizza": "POL-2025-0000012",
+          "tipo_polizza": "auto",
+          "regione": "Lombardia",
+          "premio_annuo": 450.0,
+          "stato": "attiva",
+          "data_emissione": "2025-01-15",
+          "data_scadenza": "2026-01-15"
+        },
+        {
+          "id": 4,
+          "numero_polizza": "POL-2025-0000013",
+          "tipo_polizza": "salute",
+          "regione": "Campania",
+          "premio_annuo": 394.22,
+          "stato": "attiva",
+          "data_emissione": "2024-09-04",
+          "data_scadenza": "2026-01-15"
+        },
+        {
+          "id": 5,
+          "numero_polizza": "POL-2025-0000014",
+          "tipo_polizza": "auto",
+          "regione": "Calabria",
+          "premio_annuo": 1037.83,
+          "stato": "attiva",
+          "data_emissione": "2024-12-11",
+          "data_scadenza": "2026-01-15"
+        },
+        {
+          "id": 6,
+          "numero_polizza": "POL-2025-0000015",
+          "tipo_polizza": "auto",
+          "regione": "Calabria",
+          "premio_annuo": 1125.0,
+          "stato": "scaduta",
+          "data_emissione": "2024-12-02",
+          "data_scadenza": "2026-01-15"
+        },
+        {
+          "id": 7,
+          "numero_polizza": "POL-2025-0000016",
+          "tipo_polizza": "auto",
+          "regione": "Lazio",
+          "premio_annuo": 845.45,
+          "stato": "scaduta",
+          "data_emissione": "2024-10-07",
+          "data_scadenza": "2026-01-15"
+        },
+        {
+          "id": 8,
+          "numero_polizza": "POL-2025-0000017",
+          "tipo_polizza": "viaggio",
+          "regione": "Sicilia",
+          "premio_annuo": 561.04,
+          "stato": "attiva",
+          "data_emissione": "2024-08-18",
+          "data_scadenza": "2026-01-15"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "grouping_sets"
+  ],
+  "query": "SELECT COALESCE(tipo_polizza, 'TUTTI I TIPI') AS tipo_polizza, COALESCE(regione, 'TUTTE LE REGIONI') AS regione, COUNT(*) AS numero_polizze_attive, SUM(premio_annuo) AS premio_totale, ROUND(AVG(premio_annuo), 2) AS premio_medio FROM polizze WHERE stato = 'attiva' GROUP BY GROUPING SETS ((tipo_polizza, regione), (tipo_polizza), ()) ORDER BY premio_totale DESC NULLS LAST;"
+}

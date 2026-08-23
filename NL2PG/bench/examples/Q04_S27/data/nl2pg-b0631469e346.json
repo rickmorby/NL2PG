@@ -1,0 +1,521 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "64ac31d7b53a1282"
+  },
+  "schema_ddl": "CREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT UNIQUE,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    fornitore_id INT NOT NULL,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    data_ordine DATE NOT NULL,\n    stato_ordine TEXT NOT NULL CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale_ordine NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (totale_ordine >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    id INT PRIMARY KEY,\n    ordine_id INT NOT NULL,\n    prodotto_id INT NOT NULL,\n    numero_riga INT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "fornitori",
+        "nature": "dimension",
+        "min_rows": 120,
+        "max_rows": 200,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "MetalTech S.r.l.",
+            "partita_iva": "IT01234567890",
+            "citta": "Milano",
+            "email": "info@metaltech.it",
+            "attivo": true
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Plastiche Nord S.p.A.",
+            "partita_iva": "IT09876543210",
+            "citta": "Torino",
+            "email": "vendite@plasticnord.it",
+            "attivo": true
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Elettronica Sud S.r.l.",
+            "partita_iva": "IT05566778899",
+            "citta": "Napoli",
+            "email": "ordini@elsud.it",
+            "attivo": false
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Cartotecnica Lombarda S.p.A.",
+            "partita_iva": "IT03344556677",
+            "citta": "Brescia",
+            "email": "info@cartolombarda.it",
+            "attivo": true
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Chimica Toscana S.r.l.",
+            "partita_iva": "IT07788990011",
+            "citta": "Firenze",
+            "email": null,
+            "attivo": true
+          },
+          {
+            "id": 6,
+            "ragione_sociale": "Acciai Valpadana S.p.A.",
+            "partita_iva": "IT04455667788",
+            "citta": "Verona",
+            "email": "acquisti@acciaivalpadana.it",
+            "attivo": true
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "MetalTech S.r.l.",
+              "Plastiche Nord S.p.A.",
+              "Elettronica Sud S.r.l.",
+              "Cartotecnica Lombarda S.p.A.",
+              "Chimica Toscana S.r.l.",
+              "Gomme & Affini S.n.c.",
+              "Acciai Valpadana S.p.A.",
+              "Imballaggi Adriatico S.r.l."
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Brescia",
+              "Firenze",
+              "Bologna",
+              "Verona",
+              "Padova"
+            ]
+          },
+          "attivo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "true",
+              "true",
+              "false"
+            ]
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "fornitore_id": 1,
+            "sku": "MTL-BOL-M08",
+            "nome": "Bulloni M8 zincati (conf. 100)",
+            "descrizione": "Bulloni esagonali M8 in acciaio zincato, confezione da 100 pezzi",
+            "prezzo_unitario": 12.5,
+            "scorta_minima": 50
+          },
+          {
+            "id": 2,
+            "fornitore_id": 2,
+            "sku": "PLS-CAS-30L",
+            "nome": "Casse in plastica 30L",
+            "descrizione": "Cassa impilabile in polipropilene da 30 litri",
+            "prezzo_unitario": 24.9,
+            "scorta_minima": 20
+          },
+          {
+            "id": 3,
+            "fornitore_id": 3,
+            "sku": "ELS-RES-220V",
+            "nome": "Resistenza elettrica 220V",
+            "descrizione": "Resistenza a immersione 1500W 220V",
+            "prezzo_unitario": 38.0,
+            "scorta_minima": 15
+          },
+          {
+            "id": 4,
+            "fornitore_id": 4,
+            "sku": "CRT-RIS-A4",
+            "nome": "Risme carta A4 80g",
+            "descrizione": "Confezione 5 risme carta A4 80 g/mq",
+            "prezzo_unitario": 18.75,
+            "scorta_minima": 40
+          },
+          {
+            "id": 5,
+            "fornitore_id": 5,
+            "sku": "CHM-SLV-5KG",
+            "nome": "Solvente industriale 5kg",
+            "descrizione": "Solvente sgrassante professionale, tanica da 5 kg",
+            "prezzo_unitario": 45.2,
+            "scorta_minima": 10
+          },
+          {
+            "id": 6,
+            "fornitore_id": 6,
+            "sku": "ACC-TON-20MM",
+            "nome": "Tondino acciaio 20mm",
+            "descrizione": "Barra tonda in acciaio C45, lunghezza 3 metri",
+            "prezzo_unitario": 62.0,
+            "scorta_minima": 25
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Bulloni M8 zincati (conf. 100)",
+              "Casse in plastica 30L",
+              "Resistenza elettrica 220V",
+              "Risme carta A4 80g",
+              "Solvente industriale 5kg",
+              "Guarnizioni in gomma NBR",
+              "Cavi elettrici H07V-K 2.5mm",
+              "Pellicola stretch trasparente"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "scorta_minima": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 350,
+        "max_rows": 550,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Edil Costruzioni Rossi S.r.l.",
+            "codice_fiscale": "01234567890",
+            "citta": "Roma",
+            "email": "amministrazione@edilrossi.it"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Ferramenta Centrale di Bianchi",
+            "codice_fiscale": "BLNCHR85M01H501X",
+            "citta": "Milano",
+            "email": "ordini@ferracentrale.it"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Impianti Verdi S.p.A.",
+            "codice_fiscale": "09876543211",
+            "citta": "Padova",
+            "email": "acquisti@impiantiverdi.it"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Manutenzioni Express di Conti",
+            "codice_fiscale": "CNTMRA72B15F205Z",
+            "citta": "Genova",
+            "email": null
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Cooperativa Artigiana Lavoro Legno",
+            "codice_fiscale": "05544332210",
+            "citta": "Verona",
+            "email": "info@cooplegno.it"
+          },
+          {
+            "id": 6,
+            "ragione_sociale": "Tessuti Preziosi S.r.l.",
+            "codice_fiscale": "TRSSVN68C22D969Y",
+            "citta": "Como",
+            "email": "ufficio.acquisti@tessutipreziosi.it"
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Edil Costruzioni Rossi S.r.l.",
+              "Ferramenta Centrale di Bianchi",
+              "Impianti Verdi S.p.A.",
+              "Manutenzioni Express di Conti",
+              "Cooperativa Artigiana Lavoro Legno",
+              "Tessuti Preziosi S.r.l.",
+              "Officine Meccaniche del Garda S.n.c.",
+              "Grossisti Alimentari Meridionali S.p.A."
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona",
+              "Padova"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1001,
+            "cliente_id": 1,
+            "numero_ordine": "ORD-2026-0001",
+            "data_ordine": "2026-01-12",
+            "stato_ordine": "consegnato",
+            "totale_ordine": 1250.0
+          },
+          {
+            "id": 1002,
+            "cliente_id": 2,
+            "numero_ordine": "ORD-2026-0002",
+            "data_ordine": "2026-01-20",
+            "stato_ordine": "spedito",
+            "totale_ordine": 480.5
+          },
+          {
+            "id": 1003,
+            "cliente_id": 3,
+            "numero_ordine": "ORD-2026-0003",
+            "data_ordine": "2026-02-03",
+            "stato_ordine": "confermato",
+            "totale_ordine": 89.9
+          },
+          {
+            "id": 1004,
+            "cliente_id": 4,
+            "numero_ordine": "ORD-2026-0004",
+            "data_ordine": "2026-02-14",
+            "stato_ordine": "in_attesa",
+            "totale_ordine": 2100.0
+          },
+          {
+            "id": 1005,
+            "cliente_id": 5,
+            "numero_ordine": "ORD-2026-0005",
+            "data_ordine": "2026-02-25",
+            "stato_ordine": "annullato",
+            "totale_ordine": 320.0
+          },
+          {
+            "id": 1006,
+            "cliente_id": 1,
+            "numero_ordine": "ORD-2026-0006",
+            "data_ordine": "2026-03-05",
+            "stato_ordine": "consegnato",
+            "totale_ordine": 745.25
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnato",
+              "consegnato",
+              "consegnato",
+              "spedito",
+              "spedito",
+              "confermato",
+              "in_attesa",
+              "annullato"
+            ]
+          },
+          "totale_ordine": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "righe_ordine",
+        "nature": "fact",
+        "min_rows": 1500,
+        "max_rows": 2200,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ordine_id": 1001,
+            "prodotto_id": 1,
+            "numero_riga": 1,
+            "quantita": 40,
+            "prezzo_unitario": 12.5,
+            "sconto_percentuale": 0
+          },
+          {
+            "id": 2,
+            "ordine_id": 1001,
+            "prodotto_id": 4,
+            "numero_riga": 2,
+            "quantita": 25,
+            "prezzo_unitario": 18.75,
+            "sconto_percentuale": 5.0
+          },
+          {
+            "id": 3,
+            "ordine_id": 1002,
+            "prodotto_id": 2,
+            "numero_riga": 1,
+            "quantita": 10,
+            "prezzo_unitario": 24.9,
+            "sconto_percentuale": 0
+          },
+          {
+            "id": 4,
+            "ordine_id": 1003,
+            "prodotto_id": 3,
+            "numero_riga": 1,
+            "quantita": 2,
+            "prezzo_unitario": 38.0,
+            "sconto_percentuale": 10.0
+          },
+          {
+            "id": 5,
+            "ordine_id": 1004,
+            "prodotto_id": 5,
+            "numero_riga": 1,
+            "quantita": 15,
+            "prezzo_unitario": 45.2,
+            "sconto_percentuale": 0
+          },
+          {
+            "id": 6,
+            "ordine_id": 1005,
+            "prodotto_id": 1,
+            "numero_riga": 1,
+            "quantita": 8,
+            "prezzo_unitario": 12.5,
+            "sconto_percentuale": 2.5
+          },
+          {
+            "id": 7,
+            "ordine_id": 1006,
+            "prodotto_id": 6,
+            "numero_riga": 1,
+            "quantita": 6,
+            "prezzo_unitario": 62.0,
+            "sconto_percentuale": 0
+          }
+        ],
+        "variations": {
+          "numero_riga": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          },
+          "quantita": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.5,
+            "pool": []
+          },
+          "sconto_percentuale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0",
+              "0",
+              "0",
+              "5.00",
+              "10.00",
+              "15.00"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,751 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    email TEXT,\n    telefono TEXT,\n    citta_residenza TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE polizze (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'viaggio')),\n    data_emissione DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    massimale_copertura NUMERIC(12,2) CHECK (massimale_copertura > 0),\n    polizza_attiva BOOLEAN NOT NULL DEFAULT TRUE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_scadenza > data_emissione)\n);\n\nCREATE TABLE sinistri (\n    id SERIAL PRIMARY KEY,\n    polizza_id INT NOT NULL,\n    data_apertura DATE NOT NULL,\n    data_chiusura DATE,\n    liquidazione_id INT,\n    descrizione_danno TEXT NOT NULL,\n    importo_danno NUMERIC(12,2) NOT NULL CHECK (importo_danno >= 0),\n    stato_pratica TEXT NOT NULL DEFAULT 'aperta' CHECK (stato_pratica IN ('aperta', 'in_istruttoria', 'liquidato', 'respinto')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_chiusura IS NULL OR data_chiusura >= data_apertura)\n);\n\nCREATE TABLE liquidazioni (\n    id SERIAL PRIMARY KEY,\n    sinistro_id INT NOT NULL,\n    importo_liquidato NUMERIC(12,2) NOT NULL CHECK (importo_liquidato >= 0),\n    data_liquidazione DATE NOT NULL,\n    modalita_pagamento TEXT NOT NULL CHECK (modalita_pagamento IN ('bonifico', 'assegno', 'accredito')),\n    iban_beneficiario TEXT,\n    note TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 629,
+        "columns": {
+          "id": {
+            "distinct": 629,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 629
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Francesca"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Fontana",
+              "Gallo",
+              "Greco"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 629,
+            "sample": [
+              "BNCLRA79C42F205B",
+              "BNCLRA79C42F205C",
+              "BNCLRA79C42F205D",
+              "BNCLRA79C42F205E",
+              "BNCLRA79C42F205F"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 564,
+            "sample": [
+              "1964-06-11",
+              "1964-10-10",
+              "1965-01-26",
+              "1965-08-26",
+              "1965-10-17"
+            ]
+          },
+          "email": {
+            "distinct": 8,
+            "sample": [
+              "alessandro.conti@example.com",
+              "davide.ricci@example.com",
+              "francesca.moretti@example.com",
+              "giulia.verdi@example.com",
+              "info.cliente@example.com"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "+39 011 9876543",
+              "+39 02 7654321",
+              "+39 051 1357911",
+              "+39 055 1122334",
+              "+39 06 1234567"
+            ]
+          },
+          "citta_residenza": {
+            "distinct": 6,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "polizze": {
+        "row_count": 2061,
+        "columns": {
+          "id": {
+            "distinct": 2061,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2061
+          },
+          "cliente_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "numero_polizza": {
+            "distinct": 2061,
+            "sample": [
+              "POL-2023-000003",
+              "POL-2023-0000031",
+              "POL-2023-00000310",
+              "POL-2023-000003100",
+              "POL-2023-000003101"
+            ]
+          },
+          "tipo_polizza": {
+            "distinct": 5,
+            "sample": [
+              "auto",
+              "casa",
+              "salute",
+              "viaggio",
+              "vita"
+            ]
+          },
+          "data_emissione": {
+            "distinct": 307,
+            "sample": [
+              "2023-07-23",
+              "2023-07-24",
+              "2023-07-25",
+              "2023-07-26",
+              "2023-07-27"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 6,
+            "sample": [
+              "2025-01-15",
+              "2025-02-01",
+              "2025-03-10",
+              "2025-04-22",
+              "2025-06-01"
+            ]
+          },
+          "premio_annuo": {
+            "distinct": 1967,
+            "sample": [
+              "100.55",
+              "100.72",
+              "100.96",
+              "1000.09",
+              "1001.32"
+            ],
+            "min": 90.0,
+            "max": 2280.0
+          },
+          "massimale_copertura": {
+            "distinct": 1873,
+            "sample": [
+              "100000.0",
+              "1000000.0",
+              "100403.15",
+              "101102.94",
+              "101132.43"
+            ],
+            "min": 15000.0,
+            "max": 1000000.0
+          },
+          "polizza_attiva": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "sinistri": {
+        "row_count": 2063,
+        "columns": {
+          "id": {
+            "distinct": 2063,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2063
+          },
+          "polizza_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "data_apertura": {
+            "distinct": 264,
+            "sample": [
+              "2023-12-27",
+              "2023-12-28",
+              "2023-12-29",
+              "2023-12-30",
+              "2023-12-31"
+            ]
+          },
+          "data_chiusura": {
+            "distinct": 4,
+            "sample": [
+              "2024-03-05",
+              "2024-06-30",
+              "2024-07-20",
+              "2024-12-12"
+            ]
+          },
+          "liquidazione_id": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "descrizione_danno": {
+            "distinct": 10,
+            "sample": [
+              "Danni da grandine alla carrozzeria",
+              "Danno elettrico da sovraccarico di corrente",
+              "Furto con scasso dei beni assicurati",
+              "Incidente con controparte non assicurata",
+              "Infiltrazione acqua dal tetto dopo forte pioggia"
+            ]
+          },
+          "importo_danno": {
+            "distinct": 1992,
+            "sample": [
+              "10002.49",
+              "10012.67",
+              "10017.95",
+              "10021.27",
+              "10021.46"
+            ],
+            "min": 380.0,
+            "max": 18500.0
+          },
+          "stato_pratica": {
+            "distinct": 4,
+            "sample": [
+              "aperta",
+              "in_istruttoria",
+              "liquidato",
+              "respinto"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "liquidazioni": {
+        "row_count": 1818,
+        "columns": {
+          "id": {
+            "distinct": 1818,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1818
+          },
+          "sinistro_id": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "3",
+              "6"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "importo_liquidato": {
+            "distinct": 1724,
+            "sample": [
+              "100.0",
+              "100.24",
+              "100.92",
+              "10006.93",
+              "10010.05"
+            ],
+            "min": 50.0,
+            "max": 10200.0
+          },
+          "data_liquidazione": {
+            "distinct": 79,
+            "sample": [
+              "2024-02-15",
+              "2024-02-16",
+              "2024-02-17",
+              "2024-02-18",
+              "2024-02-19"
+            ]
+          },
+          "modalita_pagamento": {
+            "distinct": 3,
+            "sample": [
+              "accredito",
+              "assegno",
+              "bonifico"
+            ]
+          },
+          "iban_beneficiario": {
+            "distinct": 5,
+            "sample": [
+              "IT12L0200800503000001234567",
+              "IT23A0362701600105284954000",
+              "IT60X0542811101000000123456",
+              "IT84S0301503200000003512345",
+              "IT99K0760103000000009876543"
+            ]
+          },
+          "note": {
+            "distinct": 6,
+            "sample": [
+              "Anticipo su presunto danno",
+              "Anticipo tecnico in attesa di stima definitiva",
+              "Liquidazione con applicazione della franchigia",
+              "Pagamento integrale dopo relazione di perizia",
+              "Saldo finale dopo controperizia"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 58,
+          "nome": "Andrea",
+          "cognome": "Gallo",
+          "codice_fiscale": "RSSMRC84A01H559G",
+          "data_nascita": "1983-03-17",
+          "email": "andrea.gallo1@example.com",
+          "telefono": "+39 055 1122334",
+          "citta_residenza": "Torino",
+          "created_at": "2000-01-01T00:00:00"
+        },
+        {
+          "id": 51,
+          "nome": "Davide",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRC84A01H552Z",
+          "data_nascita": "1994-01-04",
+          "email": "davide.conti1@example.com",
+          "telefono": "+39 099 8877665",
+          "citta_residenza": "Milano",
+          "created_at": "2000-01-01T00:00:00"
+        },
+        {
+          "id": 38,
+          "nome": "Luca",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC84A01H539M",
+          "data_nascita": "1973-12-22",
+          "email": "luca.rossi1@example.com",
+          "telefono": "+39 02 7654321",
+          "citta_residenza": null,
+          "created_at": "2000-01-01T00:00:00"
+        },
+        {
+          "id": 39,
+          "nome": "Marco",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRC84A01H540N",
+          "data_nascita": "1982-03-24",
+          "email": "marco.ricci1@example.com",
+          "telefono": "+39 055 1122334",
+          "citta_residenza": "Firenze",
+          "created_at": "2000-01-01T00:00:00"
+        },
+        {
+          "id": 65,
+          "nome": "Chiara",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRC84A01H566N",
+          "data_nascita": "1982-03-31",
+          "email": "chiara.ricci1@example.com",
+          "telefono": "+39 051 1357911",
+          "citta_residenza": "Milano",
+          "created_at": "2000-01-01T00:00:00"
+        },
+        {
+          "id": 188,
+          "nome": "Giulia",
+          "cognome": "Moretti",
+          "codice_fiscale": "BNCLRA79C42F288F",
+          "data_nascita": "1988-10-13",
+          "email": "giulia.moretti1@example.com",
+          "telefono": "+39 06 1234567",
+          "citta_residenza": "Bologna",
+          "created_at": "2000-01-01T00:00:00"
+        },
+        {
+          "id": 171,
+          "nome": "Giulia",
+          "cognome": "Rossi",
+          "codice_fiscale": "BNCLRA79C42F271O",
+          "data_nascita": "1972-05-30",
+          "email": "giulia.rossi1@example.com",
+          "telefono": "+39 081 2468135",
+          "citta_residenza": "Torino",
+          "created_at": "2000-01-01T00:00:00"
+        },
+        {
+          "id": 133,
+          "nome": "Laura",
+          "cognome": "Bianchi",
+          "codice_fiscale": "BNCLRA79C42F233C",
+          "data_nascita": "1979-03-02",
+          "email": "laura.bianchi1@example.com",
+          "telefono": "+39 02 7654321",
+          "citta_residenza": "Milano",
+          "created_at": "2000-01-01T00:00:00"
+        }
+      ],
+      "polizze": [
+        {
+          "id": 1,
+          "cliente_id": 1,
+          "numero_polizza": "POL-2024-000001",
+          "tipo_polizza": "viaggio",
+          "data_emissione": "2024-01-01",
+          "data_scadenza": "2025-01-15",
+          "premio_annuo": 796.31,
+          "massimale_copertura": 556945.0,
+          "polizza_attiva": "false",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "cliente_id": 1,
+          "numero_polizza": "POL-2024-0000011",
+          "tipo_polizza": "auto",
+          "data_emissione": "2024-01-15",
+          "data_scadenza": "2025-01-15",
+          "premio_annuo": 450.0,
+          "massimale_copertura": 500000.0,
+          "polizza_attiva": true,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "cliente_id": 1,
+          "numero_polizza": "POL-2024-0000012",
+          "tipo_polizza": "casa",
+          "data_emissione": "2023-12-03",
+          "data_scadenza": "2025-01-15",
+          "premio_annuo": 601.91,
+          "massimale_copertura": 771011.8,
+          "polizza_attiva": "false",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "cliente_id": 1,
+          "numero_polizza": "POL-2024-0000013",
+          "tipo_polizza": "casa",
+          "data_emissione": "2023-12-18",
+          "data_scadenza": "2025-01-15",
+          "premio_annuo": 717.61,
+          "massimale_copertura": 832655.63,
+          "polizza_attiva": "true",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "cliente_id": 1,
+          "numero_polizza": "POL-2024-0000014",
+          "tipo_polizza": "casa",
+          "data_emissione": "2023-11-28",
+          "data_scadenza": "2025-01-15",
+          "premio_annuo": 480.25,
+          "massimale_copertura": 250000.0,
+          "polizza_attiva": "false",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "cliente_id": 1,
+          "numero_polizza": "POL-2024-0000015",
+          "tipo_polizza": "salute",
+          "data_emissione": "2023-10-17",
+          "data_scadenza": "2025-01-15",
+          "premio_annuo": 645.33,
+          "massimale_copertura": 589006.32,
+          "polizza_attiva": "true",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "cliente_id": 1,
+          "numero_polizza": "POL-2024-0000016",
+          "tipo_polizza": "casa",
+          "data_emissione": "2023-10-15",
+          "data_scadenza": "2025-01-15",
+          "premio_annuo": 705.8,
+          "massimale_copertura": 717361.84,
+          "polizza_attiva": "true",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "cliente_id": 1,
+          "numero_polizza": "POL-2024-0000017",
+          "tipo_polizza": "vita",
+          "data_emissione": "2024-01-07",
+          "data_scadenza": "2025-01-15",
+          "premio_annuo": 369.9,
+          "massimale_copertura": 394889.19,
+          "polizza_attiva": "true",
+          "created_at": "2000-01-01"
+        }
+      ],
+      "sinistri": [
+        {
+          "id": 1,
+          "polizza_id": 1,
+          "data_apertura": "2024-01-31",
+          "data_chiusura": "2024-03-05",
+          "liquidazione_id": 1,
+          "descrizione_danno": "Smarrimento bagaglio durante il viaggio",
+          "importo_danno": 3732.87,
+          "stato_pratica": "liquidato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "polizza_id": 1,
+          "data_apertura": "2024-01-04",
+          "data_chiusura": "2024-03-05",
+          "liquidazione_id": 1,
+          "descrizione_danno": "Infiltrazione acqua dal tetto dopo forte pioggia",
+          "importo_danno": 4452.93,
+          "stato_pratica": "liquidato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "polizza_id": 1,
+          "data_apertura": "2024-01-20",
+          "data_chiusura": "2024-03-05",
+          "liquidazione_id": 1,
+          "descrizione_danno": "Tamponamento posteriore in coda al semaforo",
+          "importo_danno": 2480.65,
+          "stato_pratica": "liquidato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "polizza_id": 1,
+          "data_apertura": "2024-01-14",
+          "data_chiusura": "2024-03-05",
+          "liquidazione_id": 1,
+          "descrizione_danno": "Rottura tubatura e danno alle pareti",
+          "importo_danno": 1664.47,
+          "stato_pratica": "liquidato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "polizza_id": 1,
+          "data_apertura": "2024-01-19",
+          "data_chiusura": "2024-03-05",
+          "liquidazione_id": 1,
+          "descrizione_danno": "Furto con scasso dei beni assicurati",
+          "importo_danno": 3844.1,
+          "stato_pratica": "liquidato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "polizza_id": 1,
+          "data_apertura": "2023-12-28",
+          "data_chiusura": "2024-03-05",
+          "liquidazione_id": 1,
+          "descrizione_danno": "Vandalismo su veicolo parcheggiato",
+          "importo_danno": 1847.32,
+          "stato_pratica": "liquidato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "polizza_id": 1,
+          "data_apertura": "2024-01-08",
+          "data_chiusura": "2024-03-05",
+          "liquidazione_id": 1,
+          "descrizione_danno": "Danni da grandine alla carrozzeria",
+          "importo_danno": 1126.99,
+          "stato_pratica": "liquidato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "polizza_id": 1,
+          "data_apertura": "2024-01-14",
+          "data_chiusura": "2024-03-05",
+          "liquidazione_id": null,
+          "descrizione_danno": "Rottura tubatura e danno alle pareti",
+          "importo_danno": 2854.31,
+          "stato_pratica": "liquidato",
+          "created_at": "2000-01-01"
+        }
+      ],
+      "liquidazioni": [
+        {
+          "id": 1,
+          "sinistro_id": 1,
+          "importo_liquidato": 1892.89,
+          "data_liquidazione": "2024-03-21",
+          "modalita_pagamento": "bonifico",
+          "iban_beneficiario": "IT12L0200800503000001234567",
+          "note": "Anticipo tecnico in attesa di stima definitiva",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 2,
+          "sinistro_id": 1,
+          "importo_liquidato": 1750.0,
+          "data_liquidazione": "2024-03-07",
+          "modalita_pagamento": "bonifico",
+          "iban_beneficiario": "IT60X0542811101000000123456",
+          "note": "Pagamento integrale dopo relazione di perizia",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 3,
+          "sinistro_id": 1,
+          "importo_liquidato": 1585.67,
+          "data_liquidazione": "2024-03-15",
+          "modalita_pagamento": "assegno",
+          "iban_beneficiario": "IT23A0362701600105284954000",
+          "note": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 4,
+          "sinistro_id": 1,
+          "importo_liquidato": 1446.65,
+          "data_liquidazione": "2024-03-16",
+          "modalita_pagamento": "assegno",
+          "iban_beneficiario": "IT84S0301503200000003512345",
+          "note": "Saldo finale dopo controperizia",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 5,
+          "sinistro_id": 1,
+          "importo_liquidato": 1554.56,
+          "data_liquidazione": "2024-03-19",
+          "modalita_pagamento": "bonifico",
+          "iban_beneficiario": "IT23A0362701600105284954000",
+          "note": "Transazione concordata con il contraente",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 6,
+          "sinistro_id": 1,
+          "importo_liquidato": 1631.38,
+          "data_liquidazione": "2024-03-17",
+          "modalita_pagamento": "assegno",
+          "iban_beneficiario": "IT12L0200800503000001234567",
+          "note": "Saldo finale dopo controperizia",
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 7,
+          "sinistro_id": 1,
+          "importo_liquidato": 2188.37,
+          "data_liquidazione": "2024-03-13",
+          "modalita_pagamento": "bonifico",
+          "iban_beneficiario": "IT84S0301503200000003512345",
+          "note": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "id": 8,
+          "sinistro_id": 1,
+          "importo_liquidato": 1422.75,
+          "data_liquidazione": "2024-03-11",
+          "modalita_pagamento": "bonifico",
+          "iban_beneficiario": "IT23A0362701600105284954000",
+          "note": "Liquidazione con applicazione della franchigia",
+          "created_at": "2000-01-01"
+        }
+      ]
+    }
+  },
+  "story": "Presso la direzione sinistri della compagnia assicurativa, il controllo di fine trimestre si concentra sull'esposizione finanziaria delle pratiche ancora da definire. L'archivio denominato clienti, che gli operatori chiamano abitualmente contraenti, raccoglie 629 schede anagrafiche: per ciascun contraente sono annotati nome, cognome, codice fiscale, data di nascita, recapiti di posta elettronica e telefono, oltre alla città di residenza, con presenze a Milano, Roma, Torino, Firenze, Napoli e Bologna. Il registro polizze conserva 2061 contratti stipulati: ogni scheda riporta il numero di polizza, la tipologia — auto, casa, vita, salute o viaggio —, la data di emissione, la data di scadenza, con molte coperture che terminano il 2025-01-15, il premio annuo, compreso tra 90 e 2280 euro, il massimale di copertura, che può toccare 1000000 euro, l'indicazione se la copertura risulta attiva e il rimando al contraente intestatario. Il fascicolo pratiche_danno, denominato formalmente sinistri negli atti ufficiali, traccia 2063 eventi dannosi: la data di apertura, la data di chiusura quando la pratica si conclude, la descrizione del danno — dall'infiltrazione di acqua dal tetto dopo forte pioggia ai danni da grandine alla carrozzeria —, l'importo del danno, che negli episodi più gravi supera i 18500 euro, e lo stato della pratica, che può risultare aperta, in_istruttoria, liquidato oppure respinto. L'archivio liquidazioni documenta invece 1818 pagamenti effettuati: importo liquidato, data del pagamento, modalità — bonifico, assegno o accredito —, coordinate del beneficiario e note di perizia. Durante la verifica, gli analisti hanno isolato le pratiche prive di liquidazione collegata, ossia le schede del registro sinistri in cui il rimando all'archivio liquidazioni risulta vuoto, escludendo espressamente le posizioni con stato respinto. Sono state prese in considerazione soltanto le pratiche ancora aperte o in_istruttoria, lasciando fuori quelle già liquidate. Per ciascun contraente e per ciascuna tipologia di polizza — auto, casa, vita, salute, viaggio — è stato conteggiato il numero di pratiche da liquidare, calcolato il totale e la media dell'importo del danno, e la classifica è stata ordinata per esposizione totale decrescente, così da far emergere per prime le combinazioni contraente e tipo di copertura più gravose per i bilanci. Il responsabile attuario ha chiesto che le posizioni con danni più ingenti vengano segnalate prioritariamente al comitato, mentre le liquidazioni già emesse tramite bonifico o assegno sono state riconciliate con i movimenti di tesoreria prima della chiusura del trimestre."
+}

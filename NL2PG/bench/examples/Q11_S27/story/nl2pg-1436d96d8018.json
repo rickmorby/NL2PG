@@ -1,0 +1,660 @@
+{
+  "schema_ddl": "CREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    provincia TEXT,\n    cap TEXT,\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    numero_vani INT CHECK (numero_vani > 0),\n    tipologia TEXT NOT NULL CHECK (tipologia IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    stato TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato IN ('disponibile', 'riservato', 'venduto')),\n    prezzo_richiesto NUMERIC(12,2) CHECK (prezzo_richiesto >= 0),\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE agenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    matricola TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    immobile_id INT NOT NULL,\n    cliente_id INT NOT NULL,\n    agente_id INT,\n    data_stipula DATE NOT NULL,\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('compromesso', 'definitivo', 'opzione')),\n    prezzo_concordato NUMERIC(12,2) CHECK (prezzo_concordato >= 0),\n    note TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "immobili": {
+        "row_count": 299,
+        "columns": {
+          "id": {
+            "distinct": 299,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 299
+          },
+          "indirizzo": {
+            "distinct": 13,
+            "sample": [
+              "Corso Francia 210",
+              "Corso Italia 9",
+              "Piazza Dante 5",
+              "Strada Vicinale dei Boschi 3",
+              "Via Appia Nuova 145"
+            ]
+          },
+          "comune": {
+            "distinct": 7,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "provincia": {
+            "distinct": 7,
+            "sample": [
+              "BO",
+              "FI",
+              "MI",
+              "NA",
+              "RM"
+            ]
+          },
+          "cap": {
+            "distinct": 9,
+            "sample": [
+              "00165",
+              "00181",
+              "10146",
+              "20123",
+              "20124"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 272,
+            "sample": [
+              "101.17",
+              "1012.9",
+              "1019.93",
+              "102.35",
+              "103.3"
+            ],
+            "min": 34.08,
+            "max": 1687.5
+          },
+          "numero_vani": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 7
+          },
+          "tipologia": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "negozio",
+              "terreno",
+              "ufficio",
+              "villa"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "disponibile",
+              "riservato",
+              "venduto"
+            ]
+          },
+          "prezzo_richiesto": {
+            "distinct": 275,
+            "sample": [
+              "1000568.3",
+              "120082.29",
+              "122363.57",
+              "126478.92",
+              "127436.12"
+            ],
+            "min": 120082.29,
+            "max": 1000568.3
+          },
+          "created_at": {
+            "distinct": 265,
+            "sample": [
+              "2024-11-10 10:05:00",
+              "2024-11-11 10:05:00",
+              "2024-11-12 10:05:00",
+              "2024-12-13 10:05:00",
+              "2024-12-14 10:05:00"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 461,
+        "columns": {
+          "id": {
+            "distinct": 461,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 461
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro",
+              "Anna",
+              "Chiara",
+              "Davide",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Colombo",
+              "Conti",
+              "Esposito"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 461,
+            "sample": [
+              "BNCGLA85C43H501B",
+              "BNCGLA85C43H501C",
+              "BNCGLA85C43H501D",
+              "BNCGLA85C43H501E",
+              "BNCGLA85C43H501F"
+            ]
+          },
+          "email": {
+            "distinct": 440,
+            "sample": [
+              "alessandro.ferrari7910@tiscali.it",
+              "alessandro.ferrari7911@tiscali.it",
+              "alessandro.ferrari7912@tiscali.it",
+              "alessandro.ferrari7913@tiscali.it",
+              "alessandro.ferrari7914@tiscali.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 13,
+            "sample": [
+              "320 3344556",
+              "320 3456789",
+              "328 5566778",
+              "331 7788990",
+              "333 1122334"
+            ]
+          }
+        }
+      },
+      "agenti": {
+        "row_count": 44,
+        "columns": {
+          "id": {
+            "distinct": 44,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 44
+          },
+          "nome": {
+            "distinct": 6,
+            "sample": [
+              "Fabio",
+              "Laura",
+              "Paolo",
+              "Silvia",
+              "Stefano"
+            ]
+          },
+          "cognome": {
+            "distinct": 6,
+            "sample": [
+              "Costa",
+              "Fontana",
+              "Galli",
+              "Lombardi",
+              "Moretti"
+            ]
+          },
+          "matricola": {
+            "distinct": 44,
+            "sample": [
+              "AG-001",
+              "AG-0011",
+              "AG-0012",
+              "AG-0013",
+              "AG-0014"
+            ]
+          },
+          "telefono": {
+            "distinct": 6,
+            "sample": [
+              "334 5555666",
+              "337 6666777",
+              "340 3333444",
+              "348 1111222",
+              "349 2222333"
+            ]
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 1696,
+        "columns": {
+          "id": {
+            "distinct": 1696,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1696
+          },
+          "immobile_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "cliente_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "agente_id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "data_stipula": {
+            "distinct": 250,
+            "sample": [
+              "2025-11-06",
+              "2025-11-07",
+              "2025-11-08",
+              "2025-11-09",
+              "2025-11-11"
+            ]
+          },
+          "tipo_contratto": {
+            "distinct": 3,
+            "sample": [
+              "compromesso",
+              "definitivo",
+              "opzione"
+            ]
+          },
+          "prezzo_concordato": {
+            "distinct": 1551,
+            "sample": [
+              "142950.77",
+              "143029.57",
+              "143928.89",
+              "143962.96",
+              "143969.18"
+            ],
+            "min": 142950.77,
+            "max": 793500.0
+          },
+          "note": {
+            "distinct": 11,
+            "sample": [
+              "Acconto del 10% versato",
+              "Acconto versato",
+              "Compratore prima casa",
+              "Mutuo approvato, rogito entro 60 giorni",
+              "Mutuo in approvazione"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "immobili": [
+        {
+          "id": 1,
+          "indirizzo": "Via Mazzini 44",
+          "comune": "Milano",
+          "provincia": "MI",
+          "cap": "20123",
+          "superficie_mq": 70.06,
+          "numero_vani": 3,
+          "tipologia": "appartamento",
+          "stato": "disponibile",
+          "prezzo_richiesto": 256117.45,
+          "created_at": "2025-06-11 09:30:00"
+        },
+        {
+          "id": 2,
+          "indirizzo": "Via Garibaldi 14",
+          "comune": "Milano",
+          "provincia": "MI",
+          "cap": "20123",
+          "superficie_mq": 58.91,
+          "numero_vani": 3,
+          "tipologia": "appartamento",
+          "stato": "disponibile",
+          "prezzo_richiesto": 331781.25,
+          "created_at": "2025-01-03 09:30:00"
+        },
+        {
+          "id": 3,
+          "indirizzo": "Via Dante Alighieri 12",
+          "comune": "Milano",
+          "provincia": "MI",
+          "cap": "20123",
+          "superficie_mq": 61.53,
+          "numero_vani": 3,
+          "tipologia": "appartamento",
+          "stato": "disponibile",
+          "prezzo_richiesto": 399703.46,
+          "created_at": "2025-04-20 09:30:00"
+        },
+        {
+          "id": 4,
+          "indirizzo": "Via Torino 12",
+          "comune": "Milano",
+          "provincia": "MI",
+          "cap": "20123",
+          "superficie_mq": 68.0,
+          "numero_vani": 3,
+          "tipologia": "appartamento",
+          "stato": "venduto",
+          "prezzo_richiesto": 315000.0,
+          "created_at": "2025-03-14 09:30:00"
+        },
+        {
+          "id": 5,
+          "indirizzo": "Viale Trieste 18",
+          "comune": "Milano",
+          "provincia": "MI",
+          "cap": "20123",
+          "superficie_mq": 68.14,
+          "numero_vani": 3,
+          "tipologia": "appartamento",
+          "stato": "riservato",
+          "prezzo_richiesto": 259202.81,
+          "created_at": "2025-03-10 09:30:00"
+        },
+        {
+          "id": 6,
+          "indirizzo": "Piazza Dante 5",
+          "comune": "Milano",
+          "provincia": "MI",
+          "cap": "20123",
+          "superficie_mq": 54.42,
+          "numero_vani": 3,
+          "tipologia": "appartamento",
+          "stato": "disponibile",
+          "prezzo_richiesto": 346226.76,
+          "created_at": "2025-01-10 09:30:00"
+        },
+        {
+          "id": 7,
+          "indirizzo": "Via Verdi 31",
+          "comune": "Milano",
+          "provincia": "MI",
+          "cap": "20123",
+          "superficie_mq": 66.47,
+          "numero_vani": 3,
+          "tipologia": "appartamento",
+          "stato": "disponibile",
+          "prezzo_richiesto": 425361.01,
+          "created_at": "2025-02-05 09:30:00"
+        },
+        {
+          "id": 8,
+          "indirizzo": "Piazza Dante 5",
+          "comune": "Milano",
+          "provincia": "MI",
+          "cap": "20123",
+          "superficie_mq": 74.75,
+          "numero_vani": 3,
+          "tipologia": "appartamento",
+          "stato": "riservato",
+          "prezzo_richiesto": 281386.96,
+          "created_at": "2025-05-27 09:30:00"
+        }
+      ],
+      "clienti": [
+        {
+          "id": 34,
+          "nome": "Anna",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRC80A01F239I",
+          "email": "anna.bianchi1@example.com",
+          "telefono": "346 6677889"
+        },
+        {
+          "id": 74,
+          "nome": "Giulia",
+          "cognome": "Colombo",
+          "codice_fiscale": "BNCGLA85C43H501P",
+          "email": "giulia.colombo1@example.com",
+          "telefono": "320 3344556"
+        },
+        {
+          "id": 56,
+          "nome": "Luca",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRC80A01F261E",
+          "email": "luca.conti1@example.com",
+          "telefono": "347 2233445"
+        },
+        {
+          "id": 39,
+          "nome": "Luca",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRC80A01F244N",
+          "email": "luca.rossi1@example.com",
+          "telefono": "347 2233445"
+        },
+        {
+          "id": 148,
+          "nome": "Anna",
+          "cognome": "Marino",
+          "codice_fiscale": "FRRLSN79D12M084G",
+          "email": "anna.marino1@example.com",
+          "telefono": null
+        },
+        {
+          "id": 110,
+          "nome": "Elena",
+          "cognome": "Ricci",
+          "codice_fiscale": "BNCGLA85C43H553A",
+          "email": "elena.ricci1@example.com",
+          "telefono": "320 3344556"
+        },
+        {
+          "id": 97,
+          "nome": "Giulia",
+          "cognome": "Bianchi",
+          "codice_fiscale": "BNCGLA85C43H540N",
+          "email": "giulia.bianchi1@example.com",
+          "telefono": "347 2345678"
+        },
+        {
+          "id": 80,
+          "nome": "Sara",
+          "cognome": "Bianchi",
+          "codice_fiscale": "BNCGLA85C43H501V",
+          "email": "sara.bianchi1@example.com",
+          "telefono": "335 8899001"
+        }
+      ],
+      "agenti": [
+        {
+          "id": 1,
+          "nome": "Paolo",
+          "cognome": "Moretti",
+          "matricola": "AG-001",
+          "telefono": "348 1111222"
+        },
+        {
+          "id": 2,
+          "nome": "Paolo",
+          "cognome": "Moretti",
+          "matricola": "AG-0011",
+          "telefono": "348 1111222"
+        },
+        {
+          "id": 3,
+          "nome": "Paolo",
+          "cognome": "Moretti",
+          "matricola": "AG-0012",
+          "telefono": "348 1111222"
+        },
+        {
+          "id": 4,
+          "nome": "Paolo",
+          "cognome": "Moretti",
+          "matricola": "AG-0013",
+          "telefono": "348 1111222"
+        },
+        {
+          "id": 5,
+          "nome": "Paolo",
+          "cognome": "Moretti",
+          "matricola": "AG-0014",
+          "telefono": "348 1111222"
+        },
+        {
+          "id": 6,
+          "nome": "Paolo",
+          "cognome": "Moretti",
+          "matricola": "AG-0015",
+          "telefono": "348 1111222"
+        },
+        {
+          "id": 7,
+          "nome": "Paolo",
+          "cognome": "Moretti",
+          "matricola": "AG-0016",
+          "telefono": "348 1111222"
+        },
+        {
+          "id": 8,
+          "nome": "Paolo",
+          "cognome": "Moretti",
+          "matricola": "AG-0017",
+          "telefono": "348 1111222"
+        }
+      ],
+      "contratti": [
+        {
+          "id": 1,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_stipula": "2026-01-16",
+          "tipo_contratto": "compromesso",
+          "prezzo_concordato": 286186.9,
+          "note": "Acconto versato"
+        },
+        {
+          "id": 2,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_stipula": "2026-02-19",
+          "tipo_contratto": "definitivo",
+          "prezzo_concordato": 311410.22,
+          "note": "Prima casa"
+        },
+        {
+          "id": 3,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_stipula": "2025-11-19",
+          "tipo_contratto": "opzione",
+          "prezzo_concordato": 320619.01,
+          "note": "Mutuo in approvazione"
+        },
+        {
+          "id": 4,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_stipula": "2026-01-29",
+          "tipo_contratto": "opzione",
+          "prezzo_concordato": 335367.87,
+          "note": "Acconto versato"
+        },
+        {
+          "id": 5,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_stipula": "2026-02-06",
+          "tipo_contratto": "definitivo",
+          "prezzo_concordato": 263096.77,
+          "note": "Nessuna nota particolare"
+        },
+        {
+          "id": 6,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_stipula": "2025-12-13",
+          "tipo_contratto": "definitivo",
+          "prezzo_concordato": 271545.65,
+          "note": "Nessuna nota particolare"
+        },
+        {
+          "id": 7,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": null,
+          "data_stipula": "2026-02-26",
+          "tipo_contratto": "compromesso",
+          "prezzo_concordato": 337610.73,
+          "note": "Rogito fissato presso il notaio"
+        },
+        {
+          "id": 8,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_stipula": "2025-12-21",
+          "tipo_contratto": "definitivo",
+          "prezzo_concordato": 274924.98,
+          "note": null
+        }
+      ]
+    }
+  },
+  "story": "L'agenzia di intermediazione immobiliare Domus Nova, con sede operativa a Milano, ha avviato la consueta campagna semestrale di revisione del proprio portafoglio. Il cuore documentativo dell'attività è l'archivio denominato schede_catastali, dove trovano posto le schede di tutti gli immobili seguiti dall'agenzia: per ciascuna scheda sono annotati l'indirizzo, il comune e la provincia, il CAP, la superficie espressa in metri quadrati, il numero dei vani, la tipologia dell'unità — che può essere appartamento, villa, terreno, ufficio oppure negozio — lo stato di commercializzazione, vale a dire disponibile, riservato o venduto, il prezzo richiesto e la data di acquisizione dell'incarico. Attualmente l'archivio conta 299 schede, con superfici che spaziano dai 34,08 metri quadrati di un monolocale ai 1687,50 metri quadrati di un complesso, e prezzi richiesti compresi tra 120082,29 euro e 1000568,30 euro. A fianco delle schede_catastali, il registro clienti custodisce i dati anagrafici dei 461 aspiranti acquirenti, corredati di codice fiscale, indirizzo di posta elettronica e numero di telefono; il registro agenti elenca i 44 collaboratori della rete vendita, ciascuno identificato dalla propria matricola; il registro dei compromessi stipulati, infine, annota i 1696 accordi conclusi, precisando per ciascuno l'immobile interessato, il cliente firmatario, l'agente incaricato, la data di stipula, la natura dell'accordo — compromesso, definitivo oppure opzione — il prezzo concordato e le note di corredo, come l'acconto del 10% versato o il mutuo approvato con rogito entro 60 giorni. In occasione dell'ultima verifica operativa, la direzione commerciale ha richiesto un quadro aggiornato sull'offerta di pregio nel capoluogo meneghino: serviva l'elenco degli immobili ancora disponibili a Milano il cui prezzo richiesto supera la media di mercato degli appartamenti, accompagnato dall'indicazione del prezzo medio di riferimento degli appartamenti medesimi e ordinato per prezzo richiesto decrescente. Gli operatori hanno quindi proceduto per fasi: dapprima hanno isolato le schede con stato disponibile e comune Milano; successivamente hanno calcolato la media dei prezzi richiesti considerando soltanto la tipologia appartamento, così da fissare la soglia di mercato; infine hanno selezionato gli immobili disponibili nel capoluogo lombardo il cui prezzo richiesto eccede tale valore medio, disponendo l'elenco finale dal prezzo più alto al più basso, pronto per essere presentato agli agenti durante il briefing settimanale."
+}

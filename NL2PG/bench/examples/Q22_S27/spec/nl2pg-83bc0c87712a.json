@@ -1,0 +1,27 @@
+{
+  "domain": "università",
+  "n_tables": 4,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "distinct_on"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "studenti",
+      "obsolete_value": "anagrafica_iscritti",
+      "description": "La tabella contenente i dati anagrafici degli studenti viene indicata nei documenti di business come anagrafica_iscritti."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "voto_esame",
+      "obsolete_value": "valutazione_acquisita_in_sede_di_appello",
+      "description": "Il campo numerico del voto viene espresso nel gergo accademico burocratico come valutazione_acquisita_in_sede_di_appello."
+    }
+  ],
+  "spec_hash": "f248ac56741521af"
+}

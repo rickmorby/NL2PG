@@ -1,0 +1,51 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 11,
+    "hierarchy": "many_to_many_with_distractors",
+    "sql_features": [
+      "full_outer_join"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "distractor",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "consegne_logistiche",
+        "description": "La tabella principale che registra le spedizioni è denominata 'consegne_logistiche' nella documentazione aziendale, mentre nel database è 'spedizioni'."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "peso_kg",
+        "obsolete_value": "massa_spedizione",
+        "description": "La colonna 'peso_kg' nella tabella 'spedizioni' viene indicata come 'massa_spedizione' nei report operativi."
+      },
+      {
+        "twist_type": "distractor",
+        "target_value": "spedizioni",
+        "obsolete_value": "logistica_inversa",
+        "description": "Esiste una tabella 'logistica_inversa' che registra i resi, ma è irrilevante per la query richiesta (FULL OUTER JOIN tra spedizioni e destinatari)."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "destinatari",
+        "obsolete_value": "hub_di_destinazione",
+        "description": "La tabella 'destinatari' è chiamata 'hub_di_destinazione' nei documenti tecnici interni, creando ambiguità con la tabella 'hub' (distrattore)."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato",
+        "obsolete_value": "status_spedizione",
+        "description": "La colonna 'stato' nella tabella 'spedizioni' (che indica lo stato della spedizione) viene confusa con la colonna 'stato' nella tabella 'destinatari' (che indica lo stato geografico). Nella documentazione è chiamata 'status_spedizione' per distinguerla."
+      }
+    ],
+    "spec_hash": "05a2c15e5f10ef65"
+  },
+  "schema_ddl": "CREATE TYPE stato_spedizione AS ENUM ('in_preparazione', 'in_transito', 'consegnato', 'annullato', 'ritornato');\n\nCREATE TYPE stato_destinatario AS ENUM ('attivo', 'sospeso', 'chiuso');\n\nCREATE TABLE spedizioni (\n    id BIGSERIAL PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    peso_kg NUMERIC(10,3) NOT NULL CHECK (peso_kg > 0),\n    volume_m3 NUMERIC(10,3) CHECK (volume_m3 >= 0),\n    stato stato_spedizione NOT NULL,\n    data_creazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    data_consegna_prevista DATE,\n    data_consegna_effettiva DATE,\n    destinatario_id INT,\n    hub_partenza_id INT,\n    hub_arrivo_id INT,\n    corriere_id INT,\n    valore_dichiarato NUMERIC(12,2) CHECK (valore_dichiarato >= 0),\n    assicurazione_boolean BOOLEAN NOT NULL DEFAULT FALSE,\n    costo_spedizione NUMERIC(10,2) GENERATED ALWAYS AS (\n        CASE WHEN assicurazione_boolean THEN (peso_kg * 2.5 + volume_m3 * 1.8) * 1.15\n             ELSE (peso_kg * 2.5 + volume_m3 * 1.8)\n        END\n    ) STORED,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE destinatari (\n    id BIGSERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT UNIQUE,\n    codice_fiscale TEXT UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    stato stato_destinatario NOT NULL,\n    email TEXT,\n    telefono TEXT,\n    referente TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE hub (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    tipo_hub TEXT NOT NULL CHECK (tipo_hub IN ('partenza', 'arrivo', 'transito', 'smistamento')),\n    capacita_massima NUMERIC(10,2) CHECK (capacita_massima > 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE corrieri (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    partita_iva TEXT UNIQUE,\n    codice_fiscale TEXT UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    email TEXT,\n    telefono TEXT,\n    referente TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    deleted_at TIMESTAMP\n);\n\nCREATE TABLE veicoli (\n    id BIGSERIAL PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    tipo_veicolo TEXT NOT NULL CHECK (tipo_veicolo IN ('furgone', 'camion', 'autocarro', 'motociclo')),\n    capacita_kg NUMERIC(10,2) NOT NULL CHECK (capacita_kg > 0),\n    capacita_m3 NUMERIC(10,2) NOT NULL CHECK (capacita_m3 > 0),\n    anno_immatricolazione INT NOT NULL CHECK (anno_immatricolazione BETWEEN 1990 AND EXTRACT(YEAR FROM CURRENT_DATE)),\n    corriere_id INT NOT NULL REFERENCES corrieri(id) ON DELETE CASCADE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE spedizioni_veicoli (\n    spedizione_id BIGINT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    veicolo_id BIGINT NOT NULL REFERENCES veicoli(id) ON DELETE CASCADE,\n    data_assegnazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    PRIMARY KEY (spedizione_id, veicolo_id)\n);\n\nCREATE TABLE logistica_inversa (\n    id BIGSERIAL PRIMARY KEY,\n    codice_reso TEXT NOT NULL UNIQUE,\n    spedizione_originale_id BIGINT REFERENCES spedizioni(id) ON DELETE SET NULL,\n    motivo_reso TEXT NOT NULL,\n    stato_reso TEXT NOT NULL CHECK (stato_reso IN ('ricevuto', 'in_verifica', 'approvato', 'rifiutato', 'rimborsato')),\n    data_creazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    data_chiusura TIMESTAMP,\n    valore_rimborsato NUMERIC(12,2) CHECK (valore_rimborsato >= 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE hub_di_destinazione (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE tracking_spedizioni (\n    id BIGSERIAL PRIMARY KEY,\n    spedizione_id BIGINT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    hub_id BIGINT REFERENCES hub(id) ON DELETE SET NULL,\n    data_evento TIMESTAMP NOT NULL,\n    descrizione_evento TEXT NOT NULL,\n    ubicazione TEXT,\n    stato_attuale stato_spedizione NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE documenti_spedizione (\n    id BIGSERIAL PRIMARY KEY,\n    spedizione_id BIGINT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    tipo_documento TEXT NOT NULL CHECK (tipo_documento IN ('ddt', 'fattura', 'bolla', 'lettera_vettura')),\n    numero_documento TEXT NOT NULL,\n    data_emissione DATE NOT NULL,\n    file_path TEXT NOT NULL,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE magazzini (\n    id BIGSERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    stato_geografico TEXT NOT NULL,\n    capacita_massima NUMERIC(10,2) CHECK (capacita_massima > 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nALTER TABLE spedizioni ADD CONSTRAINT fk_destinatario\n    FOREIGN KEY (destinatario_id) REFERENCES destinatari(id) ON DELETE SET NULL;\n\nALTER TABLE spedizioni ADD CONSTRAINT fk_hub_partenza\n    FOREIGN KEY (hub_partenza_id) REFERENCES hub(id) ON DELETE SET NULL;\n\nALTER TABLE spedizioni ADD CONSTRAINT fk_hub_arrivo\n    FOREIGN KEY (hub_arrivo_id) REFERENCES hub(id) ON DELETE SET NULL;\n\nALTER TABLE spedizioni ADD CONSTRAINT fk_corriere\n    FOREIGN KEY (corriere_id) REFERENCES corrieri(id) ON DELETE SET NULL;\n\nCREATE INDEX idx_spedizioni_destinatario ON spedizioni(destinatario_id);\nCREATE INDEX idx_spedizioni_stato ON spedizioni(stato);\nCREATE INDEX idx_spedizioni_data_creazione ON spedizioni(data_creazione);\nCREATE INDEX idx_destinatari_stato ON destinatari(stato);\nCREATE INDEX idx_tracking_spedizione ON tracking_spedizioni(spedizione_id);\nCREATE INDEX idx_tracking_data_evento ON tracking_spedizioni(data_evento);"
+}

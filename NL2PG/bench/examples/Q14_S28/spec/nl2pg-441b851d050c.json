@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 3,
+  "hierarchy": "flat",
+  "sql_features": [
+    "set_op"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "emp",
+      "obsolete_value": "dipendenti",
+      "description": "La tabella 'emp' (abbreviazione di employee) viene denominata 'dipendenti' nel linguaggio aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "dept_mgr",
+      "obsolete_value": "responsabile_reparto",
+      "description": "La colonna 'dept_mgr' (department manager) viene riferita come 'responsabile_reparto' nella documentazione aziendale."
+    }
+  ],
+  "spec_hash": "b8ab3bc67aa29f87"
+}

@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "cf2f1fb6fc2bfd37"
+  },
+  "schema_ddl": "CREATE TYPE stato_transazione AS ENUM ('in_attesa', 'elaborata', 'annullata', 'fallita', 'rimborsata');\n\nCREATE TABLE transazioni_finanziarie (\n    id BIGSERIAL PRIMARY KEY,\n    codice_transazione TEXT NOT NULL UNIQUE,\n    importo NUMERIC(15, 2) NOT NULL CHECK (importo > 0),\n    valuta TEXT NOT NULL CHECK (valuta ~ '^[A-Z]{3}$'),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_transazione stato_transazione NOT NULL,\n    descrizione TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    CHECK (data_transazione <= CURRENT_TIMESTAMP)\n);"
+}

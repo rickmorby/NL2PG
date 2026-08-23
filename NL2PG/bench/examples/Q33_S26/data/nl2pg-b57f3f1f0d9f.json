@@ -1,0 +1,490 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "registrazioni",
+        "obsolete_value": "scritture di prima nota",
+        "description": "La tabella registrazioni viene denominata 'scritture di prima nota' nella prosa aziendale; il solver deve mappare questa perifrasi al nome fisico della tabella nel database."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "consistenza monetaria della voce",
+        "description": "La colonna importo è fisicamente di tipo TEXT pur contenente valori logicamente numerici; nella prosa viene indicata con il gergo contabile 'consistenza monetaria della voce'. Per eseguire confronti numerici o aggregazioni occorre applicare CAST(importo AS NUMERIC) prima del confronto, mentre i filtri testuali possono usare direttamente LIKE sul valore TEXT."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "movimenti",
+        "obsolete_value": "movimento contabile",
+        "description": "Il termine 'movimento contabile' nella prosa aziendale indica sia la singola riga della tabella movimenti sia l'intera registrazione contabile ad essa collegata; il solver deve disambiguare il significato dal contesto della query per identificare correttamente tabella e colonne coinvolte."
+      }
+    ],
+    "spec_hash": "7d849dea95319018"
+  },
+  "schema_ddl": "CREATE TABLE conti (\n    id SERIAL PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    natura_conto TEXT NOT NULL CHECK (natura_conto IN ('attivo', 'passivo', 'costo', 'ricavo'))\n);\n\nCREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    numero_protocollo INT NOT NULL UNIQUE CHECK (numero_protocollo > 0),\n    data_registrazione DATE NOT NULL,\n    causale TEXT NOT NULL,\n    descrizione_scrittura TEXT\n);\n\nCREATE TABLE movimenti (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(12,2) NOT NULL,\n    sezione_dare_avere TEXT NOT NULL CHECK (sezione_dare_avere IN ('dare', 'avere'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "conti",
+        "nature": "lookup",
+        "min_rows": 20,
+        "max_rows": 40,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_conto": "1000",
+            "denominazione": "Cassa",
+            "natura_conto": "attivo"
+          },
+          {
+            "id": 2,
+            "codice_conto": "1010",
+            "denominazione": "Banca c/c intestato alla societa'",
+            "natura_conto": "attivo"
+          },
+          {
+            "id": 3,
+            "codice_conto": "1100",
+            "denominazione": "Crediti verso clienti",
+            "natura_conto": "attivo"
+          },
+          {
+            "id": 4,
+            "codice_conto": "1150",
+            "denominazione": "Ratei attivi",
+            "natura_conto": "attivo"
+          },
+          {
+            "id": 5,
+            "codice_conto": "2000",
+            "denominazione": "Debiti verso fornitori",
+            "natura_conto": "passivo"
+          },
+          {
+            "id": 6,
+            "codice_conto": "2100",
+            "denominazione": "Debiti tributari",
+            "natura_conto": "passivo"
+          },
+          {
+            "id": 7,
+            "codice_conto": "2200",
+            "denominazione": "Debiti verso dipendenti",
+            "natura_conto": "passivo"
+          },
+          {
+            "id": 8,
+            "codice_conto": "2300",
+            "denominazione": "Fondo TFR",
+            "natura_conto": "passivo"
+          },
+          {
+            "id": 9,
+            "codice_conto": "3000",
+            "denominazione": "Acquisti di merci",
+            "natura_conto": "costo"
+          },
+          {
+            "id": 10,
+            "codice_conto": "3100",
+            "denominazione": "Costi per servizi",
+            "natura_conto": "costo"
+          },
+          {
+            "id": 11,
+            "codice_conto": "3200",
+            "denominazione": "Costi del personale",
+            "natura_conto": "costo"
+          },
+          {
+            "id": 12,
+            "codice_conto": "3300",
+            "denominazione": "Canoni di locazione",
+            "natura_conto": "costo"
+          },
+          {
+            "id": 13,
+            "codice_conto": "3400",
+            "denominazione": "Utenze telefoniche e telematiche",
+            "natura_conto": "costo"
+          },
+          {
+            "id": 14,
+            "codice_conto": "3500",
+            "denominazione": "Ammortamento immobilizzazioni immateriali",
+            "natura_conto": "costo"
+          },
+          {
+            "id": 15,
+            "codice_conto": "3600",
+            "denominazione": "Ammortamento immobilizzazioni materiali",
+            "natura_conto": "costo"
+          },
+          {
+            "id": 16,
+            "codice_conto": "3700",
+            "denominazione": "Interessi passivi bancari",
+            "natura_conto": "costo"
+          },
+          {
+            "id": 17,
+            "codice_conto": "4000",
+            "denominazione": "Ricavi delle vendite di prodotti",
+            "natura_conto": "ricavo"
+          },
+          {
+            "id": 18,
+            "codice_conto": "4100",
+            "denominazione": "Ricavi delle vendite di servizi",
+            "natura_conto": "ricavo"
+          },
+          {
+            "id": 19,
+            "codice_conto": "4200",
+            "denominazione": "Sconti attivi",
+            "natura_conto": "ricavo"
+          },
+          {
+            "id": 20,
+            "codice_conto": "4300",
+            "denominazione": "Interessi attivi bancari",
+            "natura_conto": "ricavo"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "registrazioni",
+        "nature": "fact",
+        "min_rows": 300,
+        "max_rows": 700,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero_protocollo": 1,
+            "data_registrazione": "2026-01-05",
+            "causale": "Fattura vendita",
+            "descrizione_scrittura": "Vendita merci a cliente Rossi SRL, fattura n. 12/2026"
+          },
+          {
+            "id": 2,
+            "numero_protocollo": 2,
+            "data_registrazione": "2026-01-08",
+            "causale": "Fattura acquisto",
+            "descrizione_scrittura": "Acquisto materie prime da Forniture Bianchi SpA, fattura n. 45"
+          },
+          {
+            "id": 3,
+            "numero_protocollo": 3,
+            "data_registrazione": "2026-01-15",
+            "causale": "Pagamento fornitore",
+            "descrizione_scrittura": "Bonifico a Forniture Bianchi SpA per fattura n. 45"
+          },
+          {
+            "id": 4,
+            "numero_protocollo": 4,
+            "data_registrazione": "2026-01-31",
+            "causale": "Stipendi mensili",
+            "descrizione_scrittura": "Liquidazione stipendi dipendenti mese di gennaio"
+          },
+          {
+            "id": 5,
+            "numero_protocollo": 5,
+            "data_registrazione": "2026-02-02",
+            "causale": "Incasso cliente",
+            "descrizione_scrittura": "Incasso bonifico da cliente Rossi SRL, fattura n. 12/2026"
+          },
+          {
+            "id": 6,
+            "numero_protocollo": 6,
+            "data_registrazione": "2026-02-10",
+            "causale": "Affitto ufficio",
+            "descrizione_scrittura": "Canone locazione sede operativa febbraio"
+          },
+          {
+            "id": 7,
+            "numero_protocollo": 7,
+            "data_registrazione": "2026-02-20",
+            "causale": "Fattura vendita",
+            "descrizione_scrittura": "Vendita servizi di consulenza a Delta Group, fattura n. 33/2026"
+          },
+          {
+            "id": 8,
+            "numero_protocollo": 8,
+            "data_registrazione": "2026-03-01",
+            "causale": "Utenze",
+            "descrizione_scrittura": "Bolletta luce e telefono sede di Milano"
+          },
+          {
+            "id": 9,
+            "numero_protocollo": 9,
+            "data_registrazione": "2026-03-15",
+            "causale": "Ammortamento",
+            "descrizione_scrittura": "Quota ammortamento annua attrezzature informatiche"
+          },
+          {
+            "id": 10,
+            "numero_protocollo": 10,
+            "data_registrazione": "2026-03-31",
+            "causale": "Interessi passivi",
+            "descrizione_scrittura": "Addebito interessi conto corrente bancario primo trimestre"
+          }
+        ],
+        "variations": {
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "causale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Fattura vendita",
+              "Fattura acquisto",
+              "Pagamento fornitore",
+              "Incasso cliente",
+              "Stipendi mensili",
+              "Affitto ufficio",
+              "Utenze",
+              "Ammortamento",
+              "Interessi passivi"
+            ]
+          },
+          "descrizione_scrittura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Vendita merci a cliente Rossi SRL",
+              "Acquisto materie prime da Forniture Bianchi SpA",
+              "Bonifico a fornitore per fattura ricevuta",
+              "Liquidazione stipendi dipendenti del mese",
+              "Incasso bonifico da cliente per fattura emessa",
+              "Canone locazione sede operativa mensile",
+              "Vendita servizi di consulenza a Delta Group",
+              "Bolletta luce e telefono sede di Milano",
+              "Quota ammortamento attrezzature informatiche",
+              "Addebito interessi conto corrente bancario"
+            ]
+          }
+        }
+      },
+      {
+        "table": "movimenti",
+        "nature": "fact",
+        "min_rows": 900,
+        "max_rows": 1800,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "registrazione_id": 1,
+            "conto_id": 17,
+            "importo": "1250.00",
+            "sezione_dare_avere": "avere"
+          },
+          {
+            "id": 2,
+            "registrazione_id": 1,
+            "conto_id": 1,
+            "importo": "1250.00",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 3,
+            "registrazione_id": 2,
+            "conto_id": 9,
+            "importo": "800.50",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 4,
+            "registrazione_id": 2,
+            "conto_id": 5,
+            "importo": "800.50",
+            "sezione_dare_avere": "avere"
+          },
+          {
+            "id": 5,
+            "registrazione_id": 3,
+            "conto_id": 5,
+            "importo": "800.50",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 6,
+            "registrazione_id": 3,
+            "conto_id": 2,
+            "importo": "800.50",
+            "sezione_dare_avere": "avere"
+          },
+          {
+            "id": 7,
+            "registrazione_id": 4,
+            "conto_id": 11,
+            "importo": "4200.00",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 8,
+            "registrazione_id": 4,
+            "conto_id": 2,
+            "importo": "4200.00",
+            "sezione_dare_avere": "avere"
+          },
+          {
+            "id": 9,
+            "registrazione_id": 5,
+            "conto_id": 2,
+            "importo": "1250.00",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 10,
+            "registrazione_id": 5,
+            "conto_id": 3,
+            "importo": "1250.00",
+            "sezione_dare_avere": "avere"
+          },
+          {
+            "id": 11,
+            "registrazione_id": 6,
+            "conto_id": 12,
+            "importo": "1500.00",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 12,
+            "registrazione_id": 6,
+            "conto_id": 2,
+            "importo": "1500.00",
+            "sezione_dare_avere": "avere"
+          },
+          {
+            "id": 13,
+            "registrazione_id": 7,
+            "conto_id": 18,
+            "importo": "3400.75",
+            "sezione_dare_avere": "avere"
+          },
+          {
+            "id": 14,
+            "registrazione_id": 7,
+            "conto_id": 3,
+            "importo": "3400.75",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 15,
+            "registrazione_id": 8,
+            "conto_id": 13,
+            "importo": "187.30",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 16,
+            "registrazione_id": 8,
+            "conto_id": 2,
+            "importo": "187.30",
+            "sezione_dare_avere": "avere"
+          },
+          {
+            "id": 17,
+            "registrazione_id": 9,
+            "conto_id": 14,
+            "importo": "620.00",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 18,
+            "registrazione_id": 9,
+            "conto_id": 4,
+            "importo": "620.00",
+            "sezione_dare_avere": "avere"
+          },
+          {
+            "id": 19,
+            "registrazione_id": 10,
+            "conto_id": 16,
+            "importo": "95.40",
+            "sezione_dare_avere": "dare"
+          },
+          {
+            "id": 20,
+            "registrazione_id": 10,
+            "conto_id": 2,
+            "importo": "95.40",
+            "sezione_dare_avere": "avere"
+          }
+        ],
+        "variations": {
+          "importo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "50.00",
+              "87.30",
+              "120.75",
+              "250",
+              "340.90",
+              "500",
+              "750.25",
+              "95.40",
+              "187.30",
+              "620.00",
+              "800.50",
+              "1000",
+              "1250.00",
+              "1500.00",
+              "2000",
+              "2500.60",
+              "3400.75",
+              "4200.00",
+              "5000",
+              "7500.25"
+            ]
+          },
+          "sezione_dare_avere": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "dare",
+              "dare",
+              "avere",
+              "avere"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

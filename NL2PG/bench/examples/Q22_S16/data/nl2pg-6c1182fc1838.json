@@ -1,0 +1,460 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "prezzi_storici",
+        "obsolete_value": "archivio_variazioni_listino",
+        "description": "La tabella prezzi_storici, che conserva lo storico temporale delle versioni di prezzo dei prodotti tramite le colonne valid_from e valid_to, viene denominata nella prosa aziendale 'archivio_variazioni_listino'. Le query devono risolvere questa perifrasi verso la tabella reale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "valid_to",
+        "obsolete_value": "termine di efficacia commerciale",
+        "description": "La colonna valid_to della tabella prezzi_storici è descritta nella documentazione con il gergo interno 'termine di efficacia commerciale'. Essa indica l'istante di fine validità della versione del prezzo ed è la colonna chiave su cui ordinare (ORDER BY prodotto_id, valid_from DESC) prima di applicare SELECT DISTINCT ON per estrarre la versione corrente."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato",
+        "obsolete_value": "condizione corrente dell'elemento",
+        "description": "L'espressione 'condizione corrente dell'elemento' usata nei requisiti è volutamente ambigua: può riferirsi sia alla colonna stato_ordine della tabella ordini sia alla colonna stato_disponibilita della tabella prodotti. Il solutore deve disambiguare dal contesto della query DISTINCT ON quale colonna di stato sia effettivamente richiesta."
+      }
+    ],
+    "spec_hash": "bf23bae0f686b2c5"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT,\n    telefono TEXT,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    sku TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    categoria TEXT,\n    stato_disponibilita TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_disponibilita IN ('disponibile', 'esaurito', 'in_arrivo', 'ritirato')),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE prezzi_storici (\n    id SERIAL PRIMARY KEY,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id) ON DELETE CASCADE,\n    prezzo NUMERIC(10,2) NOT NULL CHECK (prezzo >= 0),\n    valid_from TIMESTAMP NOT NULL,\n    valid_to TIMESTAMP,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    totale NUMERIC(12,2) CHECK (totale >= 0)\n);\n\nCREATE TABLE righe_ordine (\n    ordine_id INT NOT NULL REFERENCES ordini(id) ON DELETE CASCADE,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    numero_riga INT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    PRIMARY KEY (ordine_id, numero_riga)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 220,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "email": "mario.rossi@example.com",
+            "citta": "Roma",
+            "telefono": "+39 06 1234567",
+            "creato_il": "2024-03-15 09:30:00"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "email": "laura.bianchi@example.com",
+            "citta": "Milano",
+            "telefono": "+39 02 2345678",
+            "creato_il": "2024-05-20 14:45:00"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "email": "giulia.verdi@example.com",
+            "citta": "Torino",
+            "telefono": "+39 011 3456789",
+            "creato_il": "2024-08-02 11:15:00"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Ferrari",
+            "email": "alessandro.ferrari@example.com",
+            "citta": "Napoli",
+            "telefono": "+39 081 4567890",
+            "creato_il": "2024-11-10 16:20:00"
+          },
+          {
+            "id": 5,
+            "nome": "Chiara",
+            "cognome": "Conti",
+            "email": "chiara.conti@example.com",
+            "citta": "Bologna",
+            "telefono": null,
+            "creato_il": "2025-01-25 10:05:00"
+          }
+        ],
+        "variations": {
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze"
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+39 06 1234567",
+              "+39 02 2345678",
+              "+39 011 3456789",
+              "+39 081 4567890",
+              "+39 055 5678901",
+              "+39 010 6789012"
+            ]
+          },
+          "creato_il": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": 60,
+        "max_rows": 90,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Laptop Pro 14",
+            "sku": "TECH-LAP-001",
+            "descrizione": "Ultrabook 14 pollici 16GB RAM SSD 512GB",
+            "categoria": "Informatica",
+            "stato_disponibilita": "disponibile",
+            "creato_il": "2024-02-10 08:00:00"
+          },
+          {
+            "id": 2,
+            "nome": "Smartphone X5",
+            "sku": "TECH-SMA-002",
+            "descrizione": "Smartphone 5G display 6.5 pollici 128GB",
+            "categoria": "Telefonia",
+            "stato_disponibilita": "esaurito",
+            "creato_il": "2024-04-18 09:30:00"
+          },
+          {
+            "id": 3,
+            "nome": "Cuffie Wireless ANC",
+            "sku": "AUD-CUF-003",
+            "descrizione": "Cuffie bluetooth con cancellazione attiva del rumore",
+            "categoria": "Audio",
+            "stato_disponibilita": "in_arrivo",
+            "creato_il": "2024-06-25 10:15:00"
+          },
+          {
+            "id": 4,
+            "nome": "Monitor 27 4K",
+            "sku": "TECH-MON-004",
+            "descrizione": "Monitor IPS 27 pollici risoluzione 4K USB-C",
+            "categoria": "Informatica",
+            "stato_disponibilita": "disponibile",
+            "creato_il": "2024-09-05 11:00:00"
+          },
+          {
+            "id": 5,
+            "nome": "Tastiera Meccanica K70",
+            "sku": "ACC-TAS-005",
+            "descrizione": "Tastiera meccanica switches rossi retroilluminata",
+            "categoria": "Accessori",
+            "stato_disponibilita": "ritirato",
+            "creato_il": "2024-12-01 14:40:00"
+          },
+          {
+            "id": 6,
+            "nome": "Webcam Stream HD",
+            "sku": "VID-WEB-006",
+            "descrizione": "Webcam 1080p 60fps con microfono integrato",
+            "categoria": "Video",
+            "stato_disponibilita": "disponibile",
+            "creato_il": "2025-03-12 16:25:00"
+          }
+        ],
+        "variations": {
+          "categoria": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Informatica",
+              "Telefonia",
+              "Audio",
+              "Accessori",
+              "Video",
+              "Elettrodomestici"
+            ]
+          },
+          "stato_disponibilita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "disponibile",
+              "disponibile",
+              "disponibile",
+              "esaurito",
+              "in_arrivo",
+              "ritirato"
+            ]
+          },
+          "creato_il": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "prezzi_storici",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "prodotto_id": 1,
+            "prezzo": 1299.0,
+            "valid_from": "2024-03-01 00:00:00",
+            "valid_to": "2024-12-31 23:59:59"
+          },
+          {
+            "id": 2,
+            "prodotto_id": 1,
+            "prezzo": 1199.0,
+            "valid_from": "2025-01-01 00:00:00",
+            "valid_to": null
+          },
+          {
+            "id": 3,
+            "prodotto_id": 2,
+            "prezzo": 599.0,
+            "valid_from": "2024-05-01 00:00:00",
+            "valid_to": "2025-06-30 23:59:59"
+          },
+          {
+            "id": 4,
+            "prodotto_id": 2,
+            "prezzo": 549.0,
+            "valid_from": "2025-07-01 00:00:00",
+            "valid_to": null
+          },
+          {
+            "id": 5,
+            "prodotto_id": 3,
+            "prezzo": 149.9,
+            "valid_from": "2024-07-15 00:00:00",
+            "valid_to": null
+          }
+        ],
+        "variations": {
+          "prezzo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "valid_from": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 15.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "data_ordine": "2026-01-10 10:15:00",
+            "stato_ordine": "consegnato",
+            "totale": 1250.5
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "data_ordine": "2026-01-22 14:30:00",
+            "stato_ordine": "spedito",
+            "totale": 349.9
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "data_ordine": "2026-02-05 09:00:00",
+            "stato_ordine": "confermato",
+            "totale": 89.99
+          },
+          {
+            "id": 104,
+            "cliente_id": 4,
+            "data_ordine": "2026-02-18 17:45:00",
+            "stato_ordine": "in_attesa",
+            "totale": null
+          },
+          {
+            "id": 105,
+            "cliente_id": 5,
+            "data_ordine": "2026-03-03 11:20:00",
+            "stato_ordine": "annullato",
+            "totale": 210.0
+          },
+          {
+            "id": 106,
+            "cliente_id": 1,
+            "data_ordine": "2026-03-15 13:10:00",
+            "stato_ordine": "consegnato",
+            "totale": 769.0
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "stato_ordine": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnato",
+              "consegnato",
+              "spedito",
+              "confermato",
+              "in_attesa",
+              "annullato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "righe_ordine",
+        "nature": "fact",
+        "min_rows": 700,
+        "max_rows": 1200,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "ordine_id": 1,
+            "numero_riga": 1,
+            "prodotto_id": 1,
+            "quantita": 1,
+            "prezzo_unitario": 1299.0
+          },
+          {
+            "ordine_id": 1,
+            "numero_riga": 2,
+            "prodotto_id": 3,
+            "quantita": 2,
+            "prezzo_unitario": 149.9
+          },
+          {
+            "ordine_id": 2,
+            "numero_riga": 1,
+            "prodotto_id": 2,
+            "quantita": 1,
+            "prezzo_unitario": 599.0
+          },
+          {
+            "ordine_id": 3,
+            "numero_riga": 1,
+            "prodotto_id": 4,
+            "quantita": 3,
+            "prezzo_unitario": 289.0
+          },
+          {
+            "ordine_id": 4,
+            "numero_riga": 1,
+            "prodotto_id": 5,
+            "quantita": 1,
+            "prezzo_unitario": 89.9
+          },
+          {
+            "ordine_id": 5,
+            "numero_riga": 2,
+            "prodotto_id": 6,
+            "quantita": 4,
+            "prezzo_unitario": 49.99
+          }
+        ],
+        "variations": {
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "1",
+              "2",
+              "2",
+              "3",
+              "5"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

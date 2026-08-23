@@ -1,0 +1,27 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 5,
+  "hierarchy": "mixed",
+  "sql_features": [
+    "correlated_subquery"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "proprietari",
+      "obsolete_value": "anagrafica_intestatari",
+      "description": "La tabella proprietari, che contiene i dati dei soggetti che possiedono gli immobili, viene denominata anagrafica_intestatari nella prosa aziendale. Il progettista deve risalire al nome reale della tabella per costruire correttamente il percorso PK/FK."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "prezzo_richiesto",
+      "obsolete_value": "valore_di_listino",
+      "description": "La colonna prezzo_richiesto della tabella immobili è indicata nella documentazione con il gergo del settore immobiliare valore_di_listino. Le condizioni presenti nella subquery correlata EXISTS devono riferirsi alla colonna reale prezzo_richiesto."
+    }
+  ],
+  "spec_hash": "2ae1702dbf798355"
+}

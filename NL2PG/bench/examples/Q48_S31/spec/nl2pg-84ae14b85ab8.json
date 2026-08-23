@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 2,
+  "hierarchy": "flat",
+  "sql_features": [
+    "distinct"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "categoria_prodotto",
+      "obsolete_value": "linea_merceologica",
+      "description": "La colonna categoria_prodotto della tabella denormalizzata movimenti_vendita viene denominata linea_merceologica nella prosa aziendale. L'utente deve capire che l'eliminazione dei duplicati va eseguita con SELECT DISTINCT categoria_prodotto direttamente sulla tabella piatta, senza alcun join."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "fornitore",
+      "obsolete_value": "partner di approvvigionamento",
+      "description": "La colonna fornitore, incorporata come attributo ridondante nella tabella piatta, è indicata nei documenti aziendali con il gergo 'partner di approvvigionamento'. Il termine non deve indurre l'utente a filtrare o aggregare per fornitore: la richiesta riguarda esclusivamente le categorie prodotto distinte."
+    }
+  ],
+  "spec_hash": "027e9985a55384b7"
+}

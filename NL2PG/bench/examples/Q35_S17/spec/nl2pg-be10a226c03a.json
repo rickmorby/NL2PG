@@ -1,0 +1,34 @@
+{
+  "domain": "finanza",
+  "n_tables": 1,
+  "hierarchy": "flat",
+  "sql_features": [
+    "case"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "conti_correnti",
+      "obsolete_value": "anagrafica_rapporti_bancari",
+      "description": "La tabella conti_correnti viene denominata anagrafica_rapporti_bancari nella documentazione aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_conto",
+      "obsolete_value": "flag_attivazione",
+      "description": "La colonna stato_conto (che usa cancellazione logica) viene chiamata flag_attivazione nel gergo interno, creando ambiguità con altri flag di sistema."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "stato",
+      "obsolete_value": "['attivo', 'eliminato', 'congelato']",
+      "description": "La colonna stato (che usa CASE WHEN deleted_at IS NULL THEN 'attivo' ELSE 'eliminato' END) viene descritta come avente valori 'attivo', 'eliminato', 'congelato', introducendo un valore non mappato ('congelato') che non esiste nel database."
+    }
+  ],
+  "spec_hash": "9b4a126839483b69"
+}

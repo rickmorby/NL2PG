@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 6,
+    "hierarchy": "star",
+    "sql_features": [
+      "cte"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "sinistri",
+        "obsolete_value": "pratiche_liquidazione",
+        "description": "La tabella dei fatti centrale 'sinistri' viene denominata 'pratiche_liquidazione' nella prosa aziendale. Le query devono risolvere la perifrasi verso la tabella dei fatti dello star schema."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "assicurati",
+        "description": "La tabella dimensionale 'clienti' viene indicata con il sinonimo 'assicurati' nella documentazione aziendale. Il mapping sinonimo-tabella deve essere dedotto dal contesto."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo_risarcimento",
+        "obsolete_value": "indennizzo erogato",
+        "description": "La misura 'importo_risarcimento' nella tabella dei fatti è riferita con il gergo assicurativo 'indennizzo erogato'. Gli aggregati richiesti (somme, medie) vanno calcolati su tale colonna dei fatti."
+      }
+    ],
+    "spec_hash": "770192eeb4bfb7e6"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    provincia TEXT,\n    data_nascita DATE,\n    fascia_eta TEXT NOT NULL CHECK (fascia_eta IN ('18-30', '31-45', '46-60', '61-75', '76+'))\n);\n\nCREATE TABLE polizze (\n    id INT PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    tipo_polizza TEXT NOT NULL CHECK (tipo_polizza IN ('auto', 'casa', 'vita', 'salute', 'responsabilita_civile')),\n    premio_annuo NUMERIC(10,2) NOT NULL CHECK (premio_annuo >= 0),\n    data_decorrenza DATE NOT NULL,\n    data_scadenza DATE NOT NULL,\n    CHECK (data_scadenza >= data_decorrenza)\n);\n\nCREATE TABLE tipi_sinistro (\n    id INT PRIMARY KEY,\n    descrizione TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    livello_gravita TEXT NOT NULL CHECK (livello_gravita IN ('bassa', 'media', 'alta'))\n);\n\nCREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    agenzia TEXT NOT NULL,\n    regione TEXT NOT NULL\n);\n\nCREATE TABLE tempo (\n    id INT PRIMARY KEY,\n    data_completa DATE NOT NULL UNIQUE,\n    anno INT NOT NULL CHECK (anno BETWEEN 1900 AND 2100),\n    mese INT NOT NULL CHECK (mese BETWEEN 1 AND 12),\n    trimestre INT NOT NULL CHECK (trimestre BETWEEN 1 AND 4),\n    giorno_settimana TEXT NOT NULL\n);\n\nCREATE TABLE sinistri (\n    id BIGINT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    polizza_id INT NOT NULL REFERENCES polizze(id),\n    tipo_sinistro_id INT NOT NULL REFERENCES tipi_sinistro(id),\n    agente_id INT NOT NULL REFERENCES agenti(id),\n    tempo_id INT NOT NULL REFERENCES tempo(id),\n    importo_risarcimento NUMERIC(12,2) NOT NULL CHECK (importo_risarcimento >= 0),\n    importo_riserva NUMERIC(12,2) CHECK (importo_riserva >= 0),\n    stato_pratica TEXT NOT NULL DEFAULT 'aperta' CHECK (stato_pratica IN ('aperta', 'istruttoria', 'liquidata', 'respinta'))\n);"
+}

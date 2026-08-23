@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "assicurazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "case"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "polizze",
+        "obsolete_value": "contratti_assicurativi",
+        "description": "La tabella 'polizze' viene denominata 'contratti_assicurativi' nei documenti aziendali."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "stato_polizza",
+        "obsolete_value": "flag_attivazione_copertura",
+        "description": "Il campo 'stato_polizza' (ENUM: 'attiva', 'sospesa', 'cessata') viene indicato come 'flag_attivazione_copertura' nel gergo interno, pur mantenendo gli stessi valori enumerati."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "massimale",
+        "obsolete_value": "limite_copertura",
+        "description": "Il termine 'massimale' (valore numerico che indica il tetto massimo di risarcimento) viene ambiguamente sostituito con 'limite_copertura', che potrebbe essere confuso con un valore percentuale o una soglia di franchigia."
+      }
+    ],
+    "spec_hash": "7b7d1ad9a58ece27"
+  },
+  "schema_ddl": "CREATE TYPE stato_polizza AS ENUM ('attiva', 'sospesa', 'cessata');\n\nCREATE TABLE contratti_assicurativi (\n    id SERIAL PRIMARY KEY,\n    numero_polizza TEXT NOT NULL UNIQUE,\n    cliente TEXT NOT NULL,\n    massimale NUMERIC(12, 2) NOT NULL CHECK (massimale > 0),\n    stato_polizza stato_polizza NOT NULL,\n    data_inizio DATE NOT NULL,\n    data_fine DATE CHECK (data_fine IS NULL OR data_fine > data_inizio)\n);\n\nCREATE TABLE sinistri (\n    id SERIAL PRIMARY KEY,\n    contratto_id INT NOT NULL REFERENCES contratti_assicurativi(id),\n    data_sinistro DATE NOT NULL,\n    importo_richiesto NUMERIC(12, 2) NOT NULL CHECK (importo_richiesto > 0),\n    importo_liquidato NUMERIC(12, 2) CHECK (importo_liquidato >= 0 AND importo_liquidato <= importo_richiesto),\n    stato_sinistro TEXT NOT NULL\n);"
+}

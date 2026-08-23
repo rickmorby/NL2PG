@@ -1,0 +1,467 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 5,
+    "hierarchy": "implicit_fk",
+    "sql_features": [],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "consegne_programmate",
+        "description": "La tabella 'spedizioni' viene denominata 'consegne_programmate' nei documenti aziendali e nelle richieste di reportistica."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "peso_kg",
+        "obsolete_value": "massa_lorda",
+        "description": "La colonna 'peso_kg' nella tabella 'spedizioni' viene indicata come 'massa_lorda' nei manuali operativi e nelle specifiche di carico."
+      }
+    ],
+    "spec_hash": "9a70c57deb05543c"
+  },
+  "schema_ddl": "CREATE TABLE magazzini (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_max NUMERIC(10,2) CHECK (capacita_max > 0)\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    peso_unitario NUMERIC(8,3) CHECK (peso_unitario > 0),\n    volume_unitario NUMERIC(8,3) CHECK (volume_unitario > 0)\n);\n\nCREATE TABLE consegne_programmate (\n    id SERIAL PRIMARY KEY,\n    magazzino_partenza_id INT NOT NULL REFERENCES magazzini(id),\n    magazzino_destinazione_id INT NOT NULL REFERENCES magazzini(id),\n    data_partenza TIMESTAMP NOT NULL,\n    data_arrivo_prevista TIMESTAMP NOT NULL CHECK (data_arrivo_prevista > data_partenza),\n    stato TEXT NOT NULL DEFAULT 'programmata'\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    consegna_id INT NOT NULL REFERENCES consegne_programmate(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    massa_lorda NUMERIC(8,3) NOT NULL CHECK (massa_lorda > 0),\n    note TEXT\n);\n\nCREATE TABLE autisti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    licenza TEXT NOT NULL UNIQUE,\n    disponibile BOOLEAN NOT NULL DEFAULT true\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "magazzini",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Magazzino Centrale Roma",
+            "indirizzo": "Via del Porto 12, Roma",
+            "capacita_max": 10000.0
+          },
+          {
+            "id": 2,
+            "nome": "Deposito Nord Milano",
+            "indirizzo": "Via Milano 45, Milano",
+            "capacita_max": 5000.0
+          },
+          {
+            "id": 3,
+            "nome": "Magazzino Sud Napoli",
+            "indirizzo": "Via Napoli 8, Napoli",
+            "capacita_max": 2500.0
+          },
+          {
+            "id": 4,
+            "nome": "Hub Logistico Torino",
+            "indirizzo": "Corso Torino 100, Torino",
+            "capacita_max": 20000.0
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Magazzino Centrale Roma",
+              "Deposito Nord Milano",
+              "Magazzino Sud Napoli",
+              "Hub Logistico Torino",
+              "Centro Distribuzione Bologna"
+            ]
+          },
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via del Porto 12, Roma",
+              "Via Milano 45, Milano",
+              "Via Napoli 8, Napoli",
+              "Corso Torino 100, Torino",
+              "Via Emilia 22, Bologna"
+            ]
+          },
+          "capacita_max": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1000.00",
+              "2500.00",
+              "5000.00",
+              "10000.00",
+              "20000.00"
+            ]
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice": "PRD001",
+            "descrizione": "Scatola cartone 30x30x30",
+            "peso_unitario": 0.5,
+            "volume_unitario": 0.25
+          },
+          {
+            "id": 2,
+            "codice": "PRD002",
+            "descrizione": "Pallet EUR 120x80",
+            "peso_unitario": 25.0,
+            "volume_unitario": 1.2
+          },
+          {
+            "id": 3,
+            "codice": "PRD003",
+            "descrizione": "Bottiglia di vetro 750ml",
+            "peso_unitario": 0.89,
+            "volume_unitario": 0.75
+          },
+          {
+            "id": 4,
+            "codice": "PRD004",
+            "descrizione": "Elettrodomestico lavatrice",
+            "peso_unitario": 70.0,
+            "volume_unitario": 0.9
+          },
+          {
+            "id": 5,
+            "codice": "PRD005",
+            "descrizione": "Pneumatico auto",
+            "peso_unitario": 8.5,
+            "volume_unitario": 0.6
+          }
+        ],
+        "variations": {
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Scatola cartone 30x30x30",
+              "Pallet EUR 120x80",
+              "Bottiglia di vetro 750ml",
+              "Elettrodomestico lavatrice",
+              "Pneumatico auto",
+              "Scatola metallica 20x20x20"
+            ]
+          },
+          "peso_unitario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0.250",
+              "0.500",
+              "0.750",
+              "1.000",
+              "2.500",
+              "5.000",
+              "8.500",
+              "25.000",
+              "70.000"
+            ]
+          },
+          "volume_unitario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0.100",
+              "0.250",
+              "0.500",
+              "0.750",
+              "1.000",
+              "2.000"
+            ]
+          }
+        }
+      },
+      {
+        "table": "consegne_programmate",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "magazzino_partenza_id": 1,
+            "magazzino_destinazione_id": 2,
+            "data_partenza": "2026-01-05 08:00:00",
+            "data_arrivo_prevista": "2026-03-02 12:00:00",
+            "stato": "programmata"
+          },
+          {
+            "id": 2,
+            "magazzino_partenza_id": 2,
+            "magazzino_destinazione_id": 3,
+            "data_partenza": "2026-01-12 09:30:00",
+            "data_arrivo_prevista": "2026-03-05 14:00:00",
+            "stato": "in transito"
+          },
+          {
+            "id": 3,
+            "magazzino_partenza_id": 3,
+            "magazzino_destinazione_id": 4,
+            "data_partenza": "2026-01-20 07:45:00",
+            "data_arrivo_prevista": "2026-03-10 11:30:00",
+            "stato": "completata"
+          },
+          {
+            "id": 4,
+            "magazzino_partenza_id": 4,
+            "magazzino_destinazione_id": 1,
+            "data_partenza": "2026-02-02 10:00:00",
+            "data_arrivo_prevista": "2026-03-15 16:00:00",
+            "stato": "programmata"
+          }
+        ],
+        "variations": {
+          "data_partenza": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "2026-01-05 08:00:00",
+              "2026-01-12 09:30:00",
+              "2026-01-20 07:45:00",
+              "2026-02-02 10:00:00",
+              "2026-02-15 08:30:00",
+              "2026-02-25 09:00:00"
+            ]
+          },
+          "data_arrivo_prevista": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "2026-03-02 12:00:00",
+              "2026-03-05 14:00:00",
+              "2026-03-10 11:30:00",
+              "2026-03-15 16:00:00",
+              "2026-03-20 10:00:00",
+              "2026-04-01 09:00:00"
+            ]
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "programmata",
+              "in transito",
+              "completata",
+              "annullata"
+            ]
+          }
+        }
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "consegna_id": 1,
+            "prodotto_id": 1,
+            "quantita": 10,
+            "massa_lorda": 5.0,
+            "note": "Fragile"
+          },
+          {
+            "id": 2,
+            "consegna_id": 1,
+            "prodotto_id": 2,
+            "quantita": 2,
+            "massa_lorda": 50.0,
+            "note": "Maneggiare con cura"
+          },
+          {
+            "id": 3,
+            "consegna_id": 2,
+            "prodotto_id": 3,
+            "quantita": 24,
+            "massa_lorda": 21.36,
+            "note": "Bottiglie"
+          },
+          {
+            "id": 4,
+            "consegna_id": 2,
+            "prodotto_id": 4,
+            "quantita": 1,
+            "massa_lorda": 70.0,
+            "note": "Ingombrante"
+          },
+          {
+            "id": 5,
+            "consegna_id": 3,
+            "prodotto_id": 5,
+            "quantita": 4,
+            "massa_lorda": 34.0,
+            "note": ""
+          }
+        ],
+        "variations": {
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "5",
+              "10",
+              "20",
+              "50"
+            ]
+          },
+          "massa_lorda": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "0.500",
+              "1.200",
+              "2.500",
+              "5.000",
+              "10.000",
+              "25.000",
+              "50.000",
+              "70.000"
+            ]
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Fragile",
+              "Maneggiare con cura",
+              "Bottiglie",
+              "Ingombrante",
+              "Priorità alta",
+              "Standard"
+            ]
+          }
+        }
+      },
+      {
+        "table": "autisti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Luca",
+            "cognome": "Bianchi",
+            "licenza": "LIC001",
+            "disponibile": true
+          },
+          {
+            "id": 2,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "licenza": "LIC002",
+            "disponibile": true
+          },
+          {
+            "id": 3,
+            "nome": "Anna",
+            "cognome": "Verdi",
+            "licenza": "LIC003",
+            "disponibile": false
+          },
+          {
+            "id": 4,
+            "nome": "Paolo",
+            "cognome": "Neri",
+            "licenza": "LIC004",
+            "disponibile": true
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Luca",
+              "Marco",
+              "Anna",
+              "Paolo",
+              "Giulia",
+              "Francesco"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Bianchi",
+              "Rossi",
+              "Verdi",
+              "Neri",
+              "Colombo",
+              "Ferrari"
+            ]
+          },
+          "disponibile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "false"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

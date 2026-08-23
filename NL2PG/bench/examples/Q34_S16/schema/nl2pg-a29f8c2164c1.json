@@ -1,0 +1,42 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 6,
+    "hierarchy": "temporal_versioning",
+    "sql_features": [],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "movimentazioni_merci",
+        "description": "La tabella che registra le spedizioni viene denominata 'movimentazioni_merci' nei documenti aziendali, creando ambiguità con le tabelle di magazzino."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "data_consegna_prevista",
+        "obsolete_value": "ETA (Estimated Time of Arrival)",
+        "description": "La colonna 'data_consegna_prevista' viene indicata come 'ETA' nei report operativi, richiedendo la conoscenza del gergo logistico per l'interpretazione corretta."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "stato",
+        "obsolete_value": "status",
+        "description": "La colonna 'stato' (che indica lo stato della spedizione) viene spesso confusa con 'status' (usato in altri contesti aziendali per indicare lo stato di un ordine o di un veicolo), generando ambiguità semantica."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "WHERE validita_inizio <= CURRENT_TIMESTAMP AND validita_fine >= CURRENT_TIMESTAMP",
+        "obsolete_value": "Filtra solo le versioni attualmente valide",
+        "description": "La condizione SQL per filtrare le versioni attualmente valide di una spedizione viene espressa in prosa come 'Filtra solo le versioni attualmente valide', richiedendo la traduzione in una clausola temporale esplicita."
+      }
+    ],
+    "spec_hash": "44d368bce6e94892"
+  },
+  "schema_ddl": "CREATE TYPE stato_spedizione AS ENUM ('in_preparazione', 'in_transito', 'consegnato', 'annullato', 'ritardato');\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT CHECK (email ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}$'),\n    creato_il TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    modificato_il TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE indirizzi (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id) ON DELETE CASCADE,\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL CHECK (cap ~ '^[0-9]{5}$'),\n    provincia TEXT NOT NULL CHECK (LENGTH(provincia) = 2),\n    nazione TEXT NOT NULL DEFAULT 'Italia',\n    valid_from TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valid_to TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT 'infinity',\n    CHECK (valid_to > valid_from)\n);\n\nCREATE TABLE vettori (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_vettore TEXT NOT NULL UNIQUE,\n    telefono TEXT CHECK (telefono ~ '^[0-9]{10,15}$'),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    indirizzo_id INT NOT NULL REFERENCES indirizzi(id),\n    vettore_id INT NOT NULL REFERENCES vettori(id),\n    data_spedizione TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    data_consegna_prevista TIMESTAMP WITH TIME ZONE NOT NULL,\n    peso_kg NUMERIC(10, 2) NOT NULL CHECK (peso_kg > 0),\n    volume_m3 NUMERIC(10, 3) CHECK (volume_m3 >= 0),\n    stato stato_spedizione NOT NULL DEFAULT 'in_preparazione',\n    note TEXT\n);\n\nCREATE TABLE versioni_spedizioni (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    stato stato_spedizione NOT NULL,\n    data_modifica TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    modificato_da TEXT NOT NULL,\n    note_modifica TEXT,\n    validita_inizio TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    validita_fine TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT 'infinity',\n    CHECK (validita_fine > validita_inizio)\n);\n\nCREATE TABLE tracciamenti (\n    id SERIAL PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    posizione TEXT NOT NULL,\n    data_ora TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    note TEXT\n);"
+}

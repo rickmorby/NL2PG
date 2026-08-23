@@ -1,0 +1,34 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "top_n"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "dipendenti",
+      "obsolete_value": "anagrafica_risorse",
+      "description": "La tabella principale dei dipendenti viene indicata nei documenti aziendali come anagrafica_risorse, ma nel database il nome reale è dipendenti."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "updated_at",
+      "obsolete_value": "data_ultimo_aggiornamento",
+      "description": "La colonna di audit updated_at viene chiamata colloquialmente data_ultimo_aggiornamento nelle comunicazioni interne, generando ambiguità con il nome reale della colonna."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "valutazione_performance",
+      "obsolete_value": "score_review",
+      "description": "Il campo che registra il punteggio della valutazione periodica è noto in gergo HR come score_review, mentre nel database la colonna si chiama valutazione_performance."
+    }
+  ],
+  "spec_hash": "292374ffde39b3e1"
+}

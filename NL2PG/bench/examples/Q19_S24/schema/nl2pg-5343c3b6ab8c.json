@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 2,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "full_outer_join"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "agenzie",
+        "obsolete_value": "reti_intermediazione",
+        "description": "La tabella genitore agenzie (che contiene le filiali con id_agenzia come chiave primaria) viene denominata reti_intermediazione nella prosa aziendale. Il solver deve risalire al nome reale della tabella tramite la relazione referenziale one-to-many con gli immobili."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "prezzo_richiesto",
+        "obsolete_value": "valore di listino",
+        "description": "La colonna prezzo_richiesto della tabella figlio immobili viene indicata nella documentazione aziendale con il termine gergale del settore immobiliare 'valore di listino'. Il solver deve mappare il gergo commerciale sul nome tecnico della colonna quando aggrega o confronta i valori."
+      }
+    ],
+    "spec_hash": "e5031b9f09c88bd0"
+  },
+  "schema_ddl": "CREATE TABLE agenzie (\n    id_agenzia INT PRIMARY KEY,\n    nome_rete TEXT NOT NULL,\n    citta_sede TEXT NOT NULL,\n    telefono_contatto TEXT,\n    email_ufficio TEXT UNIQUE\n);\n\nCREATE TABLE immobili (\n    id_immobile INT PRIMARY KEY,\n    agenzia_id INT REFERENCES agenzie(id_agenzia) ON DELETE SET NULL ON UPDATE CASCADE,\n    indirizzo TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato_vendita TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_vendita IN ('disponibile', 'riservato', 'venduto'))\n);"
+}

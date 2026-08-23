@@ -1,0 +1,34 @@
+{
+  "domain": "università",
+  "n_tables": 2,
+  "hierarchy": "one_to_one",
+  "sql_features": [
+    "full_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "tesi",
+      "obsolete_value": "elaborato_finale",
+      "description": "La tabella tesi, che contiene i dati delle tesi di laurea con FK unica verso studenti, viene denominata elaborato_finale nella prosa aziendale. Il solver deve riconoscere che ogni menzione di elaborato_finale si riferisce alla tabella fisica tesi."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "voto_finale",
+      "obsolete_value": "valutazione_complessiva",
+      "description": "La colonna voto_finale della tabella tesi viene indicata nei documenti aziendali come valutazione_complessiva. I due termini sono intercambiabili e identificano lo stesso attributo numerico della tesi."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "relatore",
+      "obsolete_value": "docente_guida",
+      "description": "La colonna relatore della tabella tesi viene descritta con il gergo accademico docente_guida, ovvero il professore che guida lo studente nella stesura della tesi. Le query devono mappare docente_guida sulla colonna fisica relatore."
+    }
+  ],
+  "spec_hash": "d504c356a02cdc9f"
+}

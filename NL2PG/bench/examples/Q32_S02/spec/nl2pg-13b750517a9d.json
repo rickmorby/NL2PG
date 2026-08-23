@@ -1,0 +1,27 @@
+{
+  "domain": "finanza",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "values"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "flussi_di_cassa",
+      "description": "La tabella figlia transazioni, collegata tramite FK conto_id alla tabella padre conti, viene denominata flussi_di_cassa nella prosa aziendale. Il solver deve riconoscere che flussi_di_cassa corrisponde alla tabella transazioni su cui applicare il JOIN con l'alias derivato da FROM (VALUES ...) AS alias(c1,c2)."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo",
+      "obsolete_value": "controvalore",
+      "description": "La colonna importo della tabella transazioni viene indicata nella documentazione aziendale con il gergo finanziario controvalore. Il solver deve mappare il termine tecnico di settore alla colonna reale da aggregare o filtrare nella query costruita con la clausola VALUES inline."
+    }
+  ],
+  "spec_hash": "7d888bf408e0c8c3"
+}

@@ -1,0 +1,20 @@
+{
+  "domain": "università",
+  "n_tables": 2,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "top_n"
+  ],
+  "twist": [
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rephrase",
+      "target_value": "corso_padre_id",
+      "obsolete_value": "il corso da cui il modulo didattico discende direttamente",
+      "description": "Nella prosa aziendale la colonna corso_padre_id della tabella corsi non è mai citata con il suo nome tecnico, ma descritta come 'il corso da cui il modulo didattico discende direttamente'. Il risolutore deve riconoscere che questa perifrasi indica la foreign key auto-referenziale verso la stessa tabella corsi, elemento indispensabile per eseguire il self-join che collega le radici gerarchiche ai corsi foglia e selezionare i TOP-N percorsi radice-foglia richiesti."
+    }
+  ],
+  "spec_hash": "fa17642aaea5f3fc"
+}

@@ -1,0 +1,28 @@
+{
+  "domain": "erp",
+  "n_tables": 5,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "join",
+    "multi_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "fornitori",
+      "obsolete_value": "anagrafica_partner_commerciali",
+      "description": "La tabella fornitori, che contiene i dati dei soggetti che riforniscono gli articoli, viene denominata anagrafica_partner_commerciali nella prosa aziendale del sistema ERP."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "quantita_minima_ordine",
+      "obsolete_value": "MOQ",
+      "description": "La colonna quantita_minima_ordine della tabella associativa articoli_fornitori viene indicata nella documentazione aziendale con l'acronimo MOQ (Minimum Order Quantity), gergo tipico del procurement e della supply chain."
+    }
+  ],
+  "spec_hash": "51bd1443aac1cfa8"
+}

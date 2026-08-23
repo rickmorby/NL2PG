@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 5,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "in_condition"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_personale",
+        "description": "La tabella dipendenti viene denominata anagrafica_personale nella prosa aziendale. Le relazioni con le altre tabelle non sono dichiarate tramite REFERENCES: il collegamento deve essere dedotto dalla colonna dipendente_id presente nelle tabelle contratti e stipendi."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "stipendio_mensile",
+        "obsolete_value": "compenso_base",
+        "description": "La colonna stipendio_mensile della tabella stipendi viene indicata come compenso_base nella documentazione aziendale. Il solver deve riconoscere che compenso_base corrisponde a stipendio_mensile quando costruisce la subquery con IN per filtrare i dipendenti con determinate retribuzioni."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "reparti",
+        "obsolete_value": "centri di costo",
+        "description": "La tabella reparti viene indicata con il gergo aziendale centri di costo nella prosa. Il collegamento implicito avviene tramite la colonna reparto_id presente in dipendenti, che deve essere usata nella condizione IN (SELECT reparto_id FROM reparti WHERE ...) per filtrare i dipendenti dei centri di costo richiesti."
+      }
+    ],
+    "spec_hash": "992e7dbf312b4d46"
+  },
+  "schema_ddl": "CREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    sede TEXT,\n    budget_annuo NUMERIC(12,2) CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE,\n    data_assunzione DATE NOT NULL,\n    email TEXT UNIQUE,\n    reparto_id INT NOT NULL\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL,\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('tempo_indeterminato', 'tempo_determinato', 'part_time', 'apprendistato')),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    livello_ccnl TEXT,\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE stipendi (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL,\n    anno INT NOT NULL CHECK (anno BETWEEN 2000 AND 2100),\n    mese INT NOT NULL CHECK (mese BETWEEN 1 AND 12),\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile > 0),\n    bonus NUMERIC(10,2) DEFAULT 0 CHECK (bonus >= 0),\n    data_erogazione DATE\n);\n\nCREATE TABLE valutazioni (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL,\n    anno INT NOT NULL CHECK (anno BETWEEN 2000 AND 2100),\n    punteggio NUMERIC(5,2) CHECK (punteggio BETWEEN 0 AND 100),\n    esito TEXT CHECK (esito IN ('insufficiente', 'sufficiente', 'buono', 'ottimo')),\n    note TEXT\n);"
+}

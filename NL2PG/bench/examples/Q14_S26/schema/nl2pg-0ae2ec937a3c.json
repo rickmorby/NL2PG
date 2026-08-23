@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti_contabili",
+        "obsolete_value": "registro_scritture",
+        "description": "La tabella legacy movimenti_contabili, unica tabella dello schema con colonne fisiche di tipo TEXT, viene denominata registro_scritture nella prosa aziendale. Il solver deve risalire alla tabella reale tramite la perifrasi."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "controvalore della scrittura",
+        "description": "La colonna importo, fisicamente dichiarata TEXT ma logicamente numerica, viene descritta nella prosa con il gergo contabile 'controvalore della scrittura'. Le query che confrontano o aggregano tale valore richiedono CAST(importo AS NUMERIC) prima dell'operazione set (UNION/INTERSECT/EXCEPT)."
+      }
+    ],
+    "spec_hash": "0f86fe77cf6dde72"
+  },
+  "schema_ddl": "CREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    data_registrazione TEXT NOT NULL,\n    numero_conto TEXT NOT NULL,\n    descrizione_scrittura TEXT NOT NULL,\n    importo NUMERIC(12,2) NOT NULL,\n    tipo_scrittura TEXT NOT NULL,\n    documento_riferimento TEXT,\n    CHECK (data_registrazione ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'),\n    CHECK (tipo_scrittura IN ('attivo', 'passivo'))\n);"
+}

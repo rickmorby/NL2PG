@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 1,
+    "hierarchy": "single_table",
+    "sql_features": [
+      "agg_distinct"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "chiamate",
+        "obsolete_value": "registro_traffico_vocale",
+        "description": "La tabella autonoma chiamate, che registra ogni evento di traffico con PK id_chiamata e attributi come numero_mittente, numero_destinatario, data_ora, durata_secondi e tipo_chiamata, viene denominata registro_traffico_vocale nella prosa aziendale senza alcun riferimento esplicito al nome reale della tabella."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "numero_destinatario",
+        "obsolete_value": "MSISDN terminato",
+        "description": "Nella documentazione aziendale la colonna numero_destinatario della tabella chiamate è indicata esclusivamente con il gergo tecnico del settore 'MSISDN terminato', costringendo a riconoscere che si tratta del numero telefonico del destinatario della chiamata su cui applicare COUNT(DISTINCT) raggruppando per numero_mittente."
+      }
+    ],
+    "spec_hash": "506202eb87fdfe3d"
+  },
+  "schema_ddl": "CREATE TABLE chiamate (\n    id_chiamata BIGINT PRIMARY KEY,\n    numero_mittente TEXT NOT NULL,\n    numero_destinatario TEXT NOT NULL,\n    data_ora TIMESTAMP NOT NULL,\n    durata_secondi INT NOT NULL CHECK (durata_secondi >= 0),\n    tipo_chiamata TEXT NOT NULL CHECK (tipo_chiamata IN ('voce', 'video', 'internazionale', 'roaming')),\n    stato_chiamata TEXT NOT NULL DEFAULT 'completata' CHECK (stato_chiamata IN ('completata', 'persa', 'inoltrata'))\n);\n\nCREATE INDEX idx_chiamate_mittente ON chiamate (numero_mittente);\n\nCREATE INDEX idx_chiamate_data_ora ON chiamate (data_ora);"
+}

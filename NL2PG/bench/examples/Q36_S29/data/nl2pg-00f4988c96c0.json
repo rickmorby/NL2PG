@@ -1,0 +1,446 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "string_funcs"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "corrieri",
+        "obsolete_value": "operatori_di_trasporto",
+        "description": "La tabella corrieri (id_corriere, nome_corriere, cognome_corriere, targa) viene denominata operatori_di_trasporto nella prosa aziendale. L'utente deve risalire al nome reale della tabella per costruire correttamente la query."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "spedizioni",
+        "obsolete_value": "carichi_in_transito",
+        "description": "La tabella spedizioni (id_spedizione, nome_destinatario, cognome_destinatario, stato) viene indicata nella documentazione aziendale con il gergo operativo carichi_in_transito. Il dato anagrafico del destinatario è archiviato spezzato su due colonne separate (nome_destinatario e cognome_destinatario), quindi la risposta richiede la ricomposizione tramite CONCAT(nome_destinatario, ' ', cognome_destinatario) e la formattazione con UPPER/SUBSTRING nella SELECT."
+      }
+    ],
+    "spec_hash": "f54063b7ae1e9a0d"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id_cliente INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE depositi (\n    id_deposito INT PRIMARY KEY,\n    nome_deposito TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL CHECK (cap ~ '^[0-9]{5}$')\n);\n\nCREATE TABLE corrieri (\n    id_corriere INT PRIMARY KEY,\n    nome_corriere TEXT NOT NULL,\n    cognome_corriere TEXT NOT NULL,\n    targa TEXT NOT NULL UNIQUE,\n    CHECK (LENGTH(TRIM(nome_corriere)) > 0),\n    CHECK (LENGTH(TRIM(cognome_corriere)) > 0)\n);\n\nCREATE TABLE spedizioni (\n    id_spedizione INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id_cliente),\n    deposito_id INT NOT NULL REFERENCES depositi(id_deposito),\n    corriere_id INT NOT NULL REFERENCES corrieri(id_corriere),\n    nome_destinatario TEXT NOT NULL,\n    cognome_destinatario TEXT NOT NULL,\n    indirizzo_destinatario TEXT NOT NULL,\n    citta_destinatario TEXT NOT NULL,\n    stato TEXT NOT NULL CHECK (stato IN ('IN_PREPARAZIONE', 'IN_TRANSITO', 'CONSEGNATA', 'FALLITA')),\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    data_spedizione DATE NOT NULL,\n    CHECK (LENGTH(TRIM(nome_destinatario)) > 0),\n    CHECK (LENGTH(TRIM(cognome_destinatario)) > 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_cliente": 1,
+            "ragione_sociale": "Alfa Distribuzione Srl",
+            "partita_iva": "IT01234567890",
+            "citta": "Milano"
+          },
+          {
+            "id_cliente": 2,
+            "ragione_sociale": "Beta Retail SpA",
+            "partita_iva": "IT09876543210",
+            "citta": "Roma"
+          },
+          {
+            "id_cliente": 3,
+            "ragione_sociale": "Gamma Food Industries Srl",
+            "partita_iva": "IT04567891234",
+            "citta": "Torino"
+          },
+          {
+            "id_cliente": 4,
+            "ragione_sociale": "Delta Elettronica SpA",
+            "partita_iva": "IT03216549876",
+            "citta": "Napoli"
+          },
+          {
+            "id_cliente": 5,
+            "ragione_sociale": "Epsilon Cartaria Srl",
+            "partita_iva": "IT05544332211",
+            "citta": "Bologna"
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Alfa Distribuzione Srl",
+              "Beta Retail SpA",
+              "Gamma Food Industries Srl",
+              "Delta Elettronica SpA",
+              "Epsilon Cartaria Srl",
+              "Zeta Abbigliamento Srl",
+              "Omega Ferramenta Snc",
+              "Sigma Chimica SpA"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona"
+            ]
+          }
+        }
+      },
+      {
+        "table": "depositi",
+        "nature": "lookup",
+        "min_rows": 5,
+        "max_rows": 10,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_deposito": 1,
+            "nome_deposito": "Deposito Centrale Milano",
+            "citta": "Milano",
+            "cap": "20121"
+          },
+          {
+            "id_deposito": 2,
+            "nome_deposito": "Hub Sud Napoli",
+            "citta": "Napoli",
+            "cap": "80121"
+          },
+          {
+            "id_deposito": 3,
+            "nome_deposito": "Magazzino Nord Torino",
+            "citta": "Torino",
+            "cap": "10121"
+          },
+          {
+            "id_deposito": 4,
+            "nome_deposito": "Deposito Est Bologna",
+            "citta": "Bologna",
+            "cap": "40121"
+          },
+          {
+            "id_deposito": 5,
+            "nome_deposito": "Hub Ovest Roma",
+            "citta": "Roma",
+            "cap": "00185"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "corrieri",
+        "nature": "lookup",
+        "min_rows": 15,
+        "max_rows": 35,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_corriere": 1,
+            "nome_corriere": "Luca",
+            "cognome_corriere": "Ferrari",
+            "targa": "AB123CD"
+          },
+          {
+            "id_corriere": 2,
+            "nome_corriere": "Marco",
+            "cognome_corriere": "Ricci",
+            "targa": "EZ456GH"
+          },
+          {
+            "id_corriere": 3,
+            "nome_corriere": "Sara",
+            "cognome_corriere": "Moretti",
+            "targa": "FT789IL"
+          },
+          {
+            "id_corriere": 4,
+            "nome_corriere": "Paolo",
+            "cognome_corriere": "Greco",
+            "targa": "MN012OP"
+          },
+          {
+            "id_corriere": 5,
+            "nome_corriere": "Anna",
+            "cognome_corriere": "Conti",
+            "targa": "QR345ST"
+          }
+        ],
+        "variations": {
+          "nome_corriere": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Luca",
+              "Marco",
+              "Sara",
+              "Paolo",
+              "Anna",
+              "Fabio",
+              "Elena",
+              "Simone"
+            ]
+          },
+          "cognome_corriere": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ferrari",
+              "Ricci",
+              "Moretti",
+              "Greco",
+              "Conti",
+              "Lombardi",
+              "De Luca",
+              "Marchetti"
+            ]
+          }
+        }
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_spedizione": 1001,
+            "cliente_id": 1,
+            "deposito_id": 1,
+            "corriere_id": 1,
+            "nome_destinatario": "Giulia",
+            "cognome_destinatario": "Romano",
+            "indirizzo_destinatario": "Via Garibaldi 24",
+            "citta_destinatario": "Verona",
+            "stato": "CONSEGNATA",
+            "peso_kg": 12.5,
+            "data_spedizione": "2026-01-08"
+          },
+          {
+            "id_spedizione": 1002,
+            "cliente_id": 2,
+            "deposito_id": 5,
+            "corriere_id": 2,
+            "nome_destinatario": "Marco",
+            "cognome_destinatario": "Gallo",
+            "indirizzo_destinatario": "Corso Vittorio Emanuele II 8",
+            "citta_destinatario": "Firenze",
+            "stato": "CONSEGNATA",
+            "peso_kg": 3.2,
+            "data_spedizione": "2026-01-19"
+          },
+          {
+            "id_spedizione": 1003,
+            "cliente_id": 3,
+            "deposito_id": 3,
+            "corriere_id": 3,
+            "nome_destinatario": "Sara",
+            "cognome_destinatario": "Costa",
+            "indirizzo_destinatario": "Via Dante Alighieri 51",
+            "citta_destinatario": "Genova",
+            "stato": "FALLITA",
+            "peso_kg": 48.75,
+            "data_spedizione": "2026-01-27"
+          },
+          {
+            "id_spedizione": 1004,
+            "cliente_id": 4,
+            "deposito_id": 2,
+            "corriere_id": 4,
+            "nome_destinatario": "Luca",
+            "cognome_destinatario": "Fontana",
+            "indirizzo_destinatario": "Piazza della Repubblica 3",
+            "citta_destinatario": "Brescia",
+            "stato": "CONSEGNATA",
+            "peso_kg": 7.9,
+            "data_spedizione": "2026-02-05"
+          },
+          {
+            "id_spedizione": 1005,
+            "cliente_id": 5,
+            "deposito_id": 4,
+            "corriere_id": 5,
+            "nome_destinatario": "Chiara",
+            "cognome_destinatario": "Marino",
+            "indirizzo_destinatario": "Via Mazzini 17",
+            "citta_destinatario": "Padova",
+            "stato": "IN_TRANSITO",
+            "peso_kg": 22.4,
+            "data_spedizione": "2026-02-18"
+          },
+          {
+            "id_spedizione": 1006,
+            "cliente_id": 1,
+            "deposito_id": 1,
+            "corriere_id": 2,
+            "nome_destinatario": "Davide",
+            "cognome_destinatario": "Barbieri",
+            "indirizzo_destinatario": "Viale Trieste 42",
+            "citta_destinatario": "Parma",
+            "stato": "IN_TRANSITO",
+            "peso_kg": 1.6,
+            "data_spedizione": "2026-02-26"
+          },
+          {
+            "id_spedizione": 1007,
+            "cliente_id": 2,
+            "deposito_id": 5,
+            "corriere_id": 1,
+            "nome_destinatario": "Elena",
+            "cognome_destinatario": "Villa",
+            "indirizzo_destinatario": "Via Cavour 9",
+            "citta_destinatario": "Modena",
+            "stato": "IN_PREPARAZIONE",
+            "peso_kg": 15.05,
+            "data_spedizione": "2026-03-04"
+          },
+          {
+            "id_spedizione": 1008,
+            "cliente_id": 3,
+            "deposito_id": 3,
+            "corriere_id": 3,
+            "nome_destinatario": "Matteo",
+            "cognome_destinatario": "Testa",
+            "indirizzo_destinatario": "Largo Buenos Aires 6",
+            "citta_destinatario": "Trento",
+            "stato": "IN_PREPARAZIONE",
+            "peso_kg": 33.8,
+            "data_spedizione": "2026-03-09"
+          }
+        ],
+        "variations": {
+          "nome_destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Giulia",
+              "Marco",
+              "Sara",
+              "Luca",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Matteo",
+              "Alessia",
+              "Federico"
+            ]
+          },
+          "cognome_destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Romano",
+              "Gallo",
+              "Costa",
+              "Fontana",
+              "Marino",
+              "Barbieri",
+              "Villa",
+              "Testa",
+              "Colombo",
+              "Esposito"
+            ]
+          },
+          "indirizzo_destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Garibaldi 24",
+              "Corso Vittorio Emanuele II 8",
+              "Via Dante Alighieri 51",
+              "Piazza della Repubblica 3",
+              "Via Mazzini 17",
+              "Viale Trieste 42",
+              "Via Cavour 9",
+              "Largo Buenos Aires 6"
+            ]
+          },
+          "citta_destinatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Verona",
+              "Padova",
+              "Firenze",
+              "Genova",
+              "Brescia",
+              "Parma",
+              "Modena",
+              "Trento",
+              "Bergamo",
+              "Ravenna"
+            ]
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "CONSEGNATA",
+              "CONSEGNATA",
+              "CONSEGNATA",
+              "CONSEGNATA",
+              "IN_TRANSITO",
+              "IN_TRANSITO",
+              "IN_PREPARAZIONE",
+              "FALLITA"
+            ]
+          },
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.2,
+            "pool": []
+          },
+          "data_spedizione": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 7.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

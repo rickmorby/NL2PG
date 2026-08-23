@@ -1,0 +1,34 @@
+{
+  "domain": "finanza",
+  "n_tables": 2,
+  "hierarchy": "flat",
+  "sql_features": [
+    "disjunctive"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "registro_movimenti_liquidity",
+      "description": "La tabella piatta transazioni, che contiene le operazioni finanziarie con gli attributi ridondanti incorporati category_name e supplier_name, viene denominata nel testo aziendale registro_movimenti_liquidity. L'utente deve risalire al nome reale della tabella per formulare la query disgiuntiva."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "category_name",
+      "obsolete_value": "classe_attivo",
+      "description": "La colonna incorporata category_name della tabella denormalizzata viene indicata nella prosa con il sinonimo classe_attivo. La condizione OR della WHERE deve comunque riferirsi alla colonna reale category_name (es. WHERE category_name = 'obbligazioni')."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "supplier_name",
+      "obsolete_value": "controparte_emittente",
+      "description": "La colonna incorporata supplier_name viene descritta nella documentazione aziendale con il gergo finanziario controparte_emittente. Il solver deve mappare questo termine tecnico alla colonna reale supplier_name per costruire il ramo alternativo della condizione OR (es. OR supplier_name = 'forn1')."
+    }
+  ],
+  "spec_hash": "92b1f199520bb8e2"
+}

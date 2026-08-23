@@ -1,0 +1,349 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "sorting"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "registrazioni",
+        "obsolete_value": "scritture_di_prima_nota",
+        "description": "La tabella registrazioni, che contiene il giornale delle operazioni contabili dell'esercizio, viene denominata nella prosa aziendale come scritture_di_prima_nota. Le query devono risolvere questa denominazione verso il nome fisico reale della tabella."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "importo",
+        "obsolete_value": "valore_nominalmente_espresso",
+        "description": "La colonna importo della tabella movimenti_contabili è fisicamente di tipo TEXT pur contenendo valori logicamente numerici (es. '1250.50'); il gergo contabile della documentazione la indica come valore_nominalmente_espresso. Per ordinare correttamente i risultati con ORDER BY è obbligatorio applicare CAST(importo AS NUMERIC), altrimenti l'ordinamento lessicografico del testo produrrebbe sequenze errate (es. '950' dopo '1250')."
+      }
+    ],
+    "spec_hash": "d8394b786178cad0"
+  },
+  "schema_ddl": "CREATE TABLE esercizi (\n    id INT PRIMARY KEY,\n    anno INT NOT NULL UNIQUE,\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    chiuso BOOLEAN NOT NULL DEFAULT FALSE,\n    CHECK (data_fine > data_inizio)\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'costo', 'ricavo'))\n);\n\nCREATE TABLE registrazioni (\n    id INT PRIMARY KEY,\n    esercizio_id INT NOT NULL REFERENCES esercizi(id),\n    numero_registrazione INT NOT NULL,\n    data_registrazione DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    UNIQUE (esercizio_id, numero_registrazione),\n    CHECK (numero_registrazione > 0)\n);\n\nCREATE TABLE movimenti_contabili (\n    id INT PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(12,2) NOT NULL,\n    dare_avere TEXT NOT NULL CHECK (dare_avere IN ('dare', 'avere')),\n    data_valuta DATE NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "esercizi",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "anno": 2019,
+            "data_inizio": "2019-01-01",
+            "data_fine": "2019-12-31",
+            "chiuso": true
+          },
+          {
+            "id": 2,
+            "anno": 2020,
+            "data_inizio": "2020-01-01",
+            "data_fine": "2020-12-31",
+            "chiuso": true
+          },
+          {
+            "id": 3,
+            "anno": 2021,
+            "data_inizio": "2021-01-01",
+            "data_fine": "2021-12-31",
+            "chiuso": true
+          },
+          {
+            "id": 4,
+            "anno": 2022,
+            "data_inizio": "2022-01-01",
+            "data_fine": "2022-12-31",
+            "chiuso": true
+          },
+          {
+            "id": 5,
+            "anno": 2023,
+            "data_inizio": "2023-01-01",
+            "data_fine": "2023-12-31",
+            "chiuso": true
+          },
+          {
+            "id": 6,
+            "anno": 2024,
+            "data_inizio": "2024-01-01",
+            "data_fine": "2024-12-31",
+            "chiuso": true
+          },
+          {
+            "id": 7,
+            "anno": 2025,
+            "data_inizio": "2025-01-01",
+            "data_fine": "2025-12-31",
+            "chiuso": true
+          },
+          {
+            "id": 8,
+            "anno": 2026,
+            "data_inizio": "2026-01-01",
+            "data_fine": "2026-12-31",
+            "chiuso": false
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "conti",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_conto": "101",
+            "denominazione": "Cassa",
+            "tipo_conto": "attivo"
+          },
+          {
+            "id": 2,
+            "codice_conto": "102",
+            "denominazione": "Banca c/c",
+            "tipo_conto": "attivo"
+          },
+          {
+            "id": 3,
+            "codice_conto": "121",
+            "denominazione": "Crediti verso clienti",
+            "tipo_conto": "attivo"
+          },
+          {
+            "id": 4,
+            "codice_conto": "151",
+            "denominazione": "Attrezzature industriali",
+            "tipo_conto": "attivo"
+          },
+          {
+            "id": 5,
+            "codice_conto": "201",
+            "denominazione": "Capitale sociale",
+            "tipo_conto": "passivo"
+          },
+          {
+            "id": 6,
+            "codice_conto": "301",
+            "denominazione": "Debiti verso fornitori",
+            "tipo_conto": "passivo"
+          },
+          {
+            "id": 7,
+            "codice_conto": "341",
+            "denominazione": "Debiti tributari",
+            "tipo_conto": "passivo"
+          },
+          {
+            "id": 8,
+            "codice_conto": "401",
+            "denominazione": "Acquisti di materiali",
+            "tipo_conto": "costo"
+          },
+          {
+            "id": 9,
+            "codice_conto": "451",
+            "denominazione": "Costi del personale",
+            "tipo_conto": "costo"
+          },
+          {
+            "id": 10,
+            "codice_conto": "501",
+            "denominazione": "Ricavi delle vendite",
+            "tipo_conto": "ricavo"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "registrazioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 12.0,
+        "templates": [
+          {
+            "id": 1,
+            "esercizio_id": 1,
+            "numero_registrazione": 1,
+            "data_registrazione": "2026-01-05",
+            "descrizione": "Fattura vendita cliente Alpha"
+          },
+          {
+            "id": 2,
+            "esercizio_id": 1,
+            "numero_registrazione": 2,
+            "data_registrazione": "2026-02-10",
+            "descrizione": "Pagamento fornitore Beta"
+          },
+          {
+            "id": 3,
+            "esercizio_id": 1,
+            "numero_registrazione": 3,
+            "data_registrazione": "2026-03-15",
+            "descrizione": "Liquidazione stipendi mensili"
+          },
+          {
+            "id": 4,
+            "esercizio_id": 2,
+            "numero_registrazione": 1,
+            "data_registrazione": "2026-04-20",
+            "descrizione": "Versamento IVA trimestrale"
+          },
+          {
+            "id": 5,
+            "esercizio_id": 2,
+            "numero_registrazione": 2,
+            "data_registrazione": "2026-05-30",
+            "descrizione": "Ammortamento attrezzature"
+          },
+          {
+            "id": 6,
+            "esercizio_id": 3,
+            "numero_registrazione": 1,
+            "data_registrazione": "2026-06-15",
+            "descrizione": "Incasso fattura cliente Gamma"
+          }
+        ],
+        "variations": {
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Fattura vendita cliente",
+              "Pagamento fornitore",
+              "Liquidazione stipendi",
+              "Versamento IVA",
+              "Ammortamento attrezzature",
+              "Incasso fattura",
+              "Acquisto materiali di consumo",
+              "Corrispettivi cassa",
+              "Pagamento canoni e utenze",
+              "Rimborso spese dipendenti"
+            ]
+          }
+        }
+      },
+      {
+        "table": "movimenti_contabili",
+        "nature": "fact",
+        "min_rows": 300,
+        "max_rows": 600,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "registrazione_id": 1,
+            "conto_id": 1,
+            "importo": "1250.50",
+            "dare_avere": "dare",
+            "data_valuta": "2026-01-05"
+          },
+          {
+            "id": 2,
+            "registrazione_id": 1,
+            "conto_id": 10,
+            "importo": "1250.50",
+            "dare_avere": "avere",
+            "data_valuta": "2026-01-05"
+          },
+          {
+            "id": 3,
+            "registrazione_id": 2,
+            "conto_id": 10,
+            "importo": "3200.00",
+            "dare_avere": "dare",
+            "data_valuta": "2026-02-10"
+          },
+          {
+            "id": 4,
+            "registrazione_id": 2,
+            "conto_id": 6,
+            "importo": "3200.00",
+            "dare_avere": "avere",
+            "data_valuta": "2026-02-10"
+          },
+          {
+            "id": 5,
+            "registrazione_id": 3,
+            "conto_id": 9,
+            "importo": "15000",
+            "dare_avere": "dare",
+            "data_valuta": "2026-03-15"
+          },
+          {
+            "id": 6,
+            "registrazione_id": 3,
+            "conto_id": 2,
+            "importo": "15000",
+            "dare_avere": "avere",
+            "data_valuta": "2026-03-15"
+          }
+        ],
+        "variations": {
+          "importo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1250.50",
+              "950",
+              "75.25",
+              "3200.00",
+              "480.75",
+              "15000",
+              "89.90",
+              "2300.10",
+              "640",
+              "1875.30",
+              "2450",
+              "99.99"
+            ]
+          },
+          "dare_avere": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "dare",
+              "avere"
+            ]
+          },
+          "data_valuta": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

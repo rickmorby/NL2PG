@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 5,
+    "hierarchy": "temporal_versioning",
+    "sql_features": [
+      "ordered_set_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti_contabili",
+        "obsolete_value": "registrazioni",
+        "description": "La tabella movimenti_contabili viene denominata registrazioni nel linguaggio aziendale interno."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "data_validita",
+        "obsolete_value": "timestamp_operativo",
+        "description": "Il campo data_validita viene riferito come timestamp_operativo nei documenti tecnici."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "importo",
+        "obsolete_value": "valore",
+        "description": "Il termine importo viene talvolta sostituito con valore, generando ambiguità con altri campi numerici."
+      }
+    ],
+    "spec_hash": "144799741ab907c7"
+  },
+  "schema_ddl": "CREATE TYPE stato_movimento AS ENUM ('bozza', 'confermato', 'annullato', 'archiviato');\n\nCREATE TABLE conti (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'patrimoniale')),\n    valid_from DATE NOT NULL,\n    valid_to DATE,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(15, 2) NOT NULL,\n    segno CHAR(1) NOT NULL CHECK (segno IN ('D', 'A')),\n    descrizione TEXT,\n    stato stato_movimento NOT NULL DEFAULT 'bozza',\n    data_validita TIMESTAMP NOT NULL,\n    valid_from TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valid_to TIMESTAMP,\n    CHECK (valid_to IS NULL OR valid_to > valid_from),\n    CHECK (importo > 0)\n);\n\nCREATE TABLE causali (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    tipo TEXT NOT NULL CHECK (tipo IN ('ricavo', 'costo', 'patrimoniale')),\n    valid_from DATE NOT NULL,\n    valid_to DATE,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE documenti (\n    id SERIAL PRIMARY KEY,\n    numero TEXT NOT NULL,\n    tipo TEXT NOT NULL CHECK (tipo IN ('fattura', 'nota_credito', 'nota_debito', 'ricevuta')),\n    data_emissione DATE NOT NULL,\n    fornitore_cliente TEXT NOT NULL,\n    valid_from DATE NOT NULL,\n    valid_to DATE,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE collegamenti (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    causale_id INT NOT NULL REFERENCES causali(id),\n    documento_id INT REFERENCES documenti(id),\n    note TEXT,\n    valid_from TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valid_to TIMESTAMP,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);"
+}

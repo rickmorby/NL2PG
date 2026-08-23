@@ -1,0 +1,556 @@
+{
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL,\n    budget_annuo NUMERIC(12,2) NOT NULL CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile > 0),\n    data_assunzione DATE NOT NULL\n);\n\nCREATE TABLE progetti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    costo_orario_standard NUMERIC(12,2) NOT NULL,\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE registrazioni_ore (\n    id SERIAL PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    progetto_id INT NOT NULL REFERENCES progetti(id),\n    data_registrazione DATE NOT NULL,\n    ore_lavorate TEXT NOT NULL CHECK (ore_lavorate ~ '^[0-9]+(\\.[0-9]{1,2})?$'),\n    descrizione_attivita TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "dipartimenti": {
+        "row_count": 42,
+        "columns": {
+          "id": {
+            "distinct": 42,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 42
+          },
+          "nome": {
+            "distinct": 42,
+            "sample": [
+              "Finanza e Controllo",
+              "Finanza e Controllo1",
+              "Finanza e Controllo2",
+              "Finanza e Controllo3",
+              "Finanza e Controllo4"
+            ]
+          },
+          "sede": {
+            "distinct": 6,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "budget_annuo": {
+            "distinct": 42,
+            "sample": [
+              "1042964.94",
+              "1210148.34",
+              "1260897.69",
+              "1334625.2",
+              "1353793.45"
+            ],
+            "min": 409589.86,
+            "max": 2119645.3
+          }
+        }
+      },
+      "dipendenti": {
+        "row_count": 402,
+        "columns": {
+          "id": {
+            "distinct": 402,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 402
+          },
+          "matricola": {
+            "distinct": 402,
+            "sample": [
+              "MAT001",
+              "MAT0011",
+              "MAT00110",
+              "MAT00111",
+              "MAT00112"
+            ]
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Anna",
+              "Davide",
+              "Elena",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Fontana",
+              "Greco",
+              "Marino"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 402,
+            "sample": [
+              "BNCLRA85C12F205B",
+              "BNCLRA85C12F205C",
+              "BNCLRA85C12F205D",
+              "BNCLRA85C12F205E",
+              "BNCLRA85C12F205F"
+            ]
+          },
+          "dipartimento_id": {
+            "distinct": 42,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 42
+          },
+          "stipendio_mensile": {
+            "distinct": 396,
+            "sample": [
+              "2110.16",
+              "2164.52",
+              "2165.31",
+              "2171.82",
+              "2200.4"
+            ],
+            "min": 2110.16,
+            "max": 4925.43
+          },
+          "data_assunzione": {
+            "distinct": 349,
+            "sample": [
+              "2017-02-11",
+              "2017-02-14",
+              "2017-02-19",
+              "2017-03-10",
+              "2017-03-23"
+            ]
+          }
+        }
+      },
+      "progetti": {
+        "row_count": 127,
+        "columns": {
+          "id": {
+            "distinct": 127,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 127
+          },
+          "nome": {
+            "distinct": 127,
+            "sample": [
+              "Automazione Report Finanziari",
+              "Automazione Report Finanziari1",
+              "Automazione Report Finanziari10",
+              "Automazione Report Finanziari11",
+              "Automazione Report Finanziari12"
+            ]
+          },
+          "dipartimento_id": {
+            "distinct": 41,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 42
+          },
+          "costo_orario_standard": {
+            "distinct": 7,
+            "sample": [
+              "38.00",
+              "42.50",
+              "44.25",
+              "45.50",
+              "48.75"
+            ]
+          },
+          "data_inizio": {
+            "distinct": 109,
+            "sample": [
+              "2024-10-19",
+              "2024-10-26",
+              "2024-11-02",
+              "2024-11-03",
+              "2024-11-08"
+            ]
+          },
+          "data_fine": {
+            "distinct": 4,
+            "sample": [
+              "2025-11-30",
+              "2025-12-31",
+              "2026-03-31",
+              "2026-06-30"
+            ]
+          }
+        }
+      },
+      "registrazioni_ore": {
+        "row_count": 616,
+        "columns": {
+          "id": {
+            "distinct": 616,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 1616
+          },
+          "dipendente_id": {
+            "distinct": 320,
+            "sample": [
+              "10",
+              "100",
+              "102",
+              "103",
+              "104"
+            ],
+            "min": 2,
+            "max": 401
+          },
+          "progetto_id": {
+            "distinct": 127,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 127
+          },
+          "data_registrazione": {
+            "distinct": 224,
+            "sample": [
+              "2025-06-08",
+              "2025-06-09",
+              "2025-06-10",
+              "2025-06-11",
+              "2025-06-12"
+            ]
+          },
+          "ore_lavorate": {
+            "distinct": 9,
+            "sample": [
+              "4",
+              "4.5",
+              "5",
+              "6",
+              "6.5"
+            ]
+          },
+          "descrizione_attivita": {
+            "distinct": 13,
+            "sample": [
+              "Analisi requisiti",
+              "Analisi requisiti payroll",
+              "Code review e testing",
+              "Configurazione ambiente cloud",
+              "Debug e correzioni"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "dipartimenti": [
+        {
+          "id": 1,
+          "nome": "Information Technology",
+          "sede": "Milano",
+          "budget_annuo": 2119645.3
+        },
+        {
+          "id": 2,
+          "nome": "Information Technology1",
+          "sede": "Roma",
+          "budget_annuo": 1556495.59
+        },
+        {
+          "id": 3,
+          "nome": "Information Technology2",
+          "sede": "Firenze",
+          "budget_annuo": 1966708.21
+        },
+        {
+          "id": 4,
+          "nome": "Information Technology3",
+          "sede": "Torino",
+          "budget_annuo": 1353793.45
+        },
+        {
+          "id": 5,
+          "nome": "Information Technology4",
+          "sede": "Roma",
+          "budget_annuo": 1210148.34
+        },
+        {
+          "id": 6,
+          "nome": "Information Technology5",
+          "sede": "Napoli",
+          "budget_annuo": 1402475.88
+        },
+        {
+          "id": 7,
+          "nome": "Information Technology6",
+          "sede": "Bologna",
+          "budget_annuo": 1334625.2
+        },
+        {
+          "id": 8,
+          "nome": "Risorse Umane",
+          "sede": "Torino",
+          "budget_annuo": 590631.34
+        }
+      ],
+      "dipendenti": [
+        {
+          "id": 1,
+          "matricola": "MAT001",
+          "nome": "Mario",
+          "cognome": "Greco",
+          "codice_fiscale": "RSSMRA80A01H501U",
+          "dipartimento_id": 4,
+          "stipendio_mensile": 3471.21,
+          "data_assunzione": "2019-07-22"
+        },
+        {
+          "id": 2,
+          "matricola": "MAT0011",
+          "nome": "Laura",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "dipartimento_id": 24,
+          "stipendio_mensile": 2646.71,
+          "data_assunzione": "2019-05-03"
+        },
+        {
+          "id": 3,
+          "matricola": "MAT0012",
+          "nome": "Anna",
+          "cognome": "Moretti",
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "dipartimento_id": 19,
+          "stipendio_mensile": 4162.6,
+          "data_assunzione": "2017-07-23"
+        },
+        {
+          "id": 4,
+          "matricola": "MAT0013",
+          "nome": "Sara",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "dipartimento_id": 42,
+          "stipendio_mensile": 3251.82,
+          "data_assunzione": "2017-11-22"
+        },
+        {
+          "id": 5,
+          "matricola": "MAT0014",
+          "nome": "Sara",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "dipartimento_id": 28,
+          "stipendio_mensile": 4424.95,
+          "data_assunzione": "2017-10-14"
+        },
+        {
+          "id": 6,
+          "matricola": "MAT0015",
+          "nome": "Sara",
+          "cognome": "Neri",
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "dipartimento_id": 20,
+          "stipendio_mensile": 3714.78,
+          "data_assunzione": "2019-09-10"
+        },
+        {
+          "id": 7,
+          "matricola": "MAT0016",
+          "nome": "Davide",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "dipartimento_id": 20,
+          "stipendio_mensile": 3256.38,
+          "data_assunzione": "2019-05-22"
+        },
+        {
+          "id": 8,
+          "matricola": "MAT0017",
+          "nome": "Laura",
+          "cognome": "Marino",
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "dipartimento_id": 37,
+          "stipendio_mensile": 3371.28,
+          "data_assunzione": "2017-12-20"
+        }
+      ],
+      "progetti": [
+        {
+          "id": 1,
+          "nome": "Piattaforma CRM Interno",
+          "dipartimento_id": 22,
+          "costo_orario_standard": "48.75",
+          "data_inizio": "2024-10-26",
+          "data_fine": "2025-12-31"
+        },
+        {
+          "id": 2,
+          "nome": "Piattaforma CRM Interno1",
+          "dipartimento_id": 3,
+          "costo_orario_standard": "52.00",
+          "data_inizio": "2024-11-26",
+          "data_fine": "2025-12-31"
+        },
+        {
+          "id": 3,
+          "nome": "Piattaforma CRM Interno2",
+          "dipartimento_id": 32,
+          "costo_orario_standard": "55.00",
+          "data_inizio": "2024-12-24",
+          "data_fine": "2025-12-31"
+        },
+        {
+          "id": 4,
+          "nome": "Piattaforma CRM Interno3",
+          "dipartimento_id": 8,
+          "costo_orario_standard": "42.50",
+          "data_inizio": "2024-12-26",
+          "data_fine": "2025-12-31"
+        },
+        {
+          "id": 5,
+          "nome": "Piattaforma CRM Interno4",
+          "dipartimento_id": 1,
+          "costo_orario_standard": "42.50",
+          "data_inizio": "2024-10-19",
+          "data_fine": "2025-12-31"
+        },
+        {
+          "id": 6,
+          "nome": "Piattaforma CRM Interno5",
+          "dipartimento_id": 7,
+          "costo_orario_standard": "45.50",
+          "data_inizio": "2025-01-31",
+          "data_fine": "2025-12-31"
+        },
+        {
+          "id": 7,
+          "nome": "Piattaforma CRM Interno6",
+          "dipartimento_id": 13,
+          "costo_orario_standard": "38.00",
+          "data_inizio": "2025-02-25",
+          "data_fine": "2025-12-31"
+        },
+        {
+          "id": 8,
+          "nome": "Piattaforma CRM Interno7",
+          "dipartimento_id": 17,
+          "costo_orario_standard": "45.50",
+          "data_inizio": "2025-03-22",
+          "data_fine": "2025-12-31"
+        }
+      ],
+      "registrazioni_ore": [
+        {
+          "id": 1001,
+          "dipendente_id": 326,
+          "progetto_id": 101,
+          "data_registrazione": "2025-07-21",
+          "ore_lavorate": "7",
+          "descrizione_attivita": "Sviluppo funzionalita'"
+        },
+        {
+          "id": 1002,
+          "dipendente_id": 6,
+          "progetto_id": 21,
+          "data_registrazione": "2025-09-27",
+          "ore_lavorate": "4",
+          "descrizione_attivita": "Analisi requisiti"
+        },
+        {
+          "id": 1003,
+          "dipendente_id": 121,
+          "progetto_id": 44,
+          "data_registrazione": "2026-01-05",
+          "ore_lavorate": "7",
+          "descrizione_attivita": "Debug e correzioni"
+        },
+        {
+          "id": 1004,
+          "dipendente_id": 233,
+          "progetto_id": 50,
+          "data_registrazione": "2025-07-23",
+          "ore_lavorate": "7",
+          "descrizione_attivita": "Debug e correzioni"
+        },
+        {
+          "id": 1005,
+          "dipendente_id": 309,
+          "progetto_id": 113,
+          "data_registrazione": "2025-10-17",
+          "ore_lavorate": "6.5",
+          "descrizione_attivita": "Riunione di team"
+        },
+        {
+          "id": 1006,
+          "dipendente_id": 328,
+          "progetto_id": 29,
+          "data_registrazione": "2025-10-02",
+          "ore_lavorate": "4",
+          "descrizione_attivita": "Riunione di team"
+        },
+        {
+          "id": 1007,
+          "dipendente_id": 11,
+          "progetto_id": 39,
+          "data_registrazione": "2025-09-02",
+          "ore_lavorate": "7",
+          "descrizione_attivita": "Documentazione tecnica"
+        },
+        {
+          "id": 1008,
+          "dipendente_id": 291,
+          "progetto_id": 53,
+          "data_registrazione": "2025-10-20",
+          "ore_lavorate": "7.5",
+          "descrizione_attivita": "Documentazione tecnica"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "group_agg"
+  ],
+  "query": "SELECT r.descrizione_attivita AS tipo_attivita, COUNT(*) AS numero_registrazioni, ROUND(SUM(r.ore_lavorate::NUMERIC), 2) AS totale_ore FROM registrazioni_ore r JOIN progetti p ON r.progetto_id = p.id WHERE p.costo_orario_standard = '48.75' GROUP BY r.descrizione_attivita;"
+}

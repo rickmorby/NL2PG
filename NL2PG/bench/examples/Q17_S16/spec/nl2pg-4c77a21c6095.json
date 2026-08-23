@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 5,
+  "hierarchy": "temporal_star_schema",
+  "sql_features": [
+    "window"
+  ],
+  "twist": [
+    "rename",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze_storico",
+      "obsolete_value": "registro_variazioni_contrattuali",
+      "description": "La tabella che traccia le versioni temporali delle polizze è denominata internamente registro_variazioni_contrattuali."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "valid_from",
+      "obsolete_value": "data_inizio_efficacia_giuridica",
+      "description": "Il campo timestamp di inizio validità della riga è descritto nel linguaggio di business come data_inizio_efficacia_giuridica."
+    }
+  ],
+  "spec_hash": "d252bd2940417102"
+}

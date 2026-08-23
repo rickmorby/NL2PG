@@ -1,0 +1,342 @@
+{
+  "schema_ddl": "CREATE TABLE conti (\n    id SERIAL PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    natura_conto TEXT NOT NULL CHECK (natura_conto IN ('attivo', 'passivo', 'costo', 'ricavo'))\n);\n\nCREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    numero_protocollo INT NOT NULL UNIQUE CHECK (numero_protocollo > 0),\n    data_registrazione DATE NOT NULL,\n    causale TEXT NOT NULL,\n    descrizione_scrittura TEXT\n);\n\nCREATE TABLE movimenti (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(12,2) NOT NULL,\n    sezione_dare_avere TEXT NOT NULL CHECK (sezione_dare_avere IN ('dare', 'avere'))\n);",
+  "data_profile": {
+    "profile": {
+      "conti": {
+        "row_count": 24,
+        "columns": {
+          "id": {
+            "distinct": 24,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 24
+          },
+          "codice_conto": {
+            "distinct": 24,
+            "sample": [
+              "1000",
+              "1001",
+              "1010",
+              "1011",
+              "1100"
+            ]
+          },
+          "denominazione": {
+            "distinct": 20,
+            "sample": [
+              "Acquisti di merci",
+              "Ammortamento immobilizzazioni immateriali",
+              "Ammortamento immobilizzazioni materiali",
+              "Banca c/c intestato alla societa'",
+              "Canoni di locazione"
+            ]
+          },
+          "natura_conto": {
+            "distinct": 4,
+            "sample": [
+              "attivo",
+              "costo",
+              "passivo",
+              "ricavo"
+            ]
+          }
+        }
+      },
+      "registrazioni": {
+        "row_count": 1477,
+        "columns": {
+          "id": {
+            "distinct": 1477,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1477
+          },
+          "numero_protocollo": {
+            "distinct": 1477,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1477
+          },
+          "data_registrazione": {
+            "distinct": 252,
+            "sample": [
+              "2025-10-07",
+              "2025-10-08",
+              "2025-10-09",
+              "2025-10-11",
+              "2025-10-12"
+            ]
+          },
+          "causale": {
+            "distinct": 9,
+            "sample": [
+              "Affitto ufficio",
+              "Ammortamento",
+              "Fattura acquisto",
+              "Fattura vendita",
+              "Incasso cliente"
+            ]
+          },
+          "descrizione_scrittura": {
+            "distinct": 19,
+            "sample": [
+              "Acquisto materie prime da Forniture Bianchi SpA",
+              "Acquisto materie prime da Forniture Bianchi SpA, fattura n. 45",
+              "Addebito interessi conto corrente bancario",
+              "Addebito interessi conto corrente bancario primo trimestre",
+              "Bolletta luce e telefono sede di Milano"
+            ]
+          }
+        }
+      },
+      "movimenti": {
+        "row_count": 2751,
+        "columns": {
+          "id": {
+            "distinct": 2751,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2751
+          },
+          "registrazione_id": {
+            "distinct": 1231,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1477
+          },
+          "conto_id": {
+            "distinct": 24,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 24
+          },
+          "importo": {
+            "distinct": 20,
+            "sample": [
+              "1000",
+              "120.75",
+              "1250.00",
+              "1500.00",
+              "187.30"
+            ]
+          },
+          "sezione_dare_avere": {
+            "distinct": 2,
+            "sample": [
+              "avere",
+              "dare"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "conti": [
+        {
+          "id": 1,
+          "codice_conto": "1000",
+          "denominazione": "Cassa",
+          "natura_conto": "attivo"
+        },
+        {
+          "id": 2,
+          "codice_conto": "1001",
+          "denominazione": "Cassa",
+          "natura_conto": "attivo"
+        },
+        {
+          "id": 3,
+          "codice_conto": "1010",
+          "denominazione": "Banca c/c intestato alla societa'",
+          "natura_conto": "attivo"
+        },
+        {
+          "id": 4,
+          "codice_conto": "1011",
+          "denominazione": "Banca c/c intestato alla societa'",
+          "natura_conto": "attivo"
+        },
+        {
+          "id": 5,
+          "codice_conto": "1100",
+          "denominazione": "Crediti verso clienti",
+          "natura_conto": "attivo"
+        },
+        {
+          "id": 6,
+          "codice_conto": "1101",
+          "denominazione": "Crediti verso clienti",
+          "natura_conto": "attivo"
+        },
+        {
+          "id": 7,
+          "codice_conto": "1150",
+          "denominazione": "Ratei attivi",
+          "natura_conto": "attivo"
+        },
+        {
+          "id": 8,
+          "codice_conto": "1151",
+          "denominazione": "Ratei attivi",
+          "natura_conto": "attivo"
+        }
+      ],
+      "registrazioni": [
+        {
+          "id": 1,
+          "numero_protocollo": 1,
+          "data_registrazione": "2026-01-16",
+          "causale": "Fattura acquisto",
+          "descrizione_scrittura": "Vendita servizi di consulenza a Delta Group"
+        },
+        {
+          "id": 2,
+          "numero_protocollo": 2,
+          "data_registrazione": "2025-11-01",
+          "causale": "Fattura vendita",
+          "descrizione_scrittura": "Liquidazione stipendi dipendenti del mese"
+        },
+        {
+          "id": 3,
+          "numero_protocollo": 3,
+          "data_registrazione": "2025-10-29",
+          "causale": "Interessi passivi",
+          "descrizione_scrittura": "Addebito interessi conto corrente bancario"
+        },
+        {
+          "id": 4,
+          "numero_protocollo": 4,
+          "data_registrazione": "2026-02-22",
+          "causale": "Ammortamento",
+          "descrizione_scrittura": "Bolletta luce e telefono sede di Milano"
+        },
+        {
+          "id": 5,
+          "numero_protocollo": 5,
+          "data_registrazione": "2026-02-18",
+          "causale": "Pagamento fornitore",
+          "descrizione_scrittura": "Quota ammortamento attrezzature informatiche"
+        },
+        {
+          "id": 6,
+          "numero_protocollo": 6,
+          "data_registrazione": "2026-01-28",
+          "causale": "Utenze",
+          "descrizione_scrittura": "Quota ammortamento attrezzature informatiche"
+        },
+        {
+          "id": 7,
+          "numero_protocollo": 7,
+          "data_registrazione": "2026-01-28",
+          "causale": "Utenze",
+          "descrizione_scrittura": "Quota ammortamento attrezzature informatiche"
+        },
+        {
+          "id": 8,
+          "numero_protocollo": 8,
+          "data_registrazione": "2025-11-25",
+          "causale": "Ammortamento",
+          "descrizione_scrittura": "Canone locazione sede operativa mensile"
+        }
+      ],
+      "movimenti": [
+        {
+          "id": 1,
+          "registrazione_id": 896,
+          "conto_id": 22,
+          "importo": "120.75",
+          "sezione_dare_avere": "dare"
+        },
+        {
+          "id": 2,
+          "registrazione_id": 1188,
+          "conto_id": 16,
+          "importo": "1000",
+          "sezione_dare_avere": "avere"
+        },
+        {
+          "id": 3,
+          "registrazione_id": 218,
+          "conto_id": 2,
+          "importo": "87.30",
+          "sezione_dare_avere": "avere"
+        },
+        {
+          "id": 4,
+          "registrazione_id": 942,
+          "conto_id": 23,
+          "importo": "50.00",
+          "sezione_dare_avere": "avere"
+        },
+        {
+          "id": 5,
+          "registrazione_id": 1310,
+          "conto_id": 22,
+          "importo": "95.40",
+          "sezione_dare_avere": "avere"
+        },
+        {
+          "id": 6,
+          "registrazione_id": 654,
+          "conto_id": 1,
+          "importo": "2500.60",
+          "sezione_dare_avere": "avere"
+        },
+        {
+          "id": 7,
+          "registrazione_id": 1035,
+          "conto_id": 21,
+          "importo": "800.50",
+          "sezione_dare_avere": "dare"
+        },
+        {
+          "id": 8,
+          "registrazione_id": 908,
+          "conto_id": 21,
+          "importo": "500",
+          "sezione_dare_avere": "avere"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "like"
+  ],
+  "query": "SELECT c.codice_conto AS codice_conto,\n       c.denominazione AS denominazione_conto,\n       COUNT(*) AS numero_movimenti,\n       SUM(m.importo::numeric) FILTER (WHERE m.sezione_dare_avere = 'dare') AS totale_dare,\n       SUM(m.importo::numeric) FILTER (WHERE m.sezione_dare_avere = 'avere') AS totale_avere,\n       ROUND(SUM(CASE WHEN m.sezione_dare_avere = 'dare' THEN m.importo::numeric ELSE -m.importo::numeric END), 2) AS saldo_netto\nFROM conti c\nJOIN movimenti m ON m.conto_id = c.id\nJOIN registrazioni r ON r.id = m.registrazione_id\nWHERE c.codice_conto LIKE '10%'\n  AND c.natura_conto = 'attivo'\n  AND r.causale IN ('Fattura vendita', 'Fattura acquisto')\nGROUP BY c.codice_conto, c.denominazione\nORDER BY saldo_netto DESC;"
+}

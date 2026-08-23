@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 4,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "distinct"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "sinistri",
+      "obsolete_value": "eventi_avversi",
+      "description": "La tabella che registra i sinistri viene denominata internamente eventi_avversi."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "premio_annuo",
+      "obsolete_value": "carico_tariffario_ricorrente",
+      "description": "Il costo annuale della polizza viene indicato con il termine tecnico gergale carico tariffario ricorrente."
+    }
+  ],
+  "spec_hash": "c5684ee1e4a36432"
+}

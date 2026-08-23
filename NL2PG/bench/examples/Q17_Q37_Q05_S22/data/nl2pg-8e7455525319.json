@@ -1,0 +1,121 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "window"
+    ],
+    "twist": [
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "jargon",
+        "target_value": "partita_doppia",
+        "obsolete_value": "metodo_veneziano",
+        "description": "Il termine tecnico 'partita_doppia' viene sostituito dal gergo aziendale 'metodo_veneziano' nella documentazione."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "saldo",
+        "obsolete_value": "giacenza",
+        "description": "La colonna 'saldo' viene riferita come 'giacenza' nei report aziendali."
+      }
+    ],
+    "spec_hash": "8086f5d715699076"
+  },
+  "schema_ddl": "CREATE TABLE metodo_veneziano (\n    id SERIAL PRIMARY KEY,\n    data_registrazione DATE NOT NULL,\n    dare NUMERIC(15,2) NOT NULL CHECK (dare >= 0),\n    avere NUMERIC(15,2) NOT NULL CHECK (avere >= 0),\n    giacenza NUMERIC(15,2) GENERATED ALWAYS AS (dare - avere) STORED,\n    descrizione TEXT,\n    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,\n    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "metodo_veneziano",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "data_registrazione": "2026-01-10",
+            "dare": 1000.0,
+            "avere": 500.0,
+            "descrizione": "Pagamento fornitore"
+          },
+          {
+            "id": 2,
+            "data_registrazione": "2026-01-15",
+            "dare": 2000.0,
+            "avere": 1500.0,
+            "descrizione": "Incasso cliente"
+          },
+          {
+            "id": 3,
+            "data_registrazione": "2026-02-01",
+            "dare": 500.0,
+            "avere": 200.0,
+            "descrizione": "Spese generali"
+          },
+          {
+            "id": 4,
+            "data_registrazione": "2026-02-10",
+            "dare": 3000.0,
+            "avere": 2500.0,
+            "descrizione": "Vendita merce"
+          },
+          {
+            "id": 5,
+            "data_registrazione": "2026-03-05",
+            "dare": 1200.0,
+            "avere": 800.0,
+            "descrizione": "Acquisto materiali"
+          }
+        ],
+        "variations": {
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "dare": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "avere": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Pagamento fornitore",
+              "Incasso cliente",
+              "Spese generali",
+              "Vendita merce",
+              "Acquisto materiali",
+              "Rimborso spese",
+              "Anticipo cliente",
+              "Fattura emessa"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

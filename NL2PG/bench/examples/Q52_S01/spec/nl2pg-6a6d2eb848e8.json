@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 1,
+  "hierarchy": "single_entity",
+  "sql_features": [
+    "offset_fetch"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "polizze",
+      "obsolete_value": "contratti_assicurativi",
+      "description": "La tabella polizze viene denominata contratti_assicurativi nella documentazione aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "premio_annuo",
+      "obsolete_value": "costo_copertura",
+      "description": "Il campo premio_annuo viene riferito come costo_copertura nei report interni."
+    }
+  ],
+  "spec_hash": "6616b5f7ecd67f24"
+}

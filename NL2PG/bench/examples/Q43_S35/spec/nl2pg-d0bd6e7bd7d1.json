@@ -1,0 +1,27 @@
+{
+  "domain": "ecommerce",
+  "n_tables": 3,
+  "hierarchy": "partitioned",
+  "sql_features": [
+    "sorting"
+  ],
+  "twist": [
+    "rename",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "registro_vendite",
+      "description": "La tabella logica ordini, implementata come tabella unica partizionata dichiarativamente (RANGE sulla data_ordine, con partizioni LIST e HASH di supporto), viene denominata registro_vendite nella prosa aziendale. Il risolutore deve capire che tutte le richieste di ordinamento si riferiscono a questa singola tabella logica, indipendentemente dalle partizioni fisiche in cui le righe sono distribuite."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "totale_ordine",
+      "obsolete_value": "importo_complessivo",
+      "description": "La colonna totale_ordine della tabella ordini è indicata nella documentazione aziendale come importo_complessivo. Le clausole ORDER BY multi-colonna richieste dal task (es. ordinamento per stato e poi per importo decrescente, senza LIMIT) devono utilizzare il nome reale della colonna presente nello schema fisico."
+    }
+  ],
+  "spec_hash": "63d4a3cdf2fb020f"
+}

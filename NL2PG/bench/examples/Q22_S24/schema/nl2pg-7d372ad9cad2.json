@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 6,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "distinct_on"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "movimentazioni_merce",
+        "description": "La tabella padre spedizioni viene denominata movimentazioni_merce nella prosa aziendale. Le tabelle figlie pacchi ed eventi_tracciamento referenziano spedizioni tramite FK con ON DELETE CASCADE e ON DELETE SET NULL rispettivamente."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "data_consegna_effettiva",
+        "obsolete_value": "timestamp POD",
+        "description": "La colonna data_consegna_effettiva della tabella consegne viene indicata con il gergo di settore 'timestamp POD' (Proof of Delivery). Le query DISTINCT ON su corriere_id devono ordinare per data_consegna_effettiva DESC per selezionare l'ultima consegna di ciascun corriere; le righe con valore NULL derivano da spedizioni senza prova di consegna, popolate dall'azione ON DELETE SET NULL sulla tabella corrieri."
+      }
+    ],
+    "spec_hash": "e43e29345d2ee0a6"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE corrieri (\n    id INT PRIMARY KEY,\n    nome_completo TEXT NOT NULL,\n    numero_patente TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id) ON DELETE RESTRICT ON UPDATE CASCADE,\n    corriere_id INT REFERENCES corrieri(id) ON DELETE SET NULL,\n    peso_totale_kg NUMERIC(8,2) NOT NULL CHECK (peso_totale_kg > 0),\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    data_spedizione DATE NOT NULL,\n    indirizzo_destinazione TEXT NOT NULL\n);\n\nCREATE TABLE pacchi (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id) ON DELETE CASCADE,\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    larghezza_cm INT NOT NULL CHECK (larghezza_cm > 0),\n    altezza_cm INT NOT NULL CHECK (altezza_cm > 0),\n    profondita_cm INT NOT NULL CHECK (profondita_cm > 0),\n    fragile BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE eventi_tracciamento (\n    id INT PRIMARY KEY,\n    spedizione_id INT REFERENCES spedizioni(id) ON DELETE SET NULL,\n    stato TEXT NOT NULL,\n    luogo TEXT NOT NULL,\n    registrato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE consegne (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL UNIQUE REFERENCES spedizioni(id) ON DELETE CASCADE,\n    corriere_id INT REFERENCES corrieri(id) ON DELETE SET NULL,\n    data_consegna_effettiva TIMESTAMP,\n    firma_ricevente TEXT,\n    note_consegna TEXT\n);"
+}

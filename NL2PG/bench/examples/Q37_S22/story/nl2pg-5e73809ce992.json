@@ -1,0 +1,866 @@
+{
+  "schema_ddl": "CREATE TABLE dim_vettori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT,\n    email_operativa TEXT,\n    citta_sede TEXT NOT NULL\n);\n\nCREATE TABLE dim_clienti (\n    id INT PRIMARY KEY,\n    codice_cliente TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    citta_fatturazione TEXT NOT NULL,\n    provincia_fatturazione TEXT\n);\n\nCREATE TABLE dim_mezzi (\n    id INT PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    tipo_mezzo TEXT NOT NULL,\n    capacita_carico_kg NUMERIC(10,2) NOT NULL CHECK (capacita_carico_kg > 0),\n    anno_immatricolazione INT NOT NULL CHECK (anno_immatricolazione BETWEEN 1970 AND 2100)\n);\n\nCREATE TABLE dim_magazzini (\n    id INT PRIMARY KEY,\n    codice_magazzino TEXT NOT NULL UNIQUE,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL\n);\n\nCREATE TABLE dim_destinazioni (\n    id INT PRIMARY KEY,\n    citta TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    regione TEXT NOT NULL,\n    zona_logistica TEXT NOT NULL\n);\n\nCREATE TABLE fatti_spedizioni (\n    id BIGINT PRIMARY KEY,\n    data_spedizione DATE NOT NULL,\n    id_vettore INT NOT NULL REFERENCES dim_vettori(id),\n    cliente_id INT NOT NULL REFERENCES dim_clienti(id),\n    mezzo_id INT NOT NULL REFERENCES dim_mezzi(id),\n    magazzino_partenza_id INT NOT NULL REFERENCES dim_magazzini(id),\n    destinazione_id INT NOT NULL REFERENCES dim_destinazioni(id),\n    peso_kg NUMERIC(10,2) NOT NULL CHECK (peso_kg >= 0),\n    costo_trasporto NUMERIC(12,2) NOT NULL CHECK (costo_trasporto >= 0),\n    distanza_km NUMERIC(10,2) NOT NULL CHECK (distanza_km >= 0),\n    giorni_transito INT NOT NULL CHECK (giorni_transito >= 0),\n    numero_colli INT NOT NULL DEFAULT 1 CHECK (numero_colli > 0)\n);",
+  "data_profile": {
+    "profile": {
+      "dim_vettori": {
+        "row_count": 20,
+        "columns": {
+          "id": {
+            "distinct": 20,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 20
+          },
+          "ragione_sociale": {
+            "distinct": 10,
+            "sample": [
+              "Autotrasporti Messina & Figli S.r.l.",
+              "BRT Bartolini S.p.A.",
+              "Bartolini Trasporti S.p.A.",
+              "DB Schenker Italia S.p.A.",
+              "DHL Express Italia S.r.l."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 20,
+            "sample": [
+              "IT00435870341",
+              "IT004358703411",
+              "IT00456789123",
+              "IT004567891231",
+              "IT01122334455"
+            ]
+          },
+          "telefono_contatto": {
+            "distinct": 10,
+            "sample": [
+              "+39 02 1234567",
+              "+39 02 3344556",
+              "+39 02 4455667",
+              "+39 02 9876543",
+              "+39 0461 778899"
+            ]
+          },
+          "email_operativa": {
+            "distinct": 10,
+            "sample": [
+              "cargo@kuehne-nagel-italia.it",
+              "fleet@db-schenker-italia.it",
+              "flotta@brt-bartolini.it",
+              "hub@dhl-express-italia.it",
+              "info@messinafigli-autotrasporti.it"
+            ]
+          },
+          "citta_sede": {
+            "distinct": 7,
+            "sample": [
+              "Bologna",
+              "Brescia",
+              "Milano",
+              "Napoli",
+              "Padova"
+            ]
+          }
+        }
+      },
+      "dim_clienti": {
+        "row_count": 168,
+        "columns": {
+          "id": {
+            "distinct": 168,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 168
+          },
+          "codice_cliente": {
+            "distinct": 168,
+            "sample": [
+              "CL-00001",
+              "CL-000011",
+              "CL-0000110",
+              "CL-0000111",
+              "CL-0000112"
+            ]
+          },
+          "denominazione": {
+            "distinct": 8,
+            "sample": [
+              "Abbigliamento Moda Nova S.r.l.",
+              "Alimentari Rossi S.r.l.",
+              "Cartoleria Verdi & C. S.n.c.",
+              "Chimica Lombarda S.p.A.",
+              "Componenti Meccanici Emiliani S.p.A."
+            ]
+          },
+          "citta_fatturazione": {
+            "distinct": 8,
+            "sample": [
+              "Brescia",
+              "Firenze",
+              "Milano",
+              "Modena",
+              "Napoli"
+            ]
+          },
+          "provincia_fatturazione": {
+            "distinct": 8,
+            "sample": [
+              "BS",
+              "FI",
+              "MI",
+              "MO",
+              "NA"
+            ]
+          }
+        }
+      },
+      "dim_mezzi": {
+        "row_count": 13,
+        "columns": {
+          "id": {
+            "distinct": 13,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 13
+          },
+          "targa": {
+            "distinct": 13,
+            "sample": [
+              "FT512KL",
+              "FT512KL1",
+              "GB774NM",
+              "GB774NM1",
+              "HD209PQ"
+            ]
+          },
+          "tipo_mezzo": {
+            "distinct": 4,
+            "sample": [
+              "autocarro",
+              "camion",
+              "furgone",
+              "semirimorchio"
+            ]
+          },
+          "capacita_carico_kg": {
+            "distinct": 13,
+            "sample": [
+              "11255.57",
+              "13644.63",
+              "14011.98",
+              "15004.59",
+              "18970.3"
+            ],
+            "min": 3567.38,
+            "max": 31513.26
+          },
+          "anno_immatricolazione": {
+            "distinct": 13,
+            "sample": [
+              "2013.0607314188737",
+              "2015.2203072432792",
+              "2015.6408113634952",
+              "2016.8924106342663",
+              "2017.1669484508648"
+            ],
+            "min": 2013.0607314188737,
+            "max": 2022.906773683579
+          }
+        }
+      },
+      "dim_magazzini": {
+        "row_count": 8,
+        "columns": {
+          "id": {
+            "distinct": 8,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 8
+          },
+          "codice_magazzino": {
+            "distinct": 8,
+            "sample": [
+              "MAG-CENTRO-01",
+              "MAG-CENTRO-011",
+              "MAG-CENTRO-02",
+              "MAG-ISOLE-01",
+              "MAG-NORD-01"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 6,
+            "sample": [
+              "Corso Europa 101",
+              "Via Industriale 14",
+              "Via Porto Empedocle 45",
+              "Via Salaria Km 18,500",
+              "Via dei Magazzini 8"
+            ]
+          },
+          "citta": {
+            "distinct": 6,
+            "sample": [
+              "Bergamo",
+              "Caserta",
+              "Catania",
+              "Firenze",
+              "Monza"
+            ]
+          },
+          "cap": {
+            "distinct": 6,
+            "sample": [
+              "00100",
+              "20900",
+              "24100",
+              "50100",
+              "81100"
+            ]
+          }
+        }
+      },
+      "dim_destinazioni": {
+        "row_count": 162,
+        "columns": {
+          "id": {
+            "distinct": 162,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 162
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Cagliari",
+              "Firenze",
+              "Genova"
+            ]
+          },
+          "provincia": {
+            "distinct": 10,
+            "sample": [
+              "BA",
+              "BO",
+              "CA",
+              "FI",
+              "GE"
+            ]
+          },
+          "regione": {
+            "distinct": 10,
+            "sample": [
+              "Campania",
+              "Emilia-Romagna",
+              "Lazio",
+              "Liguria",
+              "Lombardia"
+            ]
+          },
+          "zona_logistica": {
+            "distinct": 4,
+            "sample": [
+              "Centro",
+              "Isole",
+              "Nord",
+              "Sud"
+            ]
+          }
+        }
+      },
+      "fatti_spedizioni": {
+        "row_count": 1754,
+        "columns": {
+          "id": {
+            "distinct": 1754,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 2754
+          },
+          "data_spedizione": {
+            "distinct": 227,
+            "sample": [
+              "2025-11-28",
+              "2025-11-30",
+              "2025-12-01",
+              "2025-12-02",
+              "2025-12-03"
+            ]
+          },
+          "id_vettore": {
+            "distinct": 20,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 20
+          },
+          "cliente_id": {
+            "distinct": 168,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 168
+          },
+          "mezzo_id": {
+            "distinct": 13,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 13
+          },
+          "magazzino_partenza_id": {
+            "distinct": 8,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 8
+          },
+          "destinazione_id": {
+            "distinct": 162,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 162
+          },
+          "peso_kg": {
+            "distinct": 1669,
+            "sample": [
+              "100.05",
+              "100.13",
+              "100.46",
+              "100.49",
+              "100.5"
+            ],
+            "min": 18.3,
+            "max": 39000.0
+          },
+          "costo_trasporto": {
+            "distinct": 1657,
+            "sample": [
+              "100.18",
+              "100.49",
+              "100.85",
+              "100.86",
+              "1001.8"
+            ],
+            "min": 41.34,
+            "max": 3990.0
+          },
+          "distanza_km": {
+            "distinct": 1664,
+            "sample": [
+              "100.27",
+              "1001.93",
+              "1002.36",
+              "1002.94",
+              "1003.55"
+            ],
+            "min": 65.0,
+            "max": 2530.0
+          },
+          "giorni_transito": {
+            "distinct": 1663,
+            "sample": [
+              "0.0",
+              "0.011801026015894056",
+              "0.015038922496528162",
+              "0.016496482537553536",
+              "0.020263623664646513"
+            ],
+            "min": 0.0,
+            "max": 7.990758394551822
+          },
+          "numero_colli": {
+            "distinct": 1677,
+            "sample": [
+              "1",
+              "1.0047598251435854",
+              "1.0199642518379353",
+              "1.0355126427105112",
+              "1.0453941758647036"
+            ],
+            "min": 1,
+            "max": 28.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "dim_vettori": [
+        {
+          "id": 1,
+          "ragione_sociale": "Bartolini Trasporti S.p.A.",
+          "partita_iva": "IT00435870341",
+          "telefono_contatto": "+39 051 3456789",
+          "email_operativa": "operazioni@bartolini-trasporti.it",
+          "citta_sede": "Padova"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Bartolini Trasporti S.p.A.",
+          "partita_iva": "IT004358703411",
+          "telefono_contatto": "+39 051 3456789",
+          "email_operativa": "operazioni@bartolini-trasporti.it",
+          "citta_sede": "Bologna"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "GLS Italia S.r.l.",
+          "partita_iva": "IT03456780123",
+          "telefono_contatto": "+39 02 9876543",
+          "email_operativa": "spedizioni@gls-italia.it",
+          "citta_sede": "Roma"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "GLS Italia S.r.l.",
+          "partita_iva": "IT034567801231",
+          "telefono_contatto": "+39 02 9876543",
+          "email_operativa": null,
+          "citta_sede": "Verona"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "DHL Express Italia S.r.l.",
+          "partita_iva": "IT07654321098",
+          "telefono_contatto": "+39 02 1234567",
+          "email_operativa": "hub@dhl-express-italia.it",
+          "citta_sede": "Milano"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "DHL Express Italia S.r.l.",
+          "partita_iva": "IT076543210981",
+          "telefono_contatto": "+39 02 1234567",
+          "email_operativa": "hub@dhl-express-italia.it",
+          "citta_sede": "Roma"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "BRT Bartolini S.p.A.",
+          "partita_iva": "IT02298765432",
+          "telefono_contatto": "+39 051 2345678",
+          "email_operativa": "flotta@brt-bartolini.it",
+          "citta_sede": "Brescia"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "BRT Bartolini S.p.A.",
+          "partita_iva": "IT022987654321",
+          "telefono_contatto": "+39 051 2345678",
+          "email_operativa": "flotta@brt-bartolini.it",
+          "citta_sede": "Milano"
+        }
+      ],
+      "dim_clienti": [
+        {
+          "id": 1,
+          "codice_cliente": "CL-00001",
+          "denominazione": "Alimentari Rossi S.r.l.",
+          "citta_fatturazione": "Roma",
+          "provincia_fatturazione": "RM"
+        },
+        {
+          "id": 2,
+          "codice_cliente": "CL-000011",
+          "denominazione": "Alimentari Rossi S.r.l.",
+          "citta_fatturazione": "Roma",
+          "provincia_fatturazione": "RM"
+        },
+        {
+          "id": 3,
+          "codice_cliente": "CL-000012",
+          "denominazione": "Alimentari Rossi S.r.l.",
+          "citta_fatturazione": "Roma",
+          "provincia_fatturazione": "RM"
+        },
+        {
+          "id": 4,
+          "codice_cliente": "CL-000013",
+          "denominazione": "Alimentari Rossi S.r.l.",
+          "citta_fatturazione": "Roma",
+          "provincia_fatturazione": "RM"
+        },
+        {
+          "id": 5,
+          "codice_cliente": "CL-000014",
+          "denominazione": "Alimentari Rossi S.r.l.",
+          "citta_fatturazione": "Roma",
+          "provincia_fatturazione": "RM"
+        },
+        {
+          "id": 6,
+          "codice_cliente": "CL-000015",
+          "denominazione": "Alimentari Rossi S.r.l.",
+          "citta_fatturazione": "Roma",
+          "provincia_fatturazione": "RM"
+        },
+        {
+          "id": 7,
+          "codice_cliente": "CL-000016",
+          "denominazione": "Alimentari Rossi S.r.l.",
+          "citta_fatturazione": "Roma",
+          "provincia_fatturazione": "RM"
+        },
+        {
+          "id": 8,
+          "codice_cliente": "CL-000017",
+          "denominazione": "Alimentari Rossi S.r.l.",
+          "citta_fatturazione": "Roma",
+          "provincia_fatturazione": "RM"
+        }
+      ],
+      "dim_mezzi": [
+        {
+          "id": 1,
+          "targa": "FT512KL",
+          "tipo_mezzo": "furgone",
+          "capacita_carico_kg": 3757.99,
+          "anno_immatricolazione": 2018.732407592096
+        },
+        {
+          "id": 2,
+          "targa": "FT512KL1",
+          "tipo_mezzo": "autocarro",
+          "capacita_carico_kg": 3567.38,
+          "anno_immatricolazione": 2017.239054673124
+        },
+        {
+          "id": 3,
+          "targa": "GB774NM",
+          "tipo_mezzo": "camion",
+          "capacita_carico_kg": 15004.59,
+          "anno_immatricolazione": 2015.2203072432792
+        },
+        {
+          "id": 4,
+          "targa": "GB774NM1",
+          "tipo_mezzo": "autocarro",
+          "capacita_carico_kg": 13644.63,
+          "anno_immatricolazione": 2016.8924106342663
+        },
+        {
+          "id": 5,
+          "targa": "HD209PQ",
+          "tipo_mezzo": "autocarro",
+          "capacita_carico_kg": 31513.26,
+          "anno_immatricolazione": 2020.1703747588053
+        },
+        {
+          "id": 6,
+          "targa": "HD209PQ1",
+          "tipo_mezzo": "camion",
+          "capacita_carico_kg": 29838.44,
+          "anno_immatricolazione": 2019.978588264424
+        },
+        {
+          "id": 7,
+          "targa": "LE883RS",
+          "tipo_mezzo": "autocarro",
+          "capacita_carico_kg": 7900.74,
+          "anno_immatricolazione": 2015.6408113634952
+        },
+        {
+          "id": 8,
+          "targa": "LE883RS1",
+          "tipo_mezzo": "furgone",
+          "capacita_carico_kg": 7991.01,
+          "anno_immatricolazione": 2013.0607314188737
+        }
+      ],
+      "dim_magazzini": [
+        {
+          "id": 1,
+          "codice_magazzino": "MAG-NORD-01",
+          "indirizzo": "Via Industriale 14",
+          "citta": "Bergamo",
+          "cap": "24100"
+        },
+        {
+          "id": 2,
+          "codice_magazzino": "MAG-NORD-011",
+          "indirizzo": "Via Industriale 14",
+          "citta": "Bergamo",
+          "cap": "24100"
+        },
+        {
+          "id": 3,
+          "codice_magazzino": "MAG-CENTRO-01",
+          "indirizzo": "Via dei Magazzini 8",
+          "citta": "Firenze",
+          "cap": "50100"
+        },
+        {
+          "id": 4,
+          "codice_magazzino": "MAG-CENTRO-011",
+          "indirizzo": "Via dei Magazzini 8",
+          "citta": "Firenze",
+          "cap": "50100"
+        },
+        {
+          "id": 5,
+          "codice_magazzino": "MAG-SUD-01",
+          "indirizzo": "Zona ASI Lotto 22",
+          "citta": "Caserta",
+          "cap": "81100"
+        },
+        {
+          "id": 6,
+          "codice_magazzino": "MAG-NORD-02",
+          "indirizzo": "Corso Europa 101",
+          "citta": "Monza",
+          "cap": "20900"
+        },
+        {
+          "id": 7,
+          "codice_magazzino": "MAG-ISOLE-01",
+          "indirizzo": "Via Porto Empedocle 45",
+          "citta": "Catania",
+          "cap": "95100"
+        },
+        {
+          "id": 8,
+          "codice_magazzino": "MAG-CENTRO-02",
+          "indirizzo": "Via Salaria Km 18,500",
+          "citta": "Roma",
+          "cap": "00100"
+        }
+      ],
+      "dim_destinazioni": [
+        {
+          "id": 1,
+          "citta": "Roma",
+          "provincia": "RM",
+          "regione": "Lazio",
+          "zona_logistica": "Centro"
+        },
+        {
+          "id": 2,
+          "citta": "Roma",
+          "provincia": "RM",
+          "regione": "Lazio",
+          "zona_logistica": "Centro"
+        },
+        {
+          "id": 3,
+          "citta": "Roma",
+          "provincia": "RM",
+          "regione": "Lazio",
+          "zona_logistica": "Centro"
+        },
+        {
+          "id": 4,
+          "citta": "Roma",
+          "provincia": "RM",
+          "regione": "Lazio",
+          "zona_logistica": "Centro"
+        },
+        {
+          "id": 5,
+          "citta": "Roma",
+          "provincia": "RM",
+          "regione": "Lazio",
+          "zona_logistica": "Centro"
+        },
+        {
+          "id": 6,
+          "citta": "Roma",
+          "provincia": "RM",
+          "regione": "Lazio",
+          "zona_logistica": "Centro"
+        },
+        {
+          "id": 7,
+          "citta": "Roma",
+          "provincia": "RM",
+          "regione": "Lazio",
+          "zona_logistica": "Centro"
+        },
+        {
+          "id": 8,
+          "citta": "Roma",
+          "provincia": "RM",
+          "regione": "Lazio",
+          "zona_logistica": "Centro"
+        }
+      ],
+      "fatti_spedizioni": [
+        {
+          "id": 1001,
+          "data_spedizione": "2026-02-01",
+          "id_vettore": 14,
+          "cliente_id": 96,
+          "mezzo_id": 2,
+          "magazzino_partenza_id": 7,
+          "destinazione_id": 89,
+          "peso_kg": 1457.42,
+          "costo_trasporto": 509.4,
+          "distanza_km": 764.26,
+          "giorni_transito": 2.6647795688713,
+          "numero_colli": 7.544950976155128
+        },
+        {
+          "id": 1002,
+          "data_spedizione": "2026-01-09",
+          "id_vettore": 8,
+          "cliente_id": 41,
+          "mezzo_id": 2,
+          "magazzino_partenza_id": 7,
+          "destinazione_id": 156,
+          "peso_kg": 1841.11,
+          "costo_trasporto": 274.48,
+          "distanza_km": 377.64,
+          "giorni_transito": 1.5960370644616977,
+          "numero_colli": 6.423245274058268
+        },
+        {
+          "id": 1003,
+          "data_spedizione": "2025-12-25",
+          "id_vettore": 19,
+          "cliente_id": 34,
+          "mezzo_id": 12,
+          "magazzino_partenza_id": 5,
+          "destinazione_id": 130,
+          "peso_kg": 578.87,
+          "costo_trasporto": 490.51,
+          "distanza_km": 298.49,
+          "giorni_transito": 4.265711236147659,
+          "numero_colli": 6.575363948465034
+        },
+        {
+          "id": 1004,
+          "data_spedizione": "2026-01-29",
+          "id_vettore": 17,
+          "cliente_id": 73,
+          "mezzo_id": 8,
+          "magazzino_partenza_id": 1,
+          "destinazione_id": 123,
+          "peso_kg": 1930.91,
+          "costo_trasporto": 326.82,
+          "distanza_km": 789.02,
+          "giorni_transito": 2.9651153842208675,
+          "numero_colli": 6.207303976027029
+        },
+        {
+          "id": 1005,
+          "data_spedizione": "2025-12-04",
+          "id_vettore": 8,
+          "cliente_id": 24,
+          "mezzo_id": 6,
+          "magazzino_partenza_id": 5,
+          "destinazione_id": 50,
+          "peso_kg": 1544.6,
+          "costo_trasporto": 247.89,
+          "distanza_km": 352.58,
+          "giorni_transito": 4.761747216125936,
+          "numero_colli": 5.5342930513639175
+        },
+        {
+          "id": 1006,
+          "data_spedizione": "2026-02-24",
+          "id_vettore": 5,
+          "cliente_id": 107,
+          "mezzo_id": 6,
+          "magazzino_partenza_id": 4,
+          "destinazione_id": 141,
+          "peso_kg": 1413.61,
+          "costo_trasporto": 316.65,
+          "distanza_km": 1043.78,
+          "giorni_transito": 3.253237398373509,
+          "numero_colli": 5.0722947185587905
+        },
+        {
+          "id": 1007,
+          "data_spedizione": "2026-02-11",
+          "id_vettore": 1,
+          "cliente_id": 64,
+          "mezzo_id": 2,
+          "magazzino_partenza_id": 1,
+          "destinazione_id": 76,
+          "peso_kg": 1948.92,
+          "costo_trasporto": 382.55,
+          "distanza_km": 728.42,
+          "giorni_transito": 2.401558908133366,
+          "numero_colli": 6.098287439366874
+        },
+        {
+          "id": 1008,
+          "data_spedizione": "2026-01-12",
+          "id_vettore": 4,
+          "cliente_id": 99,
+          "mezzo_id": 2,
+          "magazzino_partenza_id": 2,
+          "destinazione_id": 5,
+          "peso_kg": 850.0,
+          "costo_trasporto": 320.5,
+          "distanza_km": 480.0,
+          "giorni_transito": 2,
+          "numero_colli": 4
+        }
+      ]
+    }
+  },
+  "story": "Presso la direzione operativa di una rete di distribuzione nazionale, il registro_movimenti_di_flotta rappresenta il cuore della contabilità dei trasporti: ogni voce del registro corrisponde a una singola spedizione, con la data di partenza, il peso in chilogrammi, il costo di trasporto, la distanza percorsa in chilometri e il lead time di consegna, ossia il tempo di transito espresso in giorni. Le informazioni sui corrieri incaricati delle consegne sono custodite nell'anagrafica_partner_di_trasporto, dove per ciascun partner figurano la ragione sociale, la partita IVA, il recapito telefonico, la posta elettronica operativa e la città della sede. Accanto a questi archivi, il registro dim_clienti raccoglie le schede della clientela con codice cliente, denominazione e città di fatturazione; il registro dim_mezzi descrive la flotta di furgoni, autocarri, camion e semirimorchi con targa, capacità di carico in chilogrammi e anno di immatricolazione; il registro dim_magazzini elenca gli stabilimenti di partenza con codice, indirizzo, città e CAP; il registro dim_destinazioni infine cataloga i punti di arrivo con città, provincia, regione e zona logistica, articolata nelle aree Nord, Centro, Sud e Isole. In occasione della revisione trimestrale dei costi, il responsabile della logistica ha richiesto una classifica dei vettori in base al costo medio al chilometro delle spedizioni dirette nella zona logistica Nord. Gli analisti hanno quindi ricondotto ogni voce del registro_movimenti_di_flotta al corriere indicato nell'anagrafica_partner_di_trasporto e hanno verificato, tramite il registro dim_destinazioni, che la zona logistica di arrivo fosse effettivamente Nord. Per ciascun partner di trasporto hanno contato il numero di spedizioni effettuate, calcolato il costo medio al chilometro e determinato il lead time di consegna medio in giorni, così da individuare i corrieri più efficienti sulle tratte settentrionali e predisporre basi solide per le prossime trattative contrattuali."
+}

@@ -1,0 +1,31 @@
+{
+  "domain": "logistica",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "scalar_agg",
+    "group_agg",
+    "filtered_agg",
+    "having",
+    "window"
+  ],
+  "twist": [
+    "jargon",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "spedizioni",
+      "obsolete_value": "flusso last-mile",
+      "description": "La prosa aziendale utilizza il gergo del settore logistico 'flusso last-mile' per riferirsi alla tabella spedizioni; l'LLM deve riconoscere che il termine tecnico di settore indica la tabella reale spedizioni e usarla nelle join e nelle finestre temporali."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "ricavo_spedizione",
+      "obsolete_value": "corrispettivo di trasporto",
+      "description": "La colonna ricavo_spedizione non esiste fisicamente nello schema (approccio Zero-Data): la prosa aziendale la denomina 'corrispettivo di trasporto' e l'LLM deve dedurne la formula (tariffa_base + peso_kg * costo_per_km + supplementi urgenti), calcolarla come espressione scalare e aggregarla per deposito con filtri, HAVING e funzioni finestra per derivare i KPI di margine richiesti."
+    }
+  ],
+  "spec_hash": "c0b0c9d8abb8b499"
+}

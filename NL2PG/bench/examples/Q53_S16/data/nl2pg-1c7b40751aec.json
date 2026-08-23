@@ -1,0 +1,539 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 5,
+    "hierarchy": "temporal_versioning",
+    "sql_features": [
+      "ordered_set_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "polysemy"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "movimenti_contabili",
+        "obsolete_value": "registrazioni",
+        "description": "La tabella movimenti_contabili viene denominata registrazioni nel linguaggio aziendale interno."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "data_validita",
+        "obsolete_value": "timestamp_operativo",
+        "description": "Il campo data_validita viene riferito come timestamp_operativo nei documenti tecnici."
+      },
+      {
+        "twist_type": "polysemy",
+        "target_value": "importo",
+        "obsolete_value": "valore",
+        "description": "Il termine importo viene talvolta sostituito con valore, generando ambiguità con altri campi numerici."
+      }
+    ],
+    "spec_hash": "144799741ab907c7"
+  },
+  "schema_ddl": "CREATE TYPE stato_movimento AS ENUM ('bozza', 'confermato', 'annullato', 'archiviato');\n\nCREATE TABLE conti (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'patrimoniale')),\n    valid_from DATE NOT NULL,\n    valid_to DATE,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE registrazioni (\n    id SERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(15, 2) NOT NULL,\n    segno CHAR(1) NOT NULL CHECK (segno IN ('D', 'A')),\n    descrizione TEXT,\n    stato stato_movimento NOT NULL DEFAULT 'bozza',\n    data_validita TIMESTAMP NOT NULL,\n    valid_from TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valid_to TIMESTAMP,\n    CHECK (valid_to IS NULL OR valid_to > valid_from),\n    CHECK (importo > 0)\n);\n\nCREATE TABLE causali (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    tipo TEXT NOT NULL CHECK (tipo IN ('ricavo', 'costo', 'patrimoniale')),\n    valid_from DATE NOT NULL,\n    valid_to DATE,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE documenti (\n    id SERIAL PRIMARY KEY,\n    numero TEXT NOT NULL,\n    tipo TEXT NOT NULL CHECK (tipo IN ('fattura', 'nota_credito', 'nota_debito', 'ricevuta')),\n    data_emissione DATE NOT NULL,\n    fornitore_cliente TEXT NOT NULL,\n    valid_from DATE NOT NULL,\n    valid_to DATE,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);\n\nCREATE TABLE collegamenti (\n    id SERIAL PRIMARY KEY,\n    registrazione_id INT NOT NULL REFERENCES registrazioni(id),\n    causale_id INT NOT NULL REFERENCES causali(id),\n    documento_id INT REFERENCES documenti(id),\n    note TEXT,\n    valid_from TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valid_to TIMESTAMP,\n    CHECK (valid_to IS NULL OR valid_to > valid_from)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "conti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice": "CASSA",
+            "nome": "Cassa contante",
+            "tipo_conto": "attivo",
+            "valid_from": "2020-01-01",
+            "valid_to": null
+          },
+          {
+            "id": 2,
+            "codice": "BANCA",
+            "nome": "Banca Intesa",
+            "tipo_conto": "attivo",
+            "valid_from": "2020-01-01",
+            "valid_to": null
+          },
+          {
+            "id": 3,
+            "codice": "FORNITORI",
+            "nome": "Debiti vs Fornitori",
+            "tipo_conto": "passivo",
+            "valid_from": "2020-01-01",
+            "valid_to": null
+          },
+          {
+            "id": 4,
+            "codice": "CLIENTI",
+            "nome": "Crediti vs Clienti",
+            "tipo_conto": "attivo",
+            "valid_from": "2020-01-01",
+            "valid_to": "2025-12-31"
+          },
+          {
+            "id": 5,
+            "codice": "MACCHINARI",
+            "nome": "Macchinari e Attrezzature",
+            "tipo_conto": "patrimoniale",
+            "valid_from": "2020-01-01",
+            "valid_to": null
+          }
+        ],
+        "variations": {
+          "codice": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "CASSA",
+              "BANCA",
+              "FORNITORI",
+              "CLIENTI",
+              "MACCHINARI",
+              "CAPITALE",
+              "MUTUI",
+              "IMMOBILI"
+            ]
+          },
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Cassa contante",
+              "Banca Intesa",
+              "Debiti vs Fornitori",
+              "Crediti vs Clienti",
+              "Macchinari e Attrezzature",
+              "Capitale Sociale",
+              "Mutui Passivi",
+              "Immobilizzazioni Materiali"
+            ]
+          },
+          "tipo_conto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "passivo",
+              "patrimoniale"
+            ]
+          },
+          "valid_from": {
+            "axis": "shift",
+            "delta_min": -365.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "causali",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice": "RIC001",
+            "nome": "Vendita merci",
+            "tipo": "ricavo",
+            "valid_from": "2020-01-01",
+            "valid_to": null
+          },
+          {
+            "id": 2,
+            "codice": "COS001",
+            "nome": "Acquisto merci",
+            "tipo": "costo",
+            "valid_from": "2020-01-01",
+            "valid_to": null
+          },
+          {
+            "id": 3,
+            "codice": "PAT001",
+            "nome": "Ammortamento macchinari",
+            "tipo": "patrimoniale",
+            "valid_from": "2020-01-01",
+            "valid_to": null
+          },
+          {
+            "id": 4,
+            "codice": "RIC002",
+            "nome": "Servizi professionali",
+            "tipo": "ricavo",
+            "valid_from": "2021-01-01",
+            "valid_to": "2025-12-31"
+          },
+          {
+            "id": 5,
+            "codice": "COS002",
+            "nome": "Spese generali",
+            "tipo": "costo",
+            "valid_from": "2020-01-01",
+            "valid_to": null
+          }
+        ],
+        "variations": {
+          "codice": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "RIC001",
+              "RIC002",
+              "COS001",
+              "COS002",
+              "PAT001",
+              "PAT002"
+            ]
+          },
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Vendita merci",
+              "Servizi professionali",
+              "Acquisto merci",
+              "Spese generali",
+              "Ammortamento macchinari",
+              "Ammortamento immobili"
+            ]
+          },
+          "tipo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "ricavo",
+              "costo",
+              "patrimoniale"
+            ]
+          },
+          "valid_from": {
+            "axis": "shift",
+            "delta_min": -730.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "documenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "numero": "FATT-2026-001",
+            "tipo": "fattura",
+            "data_emissione": "2026-01-15",
+            "fornitore_cliente": "Clienti S.p.A.",
+            "valid_from": "2026-01-15",
+            "valid_to": null
+          },
+          {
+            "id": 2,
+            "numero": "NC-2026-001",
+            "tipo": "nota_credito",
+            "data_emissione": "2026-01-20",
+            "fornitore_cliente": "Fornitori S.r.l.",
+            "valid_from": "2026-01-20",
+            "valid_to": null
+          },
+          {
+            "id": 3,
+            "numero": "ND-2026-001",
+            "tipo": "nota_debito",
+            "data_emissione": "2026-02-01",
+            "fornitore_cliente": "Clienti S.p.A.",
+            "valid_from": "2026-02-01",
+            "valid_to": "2026-12-31"
+          },
+          {
+            "id": 4,
+            "numero": "RICEV-2026-001",
+            "tipo": "ricevuta",
+            "data_emissione": "2026-02-10",
+            "fornitore_cliente": "Privato Mario Rossi",
+            "valid_from": "2026-02-10",
+            "valid_to": null
+          }
+        ],
+        "variations": {
+          "numero": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "FATT-2026-001",
+              "FATT-2026-002",
+              "NC-2026-001",
+              "ND-2026-001",
+              "RICEV-2026-001"
+            ]
+          },
+          "tipo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "fattura",
+              "nota_credito",
+              "nota_debito",
+              "ricevuta"
+            ]
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "fornitore_cliente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Clienti S.p.A.",
+              "Fornitori S.r.l.",
+              "Privato Mario Rossi",
+              "Società Beta",
+              "Ditta Gamma"
+            ]
+          },
+          "valid_from": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "registrazioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 5.0,
+        "templates": [
+          {
+            "id": 1,
+            "conto_id": 1,
+            "importo": 1000.0,
+            "segno": "D",
+            "descrizione": "Pagamento fattura fornitore",
+            "stato": "confermato",
+            "data_validita": "2026-01-15 10:00:00",
+            "valid_from": "2026-01-15 10:00:00",
+            "valid_to": null
+          },
+          {
+            "id": 2,
+            "conto_id": 2,
+            "importo": 500.5,
+            "segno": "A",
+            "descrizione": "Incasso da cliente",
+            "stato": "confermato",
+            "data_validita": "2026-01-16 14:30:00",
+            "valid_from": "2026-01-16 14:30:00",
+            "valid_to": null
+          },
+          {
+            "id": 3,
+            "conto_id": 3,
+            "importo": 2000.0,
+            "segno": "D",
+            "descrizione": "Acquisto merci",
+            "stato": "bozza",
+            "data_validita": "2026-02-01 09:00:00",
+            "valid_from": "2026-02-01 09:00:00",
+            "valid_to": "2026-02-02 09:00:00"
+          },
+          {
+            "id": 4,
+            "conto_id": 4,
+            "importo": 1500.75,
+            "segno": "A",
+            "descrizione": "Vendita merci",
+            "stato": "archiviato",
+            "data_validita": "2026-01-10 11:00:00",
+            "valid_from": "2026-01-10 11:00:00",
+            "valid_to": null
+          }
+        ],
+        "variations": {
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.1,
+            "factor_max": 5.0,
+            "pool": []
+          },
+          "segno": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "D",
+              "A"
+            ]
+          },
+          "descrizione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Pagamento fattura fornitore",
+              "Incasso da cliente",
+              "Acquisto merci",
+              "Vendita merci",
+              "Storno errore",
+              "Ammortamento annuale"
+            ]
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "bozza",
+              "confermato",
+              "annullato",
+              "archiviato"
+            ]
+          },
+          "data_validita": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "valid_from": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "collegamenti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "registrazione_id": 1,
+            "causale_id": 2,
+            "documento_id": 1,
+            "note": "Collegato a fattura fornitore",
+            "valid_from": "2026-01-15 10:00:00",
+            "valid_to": null
+          },
+          {
+            "id": 2,
+            "registrazione_id": 2,
+            "causale_id": 1,
+            "documento_id": 1,
+            "note": "Collegato a incasso cliente",
+            "valid_from": "2026-01-16 14:30:00",
+            "valid_to": null
+          },
+          {
+            "id": 3,
+            "registrazione_id": 3,
+            "causale_id": 2,
+            "documento_id": null,
+            "note": "Nessun documento associato",
+            "valid_from": "2026-02-01 09:00:00",
+            "valid_to": "2026-02-02 09:00:00"
+          },
+          {
+            "id": 4,
+            "registrazione_id": 4,
+            "causale_id": 1,
+            "documento_id": 2,
+            "note": "Collegato a nota credito",
+            "valid_from": "2026-01-10 11:00:00",
+            "valid_to": null
+          }
+        ],
+        "variations": {
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Collegato a fattura fornitore",
+              "Collegato a incasso cliente",
+              "Nessun documento associato",
+              "Collegato a nota credito",
+              "Riferimento interno",
+              "Storno parziale"
+            ]
+          },
+          "valid_from": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

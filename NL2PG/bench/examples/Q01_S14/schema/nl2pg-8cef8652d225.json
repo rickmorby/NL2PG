@@ -1,0 +1,28 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 4,
+    "hierarchy": "flat",
+    "sql_features": [],
+    "twist": [
+      "rephrase",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "synonym",
+        "target_value": "pazienti",
+        "obsolete_value": "assistiti",
+        "description": "La tabella pazienti viene denominata nella prosa aziendale con il sinonimo assistiti, costringendo il risolutore a mappare il termine usato nel testo al nome reale della tabella."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "stato_ricovero",
+        "obsolete_value": "condizione clinica corrente del degente",
+        "description": "La colonna stato_ricovero viene descritta nella prosa aziendale con la perifrasi condizione clinica corrente del degente; i vincoli di dominio impliciti sulla query (es. filtrare solo ricoveri attivi o dimessi) devono essere applicati su questa colonna riconoscendola attraverso la perifrasi."
+      }
+    ],
+    "spec_hash": "84c78ab0108885d8"
+  },
+  "schema_ddl": "CREATE DOMAIN stato_ricovero_dom AS TEXT CHECK (VALUE IN ('attivo', 'dimesso', 'trasferito'));\n\nCREATE DOMAIN codice_fiscale_dom AS TEXT CHECK (char_length(VALUE) = 16);\n\nCREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale codice_fiscale_dom NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    telefono TEXT\n);\n\nCREATE TABLE medici (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    specializzazione TEXT NOT NULL,\n    numero_iscrizione_albo TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    piano INT CHECK (piano >= 0),\n    posti_letto INT NOT NULL CHECK (posti_letto > 0)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL REFERENCES pazienti(id),\n    medico_id INT NOT NULL REFERENCES medici(id),\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    data_ingresso DATE NOT NULL,\n    data_dimissione DATE,\n    stato_ricovero stato_ricovero_dom NOT NULL DEFAULT 'attivo',\n    diagnosi TEXT,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ingresso)\n);"
+}

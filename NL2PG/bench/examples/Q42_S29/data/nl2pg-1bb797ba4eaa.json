@@ -1,0 +1,445 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "disjunctive"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dipendenti",
+        "obsolete_value": "anagrafica_operatori",
+        "description": "La tabella dipendenti del sistema ERP viene denominata anagrafica_operatori nella documentazione e nella prosa aziendale. Le query di ricerca per nominativo devono quindi risolvere questa perifrasi verso la tabella fisica dipendenti, che contiene i campi spezzati nome e cognome."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "nome",
+        "obsolete_value": "prenome",
+        "description": "La colonna nome della tabella dipendenti, prima parte del dato anagrafico unico spezzato su due colonne, viene indicata nei documenti aziendali con il sinonimo prenome. Una ricerca come 'prenome = Mario' deve tradursi in una condizione sulla colonna nome."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "cognome",
+        "obsolete_value": "denominazione_familiare",
+        "description": "Nel gergo interno dell'ufficio personale la colonna cognome della tabella dipendenti, seconda parte del dato anagrafico spezzato, è chiamata denominazione_familiare. Le ricerche per nominativo vanno espresse con condizioni disgiuntive del tipo WHERE nome = 'val' OR cognome = 'val', mappando il termine gergale sulla colonna reale cognome."
+      }
+    ],
+    "spec_hash": "5bac512c7c6a8c39"
+  },
+  "schema_ddl": "CREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile >= 0)\n);\n\nCREATE TABLE progetti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    budget NUMERIC(12,2) NOT NULL CHECK (budget >= 0),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    dipendente_responsabile_id INT REFERENCES dipendenti(id),\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE registrazioni_ore (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    progetto_id INT NOT NULL REFERENCES progetti(id),\n    data_registrazione DATE NOT NULL,\n    ore_lavorate NUMERIC(4,1) NOT NULL CHECK (ore_lavorate > 0 AND ore_lavorate <= 24),\n    descrizione_attivita TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "reparti",
+        "nature": "lookup",
+        "min_rows": 10,
+        "max_rows": 12,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Amministrazione",
+            "sede": "Milano"
+          },
+          {
+            "id": 2,
+            "nome": "Sviluppo Software",
+            "sede": "Roma"
+          },
+          {
+            "id": 3,
+            "nome": "Risorse Umane",
+            "sede": "Milano"
+          },
+          {
+            "id": 4,
+            "nome": "Vendite",
+            "sede": "Torino"
+          },
+          {
+            "id": 5,
+            "nome": "Logistica",
+            "sede": "Napoli"
+          },
+          {
+            "id": 6,
+            "nome": "Marketing",
+            "sede": "Roma"
+          },
+          {
+            "id": 7,
+            "nome": "Finanza e Controllo",
+            "sede": "Milano"
+          },
+          {
+            "id": 8,
+            "nome": "Assistenza Clienti",
+            "sede": "Bologna"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Amministrazione",
+              "Sviluppo Software",
+              "Risorse Umane",
+              "Vendite",
+              "Logistica",
+              "Marketing",
+              "Finanza e Controllo",
+              "Assistenza Clienti",
+              "IT Operations",
+              "Acquisti",
+              "Qualita e Compliance",
+              "Ricerca e Sviluppo"
+            ]
+          },
+          "sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze"
+            ]
+          }
+        }
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 12.0,
+        "templates": [
+          {
+            "id": 1,
+            "reparto_id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA85M01H501Z",
+            "email": "mario.rossi@azienda.it",
+            "data_assunzione": "2019-03-11",
+            "stipendio_mensile": 3200.0
+          },
+          {
+            "id": 2,
+            "reparto_id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA90C45F205X",
+            "email": "laura.bianchi@azienda.it",
+            "data_assunzione": "2020-09-01",
+            "stipendio_mensile": 2850.5
+          },
+          {
+            "id": 3,
+            "reparto_id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI88T52L219Y",
+            "email": "giulia.verdi@azienda.it",
+            "data_assunzione": "2018-01-15",
+            "stipendio_mensile": 2950.0
+          },
+          {
+            "id": 4,
+            "reparto_id": 4,
+            "nome": "Alessandro",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTLSN92R05D963K",
+            "email": "alessandro.conti@azienda.it",
+            "data_assunzione": "2021-06-21",
+            "stipendio_mensile": 2450.75
+          },
+          {
+            "id": 5,
+            "reparto_id": 5,
+            "nome": "Francesca",
+            "cognome": "Moretti",
+            "codice_fiscale": "MRTFNC87D64H501W",
+            "email": "francesca.moretti@azienda.it",
+            "data_assunzione": "2017-11-02",
+            "stipendio_mensile": 3100.0
+          },
+          {
+            "id": 6,
+            "reparto_id": 6,
+            "nome": "Luca",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPSLCU91B18E507J",
+            "email": "luca.esposito@azienda.it",
+            "data_assunzione": "2022-02-14",
+            "stipendio_mensile": 2300.0
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Anna",
+              "Paolo",
+              "Sara",
+              "Davide",
+              "Chiara",
+              "Simone",
+              "Elena",
+              "Andrea",
+              "Martina"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ferrari",
+              "Russo",
+              "Gallo",
+              "Costa",
+              "Fontana",
+              "Marino",
+              "Barbieri",
+              "Ricci",
+              "Greco",
+              "Lombardi"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -300.0,
+            "delta_max": 200.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stipendio_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.4,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "progetti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.4,
+        "templates": [
+          {
+            "id": 101,
+            "nome": "Piattaforma E-commerce",
+            "budget": 150000.0,
+            "data_inizio": "2024-01-15",
+            "data_fine": "2024-12-20",
+            "dipendente_responsabile_id": 1
+          },
+          {
+            "id": 102,
+            "nome": "Migrazione Cloud",
+            "budget": 220000.0,
+            "data_inizio": "2024-03-01",
+            "data_fine": null,
+            "dipendente_responsabile_id": 2
+          },
+          {
+            "id": 103,
+            "nome": "Refactoring CRM",
+            "budget": 95000.0,
+            "data_inizio": "2024-05-10",
+            "data_fine": "2025-02-28",
+            "dipendente_responsabile_id": 3
+          },
+          {
+            "id": 104,
+            "nome": "App Mobile Fidelizzazione",
+            "budget": 78000.0,
+            "data_inizio": "2024-07-01",
+            "data_fine": "2025-04-30",
+            "dipendente_responsabile_id": 4
+          },
+          {
+            "id": 105,
+            "nome": "Data Warehouse Aziendale",
+            "budget": 180000.0,
+            "data_inizio": "2024-09-16",
+            "data_fine": null,
+            "dipendente_responsabile_id": 5
+          },
+          {
+            "id": 106,
+            "nome": "Automazione Magazzino",
+            "budget": 130000.0,
+            "data_inizio": "2025-01-08",
+            "data_fine": "2025-10-31",
+            "dipendente_responsabile_id": 6
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Portale Intranet",
+              "Sistema Ticketing",
+              "Ottimizzazione Supply Chain",
+              "Cybersecurity Audit",
+              "Integrazione ERP",
+              "Dashboard Analitiche",
+              "Onboarding Digitale",
+              "Gestione Contratti Fornitori"
+            ]
+          },
+          "budget": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "data_inizio": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_fine": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "registrazioni_ore",
+        "nature": "fact",
+        "min_rows": 700,
+        "max_rows": 1000,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1001,
+            "dipendente_id": 1,
+            "progetto_id": 101,
+            "data_registrazione": "2024-06-10",
+            "ore_lavorate": 7.5,
+            "descrizione_attivita": "Sviluppo moduli backend"
+          },
+          {
+            "id": 1002,
+            "dipendente_id": 2,
+            "progetto_id": 102,
+            "data_registrazione": "2024-08-15",
+            "ore_lavorate": 8.0,
+            "descrizione_attivita": "Configurazione ambiente cloud"
+          },
+          {
+            "id": 1003,
+            "dipendente_id": 3,
+            "progetto_id": 103,
+            "data_registrazione": "2024-10-14",
+            "ore_lavorate": 6.5,
+            "descrizione_attivita": "Analisi requisiti CRM"
+          },
+          {
+            "id": 1004,
+            "dipendente_id": 4,
+            "progetto_id": 104,
+            "data_registrazione": "2024-11-25",
+            "ore_lavorate": 4.0,
+            "descrizione_attivita": "Design UI app mobile"
+          },
+          {
+            "id": 1005,
+            "dipendente_id": 5,
+            "progetto_id": 105,
+            "data_registrazione": "2025-01-20",
+            "ore_lavorate": 9.0,
+            "descrizione_attivita": "Modellazione dati warehouse"
+          },
+          {
+            "id": 1006,
+            "dipendente_id": 6,
+            "progetto_id": 106,
+            "data_registrazione": "2025-06-09",
+            "ore_lavorate": 7.0,
+            "descrizione_attivita": "Test automazione magazzino"
+          }
+        ],
+        "variations": {
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -90.0,
+            "delta_max": 90.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "ore_lavorate": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "descrizione_attivita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Sviluppo funzionalita",
+              "Riunione di team",
+              "Code review",
+              "Documentazione tecnica",
+              "Debug e correzioni",
+              "Analisi requisiti",
+              "Testing e QA",
+              "Deploy in produzione"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

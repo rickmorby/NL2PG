@@ -1,0 +1,342 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "1ed842980fa794f1"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    data_registrazione DATE DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    prezzo NUMERIC(10,2) CHECK (prezzo >= 0),\n    quantita_disponibile INT CHECK (quantita_disponibile >= 0)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL DEFAULT CURRENT_DATE,\n    stato TEXT NOT NULL DEFAULT 'in attesa' CHECK (stato IN ('in attesa','spedito','consegnato','annullato'))\n);\n\nCREATE TABLE dettagli_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario Rossi",
+            "email": "mario.rossi@example.com",
+            "telefono": "3331234567",
+            "data_registrazione": "2025-01-10"
+          },
+          {
+            "id": 2,
+            "nome": "Laura Bianchi",
+            "email": "laura.bianchi@example.com",
+            "telefono": "3339876543",
+            "data_registrazione": "2025-02-15"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia Verdi",
+            "email": "giulia.verdi@example.com",
+            "telefono": "3345551234",
+            "data_registrazione": "2025-03-20"
+          },
+          {
+            "id": 4,
+            "nome": "Paolo Neri",
+            "email": "paolo.neri@example.com",
+            "telefono": "3351112233",
+            "data_registrazione": "2025-04-05"
+          },
+          {
+            "id": 5,
+            "nome": "Elena Gialli",
+            "email": "elena.gialli@example.com",
+            "telefono": "3364445566",
+            "data_registrazione": "2025-05-12"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Paolo Neri",
+              "Elena Gialli",
+              "Marco Blu",
+              "Sara Viola",
+              "Luca Marrone",
+              "Anna Celesti",
+              "Piero Arancio"
+            ]
+          },
+          "telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "3331234567",
+              "3339876543",
+              "3345551234",
+              "3351112233",
+              "3364445566",
+              "3377778899",
+              "3381234567",
+              "3399876543"
+            ]
+          },
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Laptop",
+            "prezzo": 899.99,
+            "quantita_disponibile": 25
+          },
+          {
+            "id": 2,
+            "nome": "Mouse wireless",
+            "prezzo": 29.99,
+            "quantita_disponibile": 120
+          },
+          {
+            "id": 3,
+            "nome": "Tastiera meccanica",
+            "prezzo": 89.99,
+            "quantita_disponibile": 60
+          },
+          {
+            "id": 4,
+            "nome": "Monitor 27\"",
+            "prezzo": 249.99,
+            "quantita_disponibile": 35
+          },
+          {
+            "id": 5,
+            "nome": "Cuffie bluetooth",
+            "prezzo": 59.99,
+            "quantita_disponibile": 80
+          },
+          {
+            "id": 6,
+            "nome": "Webcam HD",
+            "prezzo": 45.99,
+            "quantita_disponibile": 15
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Laptop",
+              "Mouse wireless",
+              "Tastiera meccanica",
+              "Monitor 27\"",
+              "Cuffie bluetooth",
+              "Webcam HD",
+              "Hub USB-C",
+              "SSD esterno",
+              "Cavo HDMI",
+              "Alimentatore"
+            ]
+          },
+          "prezzo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "quantita_disponibile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "5",
+              "10",
+              "15",
+              "20",
+              "25",
+              "30",
+              "35",
+              "40",
+              "50",
+              "60",
+              "80",
+              "100",
+              "120"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ordini",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "data_ordine": "2025-01-15",
+            "stato": "consegnato"
+          },
+          {
+            "id": 2,
+            "cliente_id": 2,
+            "data_ordine": "2025-02-20",
+            "stato": "consegnato"
+          },
+          {
+            "id": 3,
+            "cliente_id": 3,
+            "data_ordine": "2025-03-25",
+            "stato": "spedito"
+          },
+          {
+            "id": 4,
+            "cliente_id": 4,
+            "data_ordine": "2025-04-10",
+            "stato": "in attesa"
+          },
+          {
+            "id": 5,
+            "cliente_id": 5,
+            "data_ordine": "2025-05-05",
+            "stato": "annullato"
+          }
+        ],
+        "variations": {
+          "data_ordine": {
+            "axis": "shift",
+            "delta_min": -120.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "in attesa",
+              "spedito",
+              "consegnato",
+              "annullato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "dettagli_ordine",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ordine_id": 1,
+            "prodotto_id": 1,
+            "quantita": 1,
+            "prezzo_unitario": 899.99
+          },
+          {
+            "id": 2,
+            "ordine_id": 1,
+            "prodotto_id": 2,
+            "quantita": 2,
+            "prezzo_unitario": 29.99
+          },
+          {
+            "id": 3,
+            "ordine_id": 2,
+            "prodotto_id": 3,
+            "quantita": 1,
+            "prezzo_unitario": 89.99
+          },
+          {
+            "id": 4,
+            "ordine_id": 2,
+            "prodotto_id": 4,
+            "quantita": 1,
+            "prezzo_unitario": 249.99
+          },
+          {
+            "id": 5,
+            "ordine_id": 3,
+            "prodotto_id": 5,
+            "quantita": 3,
+            "prezzo_unitario": 59.99
+          },
+          {
+            "id": 6,
+            "ordine_id": 3,
+            "prodotto_id": 6,
+            "quantita": 1,
+            "prezzo_unitario": 45.99
+          }
+        ],
+        "variations": {
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "10"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.3,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

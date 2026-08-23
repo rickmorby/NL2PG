@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 9,
+  "hierarchy": "many_to_many",
+  "sql_features": [
+    "exists"
+  ],
+  "twist": [
+    "rename",
+    "distractor",
+    "synonym"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini",
+      "obsolete_value": "commesse",
+      "description": "La tabella ordini viene denominata commesse nello schema ERP, ma rappresenta gli ordini di acquisto."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "dettagli_ordini",
+      "obsolete_value": "righe_commesse",
+      "description": "La tabella dettagli_ordini è una distrazione: contiene dati irrilevanti per la query EXISTS, ma ha un nome simile a commesse."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "fornitore_id",
+      "obsolete_value": "partner_id",
+      "description": "Il campo fornitore_id nella tabella ordini è sinonimo di partner_id, ma solo il primo è rilevante per il join con la tabella fornitori."
+    }
+  ],
+  "spec_hash": "af90b774888e3b2a"
+}

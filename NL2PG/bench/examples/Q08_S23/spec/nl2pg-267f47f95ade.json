@@ -1,0 +1,34 @@
+{
+  "domain": "finanza",
+  "n_tables": 1,
+  "hierarchy": "self_referencing",
+  "sql_features": [
+    "self_join"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "movimenti_finanziari",
+      "description": "La tabella principale che registra le transazioni finanziarie viene denominata 'movimenti_finanziari' nella documentazione aziendale, mentre nel database è effettivamente chiamata 'transazioni'."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "id_transazione_padre",
+      "obsolete_value": "riferimento_gerarchico",
+      "description": "La colonna che identifica la transazione padre in una relazione gerarchica viene indicata come 'riferimento_gerarchico' nei report interni, mentre nel database è chiamata 'id_transazione_padre'."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "tipo",
+      "obsolete_value": "categoria",
+      "description": "La colonna 'tipo' nella tabella transazioni assume significati diversi a seconda del contesto: nei documenti aziendali viene chiamata 'categoria' e può riferirsi sia alla natura della transazione (es. 'bonifico', 'pagamento') che al suo ruolo nella gerarchia (es. 'padre', 'figlio')."
+    }
+  ],
+  "spec_hash": "473b12b11c74c7b6"
+}

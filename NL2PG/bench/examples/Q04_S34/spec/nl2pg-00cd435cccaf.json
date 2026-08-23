@@ -1,0 +1,27 @@
+{
+  "domain": "contabilità",
+  "n_tables": 5,
+  "hierarchy": "one_to_many_optional_fk",
+  "sql_features": [
+    "join"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "centro_di_costo",
+      "obsolete_value": "area_di_spesa_riferimento",
+      "description": "La tabella che definisce i centri di costo è denominata nel linguaggio aziendale come area_di_spesa_riferimento."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_lordo",
+      "obsolete_value": "valore_nominale_partita",
+      "description": "Il campo importo_lordo viene indicato internamente come valore_nominale_partita per riflettere la terminologia contabile specifica."
+    }
+  ],
+  "spec_hash": "55908e6515e1bdad"
+}

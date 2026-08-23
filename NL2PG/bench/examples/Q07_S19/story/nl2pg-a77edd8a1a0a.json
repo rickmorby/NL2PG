@@ -1,0 +1,1043 @@
+{
+  "schema_ddl": "CREATE TABLE valute (\n    id SERIAL PRIMARY KEY,\n    codice_valuta CHAR(3) NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    simbolo TEXT NOT NULL\n);\n\nCREATE TABLE conti_correnti (\n    id SERIAL PRIMARY KEY,\n    numero_conto TEXT NOT NULL UNIQUE,\n    nome_conto TEXT NOT NULL,\n    valuta_id INT NOT NULL REFERENCES valute(id),\n    saldo NUMERIC(15,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    data_apertura DATE NOT NULL,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE indirizzi (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    nazione TEXT NOT NULL,\n    tipo_indirizzo TEXT NOT NULL CHECK (tipo_indirizzo IN ('residenza', 'domicilio', 'lavoro'))\n);\n\nCREATE TABLE transazioni (\n    id SERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti_correnti(id),\n    tipo_transazione TEXT NOT NULL CHECK (tipo_transazione IN ('versamento', 'prelievo', 'bonifico', 'addebito')),\n    importo NUMERIC(15,2) NOT NULL CHECK (importo > 0),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    descrizione TEXT,\n    stato TEXT NOT NULL DEFAULT 'completata' CHECK (stato IN ('completata', 'in_attesa', 'annullata'))\n);\n\nCREATE TABLE bonifici (\n    id SERIAL PRIMARY KEY,\n    transazione_id INT NOT NULL REFERENCES transazioni(id),\n    conto_destinatario TEXT NOT NULL,\n    nome_destinatario TEXT NOT NULL,\n    causale TEXT NOT NULL,\n    data_esecuzione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE categorie_spesa (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    budget_mensile NUMERIC(12,2) CHECK (budget_mensile >= 0)\n);\n\nCREATE TABLE movimenti_spesa (\n    id SERIAL PRIMARY KEY,\n    transazione_id INT NOT NULL REFERENCES transazioni(id),\n    categoria_id INT NOT NULL REFERENCES categorie_spesa(id),\n    note TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "valute": {
+        "row_count": 46,
+        "columns": {
+          "id": {
+            "distinct": 46,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 46
+          },
+          "codice_valuta": {
+            "distinct": 46,
+            "sample": [
+              "CHF",
+              "C_1",
+              "C_2",
+              "C_3",
+              "C_4"
+            ]
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Dollaro Statunitense",
+              "Euro",
+              "Franco Svizzero",
+              "Sterlina Britannica",
+              "Yen Giapponese"
+            ]
+          },
+          "simbolo": {
+            "distinct": 5,
+            "sample": [
+              "$",
+              "CHF",
+              "£",
+              "¥",
+              "€"
+            ]
+          }
+        }
+      },
+      "categorie_spesa": {
+        "row_count": 40,
+        "columns": {
+          "id": {
+            "distinct": 40,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 40
+          },
+          "nome": {
+            "distinct": 40,
+            "sample": [
+              "Alimentari",
+              "Alimentari_1",
+              "Alimentari_2",
+              "Alimentari_3",
+              "Alimentari_4"
+            ]
+          },
+          "descrizione": {
+            "distinct": 5,
+            "sample": [
+              "Spese mediche e farmaceutiche",
+              "Spese per bollette e servizi",
+              "Spese per generi alimentari",
+              "Spese per svago e intrattenimento",
+              "Spese per trasporti e carburante"
+            ]
+          },
+          "budget_mensile": {
+            "distinct": 38,
+            "sample": [
+              "110.03",
+              "126.06",
+              "130.22",
+              "131.38",
+              "137.86"
+            ],
+            "min": 99.7,
+            "max": 534.2
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 372,
+        "columns": {
+          "id": {
+            "distinct": 372,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 372
+          },
+          "codice_fiscale": {
+            "distinct": 372,
+            "sample": [
+              "BNCLRA85B02H501Y",
+              "BNCLRA85B02H501Y_1",
+              "BNCLRA85B02H501Y_10",
+              "BNCLRA85B02H501Y_11",
+              "BNCLRA85B02H501Y_12"
+            ]
+          },
+          "nome": {
+            "distinct": 4,
+            "sample": [
+              "Giulia",
+              "Laura",
+              "Luca",
+              "Mario"
+            ]
+          },
+          "cognome": {
+            "distinct": 4,
+            "sample": [
+              "Bianchi",
+              "Neri",
+              "Rossi",
+              "Verdi"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 341,
+            "sample": [
+              "1955-04-28",
+              "1955-05-05",
+              "1955-06-06",
+              "1955-07-10",
+              "1955-07-19"
+            ]
+          },
+          "email": {
+            "distinct": 356,
+            "sample": [
+              "email",
+              "email_1",
+              "email_10",
+              "email_11",
+              "email_12"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+391234567890",
+              "+391234567891",
+              "+391234567892",
+              "+391234567893",
+              "None"
+            ]
+          }
+        }
+      },
+      "indirizzi": {
+        "row_count": 575,
+        "columns": {
+          "id": {
+            "distinct": 575,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 575
+          },
+          "cliente_id": {
+            "distinct": 287,
+            "sample": [
+              "1",
+              "10",
+              "103",
+              "104",
+              "105"
+            ],
+            "min": 1,
+            "max": 371
+          },
+          "via": {
+            "distinct": 5,
+            "sample": [
+              "Corso Buenos Aires 45",
+              "Piazza San Carlo 10",
+              "Via Milano 5",
+              "Via Napoli 33",
+              "Via Roma 12"
+            ]
+          },
+          "citta": {
+            "distinct": 5,
+            "sample": [
+              "Bologna",
+              "Milano",
+              "Napoli",
+              "Roma",
+              "Torino"
+            ]
+          },
+          "cap": {
+            "distinct": 5,
+            "sample": [
+              "00100",
+              "10123",
+              "20124",
+              "40121",
+              "80100"
+            ]
+          },
+          "nazione": {
+            "distinct": 4,
+            "sample": [
+              "Francia",
+              "Germania",
+              "Italia",
+              "Spagna"
+            ]
+          },
+          "tipo_indirizzo": {
+            "distinct": 3,
+            "sample": [
+              "domicilio",
+              "lavoro",
+              "residenza"
+            ]
+          }
+        }
+      },
+      "conti_correnti": {
+        "row_count": 93,
+        "columns": {
+          "id": {
+            "distinct": 93,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 93
+          },
+          "numero_conto": {
+            "distinct": 93,
+            "sample": [
+              "IT01A1234567890",
+              "IT01A1234567890_1",
+              "IT01A1234567890_10",
+              "IT01A1234567890_11",
+              "IT01A1234567890_12"
+            ]
+          },
+          "nome_conto": {
+            "distinct": 4,
+            "sample": [
+              "Conto Aziendale",
+              "Conto Corrente Personale",
+              "Conto Deposito",
+              "Conto Risparmio"
+            ]
+          },
+          "valuta_id": {
+            "distinct": 39,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "14"
+            ],
+            "min": 1,
+            "max": 46
+          },
+          "saldo": {
+            "distinct": 71,
+            "sample": [
+              "0.0",
+              "11252.7",
+              "12293.04",
+              "12479.43",
+              "13253.14"
+            ],
+            "min": 0.0,
+            "max": 57054.6
+          },
+          "data_apertura": {
+            "distinct": 93,
+            "sample": [
+              "2017-05-30",
+              "2017-08-22",
+              "2017-10-20",
+              "2017-10-21",
+              "2018-01-29"
+            ]
+          },
+          "attivo": {
+            "distinct": 3,
+            "sample": [
+              "True",
+              "false",
+              "true"
+            ],
+            "min": true,
+            "max": true
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 433,
+        "columns": {
+          "id": {
+            "distinct": 433,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 433
+          },
+          "conto_id": {
+            "distinct": 93,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 93
+          },
+          "tipo_transazione": {
+            "distinct": 4,
+            "sample": [
+              "addebito",
+              "bonifico",
+              "prelievo",
+              "versamento"
+            ]
+          },
+          "importo": {
+            "distinct": 418,
+            "sample": [
+              "100.29",
+              "1000.0",
+              "1004.24",
+              "101.39",
+              "1010.05"
+            ],
+            "min": 33.37,
+            "max": 3000.0
+          },
+          "data_transazione": {
+            "distinct": 229,
+            "sample": [
+              "2025-12-12 09:30:00",
+              "2025-12-14 14:15:00",
+              "2025-12-15 09:30:00",
+              "2025-12-15 14:15:00",
+              "2025-12-16 09:30:00"
+            ]
+          },
+          "descrizione": {
+            "distinct": 4,
+            "sample": [
+              "Addebito bolletta luce",
+              "Bonifico a fornitore",
+              "Prelievo bancomat",
+              "Versamento contanti"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "annullata",
+              "completata",
+              "in_attesa"
+            ]
+          }
+        }
+      },
+      "bonifici": {
+        "row_count": 810,
+        "columns": {
+          "id": {
+            "distinct": 810,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 810
+          },
+          "transazione_id": {
+            "distinct": 371,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 433
+          },
+          "conto_destinatario": {
+            "distinct": 4,
+            "sample": [
+              "IT66A6543210987",
+              "IT77Z7654321098",
+              "IT88Y8765432109",
+              "IT99X9876543210"
+            ]
+          },
+          "nome_destinatario": {
+            "distinct": 4,
+            "sample": [
+              "Azienda Delta",
+              "Fornitore Beta",
+              "Servizi Gamma",
+              "Società Alpha S.r.l."
+            ]
+          },
+          "causale": {
+            "distinct": 4,
+            "sample": [
+              "Acquisto materiali",
+              "Consulenza tecnica",
+              "Pagamento fattura n. 123",
+              "Rimborso spese"
+            ]
+          },
+          "data_esecuzione": {
+            "distinct": 14,
+            "sample": [
+              "2026-01-13 10:30:00",
+              "2026-01-14 10:30:00",
+              "2026-01-14 11:00:00",
+              "2026-01-15 10:30:00",
+              "2026-01-15 11:00:00"
+            ]
+          }
+        }
+      },
+      "movimenti_spesa": {
+        "row_count": 652,
+        "columns": {
+          "id": {
+            "distinct": 652,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 652
+          },
+          "transazione_id": {
+            "distinct": 334,
+            "sample": [
+              "10",
+              "101",
+              "102",
+              "103",
+              "104"
+            ],
+            "min": 2,
+            "max": 428
+          },
+          "categoria_id": {
+            "distinct": 40,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 40
+          },
+          "note": {
+            "distinct": 6,
+            "sample": [
+              "Abbonamento palestra",
+              "Bolletta luce gennaio",
+              "Cena al ristorante",
+              "Farmacia",
+              "None"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "valute": [
+        {
+          "id": 1,
+          "codice_valuta": "EUR",
+          "nome": "Euro",
+          "simbolo": "€"
+        },
+        {
+          "id": 2,
+          "codice_valuta": "E_1",
+          "nome": "Euro",
+          "simbolo": "€"
+        },
+        {
+          "id": 3,
+          "codice_valuta": "E_2",
+          "nome": "Euro",
+          "simbolo": "€"
+        },
+        {
+          "id": 4,
+          "codice_valuta": "E_3",
+          "nome": "Euro",
+          "simbolo": "€"
+        },
+        {
+          "id": 5,
+          "codice_valuta": "E_4",
+          "nome": "Euro",
+          "simbolo": "€"
+        },
+        {
+          "id": 6,
+          "codice_valuta": "E_5",
+          "nome": "Euro",
+          "simbolo": "€"
+        },
+        {
+          "id": 7,
+          "codice_valuta": "E_6",
+          "nome": "Euro",
+          "simbolo": "€"
+        },
+        {
+          "id": 8,
+          "codice_valuta": "E_7",
+          "nome": "Euro",
+          "simbolo": "€"
+        }
+      ],
+      "categorie_spesa": [
+        {
+          "id": 1,
+          "nome": "Alimentari",
+          "descrizione": null,
+          "budget_mensile": 534.2
+        },
+        {
+          "id": 2,
+          "nome": "Alimentari_1",
+          "descrizione": "Spese per generi alimentari",
+          "budget_mensile": 320.44
+        },
+        {
+          "id": 3,
+          "nome": "Alimentari_2",
+          "descrizione": "Spese per generi alimentari",
+          "budget_mensile": 481.29
+        },
+        {
+          "id": 4,
+          "nome": "Alimentari_3",
+          "descrizione": "Spese per generi alimentari",
+          "budget_mensile": 422.89
+        },
+        {
+          "id": 5,
+          "nome": "Alimentari_4",
+          "descrizione": "Spese per generi alimentari",
+          "budget_mensile": 469.01
+        },
+        {
+          "id": 6,
+          "nome": "Alimentari_5",
+          "descrizione": "Spese per generi alimentari",
+          "budget_mensile": 339.46
+        },
+        {
+          "id": 7,
+          "nome": "Alimentari_6",
+          "descrizione": "Spese per generi alimentari",
+          "budget_mensile": 347.48
+        },
+        {
+          "id": 8,
+          "nome": "Alimentari_7",
+          "descrizione": "Spese per generi alimentari",
+          "budget_mensile": 454.12
+        }
+      ],
+      "clienti": [
+        {
+          "id": 1,
+          "codice_fiscale": "RSSMRA80A01H501X",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "1981-03-18",
+          "email": null,
+          "telefono": "+391234567891"
+        },
+        {
+          "id": 2,
+          "codice_fiscale": "RSSMRA80A01H501X_1",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "1985-10-18",
+          "email": "mario.rossi@example.com_1",
+          "telefono": "+391234567893"
+        },
+        {
+          "id": 3,
+          "codice_fiscale": "RSSMRA80A01H501X_2",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "1982-02-06",
+          "email": "mario.rossi@example.com_2",
+          "telefono": "+391234567891"
+        },
+        {
+          "id": 4,
+          "codice_fiscale": "RSSMRA80A01H501X_3",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "1976-05-17",
+          "email": "mario.rossi@example.com_3",
+          "telefono": "None"
+        },
+        {
+          "id": 5,
+          "codice_fiscale": "RSSMRA80A01H501X_4",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "1984-04-05",
+          "email": "mario.rossi@example.com_4",
+          "telefono": "None"
+        },
+        {
+          "id": 6,
+          "codice_fiscale": "RSSMRA80A01H501X_5",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "1978-04-10",
+          "email": "mario.rossi@example.com_5",
+          "telefono": "+391234567890"
+        },
+        {
+          "id": 7,
+          "codice_fiscale": "RSSMRA80A01H501X_6",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "1975-02-22",
+          "email": "mario.rossi@example.com_6",
+          "telefono": "None"
+        },
+        {
+          "id": 8,
+          "codice_fiscale": "RSSMRA80A01H501X_7",
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "data_nascita": "1988-07-30",
+          "email": "mario.rossi@example.com_7",
+          "telefono": "+391234567893"
+        }
+      ],
+      "indirizzi": [
+        {
+          "id": 1,
+          "cliente_id": 85,
+          "via": "Via Napoli 33",
+          "citta": "Roma",
+          "cap": "80100",
+          "nazione": "Italia",
+          "tipo_indirizzo": "lavoro"
+        },
+        {
+          "id": 2,
+          "cliente_id": 118,
+          "via": "Via Milano 5",
+          "citta": "Roma",
+          "cap": "00100",
+          "nazione": "Francia",
+          "tipo_indirizzo": "residenza"
+        },
+        {
+          "id": 3,
+          "cliente_id": 85,
+          "via": "Corso Buenos Aires 45",
+          "citta": "Napoli",
+          "cap": "10123",
+          "nazione": "Francia",
+          "tipo_indirizzo": "lavoro"
+        },
+        {
+          "id": 4,
+          "cliente_id": 123,
+          "via": "Piazza San Carlo 10",
+          "citta": "Roma",
+          "cap": "00100",
+          "nazione": "Germania",
+          "tipo_indirizzo": "residenza"
+        },
+        {
+          "id": 5,
+          "cliente_id": 250,
+          "via": "Piazza San Carlo 10",
+          "citta": "Torino",
+          "cap": "00100",
+          "nazione": "Germania",
+          "tipo_indirizzo": "lavoro"
+        },
+        {
+          "id": 6,
+          "cliente_id": 10,
+          "via": "Corso Buenos Aires 45",
+          "citta": "Torino",
+          "cap": "40121",
+          "nazione": "Germania",
+          "tipo_indirizzo": "residenza"
+        },
+        {
+          "id": 7,
+          "cliente_id": 265,
+          "via": "Via Milano 5",
+          "citta": "Bologna",
+          "cap": "00100",
+          "nazione": "Spagna",
+          "tipo_indirizzo": "domicilio"
+        },
+        {
+          "id": 8,
+          "cliente_id": 252,
+          "via": "Piazza San Carlo 10",
+          "citta": "Torino",
+          "cap": "00100",
+          "nazione": "Italia",
+          "tipo_indirizzo": "lavoro"
+        }
+      ],
+      "conti_correnti": [
+        {
+          "id": 1,
+          "numero_conto": "IT01A1234567890",
+          "nome_conto": "Conto Corrente Personale",
+          "valuta_id": 37,
+          "saldo": 1636.62,
+          "data_apertura": "2021-07-17",
+          "attivo": "true"
+        },
+        {
+          "id": 2,
+          "numero_conto": "IT01A1234567890_1",
+          "nome_conto": "Conto Corrente Personale",
+          "valuta_id": 43,
+          "saldo": 2869.69,
+          "data_apertura": "2020-02-16",
+          "attivo": "true"
+        },
+        {
+          "id": 3,
+          "numero_conto": "IT01A1234567890_2",
+          "nome_conto": "Conto Corrente Personale",
+          "valuta_id": 28,
+          "saldo": 2237.05,
+          "data_apertura": "2019-06-16",
+          "attivo": "true"
+        },
+        {
+          "id": 4,
+          "numero_conto": "IT01A1234567890_3",
+          "nome_conto": "Conto Corrente Personale",
+          "valuta_id": 31,
+          "saldo": 6012.24,
+          "data_apertura": "2021-09-28",
+          "attivo": "true"
+        },
+        {
+          "id": 5,
+          "numero_conto": "IT01A1234567890_4",
+          "nome_conto": "Conto Corrente Personale",
+          "valuta_id": 33,
+          "saldo": 3238.53,
+          "data_apertura": "2018-02-02",
+          "attivo": "true"
+        },
+        {
+          "id": 6,
+          "numero_conto": "IT01A1234567890_5",
+          "nome_conto": "Conto Corrente Personale",
+          "valuta_id": 31,
+          "saldo": 6753.59,
+          "data_apertura": "2021-10-14",
+          "attivo": "false"
+        },
+        {
+          "id": 7,
+          "numero_conto": "IT01A1234567890_6",
+          "nome_conto": "Conto Corrente Personale",
+          "valuta_id": 45,
+          "saldo": 4906.46,
+          "data_apertura": "2020-03-14",
+          "attivo": "false"
+        },
+        {
+          "id": 8,
+          "numero_conto": "IT01A1234567890_7",
+          "nome_conto": "Conto Corrente Personale",
+          "valuta_id": 22,
+          "saldo": 1711.54,
+          "data_apertura": "2018-01-29",
+          "attivo": "true"
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 1,
+          "conto_id": 8,
+          "tipo_transazione": "versamento",
+          "importo": 816.63,
+          "data_transazione": "2025-12-29 09:30:00",
+          "descrizione": "Versamento contanti",
+          "stato": "annullata"
+        },
+        {
+          "id": 2,
+          "conto_id": 77,
+          "tipo_transazione": "addebito",
+          "importo": 557.25,
+          "data_transazione": "2025-12-12 09:30:00",
+          "descrizione": "Versamento contanti",
+          "stato": "completata"
+        },
+        {
+          "id": 3,
+          "conto_id": 77,
+          "tipo_transazione": "bonifico",
+          "importo": 2659.02,
+          "data_transazione": "2026-01-29 09:30:00",
+          "descrizione": "Versamento contanti",
+          "stato": "in_attesa"
+        },
+        {
+          "id": 4,
+          "conto_id": 6,
+          "tipo_transazione": "bonifico",
+          "importo": 1053.16,
+          "data_transazione": "2026-01-08 09:30:00",
+          "descrizione": null,
+          "stato": "annullata"
+        },
+        {
+          "id": 5,
+          "conto_id": 63,
+          "tipo_transazione": "versamento",
+          "importo": 2485.16,
+          "data_transazione": "2026-01-26 09:30:00",
+          "descrizione": "Versamento contanti",
+          "stato": "in_attesa"
+        },
+        {
+          "id": 6,
+          "conto_id": 81,
+          "tipo_transazione": "prelievo",
+          "importo": 1359.66,
+          "data_transazione": "2026-01-16 09:30:00",
+          "descrizione": "Versamento contanti",
+          "stato": "completata"
+        },
+        {
+          "id": 7,
+          "conto_id": 47,
+          "tipo_transazione": "bonifico",
+          "importo": 601.86,
+          "data_transazione": "2025-12-18 09:30:00",
+          "descrizione": "Versamento contanti",
+          "stato": "completata"
+        },
+        {
+          "id": 8,
+          "conto_id": 39,
+          "tipo_transazione": "addebito",
+          "importo": 1021.13,
+          "data_transazione": "2026-01-01 09:30:00",
+          "descrizione": "Versamento contanti",
+          "stato": "annullata"
+        }
+      ],
+      "bonifici": [
+        {
+          "id": 1,
+          "transazione_id": 107,
+          "conto_destinatario": "IT77Z7654321098",
+          "nome_destinatario": "Società Alpha S.r.l.",
+          "causale": "Rimborso spese",
+          "data_esecuzione": "2026-01-17 10:30:00"
+        },
+        {
+          "id": 2,
+          "transazione_id": 331,
+          "conto_destinatario": "IT88Y8765432109",
+          "nome_destinatario": "Società Alpha S.r.l.",
+          "causale": "Rimborso spese",
+          "data_esecuzione": "2026-01-15 10:30:00"
+        },
+        {
+          "id": 3,
+          "transazione_id": 234,
+          "conto_destinatario": "IT77Z7654321098",
+          "nome_destinatario": "Servizi Gamma",
+          "causale": "Consulenza tecnica",
+          "data_esecuzione": "2026-01-15 10:30:00"
+        },
+        {
+          "id": 4,
+          "transazione_id": 403,
+          "conto_destinatario": "IT66A6543210987",
+          "nome_destinatario": "Fornitore Beta",
+          "causale": "Acquisto materiali",
+          "data_esecuzione": "2026-01-14 10:30:00"
+        },
+        {
+          "id": 5,
+          "transazione_id": 262,
+          "conto_destinatario": "IT66A6543210987",
+          "nome_destinatario": "Azienda Delta",
+          "causale": "Pagamento fattura n. 123",
+          "data_esecuzione": "2026-01-16 10:30:00"
+        },
+        {
+          "id": 6,
+          "transazione_id": 382,
+          "conto_destinatario": "IT77Z7654321098",
+          "nome_destinatario": "Servizi Gamma",
+          "causale": "Acquisto materiali",
+          "data_esecuzione": "2026-01-15 10:30:00"
+        },
+        {
+          "id": 7,
+          "transazione_id": 163,
+          "conto_destinatario": "IT66A6543210987",
+          "nome_destinatario": "Servizi Gamma",
+          "causale": "Rimborso spese",
+          "data_esecuzione": "2026-01-15 10:30:00"
+        },
+        {
+          "id": 8,
+          "transazione_id": 430,
+          "conto_destinatario": "IT99X9876543210",
+          "nome_destinatario": "Azienda Delta",
+          "causale": "Consulenza tecnica",
+          "data_esecuzione": "2026-01-15 10:30:00"
+        }
+      ],
+      "movimenti_spesa": [
+        {
+          "id": 1,
+          "transazione_id": 163,
+          "categoria_id": 23,
+          "note": "Bolletta luce gennaio"
+        },
+        {
+          "id": 2,
+          "transazione_id": 14,
+          "categoria_id": 10,
+          "note": "Farmacia"
+        },
+        {
+          "id": 3,
+          "transazione_id": 342,
+          "categoria_id": 11,
+          "note": "None"
+        },
+        {
+          "id": 4,
+          "transazione_id": 210,
+          "categoria_id": 22,
+          "note": null
+        },
+        {
+          "id": 5,
+          "transazione_id": 406,
+          "categoria_id": 17,
+          "note": "Cena al ristorante"
+        },
+        {
+          "id": 6,
+          "transazione_id": 9,
+          "categoria_id": 16,
+          "note": null
+        },
+        {
+          "id": 7,
+          "transazione_id": 41,
+          "categoria_id": 19,
+          "note": "Bolletta luce gennaio"
+        },
+        {
+          "id": 8,
+          "transazione_id": 310,
+          "categoria_id": 25,
+          "note": "Cena al ristorante"
+        }
+      ]
+    }
+  },
+  "story": "Era una mattina di inizio gennaio quando il responsabile della tesoreria della banca aprì il fascicolo delle operazioni in sospeso. Tra le pratiche più urgenti, spiccava la necessità di redigere un rapporto dettagliato sui movimenti di denaro avvenuti nei giorni precedenti, in particolare quelli legati ai bonifici. L’obiettivo era chiaro: ricostruire, per ogni operazione completata, la data esatta, la tipologia, l’importo trasferito, il nome del conto corrente coinvolto e la valuta utilizzata, compreso il suo simbolo distintivo.\n\nPer iniziare, il team si rivolse all’archivio denominato *transazioni*, dove ogni movimento finanziario veniva registrato con precisione. Qui, gli addetti filtrarono le voci contrassegnate con lo stato *completata*, escludendo quelle ancora *in_attesa* o *annullate*. Ogni scheda riportava l’importo esatto – come i 1053,16 euro di un bonifico respinto o i 2659,02 euro di uno in attesa di conferma – e la data di esecuzione, che per alcune operazioni risaliva già al 2025-12-12, mentre altre erano più recenti, come quelle del 2026-01-16.\n\nUna volta isolate le transazioni di interesse, gli operatori incrociarono i dati con il registro *bonifici*, dove erano annotati i dettagli specifici di ogni trasferimento: il conto destinatario, il nome del beneficiario – come *Società Alpha S.r.l.* o *Fornitore Beta* – e la causale, che poteva variare da *Pagamento fattura n. 123* a *Rimborso spese*. La data di esecuzione, spesso coincidente con quella della transazione principale, veniva riportata con precisione al minuto, come nel caso del bonifico eseguito il 2026-01-15 alle 10:30.\n\nPer associare ogni operazione al conto corrente di origine, il team consultò l’archivio *conti correnti*, dove ogni scheda elencava il numero del conto – ad esempio *IT01A1234567890* – il nome assegnato dal titolare, come *Conto Corrente Personale* o *Conto Aziendale*, e lo stato di attività. Un dettaglio cruciale era la valuta associata: ogni conto era infatti legato a una divisa specifica, i cui dettagli erano custoditi nell’archivio *valute*. Qui, per ogni codice come *EUR* o *CHF*, erano riportati il nome completo – *Euro* o *Franco Svizzero* – e il simbolo corrispondente, come *€* o *CHF*. Ad esempio, un conto con valuta *EUR* mostrava il saldo in euro, mentre un altro, magari aperto per esigenze internazionali, poteva essere denominato in *Yen Giapponese* con il simbolo *¥*.\n\nDurante l’analisi, emerse un caso particolare: un conto aperto il 2021-07-17 con un saldo di 1636,62 euro, la cui valuta era stata registrata con il codice *E_3*, ma che riportava comunque il simbolo *€*, confermando la sua natura in euro. Questo dettaglio richiamò l’attenzione sul fatto che, nonostante la diversità dei codici, alcune valute condividevano lo stesso simbolo, rendendo necessaria una verifica incrociata tra il nome e il simbolo per evitare confusioni.\n\nMentre il lavoro procedeva, gli operatori notarono anche come alcune categorie di spesa, annotate nel registro *categorie spesa*, fossero state associate a specifici movimenti tramite l’archivio *movimenti spesa*. Sebbene non fosse l’obiettivo principale del rapporto, questo collegamento offrì uno spunto per future analisi sulle abitudini di spesa dei clienti, come le note che riportavano *Bolletta luce gennaio* o *Cena al ristorante*, legate a categorie come *Spese per bollette e servizi* o *Spese per svago e intrattenimento*.\n\nAlla fine della giornata, il rapporto era pronto: una lista ordinata di bonifici completati, ciascuno corredato di tutti i dettagli richiesti. Il documento sarebbe stato utile non solo per la rendicontazione interna, ma anche per fornire ai clienti una visione chiara e trasparente dei loro movimenti finanziari, rafforzando la fiducia nell’istituto."
+}

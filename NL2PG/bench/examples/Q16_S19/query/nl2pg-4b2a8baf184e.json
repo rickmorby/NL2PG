@@ -1,0 +1,975 @@
+{
+  "schema_ddl": "CREATE TABLE hub_logistici (\n    id INT PRIMARY KEY,\n    codice_hub TEXT NOT NULL UNIQUE,\n    nome_hub TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    tipo_hub TEXT NOT NULL CHECK (tipo_hub IN ('centrale', 'regionale', 'locale')),\n    superficie_mq INT CHECK (superficie_mq > 0),\n    hub_padre_id INT REFERENCES hub_logistici(id)\n);\n\nCREATE TABLE vettori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono TEXT\n);\n\nCREATE TABLE conducenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    numero_patente TEXT NOT NULL UNIQUE,\n    vettore_id INT NOT NULL REFERENCES vettori(id)\n);\n\nCREATE TABLE mezzi (\n    id INT PRIMARY KEY,\n    targa TEXT NOT NULL UNIQUE,\n    tipo_mezzo TEXT NOT NULL CHECK (tipo_mezzo IN ('furgone', 'camion', 'semirimorchio')),\n    capacita_kg NUMERIC(10,2) CHECK (capacita_kg > 0),\n    vettore_id INT NOT NULL REFERENCES vettori(id)\n);\n\nCREATE TABLE percorsi (\n    id INT PRIMARY KEY,\n    origine_id INT NOT NULL REFERENCES hub_logistici(id),\n    destinazione_id INT NOT NULL REFERENCES hub_logistici(id),\n    distanza_km NUMERIC(8,2) CHECK (distanza_km > 0),\n    durata_ore NUMERIC(5,2) CHECK (durata_ore > 0),\n    CHECK (origine_id <> destinazione_id)\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    codice_spedizione TEXT NOT NULL UNIQUE,\n    peso_kg NUMERIC(10,2) NOT NULL CHECK (peso_kg > 0),\n    volume_m3 NUMERIC(8,3) CHECK (volume_m3 > 0),\n    stato_spedizione TEXT NOT NULL CHECK (stato_spedizione IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    data_spedizione DATE NOT NULL,\n    data_consegna DATE,\n    hub_partenza_id INT NOT NULL REFERENCES hub_logistici(id),\n    hub_arrivo_id INT NOT NULL REFERENCES hub_logistici(id),\n    mezzo_id INT REFERENCES mezzi(id),\n    conducente_id INT REFERENCES conducenti(id)\n);\n\nCREATE TABLE fermate (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    hub_id INT NOT NULL REFERENCES hub_logistici(id),\n    sequenza INT NOT NULL CHECK (sequenza > 0),\n    data_arrivo TIMESTAMP,\n    UNIQUE (spedizione_id, sequenza)\n);",
+  "data_profile": {
+    "profile": {
+      "hub_logistici": {
+        "row_count": 422,
+        "columns": {
+          "id": {
+            "distinct": 422,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 422
+          },
+          "codice_hub": {
+            "distinct": 422,
+            "sample": [
+              "HUB-001",
+              "HUB-0011",
+              "HUB-00110",
+              "HUB-00111",
+              "HUB-00112"
+            ]
+          },
+          "nome_hub": {
+            "distinct": 12,
+            "sample": [
+              "Centro Distribuzione Bologna",
+              "Centro Palermo",
+              "Hub Bari Regionale",
+              "Hub Bologna Locale",
+              "Hub Firenze Locale"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "tipo_hub": {
+            "distinct": 3,
+            "sample": [
+              "centrale",
+              "locale",
+              "regionale"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 397,
+            "sample": [
+              "1000",
+              "1009.74",
+              "1012.93",
+              "1016.96",
+              "1017.18"
+            ],
+            "min": 408.07,
+            "max": 7500.0
+          },
+          "hub_padre_id": {
+            "distinct": 196,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "105"
+            ],
+            "min": 1,
+            "max": 406
+          }
+        }
+      },
+      "vettori": {
+        "row_count": 29,
+        "columns": {
+          "id": {
+            "distinct": 29,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 29
+          },
+          "ragione_sociale": {
+            "distinct": 8,
+            "sample": [
+              "Corriere Internazionale S.p.A.",
+              "Corriere Nazionale S.r.l.",
+              "Logistica Nord S.p.A.",
+              "Logistica Rapida S.r.l.",
+              "Logistica Veloce S.p.A."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 29,
+            "sample": [
+              "IT12345678901",
+              "IT123456789011",
+              "IT123456789012",
+              "IT123456789013",
+              "IT123456789014"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "011-9876543",
+              "02-1234567",
+              "02-7654321",
+              "03-1234567",
+              "049-1234567"
+            ]
+          }
+        }
+      },
+      "conducenti": {
+        "row_count": 61,
+        "columns": {
+          "id": {
+            "distinct": 61,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 61
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Anna",
+              "Elena",
+              "Francesca",
+              "Giulia",
+              "Giuseppe"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Colombo",
+              "Ferrari",
+              "Gallo"
+            ]
+          },
+          "numero_patente": {
+            "distinct": 61,
+            "sample": [
+              "AB123456",
+              "AB1234561",
+              "AB12345610",
+              "AB12345611",
+              "AB12345612"
+            ]
+          },
+          "vettore_id": {
+            "distinct": 27,
+            "sample": [
+              "10",
+              "11",
+              "12",
+              "13",
+              "15"
+            ],
+            "min": 2,
+            "max": 29
+          }
+        }
+      },
+      "mezzi": {
+        "row_count": 45,
+        "columns": {
+          "id": {
+            "distinct": 45,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 45
+          },
+          "targa": {
+            "distinct": 45,
+            "sample": [
+              "AB123CD",
+              "AB123CD1",
+              "AB123CD10",
+              "AB123CD11",
+              "AB123CD12"
+            ]
+          },
+          "tipo_mezzo": {
+            "distinct": 3,
+            "sample": [
+              "camion",
+              "furgone",
+              "semirimorchio"
+            ]
+          },
+          "capacita_kg": {
+            "distinct": 43,
+            "sample": [
+              "1712.28",
+              "1716.27",
+              "1716.48",
+              "1753.23",
+              "1766.23"
+            ],
+            "min": 425.05,
+            "max": 4164.4
+          },
+          "vettore_id": {
+            "distinct": 21,
+            "sample": [
+              "10",
+              "12",
+              "13",
+              "14",
+              "15"
+            ],
+            "min": 3,
+            "max": 29
+          }
+        }
+      },
+      "percorsi": {
+        "row_count": 930,
+        "columns": {
+          "id": {
+            "distinct": 930,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 930
+          },
+          "origine_id": {
+            "distinct": 376,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 422
+          },
+          "destinazione_id": {
+            "distinct": 373,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "103"
+            ],
+            "min": 1,
+            "max": 422
+          },
+          "distanza_km": {
+            "distinct": 833,
+            "sample": [
+              "162.45",
+              "162.64",
+              "162.8",
+              "163.28",
+              "163.33"
+            ],
+            "min": 162.45,
+            "max": 678.45
+          },
+          "durata_ore": {
+            "distinct": 277,
+            "sample": [
+              "1.98",
+              "1.99",
+              "2.0",
+              "2.01",
+              "2.02"
+            ],
+            "min": 1.98,
+            "max": 6.28
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 451,
+        "columns": {
+          "id": {
+            "distinct": 451,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 451
+          },
+          "codice_spedizione": {
+            "distinct": 451,
+            "sample": [
+              "SPD-001",
+              "SPD-0011",
+              "SPD-00110",
+              "SPD-00111",
+              "SPD-00112"
+            ]
+          },
+          "peso_kg": {
+            "distinct": 436,
+            "sample": [
+              "100.0",
+              "100.25",
+              "100.64",
+              "101.09",
+              "101.17"
+            ],
+            "min": 22.7,
+            "max": 600.0
+          },
+          "volume_m3": {
+            "distinct": 215,
+            "sample": [
+              "0.15",
+              "0.18",
+              "0.19",
+              "0.21",
+              "0.23"
+            ],
+            "min": 0.15,
+            "max": 4.37
+          },
+          "stato_spedizione": {
+            "distinct": 4,
+            "sample": [
+              "consegnata",
+              "in_preparazione",
+              "in_transito",
+              "rimandata"
+            ]
+          },
+          "data_spedizione": {
+            "distinct": 76,
+            "sample": [
+              "2025-12-06",
+              "2025-12-07",
+              "2025-12-08",
+              "2025-12-09",
+              "2025-12-10"
+            ]
+          },
+          "data_consegna": {
+            "distinct": 12,
+            "sample": [
+              "2026-01-08",
+              "2026-01-09",
+              "2026-01-10",
+              "2026-01-11",
+              "2026-01-12"
+            ]
+          },
+          "hub_partenza_id": {
+            "distinct": 286,
+            "sample": [
+              "10",
+              "100",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 2,
+            "max": 422
+          },
+          "hub_arrivo_id": {
+            "distinct": 271,
+            "sample": [
+              "10",
+              "100",
+              "102",
+              "103",
+              "105"
+            ],
+            "min": 2,
+            "max": 421
+          },
+          "mezzo_id": {
+            "distinct": 45,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 45
+          },
+          "conducente_id": {
+            "distinct": 61,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 61
+          }
+        }
+      },
+      "fermate": {
+        "row_count": 451,
+        "columns": {
+          "id": {
+            "distinct": 451,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 451
+          },
+          "spedizione_id": {
+            "distinct": 451,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 451
+          },
+          "hub_id": {
+            "distinct": 281,
+            "sample": [
+              "1",
+              "10",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 422
+          },
+          "sequenza": {
+            "distinct": 451,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 468
+          },
+          "data_arrivo": {
+            "distinct": 406,
+            "sample": [
+              "2006-04-25 08:00:00",
+              "2006-06-21 08:00:00",
+              "2006-08-21 08:00:00",
+              "2006-09-27 08:00:00",
+              "2006-11-03 08:00:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "hub_logistici": [
+        {
+          "id": 1,
+          "codice_hub": "HUB-001",
+          "nome_hub": "Hub Torino Locale",
+          "citta": "Milano",
+          "tipo_hub": "centrale",
+          "superficie_mq": 5274.8,
+          "hub_padre_id": null
+        },
+        {
+          "id": 2,
+          "codice_hub": "HUB-0011",
+          "nome_hub": "Hub Torino Locale",
+          "citta": "Roma",
+          "tipo_hub": "locale",
+          "superficie_mq": 3499.88,
+          "hub_padre_id": 1
+        },
+        {
+          "id": 3,
+          "codice_hub": "HUB-0012",
+          "nome_hub": "Piattaforma Venezia",
+          "citta": "Bologna",
+          "tipo_hub": "locale",
+          "superficie_mq": 6509.55,
+          "hub_padre_id": 1
+        },
+        {
+          "id": 4,
+          "codice_hub": "HUB-0013",
+          "nome_hub": "Hub Roma Regionale",
+          "citta": "Milano",
+          "tipo_hub": "centrale",
+          "superficie_mq": 4335.68,
+          "hub_padre_id": 2
+        },
+        {
+          "id": 5,
+          "codice_hub": "HUB-0014",
+          "nome_hub": "Hub Torino Locale",
+          "citta": "Milano",
+          "tipo_hub": "centrale",
+          "superficie_mq": 7194.16,
+          "hub_padre_id": 2
+        },
+        {
+          "id": 6,
+          "codice_hub": "HUB-0015",
+          "nome_hub": "Centro Distribuzione Bologna",
+          "citta": "Firenze",
+          "tipo_hub": "locale",
+          "superficie_mq": 4170.66,
+          "hub_padre_id": 3
+        },
+        {
+          "id": 7,
+          "codice_hub": "HUB-0016",
+          "nome_hub": "Centro Distribuzione Bologna",
+          "citta": "Torino",
+          "tipo_hub": "centrale",
+          "superficie_mq": 7285.27,
+          "hub_padre_id": 6
+        },
+        {
+          "id": 8,
+          "codice_hub": "HUB-0017",
+          "nome_hub": "Hub Genova Centrale",
+          "citta": "Genova",
+          "tipo_hub": "locale",
+          "superficie_mq": 3172.68,
+          "hub_padre_id": 7
+        }
+      ],
+      "vettori": [
+        {
+          "id": 1,
+          "ragione_sociale": "Corriere Internazionale S.p.A.",
+          "partita_iva": "IT12345678901",
+          "telefono": "06-7654321"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Trasporti Sud S.r.l.",
+          "partita_iva": "IT123456789011",
+          "telefono": "06-7654321"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Logistica Nord S.p.A.",
+          "partita_iva": "IT123456789012",
+          "telefono": "055-9876543"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Trasporti Express S.r.l.",
+          "partita_iva": "IT123456789013",
+          "telefono": "06-7654321"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Trasporti Express S.r.l.",
+          "partita_iva": "IT123456789014",
+          "telefono": "055-9876543"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Trasporti Est S.r.l.",
+          "partita_iva": "IT123456789015",
+          "telefono": "081-1234567"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Logistica Nord S.p.A.",
+          "partita_iva": "IT98765432109",
+          "telefono": "055-9876543"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Corriere Nazionale S.r.l.",
+          "partita_iva": "IT987654321091",
+          "telefono": "02-1234567"
+        }
+      ],
+      "conducenti": [
+        {
+          "id": 1,
+          "nome": "Anna",
+          "cognome": "Bianchi",
+          "numero_patente": "AB123456",
+          "vettore_id": 28
+        },
+        {
+          "id": 2,
+          "nome": "Giuseppe",
+          "cognome": "Ricci",
+          "numero_patente": "AB1234561",
+          "vettore_id": 16
+        },
+        {
+          "id": 3,
+          "nome": "Marco",
+          "cognome": "Ricci",
+          "numero_patente": "AB1234562",
+          "vettore_id": 5
+        },
+        {
+          "id": 4,
+          "nome": "Elena",
+          "cognome": "Gallo",
+          "numero_patente": "AB1234563",
+          "vettore_id": 2
+        },
+        {
+          "id": 5,
+          "nome": "Giuseppe",
+          "cognome": "Colombo",
+          "numero_patente": "AB1234564",
+          "vettore_id": 3
+        },
+        {
+          "id": 6,
+          "nome": "Luca",
+          "cognome": "Colombo",
+          "numero_patente": "AB1234565",
+          "vettore_id": 16
+        },
+        {
+          "id": 7,
+          "nome": "Mario",
+          "cognome": "Marino",
+          "numero_patente": "AB1234566",
+          "vettore_id": 8
+        },
+        {
+          "id": 8,
+          "nome": "Luca",
+          "cognome": "Bianchi",
+          "numero_patente": "AB1234567",
+          "vettore_id": 12
+        }
+      ],
+      "mezzi": [
+        {
+          "id": 1,
+          "targa": "AB123CD",
+          "tipo_mezzo": "semirimorchio",
+          "capacita_kg": 466.79,
+          "vettore_id": 10
+        },
+        {
+          "id": 2,
+          "targa": "AB123CD1",
+          "tipo_mezzo": "furgone",
+          "capacita_kg": 589.88,
+          "vettore_id": 27
+        },
+        {
+          "id": 3,
+          "targa": "AB123CD2",
+          "tipo_mezzo": "furgone",
+          "capacita_kg": 598.97,
+          "vettore_id": 13
+        },
+        {
+          "id": 4,
+          "targa": "AB123CD3",
+          "tipo_mezzo": "camion",
+          "capacita_kg": 556.52,
+          "vettore_id": 26
+        },
+        {
+          "id": 5,
+          "targa": "AB123CD4",
+          "tipo_mezzo": "camion",
+          "capacita_kg": 537.52,
+          "vettore_id": 28
+        },
+        {
+          "id": 6,
+          "targa": "AB123CD5",
+          "tipo_mezzo": "furgone",
+          "capacita_kg": 425.05,
+          "vettore_id": 24
+        },
+        {
+          "id": 7,
+          "targa": "AB123CD6",
+          "tipo_mezzo": "furgone",
+          "capacita_kg": 483.46,
+          "vettore_id": 26
+        },
+        {
+          "id": 8,
+          "targa": "AB123CD7",
+          "tipo_mezzo": "camion",
+          "capacita_kg": null,
+          "vettore_id": 12
+        }
+      ],
+      "percorsi": [
+        {
+          "id": 1,
+          "origine_id": 10,
+          "destinazione_id": 194,
+          "distanza_km": 556.33,
+          "durata_ore": 5.19
+        },
+        {
+          "id": 2,
+          "origine_id": 287,
+          "destinazione_id": 212,
+          "distanza_km": 633.11,
+          "durata_ore": 6.04
+        },
+        {
+          "id": 3,
+          "origine_id": 18,
+          "destinazione_id": 355,
+          "distanza_km": 633.53,
+          "durata_ore": 5.29
+        },
+        {
+          "id": 4,
+          "origine_id": 137,
+          "destinazione_id": 247,
+          "distanza_km": 661.58,
+          "durata_ore": 6.15
+        },
+        {
+          "id": 5,
+          "origine_id": 220,
+          "destinazione_id": 86,
+          "distanza_km": 609.39,
+          "durata_ore": 5.24
+        },
+        {
+          "id": 6,
+          "origine_id": 52,
+          "destinazione_id": 290,
+          "distanza_km": 567.55,
+          "durata_ore": 5.88
+        },
+        {
+          "id": 7,
+          "origine_id": 287,
+          "destinazione_id": 195,
+          "distanza_km": 579.25,
+          "durata_ore": 5.83
+        },
+        {
+          "id": 8,
+          "origine_id": 107,
+          "destinazione_id": 361,
+          "distanza_km": 616.77,
+          "durata_ore": 5.71
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 1,
+          "codice_spedizione": "SPD-001",
+          "peso_kg": 112.37,
+          "volume_m3": 0.42,
+          "stato_spedizione": "in_preparazione",
+          "data_spedizione": "2026-01-05",
+          "data_consegna": "2026-01-15",
+          "hub_partenza_id": 97,
+          "hub_arrivo_id": 169,
+          "mezzo_id": 8,
+          "conducente_id": 22
+        },
+        {
+          "id": 2,
+          "codice_spedizione": "SPD-0011",
+          "peso_kg": 120.5,
+          "volume_m3": 0.85,
+          "stato_spedizione": "consegnata",
+          "data_spedizione": "2026-01-10",
+          "data_consegna": "2026-01-12",
+          "hub_partenza_id": 390,
+          "hub_arrivo_id": 253,
+          "mezzo_id": 1,
+          "conducente_id": 17
+        },
+        {
+          "id": 3,
+          "codice_spedizione": "SPD-0012",
+          "peso_kg": 104.84,
+          "volume_m3": 1.36,
+          "stato_spedizione": "rimandata",
+          "data_spedizione": "2026-01-10",
+          "data_consegna": "2026-01-15",
+          "hub_partenza_id": 256,
+          "hub_arrivo_id": 86,
+          "mezzo_id": 21,
+          "conducente_id": 34
+        },
+        {
+          "id": 4,
+          "codice_spedizione": "SPD-0013",
+          "peso_kg": 200.48,
+          "volume_m3": 1.08,
+          "stato_spedizione": "consegnata",
+          "data_spedizione": "2026-01-13",
+          "data_consegna": "2026-01-15",
+          "hub_partenza_id": 196,
+          "hub_arrivo_id": 146,
+          "mezzo_id": 3,
+          "conducente_id": 29
+        },
+        {
+          "id": 5,
+          "codice_spedizione": "SPD-0014",
+          "peso_kg": 182.88,
+          "volume_m3": 0.79,
+          "stato_spedizione": "in_transito",
+          "data_spedizione": "2026-01-24",
+          "data_consegna": "2026-01-18",
+          "hub_partenza_id": 87,
+          "hub_arrivo_id": 2,
+          "mezzo_id": 1,
+          "conducente_id": 39
+        },
+        {
+          "id": 6,
+          "codice_spedizione": "SPD-0015",
+          "peso_kg": 200.43,
+          "volume_m3": 0.53,
+          "stato_spedizione": "in_transito",
+          "data_spedizione": "2026-01-30",
+          "data_consegna": "2026-01-17",
+          "hub_partenza_id": 333,
+          "hub_arrivo_id": 121,
+          "mezzo_id": 5,
+          "conducente_id": 55
+        },
+        {
+          "id": 7,
+          "codice_spedizione": "SPD-0016",
+          "peso_kg": 138.61,
+          "volume_m3": 0.5,
+          "stato_spedizione": "in_preparazione",
+          "data_spedizione": "2026-01-06",
+          "data_consegna": "2026-01-13",
+          "hub_partenza_id": 319,
+          "hub_arrivo_id": 199,
+          "mezzo_id": null,
+          "conducente_id": 31
+        },
+        {
+          "id": 8,
+          "codice_spedizione": "SPD-0017",
+          "peso_kg": 77.17,
+          "volume_m3": 0.93,
+          "stato_spedizione": "consegnata",
+          "data_spedizione": "2026-01-25",
+          "data_consegna": "2026-01-13",
+          "hub_partenza_id": 20,
+          "hub_arrivo_id": 362,
+          "mezzo_id": 40,
+          "conducente_id": 52
+        }
+      ],
+      "fermate": [
+        {
+          "id": 1,
+          "spedizione_id": 105,
+          "hub_id": 194,
+          "sequenza": 1,
+          "data_arrivo": "2015-04-05 08:00:00"
+        },
+        {
+          "id": 2,
+          "spedizione_id": 329,
+          "hub_id": 85,
+          "sequenza": 2,
+          "data_arrivo": "2023-10-29 08:00:00"
+        },
+        {
+          "id": 3,
+          "spedizione_id": 289,
+          "hub_id": 352,
+          "sequenza": 3,
+          "data_arrivo": "2024-06-02 08:00:00"
+        },
+        {
+          "id": 4,
+          "spedizione_id": 413,
+          "hub_id": 274,
+          "sequenza": 4,
+          "data_arrivo": "2036-05-21 08:00:00"
+        },
+        {
+          "id": 5,
+          "spedizione_id": 390,
+          "hub_id": 238,
+          "sequenza": 5,
+          "data_arrivo": "2034-06-29 08:00:00"
+        },
+        {
+          "id": 6,
+          "spedizione_id": 45,
+          "hub_id": 92,
+          "sequenza": 6,
+          "data_arrivo": "2034-09-08 08:00:00"
+        },
+        {
+          "id": 7,
+          "spedizione_id": 133,
+          "hub_id": 406,
+          "sequenza": 7,
+          "data_arrivo": "2044-09-29 08:00:00"
+        },
+        {
+          "id": 8,
+          "spedizione_id": 152,
+          "hub_id": 339,
+          "sequenza": 8,
+          "data_arrivo": "2028-10-19 08:00:00"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "recursive_cte"
+  ],
+  "query": "WITH RECURSIVE albero_hub AS (SELECT h.id, h.codice_hub, h.nome_hub, h.citta, h.tipo_hub, 0 AS livello FROM hub_logistici h WHERE h.codice_hub = 'HUB-001' UNION ALL SELECT f.id, f.codice_hub, f.nome_hub, f.citta, f.tipo_hub, a.livello + 1 FROM hub_logistici f JOIN albero_hub a ON f.hub_padre_id = a.id) SELECT a.codice_hub, a.nome_hub, a.citta, a.tipo_hub, a.livello, COUNT(s.id) AS spedizioni_partite, COALESCE(ROUND(SUM(s.peso_kg), 2), 0) AS peso_totale_kg FROM albero_hub a LEFT JOIN spedizioni s ON s.hub_partenza_id = a.id GROUP BY a.codice_hub, a.nome_hub, a.citta, a.tipo_hub, a.livello ORDER BY a.livello ASC, peso_totale_kg DESC, a.codice_hub ASC;"
+}

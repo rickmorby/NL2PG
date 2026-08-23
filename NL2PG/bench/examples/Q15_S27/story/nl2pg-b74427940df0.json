@@ -1,0 +1,754 @@
+{
+  "schema_ddl": "CREATE TABLE immobili (\n    id SERIAL PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    comune TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    cap TEXT,\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani > 0),\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'terreno', 'ufficio', 'negozio')),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato IN ('disponibile', 'riservato', 'venduto', 'ritirato')),\n    data_inserimento DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    budget_massimo NUMERIC(12,2) CHECK (budget_massimo >= 0),\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE agenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    agenzia TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    quota_commissione NUMERIC(5,2) NOT NULL DEFAULT 3.00 CHECK (quota_commissione BETWEEN 0 AND 100)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    immobile_id INT NOT NULL,\n    cliente_id INT NOT NULL,\n    agente_id INT,\n    data_firma DATE NOT NULL,\n    data_scadenza DATE,\n    prezzo_concordato NUMERIC(12,2) NOT NULL CHECK (prezzo_concordato >= 0),\n    acconto NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (acconto >= 0),\n    stato TEXT NOT NULL DEFAULT 'proposta' CHECK (stato IN ('proposta', 'accettato', 'rogito', 'annullato')),\n    CHECK (data_scadenza IS NULL OR data_scadenza >= data_firma)\n);",
+  "data_profile": {
+    "profile": {
+      "immobili": {
+        "row_count": 686,
+        "columns": {
+          "id": {
+            "distinct": 686,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 686
+          },
+          "indirizzo": {
+            "distinct": 14,
+            "sample": [
+              "Corso Italia 33",
+              "Corso Vittorio Emanuele II 45",
+              "Piazza della Repubblica 8",
+              "Strada Vicinale dei Colli 3",
+              "Via Dante Alighieri 5"
+            ]
+          },
+          "comune": {
+            "distinct": 7,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "provincia": {
+            "distinct": 7,
+            "sample": [
+              "BO",
+              "FI",
+              "MI",
+              "NA",
+              "RM"
+            ]
+          },
+          "cap": {
+            "distinct": 7,
+            "sample": [
+              "00184",
+              "10121",
+              "20121",
+              "40121",
+              "50122"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 657,
+            "sample": [
+              "100.03",
+              "100.45",
+              "100.74",
+              "101.8",
+              "101.97"
+            ],
+            "min": 36.0,
+            "max": 9000.0
+          },
+          "numero_vani": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 8
+          },
+          "tipo_immobile": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "negozio",
+              "terreno",
+              "ufficio",
+              "villa"
+            ]
+          },
+          "prezzo_richiesto": {
+            "distinct": 665,
+            "sample": [
+              "101604.22",
+              "102530.78",
+              "104546.33",
+              "104906.23",
+              "105561.92"
+            ],
+            "min": 84000.0,
+            "max": 982575.75
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "disponibile",
+              "riservato",
+              "ritirato",
+              "venduto"
+            ]
+          },
+          "data_inserimento": {
+            "distinct": 241,
+            "sample": [
+              "2025-04-13",
+              "2025-04-14",
+              "2025-04-16",
+              "2025-04-18",
+              "2025-04-20"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 201,
+        "columns": {
+          "id": {
+            "distinct": 201,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 201
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Ferrari",
+              "Gallo",
+              "Mancini"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 201,
+            "sample": [
+              "BNCLRA90C45H501B",
+              "BNCLRA90C45H501C",
+              "BNCLRA90C45H501D",
+              "BNCLRA90C45H501E",
+              "BNCLRA90C45H501F"
+            ]
+          },
+          "email": {
+            "distinct": 194,
+            "sample": [
+              "alessandro.ferrari10@email.it",
+              "alessandro.ferrari11@email.it",
+              "alessandro.ferrari12@email.it",
+              "alessandro.ferrari13@email.it",
+              "alessandro.ferrari14@email.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 8,
+            "sample": [
+              "0109988776",
+              "0112223344",
+              "0234567890",
+              "0559876543",
+              "0612345678"
+            ]
+          },
+          "budget_massimo": {
+            "distinct": 160,
+            "sample": [
+              "1011043.35",
+              "1058095.44",
+              "1066316.8",
+              "1096525.6",
+              "1106462.0"
+            ],
+            "min": 114802.26,
+            "max": 1108178.67
+          },
+          "data_registrazione": {
+            "distinct": 140,
+            "sample": [
+              "2024-12-21",
+              "2024-12-28",
+              "2025-01-11",
+              "2025-01-17",
+              "2025-01-22"
+            ]
+          }
+        }
+      },
+      "agenti": {
+        "row_count": 9,
+        "columns": {
+          "id": {
+            "distinct": 9,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 9
+          },
+          "nome": {
+            "distinct": 4,
+            "sample": [
+              "Giorgia",
+              "Marco",
+              "Paolo",
+              "Sara"
+            ]
+          },
+          "cognome": {
+            "distinct": 7,
+            "sample": [
+              "Barbieri",
+              "Fontana",
+              "Gatti",
+              "Moretti",
+              "Neri"
+            ]
+          },
+          "agenzia": {
+            "distinct": 3,
+            "sample": [
+              "Casa Mia Agenzia",
+              "Gruppo Abitare",
+              "Immobiliare Centrale"
+            ]
+          },
+          "email": {
+            "distinct": 9,
+            "sample": [
+              "elena.gatti1@casamia.it",
+              "elena.gatti@casamia.it",
+              "fabio.moretti1@tecnocasacolli.it",
+              "fabio.moretti@tecnocasacolli.it",
+              "luca.barbieri@agenziasole.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "0106655443",
+              "0277889900",
+              "0553344556",
+              "0644556677",
+              "0817766554"
+            ]
+          },
+          "quota_commissione": {
+            "distinct": 9,
+            "sample": [
+              "1.55",
+              "2.17",
+              "2.41",
+              "2.79",
+              "2.8"
+            ],
+            "min": 1.55,
+            "max": 5.83
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 1367,
+        "columns": {
+          "id": {
+            "distinct": 1367,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1367
+          },
+          "immobile_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "cliente_id": {
+            "distinct": 6,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 6
+          },
+          "agente_id": {
+            "distinct": 4,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 4
+          },
+          "data_firma": {
+            "distinct": 249,
+            "sample": [
+              "2025-07-02",
+              "2025-07-04",
+              "2025-07-05",
+              "2025-07-06",
+              "2025-07-08"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 165,
+            "sample": [
+              "2025-12-30",
+              "2025-12-31",
+              "2026-01-01",
+              "2026-01-02",
+              "2026-01-03"
+            ]
+          },
+          "prezzo_concordato": {
+            "distinct": 1321,
+            "sample": [
+              "100776.46",
+              "100881.39",
+              "101416.25",
+              "101942.65",
+              "102088.64"
+            ],
+            "min": 80500.0,
+            "max": 840000.0
+          },
+          "acconto": {
+            "distinct": 1098,
+            "sample": [
+              "0",
+              "0.0",
+              "10090.37",
+              "10171.86",
+              "10239.19"
+            ],
+            "min": 0.0,
+            "max": 90000.0
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "accettato",
+              "annullato",
+              "proposta",
+              "rogito"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "immobili": [
+        {
+          "id": 1,
+          "indirizzo": "Via Dante Alighieri 5",
+          "comune": "Roma",
+          "provincia": "RM",
+          "cap": "00184",
+          "superficie_mq": 80.77,
+          "numero_vani": 3,
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 269671.51,
+          "stato": "riservato",
+          "data_inserimento": "2025-07-14"
+        },
+        {
+          "id": 2,
+          "indirizzo": "Corso Italia 33",
+          "comune": "Roma",
+          "provincia": "RM",
+          "cap": "00184",
+          "superficie_mq": 102.9,
+          "numero_vani": 3,
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 430056.35,
+          "stato": "disponibile",
+          "data_inserimento": "2025-11-02"
+        },
+        {
+          "id": 3,
+          "indirizzo": "Via Dante Alighieri 5",
+          "comune": "Roma",
+          "provincia": "RM",
+          "cap": "00184",
+          "superficie_mq": 105.59,
+          "numero_vani": 3,
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 287574.64,
+          "stato": "venduto",
+          "data_inserimento": "2025-10-20"
+        },
+        {
+          "id": 4,
+          "indirizzo": "Via Roma 12",
+          "comune": "Roma",
+          "provincia": "RM",
+          "cap": "00184",
+          "superficie_mq": 86.16,
+          "numero_vani": 3,
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 302814.53,
+          "stato": "disponibile",
+          "data_inserimento": "2025-10-15"
+        },
+        {
+          "id": 5,
+          "indirizzo": "Corso Italia 33",
+          "comune": "Roma",
+          "provincia": "RM",
+          "cap": "00184",
+          "superficie_mq": 90.37,
+          "numero_vani": 3,
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 373117.2,
+          "stato": "ritirato",
+          "data_inserimento": "2025-10-24"
+        },
+        {
+          "id": 6,
+          "indirizzo": "Via Mazzini 9",
+          "comune": "Roma",
+          "provincia": "RM",
+          "cap": "00184",
+          "superficie_mq": 90.08,
+          "numero_vani": 3,
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 452256.76,
+          "stato": "disponibile",
+          "data_inserimento": "2025-11-14"
+        },
+        {
+          "id": 7,
+          "indirizzo": "Via Garibaldi 21",
+          "comune": "Roma",
+          "provincia": "RM",
+          "cap": "00184",
+          "superficie_mq": 104.45,
+          "numero_vani": 3,
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 284150.65,
+          "stato": "disponibile",
+          "data_inserimento": "2025-08-04"
+        },
+        {
+          "id": 8,
+          "indirizzo": "Viale Trieste 40",
+          "comune": "Roma",
+          "provincia": "RM",
+          "cap": "00184",
+          "superficie_mq": 123.33,
+          "numero_vani": 3,
+          "tipo_immobile": "appartamento",
+          "prezzo_richiesto": 309872.36,
+          "stato": "venduto",
+          "data_inserimento": "2025-08-10"
+        }
+      ],
+      "clienti": [
+        {
+          "id": 15,
+          "nome": "Laura",
+          "cognome": "Ricci",
+          "codice_fiscale": "RSSMRC85M01H501O",
+          "email": "laura.ricci1@example.com",
+          "telefono": "0701122334",
+          "budget_massimo": 194701.96,
+          "data_registrazione": "2025-05-01"
+        },
+        {
+          "id": 59,
+          "nome": "Sara",
+          "cognome": "Mancini",
+          "codice_fiscale": "BNCLRA90C45H501Z",
+          "email": "sara.mancini1@example.com",
+          "telefono": "0815551234",
+          "budget_massimo": 651825.03,
+          "data_registrazione": "2025-07-19"
+        },
+        {
+          "id": 137,
+          "nome": "Francesca",
+          "cognome": "Mancini",
+          "codice_fiscale": "RMNCHR95D30H501B",
+          "email": "francesca.mancini1@example.com",
+          "telefono": "0815551234",
+          "budget_massimo": null,
+          "data_registrazione": "2025-09-20"
+        },
+        {
+          "id": 85,
+          "nome": "Laura",
+          "cognome": "Mancini",
+          "codice_fiscale": "VRDGLI88A12H501Q",
+          "email": "laura.mancini1@example.com",
+          "telefono": null,
+          "budget_massimo": 281605.13,
+          "data_registrazione": "2025-05-25"
+        },
+        {
+          "id": 95,
+          "nome": "Marco",
+          "cognome": "Mancini",
+          "codice_fiscale": "VRDGLI88A12H528B",
+          "email": "marco.mancini1@example.com",
+          "telefono": null,
+          "budget_massimo": null,
+          "data_registrazione": "2025-03-18"
+        },
+        {
+          "id": 3,
+          "nome": "Alessandro",
+          "cognome": "Ferrari",
+          "codice_fiscale": "RSSMRC85M01H501C",
+          "email": "alessandro.ferrari1@email.it",
+          "telefono": "0701122334",
+          "budget_massimo": 163610.26,
+          "data_registrazione": "2025-06-10"
+        },
+        {
+          "id": 14,
+          "nome": "Chiara",
+          "cognome": "Conti",
+          "codice_fiscale": "RSSMRC85M01H501N",
+          "email": "chiara.conti1@email.it",
+          "telefono": "0234567890",
+          "budget_massimo": 360357.45,
+          "data_registrazione": "2025-02-16"
+        },
+        {
+          "id": 182,
+          "nome": "Chiara",
+          "cognome": "Mancini",
+          "codice_fiscale": "CNTDVD87E15H501N",
+          "email": "chiara.mancini1@example.com",
+          "telefono": "0234567890",
+          "budget_massimo": null,
+          "data_registrazione": "2025-08-24"
+        }
+      ],
+      "agenti": [
+        {
+          "id": 1,
+          "nome": "Marco",
+          "cognome": "Neri",
+          "agenzia": "Gruppo Abitare",
+          "email": "paolo.neri@immobiliarecentrale.it",
+          "telefono": "0817766554",
+          "quota_commissione": 4.33
+        },
+        {
+          "id": 2,
+          "nome": "Paolo",
+          "cognome": "Fontana",
+          "agenzia": "Immobiliare Centrale",
+          "email": "paolo.neri1@immobiliarecentrale.it",
+          "telefono": "0106655443",
+          "quota_commissione": 2.79
+        },
+        {
+          "id": 3,
+          "nome": "Giorgia",
+          "cognome": "Gatti",
+          "agenzia": "Immobiliare Centrale",
+          "email": "elena.gatti@casamia.it",
+          "telefono": "0277889900",
+          "quota_commissione": 2.17
+        },
+        {
+          "id": 4,
+          "nome": "Marco",
+          "cognome": "Fontana",
+          "agenzia": "Casa Mia Agenzia",
+          "email": "elena.gatti1@casamia.it",
+          "telefono": "0644556677",
+          "quota_commissione": 2.8
+        },
+        {
+          "id": 5,
+          "nome": "Marco",
+          "cognome": "Serra",
+          "agenzia": "Casa Mia Agenzia",
+          "email": "fabio.moretti@tecnocasacolli.it",
+          "telefono": null,
+          "quota_commissione": 4.45
+        },
+        {
+          "id": 6,
+          "nome": "Sara",
+          "cognome": "Moretti",
+          "agenzia": "Gruppo Abitare",
+          "email": "fabio.moretti1@tecnocasacolli.it",
+          "telefono": null,
+          "quota_commissione": 4.48
+        },
+        {
+          "id": 7,
+          "nome": "Marco",
+          "cognome": "Neri",
+          "agenzia": "Gruppo Abitare",
+          "email": "sara.longo@immobiliarecentrale.it",
+          "telefono": "0644556677",
+          "quota_commissione": 2.41
+        },
+        {
+          "id": 8,
+          "nome": "Sara",
+          "cognome": "Barbieri",
+          "agenzia": "Gruppo Abitare",
+          "email": "sara.longo1@immobiliarecentrale.it",
+          "telefono": "0106655443",
+          "quota_commissione": 1.55
+        }
+      ],
+      "contratti": [
+        {
+          "id": 1,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_firma": "2025-10-20",
+          "data_scadenza": "2026-03-26",
+          "prezzo_concordato": 278870.15,
+          "acconto": 7211.94,
+          "stato": "accettato"
+        },
+        {
+          "id": 2,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_firma": "2025-10-07",
+          "data_scadenza": "2026-04-27",
+          "prezzo_concordato": 236098.85,
+          "acconto": 19939.31,
+          "stato": "proposta"
+        },
+        {
+          "id": 3,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_firma": "2025-11-23",
+          "data_scadenza": "2026-03-28",
+          "prezzo_concordato": 230062.48,
+          "acconto": 19190.52,
+          "stato": "accettato"
+        },
+        {
+          "id": 4,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_firma": "2026-01-15",
+          "data_scadenza": null,
+          "prezzo_concordato": 218126.92,
+          "acconto": 14098.31,
+          "stato": "accettato"
+        },
+        {
+          "id": 5,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_firma": "2025-12-17",
+          "data_scadenza": "2026-04-14",
+          "prezzo_concordato": 222011.21,
+          "acconto": 17687.65,
+          "stato": "proposta"
+        },
+        {
+          "id": 6,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_firma": "2025-11-09",
+          "data_scadenza": "2026-03-18",
+          "prezzo_concordato": 268833.13,
+          "acconto": 19570.19,
+          "stato": "proposta"
+        },
+        {
+          "id": 7,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_firma": "2025-11-19",
+          "data_scadenza": "2026-03-17",
+          "prezzo_concordato": 354313.87,
+          "acconto": 10498.64,
+          "stato": "rogito"
+        },
+        {
+          "id": 8,
+          "immobile_id": 1,
+          "cliente_id": 1,
+          "agente_id": 1,
+          "data_firma": "2025-10-25",
+          "data_scadenza": "2026-05-02",
+          "prezzo_concordato": 262140.73,
+          "acconto": 18849.06,
+          "stato": "annullato"
+        }
+      ]
+    }
+  },
+  "story": "Nella sede centrale dell'agenzia immobiliare, il direttore commerciale ha indetto una verifica trimestrale sulla produttività dei collaboratori, con l'obiettivo di premiare i professionisti più efficaci nel portare le trattative fino alla conclusione. Il punto di partenza dell'analisi è l'archivio denominato schede_catastali, nel quale sono custodite le schede descrittive di ogni immobile in portafoglio: per ciascuna scheda risultano annotati l'indirizzo completo, il comune e la provincia di ubicazione, il codice di avviamento postale, la superficie espressa in metri quadrati, il numero dei vani, la tipologia dell'immobile — che può trattarsi di appartamento, villa, terreno, ufficio o negozio — il prezzo richiesto, lo stato di lavorazione, che alterna le voci disponibile, riservato, venduto e ritirato, nonché la data di inserimento in archivio. In parallelo, il registro degli acquirenti conserva le anagrafiche dei potenziali compratori, con nome, cognome, codice fiscale, recapiti di posta elettronica e numeri di telefono, il budget massimo dichiarato e la data di registrazione in rubrica. Il registro degli agenti, invece, elenca i nove professionisti attivi, ripartiti tra le agenzie Gruppo Abitare, Immobiliare Centrale e Casa Mia Agenzia; per ciascuno di essi è indicata la quota di commissione percentuale pattuita, che parte da valori minimi intorno all'1,55 per cento fino a superare il 5 per cento. Il cuore della verifica è rappresentato dal registro dei compromessi, ossia dei contratti preliminari di compravendita: ogni compromesso riporta l'immobile interessato, l'acquirente coinvolto, l'agente che ha seguito la trattativa, la data di firma, l'eventuale data di scadenza — mai anteriore alla firma stessa, come previsto dai controlli interni — il prezzo concordato, l'acconto versato e lo stato della pratica, che può assumere le voci proposta, accettato, rogito o annullato. Gli analisti hanno quindi isolato i compromessi giunti allo stato rogito: per ciascun agente hanno contato il numero di rogiti firmati e sommato i relativi prezzi concordati, ottenendo il volume di affari complessivo. Applicando a tale volume la quota di commissione propria di ogni professionista, hanno stimato il compenso atteso e predisposto la classifica finale, ordinata per commissione decrescente, dalla posizione più alta fino all'ultima, pronta per essere presentata al comitato direttivo."
+}

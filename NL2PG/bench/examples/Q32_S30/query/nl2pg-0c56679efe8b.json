@@ -1,0 +1,1380 @@
+{
+  "schema_ddl": "CREATE TABLE articoli (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    unita_misura TEXT NOT NULL DEFAULT 'PZ',\n    prezzo_standard NUMERIC(10,2) CHECK (prezzo_standard >= 0),\n    peso_kg NUMERIC(8,3) CHECK (peso_kg >= 0),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE articoli_obsoleti (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    data_dismissione DATE NOT NULL,\n    motivo_dismissione TEXT\n);\n\nCREATE TABLE articoli_servizio (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    tariffa_oraria NUMERIC(8,2) CHECK (tariffa_oraria >= 0)\n);\n\nCREATE TABLE archivio_articoli (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL,\n    descrizione TEXT,\n    data_archiviazione DATE NOT NULL,\n    note_archivio TEXT\n);\n\nCREATE TABLE magazzini (\n    id SERIAL PRIMARY KEY,\n    codice_magazzino TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    ubicazione TEXT\n);\n\nCREATE TABLE centri_costo (\n    id SERIAL PRIMARY KEY,\n    codice_centro TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    responsabile TEXT,\n    budget_annuo NUMERIC(12,2) CHECK (budget_annuo >= 0)\n);\n\nCREATE TABLE centri_ricavo (\n    id SERIAL PRIMARY KEY,\n    codice_centro TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    target_ricavi_annui NUMERIC(12,2) CHECK (target_ricavi_annui >= 0)\n);\n\nCREATE TABLE piani_dei_conti (\n    id SERIAL PRIMARY KEY,\n    codice_conto TEXT NOT NULL UNIQUE,\n    descrizione_conto TEXT NOT NULL,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('attivo', 'passivo', 'costo', 'ricavo'))\n);\n\nCREATE TABLE movimenti_magazzino (\n    id BIGSERIAL PRIMARY KEY,\n    articolo_id INT NOT NULL REFERENCES articoli(id),\n    magazzino_id INT NOT NULL REFERENCES magazzini(id),\n    centro_costo_id INT REFERENCES centri_costo(id),\n    data_movimento DATE NOT NULL,\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('carico', 'scarico', 'trasferimento')),\n    quantita NUMERIC(12,3) NOT NULL CHECK (quantita <> 0),\n    costo_unitario NUMERIC(10,2) CHECK (costo_unitario >= 0),\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE movimenti_vendite (\n    id BIGSERIAL PRIMARY KEY,\n    articolo_id INT NOT NULL REFERENCES articoli(id),\n    data_vendita DATE NOT NULL,\n    quantita_venduta NUMERIC(12,3) NOT NULL CHECK (quantita_venduta > 0),\n    prezzo_vendita NUMERIC(10,2) NOT NULL CHECK (prezzo_vendita >= 0)\n);\n\nCREATE TABLE movimenti_contabili (\n    id BIGSERIAL PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES piani_dei_conti(id),\n    centro_costo_id INT REFERENCES centri_costo(id),\n    data_registrazione DATE NOT NULL,\n    importo_dare NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_dare >= 0),\n    importo_avere NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_avere >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "articoli": {
+        "row_count": 135,
+        "columns": {
+          "id": {
+            "distinct": 135,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 135
+          },
+          "codice_articolo": {
+            "distinct": 135,
+            "sample": [
+              "ART-0001",
+              "ART-00011",
+              "ART-000110",
+              "ART-000111",
+              "ART-000112"
+            ]
+          },
+          "descrizione": {
+            "distinct": 11,
+            "sample": [
+              "Cavo elettrico H07V-K 2.5mm",
+              "Cinghia trapeziale sezione A 1000",
+              "Cuscinetto a sfera 6205-2RS",
+              "Dado esagonale M8 zincato",
+              "Filtro aria cartuccia industriale"
+            ]
+          },
+          "unita_misura": {
+            "distinct": 4,
+            "sample": [
+              "KG",
+              "LT",
+              "MT",
+              "PZ"
+            ]
+          },
+          "prezzo_standard": {
+            "distinct": 111,
+            "sample": [
+              "0.04",
+              "0.05",
+              "0.06",
+              "0.08",
+              "0.09"
+            ],
+            "min": 0.04,
+            "max": 48.0
+          },
+          "peso_kg": {
+            "distinct": 64,
+            "sample": [
+              "0.0",
+              "0.004",
+              "0.01",
+              "0.02",
+              "0.05"
+            ],
+            "min": 0.0,
+            "max": 2.56
+          },
+          "attivo": {
+            "distinct": 3,
+            "sample": [
+              "True",
+              "false",
+              "true"
+            ],
+            "min": true,
+            "max": true
+          },
+          "creato_il": {
+            "distinct": 129,
+            "sample": [
+              "2023-06-29 10:15:00",
+              "2023-07-02 08:30:00",
+              "2023-07-16 08:30:00",
+              "2023-07-20 08:30:00",
+              "2023-08-18 08:30:00"
+            ]
+          }
+        }
+      },
+      "articoli_obsoleti": {
+        "row_count": 28,
+        "columns": {
+          "id": {
+            "distinct": 28,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 28
+          },
+          "codice_articolo": {
+            "distinct": 28,
+            "sample": [
+              "OBS-1001",
+              "OBS-10011",
+              "OBS-10012",
+              "OBS-10013",
+              "OBS-10014"
+            ]
+          },
+          "descrizione": {
+            "distinct": 7,
+            "sample": [
+              "Lampada a incandescenza 100W E27",
+              "Lampada alogena 150W R7s",
+              "Nastro trasportatore in gomma 3m",
+              "Pompa centrifuga monostadio 0.5CV",
+              "Saldatrice elettrodo 140A"
+            ]
+          },
+          "data_dismissione": {
+            "distinct": 28,
+            "sample": [
+              "2024-02-08",
+              "2024-03-10",
+              "2024-04-01",
+              "2024-04-02",
+              "2024-04-08"
+            ]
+          },
+          "motivo_dismissione": {
+            "distinct": 6,
+            "sample": [
+              "articolo fuori produzione",
+              "bassa rotazione",
+              "fornitore non più attivo",
+              "normativa obsoleta",
+              "richiesta della direzione"
+            ]
+          }
+        }
+      },
+      "articoli_servizio": {
+        "row_count": 36,
+        "columns": {
+          "id": {
+            "distinct": 36,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 36
+          },
+          "codice_articolo": {
+            "distinct": 36,
+            "sample": [
+              "SRV-2001",
+              "SRV-20011",
+              "SRV-20012",
+              "SRV-20013",
+              "SRV-20014"
+            ]
+          },
+          "descrizione": {
+            "distinct": 10,
+            "sample": [
+              "Assistenza tecnica in loco",
+              "Collaudo sicurezza macchine",
+              "Diagnosi guasti in remoto",
+              "Formazione avanzata operatori",
+              "Installazione e collaudo linea"
+            ]
+          },
+          "tariffa_oraria": {
+            "distinct": 35,
+            "sample": [
+              "101.33",
+              "30.94",
+              "32.02",
+              "32.22",
+              "40.96"
+            ],
+            "min": 30.94,
+            "max": 101.33
+          }
+        }
+      },
+      "archivio_articoli": {
+        "row_count": 45,
+        "columns": {
+          "id": {
+            "distinct": 45,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 45
+          },
+          "codice_articolo": {
+            "distinct": 8,
+            "sample": [
+              "ART-0450",
+              "ART-0512",
+              "ART-0603",
+              "ART-0711",
+              "ART-0820"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Cabinet metallico 600x400",
+              "Motore elettrico 1.1kW 2 poli",
+              "Pannello comandi relay obsoleto",
+              "Pompa idraulica ingranaggi 8 cc/giro",
+              "Sensore induttivo M18 PNP"
+            ]
+          },
+          "data_archiviazione": {
+            "distinct": 43,
+            "sample": [
+              "2024-09-13",
+              "2024-09-30",
+              "2024-10-02",
+              "2024-10-14",
+              "2024-11-02"
+            ]
+          },
+          "note_archivio": {
+            "distinct": 6,
+            "sample": [
+              "articolo non più a catalogo",
+              "articolo non più a catalogo dal 2024",
+              "componente non più supportato",
+              "dismesso su richiesta direzione",
+              "fusione con articolo affine"
+            ]
+          }
+        }
+      },
+      "magazzini": {
+        "row_count": 12,
+        "columns": {
+          "id": {
+            "distinct": 12,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "2"
+            ],
+            "min": 1,
+            "max": 12
+          },
+          "codice_magazzino": {
+            "distinct": 12,
+            "sample": [
+              "MAG-01",
+              "MAG-011",
+              "MAG-02",
+              "MAG-021",
+              "MAG-03"
+            ]
+          },
+          "denominazione": {
+            "distinct": 6,
+            "sample": [
+              "Deposito centrale Bologna",
+              "Deposito nord Torino",
+              "Magazzino centrale Milano",
+              "Magazzino esterno Padova",
+              "Magazzino materiali Verona"
+            ]
+          },
+          "ubicazione": {
+            "distinct": 6,
+            "sample": [
+              "Bologna",
+              "Milano",
+              "Napoli",
+              "Padova",
+              "Torino"
+            ]
+          }
+        }
+      },
+      "centri_costo": {
+        "row_count": 39,
+        "columns": {
+          "id": {
+            "distinct": 39,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 39
+          },
+          "codice_centro": {
+            "distinct": 39,
+            "sample": [
+              "CC-100",
+              "CC-1001",
+              "CC-1002",
+              "CC-1003",
+              "CC-1004"
+            ]
+          },
+          "denominazione": {
+            "distinct": 6,
+            "sample": [
+              "Amministrazione",
+              "Logistica e magazzini",
+              "Manutenzione impianti",
+              "Produzione linea A",
+              "Produzione linea B"
+            ]
+          },
+          "responsabile": {
+            "distinct": 7,
+            "sample": [
+              "Anna Vitale",
+              "Chiara Fontana",
+              "Davide Greco",
+              "Elena Galli",
+              "Luca Moretti"
+            ]
+          },
+          "budget_annuo": {
+            "distinct": 38,
+            "sample": [
+              "111311.78",
+              "131224.88",
+              "146541.92",
+              "152128.4",
+              "157171.62"
+            ],
+            "min": 111311.78,
+            "max": 692165.93
+          }
+        }
+      },
+      "centri_ricavo": {
+        "row_count": 34,
+        "columns": {
+          "id": {
+            "distinct": 34,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 34
+          },
+          "codice_centro": {
+            "distinct": 34,
+            "sample": [
+              "CR-100",
+              "CR-1001",
+              "CR-1002",
+              "CR-1003",
+              "CR-1004"
+            ]
+          },
+          "denominazione": {
+            "distinct": 5,
+            "sample": [
+              "E-commerce",
+              "Rete distributori nord",
+              "Servizi post-vendita",
+              "Vendite dirette Italia",
+              "Vendite estero UE"
+            ]
+          },
+          "target_ricavi_annui": {
+            "distinct": 33,
+            "sample": [
+              "1120373.97",
+              "1124307.13",
+              "1200000.0",
+              "1226687.57",
+              "1374997.18"
+            ],
+            "min": 340182.21,
+            "max": 3339724.57
+          }
+        }
+      },
+      "piani_dei_conti": {
+        "row_count": 50,
+        "columns": {
+          "id": {
+            "distinct": 50,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 50
+          },
+          "codice_conto": {
+            "distinct": 50,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ]
+          },
+          "descrizione_conto": {
+            "distinct": 8,
+            "sample": [
+              "Banca c/c operativa",
+              "Cassa",
+              "Costi per materiali di consumo",
+              "Costi per servizi",
+              "Crediti verso clienti"
+            ]
+          },
+          "tipo_conto": {
+            "distinct": 4,
+            "sample": [
+              "attivo",
+              "costo",
+              "passivo",
+              "ricavo"
+            ]
+          }
+        }
+      },
+      "movimenti_magazzino": {
+        "row_count": 2008,
+        "columns": {
+          "id": {
+            "distinct": 2008,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2008
+          },
+          "articolo_id": {
+            "distinct": 135,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 135
+          },
+          "magazzino_id": {
+            "distinct": 12,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "2"
+            ],
+            "min": 1,
+            "max": 12
+          },
+          "centro_costo_id": {
+            "distinct": 39,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 39
+          },
+          "data_movimento": {
+            "distinct": 169,
+            "sample": [
+              "2025-08-07",
+              "2025-08-08",
+              "2025-08-09",
+              "2025-08-10",
+              "2025-08-11"
+            ]
+          },
+          "tipo_movimento": {
+            "distinct": 3,
+            "sample": [
+              "carico",
+              "scarico",
+              "trasferimento"
+            ]
+          },
+          "quantita": {
+            "distinct": 1902,
+            "sample": [
+              "-100.09",
+              "-103.08",
+              "-103.85",
+              "-103.98",
+              "-104.07"
+            ],
+            "min": -300.0,
+            "max": 1000.0
+          },
+          "costo_unitario": {
+            "distinct": 780,
+            "sample": [
+              "0.05",
+              "0.06",
+              "0.07",
+              "0.08",
+              "0.09"
+            ],
+            "min": 0.05,
+            "max": 41.58
+          },
+          "creato_il": {
+            "distinct": 6,
+            "sample": [
+              "2025-11-05 09:10:00",
+              "2025-11-18 14:25:00",
+              "2025-12-02 08:40:00",
+              "2025-12-15 11:05:00",
+              "2026-01-09 15:30:00"
+            ]
+          }
+        }
+      },
+      "movimenti_vendite": {
+        "row_count": 395,
+        "columns": {
+          "id": {
+            "distinct": 395,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 395
+          },
+          "articolo_id": {
+            "distinct": 127,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 135
+          },
+          "data_vendita": {
+            "distinct": 141,
+            "sample": [
+              "2025-08-12",
+              "2025-08-13",
+              "2025-08-17",
+              "2025-08-20",
+              "2025-08-21"
+            ]
+          },
+          "quantita_venduta": {
+            "distinct": 383,
+            "sample": [
+              "10.0",
+              "10.34",
+              "10.4",
+              "10.41",
+              "10.44"
+            ],
+            "min": 3.2,
+            "max": 495.28
+          },
+          "prezzo_vendita": {
+            "distinct": 261,
+            "sample": [
+              "0.13",
+              "0.14",
+              "0.15",
+              "0.16",
+              "0.17"
+            ],
+            "min": 0.13,
+            "max": 19.42
+          }
+        }
+      },
+      "movimenti_contabili": {
+        "row_count": 1757,
+        "columns": {
+          "id": {
+            "distinct": 1757,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1757
+          },
+          "conto_id": {
+            "distinct": 50,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 50
+          },
+          "centro_costo_id": {
+            "distinct": 39,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 39
+          },
+          "data_registrazione": {
+            "distinct": 163,
+            "sample": [
+              "2025-09-01",
+              "2025-09-02",
+              "2025-09-03",
+              "2025-09-04",
+              "2025-09-05"
+            ]
+          },
+          "importo_dare": {
+            "distinct": 1131,
+            "sample": [
+              "0.0",
+              "10036.57",
+              "1004.59",
+              "10055.42",
+              "10106.93"
+            ],
+            "min": 0.0,
+            "max": 31801.5
+          },
+          "importo_avere": {
+            "distinct": 576,
+            "sample": [
+              "0.0",
+              "10012.22",
+              "10104.66",
+              "10131.58",
+              "10316.94"
+            ],
+            "min": 0.0,
+            "max": 90400.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "articoli": [
+        {
+          "id": 1,
+          "codice_articolo": "ART-0001",
+          "descrizione": "Cuscinetto a sfera 6205-2RS",
+          "unita_misura": "PZ",
+          "prezzo_standard": 0.08,
+          "peso_kg": 0.02,
+          "attivo": "false",
+          "creato_il": "2024-01-10 08:30:00"
+        },
+        {
+          "id": 2,
+          "codice_articolo": "ART-00011",
+          "descrizione": "Vite esagonale M8x50 zincata",
+          "unita_misura": "PZ",
+          "prezzo_standard": 0.2,
+          "peso_kg": 0.01,
+          "attivo": "true",
+          "creato_il": "2023-08-30 08:30:00"
+        },
+        {
+          "id": 3,
+          "codice_articolo": "ART-00012",
+          "descrizione": "Olio idraulico ISO VG46",
+          "unita_misura": "PZ",
+          "prezzo_standard": 0.26,
+          "peso_kg": null,
+          "attivo": "true",
+          "creato_il": "2023-09-14 08:30:00"
+        },
+        {
+          "id": 4,
+          "codice_articolo": "ART-00013",
+          "descrizione": "Cinghia trapeziale sezione A 1000",
+          "unita_misura": "PZ",
+          "prezzo_standard": 0.08,
+          "peso_kg": 0.01,
+          "attivo": "true",
+          "creato_il": "2023-11-02 08:30:00"
+        },
+        {
+          "id": 5,
+          "codice_articolo": "ART-00014",
+          "descrizione": "Olio idraulico ISO VG46",
+          "unita_misura": "KG",
+          "prezzo_standard": 0.15,
+          "peso_kg": 0.02,
+          "attivo": "true",
+          "creato_il": "2023-07-02 08:30:00"
+        },
+        {
+          "id": 6,
+          "codice_articolo": "ART-00015",
+          "descrizione": "Guarnizione OR 40x4 NBR",
+          "unita_misura": "PZ",
+          "prezzo_standard": 0.23,
+          "peso_kg": null,
+          "attivo": "true",
+          "creato_il": "2024-01-11 08:30:00"
+        },
+        {
+          "id": 7,
+          "codice_articolo": "ART-00016",
+          "descrizione": "Dado esagonale M8 zincato",
+          "unita_misura": "PZ",
+          "prezzo_standard": 0.1,
+          "peso_kg": 0.01,
+          "attivo": "true",
+          "creato_il": "2023-12-22 08:30:00"
+        },
+        {
+          "id": 8,
+          "codice_articolo": "ART-00017",
+          "descrizione": "Olio idraulico ISO VG46",
+          "unita_misura": "PZ",
+          "prezzo_standard": 0.18,
+          "peso_kg": 0.02,
+          "attivo": "true",
+          "creato_il": "2023-07-16 08:30:00"
+        }
+      ],
+      "articoli_obsoleti": [
+        {
+          "id": 1,
+          "codice_articolo": "OBS-1001",
+          "descrizione": "Lampada a incandescenza 100W E27",
+          "data_dismissione": "2024-02-08",
+          "motivo_dismissione": null
+        },
+        {
+          "id": 2,
+          "codice_articolo": "OBS-10011",
+          "descrizione": "Nastro trasportatore in gomma 3m",
+          "data_dismissione": "2024-04-02",
+          "motivo_dismissione": null
+        },
+        {
+          "id": 3,
+          "codice_articolo": "OBS-10012",
+          "descrizione": "Ventilatore assiale 300mm",
+          "data_dismissione": "2024-03-10",
+          "motivo_dismissione": "articolo fuori produzione"
+        },
+        {
+          "id": 4,
+          "codice_articolo": "OBS-10013",
+          "descrizione": "Nastro trasportatore in gomma 3m",
+          "data_dismissione": "2024-04-08",
+          "motivo_dismissione": "normativa obsoleta"
+        },
+        {
+          "id": 5,
+          "codice_articolo": "OBS-10014",
+          "descrizione": "Pompa centrifuga monostadio 0.5CV",
+          "data_dismissione": "2024-04-10",
+          "motivo_dismissione": "articolo fuori produzione"
+        },
+        {
+          "id": 6,
+          "codice_articolo": "OBS-10015",
+          "descrizione": "Nastro trasportatore in gomma 3m",
+          "data_dismissione": "2024-04-01",
+          "motivo_dismissione": "sostituito da modello successivo"
+        },
+        {
+          "id": 7,
+          "codice_articolo": "OBS-1002",
+          "descrizione": "Trapano a colonna modello TC-150",
+          "data_dismissione": "2024-07-08",
+          "motivo_dismissione": "bassa rotazione"
+        },
+        {
+          "id": 8,
+          "codice_articolo": "OBS-10021",
+          "descrizione": "Pompa centrifuga monostadio 0.5CV",
+          "data_dismissione": "2024-07-28",
+          "motivo_dismissione": "richiesta della direzione"
+        }
+      ],
+      "articoli_servizio": [
+        {
+          "id": 1,
+          "codice_articolo": "SRV-2001",
+          "descrizione": "Assistenza tecnica in loco",
+          "tariffa_oraria": 49.03
+        },
+        {
+          "id": 2,
+          "codice_articolo": "SRV-20011",
+          "descrizione": "Installazione e collaudo linea",
+          "tariffa_oraria": null
+        },
+        {
+          "id": 3,
+          "codice_articolo": "SRV-20012",
+          "descrizione": "Taratura strumentazione",
+          "tariffa_oraria": 62.71
+        },
+        {
+          "id": 4,
+          "codice_articolo": "SRV-20013",
+          "descrizione": "Assistenza tecnica in loco",
+          "tariffa_oraria": 62.81
+        },
+        {
+          "id": 5,
+          "codice_articolo": "SRV-20014",
+          "descrizione": "Installazione e collaudo linea",
+          "tariffa_oraria": 50.36
+        },
+        {
+          "id": 6,
+          "codice_articolo": "SRV-20015",
+          "descrizione": "Manutenzione ordinaria impianto",
+          "tariffa_oraria": 45.0
+        },
+        {
+          "id": 7,
+          "codice_articolo": "SRV-20016",
+          "descrizione": "Taratura strumentazione",
+          "tariffa_oraria": 32.02
+        },
+        {
+          "id": 8,
+          "codice_articolo": "SRV-20017",
+          "descrizione": "Formazione avanzata operatori",
+          "tariffa_oraria": 63.44
+        }
+      ],
+      "archivio_articoli": [
+        {
+          "id": 1,
+          "codice_articolo": "ART-0711",
+          "descrizione": "Sensore induttivo M18 PNP",
+          "data_archiviazione": "2024-11-02",
+          "note_archivio": "sostituito da versione successiva"
+        },
+        {
+          "id": 2,
+          "codice_articolo": "ART-0933",
+          "descrizione": "Pompa idraulica ingranaggi 8 cc/giro",
+          "data_archiviazione": "2024-10-14",
+          "note_archivio": "dismesso su richiesta direzione"
+        },
+        {
+          "id": 3,
+          "codice_articolo": "ART-0450",
+          "descrizione": "Telaio metallico per nastro trasportatore",
+          "data_archiviazione": "2024-12-31",
+          "note_archivio": null
+        },
+        {
+          "id": 4,
+          "codice_articolo": "ART-0933",
+          "descrizione": "Sensore induttivo M18 PNP",
+          "data_archiviazione": "2024-09-30",
+          "note_archivio": "articolo non più a catalogo"
+        },
+        {
+          "id": 5,
+          "codice_articolo": "ART-0450",
+          "descrizione": "Telaio metallico per nastro trasportatore",
+          "data_archiviazione": "2024-12-31",
+          "note_archivio": "articolo non più a catalogo dal 2024"
+        },
+        {
+          "id": 6,
+          "codice_articolo": "ART-0820",
+          "descrizione": "Valvola a sfera DN20 ottone",
+          "data_archiviazione": "2024-10-02",
+          "note_archivio": "componente non più supportato"
+        },
+        {
+          "id": 7,
+          "codice_articolo": "ART-0820",
+          "descrizione": "Variatore di velocità monofase",
+          "data_archiviazione": "2024-12-11",
+          "note_archivio": "componente non più supportato"
+        },
+        {
+          "id": 8,
+          "codice_articolo": "ART-0820",
+          "descrizione": "Valvola a sfera DN20 ottone",
+          "data_archiviazione": "2024-09-13",
+          "note_archivio": "articolo non più a catalogo"
+        }
+      ],
+      "magazzini": [
+        {
+          "id": 1,
+          "codice_magazzino": "MAG-01",
+          "denominazione": "Magazzino centrale Milano",
+          "ubicazione": null
+        },
+        {
+          "id": 2,
+          "codice_magazzino": "MAG-011",
+          "denominazione": "Magazzino centrale Milano",
+          "ubicazione": "Milano"
+        },
+        {
+          "id": 3,
+          "codice_magazzino": "MAG-02",
+          "denominazione": "Deposito nord Torino",
+          "ubicazione": "Torino"
+        },
+        {
+          "id": 4,
+          "codice_magazzino": "MAG-021",
+          "denominazione": "Deposito nord Torino",
+          "ubicazione": "Torino"
+        },
+        {
+          "id": 5,
+          "codice_magazzino": "MAG-03",
+          "denominazione": "Magazzino esterno Padova",
+          "ubicazione": "Padova"
+        },
+        {
+          "id": 6,
+          "codice_magazzino": "MAG-031",
+          "denominazione": "Magazzino esterno Padova",
+          "ubicazione": "Padova"
+        },
+        {
+          "id": 7,
+          "codice_magazzino": "MAG-04",
+          "denominazione": "Deposito centrale Bologna",
+          "ubicazione": "Bologna"
+        },
+        {
+          "id": 8,
+          "codice_magazzino": "MAG-041",
+          "denominazione": "Deposito centrale Bologna",
+          "ubicazione": "Bologna"
+        }
+      ],
+      "centri_costo": [
+        {
+          "id": 1,
+          "codice_centro": "CC-100",
+          "denominazione": "Produzione linea A",
+          "responsabile": "Chiara Fontana",
+          "budget_annuo": 292363.22
+        },
+        {
+          "id": 2,
+          "codice_centro": "CC-1001",
+          "denominazione": "Produzione linea A",
+          "responsabile": "Marco Rinaldi",
+          "budget_annuo": 544771.64
+        },
+        {
+          "id": 3,
+          "codice_centro": "CC-1002",
+          "denominazione": "Produzione linea A",
+          "responsabile": "Paolo Ferri",
+          "budget_annuo": 450000.0
+        },
+        {
+          "id": 4,
+          "codice_centro": "CC-1003",
+          "denominazione": "Produzione linea A",
+          "responsabile": "Paolo Ferri",
+          "budget_annuo": 437682.66
+        },
+        {
+          "id": 5,
+          "codice_centro": "CC-1004",
+          "denominazione": "Produzione linea A",
+          "responsabile": null,
+          "budget_annuo": 692165.93
+        },
+        {
+          "id": 6,
+          "codice_centro": "CC-1005",
+          "denominazione": "Produzione linea A",
+          "responsabile": "Davide Greco",
+          "budget_annuo": 347884.0
+        },
+        {
+          "id": 7,
+          "codice_centro": "CC-1006",
+          "denominazione": "Produzione linea A",
+          "responsabile": "Anna Vitale",
+          "budget_annuo": 624724.3
+        },
+        {
+          "id": 8,
+          "codice_centro": "CC-200",
+          "denominazione": "Produzione linea B",
+          "responsabile": "Marco Rinaldi",
+          "budget_annuo": 266689.0
+        }
+      ],
+      "centri_ricavo": [
+        {
+          "id": 1,
+          "codice_centro": "CR-100",
+          "denominazione": "Vendite dirette Italia",
+          "target_ricavi_annui": 2034090.86
+        },
+        {
+          "id": 2,
+          "codice_centro": "CR-1001",
+          "denominazione": "Vendite dirette Italia",
+          "target_ricavi_annui": 2297240.87
+        },
+        {
+          "id": 3,
+          "codice_centro": "CR-1002",
+          "denominazione": "Vendite dirette Italia",
+          "target_ricavi_annui": 2189833.45
+        },
+        {
+          "id": 4,
+          "codice_centro": "CR-1003",
+          "denominazione": "Vendite dirette Italia",
+          "target_ricavi_annui": 2723980.34
+        },
+        {
+          "id": 5,
+          "codice_centro": "CR-1004",
+          "denominazione": "Vendite dirette Italia",
+          "target_ricavi_annui": 2381765.64
+        },
+        {
+          "id": 6,
+          "codice_centro": "CR-1005",
+          "denominazione": "Vendite dirette Italia",
+          "target_ricavi_annui": 2180676.5
+        },
+        {
+          "id": 7,
+          "codice_centro": "CR-1006",
+          "denominazione": "Vendite dirette Italia",
+          "target_ricavi_annui": 3339724.57
+        },
+        {
+          "id": 8,
+          "codice_centro": "CR-200",
+          "denominazione": "Rete distributori nord",
+          "target_ricavi_annui": 1471706.06
+        }
+      ],
+      "piani_dei_conti": [
+        {
+          "id": 1,
+          "codice_conto": "1001",
+          "descrizione_conto": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 2,
+          "codice_conto": "1002",
+          "descrizione_conto": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 3,
+          "codice_conto": "1003",
+          "descrizione_conto": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 4,
+          "codice_conto": "1004",
+          "descrizione_conto": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 5,
+          "codice_conto": "1005",
+          "descrizione_conto": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 6,
+          "codice_conto": "1006",
+          "descrizione_conto": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 7,
+          "codice_conto": "1007",
+          "descrizione_conto": "Cassa",
+          "tipo_conto": "attivo"
+        },
+        {
+          "id": 8,
+          "codice_conto": "1010",
+          "descrizione_conto": "Banca c/c operativa",
+          "tipo_conto": "attivo"
+        }
+      ],
+      "movimenti_magazzino": [
+        {
+          "id": 1,
+          "articolo_id": 53,
+          "magazzino_id": 11,
+          "centro_costo_id": null,
+          "data_movimento": "2025-08-14",
+          "tipo_movimento": "carico",
+          "quantita": 518.43,
+          "costo_unitario": 0.2,
+          "creato_il": "2025-11-05 09:10:00"
+        },
+        {
+          "id": 2,
+          "articolo_id": 24,
+          "magazzino_id": 9,
+          "centro_costo_id": 6,
+          "data_movimento": "2025-10-20",
+          "tipo_movimento": "carico",
+          "quantita": 596.99,
+          "costo_unitario": 0.19,
+          "creato_il": "2025-11-05 09:10:00"
+        },
+        {
+          "id": 3,
+          "articolo_id": 85,
+          "magazzino_id": 7,
+          "centro_costo_id": 23,
+          "data_movimento": "2025-08-28",
+          "tipo_movimento": "carico",
+          "quantita": 693.51,
+          "costo_unitario": 0.23,
+          "creato_il": "2025-11-05 09:10:00"
+        },
+        {
+          "id": 4,
+          "articolo_id": 7,
+          "magazzino_id": 8,
+          "centro_costo_id": 32,
+          "data_movimento": "2025-10-15",
+          "tipo_movimento": "carico",
+          "quantita": 621.2,
+          "costo_unitario": 0.12,
+          "creato_il": "2025-11-05 09:10:00"
+        },
+        {
+          "id": 5,
+          "articolo_id": 11,
+          "magazzino_id": 8,
+          "centro_costo_id": 6,
+          "data_movimento": "2025-10-17",
+          "tipo_movimento": "carico",
+          "quantita": 919.49,
+          "costo_unitario": null,
+          "creato_il": "2025-11-05 09:10:00"
+        },
+        {
+          "id": 6,
+          "articolo_id": 133,
+          "magazzino_id": 12,
+          "centro_costo_id": 8,
+          "data_movimento": "2025-10-06",
+          "tipo_movimento": "carico",
+          "quantita": 532.27,
+          "costo_unitario": 0.22,
+          "creato_il": "2025-11-05 09:10:00"
+        },
+        {
+          "id": 7,
+          "articolo_id": 117,
+          "magazzino_id": 11,
+          "centro_costo_id": 3,
+          "data_movimento": "2025-08-07",
+          "tipo_movimento": "carico",
+          "quantita": 538.51,
+          "costo_unitario": 0.16,
+          "creato_il": "2025-11-05 09:10:00"
+        },
+        {
+          "id": 8,
+          "articolo_id": 90,
+          "magazzino_id": 8,
+          "centro_costo_id": 23,
+          "data_movimento": "2025-09-04",
+          "tipo_movimento": "carico",
+          "quantita": 327.93,
+          "costo_unitario": 0.13,
+          "creato_il": "2025-11-05 09:10:00"
+        }
+      ],
+      "movimenti_vendite": [
+        {
+          "id": 1,
+          "articolo_id": 32,
+          "data_vendita": "2025-09-17",
+          "quantita_venduta": 449.54,
+          "prezzo_vendita": 0.21
+        },
+        {
+          "id": 2,
+          "articolo_id": 80,
+          "data_vendita": "2025-11-02",
+          "quantita_venduta": 318.47,
+          "prezzo_vendita": 0.24
+        },
+        {
+          "id": 3,
+          "articolo_id": 94,
+          "data_vendita": "2025-09-25",
+          "quantita_venduta": 340.71,
+          "prezzo_vendita": 0.22
+        },
+        {
+          "id": 4,
+          "articolo_id": 8,
+          "data_vendita": "2025-10-30",
+          "quantita_venduta": 143.68,
+          "prezzo_vendita": 0.18
+        },
+        {
+          "id": 5,
+          "articolo_id": 130,
+          "data_vendita": "2025-09-10",
+          "quantita_venduta": 277.57,
+          "prezzo_vendita": 0.24
+        },
+        {
+          "id": 6,
+          "articolo_id": 103,
+          "data_vendita": "2025-10-09",
+          "quantita_venduta": 267.76,
+          "prezzo_vendita": 0.17
+        },
+        {
+          "id": 7,
+          "articolo_id": 112,
+          "data_vendita": "2025-09-04",
+          "quantita_venduta": 383.54,
+          "prezzo_vendita": 0.25
+        },
+        {
+          "id": 8,
+          "articolo_id": 59,
+          "data_vendita": "2025-09-18",
+          "quantita_venduta": 162.89,
+          "prezzo_vendita": 0.23
+        }
+      ],
+      "movimenti_contabili": [
+        {
+          "id": 1,
+          "conto_id": 24,
+          "centro_costo_id": 25,
+          "data_registrazione": "2025-10-23",
+          "importo_dare": 21130.13,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 2,
+          "conto_id": 5,
+          "centro_costo_id": 17,
+          "data_registrazione": "2025-10-16",
+          "importo_dare": 20897.54,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 3,
+          "conto_id": 5,
+          "centro_costo_id": 19,
+          "data_registrazione": "2025-10-30",
+          "importo_dare": 7670.97,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 4,
+          "conto_id": 23,
+          "centro_costo_id": 19,
+          "data_registrazione": "2025-09-04",
+          "importo_dare": 13136.54,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 5,
+          "conto_id": 38,
+          "centro_costo_id": 5,
+          "data_registrazione": "2025-10-20",
+          "importo_dare": 4861.42,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 6,
+          "conto_id": 37,
+          "centro_costo_id": 32,
+          "data_registrazione": "2025-11-13",
+          "importo_dare": 3750.0,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 7,
+          "conto_id": 16,
+          "centro_costo_id": 34,
+          "data_registrazione": "2025-09-01",
+          "importo_dare": 6460.31,
+          "importo_avere": 0.0
+        },
+        {
+          "id": 8,
+          "conto_id": 27,
+          "centro_costo_id": 35,
+          "data_registrazione": "2025-09-11",
+          "importo_dare": 18699.43,
+          "importo_avere": 0.0
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "values"
+  ],
+  "query": "WITH sedi_target(citta) AS (VALUES ('Milano'), ('Torino'), ('Bologna')) SELECT m.ubicazione AS citta, COUNT(DISTINCT mm.articolo_id) AS articoli_movimentati, SUM(mm.quantita) AS quantita_totale, ROUND(SUM(mm.quantita * mm.costo_unitario), 2) AS valore_carichi_euro FROM magazzini m JOIN movimenti_magazzino mm ON m.id = mm.magazzino_id JOIN sedi_target s ON m.ubicazione = s.citta WHERE mm.tipo_movimento = 'carico' GROUP BY m.ubicazione ORDER BY valore_carichi_euro DESC;"
+}

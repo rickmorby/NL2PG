@@ -1,0 +1,350 @@
+{
+  "schema_ddl": "CREATE TABLE utenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    utente_id INT NOT NULL,\n    ordine_padre_id INT,\n    totale NUMERIC(12,2) NOT NULL CHECK (totale >= 0),\n    stato TEXT NOT NULL CHECK (stato IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato'))\n);\n\nCREATE TABLE articoli_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL,\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "utenti": {
+        "row_count": 248,
+        "columns": {
+          "id": {
+            "distinct": 248,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 248
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro Conti",
+              "Andrea Marini",
+              "Chiara Lombardi",
+              "Davide Greco",
+              "Elena Fontana"
+            ]
+          },
+          "email": {
+            "distinct": 248,
+            "sample": [
+              "alessandro.conti10@example.com",
+              "alessandro.conti11@example.com",
+              "alessandro.conti12@example.com",
+              "alessandro.conti13@example.com",
+              "alessandro.conti14@example.com"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 211,
+            "sample": [
+              "2023-03-21",
+              "2023-03-25",
+              "2023-04-11",
+              "2023-04-22",
+              "2023-04-28"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1690,
+        "columns": {
+          "id": {
+            "distinct": 1690,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1690
+          },
+          "utente_id": {
+            "distinct": 12,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "2"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "ordine_padre_id": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "totale": {
+            "distinct": 1598,
+            "sample": [
+              "10.0",
+              "10.27",
+              "10.49",
+              "10.52",
+              "10.88"
+            ],
+            "min": 6.4,
+            "max": 800.0
+          },
+          "stato": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "confermato",
+              "consegnato",
+              "in_attesa",
+              "spedito"
+            ]
+          }
+        }
+      },
+      "articoli_ordine": {
+        "row_count": 2381,
+        "columns": {
+          "id": {
+            "distinct": 2381,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2381
+          },
+          "ordine_id": {
+            "distinct": 21,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 8
+          },
+          "prodotto": {
+            "distinct": 10,
+            "sample": [
+              "Cavo HDMI 2m",
+              "Cuffie Bluetooth",
+              "Hub USB-C",
+              "Laptop Pro 14",
+              "Monitor 27 4K"
+            ]
+          },
+          "quantita": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 4
+          },
+          "prezzo_unitario": {
+            "distinct": 2173,
+            "sample": [
+              "100.12",
+              "100.15",
+              "100.19",
+              "100.29",
+              "100.3"
+            ],
+            "min": 12.45,
+            "max": 1798.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "utenti": [
+        {
+          "id": 19,
+          "nome": "Alessandro Conti",
+          "email": "alessandroconti1@example.com",
+          "data_registrazione": "2023-08-25"
+        },
+        {
+          "id": 30,
+          "nome": "Alessandro Conti",
+          "email": "alessandroconti2@example.com",
+          "data_registrazione": "2023-05-10"
+        },
+        {
+          "id": 37,
+          "nome": "Alessandro Conti",
+          "email": "alessandroconti3@example.com",
+          "data_registrazione": "2024-04-05"
+        },
+        {
+          "id": 1,
+          "nome": "Andrea Marini",
+          "email": "andreamarini1@example.com",
+          "data_registrazione": "2024-04-09"
+        },
+        {
+          "id": 13,
+          "nome": "Andrea Marini",
+          "email": "andreamarini2@example.com",
+          "data_registrazione": "2023-05-02"
+        },
+        {
+          "id": 10,
+          "nome": "Chiara Lombardi",
+          "email": "chiaralombardi1@example.com",
+          "data_registrazione": "2023-07-24"
+        },
+        {
+          "id": 21,
+          "nome": "Chiara Lombardi",
+          "email": "chiaralombardi2@example.com",
+          "data_registrazione": "2023-06-16"
+        },
+        {
+          "id": 28,
+          "nome": "Chiara Lombardi",
+          "email": "chiaralombardi3@example.com",
+          "data_registrazione": "2023-10-23"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 1,
+          "utente_id": "10",
+          "ordine_padre_id": null,
+          "totale": 175.37,
+          "stato": "consegnato"
+        },
+        {
+          "id": 2,
+          "utente_id": "4",
+          "ordine_padre_id": null,
+          "totale": 171.79,
+          "stato": "annullato"
+        },
+        {
+          "id": 3,
+          "utente_id": "1",
+          "ordine_padre_id": null,
+          "totale": 321.26,
+          "stato": "confermato"
+        },
+        {
+          "id": 4,
+          "utente_id": "3",
+          "ordine_padre_id": null,
+          "totale": 202.36,
+          "stato": "consegnato"
+        },
+        {
+          "id": 5,
+          "utente_id": "6",
+          "ordine_padre_id": null,
+          "totale": 106.1,
+          "stato": "consegnato"
+        },
+        {
+          "id": 6,
+          "utente_id": "3",
+          "ordine_padre_id": null,
+          "totale": 191.77,
+          "stato": "spedito"
+        },
+        {
+          "id": 7,
+          "utente_id": "2",
+          "ordine_padre_id": null,
+          "totale": 198.62,
+          "stato": "in_attesa"
+        },
+        {
+          "id": 8,
+          "utente_id": "3",
+          "ordine_padre_id": null,
+          "totale": 142.55,
+          "stato": "consegnato"
+        }
+      ],
+      "articoli_ordine": [
+        {
+          "id": 1,
+          "ordine_id": "20",
+          "prodotto": "Cavo HDMI 2m",
+          "quantita": "1",
+          "prezzo_unitario": 828.47
+        },
+        {
+          "id": 2,
+          "ordine_id": "5",
+          "prodotto": "Cuffie Bluetooth",
+          "quantita": "1",
+          "prezzo_unitario": 1286.09
+        },
+        {
+          "id": 3,
+          "ordine_id": "17",
+          "prodotto": "Mouse Wireless",
+          "quantita": "3",
+          "prezzo_unitario": 821.4
+        },
+        {
+          "id": 4,
+          "ordine_id": "14",
+          "prodotto": "Cuffie Bluetooth",
+          "quantita": "1",
+          "prezzo_unitario": 461.15
+        },
+        {
+          "id": 5,
+          "ordine_id": "11",
+          "prodotto": "Tastiera Meccanica",
+          "quantita": "5",
+          "prezzo_unitario": 1480.08
+        },
+        {
+          "id": 6,
+          "ordine_id": "3",
+          "prodotto": "Stampante Laser",
+          "quantita": "2",
+          "prezzo_unitario": 1069.41
+        },
+        {
+          "id": 7,
+          "ordine_id": "9",
+          "prodotto": "Cavo HDMI 2m",
+          "quantita": "1",
+          "prezzo_unitario": 1660.1
+        },
+        {
+          "id": 8,
+          "ordine_id": "15",
+          "prodotto": "Monitor 27 4K",
+          "quantita": "1",
+          "prezzo_unitario": 1098.23
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "recursive_cte"
+  ],
+  "query": "WITH RECURSIVE catena_ordini (ordine_radice, ordine_corrente, utente_id, stato, livello, totale_ordine, totale_cumulato) AS (SELECT o.id, o.id, o.utente_id, o.stato, 0::int AS livello, o.totale::numeric AS totale_ordine, o.totale::numeric AS totale_cumulato FROM ordini o WHERE o.ordine_padre_id IS NULL AND o.stato IN ('confermato', 'spedito', 'consegnato') UNION ALL SELECT c.ordine_radice, f.id, f.utente_id, f.stato, c.livello + 1, f.totale::numeric, c.totale_cumulato + f.totale::numeric FROM catena_ordini c JOIN ordini f ON f.ordine_padre_id = c.ordine_corrente) SELECT u.nome AS nome_utente, COUNT(*) AS ordini_in_catena, MAX(c.livello) AS profondita_massima, ROUND(SUM(c.totale_ordine), 2) AS valore_totale_catena, COUNT(DISTINCT c.stato) AS stati_distinti_catena FROM catena_ordini c JOIN utenti u ON u.id = c.utente_id GROUP BY u.nome ORDER BY valore_totale_catena DESC, nome_utente ASC;"
+}

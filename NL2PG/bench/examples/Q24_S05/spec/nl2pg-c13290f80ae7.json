@@ -1,0 +1,21 @@
+{
+  "domain": "risorse_umane",
+  "n_tables": 3,
+  "hierarchy": "one_to_many_weak_entity",
+  "sql_features": [
+    "join",
+    "left_outer_join"
+  ],
+  "twist": [
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rephrase",
+      "target_value": "dipendenti_benefit",
+      "obsolete_value": "assegnazioni_accessorie_personale",
+      "description": "La tabella che modella l'entità debole 'dipendenti_benefit' viene indicata nel linguaggio aziendale come 'assegnazioni_accessorie_personale', rendendo meno immediata l'identificazione della relazione di dipendenza con la tabella 'dipendenti'."
+    }
+  ],
+  "spec_hash": "ddc59e55069c7481"
+}

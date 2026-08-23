@@ -1,0 +1,27 @@
+{
+  "domain": "vendite",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_acquirenti",
+      "description": "La tabella padre 'clienti' viene denominata 'anagrafica_acquirenti' nella prosa aziendale. L'agente deve risalire alla tabella reale 'clienti' e considerare che la tabella figlia 'ordini' contiene la FK nullable 'cliente_id' verso di essa."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_totale",
+      "obsolete_value": "controvalore transazione",
+      "description": "La colonna 'importo_totale' della tabella 'ordini' è indicata nei documenti commerciali con il gergo 'controvalore transazione'. L'agente deve mappare questo termine al nome colonna reale per formulare l'aggregatore scalare (SUM o AVG) senza GROUP BY, gestendo eventualmente gli ordini senza cliente tramite IS NULL o join esterno."
+    }
+  ],
+  "spec_hash": "d99945727c77cda6"
+}

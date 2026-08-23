@@ -1,0 +1,27 @@
+{
+  "domain": "logistica",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "string_funcs"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "corrieri",
+      "obsolete_value": "operatori_di_trasporto",
+      "description": "La tabella corrieri (id_corriere, nome_corriere, cognome_corriere, targa) viene denominata operatori_di_trasporto nella prosa aziendale. L'utente deve risalire al nome reale della tabella per costruire correttamente la query."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "spedizioni",
+      "obsolete_value": "carichi_in_transito",
+      "description": "La tabella spedizioni (id_spedizione, nome_destinatario, cognome_destinatario, stato) viene indicata nella documentazione aziendale con il gergo operativo carichi_in_transito. Il dato anagrafico del destinatario è archiviato spezzato su due colonne separate (nome_destinatario e cognome_destinatario), quindi la risposta richiede la ricomposizione tramite CONCAT(nome_destinatario, ' ', cognome_destinatario) e la formattazione con UPPER/SUBSTRING nella SELECT."
+    }
+  ],
+  "spec_hash": "f54063b7ae1e9a0d"
+}

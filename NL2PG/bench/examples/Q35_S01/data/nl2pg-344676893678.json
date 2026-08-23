@@ -1,0 +1,168 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "case"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "scritture_contabili",
+        "obsolete_value": "registro_movimenti_amministrativi",
+        "description": "La tabella scritture_contabili, che contiene le registrazioni contabili con chiave primaria id_scrittura e attributi come data_registrazione, conto, importo_dare, importo_avere e stato_pagamento, viene denominata nella prosa aziendale registro_movimenti_amministrativi."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "stato_pagamento",
+        "obsolete_value": "posizione di liquidazione del debito",
+        "description": "La colonna stato_pagamento della tabella scritture_contabili, che assume valori come 'pagato', 'sospeso' o 'insoluto', viene indicata nella documentazione aziendale con il gergo contabile 'posizione di liquidazione del debito'. Le query devono riconoscere questa perifrasi per filtrare o classificare correttamente i record tramite CASE WHEN."
+      }
+    ],
+    "spec_hash": "a265fa25f838a6a8"
+  },
+  "schema_ddl": "CREATE TABLE scritture_contabili (\n    id_scrittura INT PRIMARY KEY,\n    data_registrazione DATE NOT NULL,\n    conto TEXT NOT NULL,\n    importo_dare NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_dare >= 0),\n    importo_avere NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_avere >= 0),\n    stato_pagamento TEXT NOT NULL CHECK (stato_pagamento IN ('pagato', 'sospeso', 'insoluto'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "scritture_contabili",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_scrittura": 1,
+            "data_registrazione": "2026-01-05",
+            "conto": "Crediti verso clienti",
+            "importo_dare": 2440.0,
+            "importo_avere": 0.0,
+            "stato_pagamento": "sospeso"
+          },
+          {
+            "id_scrittura": 2,
+            "data_registrazione": "2026-01-12",
+            "conto": "Ricavi di vendita",
+            "importo_dare": 0.0,
+            "importo_avere": 2000.0,
+            "stato_pagamento": "pagato"
+          },
+          {
+            "id_scrittura": 3,
+            "data_registrazione": "2026-01-20",
+            "conto": "Banca c/c",
+            "importo_dare": 1500.0,
+            "importo_avere": 0.0,
+            "stato_pagamento": "pagato"
+          },
+          {
+            "id_scrittura": 4,
+            "data_registrazione": "2026-02-03",
+            "conto": "Debiti verso fornitori",
+            "importo_dare": 0.0,
+            "importo_avere": 1220.0,
+            "stato_pagamento": "sospeso"
+          },
+          {
+            "id_scrittura": 5,
+            "data_registrazione": "2026-02-18",
+            "conto": "Acquisti di merci",
+            "importo_dare": 980.0,
+            "importo_avere": 0.0,
+            "stato_pagamento": "pagato"
+          },
+          {
+            "id_scrittura": 6,
+            "data_registrazione": "2026-03-08",
+            "conto": "Crediti verso clienti",
+            "importo_dare": 3400.0,
+            "importo_avere": 0.0,
+            "stato_pagamento": "insoluto"
+          },
+          {
+            "id_scrittura": 7,
+            "data_registrazione": "2026-03-15",
+            "conto": "Costi del personale",
+            "importo_dare": 5600.0,
+            "importo_avere": 0.0,
+            "stato_pagamento": "pagato"
+          },
+          {
+            "id_scrittura": 8,
+            "data_registrazione": "2026-03-25",
+            "conto": "IVA a credito",
+            "importo_dare": 196.0,
+            "importo_avere": 0.0,
+            "stato_pagamento": "sospeso"
+          }
+        ],
+        "variations": {
+          "data_registrazione": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "conto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Crediti verso clienti",
+              "Debiti verso fornitori",
+              "Banca c/c",
+              "Cassa",
+              "Ricavi di vendita",
+              "Acquisti di merci",
+              "Costi del personale",
+              "IVA a debito",
+              "IVA a credito",
+              "Capitale sociale"
+            ]
+          },
+          "importo_dare": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "importo_avere": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "stato_pagamento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "pagato",
+              "pagato",
+              "pagato",
+              "pagato",
+              "sospeso",
+              "sospeso",
+              "insoluto"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

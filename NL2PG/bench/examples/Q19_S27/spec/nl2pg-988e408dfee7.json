@@ -1,0 +1,34 @@
+{
+  "domain": "finanza",
+  "n_tables": 5,
+  "hierarchy": "implicit_fk",
+  "sql_features": [
+    "full_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "transazioni",
+      "obsolete_value": "movimenti_contabili",
+      "description": "La tabella transazioni viene rinominata in movimenti_contabili nel linguaggio aziendale."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "cliente_id",
+      "obsolete_value": "codice_anagrafico",
+      "description": "La colonna cliente_id è riferita come codice_anagrafico nei documenti interni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "saldo",
+      "obsolete_value": "giacenza",
+      "description": "Il termine saldo viene sostituito con giacenza nel gergo finanziario aziendale."
+    }
+  ],
+  "spec_hash": "294b8d7b2a819573"
+}

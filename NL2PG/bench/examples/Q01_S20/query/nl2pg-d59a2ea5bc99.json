@@ -1,0 +1,200 @@
+{
+  "schema_ddl": "CREATE TYPE tipo_movimento AS ENUM ('entrata', 'uscita', 'rettifica');\n\nCREATE TYPE stato_documento AS ENUM ('bozza', 'registrato', 'verificato', 'chiuso', 'annullato');\n\nCREATE TABLE movimenti_contabili (\n    id INT PRIMARY KEY,\n    numero_protocollo BIGINT NOT NULL UNIQUE,\n    data_registrazione DATE NOT NULL,\n    descrizione TEXT NOT NULL,\n    tipo tipo_movimento NOT NULL,\n    stato stato_documento NOT NULL DEFAULT 'bozza',\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    conto TEXT NOT NULL,\n    causale TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "movimenti_contabili": {
+        "row_count": 973,
+        "columns": {
+          "id": {
+            "distinct": 973,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 973
+          },
+          "numero_protocollo": {
+            "distinct": 973,
+            "sample": [
+              "100001",
+              "100002",
+              "100003",
+              "100004",
+              "100005"
+            ],
+            "min": 100001,
+            "max": 100973
+          },
+          "data_registrazione": {
+            "distinct": 150,
+            "sample": [
+              "2025-11-21",
+              "2025-11-22",
+              "2025-11-23",
+              "2025-11-24",
+              "2025-11-25"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Accredito interessi attivi su conto corrente",
+              "Acquisto cancelleria e materiali ufficio",
+              "Fattura vendita cliente Alfa Srl",
+              "Incasso fattura Gamma Snc",
+              "Pagamento canone locazione sede marzo"
+            ]
+          },
+          "tipo": {
+            "distinct": 3,
+            "sample": [
+              "entrata",
+              "rettifica",
+              "uscita"
+            ]
+          },
+          "stato": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "bozza",
+              "chiuso",
+              "registrato",
+              "verificato"
+            ]
+          },
+          "importo": {
+            "distinct": 952,
+            "sample": [
+              "100.39",
+              "100.69",
+              "100.84",
+              "10026.05",
+              "10040.04"
+            ],
+            "min": 18.08,
+            "max": 13602.0
+          },
+          "conto": {
+            "distinct": 6,
+            "sample": [
+              "Banca c/c",
+              "Cassa",
+              "Costi per materie prime e consumi",
+              "Crediti verso clienti",
+              "Debiti verso fornitori"
+            ]
+          },
+          "causale": {
+            "distinct": 9,
+            "sample": [
+              "Addebito diretto",
+              "Bonifico SEPA",
+              "Distinta versamento",
+              "Estratto conto",
+              "Fattura n. 12/2026"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "movimenti_contabili": [
+        {
+          "id": 1,
+          "numero_protocollo": 100001,
+          "data_registrazione": "2025-11-30",
+          "descrizione": "Fattura vendita cliente Alfa Srl",
+          "tipo": "entrata",
+          "stato": "verificato",
+          "importo": 1085.98,
+          "conto": "Banca c/c",
+          "causale": "Fattura vendita"
+        },
+        {
+          "id": 2,
+          "numero_protocollo": 100002,
+          "data_registrazione": "2025-12-13",
+          "descrizione": "Fattura vendita cliente Alfa Srl",
+          "tipo": "rettifica",
+          "stato": "bozza",
+          "importo": 2380.59,
+          "conto": "Cassa",
+          "causale": "Bonifico SEPA"
+        },
+        {
+          "id": 3,
+          "numero_protocollo": 100003,
+          "data_registrazione": "2025-12-20",
+          "descrizione": "Fattura vendita cliente Alfa Srl",
+          "tipo": "uscita",
+          "stato": "annullato",
+          "importo": 3689.62,
+          "conto": "Banca c/c",
+          "causale": "Storno interno"
+        },
+        {
+          "id": 4,
+          "numero_protocollo": 100004,
+          "data_registrazione": "2026-01-29",
+          "descrizione": "Fattura vendita cliente Alfa Srl",
+          "tipo": "entrata",
+          "stato": "verificato",
+          "importo": 709.53,
+          "conto": "Debiti verso fornitori",
+          "causale": "Fattura vendita"
+        },
+        {
+          "id": 5,
+          "numero_protocollo": 100005,
+          "data_registrazione": "2025-12-11",
+          "descrizione": "Fattura vendita cliente Alfa Srl",
+          "tipo": "entrata",
+          "stato": "bozza",
+          "importo": 3294.94,
+          "conto": "Debiti verso fornitori",
+          "causale": "Fattura vendita"
+        },
+        {
+          "id": 6,
+          "numero_protocollo": 100006,
+          "data_registrazione": "2026-02-19",
+          "descrizione": "Fattura vendita cliente Alfa Srl",
+          "tipo": "uscita",
+          "stato": "chiuso",
+          "importo": 4559.26,
+          "conto": "Cassa",
+          "causale": "Ricevuta bancaria"
+        },
+        {
+          "id": 7,
+          "numero_protocollo": 100007,
+          "data_registrazione": "2025-12-04",
+          "descrizione": "Fattura vendita cliente Alfa Srl",
+          "tipo": "uscita",
+          "stato": "registrato",
+          "importo": 2097.03,
+          "conto": "Cassa",
+          "causale": "Bonifico SEPA"
+        },
+        {
+          "id": 8,
+          "numero_protocollo": 100008,
+          "data_registrazione": "2026-02-04",
+          "descrizione": "Fattura vendita cliente Alfa Srl",
+          "tipo": "entrata",
+          "stato": "registrato",
+          "importo": 3484.2,
+          "conto": "Costi per materie prime e consumi",
+          "causale": "Pagamento fornitore"
+        }
+      ]
+    }
+  },
+  "feature_sql": [],
+  "query": "SELECT tipo, conto, COUNT(*) AS numero_operazioni, SUM(importo) AS totale_importi, ROUND(AVG(importo), 2) AS importo_medio FROM movimenti_contabili WHERE stato IN ('registrato', 'verificato') GROUP BY tipo, conto ORDER BY totale_importi DESC;"
+}

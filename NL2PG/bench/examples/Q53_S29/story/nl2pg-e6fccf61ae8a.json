@@ -1,0 +1,421 @@
+{
+  "schema_ddl": "CREATE TABLE agenti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT UNIQUE,\n    telefono TEXT,\n    data_assunzione DATE NOT NULL\n);\n\nCREATE TABLE immobili (\n    id INT PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    tipo_immobile TEXT NOT NULL CHECK (tipo_immobile IN ('appartamento', 'villa', 'attico', 'loft', 'rustico')),\n    superficie_mq NUMERIC(7,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani > 0)\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    agente_id INT NOT NULL REFERENCES agenti(id),\n    immobile_id INT NOT NULL REFERENCES immobili(id),\n    data_contratto DATE NOT NULL,\n    prezzo_vendita NUMERIC(12,2) NOT NULL CHECK (prezzo_vendita > 0),\n    provvigione NUMERIC(10,2) NOT NULL DEFAULT 0 CHECK (provvigione >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "agenti": {
+        "row_count": 397,
+        "columns": {
+          "id": {
+            "distinct": 397,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 397
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro",
+              "Anna",
+              "Carlo",
+              "Chiara",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Colombo",
+              "Conti",
+              "Esposito"
+            ]
+          },
+          "email": {
+            "distinct": 376,
+            "sample": [
+              "anna.esposito10@agenzia.it",
+              "anna.esposito11@agenzia.it",
+              "anna.esposito12@agenzia.it",
+              "anna.esposito13@agenzia.it",
+              "anna.esposito14@agenzia.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 9,
+            "sample": [
+              "+39 010 4567890",
+              "+39 011 6789012",
+              "+39 02 2345678",
+              "+39 055 5678901",
+              "+39 06 1234567"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 361,
+            "sample": [
+              "2015-11-21",
+              "2015-12-11",
+              "2015-12-14",
+              "2016-01-01",
+              "2016-02-10"
+            ]
+          }
+        }
+      },
+      "immobili": {
+        "row_count": 789,
+        "columns": {
+          "id": {
+            "distinct": 789,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 789
+          },
+          "indirizzo": {
+            "distinct": 10,
+            "sample": [
+              "Corso Buenos Aires 45",
+              "Corso Vittorio Emanuele II 88",
+              "Largo Cairoli 5",
+              "Piazza Dante 3",
+              "Via Etnea 220"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Catania",
+              "Firenze",
+              "Genova"
+            ]
+          },
+          "tipo_immobile": {
+            "distinct": 5,
+            "sample": [
+              "appartamento",
+              "attico",
+              "loft",
+              "rustico",
+              "villa"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 760,
+            "sample": [
+              "100.29",
+              "100.35",
+              "100.58",
+              "100.59",
+              "100.93"
+            ],
+            "min": 37.2,
+            "max": 419.42
+          },
+          "numero_vani": {
+            "distinct": 7,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 3,
+            "max": 7
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 2011,
+        "columns": {
+          "id": {
+            "distinct": 2011,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3011
+          },
+          "agente_id": {
+            "distinct": 397,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 397
+          },
+          "immobile_id": {
+            "distinct": 719,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 789
+          },
+          "data_contratto": {
+            "distinct": 778,
+            "sample": [
+              "2023-06-15",
+              "2023-06-16",
+              "2023-06-17",
+              "2023-06-21",
+              "2023-06-22"
+            ]
+          },
+          "prezzo_vendita": {
+            "distinct": 1949,
+            "sample": [
+              "100601.84",
+              "100761.92",
+              "100843.31",
+              "1008540.18",
+              "1009309.56"
+            ],
+            "min": 81400.0,
+            "max": 1188000.0
+          },
+          "provvigione": {
+            "distinct": 1934,
+            "sample": [
+              "10005.09",
+              "10005.51",
+              "10014.56",
+              "10025.7",
+              "10033.7"
+            ],
+            "min": 2442.0,
+            "max": 35640.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "agenti": [
+        {
+          "id": 24,
+          "nome": "Alessandro",
+          "cognome": "Marino",
+          "email": "alessandro.marino1@example.com",
+          "telefono": "+39 320 4455667",
+          "data_assunzione": "2017-03-21"
+        },
+        {
+          "id": 38,
+          "nome": "Laura",
+          "cognome": "Romano",
+          "email": "laura.romano1@example.com",
+          "telefono": "+39 320 4455667",
+          "data_assunzione": "2017-10-03"
+        },
+        {
+          "id": 47,
+          "nome": "Marco",
+          "cognome": "Rossi",
+          "email": "marco.rossi1@example.com",
+          "telefono": null,
+          "data_assunzione": "2017-09-23"
+        },
+        {
+          "id": 117,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi1@example.com",
+          "telefono": "+39 055 5678901",
+          "data_assunzione": "2019-03-14"
+        },
+        {
+          "id": 125,
+          "nome": "Carlo",
+          "cognome": "Ferrari",
+          "email": "carlo.ferrari1@example.com",
+          "telefono": "+39 055 5678901",
+          "data_assunzione": "2019-11-18"
+        },
+        {
+          "id": 158,
+          "nome": "Elena",
+          "cognome": "Rossi",
+          "email": "elena.rossi1@example.com",
+          "telefono": "+39 347 9988776",
+          "data_assunzione": "2017-03-14"
+        },
+        {
+          "id": 227,
+          "nome": "Alessandro",
+          "cognome": "Ferrari",
+          "email": "alessandro.ferrari1@example.com",
+          "telefono": "+39 081 3456789",
+          "data_assunzione": "2021-06-09"
+        },
+        {
+          "id": 224,
+          "nome": "Anna",
+          "cognome": "Esposito",
+          "email": "anna.esposito1@example.com",
+          "telefono": null,
+          "data_assunzione": "2021-01-10"
+        }
+      ],
+      "immobili": [
+        {
+          "id": 1,
+          "indirizzo": "Corso Buenos Aires 45",
+          "citta": "Bari",
+          "tipo_immobile": "attico",
+          "superficie_mq": 63.72,
+          "numero_vani": "1"
+        },
+        {
+          "id": 2,
+          "indirizzo": "Largo Cairoli 5",
+          "citta": "Genova",
+          "tipo_immobile": "villa",
+          "superficie_mq": 99.83,
+          "numero_vani": "3"
+        },
+        {
+          "id": 3,
+          "indirizzo": "Corso Vittorio Emanuele II 88",
+          "citta": "Catania",
+          "tipo_immobile": "loft",
+          "superficie_mq": 88.92,
+          "numero_vani": "4"
+        },
+        {
+          "id": 4,
+          "indirizzo": "Largo Cairoli 5",
+          "citta": "Firenze",
+          "tipo_immobile": "appartamento",
+          "superficie_mq": 82.63,
+          "numero_vani": "4"
+        },
+        {
+          "id": 5,
+          "indirizzo": "Via Verdi 24",
+          "citta": "Bari",
+          "tipo_immobile": "attico",
+          "superficie_mq": 119.12,
+          "numero_vani": "4"
+        },
+        {
+          "id": 6,
+          "indirizzo": "Via Garibaldi 8",
+          "citta": "Milano",
+          "tipo_immobile": "attico",
+          "superficie_mq": 90.76,
+          "numero_vani": "7"
+        },
+        {
+          "id": 7,
+          "indirizzo": "Via Verdi 24",
+          "citta": "Bologna",
+          "tipo_immobile": "appartamento",
+          "superficie_mq": 129.43,
+          "numero_vani": "4"
+        },
+        {
+          "id": 8,
+          "indirizzo": "Corso Buenos Aires 45",
+          "citta": "Genova",
+          "tipo_immobile": "attico",
+          "superficie_mq": 60.73,
+          "numero_vani": "3"
+        }
+      ],
+      "contratti": [
+        {
+          "id": 1001,
+          "agente_id": 331,
+          "immobile_id": 258,
+          "data_contratto": "2024-06-09",
+          "prezzo_vendita": 284955.68,
+          "provvigione": 11318.5
+        },
+        {
+          "id": 1002,
+          "agente_id": 273,
+          "immobile_id": 612,
+          "data_contratto": "2024-02-22",
+          "prezzo_vendita": 130702.56,
+          "provvigione": 3492.66
+        },
+        {
+          "id": 1003,
+          "agente_id": 355,
+          "immobile_id": 453,
+          "data_contratto": "2023-12-12",
+          "prezzo_vendita": 318669.99,
+          "provvigione": 4299.31
+        },
+        {
+          "id": 1004,
+          "agente_id": 340,
+          "immobile_id": 620,
+          "data_contratto": "2023-10-16",
+          "prezzo_vendita": 102949.86,
+          "provvigione": 10939.83
+        },
+        {
+          "id": 1005,
+          "agente_id": 11,
+          "immobile_id": 112,
+          "data_contratto": "2024-05-19",
+          "prezzo_vendita": 287456.12,
+          "provvigione": 4423.81
+        },
+        {
+          "id": 1006,
+          "agente_id": 205,
+          "immobile_id": 767,
+          "data_contratto": "2024-03-27",
+          "prezzo_vendita": 248727.94,
+          "provvigione": 5320.09
+        },
+        {
+          "id": 1007,
+          "agente_id": 103,
+          "immobile_id": 201,
+          "data_contratto": "2024-08-07",
+          "prezzo_vendita": 249142.63,
+          "provvigione": 5728.16
+        },
+        {
+          "id": 1008,
+          "agente_id": 69,
+          "immobile_id": 214,
+          "data_contratto": "2023-08-27",
+          "prezzo_vendita": 232947.9,
+          "provvigione": 8476.48
+        }
+      ]
+    }
+  },
+  "story": "Nella sede centrale della rete di intermediazione Agenzia.it, la revisione semestrale delle performance commerciali è entrata nel vivo. Il capo ufficio vendite ha convocato i revisori interni per analizzare l'archivio denominato consulenti_catastali_abilitati, dove sono custodite le schede del personale di negoziazione: per ogni professionista compaiono il nome, il componente_familiare_dell'anagrafica — così viene chiamata nei documenti la seconda parte del nominativo, tenuta distintamente dalla prima — oltre all'indirizzo di posta elettronica aziendale, al recapito telefonico e alla data di assunzione in servizio. Accanto a questo archivio opera il registro immobili, che descrive ciascuna delle 789 unità abitative trattate dalla rete: ubicazione precisa, città di riferimento — Bari, Bologna, Catania, Firenze, Genova e Milano tra le piazze più attive — tipologia costruttiva (appartamento, villa, attico, loft oppure rustico), superficie espressa in metri quadrati, con valori che vanno dai 37,2 metri quadrati di un monolocale ai 419,42 di una dimora signorile, e numero di vani, oscillante tra un minimo di 3 e un massimo di 7. Completa il quadro l'archivio contratti, che annota le 2011 operazioni perfezionate: data di stipula dell'accordo, controvalore di realizzo dell'unità abitativa — termine tecnico con cui i periti indicano il prezzo di vendita concordato — e provvigione riconosciuta al negoziatore, con importi che si muovono tra i 2.442 e i 35.640 euro, mentre i controvalori spaziano dagli 81.400 euro di un bilocale di provincia agli 1.188.000 euro di un attico di pregio. La direzione ha richiesto un estratto mirato: occorre individuare i consulenti_catastali_abilitati che, nel periodo compreso tra il 15 giugno 2023 (2023-06-15) e la chiusura dell'esercizio il 31 dicembre 2024 (2024-12-31), abbiano firmato almeno 3 contratti relativi a unità di tipo appartamento, attico o loft, lasciando fuori ville e rustici. Per ciascun professionista che supera questa soglia bisognerà riportare il nome, il componente_familiare_dell'anagrafica, l'indirizzo di posta elettronica, il numero di contratti conclusi, il prezzo mediano di vendita — calcolato secondo il metodo del percentile continuo sulla serie dei controvalori di realizzo dell'unità abitativa — e il totale complessivo delle provvigioni maturate. L'elenco finale sarà disposto dal prezzo mediano più alto al più basso e, in caso di pari merito, l'email farà da criterio di spareggio per garantire un ordinamento univoco. I revisori hanno già predisposto i fogli di lavoro: incroceranno le schede del personale con quelle degli immobili e con le annotazioni delle vendite, verificando che ogni pratica rientri nella finestra temporale e nella tipologia richiesta, prima di trasmettere la graduatoria definitiva alla direzione generale."
+}

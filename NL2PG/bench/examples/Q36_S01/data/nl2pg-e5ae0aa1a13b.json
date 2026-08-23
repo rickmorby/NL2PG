@@ -1,0 +1,133 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 1,
+    "hierarchy": "none",
+    "sql_features": [
+      "string_funcs"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "conti_correnti",
+        "obsolete_value": "posizioni_cliente",
+        "description": "La tabella conti_correnti, che contiene PK id_conto e attributi base come intestatario, iban, saldo e filiale, viene denominata posizioni_cliente nella prosa aziendale. Le query devono risolvere il nome reale della tabella."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "saldo",
+        "obsolete_value": "giacenza",
+        "description": "La colonna saldo della tabella conti_correnti viene indicata con il sinonimo giacenza nella documentazione aziendale. Le query che manipolano stringhe (UPPER, CONCAT, SUBSTRING) su intestatario o filiale devono comunque riferirsi alle colonne reali dello schema."
+      }
+    ],
+    "spec_hash": "a8cfbc0c4b8a72dd"
+  },
+  "schema_ddl": "CREATE TABLE conti_correnti (\n    id_conto INT PRIMARY KEY,\n    intestatario TEXT NOT NULL,\n    iban TEXT NOT NULL UNIQUE,\n    saldo NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    filiale TEXT NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "conti_correnti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id_conto": 1,
+            "intestatario": "Mario Rossi",
+            "iban": "IT60X0542811101000000123456",
+            "saldo": 15400.75,
+            "filiale": "Roma Centro"
+          },
+          {
+            "id_conto": 2,
+            "intestatario": "Laura Bianchi",
+            "iban": "IT02L0301503200012345678901",
+            "saldo": 8920.4,
+            "filiale": "Milano Duomo"
+          },
+          {
+            "id_conto": 3,
+            "intestatario": "Giulia Verdi",
+            "iban": "IT21A0200805043012345678901",
+            "saldo": 25750.0,
+            "filiale": "Torino Porta Nuova"
+          },
+          {
+            "id_conto": 4,
+            "intestatario": "Alessandro Conti",
+            "iban": "IT90M0569602101012345678901",
+            "saldo": 430.12,
+            "filiale": "Napoli Vomero"
+          },
+          {
+            "id_conto": 5,
+            "intestatario": "Sara Moretti",
+            "iban": "IT45T0335901600101234567890",
+            "saldo": 67890.55,
+            "filiale": "Firenze Santa Maria Novella"
+          },
+          {
+            "id_conto": 6,
+            "intestatario": "Luca Ferrari",
+            "iban": "IT33X0101503200012345678902",
+            "saldo": 1250.0,
+            "filiale": "Bologna Centrale"
+          }
+        ],
+        "variations": {
+          "intestatario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Alessandro Conti",
+              "Sara Moretti",
+              "Luca Ferrari",
+              "Elena Gallo",
+              "Davide Fontana",
+              "Chiara Lombardi",
+              "Marco Esposito",
+              "Anna Ricci",
+              "Paolo Greco"
+            ]
+          },
+          "saldo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.1,
+            "factor_max": 6.0,
+            "pool": []
+          },
+          "filiale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma Centro",
+              "Milano Duomo",
+              "Torino Porta Nuova",
+              "Napoli Vomero",
+              "Firenze Santa Maria Novella",
+              "Bologna Centrale",
+              "Genova Porto Antico",
+              "Verona Arena"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

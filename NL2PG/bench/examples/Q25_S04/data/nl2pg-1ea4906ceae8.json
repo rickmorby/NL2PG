@@ -1,0 +1,165 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "c626465d24ef1022"
+  },
+  "schema_ddl": "CREATE TABLE bilanci (\n    esercizio_id INT PRIMARY KEY,\n    anno_esercizio INT NOT NULL UNIQUE CHECK (anno_esercizio BETWEEN 1900 AND 2100),\n    data_chiusura DATE NOT NULL,\n    totale_attivo NUMERIC(14,2) NOT NULL CHECK (totale_attivo >= 0),\n    totale_passivo NUMERIC(14,2) NOT NULL CHECK (totale_passivo >= 0)\n);\n\nCREATE TABLE relazioni_gestione (\n    esercizio_id INT PRIMARY KEY REFERENCES bilanci(esercizio_id),\n    testo_relazione TEXT NOT NULL,\n    data_redazione DATE NOT NULL,\n    redattore TEXT NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "bilanci",
+        "nature": "explicit",
+        "min_rows": 25,
+        "max_rows": 35,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "esercizio_id": 1,
+            "anno_esercizio": 2015,
+            "data_chiusura": "2015-12-31",
+            "totale_attivo": 2450000.0,
+            "totale_passivo": 2450000.0
+          },
+          {
+            "esercizio_id": 2,
+            "anno_esercizio": 2016,
+            "data_chiusura": "2016-12-31",
+            "totale_attivo": 2615000.0,
+            "totale_passivo": 2615000.0
+          },
+          {
+            "esercizio_id": 3,
+            "anno_esercizio": 2017,
+            "data_chiusura": "2017-12-31",
+            "totale_attivo": 2890000.0,
+            "totale_passivo": 2890000.0
+          },
+          {
+            "esercizio_id": 4,
+            "anno_esercizio": 2018,
+            "data_chiusura": "2018-12-31",
+            "totale_attivo": 2742500.0,
+            "totale_passivo": 2742500.0
+          },
+          {
+            "esercizio_id": 5,
+            "anno_esercizio": 2019,
+            "data_chiusura": "2019-12-31",
+            "totale_attivo": 3010000.0,
+            "totale_passivo": 3010000.0
+          },
+          {
+            "esercizio_id": 6,
+            "anno_esercizio": 2020,
+            "data_chiusura": "2020-12-31",
+            "totale_attivo": 3325000.0,
+            "totale_passivo": 3325000.0
+          }
+        ],
+        "variations": {
+          "data_chiusura": {
+            "axis": "shift",
+            "delta_min": -7.0,
+            "delta_max": 7.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "totale_attivo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.35,
+            "pool": []
+          },
+          "totale_passivo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.75,
+            "factor_max": 1.35,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "relazioni_gestione",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.0,
+        "templates": [
+          {
+            "esercizio_id": 1,
+            "testo_relazione": "La gestione ha chiuso con risultati in linea con le previsioni di budget; il margine operativo lordo risulta in crescita rispetto all'esercizio precedente.",
+            "data_redazione": "2016-04-15",
+            "redattore": "Dott. Alessandro Ferri"
+          },
+          {
+            "esercizio_id": 2,
+            "testo_relazione": "L'esercizio si caratterizza per una contenuta contrazione dei ricavi dovuta alla congiuntura di mercato, compensata da interventi di razionalizzazione dei costi.",
+            "data_redazione": "2017-03-28",
+            "redattore": "Rag. Chiara Lombardi"
+          },
+          {
+            "esercizio_id": 3,
+            "testo_relazione": "Si segnala un incremento degli investimenti in immobilizzazioni tecniche finalizzati all'ammodernamento del parco macchine e all'ampliamento della capacita' produttiva.",
+            "data_redazione": "2018-04-10",
+            "redattore": "Dott. Alessandro Ferri"
+          },
+          {
+            "esercizio_id": 4,
+            "testo_relazione": "Il risultato d'esercizio evidenzia un utile che consente il ripristino delle riserve patrimoniali decurtate negli anni precedenti e una solida posizione finanziaria netta.",
+            "data_redazione": "2019-03-22",
+            "redattore": "Dott.ssa Elena Vitale"
+          }
+        ],
+        "variations": {
+          "testo_relazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "La gestione ha chiuso con risultati in linea con le previsioni di budget; il margine operativo lordo risulta in crescita rispetto all'esercizio precedente.",
+              "L'esercizio si caratterizza per una contenuta contrazione dei ricavi dovuta alla congiuntura di mercato, compensata da interventi di razionalizzazione dei costi.",
+              "Si segnala un incremento degli investimenti in immobilizzazioni tecniche finalizzati all'ammodernamento del parco macchine e all'ampliamento della capacita' produttiva.",
+              "Il risultato d'esercizio evidenzia un utile che consente il ripristino delle riserve patrimoniali decurtate negli anni precedenti e una solida posizione finanziaria netta.",
+              "La produzione e le vendite hanno raggiunto livelli record grazie all'espansione sulla clientela estera; il fabbisogno finanziario e' stato interamente couerto da mezzi propri."
+            ]
+          },
+          "data_redazione": {
+            "axis": "shift",
+            "delta_min": -25.0,
+            "delta_max": 25.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "redattore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Dott. Alessandro Ferri",
+              "Rag. Chiara Lombardi",
+              "Dott.ssa Elena Vitale",
+              "Dott. Paolo Grassi"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

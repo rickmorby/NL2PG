@@ -1,0 +1,361 @@
+{
+  "schema_ddl": "CREATE TABLE reparti (\n    id INT PRIMARY KEY,\n    nome_reparto TEXT NOT NULL UNIQUE,\n    sede TEXT NOT NULL\n);\n\nCREATE TABLE dipendenti (\n    id INT PRIMARY KEY,\n    reparto_id INT NOT NULL REFERENCES reparti(id),\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile >= 0)\n);\n\nCREATE TABLE richieste_ferie (\n    id INT PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id),\n    data_inizio DATE NOT NULL,\n    data_fine DATE NOT NULL,\n    stato TEXT NOT NULL CHECK (stato IN ('in_attesa', 'approvata', 'rifiutata')),\n    CHECK (data_fine >= data_inizio)\n);",
+  "data_profile": {
+    "profile": {
+      "reparti": {
+        "row_count": 8,
+        "columns": {
+          "id": {
+            "distinct": 8,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 8
+          },
+          "nome_reparto": {
+            "distinct": 8,
+            "sample": [
+              "Amministrazione",
+              "Finanza",
+              "Information Technology",
+              "Logistica",
+              "Marketing"
+            ]
+          },
+          "sede": {
+            "distinct": 4,
+            "sample": [
+              "Bologna",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          }
+        }
+      },
+      "dipendenti": {
+        "row_count": 143,
+        "columns": {
+          "id": {
+            "distinct": 143,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 143
+          },
+          "reparto_id": {
+            "distinct": 8,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 8
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Chiara",
+              "Davide",
+              "Elena"
+            ]
+          },
+          "cognome": {
+            "distinct": 12,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "email": {
+            "distinct": 143,
+            "sample": [
+              "alessandro.conti10@azienda.it",
+              "alessandro.conti11@azienda.it",
+              "alessandro.conti12@azienda.it",
+              "alessandro.conti13@azienda.it",
+              "alessandro.conti14@azienda.it"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 139,
+            "sample": [
+              "2014-05-12",
+              "2014-05-13",
+              "2014-07-10",
+              "2014-10-01",
+              "2015-01-20"
+            ]
+          },
+          "stipendio_mensile": {
+            "distinct": 141,
+            "sample": [
+              "1488.09",
+              "1560.8",
+              "1570.87",
+              "1605.44",
+              "1667.5"
+            ],
+            "min": 1488.09,
+            "max": 5997.74
+          }
+        }
+      },
+      "richieste_ferie": {
+        "row_count": 437,
+        "columns": {
+          "id": {
+            "distinct": 437,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 437
+          },
+          "dipendente_id": {
+            "distinct": 139,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 143
+          },
+          "data_inizio": {
+            "distinct": 166,
+            "sample": [
+              "2025-11-23",
+              "2025-11-24",
+              "2025-11-28",
+              "2025-11-29",
+              "2025-11-30"
+            ]
+          },
+          "data_fine": {
+            "distinct": 111,
+            "sample": [
+              "2026-01-09",
+              "2026-01-10",
+              "2026-01-11",
+              "2026-01-12",
+              "2026-01-13"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "approvata",
+              "in_attesa",
+              "rifiutata"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "reparti": [
+        {
+          "id": 1,
+          "nome_reparto": "Risorse Umane",
+          "sede": "Milano"
+        },
+        {
+          "id": 2,
+          "nome_reparto": "Vendite",
+          "sede": "Milano"
+        },
+        {
+          "id": 3,
+          "nome_reparto": "Information Technology",
+          "sede": "Napoli"
+        },
+        {
+          "id": 4,
+          "nome_reparto": "Amministrazione",
+          "sede": "Napoli"
+        },
+        {
+          "id": 5,
+          "nome_reparto": "Produzione",
+          "sede": "Napoli"
+        },
+        {
+          "id": 6,
+          "nome_reparto": "Marketing",
+          "sede": "Roma"
+        },
+        {
+          "id": 7,
+          "nome_reparto": "Logistica",
+          "sede": "Milano"
+        },
+        {
+          "id": 8,
+          "nome_reparto": "Finanza",
+          "sede": "Bologna"
+        }
+      ],
+      "dipendenti": [
+        {
+          "id": 24,
+          "reparto_id": 4,
+          "nome": "Andrea",
+          "cognome": "Moretti",
+          "email": "andrea.moretti1@azienda.it",
+          "data_assunzione": "2016-03-30",
+          "stipendio_mensile": 2849.33
+        },
+        {
+          "id": 13,
+          "reparto_id": 1,
+          "nome": "Andrea",
+          "cognome": "Verdi",
+          "email": "andrea.verdi1@azienda.it",
+          "data_assunzione": "2016-09-12",
+          "stipendio_mensile": 3233.43
+        },
+        {
+          "id": 8,
+          "reparto_id": 2,
+          "nome": "Chiara",
+          "cognome": "Marino",
+          "email": "chiara.marino1@azienda.it",
+          "data_assunzione": "2016-04-22",
+          "stipendio_mensile": 2126.74
+        },
+        {
+          "id": 18,
+          "reparto_id": 7,
+          "nome": "Chiara",
+          "cognome": "Marino",
+          "email": "chiara.marino2@azienda.it",
+          "data_assunzione": "2019-02-01",
+          "stipendio_mensile": 2621.02
+        },
+        {
+          "id": 22,
+          "reparto_id": 7,
+          "nome": "Davide",
+          "cognome": "Moretti",
+          "email": "davide.moretti1@azienda.it",
+          "data_assunzione": "2019-06-17",
+          "stipendio_mensile": 3423.79
+        },
+        {
+          "id": 9,
+          "reparto_id": 3,
+          "nome": "Elena",
+          "cognome": "Bianchi",
+          "email": "elena.bianchi1@azienda.it",
+          "data_assunzione": "2017-07-29",
+          "stipendio_mensile": 3484.04
+        },
+        {
+          "id": 23,
+          "reparto_id": 2,
+          "nome": "Elena",
+          "cognome": "Conti",
+          "email": "elena.conti1@azienda.it",
+          "data_assunzione": "2019-10-11",
+          "stipendio_mensile": 3167.65
+        },
+        {
+          "id": 15,
+          "reparto_id": 5,
+          "nome": "Elena",
+          "cognome": "Moretti",
+          "email": "elena.moretti1@azienda.it",
+          "data_assunzione": "2019-03-19",
+          "stipendio_mensile": 3174.91
+        }
+      ],
+      "richieste_ferie": [
+        {
+          "id": 1,
+          "dipendente_id": 139,
+          "data_inizio": "2025-12-14",
+          "data_fine": "2026-01-17",
+          "stato": "approvata"
+        },
+        {
+          "id": 2,
+          "dipendente_id": 62,
+          "data_inizio": "2025-11-29",
+          "data_fine": "2026-01-16",
+          "stato": "in_attesa"
+        },
+        {
+          "id": 3,
+          "dipendente_id": 53,
+          "data_inizio": "2026-01-05",
+          "data_fine": "2026-01-09",
+          "stato": "approvata"
+        },
+        {
+          "id": 4,
+          "dipendente_id": 113,
+          "data_inizio": "2025-11-29",
+          "data_fine": "2026-01-14",
+          "stato": "in_attesa"
+        },
+        {
+          "id": 5,
+          "dipendente_id": 76,
+          "data_inizio": "2025-12-25",
+          "data_fine": "2026-01-25",
+          "stato": "rifiutata"
+        },
+        {
+          "id": 6,
+          "dipendente_id": 27,
+          "data_inizio": "2025-12-10",
+          "data_fine": "2026-01-13",
+          "stato": "approvata"
+        },
+        {
+          "id": 7,
+          "dipendente_id": 134,
+          "data_inizio": "2025-12-05",
+          "data_fine": "2026-01-12",
+          "stato": "approvata"
+        },
+        {
+          "id": 8,
+          "dipendente_id": 79,
+          "data_inizio": "2025-12-09",
+          "data_fine": "2026-01-23",
+          "stato": "approvata"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "like"
+  ],
+  "query": "SELECT r.nome_reparto AS reparto, r.sede, COUNT(d.id) AS numero_dipendenti, ROUND(AVG(d.stipendio_mensile), 2) AS stipendio_medio_mensile FROM reparti r JOIN dipendenti d ON d.reparto_id = r.id WHERE r.nome_reparto LIKE '%zione%' OR r.sede = 'Milano' GROUP BY r.nome_reparto, r.sede ORDER BY stipendio_medio_mensile DESC, numero_dipendenti DESC;"
+}

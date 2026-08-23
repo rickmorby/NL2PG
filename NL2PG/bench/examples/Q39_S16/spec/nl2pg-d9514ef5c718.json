@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "between"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "versioni_polizza",
+      "obsolete_value": "storico_coperture",
+      "description": "La tabella versioni_polizza, che contiene le versioni storiche delle condizioni di ciascuna polizza con i relativi timestamp di validità, viene denominata storico_coperture nella prosa aziendale. Il richiedente deve mappare la perifrasi al nome reale della tabella per costruire correttamente la clausola WHERE col_ts BETWEEN t1 AND t2."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "ts_validita",
+      "obsolete_value": "decorrenza della garanzia",
+      "description": "La colonna ts_validita della tabella versioni_polizza, che indica l'istante temporale di validità di ciascuna versione della polizza, viene indicata nel linguaggio aziendale con il gergo assicurativo 'decorrenza della garanzia'. Le query di intervallo chiuso devono applicare il filtro BETWEEN proprio su ts_validita, riconoscendo il termine di settore come riferimento alla colonna temporale."
+    }
+  ],
+  "spec_hash": "89879c9eb3c10b2d"
+}

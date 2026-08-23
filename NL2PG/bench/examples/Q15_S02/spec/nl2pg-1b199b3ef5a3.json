@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 3,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "cte"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "pazienti",
+      "obsolete_value": "anagrafica_utenti",
+      "description": "La tabella pazienti viene denominata anagrafica_utenti nel linguaggio aziendale."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "esami",
+      "obsolete_value": "prestazioni_diagnostiche",
+      "description": "La tabella esami viene riferita come prestazioni_diagnostiche nel gergo medico-amministrativo."
+    }
+  ],
+  "spec_hash": "d7a0be890eaf9f02"
+}

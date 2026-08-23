@@ -1,0 +1,106 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [
+      "disjunctive"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "clnt",
+        "obsolete_value": "cliente",
+        "description": "La colonna 'clnt' (sigla per cliente) viene riferita come 'cliente' nella prosa aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "tot_vnd",
+        "obsolete_value": "fatturato",
+        "description": "La colonna 'tot_vnd' (totale vendite) viene chiamata 'fatturato' nel linguaggio aziendale."
+      }
+    ],
+    "spec_hash": "b8d4d221ae723499"
+  },
+  "schema_ddl": "CREATE TABLE vnd (\n    id SERIAL PRIMARY KEY,\n    clnt TEXT NOT NULL,\n    tot_vnd NUMERIC(12,2) CHECK (tot_vnd >= 0),\n    dt_vnd DATE NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "vnd",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "clnt": "CL001",
+            "tot_vnd": 1500.0,
+            "dt_vnd": "2026-01-15"
+          },
+          {
+            "id": 2,
+            "clnt": "CL002",
+            "tot_vnd": 2300.5,
+            "dt_vnd": "2026-01-20"
+          },
+          {
+            "id": 3,
+            "clnt": "CL003",
+            "tot_vnd": 890.0,
+            "dt_vnd": "2026-02-01"
+          },
+          {
+            "id": 4,
+            "clnt": "CL001",
+            "tot_vnd": 4500.75,
+            "dt_vnd": "2026-02-10"
+          },
+          {
+            "id": 5,
+            "clnt": "CL004",
+            "tot_vnd": 1200.2,
+            "dt_vnd": "2026-03-05"
+          }
+        ],
+        "variations": {
+          "clnt": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "CL001",
+              "CL002",
+              "CL003",
+              "CL004",
+              "CL005",
+              "CL006"
+            ]
+          },
+          "tot_vnd": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "dt_vnd": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "domain": "vendite",
+  "n_tables": 5,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [
+    "ambiguity"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "ambiguity",
+      "target_value": "importo_vendita",
+      "obsolete_value": "valore_transazione",
+      "description": "La colonna 'importo_vendita' (tipo NUMERIC) è fisicamente memorizzata come TEXT nel database, ma viene referenziata come 'valore_transazione' nei report aziendali. Le query devono gestire esplicitamente la conversione di tipo per evitare errori di aggregazione (es. SUM su stringhe)."
+    },
+    {
+      "twist_type": "ambiguity",
+      "target_value": "quantita",
+      "obsolete_value": "unita_movimentate",
+      "description": "La colonna 'quantita' (tipo INTEGER) è memorizzata come TEXT e viene chiamata 'unita_movimentate' nei documenti interni. Le query devono includere un CAST esplicito per operazioni aritmetiche o aggregazioni."
+    }
+  ],
+  "spec_hash": "8358ef83a8435df1"
+}

@@ -1,0 +1,41 @@
+{
+  "domain": "vendite",
+  "n_tables": 7,
+  "hierarchy": "multi_level_one_to_many",
+  "sql_features": [
+    "distinct_on"
+  ],
+  "twist": [
+    "rename",
+    "distractor",
+    "polysemy",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "clienti",
+      "obsolete_value": "anagrafica_contatti_commerciali",
+      "description": "La tabella che contiene i dati dei clienti è denominata 'anagrafica_contatti_commerciali' nel database, ma nel linguaggio aziendale viene spesso chiamata semplicemente 'clienti'."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "ordini",
+      "obsolete_value": "transazioni_storiche",
+      "description": "Esiste una tabella 'transazioni_storiche' che contiene dati di vendite obsolete o annullate, ma non è rilevante per la query corrente. La tabella pertinente è 'ordini'."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "valore_totale",
+      "obsolete_value": "importo",
+      "description": "La colonna 'valore_totale' nella tabella 'ordini' rappresenta l'importo complessivo dell'ordine, ma nel linguaggio aziendale viene spesso chiamata genericamente 'importo', che può riferirsi anche ad altri campi come 'importo_sconto' o 'importo_spedizione'."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "priorità_spedizione",
+      "obsolete_value": "SLA tier",
+      "description": "La colonna 'priorità_spedizione' nella tabella 'ordini' è indicata nel database come un valore numerico (1-3), ma nel linguaggio aziendale viene chiamata 'SLA tier' (Service Level Agreement tier)."
+    }
+  ],
+  "spec_hash": "d352401df5864c87"
+}

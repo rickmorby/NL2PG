@@ -1,0 +1,34 @@
+{
+  "domain": "università",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "scalar_agg"
+  ],
+  "twist": [
+    "jargon",
+    "synonym",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "esm",
+      "obsolete_value": "prove di profitto",
+      "description": "La tabella esm (abbreviazione di esami) viene indicata nella narrativa aziendale con il gergo burocratico 'prove di profitto'. Il risolutore deve decodificare che ogni menzione delle prove di profitto si riferisce alle righe della tabella esm su cui effettuare l'aggregazione scalare."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "dnt",
+      "obsolete_value": "corpo insegnante",
+      "description": "La tabella dnt (abbreviazione di docenti) è denominata nei documenti con il sinonimo 'corpo insegnante'. Il mapping semantico richiesto collega il sinonimo usato nella prosa all'identificatore abbreviato dnt nello schema."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "vot_fin",
+      "obsolete_value": "esito definitivo della valutazione",
+      "description": "La colonna vot_fin (voto finale) della tabella esm è descritta nella prosa aziendale con la perifrasi 'esito definitivo della valutazione'. La query di aggregazione scalare (ad esempio AVG o MAX) deve essere applicata proprio a questa colonna dopo aver riconosciuto la perifrasi."
+    }
+  ],
+  "spec_hash": "625287695b1bc785"
+}

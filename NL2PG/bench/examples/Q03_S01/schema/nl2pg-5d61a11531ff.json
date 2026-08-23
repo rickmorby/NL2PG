@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 1,
+    "hierarchy": "single_entity",
+    "sql_features": [
+      "top_n"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobili",
+        "obsolete_value": "schede_alloggi",
+        "description": "La tabella autonoma immobili (con PK id_immobile e attributi come tipo, quartiere, superficie_mq, numero_vani, prezzo) viene denominata schede_alloggi nella prosa aziendale."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "prezzo",
+        "obsolete_value": "valore_di_listino",
+        "description": "La colonna prezzo dell'immobile viene indicata con il sinonimo valore_di_listino nella documentazione commerciale, richiedendo il mapping semantico per le query top-N su ORDER BY e LIMIT."
+      }
+    ],
+    "spec_hash": "82b1c7427001ad0d"
+  },
+  "schema_ddl": "CREATE TABLE immobili (\n    id_immobile INT PRIMARY KEY,\n    tipo TEXT NOT NULL,\n    quartiere TEXT NOT NULL,\n    indirizzo TEXT,\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani BETWEEN 1 AND 30),\n    prezzo NUMERIC(12,2) NOT NULL CHECK (prezzo >= 0),\n    disponibile BOOLEAN NOT NULL DEFAULT TRUE\n);"
+}

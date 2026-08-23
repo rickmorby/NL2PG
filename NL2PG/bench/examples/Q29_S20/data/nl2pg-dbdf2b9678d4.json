@@ -1,0 +1,313 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "agg_distinct"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "vendite",
+        "obsolete_value": "registrazione_transazioni_commerciali",
+        "description": "La tabella vendite viene denominata registrazione_transazioni_commerciali nella prosa aziendale. Il progettista deve riconoscere che il termine perifrastico usato nei documenti di business corrisponde alla tabella fisica vendite."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "stato",
+        "obsolete_value": "classificazione_operativa_del_flusso",
+        "description": "La colonna ENUM stato della tabella vendite, con valori dichiarati 'confermata', 'annullata' e 'resa', viene indicata nella documentazione aziendale come classificazione_operativa_del_flusso. La query richiede COUNT(DISTINCT prodotto_id) raggruppato per stato, considerando esclusivamente i tre valori dichiarati nel tipo enumerato."
+      }
+    ],
+    "spec_hash": "03959e053c229b2d"
+  },
+  "schema_ddl": "CREATE TYPE stato_vendita AS ENUM ('confermata', 'annullata', 'resa');\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);\n\nCREATE TABLE vendite (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    stato stato_vendita NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    data_vendita DATE NOT NULL DEFAULT CURRENT_DATE\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario Rossi",
+            "email": "mario.rossi@gmail.com"
+          },
+          {
+            "id": 2,
+            "nome": "Laura Bianchi",
+            "email": "laura.bianchi@libero.it"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia Verdi",
+            "email": "giulia.verdi@outlook.com"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro Ferrari",
+            "email": "alessandro.ferrari@yahoo.it"
+          },
+          {
+            "id": 5,
+            "nome": "Chiara Esposito",
+            "email": "chiara.esposito@gmail.com"
+          },
+          {
+            "id": 6,
+            "nome": "Francesco Romano",
+            "email": "francesco.romano@tiscali.it"
+          },
+          {
+            "id": 7,
+            "nome": "Sara Colombo",
+            "email": "sara.colombo@icloud.com"
+          },
+          {
+            "id": 8,
+            "nome": "Luca Moretti",
+            "email": "luca.moretti@fastwebnet.it"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario Rossi",
+              "Laura Bianchi",
+              "Giulia Verdi",
+              "Alessandro Ferrari",
+              "Chiara Esposito",
+              "Francesco Romano",
+              "Sara Colombo",
+              "Luca Moretti",
+              "Elena Greco",
+              "Davide Fontana",
+              "Martina Galli",
+              "Andrea Rinaldi",
+              "Paola Marini",
+              "Simone Vitale",
+              "Federica Longo",
+              "Roberto Serra"
+            ]
+          }
+        }
+      },
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Laptop Ultrabook 14 pollici",
+            "prezzo_unitario": 899.9
+          },
+          {
+            "id": 2,
+            "nome": "Mouse Wireless Ergonomico",
+            "prezzo_unitario": 24.5
+          },
+          {
+            "id": 3,
+            "nome": "Tastiera Meccanica RGB",
+            "prezzo_unitario": 79.99
+          },
+          {
+            "id": 4,
+            "nome": "Monitor 27 pollici 4K",
+            "prezzo_unitario": 349.0
+          },
+          {
+            "id": 5,
+            "nome": "Cuffie Bluetooth con Riduzione Rumore",
+            "prezzo_unitario": 129.9
+          },
+          {
+            "id": 6,
+            "nome": "Webcam Full HD",
+            "prezzo_unitario": 59.0
+          },
+          {
+            "id": 7,
+            "nome": "SSD Esterno 1TB USB-C",
+            "prezzo_unitario": 109.95
+          },
+          {
+            "id": 8,
+            "nome": "Hub USB-C 7 porte",
+            "prezzo_unitario": 45.75
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Laptop Ultrabook 14 pollici",
+              "Mouse Wireless Ergonomico",
+              "Tastiera Meccanica RGB",
+              "Monitor 27 pollici 4K",
+              "Cuffie Bluetooth con Riduzione Rumore",
+              "Webcam Full HD",
+              "SSD Esterno 1TB USB-C",
+              "Hub USB-C 7 porte",
+              "Stampante Laser Multifunzione",
+              "Router WiFi 6 Mesh",
+              "Power Bank 20000mAh",
+              "Microfono USB da Studio",
+              "Supporto per Laptop Regolabile",
+              "Caricatore Rapido GaN 65W",
+              "Smartwatch Fitness Tracker",
+              "Altoparlante Bluetooth Portatile"
+            ]
+          },
+          "prezzo_unitario": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "vendite",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "cliente_id": 1,
+            "prodotto_id": 1,
+            "stato": "confermata",
+            "quantita": 1,
+            "data_vendita": "2026-01-10"
+          },
+          {
+            "id": 2,
+            "cliente_id": 2,
+            "prodotto_id": 2,
+            "stato": "confermata",
+            "quantita": 3,
+            "data_vendita": "2026-01-18"
+          },
+          {
+            "id": 3,
+            "cliente_id": 3,
+            "prodotto_id": 3,
+            "stato": "annullata",
+            "quantita": 2,
+            "data_vendita": "2026-02-03"
+          },
+          {
+            "id": 4,
+            "cliente_id": 4,
+            "prodotto_id": 4,
+            "stato": "resa",
+            "quantita": 1,
+            "data_vendita": "2026-02-21"
+          },
+          {
+            "id": 5,
+            "cliente_id": 5,
+            "prodotto_id": 5,
+            "stato": "confermata",
+            "quantita": 5,
+            "data_vendita": "2026-03-05"
+          },
+          {
+            "id": 6,
+            "cliente_id": 6,
+            "prodotto_id": 6,
+            "stato": "annullata",
+            "quantita": 4,
+            "data_vendita": "2026-03-12"
+          },
+          {
+            "id": 7,
+            "cliente_id": 7,
+            "prodotto_id": 7,
+            "stato": "confermata",
+            "quantita": 2,
+            "data_vendita": "2026-03-25"
+          },
+          {
+            "id": 8,
+            "cliente_id": 8,
+            "prodotto_id": 8,
+            "stato": "resa",
+            "quantita": 1,
+            "data_vendita": "2026-04-02"
+          }
+        ],
+        "variations": {
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "confermata",
+              "confermata",
+              "confermata",
+              "confermata",
+              "confermata",
+              "annullata",
+              "annullata",
+              "resa"
+            ]
+          },
+          "quantita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "1",
+              "1",
+              "2",
+              "2",
+              "3",
+              "3",
+              "4",
+              "5",
+              "6"
+            ]
+          },
+          "data_vendita": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

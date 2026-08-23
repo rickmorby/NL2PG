@@ -1,0 +1,34 @@
+{
+  "domain": "erp",
+  "n_tables": 11,
+  "hierarchy": "many_to_many_complex",
+  "sql_features": [
+    "any_all"
+  ],
+  "twist": [
+    "rename",
+    "distractor",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini_fornitore",
+      "obsolete_value": "flussi_inbound_approvvigionamento",
+      "description": "La tabella contenente gli ordini verso i fornitori è stata rinominata nel linguaggio aziendale come flussi_inbound_approvvigionamento."
+    },
+    {
+      "twist_type": "distractor",
+      "target_value": "ordini_cliente_storico",
+      "obsolete_value": "ordini_archiviati_non_pertinenti",
+      "description": "Tabella inserita per confondere la logica di join; contiene dati simili ma non necessari per la query corrente."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "stato_ordine",
+      "obsolete_value": "status",
+      "description": "Il termine 'status' viene utilizzato sia per indicare lo stato di avanzamento logistico che lo stato di pagamento contabile, creando ambiguità nella selezione della colonna."
+    }
+  ],
+  "spec_hash": "910a2302d785ba20"
+}

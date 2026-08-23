@@ -1,0 +1,320 @@
+{
+  "schema_ddl": "CREATE TABLE gestori_immobili (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    citta_sede TEXT NOT NULL\n);\n\nCREATE TABLE immobili (\n    id INT PRIMARY KEY,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    categoria_immobile TEXT NOT NULL,\n    superficie_mq NUMERIC(8,2) CHECK (superficie_mq > 0),\n    valore_stimato NUMERIC(12,2) CHECK (valore_stimato >= 0),\n    fornitore_manutenzione TEXT,\n    gestore_id INT REFERENCES gestori_immobili(id),\n    n_interventi_manutenzione INT NOT NULL DEFAULT 0 CHECK (n_interventi_manutenzione >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "gestori_immobili": {
+        "row_count": 548,
+        "columns": {
+          "id": {
+            "distinct": 548,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 548
+          },
+          "ragione_sociale": {
+            "distinct": 5,
+            "sample": [
+              "Alpi Real Estate S.p.A.",
+              "Gestione Beni Liguri S.r.l.",
+              "Immobiliare Aurora S.r.l.",
+              "Milano Gestioni Patrimoniali S.p.A.",
+              "Partenope Asset Management S.r.l."
+            ]
+          },
+          "email": {
+            "distinct": 548,
+            "sample": [
+              "amministrazione100@beniliguri.it",
+              "amministrazione101@beniliguri.it",
+              "amministrazione102@beniliguri.it",
+              "amministrazione103@beniliguri.it",
+              "amministrazione104@beniliguri.it"
+            ]
+          },
+          "telefono": {
+            "distinct": 5,
+            "sample": [
+              "+39 010 555123",
+              "+39 011 667788",
+              "+39 02 9876543",
+              "+39 06 1234567",
+              "+39 081 4423399"
+            ]
+          },
+          "citta_sede": {
+            "distinct": 8,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          }
+        }
+      },
+      "immobili": {
+        "row_count": 2994,
+        "columns": {
+          "id": {
+            "distinct": 2994,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 3094
+          },
+          "indirizzo": {
+            "distinct": 7,
+            "sample": [
+              "Corso Buenos Aires 45",
+              "Piazza della Signoria 3",
+              "Via Indipendenza 7",
+              "Via Po 21",
+              "Via Roma 88"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          },
+          "categoria_immobile": {
+            "distinct": 7,
+            "sample": [
+              "Appartamento",
+              "Loft",
+              "Magazzino",
+              "Negozio",
+              "Palazzo Storico"
+            ]
+          },
+          "superficie_mq": {
+            "distinct": 2664,
+            "sample": [
+              "100.0",
+              "100.37",
+              "100.44",
+              "100.84",
+              "100.9"
+            ],
+            "min": 30.12,
+            "max": 1125.0
+          },
+          "valore_stimato": {
+            "distinct": 2748,
+            "sample": [
+              "1005826.04",
+              "1005973.82",
+              "1007255.85",
+              "1008213.2",
+              "1009750.75"
+            ],
+            "min": 108000.0,
+            "max": 2250000.0
+          },
+          "fornitore_manutenzione": {
+            "distinct": 6,
+            "sample": [
+              "Costruzioni Vesuvio S.n.c.",
+              "EdilRestauro S.r.l.",
+              "GreenService Manutenzioni S.r.l.",
+              "Logistica Manutenzioni Italia S.r.l.",
+              "Manutenzioni Tecniche Lombardia S.p.A."
+            ]
+          },
+          "gestore_id": {
+            "distinct": 538,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 548
+          },
+          "n_interventi_manutenzione": {
+            "distinct": 2870,
+            "sample": [
+              "1.0",
+              "1.0042535493319282",
+              "1.0392350644097685",
+              "1.0536219721032667",
+              "1.0648794263904204"
+            ],
+            "min": 1.0,
+            "max": 24.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "gestori_immobili": [
+        {
+          "id": 1,
+          "ragione_sociale": "Immobiliare Aurora S.r.l.",
+          "email": "info@auroraimmobili.it",
+          "telefono": "+39 06 1234567",
+          "citta_sede": "Milano"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Immobiliare Aurora S.r.l.",
+          "email": "info1@auroraimmobili.it",
+          "telefono": "+39 06 1234567",
+          "citta_sede": "Roma"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Immobiliare Aurora S.r.l.",
+          "email": "info2@auroraimmobili.it",
+          "telefono": "+39 06 1234567",
+          "citta_sede": "Milano"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Immobiliare Aurora S.r.l.",
+          "email": "info3@auroraimmobili.it",
+          "telefono": "+39 06 1234567",
+          "citta_sede": "Napoli"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Immobiliare Aurora S.r.l.",
+          "email": "info4@auroraimmobili.it",
+          "telefono": "+39 06 1234567",
+          "citta_sede": "Milano"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Immobiliare Aurora S.r.l.",
+          "email": "info5@auroraimmobili.it",
+          "telefono": "+39 06 1234567",
+          "citta_sede": "Milano"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Immobiliare Aurora S.r.l.",
+          "email": "info6@auroraimmobili.it",
+          "telefono": "+39 06 1234567",
+          "citta_sede": "Napoli"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Immobiliare Aurora S.r.l.",
+          "email": "info7@auroraimmobili.it",
+          "telefono": "+39 06 1234567",
+          "citta_sede": "Milano"
+        }
+      ],
+      "immobili": [
+        {
+          "id": 101,
+          "indirizzo": "Via del Corso 12",
+          "citta": "Firenze",
+          "categoria_immobile": "Loft",
+          "superficie_mq": 101.86,
+          "valore_stimato": 286527.48,
+          "fornitore_manutenzione": "Manutenzioni Tecniche Lombardia S.p.A.",
+          "gestore_id": 255,
+          "n_interventi_manutenzione": 9.836602870216147
+        },
+        {
+          "id": 102,
+          "indirizzo": "Via del Corso 12",
+          "citta": "Napoli",
+          "categoria_immobile": "Appartamento",
+          "superficie_mq": 48.19,
+          "valore_stimato": 343833.09,
+          "fornitore_manutenzione": "Logistica Manutenzioni Italia S.r.l.",
+          "gestore_id": 342,
+          "n_interventi_manutenzione": 6.583517302289805
+        },
+        {
+          "id": 103,
+          "indirizzo": "Via del Corso 12",
+          "citta": "Napoli",
+          "categoria_immobile": "Appartamento",
+          "superficie_mq": 43.5,
+          "valore_stimato": null,
+          "fornitore_manutenzione": "Logistica Manutenzioni Italia S.r.l.",
+          "gestore_id": 272,
+          "n_interventi_manutenzione": 5.261006760467345
+        },
+        {
+          "id": 104,
+          "indirizzo": "Via del Corso 12",
+          "citta": "Torino",
+          "categoria_immobile": "Loft",
+          "superficie_mq": 99.4,
+          "valore_stimato": 372486.67,
+          "fornitore_manutenzione": "GreenService Manutenzioni S.r.l.",
+          "gestore_id": 226,
+          "n_interventi_manutenzione": 7.8321164169792965
+        },
+        {
+          "id": 105,
+          "indirizzo": "Via del Corso 12",
+          "citta": "Bari",
+          "categoria_immobile": "Appartamento",
+          "superficie_mq": 123.18,
+          "valore_stimato": 404474.45,
+          "fornitore_manutenzione": "GreenService Manutenzioni S.r.l.",
+          "gestore_id": 522,
+          "n_interventi_manutenzione": 5.667097497302359
+        },
+        {
+          "id": 106,
+          "indirizzo": "Via del Corso 12",
+          "citta": "Firenze",
+          "categoria_immobile": "Loft",
+          "superficie_mq": 194.51,
+          "valore_stimato": 386561.36,
+          "fornitore_manutenzione": "EdilRestauro S.r.l.",
+          "gestore_id": 16,
+          "n_interventi_manutenzione": 3.0
+        },
+        {
+          "id": 107,
+          "indirizzo": "Via del Corso 12",
+          "citta": "Napoli",
+          "categoria_immobile": "Negozio",
+          "superficie_mq": 102.46,
+          "valore_stimato": null,
+          "fornitore_manutenzione": "GreenService Manutenzioni S.r.l.",
+          "gestore_id": 463,
+          "n_interventi_manutenzione": 8.506319898632643
+        },
+        {
+          "id": 108,
+          "indirizzo": "Via del Corso 12",
+          "citta": "Roma",
+          "categoria_immobile": "Appartamento",
+          "superficie_mq": 85.5,
+          "valore_stimato": 320000.0,
+          "fornitore_manutenzione": "EdilRestauro S.r.l.",
+          "gestore_id": 125,
+          "n_interventi_manutenzione": 4
+        }
+      ]
+    }
+  },
+  "story": "Alla direzione patrimoniale di Meridiana Asset Advisory, società che coordina un portafoglio di quasi tremila unità distribuite tra le principali città italiane, è arrivato il momento della consueta verifica semestrale sulla qualità dei servizi di manutenzione. Il lavoro prende le mosse dall'archivio denominato gestori_immobili, nel quale sono conservate le schede delle 548 società di gestione attive: per ciascuna sono annotati la ragione sociale, l'indirizzo di posta elettronica dedicato all'amministrazione, il recapito telefonico dell'ufficio e la città in cui insiste la direzione operativa, da Milano a Roma, passando per Genova, Firenze, Bologna e Bari. Accanto a questo archivio opera il registro intitolato immobili, vero cuore documentale della società: ogni scheda descrive un'unità con il proprio indirizzo, la città in cui sorge, la tipologia_di_bene attribuita secondo la classificazione interna, la superficie espressa in metri quadrati, il valore stimato dai periti, l'impresa appaltatrice dei lavori di manutenzione affidataria, il gestore incaricato del rapporto e il numero degli interventi già eseguiti, che in alcuni casi arriva fino a 24. Per la verifica di questo semestre gli analisti hanno imposto due condizioni precise: prendere in esame esclusivamente le unità ubicate a Milano oppure a Roma, e considerare soltanto quelle schede in cui il valore stimato risulta noto, cioè effettivamente attestato dalle perizie, in un intervallo che va da 108000 fino a 2250000 euro. Sulle unità così individuate è stato condotto il conteggio per ciascuna tipologia_di_bene: dagli appartamenti ai loft, dai negozi ai magazzini fino ai palazzi storici, gli operatori hanno contato quante imprese appaltatrici dei lavori distinte, tra EdilRestauro, GreenService Manutenzioni e le altre realtà convenzionate, abbiano operato sugli immobili coinvolti, affiancando a questo dato il totale delle unità rientranti nel perimetro della revisione. L'elenco finale è stato disposto dalla categoria con la maggiore varietà di appaltatori verso quella con la minore, così da mostrare subito dove la concorrenza tra fornitori si rivela più intensa e dove invece un unico soggetto domina il servizio, elemento prezioso per pianificare le prossime gare d'appalto."
+}

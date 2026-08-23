@@ -1,0 +1,713 @@
+{
+  "schema_ddl": "CREATE TABLE categorie (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT\n);\n\nCREATE TABLE fornitori (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    sku TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    categoria_id INT NOT NULL REFERENCES categorie(id),\n    fornitore_id INT REFERENCES fornitori(id),\n    versione_catalogo INT NOT NULL DEFAULT 1 CHECK (versione_catalogo >= 1),\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE storico_prezzi (\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    versione INT NOT NULL CHECK (versione >= 1),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    data_inizio DATE NOT NULL,\n    data_fine DATE,\n    PRIMARY KEY (prodotto_id, versione),\n    CHECK (data_fine IS NULL OR data_fine >= data_inizio)\n);\n\nCREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    citta TEXT\n);\n\nCREATE TABLE ordini (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    data_ordine DATE NOT NULL,\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    importo_totale NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (importo_totale >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "categorie": {
+        "row_count": 29,
+        "columns": {
+          "id": {
+            "distinct": 29,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 29
+          },
+          "nome": {
+            "distinct": 29,
+            "sample": [
+              "Abbigliamento",
+              "Abbigliamento1",
+              "Abbigliamento2",
+              "Bellezza",
+              "Bellezza1"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Attrezzatura sportiva e outdoor",
+              "Cosmetici e prodotti per la cura personale",
+              "Dispositivi elettronici di consumo e accessori",
+              "Elettrodomestici piccoli e articoli per la casa",
+              "Giochi e articoli per l'infanzia"
+            ]
+          }
+        }
+      },
+      "fornitori": {
+        "row_count": 19,
+        "columns": {
+          "id": {
+            "distinct": 19,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 19
+          },
+          "ragione_sociale": {
+            "distinct": 6,
+            "sample": [
+              "CasaVerde Import S.r.l.",
+              "EdiCulture Distribuzione S.r.l.",
+              "EuroDistribuzione SpA",
+              "NordComponenti S.n.c.",
+              "SportLine Forniture S.r.l."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 19,
+            "sample": [
+              "01234567891",
+              "01234567892",
+              "01234567893",
+              "01234567894",
+              "02345678912"
+            ]
+          },
+          "citta": {
+            "distinct": 8,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 398,
+        "columns": {
+          "id": {
+            "distinct": 398,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 398
+          },
+          "sku": {
+            "distinct": 398,
+            "sample": [
+              "SKU-BE-050",
+              "SKU-BE-0501",
+              "SKU-BE-05010",
+              "SKU-BE-05011",
+              "SKU-BE-05012"
+            ]
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Cuffie Bluetooth SoundPro X2",
+              "Frullatore VortexMix 800W",
+              "I silenzi del nord",
+              "Mouse wireless SilentClick Pro",
+              "Siero viso HydraGlow 30ml"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Cuffie over-ear con cancellazione attiva del rumore",
+              "Frullatore da banco con bicchiere triplo strato",
+              "Mouse ergonomico silenzioso 16000 DPI",
+              "Romanzo giallo, edizione tascabile 480 pagine",
+              "Siero concentrato con acido ialuronico"
+            ]
+          },
+          "categoria_id": {
+            "distinct": 29,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 29
+          },
+          "fornitore_id": {
+            "distinct": 19,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 19
+          },
+          "versione_catalogo": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "storico_prezzi": {
+        "row_count": 398,
+        "columns": {
+          "prodotto_id": {
+            "distinct": 251,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "104"
+            ],
+            "min": 1,
+            "max": 397
+          },
+          "versione": {
+            "distinct": 398,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 398
+          },
+          "prezzo_unitario": {
+            "distinct": 382,
+            "sample": [
+              "100.13",
+              "100.61",
+              "101.01",
+              "101.8",
+              "101.81"
+            ],
+            "min": 40.51,
+            "max": 172.67
+          },
+          "data_inizio": {
+            "distinct": 256,
+            "sample": [
+              "2024-12-04",
+              "2024-12-06",
+              "2024-12-07",
+              "2024-12-11",
+              "2024-12-13"
+            ]
+          },
+          "data_fine": {
+            "distinct": 125,
+            "sample": [
+              "2025-05-17",
+              "2025-05-18",
+              "2025-05-19",
+              "2025-05-20",
+              "2025-05-24"
+            ]
+          }
+        }
+      },
+      "clienti": {
+        "row_count": 338,
+        "columns": {
+          "id": {
+            "distinct": 338,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 338
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 8,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Esposito",
+              "Ferrari",
+              "Gallo"
+            ]
+          },
+          "email": {
+            "distinct": 338,
+            "sample": [
+              "alessandro.ferrari10@example.com",
+              "alessandro.ferrari11@example.com",
+              "alessandro.ferrari12@example.com",
+              "alessandro.ferrari13@example.com",
+              "alessandro.ferrari14@example.com"
+            ]
+          },
+          "citta": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1075,
+        "columns": {
+          "id": {
+            "distinct": 1075,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 2075
+          },
+          "cliente_id": {
+            "distinct": 321,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 338
+          },
+          "data_ordine": {
+            "distinct": 176,
+            "sample": [
+              "2025-10-22",
+              "2025-10-23",
+              "2025-10-26",
+              "2025-10-27",
+              "2025-10-29"
+            ]
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "confermato",
+              "consegnato",
+              "in_attesa",
+              "spedito"
+            ]
+          },
+          "importo_totale": {
+            "distinct": 1034,
+            "sample": [
+              "100.18",
+              "100.33",
+              "100.65",
+              "101.17",
+              "101.37"
+            ],
+            "min": 18.0,
+            "max": 781.88
+          }
+        }
+      }
+    },
+    "preview": {
+      "categorie": [
+        {
+          "id": 1,
+          "nome": "Elettronica",
+          "descrizione": "Dispositivi elettronici di consumo e accessori"
+        },
+        {
+          "id": 2,
+          "nome": "Elettronica1",
+          "descrizione": "Dispositivi elettronici di consumo e accessori"
+        },
+        {
+          "id": 3,
+          "nome": "Elettronica2",
+          "descrizione": "Dispositivi elettronici di consumo e accessori"
+        },
+        {
+          "id": 4,
+          "nome": "Elettronica3",
+          "descrizione": "Dispositivi elettronici di consumo e accessori"
+        },
+        {
+          "id": 5,
+          "nome": "Informatica",
+          "descrizione": "Periferiche, componenti e accessori PC"
+        },
+        {
+          "id": 6,
+          "nome": "Informatica1",
+          "descrizione": "Periferiche, componenti e accessori PC"
+        },
+        {
+          "id": 7,
+          "nome": "Informatica2",
+          "descrizione": "Periferiche, componenti e accessori PC"
+        },
+        {
+          "id": 8,
+          "nome": "Informatica3",
+          "descrizione": "Periferiche, componenti e accessori PC"
+        }
+      ],
+      "fornitori": [
+        {
+          "id": 1,
+          "ragione_sociale": "TechSupply S.r.l.",
+          "partita_iva": "01234567891",
+          "citta": "Torino"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "TechSupply S.r.l.",
+          "partita_iva": "01234567892",
+          "citta": "Roma"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "TechSupply S.r.l.",
+          "partita_iva": "01234567893",
+          "citta": "Roma"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "TechSupply S.r.l.",
+          "partita_iva": "01234567894",
+          "citta": "Bologna"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "EuroDistribuzione SpA",
+          "partita_iva": "02345678912",
+          "citta": "Napoli"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "EuroDistribuzione SpA",
+          "partita_iva": "02345678913",
+          "citta": "Firenze"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "EuroDistribuzione SpA",
+          "partita_iva": "02345678914",
+          "citta": "Napoli"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "NordComponenti S.n.c.",
+          "partita_iva": "03456789123",
+          "citta": "Bologna"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "sku": "SKU-EL-001",
+          "nome": "Cuffie Bluetooth SoundPro X2",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "categoria_id": 22,
+          "fornitore_id": 10,
+          "versione_catalogo": "1",
+          "attivo": "true"
+        },
+        {
+          "id": 2,
+          "sku": "SKU-EL-0011",
+          "nome": "Cuffie Bluetooth SoundPro X2",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "categoria_id": 20,
+          "fornitore_id": 16,
+          "versione_catalogo": "1",
+          "attivo": "true"
+        },
+        {
+          "id": 3,
+          "sku": "SKU-EL-0012",
+          "nome": "Cuffie Bluetooth SoundPro X2",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "categoria_id": 4,
+          "fornitore_id": 4,
+          "versione_catalogo": "1",
+          "attivo": "true"
+        },
+        {
+          "id": 4,
+          "sku": "SKU-EL-0013",
+          "nome": "Cuffie Bluetooth SoundPro X2",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "categoria_id": 28,
+          "fornitore_id": 13,
+          "versione_catalogo": "1",
+          "attivo": "true"
+        },
+        {
+          "id": 5,
+          "sku": "SKU-EL-0014",
+          "nome": "Cuffie Bluetooth SoundPro X2",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "categoria_id": 25,
+          "fornitore_id": 5,
+          "versione_catalogo": "2",
+          "attivo": "true"
+        },
+        {
+          "id": 6,
+          "sku": "SKU-EL-0015",
+          "nome": "Cuffie Bluetooth SoundPro X2",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "categoria_id": 21,
+          "fornitore_id": 18,
+          "versione_catalogo": "3",
+          "attivo": "true"
+        },
+        {
+          "id": 7,
+          "sku": "SKU-EL-0016",
+          "nome": "Cuffie Bluetooth SoundPro X2",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "categoria_id": 29,
+          "fornitore_id": 6,
+          "versione_catalogo": "1",
+          "attivo": "false"
+        },
+        {
+          "id": 8,
+          "sku": "SKU-EL-0017",
+          "nome": "Cuffie Bluetooth SoundPro X2",
+          "descrizione": "Cuffie over-ear con cancellazione attiva del rumore",
+          "categoria_id": 18,
+          "fornitore_id": 5,
+          "versione_catalogo": "1",
+          "attivo": "true"
+        }
+      ],
+      "storico_prezzi": [
+        {
+          "prodotto_id": 300,
+          "versione": 1,
+          "prezzo_unitario": 98.4,
+          "data_inizio": "2025-02-27",
+          "data_fine": "2025-07-20"
+        },
+        {
+          "prodotto_id": 1,
+          "versione": 2,
+          "prezzo_unitario": 107.49,
+          "data_inizio": "2024-12-15",
+          "data_fine": "2025-06-07"
+        },
+        {
+          "prodotto_id": 117,
+          "versione": 3,
+          "prezzo_unitario": 69.78,
+          "data_inizio": "2024-12-13",
+          "data_fine": "2025-07-17"
+        },
+        {
+          "prodotto_id": 142,
+          "versione": 4,
+          "prezzo_unitario": 106.97,
+          "data_inizio": "2025-01-14",
+          "data_fine": "2025-06-19"
+        },
+        {
+          "prodotto_id": 133,
+          "versione": 5,
+          "prezzo_unitario": 101.01,
+          "data_inizio": "2025-01-15",
+          "data_fine": "2025-07-14"
+        },
+        {
+          "prodotto_id": 75,
+          "versione": 6,
+          "prezzo_unitario": 101.81,
+          "data_inizio": "2025-01-27",
+          "data_fine": null
+        },
+        {
+          "prodotto_id": 262,
+          "versione": 7,
+          "prezzo_unitario": 87.21,
+          "data_inizio": "2025-02-21",
+          "data_fine": "2025-06-30"
+        },
+        {
+          "prodotto_id": 154,
+          "versione": 8,
+          "prezzo_unitario": 81.34,
+          "data_inizio": "2024-12-30",
+          "data_fine": "2025-08-10"
+        }
+      ],
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi@example.com",
+          "citta": "Napoli"
+        },
+        {
+          "id": 2,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi1@example.com",
+          "citta": "Napoli"
+        },
+        {
+          "id": 3,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi2@example.com",
+          "citta": "Firenze"
+        },
+        {
+          "id": 4,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi3@example.com",
+          "citta": "Verona"
+        },
+        {
+          "id": 5,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi4@example.com",
+          "citta": "Bari"
+        },
+        {
+          "id": 6,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi5@example.com",
+          "citta": "Genova"
+        },
+        {
+          "id": 7,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi6@example.com",
+          "citta": null
+        },
+        {
+          "id": 8,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "email": "mario.rossi7@example.com",
+          "citta": "Firenze"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 1001,
+          "cliente_id": 197,
+          "data_ordine": "2025-12-12",
+          "stato_ordine": "in_attesa",
+          "importo_totale": 367.58
+        },
+        {
+          "id": 1002,
+          "cliente_id": 297,
+          "data_ordine": "2026-02-05",
+          "stato_ordine": "annullato",
+          "importo_totale": 109.44
+        },
+        {
+          "id": 1003,
+          "cliente_id": 238,
+          "data_ordine": "2025-11-04",
+          "stato_ordine": "consegnato",
+          "importo_totale": 221.66
+        },
+        {
+          "id": 1004,
+          "cliente_id": 27,
+          "data_ordine": "2026-01-26",
+          "stato_ordine": "in_attesa",
+          "importo_totale": 61.92
+        },
+        {
+          "id": 1005,
+          "cliente_id": 100,
+          "data_ordine": "2025-12-14",
+          "stato_ordine": "confermato",
+          "importo_totale": 329.8
+        },
+        {
+          "id": 1006,
+          "cliente_id": 315,
+          "data_ordine": "2026-02-05",
+          "stato_ordine": "spedito",
+          "importo_totale": 189.03
+        },
+        {
+          "id": 1007,
+          "cliente_id": 28,
+          "data_ordine": "2026-01-08",
+          "stato_ordine": "spedito",
+          "importo_totale": 218.05
+        },
+        {
+          "id": 1008,
+          "cliente_id": 35,
+          "data_ordine": "2025-12-09",
+          "stato_ordine": "annullato",
+          "importo_totale": 216.12
+        }
+      ]
+    }
+  },
+  "story": "Alla direzione commerciale di EuroDistribuzione SpA è giunto il momento della consueta verifica annuale sulla clientela più virtuosa. Tutto parte dall'archivio denominato clienti, dove ogni scheda anagrafica riporta nome, cognome, indirizzo di posta elettronica e città di residenza; non mancano schede con la città lasciata in bianco, come quella di un certo Mario Rossi raggiungibile all'email mario.rossi6@example.com, e proprio perché molti nominativi si ripetono — si pensi ai numerosi Mario Rossi distinguibili solo da email progressive come mario.rossi@example.com e mario.rossi1@example.com — l'indirizzo di posta elettronica rappresenta l'elemento identificativo davvero univoco di ciascuna persona. Il registro intitolato ordini, invece, conserva le richieste d'acquisto numerate dalla 1001 fino alla 2075, ciascuna con la data dell'ordine, lo stato dell'ordine — che può risultare in attesa, confermato, spedito, consegnato oppure annullato — e l'importo totale, oscillante tra i 18.00 euro minimi e i 781.88 euro massimi registrati. Il capo ufficio ha impartito una direttiva precisa: considerare esclusivamente i clienti con città nota che vantino almeno 2 ordini in stato consegnato o spedito; per ciascuno occorre restituire nome completo, email, numero di ordini validi, spesa media per ordine arrotondata a 2 decimali e spesa totale complessiva, disponendo l'elenco per spesa totale decrescente e adottando l'email come criterio di spareggio univoco. A titolo di esempio, l'ordine 1003 del 2025-11-04, consegnato per 221.66 euro, concorre pienamente al conteggio, mentre l'ordine 1002 del 2026-02-05, annullato per 109.44 euro, resta fuori dalla statistica. Il quadro si completa con gli archivi di supporto al merchandising. L'archivio categorie conta 29 sezioni merceologiche — da Elettronica a Informatica, senza dimenticare Abbigliamento e Bellezza — ciascuna corredata da una descrizione sintetica come 'Dispositivi elettronici di consumo e accessori' o 'Periferiche, componenti e accessori PC'. Le forniture giungono da 19 controparti censite nell'archivio fornitori, con ragioni sociali quali TechSupply S.r.l., EuroDistribuzione SpA e NordComponenti S.n.c., ognuna munita di partita iva propria e operativa in città come Torino, Roma, Bologna, Napoli e Firenze. Il catalogo commerciale custodito nell'archivio prodotti elenca 398 articoli, ciascuno con codice SKU univoco — basti pensare alle Cuffie Bluetooth SoundPro X2 identificate da SKU-EL-001 e SKU-EL-0011 — insieme alla descrizione, al riferimento alla sezione merceologica e al fornitore di provenienza, alla versione del catalogo che può essere la 1, la 2 o la 3, e all'indicazione se l'articolo risulta attivo o dismesso. Le variazioni di prezzo trovano infine sistemazione nel registro_variazioni_tariffarie, dove ogni voce indica l'articolo interessato, la revisione progressiva della modifica, il valore tariffario corrente applicato — con punte dai 40.51 euro ai 172.67 euro — e il periodo di validità, con data di inizio e, quando la fase si è chiusa, data di fine. Attenzione però al lessico degli uffici: il termine 'revisione' è volutamente ambiguo, poiché designa sia il progressivo delle modifiche di prezzo del registro_variazioni_tariffarie sia la versione del catalogo dell'archivio prodotti; sarà il contesto dell'analisi a chiarire quale delle due occorra considerare. Con questi elementi ben in mente, gli analisti possono costruire la classifica dei migliori acquirenti con la serenità di chi dispone di archivi ordinati, coerenti e verificati."
+}

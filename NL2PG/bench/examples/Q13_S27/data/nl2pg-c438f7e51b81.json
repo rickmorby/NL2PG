@@ -1,0 +1,393 @@
+{
+  "spec": {
+    "domain": "sanità",
+    "n_tables": 4,
+    "hierarchy": "implicit",
+    "sql_features": [
+      "exists"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "pazienti",
+        "obsolete_value": "anagrafica_assistiti",
+        "description": "La tabella pazienti viene denominata anagrafica_assistiti nella prosa aziendale. Le query devono risolvere il riferimento alla tabella reale pazienti tramite la colonna id, collegata concettualmente a paziente_id nelle tabelle visite e ricoveri senza vincolo REFERENCES dichiarato."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "referti",
+        "obsolete_value": "documentazione_diagnostica",
+        "description": "La tabella referti viene indicata con il gergo clinico documentazione_diagnostica. Le query che verificano l'esistenza di referti per una visita devono mappare tale perifrasi sulla tabella referti, associandola tramite visita_id compatibile con visite.id."
+      }
+    ],
+    "spec_hash": "7bba1c1c08332e36"
+  },
+  "schema_ddl": "CREATE TABLE pazienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_nascita DATE NOT NULL,\n    CHECK (LENGTH(codice_fiscale) = 16)\n);\n\nCREATE TABLE visite (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL,\n    data_visita DATE NOT NULL,\n    motivo_visita TEXT,\n    esito TEXT,\n    CHECK (paziente_id > 0)\n);\n\nCREATE TABLE ricoveri (\n    id INT PRIMARY KEY,\n    paziente_id INT NOT NULL,\n    data_ingresso DATE NOT NULL,\n    data_dimissione DATE,\n    reparto TEXT NOT NULL,\n    CHECK (data_dimissione IS NULL OR data_dimissione >= data_ingresso)\n);\n\nCREATE TABLE referti (\n    id INT PRIMARY KEY,\n    visita_id INT NOT NULL,\n    data_referto DATE NOT NULL,\n    contenuto TEXT NOT NULL,\n    medico_redattore TEXT NOT NULL,\n    CHECK (visita_id > 0)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "pazienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Mario",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "data_nascita": "1980-01-01"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA85C45F205Y",
+            "data_nascita": "1985-03-05"
+          },
+          {
+            "id": 3,
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGLI92D58L219A",
+            "data_nascita": "1992-04-18"
+          },
+          {
+            "id": 4,
+            "nome": "Alessandro",
+            "cognome": "Russo",
+            "codice_fiscale": "RSSLSN78T29D963G",
+            "data_nascita": "1978-12-29"
+          },
+          {
+            "id": 5,
+            "nome": "Francesca",
+            "cognome": "Ferrari",
+            "codice_fiscale": "FRRFNC90E61H501M",
+            "data_nascita": "1990-05-21"
+          },
+          {
+            "id": 6,
+            "nome": "Luca",
+            "cognome": "Esposito",
+            "codice_fiscale": "SPSLCU70L14F839J",
+            "data_nascita": "1970-07-14"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Mario",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Sara",
+              "Davide",
+              "Anna",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Russo",
+              "Ferrari",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci",
+              "Marino"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -3650.0,
+            "delta_max": 1825.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "visite",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "paziente_id": 1,
+            "data_visita": "2025-11-10",
+            "motivo_visita": "controllo periodico",
+            "esito": "normale"
+          },
+          {
+            "id": 102,
+            "paziente_id": 2,
+            "data_visita": "2025-12-02",
+            "motivo_visita": "febbre alta persistente",
+            "esito": "prescrizione terapia"
+          },
+          {
+            "id": 103,
+            "paziente_id": 3,
+            "data_visita": "2026-01-15",
+            "motivo_visita": "dolore addominale",
+            "esito": "invio esami approfonditi"
+          },
+          {
+            "id": 104,
+            "paziente_id": 1,
+            "data_visita": "2026-02-03",
+            "motivo_visita": "visita cardiologica",
+            "esito": "normale"
+          },
+          {
+            "id": 105,
+            "paziente_id": 4,
+            "data_visita": "2026-02-20",
+            "motivo_visita": "trauma al ginocchio",
+            "esito": "ricovero consigliato"
+          },
+          {
+            "id": 106,
+            "paziente_id": 5,
+            "data_visita": "2026-03-08",
+            "motivo_visita": "vaccinazione antinfluenzale",
+            "esito": "normale"
+          }
+        ],
+        "variations": {
+          "data_visita": {
+            "axis": "shift",
+            "delta_min": -10.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "motivo_visita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "controllo periodico",
+              "febbre alta persistente",
+              "dolore addominale",
+              "visita cardiologica",
+              "trauma al ginocchio",
+              "vaccinazione antinfluenzale",
+              "cefalea ricorrente",
+              "controllo post-operatorio"
+            ]
+          },
+          "esito": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "normale",
+              "normale",
+              "prescrizione terapia",
+              "invio esami approfonditi",
+              "patologia lieve",
+              "ricovero consigliato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "ricoveri",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 201,
+            "paziente_id": 2,
+            "data_ingresso": "2025-12-05",
+            "data_dimissione": "2025-12-19",
+            "reparto": "Medicina Interna"
+          },
+          {
+            "id": 202,
+            "paziente_id": 4,
+            "data_ingresso": "2026-02-22",
+            "data_dimissione": "2026-03-10",
+            "reparto": "Ortopedia"
+          },
+          {
+            "id": 203,
+            "paziente_id": 3,
+            "data_ingresso": "2026-01-20",
+            "data_dimissione": null,
+            "reparto": "Cardiologia"
+          },
+          {
+            "id": 204,
+            "paziente_id": 6,
+            "data_ingresso": "2025-10-11",
+            "data_dimissione": "2025-10-30",
+            "reparto": "Chirurgia Generale"
+          },
+          {
+            "id": 205,
+            "paziente_id": 1,
+            "data_ingresso": "2026-03-01",
+            "data_dimissione": null,
+            "reparto": "Neurologia"
+          }
+        ],
+        "variations": {
+          "data_ingresso": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "data_dimissione": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "reparto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Medicina Interna",
+              "Cardiologia",
+              "Chirurgia Generale",
+              "Ortopedia",
+              "Neurologia",
+              "Pediatria"
+            ]
+          }
+        }
+      },
+      {
+        "table": "referti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 301,
+            "visita_id": 101,
+            "data_referto": "2025-11-10",
+            "contenuto": "Esame emocromo: valori nei limiti della norma.",
+            "medico_redattore": "Dr. Alessandro Ferri"
+          },
+          {
+            "id": 302,
+            "visita_id": 102,
+            "data_referto": "2025-12-03",
+            "contenuto": "Radiografia torace: assenza di lesioni significative.",
+            "medico_redattore": "Dr.ssa Elena Marchetti"
+          },
+          {
+            "id": 303,
+            "visita_id": 103,
+            "data_referto": "2026-01-17",
+            "contenuto": "Ecografia addome completo: reperto negativo.",
+            "medico_redattore": "Dr. Paolo Neri"
+          },
+          {
+            "id": 304,
+            "visita_id": 104,
+            "data_referto": "2026-02-04",
+            "contenuto": "ECG: ritmo sinusale, normale funzione ventricolare.",
+            "medico_redattore": "Dr.ssa Chiara Lombardi"
+          },
+          {
+            "id": 305,
+            "visita_id": 105,
+            "data_referto": "2026-02-21",
+            "contenuto": "Radiografia ginocchio destro: frattura non spostata del plateau tibiale.",
+            "medico_redattore": "Dr. Marco Vitale"
+          },
+          {
+            "id": 306,
+            "visita_id": 106,
+            "data_referto": "2026-03-09",
+            "contenuto": "Referto vaccinale: somministrazione regolare, nessuna reazione avversa.",
+            "medico_redattore": "Dr. Alessandro Ferri"
+          }
+        ],
+        "variations": {
+          "data_referto": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 14.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "contenuto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Esame emocromo: valori nei limiti della norma.",
+              "Radiografia torace: assenza di lesioni significative.",
+              "Ecografia addome completo: reperto negativo.",
+              "ECG: ritmo sinusale, normale funzione ventricolare.",
+              "TAC encefalo senza contrasto: nessun reperto patologico acuto.",
+              "Esame urine: lieve leucocituria, consigliata terapia antibiotica."
+            ]
+          },
+          "medico_redattore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Dr. Alessandro Ferri",
+              "Dr.ssa Elena Marchetti",
+              "Dr. Paolo Neri",
+              "Dr.ssa Chiara Lombardi",
+              "Dr. Marco Vitale"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "domain": "sanità",
+  "n_tables": 4,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "relative_time"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "visite_ambulatoriali",
+      "obsolete_value": "registro_attivita_clinica",
+      "description": "La tabella partizionata per RANGE sulla colonna data_visita, nominalmente visite_ambulatoriali, viene indicata nella prosa aziendale come registro_attivita_clinica. Le query devono risolvere il nome reale della tabella per applicare correttamente il filtro temporale relativo CURRENT_DATE - INTERVAL 'n days' e sfruttare il pruning delle partizioni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "reparti",
+      "obsolete_value": "unita_operative_nosologiche",
+      "description": "La tabella reparti viene descritta nella documentazione aziendale con il gergo sanitario 'unità operative nosologiche' (U.O.). Il lettore deve riconoscere che il termine tecnico del dominio clinico corrisponde alla tabella reparti per poter effettuare i join corretti con la tabella partizionata visite_ambulatoriali."
+    }
+  ],
+  "spec_hash": "43c196dba0b03dba"
+}

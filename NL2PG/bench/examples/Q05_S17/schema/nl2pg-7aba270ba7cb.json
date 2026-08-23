@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 3,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "group_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "fc1045596f865d5f"
+  },
+  "schema_ddl": "CREATE TABLE istituti_credito (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_abi TEXT NOT NULL UNIQUE,\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    istituto_id INT NOT NULL REFERENCES istituti_credito(id),\n    numero_conto TEXT NOT NULL UNIQUE,\n    saldo NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo >= 0),\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE movimenti (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    data_movimento DATE NOT NULL,\n    descrizione TEXT,\n    categoria TEXT NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo <> 0),\n    eliminato BOOLEAN NOT NULL DEFAULT FALSE\n);"
+}

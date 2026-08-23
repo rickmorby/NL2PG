@@ -1,0 +1,1031 @@
+{
+  "schema_ddl": "CREATE TABLE anagrafica_contatti_commerciali (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    data_registrazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    is_attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE categorie_prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    descrizione TEXT,\n    prezzo_unitario NUMERIC(10, 2) NOT NULL CHECK (prezzo_unitario >= 0),\n    categoria_id INT NOT NULL REFERENCES categorie_prodotti(id),\n    codice_articolo TEXT NOT NULL UNIQUE,\n    quantita_disponibile INT NOT NULL DEFAULT 0 CHECK (quantita_disponibile >= 0)\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES anagrafica_contatti_commerciali(id),\n    data_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    valore_totale NUMERIC(12, 2) NOT NULL CHECK (valore_totale >= 0),\n    stato_ordine TEXT NOT NULL DEFAULT 'in_attesa' CHECK (stato_ordine IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato')),\n    priorità_spedizione INT CHECK (priorità_spedizione BETWEEN 1 AND 3),\n    importo_sconto NUMERIC(10, 2) DEFAULT 0 CHECK (importo_sconto >= 0),\n    importo_spedizione NUMERIC(10, 2) DEFAULT 0 CHECK (importo_spedizione >= 0)\n);\n\nCREATE TABLE dettagli_ordini (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario_ordine NUMERIC(10, 2) NOT NULL CHECK (prezzo_unitario_ordine >= 0),\n    totale_riga NUMERIC(12, 2) GENERATED ALWAYS AS (quantita * prezzo_unitario_ordine) STORED\n);\n\nCREATE TABLE indirizzi_spedizione (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES anagrafica_contatti_commerciali(id),\n    via TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    cap TEXT NOT NULL,\n    provincia TEXT NOT NULL,\n    nazione TEXT NOT NULL DEFAULT 'Italia',\n    is_predefinito BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nCREATE TABLE transazioni_storiche (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT REFERENCES ordini(id),\n    tipo_transazione TEXT NOT NULL CHECK (tipo_transazione IN ('pagamento', 'rimborso', 'storno')),\n    importo NUMERIC(10, 2) NOT NULL CHECK (importo >= 0),\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,\n    note TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "anagrafica_contatti_commerciali": {
+        "row_count": 512,
+        "columns": {
+          "id": {
+            "distinct": 512,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 512
+          },
+          "nome": {
+            "distinct": 8,
+            "sample": [
+              "Alessandro",
+              "Andrea",
+              "Francesca",
+              "Giulia",
+              "Laura"
+            ]
+          },
+          "cognome": {
+            "distinct": 8,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Ferrari",
+              "Greco",
+              "Neri"
+            ]
+          },
+          "email": {
+            "distinct": 512,
+            "sample": [
+              "alessandro.neri@example.com",
+              "alessandro.neri@example.com_1",
+              "alessandro.neri@example.com_10",
+              "alessandro.neri@example.com_100",
+              "alessandro.neri@example.com_101"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 512,
+            "sample": [
+              "BNCLRA85B45F205X",
+              "BNCLRA85B45F205X_1",
+              "BNCLRA85B45F205X_10",
+              "BNCLRA85B45F205X_100",
+              "BNCLRA85B45F205X_101"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 438,
+            "sample": [
+              "2024-01-15 09:30:00",
+              "2024-01-26 09:30:00",
+              "2024-02-03 09:30:00",
+              "2024-02-10 09:30:00",
+              "2024-02-13 09:30:00"
+            ]
+          },
+          "is_attivo": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "categorie_prodotti": {
+        "row_count": 23,
+        "columns": {
+          "id": {
+            "distinct": 23,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 23
+          },
+          "nome": {
+            "distinct": 23,
+            "sample": [
+              "Arredamento",
+              "Arredamento_1",
+              "Arredamento_2",
+              "Arredamento_3",
+              "Complementi"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Arredo esterno e piante",
+              "Hardware e accessori",
+              "Lampade e sistemi luce",
+              "Mobili e complementi",
+              "Oggetti decorativi"
+            ]
+          },
+          "created_at": {
+            "distinct": 23,
+            "sample": [
+              "2024-12-11 10:30:00",
+              "2024-12-12 08:00:00",
+              "2024-12-13 10:30:00",
+              "2024-12-15 09:00:00",
+              "2024-12-16 09:00:00"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 411,
+        "columns": {
+          "id": {
+            "distinct": 411,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 411
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Lampada da terra LED",
+              "Laptop 16GB RAM",
+              "Monitor 27 pollici 4K",
+              "Plafoniera LED",
+              "Scrivania ergonomica"
+            ]
+          },
+          "descrizione": {
+            "distinct": 11,
+            "sample": [
+              "Articolo disponibile",
+              "Lampada con regolazione intensita",
+              "Modello premium",
+              "Modello standard",
+              "Notebook 16GB SSD 512GB"
+            ]
+          },
+          "prezzo_unitario": {
+            "distinct": 396,
+            "sample": [
+              "100.19",
+              "1003.16",
+              "1005.89",
+              "101.99",
+              "1015.05"
+            ],
+            "min": 25.29,
+            "max": 1168.7
+          },
+          "categoria_id": {
+            "distinct": 23,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 23
+          },
+          "codice_articolo": {
+            "distinct": 411,
+            "sample": [
+              "ARR001",
+              "ARR001_1",
+              "ARR001_10",
+              "ARR001_11",
+              "ARR001_12"
+            ]
+          },
+          "quantita_disponibile": {
+            "distinct": 10,
+            "sample": [
+              "0",
+              "12",
+              "15",
+              "150",
+              "25"
+            ],
+            "min": 0,
+            "max": 60
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1875,
+        "columns": {
+          "id": {
+            "distinct": 1875,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 101,
+            "max": 1975
+          },
+          "cliente_id": {
+            "distinct": 501,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 512
+          },
+          "data_ordine": {
+            "distinct": 302,
+            "sample": [
+              "2025-12-16 10:30:00",
+              "2025-12-17 10:30:00",
+              "2025-12-17 12:00:00",
+              "2025-12-18 10:30:00",
+              "2025-12-18 12:00:00"
+            ]
+          },
+          "valore_totale": {
+            "distinct": 1741,
+            "sample": [
+              "100.13",
+              "100.47",
+              "100.7",
+              "100.77",
+              "101.25"
+            ],
+            "min": 42.0,
+            "max": 546.0
+          },
+          "stato_ordine": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "confermato",
+              "consegnato",
+              "in_attesa",
+              "spedito"
+            ]
+          },
+          "priorità_spedizione": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "importo_sconto": {
+            "distinct": 8,
+            "sample": [
+              "0.0",
+              "0.00",
+              "10.0",
+              "10.00",
+              "20.0"
+            ],
+            "min": 0.0,
+            "max": 20.0
+          },
+          "importo_spedizione": {
+            "distinct": 7,
+            "sample": [
+              "0.0",
+              "0.00",
+              "12.50",
+              "4.9",
+              "4.90"
+            ],
+            "min": 0.0,
+            "max": 9.9
+          }
+        }
+      },
+      "dettagli_ordini": {
+        "row_count": 885,
+        "columns": {
+          "id": {
+            "distinct": 885,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 885
+          },
+          "ordine_id": {
+            "distinct": 704,
+            "sample": [
+              "1000",
+              "1003",
+              "101",
+              "1016",
+              "1017"
+            ],
+            "min": 101,
+            "max": 1973
+          },
+          "prodotto_id": {
+            "distinct": 367,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 411
+          },
+          "quantita": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "prezzo_unitario_ordine": {
+            "distinct": 840,
+            "sample": [
+              "100.29",
+              "100.32",
+              "100.9",
+              "1000.24",
+              "1008.55"
+            ],
+            "min": 17.95,
+            "max": 1348.5
+          },
+          "totale_riga": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      },
+      "indirizzi_spedizione": {
+        "row_count": 727,
+        "columns": {
+          "id": {
+            "distinct": 727,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 727
+          },
+          "cliente_id": {
+            "distinct": 398,
+            "sample": [
+              "1",
+              "100",
+              "101",
+              "103",
+              "104"
+            ],
+            "min": 1,
+            "max": 511
+          },
+          "via": {
+            "distinct": 6,
+            "sample": [
+              "Corso Italia 25",
+              "Piazza Dante 3",
+              "Via Cavour 8",
+              "Via Garibaldi 10",
+              "Via Roma 1"
+            ]
+          },
+          "citta": {
+            "distinct": 4,
+            "sample": [
+              "Milano",
+              "Napoli",
+              "Roma",
+              "Torino"
+            ]
+          },
+          "cap": {
+            "distinct": 4,
+            "sample": [
+              "00184",
+              "10123",
+              "20121",
+              "80133"
+            ]
+          },
+          "provincia": {
+            "distinct": 4,
+            "sample": [
+              "MI",
+              "NA",
+              "RM",
+              "TO"
+            ]
+          },
+          "nazione": {
+            "distinct": 1,
+            "sample": [
+              "Italia"
+            ]
+          },
+          "is_predefinito": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      },
+      "transazioni_storiche": {
+        "row_count": 1827,
+        "columns": {
+          "id": {
+            "distinct": 1827,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1827
+          },
+          "ordine_id": {
+            "distinct": 1118,
+            "sample": [
+              "1000",
+              "1002",
+              "1004",
+              "1008",
+              "1010"
+            ],
+            "min": 102,
+            "max": 1975
+          },
+          "tipo_transazione": {
+            "distinct": 3,
+            "sample": [
+              "pagamento",
+              "rimborso",
+              "storno"
+            ]
+          },
+          "importo": {
+            "distinct": 1628,
+            "sample": [
+              "100.04",
+              "100.41",
+              "100.77",
+              "101.2",
+              "101.34"
+            ],
+            "min": 2.5,
+            "max": 630.0
+          },
+          "data_transazione": {
+            "distinct": 105,
+            "sample": [
+              "2026-04-01 09:00:00",
+              "2026-04-01 10:30:00",
+              "2026-04-02 09:00:00",
+              "2026-04-02 10:30:00",
+              "2026-04-02 11:15:00"
+            ]
+          },
+          "note": {
+            "distinct": 5,
+            "sample": [
+              "Copia fattura",
+              "Pagamento ricevuto",
+              "Rimborso totale",
+              "Storno sconto",
+              "Transazione con carta"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "anagrafica_contatti_commerciali": [
+        {
+          "id": 13,
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "email": "alessandro.bianchi1@example.com",
+          "codice_fiscale": "RSSMRA80A01H501U_12",
+          "data_registrazione": "2024-07-24T09:30:00",
+          "is_attivo": true
+        },
+        {
+          "id": 31,
+          "nome": "Alessandro",
+          "cognome": "Greco",
+          "email": "alessandro.greco1@example.com",
+          "codice_fiscale": "RSSMRA80A01H501U_30",
+          "data_registrazione": "2024-06-09T09:30:00",
+          "is_attivo": true
+        },
+        {
+          "id": 38,
+          "nome": "Alessandro",
+          "cognome": "Greco",
+          "email": "alessandro.greco2@example.com",
+          "codice_fiscale": "RSSMRA80A01H501U_37",
+          "data_registrazione": "2024-02-29T09:30:00",
+          "is_attivo": true
+        },
+        {
+          "id": 7,
+          "nome": "Alessandro",
+          "cognome": "Neri",
+          "email": "alessandro.neri1@example.com",
+          "codice_fiscale": "RSSMRA80A01H501U_6",
+          "data_registrazione": "2024-02-16T09:30:00",
+          "is_attivo": true
+        },
+        {
+          "id": 9,
+          "nome": "Alessandro",
+          "cognome": "Neri",
+          "email": "alessandro.neri2@example.com",
+          "codice_fiscale": "RSSMRA80A01H501U_8",
+          "data_registrazione": "2025-01-07T09:30:00",
+          "is_attivo": true
+        },
+        {
+          "id": 36,
+          "nome": "Alessandro",
+          "cognome": "Neri",
+          "email": "alessandro.neri3@example.com",
+          "codice_fiscale": "RSSMRA80A01H501U_35",
+          "data_registrazione": "2024-02-13T09:30:00",
+          "is_attivo": true
+        },
+        {
+          "id": 26,
+          "nome": "Alessandro",
+          "cognome": "Romano",
+          "email": "alessandro.romano1@example.com",
+          "codice_fiscale": "RSSMRA80A01H501U_25",
+          "data_registrazione": "2024-07-09T09:30:00",
+          "is_attivo": true
+        },
+        {
+          "id": 8,
+          "nome": "Alessandro",
+          "cognome": "Rossi",
+          "email": "alessandro.rossi1@example.com",
+          "codice_fiscale": "RSSMRA80A01H501U_7",
+          "data_registrazione": "2024-08-23T09:30:00",
+          "is_attivo": true
+        }
+      ],
+      "categorie_prodotti": [
+        {
+          "id": 1,
+          "nome": "Arredamento",
+          "descrizione": "Mobili e complementi",
+          "created_at": "2025-01-29 08:00:00"
+        },
+        {
+          "id": 2,
+          "nome": "Arredamento_1",
+          "descrizione": "Mobili e complementi",
+          "created_at": "2025-01-18 08:00:00"
+        },
+        {
+          "id": 3,
+          "nome": "Arredamento_2",
+          "descrizione": "Mobili e complementi",
+          "created_at": "2024-12-12 08:00:00"
+        },
+        {
+          "id": 4,
+          "nome": "Arredamento_3",
+          "descrizione": "Mobili e complementi",
+          "created_at": "2024-12-25 08:00:00"
+        },
+        {
+          "id": 5,
+          "nome": "Informatica",
+          "descrizione": "Hardware e accessori",
+          "created_at": "2025-01-22 08:05:00"
+        },
+        {
+          "id": 6,
+          "nome": "Informatica_1",
+          "descrizione": "Hardware e accessori",
+          "created_at": "2025-01-14 08:05:00"
+        },
+        {
+          "id": 7,
+          "nome": "Informatica_2",
+          "descrizione": "Hardware e accessori",
+          "created_at": "2025-01-30 08:05:00"
+        },
+        {
+          "id": 8,
+          "nome": "Informatica_3",
+          "descrizione": "Hardware e accessori",
+          "created_at": "2025-01-01 08:05:00"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "nome": "Tenda veneziana",
+          "descrizione": "Modello premium",
+          "prezzo_unitario": 523.24,
+          "categoria_id": 9,
+          "codice_articolo": "ARR001",
+          "quantita_disponibile": "5"
+        },
+        {
+          "id": 2,
+          "nome": "Vaso in ceramica",
+          "descrizione": "Articolo disponibile",
+          "prezzo_unitario": 423.09,
+          "categoria_id": 5,
+          "codice_articolo": "ARR001_1",
+          "quantita_disponibile": "150"
+        },
+        {
+          "id": 3,
+          "nome": "Tappeto in lana",
+          "descrizione": null,
+          "prezzo_unitario": 437.78,
+          "categoria_id": 11,
+          "codice_articolo": "ARR001_2",
+          "quantita_disponibile": "150"
+        },
+        {
+          "id": 4,
+          "nome": "Laptop 16GB RAM",
+          "descrizione": "Versione base",
+          "prezzo_unitario": 364.7,
+          "categoria_id": 23,
+          "codice_articolo": "ARR001_3",
+          "quantita_disponibile": "12"
+        },
+        {
+          "id": 5,
+          "nome": "Laptop 16GB RAM",
+          "descrizione": "Modello premium",
+          "prezzo_unitario": 469.45,
+          "categoria_id": 3,
+          "codice_articolo": "ARR001_4",
+          "quantita_disponibile": "5"
+        },
+        {
+          "id": 6,
+          "nome": "Set poltrona giardino",
+          "descrizione": "Modello standard",
+          "prezzo_unitario": 559.49,
+          "categoria_id": 19,
+          "codice_articolo": "ARR001_5",
+          "quantita_disponibile": "25"
+        },
+        {
+          "id": 7,
+          "nome": "Tenda veneziana",
+          "descrizione": "Versione base",
+          "prezzo_unitario": 360.09,
+          "categoria_id": 6,
+          "codice_articolo": "ARR001_6",
+          "quantita_disponibile": "40"
+        },
+        {
+          "id": 8,
+          "nome": "Set poltrona giardino",
+          "descrizione": "Modello standard",
+          "prezzo_unitario": 425.37,
+          "categoria_id": 19,
+          "codice_articolo": "ARR001_7",
+          "quantita_disponibile": "25"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 101,
+          "cliente_id": 262,
+          "data_ordine": "2026-01-26 10:30:00",
+          "valore_totale": 187.76,
+          "stato_ordine": "in_attesa",
+          "priorità_spedizione": "2",
+          "importo_sconto": "10.00",
+          "importo_spedizione": "0.00"
+        },
+        {
+          "id": 102,
+          "cliente_id": 92,
+          "data_ordine": "2026-01-17 10:30:00",
+          "valore_totale": 278.19,
+          "stato_ordine": "consegnato",
+          "priorità_spedizione": "1",
+          "importo_sconto": null,
+          "importo_spedizione": null
+        },
+        {
+          "id": 103,
+          "cliente_id": 43,
+          "data_ordine": "2026-01-27 10:30:00",
+          "valore_totale": 295.71,
+          "stato_ordine": "confermato",
+          "priorità_spedizione": "2",
+          "importo_sconto": "10.00",
+          "importo_spedizione": "0.00"
+        },
+        {
+          "id": 104,
+          "cliente_id": 489,
+          "data_ordine": "2025-12-27 10:30:00",
+          "valore_totale": 179.15,
+          "stato_ordine": "consegnato",
+          "priorità_spedizione": "2",
+          "importo_sconto": "0.00",
+          "importo_spedizione": "4.90"
+        },
+        {
+          "id": 105,
+          "cliente_id": 294,
+          "data_ordine": "2026-02-07 10:30:00",
+          "valore_totale": 262.63,
+          "stato_ordine": "consegnato",
+          "priorità_spedizione": "3",
+          "importo_sconto": "5.00",
+          "importo_spedizione": "12.50"
+        },
+        {
+          "id": 106,
+          "cliente_id": 310,
+          "data_ordine": "2026-02-13 10:30:00",
+          "valore_totale": 251.12,
+          "stato_ordine": "consegnato",
+          "priorità_spedizione": "1",
+          "importo_sconto": "10.00",
+          "importo_spedizione": "12.50"
+        },
+        {
+          "id": 107,
+          "cliente_id": 357,
+          "data_ordine": "2026-01-13 10:30:00",
+          "valore_totale": 175.35,
+          "stato_ordine": "annullato",
+          "priorità_spedizione": "3",
+          "importo_sconto": "0.00",
+          "importo_spedizione": "0.00"
+        },
+        {
+          "id": 108,
+          "cliente_id": 237,
+          "data_ordine": "2026-02-13 10:30:00",
+          "valore_totale": 248.77,
+          "stato_ordine": "consegnato",
+          "priorità_spedizione": "2",
+          "importo_sconto": "0.00",
+          "importo_spedizione": "4.90"
+        }
+      ],
+      "dettagli_ordini": [
+        {
+          "id": 1,
+          "ordine_id": 1097,
+          "prodotto_id": 215,
+          "quantita": "2",
+          "prezzo_unitario_ordine": 551.63,
+          "totale_riga": null
+        },
+        {
+          "id": 2,
+          "ordine_id": 1765,
+          "prodotto_id": 124,
+          "quantita": "2",
+          "prezzo_unitario_ordine": 234.42,
+          "totale_riga": null
+        },
+        {
+          "id": 3,
+          "ordine_id": 561,
+          "prodotto_id": 119,
+          "quantita": "4",
+          "prezzo_unitario_ordine": 430.52,
+          "totale_riga": null
+        },
+        {
+          "id": 4,
+          "ordine_id": 1041,
+          "prodotto_id": 359,
+          "quantita": "2",
+          "prezzo_unitario_ordine": 553.72,
+          "totale_riga": null
+        },
+        {
+          "id": 5,
+          "ordine_id": 1966,
+          "prodotto_id": 227,
+          "quantita": "2",
+          "prezzo_unitario_ordine": 442.34,
+          "totale_riga": null
+        },
+        {
+          "id": 6,
+          "ordine_id": 1681,
+          "prodotto_id": 313,
+          "quantita": "4",
+          "prezzo_unitario_ordine": 578.22,
+          "totale_riga": null
+        },
+        {
+          "id": 7,
+          "ordine_id": 407,
+          "prodotto_id": 397,
+          "quantita": "2",
+          "prezzo_unitario_ordine": 653.31,
+          "totale_riga": null
+        },
+        {
+          "id": 8,
+          "ordine_id": 461,
+          "prodotto_id": 129,
+          "quantita": "2",
+          "prezzo_unitario_ordine": 672.78,
+          "totale_riga": null
+        }
+      ],
+      "indirizzi_spedizione": [
+        {
+          "id": 1,
+          "cliente_id": 200,
+          "via": "Via Garibaldi 10",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "nazione": "Italia",
+          "is_predefinito": "false"
+        },
+        {
+          "id": 2,
+          "cliente_id": 143,
+          "via": "Via Garibaldi 10",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "nazione": "Italia",
+          "is_predefinito": "false"
+        },
+        {
+          "id": 3,
+          "cliente_id": 477,
+          "via": "Corso Italia 25",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "nazione": "Italia",
+          "is_predefinito": "true"
+        },
+        {
+          "id": 4,
+          "cliente_id": 210,
+          "via": "Viale Europa 40",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "nazione": "Italia",
+          "is_predefinito": "false"
+        },
+        {
+          "id": 5,
+          "cliente_id": 467,
+          "via": "Via Roma 1",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "nazione": "Italia",
+          "is_predefinito": "false"
+        },
+        {
+          "id": 6,
+          "cliente_id": 48,
+          "via": "Corso Italia 25",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "nazione": "Italia",
+          "is_predefinito": "false"
+        },
+        {
+          "id": 7,
+          "cliente_id": 166,
+          "via": "Via Garibaldi 10",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "nazione": "Italia",
+          "is_predefinito": "true"
+        },
+        {
+          "id": 8,
+          "cliente_id": 401,
+          "via": "Via Cavour 8",
+          "citta": "Roma",
+          "cap": "00184",
+          "provincia": "RM",
+          "nazione": "Italia",
+          "is_predefinito": "false"
+        }
+      ],
+      "transazioni_storiche": [
+        {
+          "id": 1,
+          "ordine_id": 513,
+          "tipo_transazione": "pagamento",
+          "importo": 300.31,
+          "data_transazione": "2026-04-08 09:00:00",
+          "note": "Transazione con carta"
+        },
+        {
+          "id": 2,
+          "ordine_id": 133,
+          "tipo_transazione": "pagamento",
+          "importo": 258.16,
+          "data_transazione": "2026-04-01 09:00:00",
+          "note": "Rimborso totale"
+        },
+        {
+          "id": 3,
+          "ordine_id": 477,
+          "tipo_transazione": "pagamento",
+          "importo": 369.63,
+          "data_transazione": "2026-04-16 09:00:00",
+          "note": "Rimborso totale"
+        },
+        {
+          "id": 4,
+          "ordine_id": 300,
+          "tipo_transazione": "pagamento",
+          "importo": 310.45,
+          "data_transazione": "2026-04-09 09:00:00",
+          "note": "Storno sconto"
+        },
+        {
+          "id": 5,
+          "ordine_id": 575,
+          "tipo_transazione": "pagamento",
+          "importo": 332.38,
+          "data_transazione": "2026-04-05 09:00:00",
+          "note": "Storno sconto"
+        },
+        {
+          "id": 6,
+          "ordine_id": null,
+          "tipo_transazione": "rimborso",
+          "importo": 352.51,
+          "data_transazione": "2026-04-19 09:00:00",
+          "note": "Rimborso totale"
+        },
+        {
+          "id": 7,
+          "ordine_id": 453,
+          "tipo_transazione": "pagamento",
+          "importo": 152.12,
+          "data_transazione": "2026-04-12 09:00:00",
+          "note": "Copia fattura"
+        },
+        {
+          "id": 8,
+          "ordine_id": 1755,
+          "tipo_transazione": "storno",
+          "importo": 321.64,
+          "data_transazione": "2026-04-13 09:00:00",
+          "note": "Pagamento ricevuto"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "distinct_on"
+  ],
+  "query": "WITH clienti_attivi AS (\n    SELECT id, nome, cognome, email\n    FROM anagrafica_contatti_commerciali\n    WHERE is_attivo IS TRUE\n),\nordini_recenti AS (\n    SELECT o.id, o.cliente_id, o.data_ordine, o.valore_totale, o.stato_ordine,\n           ROW_NUMBER() OVER (PARTITION BY o.cliente_id ORDER BY o.data_ordine DESC, o.id DESC) AS rn\n    FROM ordini o\n    WHERE o.data_ordine BETWEEN DATE '2026-03-31' - INTERVAL '90 days' AND DATE '2026-03-31'\n      AND o.stato_ordine IN ('confermato', 'spedito', 'consegnato')\n),\nultimo_ordine AS (\n    SELECT * FROM ordini_recenti WHERE rn = 1\n),\nriepilogo_cliente AS (\n    SELECT cliente_id,\n           COUNT(*) AS numero_ordini_recenti,\n           SUM(valore_totale) AS totale_speso_recenti\n    FROM ordini_recenti\n    GROUP BY cliente_id\n)\nSELECT c.nome || ' ' || c.cognome AS cliente,\n       c.email,\n       u.data_ordine AS ultima_data_ordine,\n       u.valore_totale AS ultimo_valore_ordine,\n       u.stato_ordine,\n       CASE\n           WHEN u.stato_ordine = 'consegnato' THEN 'Completato'\n           WHEN u.stato_ordine = 'spedito' THEN 'In transito'\n           ELSE 'In elaborazione'\n       END AS stato_descrizione,\n       COALESCE(r.numero_ordini_recenti, 0) AS numero_ordini_recenti,\n       COALESCE(r.totale_speso_recenti, 0) AS totale_speso_recenti,\n       ROUND(COALESCE(r.totale_speso_recenti / NULLIF(r.numero_ordini_recenti, 0), 0), 2) AS media_spesa_per_ordine\nFROM clienti_attivi c\nLEFT JOIN ultimo_ordine u ON c.id = u.cliente_id\nLEFT JOIN riepilogo_cliente r ON c.id = r.cliente_id\nORDER BY c.id, u.data_ordine DESC"
+}

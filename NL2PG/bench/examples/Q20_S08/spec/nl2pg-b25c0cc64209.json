@@ -1,0 +1,34 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 5,
+  "hierarchy": "isa",
+  "sql_features": [
+    "right_outer_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "contratti_fibra",
+      "obsolete_value": "pratiche_attivazione_fibra",
+      "description": "La tabella del sottotipo contratti_fibra viene denominata pratiche_attivazione_fibra nella prosa aziendale. Il risolutore deve capire che ogni pratica_attivazione_fibra citata nei requisiti corrisponde a una riga della tabella contratti_fibra, collegata alla tabella base contratti tramite la chiave esterna id_contratto."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "clienti",
+      "obsolete_value": "utenze",
+      "description": "Il termine utenze è usato nella documentazione aziendale come sinonimo completo della tabella clienti. Ogni riferimento alle utenze attive o registrate va mappato sui record della tabella clienti, senza introdurre entità aggiuntive."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "traffico_dati_gb",
+      "obsolete_value": "bucket dati mensile",
+      "description": "Il gergo tecnico delle telecomunicazioni 'bucket dati mensile' indica la colonna traffico_dati_gb presente nelle tabelle dei sottotipi contratti_mobile e contratti_fibra. La prosa usa questa espressione settoriale per riferirsi al volume di gigabyte inclusi nel piano, e il risolutore deve tradurla correttamente sul nome reale della colonna."
+    }
+  ],
+  "spec_hash": "11196cecb70e0d42"
+}

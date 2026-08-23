@@ -1,0 +1,27 @@
+{
+  "domain": "assicurazioni",
+  "n_tables": 1,
+  "hierarchy": "single_entity",
+  "sql_features": [
+    "filtered_agg"
+  ],
+  "twist": [
+    "jargon",
+    "polysemy"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "jargon",
+      "target_value": "stato_polizza",
+      "obsolete_value": "lifecycle_status_code",
+      "description": "Il campo che indica lo stato corrente della polizza viene riferito nel gergo aziendale interno come lifecycle_status_code."
+    },
+    {
+      "twist_type": "polysemy",
+      "target_value": "premio_annuo",
+      "obsolete_value": "valore",
+      "description": "Il termine 'valore' è ambiguo in quanto può riferirsi sia al premio_annuo che al massimale di copertura; nel contesto della query, deve essere interpretato come premio_annuo."
+    }
+  ],
+  "spec_hash": "e35d51812c973fe4"
+}

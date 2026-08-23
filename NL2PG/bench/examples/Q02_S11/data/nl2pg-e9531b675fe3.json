@@ -1,0 +1,337 @@
+{
+  "spec": {
+    "domain": "risorse_umane",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "scalar_agg"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "b7822a3d67c06f70"
+  },
+  "schema_ddl": "CREATE TABLE aziende (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta_sede TEXT NOT NULL\n);\n\nCREATE TABLE dipartimenti (\n    id SERIAL PRIMARY KEY,\n    azienda_id INT NOT NULL REFERENCES aziende(id) ON DELETE CASCADE,\n    nome TEXT NOT NULL,\n    budget_annuo NUMERIC(12,2) NOT NULL CHECK (budget_annuo >= 0),\n    UNIQUE (azienda_id, nome)\n);\n\nCREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile > 0)\n);\n\nCREATE TABLE valutazioni (\n    id SERIAL PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON DELETE CASCADE,\n    data_valutazione DATE NOT NULL,\n    punteggio NUMERIC(5,2) NOT NULL CHECK (punteggio BETWEEN 0 AND 100),\n    commento TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "aziende",
+        "nature": "dimension",
+        "min_rows": 24,
+        "max_rows": 36,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Tecnologia Alfa S.p.A.",
+            "partita_iva": "IT01234567890",
+            "citta_sede": "Milano"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Costruzioni Beta S.r.l.",
+            "partita_iva": "IT09876543210",
+            "citta_sede": "Roma"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Logistica Gamma S.p.A.",
+            "partita_iva": "IT02345678901",
+            "citta_sede": "Torino"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "Alimenti Delta S.r.l.",
+            "partita_iva": "IT03456789012",
+            "citta_sede": "Napoli"
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Consulenza Epsilon S.p.A.",
+            "partita_iva": "IT04567890123",
+            "citta_sede": "Bologna"
+          }
+        ],
+        "variations": {
+          "ragione_sociale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Tecnologia Alfa S.p.A.",
+              "Costruzioni Beta S.r.l.",
+              "Logistica Gamma S.p.A.",
+              "Alimenti Delta S.r.l.",
+              "Consulenza Epsilon S.p.A.",
+              "Retail Zeta S.p.A.",
+              "Energia Eta S.r.l.",
+              "Farmaceutica Theta S.p.A.",
+              "Trasporti Iota S.r.l.",
+              "Moda Kappa S.p.A."
+            ]
+          },
+          "citta_sede": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Verona",
+              "Padova",
+              "Bari"
+            ]
+          }
+        }
+      },
+      {
+        "table": "dipartimenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Vendite",
+            "budget_annuo": 250000.0
+          },
+          {
+            "id": 2,
+            "nome": "Information Technology",
+            "budget_annuo": 480000.0
+          },
+          {
+            "id": 3,
+            "nome": "Risorse Umane",
+            "budget_annuo": 150000.0
+          },
+          {
+            "id": 4,
+            "nome": "Finanza",
+            "budget_annuo": 320000.0
+          },
+          {
+            "id": 5,
+            "nome": "Produzione",
+            "budget_annuo": 610000.0
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Vendite",
+              "Marketing",
+              "Information Technology",
+              "Risorse Umane",
+              "Finanza",
+              "Produzione",
+              "Logistica",
+              "Ricerca e Sviluppo",
+              "Assistenza Clienti",
+              "Amministrazione"
+            ]
+          },
+          "budget_annuo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "dipendenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 4.0,
+        "templates": [
+          {
+            "id": 1,
+            "codice_fiscale": "RSSMRA80A01H501U",
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "data_assunzione": "2019-03-11",
+            "stipendio_mensile": 2850.0
+          },
+          {
+            "id": 2,
+            "codice_fiscale": "BNCLRA85C44F205X",
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "data_assunzione": "2020-09-01",
+            "stipendio_mensile": 3200.0
+          },
+          {
+            "id": 3,
+            "codice_fiscale": "VRDGLI88D21L219W",
+            "nome": "Giulia",
+            "cognome": "Verdi",
+            "data_assunzione": "2018-01-15",
+            "stipendio_mensile": 2450.0
+          },
+          {
+            "id": 4,
+            "codice_fiscale": "FRRLSN79E15G224Z",
+            "nome": "Alessandro",
+            "cognome": "Ferrari",
+            "data_assunzione": "2021-06-21",
+            "stipendio_mensile": 2750.0
+          },
+          {
+            "id": 5,
+            "codice_fiscale": "CNTSRA93B05H501K",
+            "nome": "Sara",
+            "cognome": "Conti",
+            "data_assunzione": "2022-02-14",
+            "stipendio_mensile": 2300.0
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Sara",
+              "Davide",
+              "Francesca",
+              "Luca",
+              "Elena",
+              "Matteo"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Ferrari",
+              "Esposito",
+              "Romano",
+              "Colombo",
+              "Ricci",
+              "Marino",
+              "Greco"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -400.0,
+            "delta_max": 200.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stipendio_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.5,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "valutazioni",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.0,
+        "templates": [
+          {
+            "id": 1,
+            "data_valutazione": "2025-01-20",
+            "punteggio": 78.5,
+            "commento": "Buone performance nel trimestre, obiettivi raggiunti."
+          },
+          {
+            "id": 2,
+            "data_valutazione": "2025-07-15",
+            "punteggio": 91.0,
+            "commento": "Eccellente contributo al progetto di digitalizzazione."
+          },
+          {
+            "id": 3,
+            "data_valutazione": "2024-12-10",
+            "punteggio": 54.25,
+            "commento": "Necessario migliorare la gestione delle scadenze."
+          },
+          {
+            "id": 4,
+            "data_valutazione": "2025-04-05",
+            "punteggio": 66.75,
+            "commento": "Progressi costanti, buon potenziale di crescita."
+          },
+          {
+            "id": 5,
+            "data_valutazione": "2025-10-18",
+            "punteggio": 83.4,
+            "commento": "Ottima collaborazione con il team e proattivita'."
+          }
+        ],
+        "variations": {
+          "data_valutazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "punteggio": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.08,
+            "pool": []
+          },
+          "commento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Buone performance nel trimestre, obiettivi raggiunti.",
+              "Eccellente contributo al progetto di digitalizzazione.",
+              "Necessario migliorare la gestione delle scadenze.",
+              "Progressi costanti, buon potenziale di crescita.",
+              "Ottima collaborazione con il team e proattivita'.",
+              "Risultati sotto le attese, piano di miglioramento avviato."
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "domain": "logistica",
+  "n_tables": 6,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "between"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "spedizioni",
+      "obsolete_value": "pratiche_di_trasporto",
+      "description": "La tabella spedizioni viene denominata pratiche_di_trasporto nella prosa aziendale. Le query devono risolvere la perifrasi verso la tabella reale spedizioni."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "pacchi",
+      "obsolete_value": "colli",
+      "description": "La tabella pacchi viene indicata con il sinonimo colli nella documentazione aziendale. Le query devono mappare il termine colli alla tabella pacchi."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "deleted_at",
+      "obsolete_value": "data_di_archiviazione",
+      "description": "La colonna di cancellazione logica deleted_at viene descritta con il gergo aziendale data_di_archiviazione: le righe con deleted_at valorizzato sono dette 'archiviate' anziché eliminate. Le query devono applicare il predicato di visibilità deleted_at IS NULL per escludere i record soft-deleted, combinato con il filtro di intervallo BETWEEN richiesto."
+    }
+  ],
+  "spec_hash": "06983c29e98dfc64"
+}

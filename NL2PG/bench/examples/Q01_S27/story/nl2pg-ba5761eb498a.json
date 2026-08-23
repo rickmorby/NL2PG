@@ -1,0 +1,621 @@
+{
+  "schema_ddl": "CREATE TABLE magazzini (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    capacita_max NUMERIC(10,2) CHECK (capacita_max > 0)\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    peso_unitario NUMERIC(8,3) CHECK (peso_unitario > 0),\n    volume_unitario NUMERIC(8,3) CHECK (volume_unitario > 0)\n);\n\nCREATE TABLE consegne_programmate (\n    id SERIAL PRIMARY KEY,\n    magazzino_partenza_id INT NOT NULL REFERENCES magazzini(id),\n    magazzino_destinazione_id INT NOT NULL REFERENCES magazzini(id),\n    data_partenza TIMESTAMP NOT NULL,\n    data_arrivo_prevista TIMESTAMP NOT NULL CHECK (data_arrivo_prevista > data_partenza),\n    stato TEXT NOT NULL DEFAULT 'programmata'\n);\n\nCREATE TABLE spedizioni (\n    id SERIAL PRIMARY KEY,\n    consegna_id INT NOT NULL REFERENCES consegne_programmate(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    massa_lorda NUMERIC(8,3) NOT NULL CHECK (massa_lorda > 0),\n    note TEXT\n);\n\nCREATE TABLE autisti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    licenza TEXT NOT NULL UNIQUE,\n    disponibile BOOLEAN NOT NULL DEFAULT true\n);",
+  "data_profile": {
+    "profile": {
+      "magazzini": {
+        "row_count": 29,
+        "columns": {
+          "id": {
+            "distinct": 29,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 29
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Centro Distribuzione Bologna",
+              "Deposito Nord Milano",
+              "Hub Logistico Torino",
+              "Magazzino Centrale Roma",
+              "Magazzino Sud Napoli"
+            ]
+          },
+          "indirizzo": {
+            "distinct": 5,
+            "sample": [
+              "Corso Torino 100, Torino",
+              "Via Emilia 22, Bologna",
+              "Via Milano 45, Milano",
+              "Via Napoli 8, Napoli",
+              "Via del Porto 12, Roma"
+            ]
+          },
+          "capacita_max": {
+            "distinct": 6,
+            "sample": [
+              "1000.00",
+              "10000.00",
+              "20000.00",
+              "2500.0",
+              "2500.00"
+            ],
+            "min": 2500.0,
+            "max": 2500.0
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 665,
+        "columns": {
+          "id": {
+            "distinct": 665,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 665
+          },
+          "codice": {
+            "distinct": 665,
+            "sample": [
+              "PRD001",
+              "PRD001_1",
+              "PRD001_10",
+              "PRD001_100",
+              "PRD001_101"
+            ]
+          },
+          "descrizione": {
+            "distinct": 6,
+            "sample": [
+              "Bottiglia di vetro 750ml",
+              "Elettrodomestico lavatrice",
+              "Pallet EUR 120x80",
+              "Pneumatico auto",
+              "Scatola cartone 30x30x30"
+            ]
+          },
+          "peso_unitario": {
+            "distinct": 13,
+            "sample": [
+              "0.250",
+              "0.500",
+              "0.750",
+              "0.89",
+              "1.000"
+            ],
+            "min": 0.89,
+            "max": 70.0
+          },
+          "volume_unitario": {
+            "distinct": 10,
+            "sample": [
+              "0.100",
+              "0.250",
+              "0.500",
+              "0.6",
+              "0.75"
+            ],
+            "min": 0.6,
+            "max": 1.2
+          }
+        }
+      },
+      "consegne_programmate": {
+        "row_count": 2635,
+        "columns": {
+          "id": {
+            "distinct": 2635,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2635
+          },
+          "magazzino_partenza_id": {
+            "distinct": 29,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 29
+          },
+          "magazzino_destinazione_id": {
+            "distinct": 29,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 29
+          },
+          "data_partenza": {
+            "distinct": 6,
+            "sample": [
+              "2026-01-05 08:00:00",
+              "2026-01-12 09:30:00",
+              "2026-01-20 07:45:00",
+              "2026-02-02 10:00:00",
+              "2026-02-15 08:30:00"
+            ]
+          },
+          "data_arrivo_prevista": {
+            "distinct": 6,
+            "sample": [
+              "2026-03-02 12:00:00",
+              "2026-03-05 14:00:00",
+              "2026-03-10 11:30:00",
+              "2026-03-15 16:00:00",
+              "2026-03-20 10:00:00"
+            ]
+          },
+          "stato": {
+            "distinct": 4,
+            "sample": [
+              "annullata",
+              "completata",
+              "in transito",
+              "programmata"
+            ]
+          }
+        }
+      },
+      "spedizioni": {
+        "row_count": 487,
+        "columns": {
+          "id": {
+            "distinct": 487,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 487
+          },
+          "consegna_id": {
+            "distinct": 448,
+            "sample": [
+              "1004",
+              "1005",
+              "1006",
+              "101",
+              "1017"
+            ],
+            "min": 3,
+            "max": 2632
+          },
+          "prodotto_id": {
+            "distinct": 343,
+            "sample": [
+              "10",
+              "100",
+              "104",
+              "107",
+              "109"
+            ],
+            "min": 7,
+            "max": 665
+          },
+          "quantita": {
+            "distinct": 8,
+            "sample": [
+              "1",
+              "10",
+              "2",
+              "20",
+              "24"
+            ],
+            "min": 1,
+            "max": 24
+          },
+          "massa_lorda": {
+            "distinct": 12,
+            "sample": [
+              "0.500",
+              "1.200",
+              "10.000",
+              "2.500",
+              "21.36"
+            ],
+            "min": 5.0,
+            "max": 70.0
+          },
+          "note": {
+            "distinct": 7,
+            "sample": [
+              "",
+              "Bottiglie",
+              "Fragile",
+              "Ingombrante",
+              "Maneggiare con cura"
+            ]
+          }
+        }
+      },
+      "autisti": {
+        "row_count": 479,
+        "columns": {
+          "id": {
+            "distinct": 479,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 479
+          },
+          "nome": {
+            "distinct": 6,
+            "sample": [
+              "Anna",
+              "Francesco",
+              "Giulia",
+              "Luca",
+              "Marco"
+            ]
+          },
+          "cognome": {
+            "distinct": 6,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Ferrari",
+              "Neri",
+              "Rossi"
+            ]
+          },
+          "licenza": {
+            "distinct": 479,
+            "sample": [
+              "LIC001",
+              "LIC001_1",
+              "LIC001_10",
+              "LIC001_100",
+              "LIC001_101"
+            ]
+          },
+          "disponibile": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "magazzini": [
+        {
+          "id": 1,
+          "nome": "Centro Distribuzione Bologna",
+          "indirizzo": "Corso Torino 100, Torino",
+          "capacita_max": "5000.00"
+        },
+        {
+          "id": 2,
+          "nome": "Centro Distribuzione Bologna",
+          "indirizzo": "Via Emilia 22, Bologna",
+          "capacita_max": "20000.00"
+        },
+        {
+          "id": 3,
+          "nome": "Magazzino Sud Napoli",
+          "indirizzo": "Via Milano 45, Milano",
+          "capacita_max": "10000.00"
+        },
+        {
+          "id": 4,
+          "nome": "Centro Distribuzione Bologna",
+          "indirizzo": "Via Napoli 8, Napoli",
+          "capacita_max": "10000.00"
+        },
+        {
+          "id": 5,
+          "nome": "Hub Logistico Torino",
+          "indirizzo": "Via Milano 45, Milano",
+          "capacita_max": "20000.00"
+        },
+        {
+          "id": 6,
+          "nome": "Deposito Nord Milano",
+          "indirizzo": "Via Emilia 22, Bologna",
+          "capacita_max": "20000.00"
+        },
+        {
+          "id": 7,
+          "nome": "Hub Logistico Torino",
+          "indirizzo": "Via Napoli 8, Napoli",
+          "capacita_max": "20000.00"
+        },
+        {
+          "id": 8,
+          "nome": "Magazzino Sud Napoli",
+          "indirizzo": "Via Milano 45, Milano",
+          "capacita_max": "10000.00"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "codice": "PRD001",
+          "descrizione": "Bottiglia di vetro 750ml",
+          "peso_unitario": "0.750",
+          "volume_unitario": "0.750"
+        },
+        {
+          "id": 2,
+          "codice": "PRD001_1",
+          "descrizione": "Elettrodomestico lavatrice",
+          "peso_unitario": "5.000",
+          "volume_unitario": "0.100"
+        },
+        {
+          "id": 3,
+          "codice": "PRD001_2",
+          "descrizione": "Bottiglia di vetro 750ml",
+          "peso_unitario": "1.000",
+          "volume_unitario": "1.000"
+        },
+        {
+          "id": 4,
+          "codice": "PRD001_3",
+          "descrizione": "Scatola metallica 20x20x20",
+          "peso_unitario": "2.500",
+          "volume_unitario": "1.000"
+        },
+        {
+          "id": 5,
+          "codice": "PRD001_4",
+          "descrizione": "Bottiglia di vetro 750ml",
+          "peso_unitario": "25.000",
+          "volume_unitario": "1.000"
+        },
+        {
+          "id": 6,
+          "codice": "PRD001_5",
+          "descrizione": "Pneumatico auto",
+          "peso_unitario": "70.000",
+          "volume_unitario": "0.750"
+        },
+        {
+          "id": 7,
+          "codice": "PRD001_6",
+          "descrizione": "Scatola metallica 20x20x20",
+          "peso_unitario": "8.500",
+          "volume_unitario": "0.500"
+        },
+        {
+          "id": 8,
+          "codice": "PRD001_7",
+          "descrizione": "Scatola cartone 30x30x30",
+          "peso_unitario": "2.500",
+          "volume_unitario": "0.500"
+        }
+      ],
+      "consegne_programmate": [
+        {
+          "id": 1,
+          "magazzino_partenza_id": 21,
+          "magazzino_destinazione_id": 22,
+          "data_partenza": "2026-02-02 10:00:00",
+          "data_arrivo_prevista": "2026-03-02 12:00:00",
+          "stato": "in transito"
+        },
+        {
+          "id": 2,
+          "magazzino_partenza_id": 8,
+          "magazzino_destinazione_id": 23,
+          "data_partenza": "2026-02-02 10:00:00",
+          "data_arrivo_prevista": "2026-03-05 14:00:00",
+          "stato": "completata"
+        },
+        {
+          "id": 3,
+          "magazzino_partenza_id": 24,
+          "magazzino_destinazione_id": 17,
+          "data_partenza": "2026-01-12 09:30:00",
+          "data_arrivo_prevista": "2026-04-01 09:00:00",
+          "stato": "completata"
+        },
+        {
+          "id": 4,
+          "magazzino_partenza_id": 27,
+          "magazzino_destinazione_id": 2,
+          "data_partenza": "2026-02-02 10:00:00",
+          "data_arrivo_prevista": "2026-03-15 16:00:00",
+          "stato": "annullata"
+        },
+        {
+          "id": 5,
+          "magazzino_partenza_id": 2,
+          "magazzino_destinazione_id": 28,
+          "data_partenza": "2026-01-12 09:30:00",
+          "data_arrivo_prevista": "2026-03-02 12:00:00",
+          "stato": "annullata"
+        },
+        {
+          "id": 6,
+          "magazzino_partenza_id": 23,
+          "magazzino_destinazione_id": 19,
+          "data_partenza": "2026-01-12 09:30:00",
+          "data_arrivo_prevista": "2026-03-05 14:00:00",
+          "stato": "completata"
+        },
+        {
+          "id": 7,
+          "magazzino_partenza_id": 12,
+          "magazzino_destinazione_id": 14,
+          "data_partenza": "2026-01-05 08:00:00",
+          "data_arrivo_prevista": "2026-03-02 12:00:00",
+          "stato": "programmata"
+        },
+        {
+          "id": 8,
+          "magazzino_partenza_id": 4,
+          "magazzino_destinazione_id": 14,
+          "data_partenza": "2026-02-15 08:30:00",
+          "data_arrivo_prevista": "2026-03-15 16:00:00",
+          "stato": "in transito"
+        }
+      ],
+      "spedizioni": [
+        {
+          "id": 1,
+          "consegna_id": 740,
+          "prodotto_id": 221,
+          "quantita": "10",
+          "massa_lorda": "1.200",
+          "note": "Maneggiare con cura"
+        },
+        {
+          "id": 2,
+          "consegna_id": 2578,
+          "prodotto_id": 376,
+          "quantita": "50",
+          "massa_lorda": "50.000",
+          "note": "Maneggiare con cura"
+        },
+        {
+          "id": 3,
+          "consegna_id": 101,
+          "prodotto_id": 350,
+          "quantita": "20",
+          "massa_lorda": "1.200",
+          "note": "Fragile"
+        },
+        {
+          "id": 4,
+          "consegna_id": 2608,
+          "prodotto_id": 109,
+          "quantita": "50",
+          "massa_lorda": "2.500",
+          "note": "Standard"
+        },
+        {
+          "id": 5,
+          "consegna_id": 1423,
+          "prodotto_id": 124,
+          "quantita": "10",
+          "massa_lorda": "50.000",
+          "note": "Bottiglie"
+        },
+        {
+          "id": 6,
+          "consegna_id": 1245,
+          "prodotto_id": 182,
+          "quantita": "5",
+          "massa_lorda": "70.000",
+          "note": "Fragile"
+        },
+        {
+          "id": 7,
+          "consegna_id": 2094,
+          "prodotto_id": 274,
+          "quantita": "20",
+          "massa_lorda": "5.000",
+          "note": "Bottiglie"
+        },
+        {
+          "id": 8,
+          "consegna_id": 1870,
+          "prodotto_id": 371,
+          "quantita": "5",
+          "massa_lorda": "25.000",
+          "note": "Ingombrante"
+        }
+      ],
+      "autisti": [
+        {
+          "id": 1,
+          "nome": "Anna",
+          "cognome": "Ferrari",
+          "licenza": "LIC001",
+          "disponibile": "false"
+        },
+        {
+          "id": 2,
+          "nome": "Paolo",
+          "cognome": "Ferrari",
+          "licenza": "LIC001_1",
+          "disponibile": "false"
+        },
+        {
+          "id": 3,
+          "nome": "Francesco",
+          "cognome": "Colombo",
+          "licenza": "LIC001_2",
+          "disponibile": "true"
+        },
+        {
+          "id": 4,
+          "nome": "Anna",
+          "cognome": "Colombo",
+          "licenza": "LIC001_3",
+          "disponibile": "true"
+        },
+        {
+          "id": 5,
+          "nome": "Marco",
+          "cognome": "Bianchi",
+          "licenza": "LIC001_4",
+          "disponibile": "true"
+        },
+        {
+          "id": 6,
+          "nome": "Anna",
+          "cognome": "Ferrari",
+          "licenza": "LIC001_5",
+          "disponibile": "true"
+        },
+        {
+          "id": 7,
+          "nome": "Anna",
+          "cognome": "Rossi",
+          "licenza": "LIC001_6",
+          "disponibile": "true"
+        },
+        {
+          "id": 8,
+          "nome": "Francesco",
+          "cognome": "Neri",
+          "licenza": "LIC001_7",
+          "disponibile": "false"
+        }
+      ]
+    }
+  },
+  "story": "Nel cuore della Direzione Logistica della nostra azienda, l’archivio intitolato **magazzini** rappresenta il punto di riferimento per la pianificazione delle risorse. Ogni scheda al suo interno riporta dettagli fondamentali come il nome della struttura, l’indirizzo esatto e, soprattutto, la **capacità massima** che ciascun deposito può ospitare. Durante una recente verifica operativa, il responsabile della logistica ha richiesto un’analisi mirata: individuare i cinque siti con una capacità superiore a **2500** unità di stoccaggio, ordinati dal più capiente al meno capiente, per valutare una possibile riorganizzazione delle scorte in eccesso.\n\nParallelamente, il registro **prodotti** raccoglie le caratteristiche di ogni articolo movimentato: dal codice identificativo alla descrizione dettagliata, passando per il **peso unitario** e il **volume unitario**, dati essenziali per calcolare il carico complessivo delle spedizioni. Questi valori, infatti, vengono utilizzati dagli operatori per compilare le schede del registro **spedizioni** – noto internamente anche come **consegne programmate**, come indicato nei documenti ufficiali – dove vengono annotate le quantità di merce assegnate a ciascuna consegna, insieme alla **massa lorda** (spesso chiamata **peso_kg** nei manuali operativi) e alle eventuali note per la movimentazione, come \"Fragile\" o \"Maneggiare con cura\".\n\nUn esempio pratico di questa sinergia tra archivi si è verificato durante la preparazione di una spedizione dal **Centro Distribuzione Bologna** verso il **Hub Logistico Torino**, prevista per il **5 gennaio 2026** con arrivo stimato per il **2 marzo 2026**. In quella occasione, gli addetti hanno dovuto verificare che la somma delle masse lorde dei prodotti – tra cui **20** scatole di vetro da **0.750** kg ciascuna – non superasse la capacità del mezzo di trasporto, mentre il sistema segnalava automaticamente le consegne con stato \"in transito\" o \"programmata\" per evitare sovrapposizioni.\n\nNel frattempo, l’archivio **autisti** veniva consultato per assegnare un conducente disponibile, come Francesco Colombo, la cui licenza **LIC001_2** risultava valida e non impegnata in altre missioni. Ogni dettaglio, dalla partenza alla destinazione, veniva tracciato con precisione, garantendo che anche le spedizioni più complesse – come quelle con massa lorda superiore a **50.00** kg – fossero gestite nel rispetto delle normative di sicurezza e delle tempistiche previste."
+}

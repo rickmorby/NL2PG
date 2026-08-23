@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 5,
+    "hierarchy": "isa",
+    "sql_features": [
+      "right_outer_join"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "contratti_fibra",
+        "obsolete_value": "pratiche_attivazione_fibra",
+        "description": "La tabella del sottotipo contratti_fibra viene denominata pratiche_attivazione_fibra nella prosa aziendale. Il risolutore deve capire che ogni pratica_attivazione_fibra citata nei requisiti corrisponde a una riga della tabella contratti_fibra, collegata alla tabella base contratti tramite la chiave esterna id_contratto."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "clienti",
+        "obsolete_value": "utenze",
+        "description": "Il termine utenze è usato nella documentazione aziendale come sinonimo completo della tabella clienti. Ogni riferimento alle utenze attive o registrate va mappato sui record della tabella clienti, senza introdurre entità aggiuntive."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "traffico_dati_gb",
+        "obsolete_value": "bucket dati mensile",
+        "description": "Il gergo tecnico delle telecomunicazioni 'bucket dati mensile' indica la colonna traffico_dati_gb presente nelle tabelle dei sottotipi contratti_mobile e contratti_fibra. La prosa usa questa espressione settoriale per riferirsi al volume di gigabyte inclusi nel piano, e il risolutore deve tradurla correttamente sul nome reale della colonna."
+      }
+    ],
+    "spec_hash": "11196cecb70e0d42"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE,\n    utenza_attiva BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE piani_tariffari (\n    id SERIAL PRIMARY KEY,\n    nome_piano TEXT NOT NULL UNIQUE,\n    tecnologia TEXT NOT NULL CHECK (tecnologia IN ('mobile', 'fibra')),\n    prezzo_mensile NUMERIC(8,2) NOT NULL CHECK (prezzo_mensile >= 0)\n);\n\nCREATE TABLE contratti (\n    id SERIAL PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    piano_id INT REFERENCES piani_tariffari(id),\n    data_attivazione DATE NOT NULL,\n    data_disdetta DATE,\n    stato_contratto TEXT NOT NULL DEFAULT 'attivo' CHECK (stato_contratto IN ('attivo', 'sospeso', 'cessato')),\n    CHECK (data_disdetta IS NULL OR data_disdetta >= data_attivazione)\n);\n\nCREATE TABLE contratti_mobile (\n    id_contratto INT PRIMARY KEY REFERENCES contratti(id),\n    numero_msisdn TEXT NOT NULL UNIQUE,\n    traffico_dati_gb INT NOT NULL CHECK (traffico_dati_gb >= 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0)\n);\n\nCREATE TABLE contratti_fibra (\n    id_contratto INT PRIMARY KEY REFERENCES contratti(id),\n    traffico_dati_gb INT NOT NULL CHECK (traffico_dati_gb >= 0),\n    velocita_download_mbps INT NOT NULL CHECK (velocita_download_mbps > 0),\n    indirizzo_installazione TEXT NOT NULL\n);"
+}

@@ -1,0 +1,414 @@
+{
+  "schema_ddl": "CREATE TABLE strumenti_finanziari (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_isin TEXT NOT NULL UNIQUE,\n    emittente TEXT NOT NULL,\n    data_emissione DATE NOT NULL,\n    valore_nominale NUMERIC(14,2) NOT NULL CHECK (valore_nominale > 0),\n    valuta CHAR(3) NOT NULL,\n    stato TEXT NOT NULL DEFAULT 'attivo' CHECK (stato IN ('attivo', 'sospeso', 'delistato'))\n);\n\nCREATE TABLE obbligazioni (\n    id INT PRIMARY KEY REFERENCES strumenti_finanziari(id) ON DELETE CASCADE,\n    tasso_cedola NUMERIC(6,3) NOT NULL CHECK (tasso_cedola >= 0),\n    tipo_tasso TEXT NOT NULL CHECK (tipo_tasso IN ('fisso', 'variabile')),\n    data_scadenza DATE NOT NULL,\n    rating TEXT CHECK (rating IN ('AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'CCC', 'D'))\n);\n\nCREATE TABLE azioni (\n    id INT PRIMARY KEY REFERENCES strumenti_finanziari(id) ON DELETE CASCADE,\n    ticker TEXT NOT NULL UNIQUE,\n    quantita_azioni_emesse BIGINT NOT NULL CHECK (quantita_azioni_emesse > 0),\n    dividendo_per_azione NUMERIC(10,4) NOT NULL DEFAULT 0 CHECK (dividendo_per_azione >= 0),\n    settore TEXT NOT NULL\n);",
+  "data_profile": {
+    "profile": {
+      "strumenti_finanziari": {
+        "row_count": 178,
+        "columns": {
+          "id": {
+            "distinct": 178,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 178
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Azione Ordinaria Apple",
+              "Azione Ordinaria Eni",
+              "Azione Ordinaria Ferrari",
+              "Azione Ordinaria Generali",
+              "Azione Ordinaria Intesa"
+            ]
+          },
+          "codice_isin": {
+            "distinct": 178,
+            "sample": [
+              "IT0003128367",
+              "IT00031283671",
+              "IT000312836710",
+              "IT000312836711",
+              "IT000312836712"
+            ]
+          },
+          "emittente": {
+            "distinct": 10,
+            "sample": [
+              "Apple Inc",
+              "Enel SpA",
+              "Eni SpA",
+              "Ferrari NV",
+              "Generali SpA"
+            ]
+          },
+          "data_emissione": {
+            "distinct": 174,
+            "sample": [
+              "1976-04-05",
+              "1976-05-18",
+              "1976-05-23",
+              "1976-07-04",
+              "1977-01-17"
+            ]
+          },
+          "valore_nominale": {
+            "distinct": 7,
+            "sample": [
+              "0.01",
+              "0.5",
+              "0.50",
+              "1.00",
+              "100.00"
+            ],
+            "min": 0.01,
+            "max": 0.5
+          },
+          "valuta": {
+            "distinct": 4,
+            "sample": [
+              "CHF",
+              "EUR",
+              "GBP",
+              "USD"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "delistato",
+              "sospeso"
+            ]
+          }
+        }
+      },
+      "obbligazioni": {
+        "row_count": 178,
+        "columns": {
+          "id": {
+            "distinct": 178,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 178
+          },
+          "tasso_cedola": {
+            "distinct": 136,
+            "sample": [
+              "0.0",
+              "0.88",
+              "0.91",
+              "1.07",
+              "1.2"
+            ],
+            "min": 0.0,
+            "max": 13.75
+          },
+          "tipo_tasso": {
+            "distinct": 2,
+            "sample": [
+              "fisso",
+              "variabile"
+            ]
+          },
+          "data_scadenza": {
+            "distinct": 171,
+            "sample": [
+              "2027-05-18",
+              "2027-05-30",
+              "2027-07-08",
+              "2027-07-21",
+              "2027-08-01"
+            ]
+          },
+          "rating": {
+            "distinct": 7,
+            "sample": [
+              "A",
+              "AA",
+              "AAA",
+              "B",
+              "BB"
+            ]
+          }
+        }
+      },
+      "azioni": {
+        "row_count": 178,
+        "columns": {
+          "id": {
+            "distinct": 178,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 178
+          },
+          "ticker": {
+            "distinct": 178,
+            "sample": [
+              "AAPL",
+              "AAPL1",
+              "AAPL10",
+              "AAPL11",
+              "AAPL12"
+            ]
+          },
+          "quantita_azioni_emesse": {
+            "distinct": 175,
+            "sample": [
+              "10120735357.63",
+              "10185895752.66",
+              "10203562250.73",
+              "10399558906.21",
+              "10504512967.81"
+            ],
+            "min": 89000000.0,
+            "max": 29931444538.93
+          },
+          "dividendo_per_azione": {
+            "distinct": 114,
+            "sample": [
+              "0.0",
+              "0.22",
+              "0.23",
+              "0.25",
+              "0.26"
+            ],
+            "min": 0.0,
+            "max": 4.2
+          },
+          "settore": {
+            "distinct": 10,
+            "sample": [
+              "Automotive",
+              "Energia",
+              "Finanza",
+              "Industria",
+              "Lusso"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "strumenti_finanziari": [
+        {
+          "id": 1,
+          "nome": "Buono Ordinario del Tesoro",
+          "codice_isin": "IT0005239360",
+          "emittente": "Telecom Italia SpA",
+          "data_emissione": "2021-02-22",
+          "valore_nominale": "100.00",
+          "valuta": "GBP",
+          "stato": "attivo"
+        },
+        {
+          "id": 2,
+          "nome": "Corporate Bond Eni 2030",
+          "codice_isin": "IT00052393601",
+          "emittente": "Telecom Italia SpA",
+          "data_emissione": "2022-01-21",
+          "valore_nominale": "100.00",
+          "valuta": "EUR",
+          "stato": "attivo"
+        },
+        {
+          "id": 3,
+          "nome": "Corporate Bond Eni 2030",
+          "codice_isin": "IT00052393602",
+          "emittente": "Repubblica Italiana",
+          "data_emissione": "2020-04-02",
+          "valore_nominale": "0.01",
+          "valuta": "GBP",
+          "stato": "sospeso"
+        },
+        {
+          "id": 4,
+          "nome": "Azione Ordinaria Intesa",
+          "codice_isin": "IT00052393603",
+          "emittente": "Stellantis NV",
+          "data_emissione": "2022-04-20",
+          "valore_nominale": "5.00",
+          "valuta": "EUR",
+          "stato": "attivo"
+        },
+        {
+          "id": 5,
+          "nome": "Azione Ordinaria Eni",
+          "codice_isin": "IT00052393604",
+          "emittente": "Enel SpA",
+          "data_emissione": "2023-03-21",
+          "valore_nominale": "0.01",
+          "valuta": "USD",
+          "stato": "attivo"
+        },
+        {
+          "id": 6,
+          "nome": "BTP Italia 2035",
+          "codice_isin": "IT00052393605",
+          "emittente": "Intesa Sanpaolo SpA",
+          "data_emissione": "2022-07-08",
+          "valore_nominale": "0.01",
+          "valuta": "GBP",
+          "stato": "attivo"
+        },
+        {
+          "id": 7,
+          "nome": "Green Bond Enel 2033",
+          "codice_isin": "IT00052393606",
+          "emittente": "Ferrari NV",
+          "data_emissione": "2020-07-04",
+          "valore_nominale": "0.01",
+          "valuta": "EUR",
+          "stato": "sospeso"
+        },
+        {
+          "id": 8,
+          "nome": "Buono Ordinario del Tesoro",
+          "codice_isin": "IT00052393607",
+          "emittente": "Eni SpA",
+          "data_emissione": "2023-06-11",
+          "valore_nominale": "1000.00",
+          "valuta": "EUR",
+          "stato": "attivo"
+        }
+      ],
+      "obbligazioni": [
+        {
+          "id": 61,
+          "tasso_cedola": 3.2,
+          "tipo_tasso": "variabile",
+          "data_scadenza": "2037-07-30",
+          "rating": "AA"
+        },
+        {
+          "id": 8,
+          "tasso_cedola": 4.9,
+          "tipo_tasso": "fisso",
+          "data_scadenza": "2036-03-26",
+          "rating": "BB"
+        },
+        {
+          "id": 148,
+          "tasso_cedola": 4.57,
+          "tipo_tasso": "variabile",
+          "data_scadenza": "2036-09-28",
+          "rating": "AA"
+        },
+        {
+          "id": 9,
+          "tasso_cedola": 6.25,
+          "tipo_tasso": "variabile",
+          "data_scadenza": "2036-01-24",
+          "rating": "BBB"
+        },
+        {
+          "id": 128,
+          "tasso_cedola": 2.33,
+          "tipo_tasso": "fisso",
+          "data_scadenza": "2036-03-08",
+          "rating": "BBB"
+        },
+        {
+          "id": 6,
+          "tasso_cedola": 4.66,
+          "tipo_tasso": "fisso",
+          "data_scadenza": "2038-01-03",
+          "rating": "AAA"
+        },
+        {
+          "id": 50,
+          "tasso_cedola": 2.02,
+          "tipo_tasso": "fisso",
+          "data_scadenza": "2037-11-07",
+          "rating": "BB"
+        },
+        {
+          "id": 160,
+          "tasso_cedola": 3.03,
+          "tipo_tasso": "fisso",
+          "data_scadenza": "2037-06-09",
+          "rating": "BBB"
+        }
+      ],
+      "azioni": [
+        {
+          "id": 168,
+          "ticker": "ENEL",
+          "quantita_azioni_emesse": 6563649845.29,
+          "dividendo_per_azione": 0.34,
+          "settore": "Finanza"
+        },
+        {
+          "id": 118,
+          "ticker": "ENEL1",
+          "quantita_azioni_emesse": 10622574548.29,
+          "dividendo_per_azione": 0.56,
+          "settore": "Lusso"
+        },
+        {
+          "id": 46,
+          "ticker": "ENEL2",
+          "quantita_azioni_emesse": 9965569146.24,
+          "dividendo_per_azione": 0.22,
+          "settore": "Petrolio e Gas"
+        },
+        {
+          "id": 124,
+          "ticker": "ENEL3",
+          "quantita_azioni_emesse": 17875027274.12,
+          "dividendo_per_azione": 0.68,
+          "settore": "Finanza"
+        },
+        {
+          "id": 17,
+          "ticker": "ENEL4",
+          "quantita_azioni_emesse": 14567859638.05,
+          "dividendo_per_azione": 0.76,
+          "settore": "Automotive"
+        },
+        {
+          "id": 54,
+          "ticker": "ENEL5",
+          "quantita_azioni_emesse": 14206024541.16,
+          "dividendo_per_azione": 0.45,
+          "settore": "Lusso"
+        },
+        {
+          "id": 26,
+          "ticker": "ENEL6",
+          "quantita_azioni_emesse": 8725204969.62,
+          "dividendo_per_azione": 0.28,
+          "settore": "Retail"
+        },
+        {
+          "id": 135,
+          "ticker": "ENEL7",
+          "quantita_azioni_emesse": 19329946484.22,
+          "dividendo_per_azione": 0.75,
+          "settore": "Petrolio e Gas"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "exists"
+  ],
+  "query": "SELECT sf.nome,\n       sf.emittente,\n       sf.valuta,\n       sf.valore_nominale,\n       sf.data_emissione,\n       ob.tasso_cedola,\n       ob.rating\nFROM strumenti_finanziari sf\nJOIN obbligazioni ob ON ob.id = sf.id\nWHERE sf.stato = 'attivo'\n  AND sf.valuta = 'EUR'\n  AND ob.tipo_tasso = 'fisso'\n  AND EXISTS (\n      SELECT 1\n      FROM strumenti_finanziari altri\n      WHERE altri.emittente = sf.emittente\n        AND altri.stato = 'sospeso'\n  )\nORDER BY sf.data_emissione DESC, sf.codice_isin ASC;"
+}

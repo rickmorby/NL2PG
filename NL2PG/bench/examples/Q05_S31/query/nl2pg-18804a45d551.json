@@ -1,0 +1,480 @@
+{
+  "schema_ddl": "CREATE TABLE movimenti_contabili (\n    id SERIAL PRIMARY KEY,\n    data_movimento DATE NOT NULL,\n    importo NUMERIC(15,2) NOT NULL CHECK (importo != 0),\n    nome_categoria TEXT NOT NULL,\n    nome_fornitore TEXT,\n    totale_per_categoria NUMERIC(15,2) GENERATED ALWAYS AS (importo) STORED,\n    conteggio_per_fornitore INT GENERATED ALWAYS AS (1) STORED\n);\n\nCREATE TABLE categorie_contabili (\n    id SERIAL PRIMARY KEY,\n    nome_categoria TEXT NOT NULL UNIQUE,\n    descrizione TEXT,\n    totale_movimenti NUMERIC(15,2) DEFAULT 0,\n    n_movimenti INT DEFAULT 0\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    nome_fornitore TEXT NOT NULL UNIQUE,\n    codice_fiscale TEXT UNIQUE,\n    totale_speso NUMERIC(15,2) DEFAULT 0,\n    n_fatture INT DEFAULT 0\n);\n\nCREATE TABLE riepilogo_annuale (\n    id SERIAL PRIMARY KEY,\n    anno INT NOT NULL UNIQUE,\n    totale_movimenti_annuali NUMERIC(15,2) DEFAULT 0,\n    n_movimenti_annuali INT DEFAULT 0,\n    n_categorie_attive INT DEFAULT 0,\n    n_fornitori_attivi INT DEFAULT 0\n);",
+  "data_profile": {
+    "profile": {
+      "categorie_contabili": {
+        "row_count": 5,
+        "columns": {
+          "id": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "nome_categoria": {
+            "distinct": 5,
+            "sample": [
+              "Manutenzione",
+              "Materiali di consumo",
+              "Servizi professionali",
+              "Trasporti",
+              "Utenze"
+            ]
+          },
+          "descrizione": {
+            "distinct": 3,
+            "sample": [
+              "",
+              "Altro",
+              "Investimenti"
+            ]
+          },
+          "totale_movimenti": {
+            "distinct": 1,
+            "sample": [
+              "0"
+            ],
+            "min": 0,
+            "max": 0
+          },
+          "n_movimenti": {
+            "distinct": 1,
+            "sample": [
+              "0"
+            ],
+            "min": 0,
+            "max": 0
+          }
+        }
+      },
+      "fornitori": {
+        "row_count": 619,
+        "columns": {
+          "id": {
+            "distinct": 619,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 619
+          },
+          "nome_fornitore": {
+            "distinct": 619,
+            "sample": [
+              "Cartaria Rossi",
+              "Cartaria Rossi_1",
+              "Cartaria Rossi_10",
+              "Cartaria Rossi_100",
+              "Cartaria Rossi_101"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 590,
+            "sample": [
+              "IT09876543210",
+              "IT09876543210_1",
+              "IT09876543210_10",
+              "IT09876543210_100",
+              "IT09876543210_101"
+            ]
+          },
+          "totale_speso": {
+            "distinct": 1,
+            "sample": [
+              "0"
+            ],
+            "min": 0,
+            "max": 0
+          },
+          "n_fatture": {
+            "distinct": 1,
+            "sample": [
+              "0"
+            ],
+            "min": 0,
+            "max": 0
+          }
+        }
+      },
+      "movimenti_contabili": {
+        "row_count": 991,
+        "columns": {
+          "id": {
+            "distinct": 991,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 991
+          },
+          "data_movimento": {
+            "distinct": 160,
+            "sample": [
+              "2025-11-16",
+              "2025-11-17",
+              "2025-11-19",
+              "2025-11-20",
+              "2025-11-21"
+            ]
+          },
+          "importo": {
+            "distinct": 955,
+            "sample": [
+              "-1008.77",
+              "-1011.86",
+              "-1023.09",
+              "-1024.99",
+              "-1029.64"
+            ],
+            "min": -4502.25,
+            "max": 7500.0
+          },
+          "nome_categoria": {
+            "distinct": 5,
+            "sample": [
+              "Manutenzione",
+              "Materiali di consumo",
+              "Servizi professionali",
+              "Trasporti",
+              "Utenze"
+            ]
+          },
+          "nome_fornitore": {
+            "distinct": 6,
+            "sample": [
+              "",
+              "Cartaria Rossi",
+              "Energit S.p.A.",
+              "Manutenzioni Verdi",
+              "Studio Legale Bianchi"
+            ]
+          },
+          "totale_per_categoria": {
+            "distinct": 0,
+            "sample": []
+          },
+          "conteggio_per_fornitore": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      },
+      "riepilogo_annuale": {
+        "row_count": 10,
+        "columns": {
+          "id": {
+            "distinct": 10,
+            "sample": [
+              "1",
+              "10",
+              "2",
+              "3",
+              "4"
+            ],
+            "min": 1,
+            "max": 10
+          },
+          "anno": {
+            "distinct": 10,
+            "sample": [
+              "2024",
+              "2025",
+              "2026",
+              "2027",
+              "2028"
+            ],
+            "min": 2024,
+            "max": 2033
+          },
+          "totale_movimenti_annuali": {
+            "distinct": 1,
+            "sample": [
+              "0"
+            ],
+            "min": 0,
+            "max": 0
+          },
+          "n_movimenti_annuali": {
+            "distinct": 1,
+            "sample": [
+              "0"
+            ],
+            "min": 0,
+            "max": 0
+          },
+          "n_categorie_attive": {
+            "distinct": 1,
+            "sample": [
+              "0"
+            ],
+            "min": 0,
+            "max": 0
+          },
+          "n_fornitori_attivi": {
+            "distinct": 1,
+            "sample": [
+              "0"
+            ],
+            "min": 0,
+            "max": 0
+          }
+        }
+      }
+    },
+    "preview": {
+      "categorie_contabili": [
+        {
+          "id": 1,
+          "nome_categoria": "Utenze",
+          "descrizione": "Investimenti",
+          "totale_movimenti": 0,
+          "n_movimenti": 0
+        },
+        {
+          "id": 2,
+          "nome_categoria": "Materiali di consumo",
+          "descrizione": "Investimenti",
+          "totale_movimenti": 0,
+          "n_movimenti": 0
+        },
+        {
+          "id": 3,
+          "nome_categoria": "Servizi professionali",
+          "descrizione": "Altro",
+          "totale_movimenti": 0,
+          "n_movimenti": 0
+        },
+        {
+          "id": 4,
+          "nome_categoria": "Manutenzione",
+          "descrizione": "",
+          "totale_movimenti": 0,
+          "n_movimenti": 0
+        },
+        {
+          "id": 5,
+          "nome_categoria": "Trasporti",
+          "descrizione": "Altro",
+          "totale_movimenti": 0,
+          "n_movimenti": 0
+        }
+      ],
+      "fornitori": [
+        {
+          "id": 1,
+          "nome_fornitore": "Energit S.p.A.",
+          "codice_fiscale": "IT12345678901",
+          "totale_speso": 0,
+          "n_fatture": 0
+        },
+        {
+          "id": 2,
+          "nome_fornitore": "Energit S.p.A._1",
+          "codice_fiscale": "IT12345678901_1",
+          "totale_speso": 0,
+          "n_fatture": 0
+        },
+        {
+          "id": 3,
+          "nome_fornitore": "Energit S.p.A._2",
+          "codice_fiscale": "IT12345678901_2",
+          "totale_speso": 0,
+          "n_fatture": 0
+        },
+        {
+          "id": 4,
+          "nome_fornitore": "Energit S.p.A._3",
+          "codice_fiscale": "IT12345678901_3",
+          "totale_speso": 0,
+          "n_fatture": null
+        },
+        {
+          "id": 5,
+          "nome_fornitore": "Energit S.p.A._4",
+          "codice_fiscale": "IT12345678901_4",
+          "totale_speso": 0,
+          "n_fatture": 0
+        },
+        {
+          "id": 6,
+          "nome_fornitore": "Energit S.p.A._5",
+          "codice_fiscale": "IT12345678901_5",
+          "totale_speso": 0,
+          "n_fatture": 0
+        },
+        {
+          "id": 7,
+          "nome_fornitore": "Energit S.p.A._6",
+          "codice_fiscale": "IT12345678901_6",
+          "totale_speso": 0,
+          "n_fatture": 0
+        },
+        {
+          "id": 8,
+          "nome_fornitore": "Energit S.p.A._7",
+          "codice_fiscale": "IT12345678901_7",
+          "totale_speso": null,
+          "n_fatture": null
+        }
+      ],
+      "movimenti_contabili": [
+        {
+          "id": 1,
+          "data_movimento": "2025-12-11",
+          "importo": 2761.48,
+          "nome_categoria": "Servizi professionali",
+          "nome_fornitore": "Energit S.p.A.",
+          "totale_per_categoria": null,
+          "conteggio_per_fornitore": null
+        },
+        {
+          "id": 2,
+          "data_movimento": "2025-11-22",
+          "importo": 2385.63,
+          "nome_categoria": "Trasporti",
+          "nome_fornitore": "Manutenzioni Verdi",
+          "totale_per_categoria": null,
+          "conteggio_per_fornitore": null
+        },
+        {
+          "id": 3,
+          "data_movimento": "2025-11-28",
+          "importo": 1691.19,
+          "nome_categoria": "Utenze",
+          "nome_fornitore": "Studio Legale Bianchi",
+          "totale_per_categoria": null,
+          "conteggio_per_fornitore": null
+        },
+        {
+          "id": 4,
+          "data_movimento": "2025-11-23",
+          "importo": 3547.89,
+          "nome_categoria": "Servizi professionali",
+          "nome_fornitore": "Trasporti Blu",
+          "totale_per_categoria": null,
+          "conteggio_per_fornitore": null
+        },
+        {
+          "id": 5,
+          "data_movimento": "2026-02-27",
+          "importo": 1273.15,
+          "nome_categoria": "Trasporti",
+          "nome_fornitore": "Trasporti Blu",
+          "totale_per_categoria": null,
+          "conteggio_per_fornitore": null
+        },
+        {
+          "id": 6,
+          "data_movimento": "2026-02-12",
+          "importo": 3601.5,
+          "nome_categoria": "Manutenzione",
+          "nome_fornitore": "Cartaria Rossi",
+          "totale_per_categoria": null,
+          "conteggio_per_fornitore": null
+        },
+        {
+          "id": 7,
+          "data_movimento": "2026-01-14",
+          "importo": 2205.77,
+          "nome_categoria": "Manutenzione",
+          "nome_fornitore": "Cartaria Rossi",
+          "totale_per_categoria": null,
+          "conteggio_per_fornitore": null
+        },
+        {
+          "id": 8,
+          "data_movimento": "2025-12-07",
+          "importo": 750.42,
+          "nome_categoria": "Utenze",
+          "nome_fornitore": "",
+          "totale_per_categoria": null,
+          "conteggio_per_fornitore": null
+        }
+      ],
+      "riepilogo_annuale": [
+        {
+          "id": 1,
+          "anno": 2024,
+          "totale_movimenti_annuali": 0,
+          "n_movimenti_annuali": 0,
+          "n_categorie_attive": 0,
+          "n_fornitori_attivi": 0
+        },
+        {
+          "id": 2,
+          "anno": 2025,
+          "totale_movimenti_annuali": 0,
+          "n_movimenti_annuali": 0,
+          "n_categorie_attive": 0,
+          "n_fornitori_attivi": 0
+        },
+        {
+          "id": 3,
+          "anno": 2026,
+          "totale_movimenti_annuali": 0,
+          "n_movimenti_annuali": 0,
+          "n_categorie_attive": 0,
+          "n_fornitori_attivi": 0
+        },
+        {
+          "id": 4,
+          "anno": 2027,
+          "totale_movimenti_annuali": 0,
+          "n_movimenti_annuali": 0,
+          "n_categorie_attive": 0,
+          "n_fornitori_attivi": 0
+        },
+        {
+          "id": 5,
+          "anno": 2028,
+          "totale_movimenti_annuali": 0,
+          "n_movimenti_annuali": 0,
+          "n_categorie_attive": 0,
+          "n_fornitori_attivi": 0
+        },
+        {
+          "id": 6,
+          "anno": 2029,
+          "totale_movimenti_annuali": 0,
+          "n_movimenti_annuali": 0,
+          "n_categorie_attive": 0,
+          "n_fornitori_attivi": 0
+        },
+        {
+          "id": 7,
+          "anno": 2030,
+          "totale_movimenti_annuali": null,
+          "n_movimenti_annuali": 0,
+          "n_categorie_attive": 0,
+          "n_fornitori_attivi": 0
+        },
+        {
+          "id": 8,
+          "anno": 2031,
+          "totale_movimenti_annuali": 0,
+          "n_movimenti_annuali": 0,
+          "n_categorie_attive": 0,
+          "n_fornitori_attivi": 0
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "group_agg"
+  ],
+  "query": "SELECT mc.nome_categoria AS nome_categoria, SUM(mc.importo) AS totale_importo, COUNT(*) AS numero_movimenti FROM movimenti_contabili mc GROUP BY mc.nome_categoria;"
+}

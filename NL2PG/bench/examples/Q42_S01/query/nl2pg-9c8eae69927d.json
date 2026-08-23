@@ -1,0 +1,198 @@
+{
+  "schema_ddl": "CREATE TABLE operazioni_finanziarie (\n    id SERIAL PRIMARY KEY,\n    tipo_operazione TEXT NOT NULL CHECK (tipo_operazione IN ('accredito', 'addebito', 'bonifico', 'investimento', 'prelievo')),\n    importo_lordo NUMERIC(15,2) NOT NULL CHECK (importo_lordo >= 0),\n    data_operazione DATE NOT NULL,\n    descrizione TEXT,\n    categoria TEXT CHECK (categoria IN ('stipendio', 'utenze', 'alimentari', 'trasporti', 'intrattenimento', 'investimenti', 'altro')),\n    stato TEXT NOT NULL DEFAULT 'registrata' CHECK (stato IN ('registrata', 'contabilizzata', 'annullata')),\n    conto_corrente TEXT,\n    note TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "operazioni_finanziarie": {
+        "row_count": 1512,
+        "columns": {
+          "id": {
+            "distinct": 1512,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1512
+          },
+          "tipo_operazione": {
+            "distinct": 5,
+            "sample": [
+              "accredito",
+              "addebito",
+              "bonifico",
+              "investimento",
+              "prelievo"
+            ]
+          },
+          "importo_lordo": {
+            "distinct": 1464,
+            "sample": [
+              "100.6",
+              "100.93",
+              "1000.0",
+              "10001.53",
+              "10001.88"
+            ],
+            "min": 25.27,
+            "max": 25000.0
+          },
+          "data_operazione": {
+            "distinct": 239,
+            "sample": [
+              "2025-07-09",
+              "2025-07-10",
+              "2025-07-11",
+              "2025-07-13",
+              "2025-07-15"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Abbonamento palestra",
+              "Acquisto quote fondo",
+              "Bolletta elettrica",
+              "Pagamento affitto",
+              "Prelievo contante"
+            ]
+          },
+          "categoria": {
+            "distinct": 7,
+            "sample": [
+              "alimentari",
+              "altro",
+              "intrattenimento",
+              "investimenti",
+              "stipendio"
+            ]
+          },
+          "stato": {
+            "distinct": 3,
+            "sample": [
+              "annullata",
+              "contabilizzata",
+              "registrata"
+            ]
+          },
+          "conto_corrente": {
+            "distinct": 3,
+            "sample": [
+              "IT02L1234500000123456789",
+              "IT12A0312801600000123456789",
+              "IT60X0542811101000000123456"
+            ]
+          },
+          "note": {
+            "distinct": 5,
+            "sample": [
+              "Accredito regolare",
+              "Bonifico verso locatore",
+              "Nessuna nota",
+              "Operazione annullata",
+              "Piano di accumulo"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "operazioni_finanziarie": [
+        {
+          "id": 1,
+          "tipo_operazione": "bonifico",
+          "importo_lordo": 7051.92,
+          "data_operazione": "2025-09-20",
+          "descrizione": "Abbonamento palestra",
+          "categoria": "intrattenimento",
+          "stato": "registrata",
+          "conto_corrente": "IT02L1234500000123456789",
+          "note": "Bonifico verso locatore"
+        },
+        {
+          "id": 2,
+          "tipo_operazione": "bonifico",
+          "importo_lordo": 1361.12,
+          "data_operazione": "2025-11-01",
+          "descrizione": "Stipendio mensile",
+          "categoria": "altro",
+          "stato": "registrata",
+          "conto_corrente": "IT60X0542811101000000123456",
+          "note": "Nessuna nota"
+        },
+        {
+          "id": 3,
+          "tipo_operazione": "investimento",
+          "importo_lordo": 7992.62,
+          "data_operazione": "2025-12-14",
+          "descrizione": "Ricarica telefonica",
+          "categoria": "intrattenimento",
+          "stato": "contabilizzata",
+          "conto_corrente": "IT02L1234500000123456789",
+          "note": null
+        },
+        {
+          "id": 4,
+          "tipo_operazione": "bonifico",
+          "importo_lordo": 6449.58,
+          "data_operazione": "2026-02-19",
+          "descrizione": "Acquisto quote fondo",
+          "categoria": "investimenti",
+          "stato": "registrata",
+          "conto_corrente": "IT60X0542811101000000123456",
+          "note": "Nessuna nota"
+        },
+        {
+          "id": 5,
+          "tipo_operazione": "prelievo",
+          "importo_lordo": 11986.52,
+          "data_operazione": "2026-02-02",
+          "descrizione": "Ricarica telefonica",
+          "categoria": "stipendio",
+          "stato": "contabilizzata",
+          "conto_corrente": "IT12A0312801600000123456789",
+          "note": "Operazione annullata"
+        },
+        {
+          "id": 6,
+          "tipo_operazione": "accredito",
+          "importo_lordo": 5802.37,
+          "data_operazione": "2026-03-05",
+          "descrizione": "Ricarica telefonica",
+          "categoria": "trasporti",
+          "stato": "annullata",
+          "conto_corrente": "IT12A0312801600000123456789",
+          "note": "Operazione annullata"
+        },
+        {
+          "id": 7,
+          "tipo_operazione": "investimento",
+          "importo_lordo": 2797.56,
+          "data_operazione": "2025-10-28",
+          "descrizione": "Abbonamento palestra",
+          "categoria": "intrattenimento",
+          "stato": "contabilizzata",
+          "conto_corrente": "IT12A0312801600000123456789",
+          "note": "Accredito regolare"
+        },
+        {
+          "id": 8,
+          "tipo_operazione": "addebito",
+          "importo_lordo": 9277.95,
+          "data_operazione": "2026-03-05",
+          "descrizione": "Spesa supermercato",
+          "categoria": "stipendio",
+          "stato": "registrata",
+          "conto_corrente": "IT02L1234500000123456789",
+          "note": "Accredito regolare"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "disjunctive"
+  ],
+  "query": "SELECT tipo_operazione, importo_lordo, data_operazione, descrizione, categoria, stato, conto_corrente FROM operazioni_finanziarie WHERE (tipo_operazione = 'accredito' OR tipo_operazione = 'bonifico') OR stato = 'annullata' ORDER BY data_operazione DESC;"
+}

@@ -1,0 +1,347 @@
+{
+  "schema_ddl": "CREATE TABLE utenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE ordini (\n    id SERIAL PRIMARY KEY,\n    utente_id INT NOT NULL,\n    ordine_padre_id INT,\n    totale NUMERIC(12,2) NOT NULL CHECK (totale >= 0),\n    stato TEXT NOT NULL CHECK (stato IN ('in_attesa', 'confermato', 'spedito', 'consegnato', 'annullato'))\n);\n\nCREATE TABLE articoli_ordine (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL,\n    prodotto TEXT NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0)\n);",
+  "data_profile": {
+    "profile": {
+      "utenti": {
+        "row_count": 248,
+        "columns": {
+          "id": {
+            "distinct": 248,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 248
+          },
+          "nome": {
+            "distinct": 12,
+            "sample": [
+              "Alessandro Conti",
+              "Andrea Marini",
+              "Chiara Lombardi",
+              "Davide Greco",
+              "Elena Fontana"
+            ]
+          },
+          "email": {
+            "distinct": 248,
+            "sample": [
+              "alessandro.conti10@example.com",
+              "alessandro.conti11@example.com",
+              "alessandro.conti12@example.com",
+              "alessandro.conti13@example.com",
+              "alessandro.conti14@example.com"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 211,
+            "sample": [
+              "2023-03-21",
+              "2023-03-25",
+              "2023-04-11",
+              "2023-04-22",
+              "2023-04-28"
+            ]
+          }
+        }
+      },
+      "ordini": {
+        "row_count": 1690,
+        "columns": {
+          "id": {
+            "distinct": 1690,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1690
+          },
+          "utente_id": {
+            "distinct": 12,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "2"
+            ],
+            "min": 1,
+            "max": 5
+          },
+          "ordine_padre_id": {
+            "distinct": 3,
+            "sample": [
+              "1",
+              "2",
+              "3"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "totale": {
+            "distinct": 1598,
+            "sample": [
+              "10.0",
+              "10.27",
+              "10.49",
+              "10.52",
+              "10.88"
+            ],
+            "min": 6.4,
+            "max": 800.0
+          },
+          "stato": {
+            "distinct": 5,
+            "sample": [
+              "annullato",
+              "confermato",
+              "consegnato",
+              "in_attesa",
+              "spedito"
+            ]
+          }
+        }
+      },
+      "articoli_ordine": {
+        "row_count": 2381,
+        "columns": {
+          "id": {
+            "distinct": 2381,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 2381
+          },
+          "ordine_id": {
+            "distinct": 21,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 8
+          },
+          "prodotto": {
+            "distinct": 10,
+            "sample": [
+              "Cavo HDMI 2m",
+              "Cuffie Bluetooth",
+              "Hub USB-C",
+              "Laptop Pro 14",
+              "Monitor 27 4K"
+            ]
+          },
+          "quantita": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 4
+          },
+          "prezzo_unitario": {
+            "distinct": 2173,
+            "sample": [
+              "100.12",
+              "100.15",
+              "100.19",
+              "100.29",
+              "100.3"
+            ],
+            "min": 12.45,
+            "max": 1798.0
+          }
+        }
+      }
+    },
+    "preview": {
+      "utenti": [
+        {
+          "id": 19,
+          "nome": "Alessandro Conti",
+          "email": "alessandroconti1@example.com",
+          "data_registrazione": "2023-08-25"
+        },
+        {
+          "id": 30,
+          "nome": "Alessandro Conti",
+          "email": "alessandroconti2@example.com",
+          "data_registrazione": "2023-05-10"
+        },
+        {
+          "id": 37,
+          "nome": "Alessandro Conti",
+          "email": "alessandroconti3@example.com",
+          "data_registrazione": "2024-04-05"
+        },
+        {
+          "id": 1,
+          "nome": "Andrea Marini",
+          "email": "andreamarini1@example.com",
+          "data_registrazione": "2024-04-09"
+        },
+        {
+          "id": 13,
+          "nome": "Andrea Marini",
+          "email": "andreamarini2@example.com",
+          "data_registrazione": "2023-05-02"
+        },
+        {
+          "id": 10,
+          "nome": "Chiara Lombardi",
+          "email": "chiaralombardi1@example.com",
+          "data_registrazione": "2023-07-24"
+        },
+        {
+          "id": 21,
+          "nome": "Chiara Lombardi",
+          "email": "chiaralombardi2@example.com",
+          "data_registrazione": "2023-06-16"
+        },
+        {
+          "id": 28,
+          "nome": "Chiara Lombardi",
+          "email": "chiaralombardi3@example.com",
+          "data_registrazione": "2023-10-23"
+        }
+      ],
+      "ordini": [
+        {
+          "id": 1,
+          "utente_id": "10",
+          "ordine_padre_id": null,
+          "totale": 175.37,
+          "stato": "consegnato"
+        },
+        {
+          "id": 2,
+          "utente_id": "4",
+          "ordine_padre_id": null,
+          "totale": 171.79,
+          "stato": "annullato"
+        },
+        {
+          "id": 3,
+          "utente_id": "1",
+          "ordine_padre_id": null,
+          "totale": 321.26,
+          "stato": "confermato"
+        },
+        {
+          "id": 4,
+          "utente_id": "3",
+          "ordine_padre_id": null,
+          "totale": 202.36,
+          "stato": "consegnato"
+        },
+        {
+          "id": 5,
+          "utente_id": "6",
+          "ordine_padre_id": null,
+          "totale": 106.1,
+          "stato": "consegnato"
+        },
+        {
+          "id": 6,
+          "utente_id": "3",
+          "ordine_padre_id": null,
+          "totale": 191.77,
+          "stato": "spedito"
+        },
+        {
+          "id": 7,
+          "utente_id": "2",
+          "ordine_padre_id": null,
+          "totale": 198.62,
+          "stato": "in_attesa"
+        },
+        {
+          "id": 8,
+          "utente_id": "3",
+          "ordine_padre_id": null,
+          "totale": 142.55,
+          "stato": "consegnato"
+        }
+      ],
+      "articoli_ordine": [
+        {
+          "id": 1,
+          "ordine_id": "20",
+          "prodotto": "Cavo HDMI 2m",
+          "quantita": "1",
+          "prezzo_unitario": 828.47
+        },
+        {
+          "id": 2,
+          "ordine_id": "5",
+          "prodotto": "Cuffie Bluetooth",
+          "quantita": "1",
+          "prezzo_unitario": 1286.09
+        },
+        {
+          "id": 3,
+          "ordine_id": "17",
+          "prodotto": "Mouse Wireless",
+          "quantita": "3",
+          "prezzo_unitario": 821.4
+        },
+        {
+          "id": 4,
+          "ordine_id": "14",
+          "prodotto": "Cuffie Bluetooth",
+          "quantita": "1",
+          "prezzo_unitario": 461.15
+        },
+        {
+          "id": 5,
+          "ordine_id": "11",
+          "prodotto": "Tastiera Meccanica",
+          "quantita": "5",
+          "prezzo_unitario": 1480.08
+        },
+        {
+          "id": 6,
+          "ordine_id": "3",
+          "prodotto": "Stampante Laser",
+          "quantita": "2",
+          "prezzo_unitario": 1069.41
+        },
+        {
+          "id": 7,
+          "ordine_id": "9",
+          "prodotto": "Cavo HDMI 2m",
+          "quantita": "1",
+          "prezzo_unitario": 1660.1
+        },
+        {
+          "id": 8,
+          "ordine_id": "15",
+          "prodotto": "Monitor 27 4K",
+          "quantita": "1",
+          "prezzo_unitario": 1098.23
+        }
+      ]
+    }
+  },
+  "story": "All'interno di NovaTech Distribuzione, rivenditore omnicanale di accessori tecnologici, il reparto Controllo Vendite ha aperto la revisione semestrale delle catene di commesse. Tutto parte dall'archivio utenti, il registro che custodisce le 248 schede della clientela iscritta: per ciascun cliente sono annotate il nome, l'indirizzo di posta elettronica e la data di registrazione, come si evince per Andrea Marini, entrato a far parte della clientela il 2024-04-09, per Mario Rossi, presente dal 2023-07-22, o per Elena Fontana, arrivata il 2023-10-08. Accanto a loro figurano Laura Bianchi, Davide Greco, Giulia Verdi, Luca Ferrari, Chiara Lombardi e Alessandro Conti, alcuni dei quali compaiono più volte perché si sono iscritti in momenti diversi. Il cuore della verifica è il registro movimenti_transazionali, l'archivio che molti addetti ai lavori chiamano ancora con il vecchio nome ordini: 1690 movimenti, ciascuno descritto da un numero progressivo, dal riferimento al cliente acquirente, dal rimando facoltativo all'ordine padre, dal valore_complessivo — ossia il totale dell'operazione — e dallo stato di avanzamento. Le istruzioni della direzione sono precise: prendono parte all'analisi soltanto le catene il cui capostipite risulta confermato, spedito o consegnato; i movimenti lasciati in_attesa, come quello da 198.62 euro, oppure annullati, come la commessa da 171.79 euro, restano fuori perimetro. Per ogni capostipite privo di rimando a un ordine padre, gli analisti risalgono ai figli collegati attraverso quel richiamo gerarchico e misurano quattro grandezze: quanti movimenti compongono la catena, quale profondità massima raggiunge la gerarchia, quanto ammonta il valore_complessivo cumulato una volta arrotondato e quanti stati distinti attraversano il percorso. L'elenco finale viene disposto dal valore_complessivo più alto al più basso e, a parità di importo, in ordine alfabetico per nome utente. A titolo d'esempio, la catena aperta dalla commessa numero 1, consegnata con un valore_complessivo di 175.37 euro, viene confrontata con quella confermata da 321.26 euro e con quella spedita da 191.77 euro. A supporto degli accertamenti arriva la distinta commerciale, l'archivio articoli_ordine che in ufficio tutti chiamano righe SKU: 2381 voci che descrivono, movimento per movimento, i prodotti prescelti con la relativa quantità e il prezzo unitario. Si trovano così un Cavo HDMI 2m da 828.47 euro l'uno in quantità 1, le Cuffie Bluetooth da 1286.09 euro, tre Mouse Wireless da 821.40 euro ciascuno, cinque Tastiera Meccanica da 1480.08 euro, due Stampante Laser da 1069.41 euro e un Monitor 27 4K da 1098.23 euro, con prezzi che oscillano tra 12.45 e 1798.0 euro e quantità che non superano mai le 5 unità. Incrociando questi elementi, il team ottiene la classifica definitiva delle catene gerarchiche, pronta per essere presentata alla direzione commerciale."
+}

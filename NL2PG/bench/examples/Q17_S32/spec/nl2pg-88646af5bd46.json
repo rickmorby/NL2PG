@@ -1,0 +1,27 @@
+{
+  "domain": "erp",
+  "n_tables": 2,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "window"
+  ],
+  "twist": [
+    "rename",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "ordini_acquisto",
+      "obsolete_value": "documenti_di_approvvigionamento",
+      "description": "La tabella ordini_acquisto (con colonne di audit created_at, created_by, updated_at, updated_by) viene denominata documenti_di_approvvigionamento nella prosa aziendale; il solver deve mappare la perifrasi al nome reale della tabella."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "updated_by",
+      "obsolete_value": "responsabile ultima revisione",
+      "description": "La colonna di audit updated_by viene indicata nella prosa con il gergo ERP 'responsabile ultima revisione'; il solver deve riconoscere che si tratta dell'utente che ha eseguito l'ultima modifica e usarla per filtri di responsabilità o partizioni nelle finestre temporali."
+    }
+  ],
+  "spec_hash": "46c6918b245c8067"
+}

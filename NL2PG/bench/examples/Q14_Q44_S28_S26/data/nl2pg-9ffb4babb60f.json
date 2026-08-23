@@ -1,0 +1,254 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "set_op"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "contratti",
+        "obsolete_value": "piani_abbonamento_storici",
+        "description": "La tabella contratti, che mantiene la relazione uno-a-uno con la tabella sim, viene denominata piani_abbonamento_storici nella prosa aziendale. Il progettista deve riconoscere che le richieste sui 'piani abbonamento storici' si riferiscono alla tabella fisica contratti."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "gigabyte",
+        "obsolete_value": "volume traffico dati",
+        "description": "La colonna gigabyte della tabella contratti, che indica il tetto mensile di dati inclusi nel piano, viene indicata nella documentazione come 'volume traffico dati'. Le query di confronto tra lo schema legacy e quello moderno devono allineare questa colonna tramite UNION ALL nonostante la diversa denominazione."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "iccid",
+        "obsolete_value": "codice identificativo circuito integrato della scheda",
+        "description": "La colonna iccid della tabella sim è espressa nella prosa aziendale con la perifrasi tecnica completa 'codice identificativo circuito integrato della scheda'. Il solver deve mappare l'abbreviazione di settore al nome reale della colonna quando unisce i record dei due schemi discordanti con UNION ALL."
+      }
+    ],
+    "spec_hash": "b24a0c8072ca9f69"
+  },
+  "schema_ddl": "CREATE TABLE sim (\n    id INT PRIMARY KEY,\n    iccid TEXT NOT NULL UNIQUE,\n    numero_telefono TEXT NOT NULL,\n    operatore TEXT NOT NULL,\n    stato TEXT NOT NULL DEFAULT 'attiva' CHECK (stato IN ('attiva', 'sospesa', 'disattivata')),\n    data_attivazione DATE NOT NULL\n);\n\nCREATE TABLE contratti (\n    id INT PRIMARY KEY,\n    sim_id INT NOT NULL UNIQUE REFERENCES sim(id),\n    denominazione_piano TEXT NOT NULL,\n    gigabyte INT NOT NULL CHECK (gigabyte > 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0),\n    canone_mensile NUMERIC(8,2) NOT NULL CHECK (canone_mensile >= 0),\n    data_sottoscrizione DATE NOT NULL,\n    data_cessazione DATE,\n    CHECK (data_cessazione IS NULL OR data_cessazione >= data_sottoscrizione)\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "sim",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 250,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "iccid": "8939012345678901230",
+            "numero_telefono": "+393331234567",
+            "operatore": "TIM",
+            "stato": "attiva",
+            "data_attivazione": "2022-03-15"
+          },
+          {
+            "id": 2,
+            "iccid": "8939012345678901231",
+            "numero_telefono": "+393471234567",
+            "operatore": "Vodafone",
+            "stato": "attiva",
+            "data_attivazione": "2022-07-01"
+          },
+          {
+            "id": 3,
+            "iccid": "8939012345678901232",
+            "numero_telefono": "+393201234567",
+            "operatore": "WindTre",
+            "stato": "sospesa",
+            "data_attivazione": "2023-01-10"
+          },
+          {
+            "id": 4,
+            "iccid": "8939012345678901233",
+            "numero_telefono": "+393451234567",
+            "operatore": "Iliad",
+            "stato": "disattivata",
+            "data_attivazione": "2021-11-05"
+          },
+          {
+            "id": 5,
+            "iccid": "8939012345678901234",
+            "numero_telefono": "+393381234567",
+            "operatore": "Fastweb",
+            "stato": "attiva",
+            "data_attivazione": "2023-05-20"
+          }
+        ],
+        "variations": {
+          "numero_telefono": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "+393331234567",
+              "+393471234567",
+              "+393201234567",
+              "+393331122334",
+              "+393451234567",
+              "+393381234567",
+              "+393491234567",
+              "+393311234567"
+            ]
+          },
+          "operatore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "TIM",
+              "Vodafone",
+              "WindTre",
+              "Iliad",
+              "Fastweb",
+              "PosteMobile"
+            ]
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attiva",
+              "attiva",
+              "attiva",
+              "attiva",
+              "sospesa",
+              "disattivata"
+            ]
+          },
+          "data_attivazione": {
+            "axis": "shift",
+            "delta_min": -365.0,
+            "delta_max": 365.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "contratti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 1.0,
+        "templates": [
+          {
+            "id": 1,
+            "sim_id": 1,
+            "denominazione_piano": "Piano Base",
+            "gigabyte": 5,
+            "minuti_inclusi": 100,
+            "canone_mensile": 9.99,
+            "data_sottoscrizione": "2022-03-15",
+            "data_cessazione": null
+          },
+          {
+            "id": 2,
+            "sim_id": 2,
+            "denominazione_piano": "Piano Plus",
+            "gigabyte": 15,
+            "minuti_inclusi": 300,
+            "canone_mensile": 14.99,
+            "data_sottoscrizione": "2022-07-01",
+            "data_cessazione": null
+          },
+          {
+            "id": 3,
+            "sim_id": 3,
+            "denominazione_piano": "Piano Premium",
+            "gigabyte": 50,
+            "minuti_inclusi": 1000,
+            "canone_mensile": 24.99,
+            "data_sottoscrizione": "2023-01-10",
+            "data_cessazione": null
+          },
+          {
+            "id": 4,
+            "sim_id": 4,
+            "denominazione_piano": "Piano Business",
+            "gigabyte": 100,
+            "minuti_inclusi": 2000,
+            "canone_mensile": 39.99,
+            "data_sottoscrizione": "2021-11-05",
+            "data_cessazione": "2024-06-30"
+          },
+          {
+            "id": 5,
+            "sim_id": 5,
+            "denominazione_piano": "Piano Young",
+            "gigabyte": 20,
+            "minuti_inclusi": 500,
+            "canone_mensile": 12.99,
+            "data_sottoscrizione": "2023-06-20",
+            "data_cessazione": "2024-12-31"
+          }
+        ],
+        "variations": {
+          "denominazione_piano": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Piano Base",
+              "Piano Plus",
+              "Piano Premium",
+              "Piano Business",
+              "Piano Young"
+            ]
+          },
+          "gigabyte": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "minuti_inclusi": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "canone_mensile": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "data_sottoscrizione": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

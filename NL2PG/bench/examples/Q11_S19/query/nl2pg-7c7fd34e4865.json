@@ -1,0 +1,553 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    creato_il TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    iban TEXT NOT NULL UNIQUE,\n    tipo_conto TEXT NOT NULL CHECK (tipo_conto IN ('corrente', 'risparmio', 'deposito')),\n    saldo_disponibile NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (saldo_disponibile >= 0),\n    data_apertura DATE NOT NULL DEFAULT CURRENT_DATE\n);\n\nCREATE TABLE transazioni (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo <> 0),\n    tipo_movimento TEXT NOT NULL CHECK (tipo_movimento IN ('accredito', 'addebito')),\n    descrizione TEXT,\n    data_transazione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE carte (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    numero_carta TEXT NOT NULL UNIQUE,\n    scadenza DATE NOT NULL,\n    limite_spesa NUMERIC(10,2) NOT NULL CHECK (limite_spesa > 0),\n    attiva BOOLEAN NOT NULL DEFAULT TRUE\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 736,
+        "columns": {
+          "id": {
+            "distinct": 736,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 736
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Davide",
+              "Elena",
+              "Francesco"
+            ]
+          },
+          "cognome": {
+            "distinct": 10,
+            "sample": [
+              "Bianchi",
+              "Conti",
+              "Esposito",
+              "Ferrari",
+              "Greco"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 736,
+            "sample": [
+              "BNCLRA90A41F205B",
+              "BNCLRA90A41F205C",
+              "BNCLRA90A41F205D",
+              "BNCLRA90A41F205E",
+              "BNCLRA90A41F205F"
+            ]
+          },
+          "email": {
+            "distinct": 707,
+            "sample": [
+              "alessandro.ferrari100@email.it",
+              "alessandro.ferrari101@email.it",
+              "alessandro.ferrari102@email.it",
+              "alessandro.ferrari103@email.it",
+              "alessandro.ferrari104@email.it"
+            ]
+          },
+          "creato_il": {
+            "distinct": 646,
+            "sample": [
+              "2022-09-22 09:30:00",
+              "2022-10-12 09:30:00",
+              "2022-10-18 09:30:00",
+              "2022-10-19 09:30:00",
+              "2022-10-20 09:30:00"
+            ]
+          }
+        }
+      },
+      "conti": {
+        "row_count": 1136,
+        "columns": {
+          "id": {
+            "distinct": 1136,
+            "sample": [
+              "100",
+              "1000",
+              "1001",
+              "1002",
+              "1003"
+            ],
+            "min": 100,
+            "max": 1235
+          },
+          "cliente_id": {
+            "distinct": 580,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "102",
+              "104"
+            ],
+            "min": 1,
+            "max": 736
+          },
+          "iban": {
+            "distinct": 1136,
+            "sample": [
+              "IT60X0542811101000000123456",
+              "IT60X05428111010000001234561",
+              "IT60X054281110100000012345610",
+              "IT60X0542811101000000123456100",
+              "IT60X0542811101000000123456101"
+            ]
+          },
+          "tipo_conto": {
+            "distinct": 3,
+            "sample": [
+              "corrente",
+              "deposito",
+              "risparmio"
+            ]
+          },
+          "saldo_disponibile": {
+            "distinct": 1088,
+            "sample": [
+              "1002.36",
+              "10024.62",
+              "10083.98",
+              "10103.12",
+              "10106.32"
+            ],
+            "min": 93.73,
+            "max": 135000.0
+          },
+          "data_apertura": {
+            "distinct": 641,
+            "sample": [
+              "2022-04-02",
+              "2022-04-04",
+              "2022-04-07",
+              "2022-04-09",
+              "2022-04-12"
+            ]
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 1000,
+            "max": 3999
+          },
+          "conto_id": {
+            "distinct": 1069,
+            "sample": [
+              "100",
+              "1000",
+              "1001",
+              "1003",
+              "1004"
+            ],
+            "min": 100,
+            "max": 1235
+          },
+          "importo": {
+            "distinct": 2825,
+            "sample": [
+              "-10.0",
+              "-10.11",
+              "-10.43",
+              "-10.49",
+              "-100.15"
+            ],
+            "min": -1283.0,
+            "max": 9800.0
+          },
+          "tipo_movimento": {
+            "distinct": 2,
+            "sample": [
+              "accredito",
+              "addebito"
+            ]
+          },
+          "descrizione": {
+            "distinct": 8,
+            "sample": [
+              "Accredito interessi",
+              "Bollette luce e gas",
+              "Bonifico in entrata",
+              "Canone abbonamento streaming",
+              "Pagamento POS supermercato"
+            ]
+          },
+          "data_transazione": {
+            "distinct": 929,
+            "sample": [
+              "2025-09-07 08:30:00",
+              "2025-09-09 08:30:00",
+              "2025-09-10 08:30:00",
+              "2025-09-10 19:15:00",
+              "2025-09-11 08:30:00"
+            ]
+          }
+        }
+      },
+      "carte": {
+        "row_count": 1242,
+        "columns": {
+          "id": {
+            "distinct": 1242,
+            "sample": [
+              "1000",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 500,
+            "max": 1741
+          },
+          "conto_id": {
+            "distinct": 753,
+            "sample": [
+              "100",
+              "1000",
+              "1001",
+              "1004",
+              "1006"
+            ],
+            "min": 100,
+            "max": 1234
+          },
+          "numero_carta": {
+            "distinct": 1242,
+            "sample": [
+              "4539881203456781",
+              "4539881203456782",
+              "4539881203456782_101",
+              "4539881203456782_102",
+              "4539881203456782_103"
+            ]
+          },
+          "scadenza": {
+            "distinct": 882,
+            "sample": [
+              "2025-12-31",
+              "2026-01-24",
+              "2026-01-25",
+              "2026-02-01",
+              "2026-02-05"
+            ]
+          },
+          "limite_spesa": {
+            "distinct": 1199,
+            "sample": [
+              "10000.0",
+              "10001.36",
+              "1001.83",
+              "1002.66",
+              "10061.62"
+            ],
+            "min": 750.0,
+            "max": 30000.0
+          },
+          "attiva": {
+            "distinct": 4,
+            "sample": [
+              "False",
+              "True",
+              "false",
+              "true"
+            ],
+            "min": false,
+            "max": true
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 47,
+          "nome": "Chiara",
+          "cognome": "Greco",
+          "codice_fiscale": "RSSMRC85M01H548V",
+          "email": "chiara.greco1@example.com",
+          "creato_il": "2022-11-15T09:30:00"
+        },
+        {
+          "id": 10,
+          "nome": "Luca",
+          "cognome": "Esposito",
+          "codice_fiscale": "RSSMRC85M01H501J",
+          "email": "luca.esposito1@example.com",
+          "creato_il": "2023-08-23T09:30:00"
+        },
+        {
+          "id": 31,
+          "nome": "Luca",
+          "cognome": "Esposito",
+          "codice_fiscale": "RSSMRC85M01H532F",
+          "email": "luca.esposito2@example.com",
+          "creato_il": "2023-08-01T09:30:00"
+        },
+        {
+          "id": 28,
+          "nome": "Sara",
+          "cognome": "Bianchi",
+          "codice_fiscale": "RSSMRC85M01H529C",
+          "email": "sara.bianchi1@example.com",
+          "creato_il": "2023-07-23T09:30:00"
+        },
+        {
+          "id": 162,
+          "nome": "Alessandro",
+          "cognome": "Esposito",
+          "codice_fiscale": "BNCLRA90A41F244N",
+          "email": "alessandro.esposito1@example.com",
+          "creato_il": "2023-05-01T14:15:00"
+        },
+        {
+          "id": 137,
+          "nome": "Alessandro",
+          "cognome": "Romano",
+          "codice_fiscale": "BNCLRA90A41F205N",
+          "email": "alessandro.romano1@example.com",
+          "creato_il": "2023-02-05T14:15:00"
+        },
+        {
+          "id": 165,
+          "nome": "Chiara",
+          "cognome": "Marino",
+          "codice_fiscale": "BNCLRA90A41F247Q",
+          "email": "chiara.marino1@example.com",
+          "creato_il": "2024-02-19T14:15:00"
+        },
+        {
+          "id": 118,
+          "nome": "Francesco",
+          "cognome": "Greco",
+          "codice_fiscale": "RSSMRC85M01H619O",
+          "email": "francesco.greco1@example.com",
+          "creato_il": "2022-12-12T09:30:00"
+        }
+      ],
+      "conti": [
+        {
+          "id": 100,
+          "cliente_id": 480,
+          "iban": "IT60X0542811101000000123456",
+          "tipo_conto": "corrente",
+          "saldo_disponibile": 13663.26,
+          "data_apertura": "2022-12-19"
+        },
+        {
+          "id": 101,
+          "cliente_id": 200,
+          "iban": "IT60X05428111010000001234561",
+          "tipo_conto": "risparmio",
+          "saldo_disponibile": 8217.14,
+          "data_apertura": "2023-06-15"
+        },
+        {
+          "id": 102,
+          "cliente_id": 156,
+          "iban": "IT60X05428111010000001234562",
+          "tipo_conto": "deposito",
+          "saldo_disponibile": 9712.14,
+          "data_apertura": "2023-01-09"
+        },
+        {
+          "id": 103,
+          "cliente_id": 506,
+          "iban": "IT60X05428111010000001234563",
+          "tipo_conto": "risparmio",
+          "saldo_disponibile": 2275.92,
+          "data_apertura": "2023-05-08"
+        },
+        {
+          "id": 104,
+          "cliente_id": 96,
+          "iban": "IT60X05428111010000001234564",
+          "tipo_conto": "deposito",
+          "saldo_disponibile": 6167.98,
+          "data_apertura": "2023-10-24"
+        },
+        {
+          "id": 105,
+          "cliente_id": 249,
+          "iban": "IT60X05428111010000001234565",
+          "tipo_conto": "corrente",
+          "saldo_disponibile": 5230.75,
+          "data_apertura": "2024-04-01"
+        },
+        {
+          "id": 106,
+          "cliente_id": 659,
+          "iban": "IT60X05428111010000001234566",
+          "tipo_conto": "corrente",
+          "saldo_disponibile": 12896.48,
+          "data_apertura": "2023-01-16"
+        },
+        {
+          "id": 107,
+          "cliente_id": 255,
+          "iban": "IT60X05428111010000001234567",
+          "tipo_conto": "corrente",
+          "saldo_disponibile": 9120.94,
+          "data_apertura": "2022-06-20"
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 1000,
+          "conto_id": 407,
+          "importo": 9286.23,
+          "tipo_movimento": "accredito",
+          "descrizione": "Stipendio mensile",
+          "data_transazione": "2025-11-29 08:30:00"
+        },
+        {
+          "id": 1001,
+          "conto_id": 598,
+          "importo": 5027.36,
+          "tipo_movimento": "accredito",
+          "descrizione": "Stipendio mensile",
+          "data_transazione": "2025-09-12 08:30:00"
+        },
+        {
+          "id": 1002,
+          "conto_id": 1147,
+          "importo": 6236.05,
+          "tipo_movimento": "accredito",
+          "descrizione": "Stipendio mensile",
+          "data_transazione": "2025-11-24 08:30:00"
+        },
+        {
+          "id": 1003,
+          "conto_id": 384,
+          "importo": 2265.43,
+          "tipo_movimento": "accredito",
+          "descrizione": null,
+          "data_transazione": "2025-11-07 08:30:00"
+        },
+        {
+          "id": 1004,
+          "conto_id": 493,
+          "importo": 1712.25,
+          "tipo_movimento": "accredito",
+          "descrizione": "Stipendio mensile",
+          "data_transazione": "2025-11-13 08:30:00"
+        },
+        {
+          "id": 1005,
+          "conto_id": 968,
+          "importo": 8707.96,
+          "tipo_movimento": "accredito",
+          "descrizione": "Stipendio mensile",
+          "data_transazione": "2025-12-01 08:30:00"
+        },
+        {
+          "id": 1006,
+          "conto_id": 374,
+          "importo": 8918.61,
+          "tipo_movimento": "accredito",
+          "descrizione": "Stipendio mensile",
+          "data_transazione": "2025-11-14 08:30:00"
+        },
+        {
+          "id": 1007,
+          "conto_id": 932,
+          "importo": 7190.92,
+          "tipo_movimento": "accredito",
+          "descrizione": "Stipendio mensile",
+          "data_transazione": "2025-09-28 08:30:00"
+        }
+      ],
+      "carte": [
+        {
+          "id": 500,
+          "conto_id": 1141,
+          "numero_carta": "4539881203456781",
+          "scadenza": "2027-08-23",
+          "limite_spesa": 7081.82,
+          "attiva": "true"
+        },
+        {
+          "id": 501,
+          "conto_id": 1199,
+          "numero_carta": "4539881203456782",
+          "scadenza": "2029-06-22",
+          "limite_spesa": 4025.14,
+          "attiva": "true"
+        },
+        {
+          "id": 502,
+          "conto_id": 500,
+          "numero_carta": "4539881203456783",
+          "scadenza": "2029-09-18",
+          "limite_spesa": 8837.35,
+          "attiva": "true"
+        },
+        {
+          "id": 503,
+          "conto_id": 806,
+          "numero_carta": "4539881203456784",
+          "scadenza": "2028-06-21",
+          "limite_spesa": 1774.93,
+          "attiva": "true"
+        },
+        {
+          "id": 504,
+          "conto_id": 672,
+          "numero_carta": "4539881203456785",
+          "scadenza": "2029-11-26",
+          "limite_spesa": 3931.96,
+          "attiva": "false"
+        },
+        {
+          "id": 505,
+          "conto_id": 967,
+          "numero_carta": "4539881203456786",
+          "scadenza": "2028-01-13",
+          "limite_spesa": 5656.76,
+          "attiva": "true"
+        },
+        {
+          "id": 506,
+          "conto_id": 976,
+          "numero_carta": "4539881203456787",
+          "scadenza": "2028-08-31",
+          "limite_spesa": 5074.43,
+          "attiva": "true"
+        },
+        {
+          "id": 507,
+          "conto_id": 120,
+          "numero_carta": "4539881203456788",
+          "scadenza": "2026-12-10",
+          "limite_spesa": 1516.29,
+          "attiva": "true"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "subquery"
+  ],
+  "query": "SELECT c.nome, c.cognome, co.tipo_conto, co.saldo_disponibile AS saldo_conto, ROUND(co.saldo_disponibile - (SELECT AVG(saldo_disponibile) FROM conti WHERE tipo_conto = 'corrente'), 2) AS scostamento_dalla_media FROM conti co JOIN clienti c ON c.id = co.cliente_id WHERE co.tipo_conto = 'corrente' AND co.saldo_disponibile > (SELECT AVG(saldo_disponibile) FROM conti WHERE tipo_conto = 'corrente') ORDER BY co.saldo_disponibile DESC;"
+}

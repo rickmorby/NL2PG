@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "self_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "570f425d6d763a59"
+  },
+  "schema_ddl": "CREATE TABLE dipartimenti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL UNIQUE,\n    edificio TEXT NOT NULL\n);\n\nCREATE TABLE studenti (\n    id SERIAL PRIMARY KEY,\n    matricola TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_immatricolazione DATE NOT NULL,\n    tutor_id INT REFERENCES studenti(id) ON DELETE SET NULL,\n    CHECK (tutor_id IS NULL OR tutor_id <> id)\n);\n\nCREATE TABLE corsi (\n    id SERIAL PRIMARY KEY,\n    codice TEXT NOT NULL UNIQUE,\n    titolo TEXT NOT NULL,\n    cfu INT NOT NULL CHECK (cfu BETWEEN 1 AND 30),\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id) ON DELETE RESTRICT\n);\n\nCREATE TABLE esami (\n    id SERIAL PRIMARY KEY,\n    studente_id INT NOT NULL REFERENCES studenti(id) ON DELETE CASCADE,\n    corso_id INT NOT NULL REFERENCES corsi(id) ON DELETE CASCADE,\n    data_esame DATE NOT NULL,\n    voto INT NOT NULL CHECK (voto BETWEEN 18 AND 30),\n    lode BOOLEAN NOT NULL DEFAULT FALSE\n);"
+}

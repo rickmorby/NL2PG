@@ -1,0 +1,570 @@
+{
+  "spec": {
+    "domain": "immobiliare",
+    "n_tables": 5,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "natural_join"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "rephrase"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "immobili",
+        "obsolete_value": "unita_abitative",
+        "description": "La tabella immobili viene denominata unita_abitative nella prosa aziendale. Le chiavi esterne sono implicite: colonne con lo stesso nome (es. immobile_id, agente_id) sono condivise tra le tabelle, cosi che il natural join risolva semanticamente le relazioni senza vincoli FK espliciti."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "prezzo_richiesto",
+        "obsolete_value": "valore_di_listino",
+        "description": "La colonna prezzo_richiesto della tabella immobili viene indicata nella narrativa aziendale come valore_di_listino. Il lettore deve mappare il sinonimo alla colonna reale per formulare correttamente aggregazioni e confronti basati su natural join."
+      },
+      {
+        "twist_type": "rephrase",
+        "target_value": "visite",
+        "obsolete_value": "appuntamenti di visione degli immobili",
+        "description": "La tabella visite viene descritta nella prosa come appuntamenti di visione degli immobili. La perifrasi richiede di ricondurre la descrizione semantica al nome effettivo della tabella, le cui colonne condivise (cliente_id, agente_id, immobile_id) abilitano il join naturale con clienti, agenti e immobili."
+      }
+    ],
+    "spec_hash": "28cbd158407e767e"
+  },
+  "schema_ddl": "CREATE TABLE agenti (\n    agente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    data_assunzione DATE NOT NULL\n);\n\nCREATE TABLE clienti (\n    cliente_id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    email TEXT NOT NULL UNIQUE,\n    telefono TEXT,\n    budget_massimo NUMERIC(12,2) CHECK (budget_massimo >= 0)\n);\n\nCREATE TABLE immobili (\n    immobile_id INT PRIMARY KEY,\n    agente_id INT NOT NULL,\n    indirizzo TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    provincia CHAR(2),\n    superficie_mq NUMERIC(8,2) NOT NULL CHECK (superficie_mq > 0),\n    numero_vani INT NOT NULL CHECK (numero_vani > 0),\n    prezzo_richiesto NUMERIC(12,2) NOT NULL CHECK (prezzo_richiesto >= 0),\n    stato_immobile TEXT NOT NULL DEFAULT 'disponibile' CHECK (stato_immobile IN ('disponibile', 'riservato', 'venduto', 'affittato'))\n);\n\nCREATE TABLE visite (\n    visita_id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    agente_id INT NOT NULL,\n    immobile_id INT NOT NULL,\n    data_visita DATE NOT NULL,\n    ora_visita TIME NOT NULL,\n    esito_visita TEXT CHECK (esito_visita IN ('interessato', 'non_interessato', 'da_rivalutare')),\n    note TEXT\n);\n\nCREATE TABLE contratti (\n    contratto_id INT PRIMARY KEY,\n    cliente_id INT NOT NULL,\n    agente_id INT NOT NULL,\n    immobile_id INT NOT NULL,\n    data_firma DATE NOT NULL,\n    prezzo_finale NUMERIC(12,2) NOT NULL CHECK (prezzo_finale >= 0),\n    tipo_contratto TEXT NOT NULL CHECK (tipo_contratto IN ('vendita', 'affitto'))\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "agenti",
+        "nature": "dimension",
+        "min_rows": 35,
+        "max_rows": 50,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "agente_id": 1,
+            "nome": "Marco",
+            "cognome": "Bellini",
+            "email": "marco.bellini@agenzia.it",
+            "telefono": "+39 06 1234567",
+            "data_assunzione": "2018-03-12"
+          },
+          {
+            "agente_id": 2,
+            "nome": "Laura",
+            "cognome": "Fontana",
+            "email": "laura.fontana@agenzia.it",
+            "telefono": "+39 02 9876543",
+            "data_assunzione": "2019-06-01"
+          },
+          {
+            "agente_id": 3,
+            "nome": "Giuseppe",
+            "cognome": "Rinaldi",
+            "email": "giuseppe.rinaldi@agenzia.it",
+            "telefono": "+39 011 4567890",
+            "data_assunzione": "2020-01-20"
+          },
+          {
+            "agente_id": 4,
+            "nome": "Chiara",
+            "cognome": "Moretti",
+            "email": "chiara.moretti@agenzia.it",
+            "telefono": "+39 081 3344556",
+            "data_assunzione": "2021-09-15"
+          },
+          {
+            "agente_id": 5,
+            "nome": "Andrea",
+            "cognome": "Colombo",
+            "email": "andrea.colombo@agenzia.it",
+            "telefono": "+39 010 2233445",
+            "data_assunzione": "2022-04-05"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giuseppe",
+              "Chiara",
+              "Andrea",
+              "Paolo",
+              "Sara",
+              "Luca",
+              "Elena",
+              "Davide"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Bellini",
+              "Fontana",
+              "Rinaldi",
+              "Moretti",
+              "Colombo",
+              "Greco",
+              "Mancini",
+              "Longo",
+              "Ferri",
+              "Gallo"
+            ]
+          },
+          "data_assunzione": {
+            "axis": "shift",
+            "delta_min": -500.0,
+            "delta_max": 500.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 140,
+        "max_rows": 200,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "cliente_id": 1,
+            "nome": "Alessandro",
+            "cognome": "Marino",
+            "email": "alessandro.marino@gmail.com",
+            "telefono": "+39 333 1112223",
+            "budget_massimo": 350000.0
+          },
+          {
+            "cliente_id": 2,
+            "nome": "Valentina",
+            "cognome": "Costa",
+            "email": "valentina.costa@gmail.com",
+            "telefono": "+39 347 5556677",
+            "budget_massimo": 180000.0
+          },
+          {
+            "cliente_id": 3,
+            "nome": "Roberto",
+            "cognome": "Lombardi",
+            "email": "roberto.lombardi@gmail.com",
+            "telefono": "+39 320 4445566",
+            "budget_massimo": 520000.0
+          },
+          {
+            "cliente_id": 4,
+            "nome": "Federica",
+            "cognome": "Gatti",
+            "email": "federica.gatti@gmail.com",
+            "telefono": "+39 328 7778899",
+            "budget_massimo": 95000.0
+          },
+          {
+            "cliente_id": 5,
+            "nome": "Stefano",
+            "cognome": "De Luca",
+            "email": "stefano.deluca@gmail.com",
+            "telefono": "+39 331 2223344",
+            "budget_massimo": 275000.0
+          },
+          {
+            "cliente_id": 6,
+            "nome": "Monica",
+            "cognome": "Villa",
+            "email": "monica.villa@gmail.com",
+            "telefono": "+39 340 6667788",
+            "budget_massimo": 420000.0
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Alessandro",
+              "Valentina",
+              "Roberto",
+              "Federica",
+              "Stefano",
+              "Monica",
+              "Francesca",
+              "Antonio",
+              "Silvia",
+              "Matteo"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marino",
+              "Costa",
+              "Lombardi",
+              "Gatti",
+              "De Luca",
+              "Villa",
+              "Barbieri",
+              "Testa",
+              "Amato",
+              "Pellegrini"
+            ]
+          },
+          "budget_massimo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.4,
+            "factor_max": 2.2,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "immobili",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 240,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "immobile_id": 1,
+            "agente_id": 1,
+            "indirizzo": "Via del Corso 15",
+            "citta": "Roma",
+            "provincia": "RM",
+            "superficie_mq": 85.0,
+            "numero_vani": 3,
+            "prezzo_richiesto": 385000.0,
+            "stato_immobile": "disponibile"
+          },
+          {
+            "immobile_id": 2,
+            "agente_id": 2,
+            "indirizzo": "Via Brera 8",
+            "citta": "Milano",
+            "provincia": "MI",
+            "superficie_mq": 62.0,
+            "numero_vani": 2,
+            "prezzo_richiesto": 295000.0,
+            "stato_immobile": "riservato"
+          },
+          {
+            "immobile_id": 3,
+            "agente_id": 3,
+            "indirizzo": "Corso Vittorio Emanuele II 42",
+            "citta": "Torino",
+            "provincia": "TO",
+            "superficie_mq": 110.0,
+            "numero_vani": 4,
+            "prezzo_richiesto": 245000.0,
+            "stato_immobile": "venduto"
+          },
+          {
+            "immobile_id": 4,
+            "agente_id": 4,
+            "indirizzo": "Via Toledo 76",
+            "citta": "Napoli",
+            "provincia": "NA",
+            "superficie_mq": 95.0,
+            "numero_vani": 4,
+            "prezzo_richiesto": 210000.0,
+            "stato_immobile": "affittato"
+          },
+          {
+            "immobile_id": 5,
+            "agente_id": 5,
+            "indirizzo": "Via dei Neri 3",
+            "citta": "Firenze",
+            "provincia": "FI",
+            "superficie_mq": 78.0,
+            "numero_vani": 3,
+            "prezzo_richiesto": 330000.0,
+            "stato_immobile": "disponibile"
+          },
+          {
+            "immobile_id": 6,
+            "agente_id": 1,
+            "indirizzo": "Via Etnea 120",
+            "citta": "Catania",
+            "provincia": "CT",
+            "superficie_mq": 130.0,
+            "numero_vani": 5,
+            "prezzo_richiesto": 175000.0,
+            "stato_immobile": "riservato"
+          }
+        ],
+        "variations": {
+          "indirizzo": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Via Garibaldi 21",
+              "Piazza Navona 5",
+              "Via Torino 44",
+              "Via Roma 17",
+              "Corso Buenos Aires 30",
+              "Via Dante 9",
+              "Via Mazzini 58",
+              "Via Cavour 12"
+            ]
+          },
+          "superficie_mq": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          },
+          "numero_vani": {
+            "axis": "shift",
+            "delta_min": -1.0,
+            "delta_max": 2.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "prezzo_richiesto": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.7,
+            "factor_max": 1.6,
+            "pool": []
+          },
+          "stato_immobile": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "disponibile",
+              "disponibile",
+              "disponibile",
+              "riservato",
+              "venduto",
+              "affittato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "visite",
+        "nature": "fact",
+        "min_rows": 450,
+        "max_rows": 750,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "visita_id": 1,
+            "cliente_id": 1,
+            "agente_id": 1,
+            "immobile_id": 1,
+            "data_visita": "2026-01-10",
+            "ora_visita": "10:00:00",
+            "esito_visita": "interessato",
+            "note": "Cliente molto interessato, richiede una seconda visita"
+          },
+          {
+            "visita_id": 2,
+            "cliente_id": 2,
+            "agente_id": 2,
+            "immobile_id": 2,
+            "data_visita": "2026-01-14",
+            "ora_visita": "15:30:00",
+            "esito_visita": "non_interessato",
+            "note": "Immobile troppo piccolo rispetto alle aspettative"
+          },
+          {
+            "visita_id": 3,
+            "cliente_id": 3,
+            "agente_id": 3,
+            "immobile_id": 3,
+            "data_visita": "2026-01-22",
+            "ora_visita": "11:15:00",
+            "esito_visita": "da_rivalutare",
+            "note": "In attesa della decisione del coniuge"
+          },
+          {
+            "visita_id": 4,
+            "cliente_id": 4,
+            "agente_id": 4,
+            "immobile_id": 4,
+            "data_visita": "2026-02-03",
+            "ora_visita": "16:45:00",
+            "esito_visita": "interessato",
+            "note": "Proposta di affitto in fase di valutazione"
+          },
+          {
+            "visita_id": 5,
+            "cliente_id": 5,
+            "agente_id": 5,
+            "immobile_id": 5,
+            "data_visita": "2026-02-11",
+            "ora_visita": "09:30:00",
+            "esito_visita": "non_interessato",
+            "note": "Zona poco comoda per i collegamenti"
+          },
+          {
+            "visita_id": 6,
+            "cliente_id": 6,
+            "agente_id": 1,
+            "immobile_id": 6,
+            "data_visita": "2026-02-18",
+            "ora_visita": "17:00:00",
+            "esito_visita": "interessato",
+            "note": "Disponibile per avviare la trattativa rapidamente"
+          }
+        ],
+        "variations": {
+          "data_visita": {
+            "axis": "shift",
+            "delta_min": -50.0,
+            "delta_max": 50.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "ora_visita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "09:00:00",
+              "10:30:00",
+              "11:00:00",
+              "14:30:00",
+              "15:00:00",
+              "16:30:00",
+              "18:00:00"
+            ]
+          },
+          "esito_visita": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "interessato",
+              "interessato",
+              "non_interessato",
+              "da_rivalutare"
+            ]
+          },
+          "note": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Ottima impressione generale dell'immobile",
+              "Richieste ulteriori informazioni su spese condominiali e costi",
+              "Visita breve, cliente di fretta",
+              "Interessato ma attende la valutazione finanziaria",
+              "Nessuna nota particolare da segnalare"
+            ]
+          }
+        }
+      },
+      {
+        "table": "contratti",
+        "nature": "fact",
+        "min_rows": 100,
+        "max_rows": 160,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "contratto_id": 1,
+            "cliente_id": 3,
+            "agente_id": 3,
+            "immobile_id": 3,
+            "data_firma": "2026-02-20",
+            "prezzo_finale": 238000.0,
+            "tipo_contratto": "vendita"
+          },
+          {
+            "contratto_id": 2,
+            "cliente_id": 1,
+            "agente_id": 1,
+            "immobile_id": 1,
+            "data_firma": "2026-03-05",
+            "prezzo_finale": 370000.0,
+            "tipo_contratto": "vendita"
+          },
+          {
+            "contratto_id": 3,
+            "cliente_id": 4,
+            "agente_id": 4,
+            "immobile_id": 4,
+            "data_firma": "2026-02-25",
+            "prezzo_finale": 850.0,
+            "tipo_contratto": "affitto"
+          },
+          {
+            "contratto_id": 4,
+            "cliente_id": 6,
+            "agente_id": 1,
+            "immobile_id": 6,
+            "data_firma": "2026-03-12",
+            "prezzo_finale": 720.0,
+            "tipo_contratto": "affitto"
+          },
+          {
+            "contratto_id": 5,
+            "cliente_id": 2,
+            "agente_id": 2,
+            "immobile_id": 2,
+            "data_firma": "2026-03-18",
+            "prezzo_finale": 290000.0,
+            "tipo_contratto": "vendita"
+          }
+        ],
+        "variations": {
+          "data_firma": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 30.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "prezzo_finale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.85,
+            "factor_max": 1.15,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "spec": {
+    "domain": "erp",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "exists"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fornitori",
+        "obsolete_value": "anagrafica_partner",
+        "description": "La tabella padre fornitori viene denominata anagrafica_partner nella prosa aziendale; l'utente deve riconoscere che le richieste su 'anagrafica_partner' si riferiscono alla tabella fornitori."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "scorta_minima",
+        "obsolete_value": "stock di sicurezza",
+        "description": "La colonna scorta_minima della tabella articoli viene indicata con il gergo ERP/logistico 'stock di sicurezza'; le query che menzionano tale termine devono risolvere la colonna scorta_minima."
+      }
+    ],
+    "spec_hash": "0ad98d9b4bb39e17"
+  },
+  "schema_ddl": "CREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    codice_fornitore TEXT NOT NULL UNIQUE,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    email TEXT,\n    telefono TEXT,\n    citta TEXT,\n    attivo BOOLEAN NOT NULL DEFAULT TRUE\n);\n\nCREATE TABLE articoli (\n    id SERIAL PRIMARY KEY,\n    codice_articolo TEXT NOT NULL UNIQUE,\n    descrizione TEXT NOT NULL,\n    unita_misura TEXT NOT NULL DEFAULT 'PZ',\n    prezzo_listino NUMERIC(10,2) NOT NULL CHECK (prezzo_listino >= 0),\n    scorta_minima INT NOT NULL DEFAULT 0 CHECK (scorta_minima >= 0),\n    fornitore_preferenziale_id INT REFERENCES fornitori(id)\n);\n\nCREATE TABLE ordini_acquisto (\n    id SERIAL PRIMARY KEY,\n    numero_ordine TEXT NOT NULL UNIQUE,\n    data_ordine DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato_ordine TEXT NOT NULL DEFAULT 'aperto' CHECK (stato_ordine IN ('aperto', 'confermato', 'evaso', 'annullato')),\n    fornitore_id INT NOT NULL REFERENCES fornitori(id)\n);\n\nCREATE TABLE righe_ordine_acquisto (\n    id SERIAL PRIMARY KEY,\n    ordine_id INT NOT NULL REFERENCES ordini_acquisto(id),\n    articolo_id INT NOT NULL REFERENCES articoli(id),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario_riga NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario_riga >= 0),\n    sconto_percentuale NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (sconto_percentuale BETWEEN 0 AND 100)\n);"
+}

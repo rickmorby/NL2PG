@@ -1,0 +1,164 @@
+{
+  "schema_ddl": "CREATE TABLE esami (\n    id_esame INT PRIMARY KEY,\n    matricola_studente TEXT NOT NULL,\n    corso TEXT NOT NULL,\n    voto NUMERIC(4,1) NOT NULL CHECK (voto >= 0 AND voto <= 30),\n    cfu INT NOT NULL CHECK (cfu > 0 AND cfu <= 30),\n    docente TEXT NOT NULL,\n    data_esame DATE NOT NULL,\n    UNIQUE (matricola_studente, corso, data_esame)\n);",
+  "data_profile": {
+    "profile": {
+      "esami": {
+        "row_count": 975,
+        "columns": {
+          "id_esame": {
+            "distinct": 975,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 975
+          },
+          "matricola_studente": {
+            "distinct": 975,
+            "sample": [
+              "BO100005",
+              "BO1000051",
+              "BO10000510",
+              "BO100005100",
+              "BO100005101"
+            ]
+          },
+          "corso": {
+            "distinct": 975,
+            "sample": [
+              "Analisi Matematica I",
+              "Analisi Matematica I1",
+              "Analisi Matematica I10",
+              "Analisi Matematica I100",
+              "Analisi Matematica I101"
+            ]
+          },
+          "voto": {
+            "distinct": 683,
+            "sample": [
+              "14.8",
+              "14.82",
+              "14.85",
+              "14.86",
+              "14.97"
+            ],
+            "min": 14.8,
+            "max": 30.0
+          },
+          "cfu": {
+            "distinct": 4,
+            "sample": [
+              "12",
+              "15",
+              "6",
+              "9"
+            ],
+            "min": 6,
+            "max": 12
+          },
+          "docente": {
+            "distinct": 6,
+            "sample": [
+              "Prof. Carlo Fontana",
+              "Prof. Luca Bianchi",
+              "Prof. Marco Rinaldi",
+              "Prof.ssa Elena Marchetti",
+              "Prof.ssa Giulia Ferri"
+            ]
+          },
+          "data_esame": {
+            "distinct": 975,
+            "sample": [
+              "2026-01-20",
+              "2026-01-21",
+              "2026-01-22",
+              "2026-01-23",
+              "2026-01-24"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "esami": [
+        {
+          "id_esame": 1,
+          "matricola_studente": "VR100001",
+          "corso": "Analisi Matematica I",
+          "voto": 19.53,
+          "cfu": "6",
+          "docente": "Prof.ssa Elena Marchetti",
+          "data_esame": "2026-01-20"
+        },
+        {
+          "id_esame": 2,
+          "matricola_studente": "VR1000011",
+          "corso": "Analisi Matematica I1",
+          "voto": 25.14,
+          "cfu": "15",
+          "docente": "Prof. Marco Rinaldi",
+          "data_esame": "2026-01-21"
+        },
+        {
+          "id_esame": 3,
+          "matricola_studente": "VR1000012",
+          "corso": "Analisi Matematica I2",
+          "voto": 20.09,
+          "cfu": "6",
+          "docente": "Prof. Carlo Fontana",
+          "data_esame": "2026-01-22"
+        },
+        {
+          "id_esame": 4,
+          "matricola_studente": "VR1000013",
+          "corso": "Analisi Matematica I3",
+          "voto": 19.97,
+          "cfu": "15",
+          "docente": "Prof.ssa Elena Marchetti",
+          "data_esame": "2026-01-23"
+        },
+        {
+          "id_esame": 5,
+          "matricola_studente": "VR1000014",
+          "corso": "Analisi Matematica I4",
+          "voto": 22.0,
+          "cfu": 9,
+          "docente": "Prof.ssa Elena Marchetti",
+          "data_esame": "2026-01-24"
+        },
+        {
+          "id_esame": 6,
+          "matricola_studente": "VR1000015",
+          "corso": "Analisi Matematica I5",
+          "voto": 20.14,
+          "cfu": "6",
+          "docente": "Prof.ssa Sara Colombo",
+          "data_esame": "2026-01-25"
+        },
+        {
+          "id_esame": 7,
+          "matricola_studente": "VR1000016",
+          "corso": "Analisi Matematica I6",
+          "voto": 22.14,
+          "cfu": "12",
+          "docente": "Prof.ssa Sara Colombo",
+          "data_esame": "2026-01-26"
+        },
+        {
+          "id_esame": 8,
+          "matricola_studente": "VR1000017",
+          "corso": "Analisi Matematica I7",
+          "voto": 24.77,
+          "cfu": "15",
+          "docente": "Prof.ssa Elena Marchetti",
+          "data_esame": "2026-01-27"
+        }
+      ]
+    }
+  },
+  "story": "Presso la Segreteria Didattica dell'ateneo, l'archivio denominato verbali_prova_finale custodisce tutti gli atti relativi alle prove sostenute dagli studenti durante le sessioni d'appello. In ciascun verbale vengono annotati il numero progressivo dell'atto, la matricola del candidato, la denominazione del corso, l'esito trentesimale conseguito, i crediti formativi riconosciuti, il docente che ha presieduto la commissione e la giornata in cui la prova si è svolta. Un controllo interno garantisce che nessuno studente possa risultare verbalizzato più volte per lo stesso corso nella medesima giornata, così da preservare l'affidabilità dell'archivio. Le registrazioni analizzate coprono l'inizio del 2026, con appuntamenti svoltisi a partire dal 20 gennaio e con esiti trentesimali oscillanti tra un minimo di 14,8 e il massimo pieno di 30. In occasione della revisione annuale della qualità della didattica, il responsabile di segreteria ha incaricato gli uffici di valutare l'andamento dei sei docenti coinvolti nelle commissioni, tra cui la Prof.ssa Elena Marchetti, il Prof. Marco Rinaldi e il Prof. Carlo Fontana. Poiché l'interesse gestionale riguarda soprattutto gli insegnamenti più brevi, l'analisi è stata circoscritta alle prove da 6 o 9 crediti formativi, lasciando fuori quelle da 12 o 15 crediti. Per ciascun docente gli operatori hanno quindi determinato il valore mediano dell'esito trentesimale, calcolato come 50° percentile continuo, affiancandolo alla media aritmetica degli esiti, al numero complessivo di prove verbalizzate e al totale dei crediti erogati nei rispettivi appelli. Il prospetto conclusivo, destinato al Consiglio di Facoltà, ordina i docenti per voto mediano decrescente, così da evidenziare chi ha conseguito gli esiti centrali più elevati sugli insegnamenti da 6 o 9 crediti. Il documento, redatto a cura dell'ufficio affari accademici, sarà allegato al rendiconto trimestrale e conservato insieme agli altri verbali prova finale per eventuali verifiche successive."
+}

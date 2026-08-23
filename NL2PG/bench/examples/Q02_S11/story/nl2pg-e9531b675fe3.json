@@ -1,0 +1,482 @@
+{
+  "schema_ddl": "CREATE TABLE aziende (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    citta_sede TEXT NOT NULL\n);\n\nCREATE TABLE dipartimenti (\n    id SERIAL PRIMARY KEY,\n    azienda_id INT NOT NULL REFERENCES aziende(id) ON DELETE CASCADE,\n    nome TEXT NOT NULL,\n    budget_annuo NUMERIC(12,2) NOT NULL CHECK (budget_annuo >= 0),\n    UNIQUE (azienda_id, nome)\n);\n\nCREATE TABLE dipendenti (\n    id SERIAL PRIMARY KEY,\n    dipartimento_id INT NOT NULL REFERENCES dipartimenti(id),\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    data_assunzione DATE NOT NULL,\n    stipendio_mensile NUMERIC(10,2) NOT NULL CHECK (stipendio_mensile > 0)\n);\n\nCREATE TABLE valutazioni (\n    id SERIAL PRIMARY KEY,\n    dipendente_id INT NOT NULL REFERENCES dipendenti(id) ON DELETE CASCADE,\n    data_valutazione DATE NOT NULL,\n    punteggio NUMERIC(5,2) NOT NULL CHECK (punteggio BETWEEN 0 AND 100),\n    commento TEXT\n);",
+  "data_profile": {
+    "profile": {
+      "aziende": {
+        "row_count": 386,
+        "columns": {
+          "id": {
+            "distinct": 386,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 386
+          },
+          "ragione_sociale": {
+            "distinct": 10,
+            "sample": [
+              "Alimenti Delta S.r.l.",
+              "Consulenza Epsilon S.p.A.",
+              "Costruzioni Beta S.r.l.",
+              "Energia Eta S.r.l.",
+              "Farmaceutica Theta S.p.A."
+            ]
+          },
+          "partita_iva": {
+            "distinct": 386,
+            "sample": [
+              "IT01234567890",
+              "IT012345678901",
+              "IT0123456789010",
+              "IT0123456789011",
+              "IT0123456789012"
+            ]
+          },
+          "citta_sede": {
+            "distinct": 10,
+            "sample": [
+              "Bari",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Milano"
+            ]
+          }
+        }
+      },
+      "dipartimenti": {
+        "row_count": 1143,
+        "columns": {
+          "id": {
+            "distinct": 1143,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1143
+          },
+          "azienda_id": {
+            "distinct": 386,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 386
+          },
+          "nome": {
+            "distinct": 1143,
+            "sample": [
+              "Finanza",
+              "Finanza1",
+              "Finanza10",
+              "Finanza100",
+              "Finanza101"
+            ]
+          },
+          "budget_annuo": {
+            "distinct": 1098,
+            "sample": [
+              "1002493.01",
+              "1010710.6",
+              "1016353.7",
+              "1021817.24",
+              "103160.65"
+            ],
+            "min": 90000.0,
+            "max": 1098000.0
+          }
+        }
+      },
+      "dipendenti": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "dipartimento_id": {
+            "distinct": 1062,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1143
+          },
+          "codice_fiscale": {
+            "distinct": 3000,
+            "sample": [
+              "BNCLRA85C44F205B",
+              "BNCLRA85C44F205C",
+              "BNCLRA85C44F205D",
+              "BNCLRA85C44F205E",
+              "BNCLRA85C44F205F"
+            ]
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Davide",
+              "Elena",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 11,
+            "sample": [
+              "Bianchi",
+              "Colombo",
+              "Conti",
+              "Esposito",
+              "Ferrari"
+            ]
+          },
+          "data_assunzione": {
+            "distinct": 1482,
+            "sample": [
+              "2016-12-11",
+              "2016-12-12",
+              "2016-12-13",
+              "2016-12-14",
+              "2016-12-15"
+            ]
+          },
+          "stipendio_mensile": {
+            "distinct": 2853,
+            "sample": [
+              "1840.0",
+              "1842.73",
+              "1843.17",
+              "1844.27",
+              "1844.49"
+            ],
+            "min": 1840.0,
+            "max": 4800.0
+          }
+        }
+      },
+      "valutazioni": {
+        "row_count": 3000,
+        "columns": {
+          "id": {
+            "distinct": 3000,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 3000
+          },
+          "dipendente_id": {
+            "distinct": 1905,
+            "sample": [
+              "100",
+              "1001",
+              "1002",
+              "1003",
+              "1004"
+            ],
+            "min": 2,
+            "max": 3000
+          },
+          "data_valutazione": {
+            "distinct": 635,
+            "sample": [
+              "2024-06-13",
+              "2024-06-14",
+              "2024-06-17",
+              "2024-06-20",
+              "2024-06-22"
+            ]
+          },
+          "punteggio": {
+            "distinct": 2251,
+            "sample": [
+              "32.55",
+              "32.6",
+              "32.62",
+              "32.64",
+              "32.73"
+            ],
+            "min": 32.55,
+            "max": 98.28
+          },
+          "commento": {
+            "distinct": 6,
+            "sample": [
+              "Buone performance nel trimestre, obiettivi raggiunti.",
+              "Eccellente contributo al progetto di digitalizzazione.",
+              "Necessario migliorare la gestione delle scadenze.",
+              "Ottima collaborazione con il team e proattivita'.",
+              "Progressi costanti, buon potenziale di crescita."
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "aziende": [
+        {
+          "id": 1,
+          "ragione_sociale": "Energia Eta S.r.l.",
+          "partita_iva": "IT01234567890",
+          "citta_sede": "Torino"
+        },
+        {
+          "id": 2,
+          "ragione_sociale": "Moda Kappa S.p.A.",
+          "partita_iva": "IT012345678901",
+          "citta_sede": "Napoli"
+        },
+        {
+          "id": 3,
+          "ragione_sociale": "Trasporti Iota S.r.l.",
+          "partita_iva": "IT012345678902",
+          "citta_sede": "Verona"
+        },
+        {
+          "id": 4,
+          "ragione_sociale": "Moda Kappa S.p.A.",
+          "partita_iva": "IT012345678903",
+          "citta_sede": "Napoli"
+        },
+        {
+          "id": 5,
+          "ragione_sociale": "Energia Eta S.r.l.",
+          "partita_iva": "IT012345678904",
+          "citta_sede": "Verona"
+        },
+        {
+          "id": 6,
+          "ragione_sociale": "Tecnologia Alfa S.p.A.",
+          "partita_iva": "IT012345678905",
+          "citta_sede": "Milano"
+        },
+        {
+          "id": 7,
+          "ragione_sociale": "Energia Eta S.r.l.",
+          "partita_iva": "IT012345678906",
+          "citta_sede": "Bari"
+        },
+        {
+          "id": 8,
+          "ragione_sociale": "Consulenza Epsilon S.p.A.",
+          "partita_iva": "IT012345678907",
+          "citta_sede": "Roma"
+        }
+      ],
+      "dipartimenti": [
+        {
+          "id": 1,
+          "azienda_id": 189,
+          "nome": "Vendite",
+          "budget_annuo": 361304.59
+        },
+        {
+          "id": 2,
+          "azienda_id": 37,
+          "nome": "Vendite1",
+          "budget_annuo": 446738.63
+        },
+        {
+          "id": 3,
+          "azienda_id": 167,
+          "nome": "Vendite2",
+          "budget_annuo": 194034.09
+        },
+        {
+          "id": 4,
+          "azienda_id": 284,
+          "nome": "Vendite3",
+          "budget_annuo": 181353.04
+        },
+        {
+          "id": 5,
+          "azienda_id": 260,
+          "nome": "Vendite4",
+          "budget_annuo": 288916.09
+        },
+        {
+          "id": 6,
+          "azienda_id": 369,
+          "nome": "Vendite5",
+          "budget_annuo": 319773.23
+        },
+        {
+          "id": 7,
+          "azienda_id": 35,
+          "nome": "Vendite6",
+          "budget_annuo": 181135.14
+        },
+        {
+          "id": 8,
+          "azienda_id": 313,
+          "nome": "Vendite7",
+          "budget_annuo": 363560.31
+        }
+      ],
+      "dipendenti": [
+        {
+          "id": 1,
+          "dipartimento_id": 196,
+          "codice_fiscale": "RSSMRA80A01H501U",
+          "nome": "Marco",
+          "cognome": "Esposito",
+          "data_assunzione": "2018-06-15",
+          "stipendio_mensile": 2474.42
+        },
+        {
+          "id": 2,
+          "dipartimento_id": 78,
+          "codice_fiscale": "RSSMRA80A01H501B",
+          "nome": "Alessandro",
+          "cognome": "Bianchi",
+          "data_assunzione": "2018-12-06",
+          "stipendio_mensile": 4190.16
+        },
+        {
+          "id": 3,
+          "dipartimento_id": 444,
+          "codice_fiscale": "RSSMRA80A01H501C",
+          "nome": "Davide",
+          "cognome": "Ricci",
+          "data_assunzione": "2018-08-04",
+          "stipendio_mensile": 2946.17
+        },
+        {
+          "id": 4,
+          "dipartimento_id": 116,
+          "codice_fiscale": "RSSMRA80A01H501D",
+          "nome": "Sara",
+          "cognome": "Greco",
+          "data_assunzione": "2019-03-23",
+          "stipendio_mensile": 3199.19
+        },
+        {
+          "id": 5,
+          "dipartimento_id": 143,
+          "codice_fiscale": "RSSMRA80A01H501E",
+          "nome": "Laura",
+          "cognome": "Verdi",
+          "data_assunzione": "2018-07-27",
+          "stipendio_mensile": 2527.88
+        },
+        {
+          "id": 6,
+          "dipartimento_id": 816,
+          "codice_fiscale": "RSSMRA80A01H501F",
+          "nome": "Davide",
+          "cognome": "Ricci",
+          "data_assunzione": "2019-04-10",
+          "stipendio_mensile": 2640.59
+        },
+        {
+          "id": 7,
+          "dipartimento_id": 502,
+          "codice_fiscale": "RSSMRA80A01H501G",
+          "nome": "Laura",
+          "cognome": "Bianchi",
+          "data_assunzione": "2019-08-07",
+          "stipendio_mensile": 4187.21
+        },
+        {
+          "id": 8,
+          "dipartimento_id": 644,
+          "codice_fiscale": "RSSMRA80A01H501H",
+          "nome": "Francesca",
+          "cognome": "Esposito",
+          "data_assunzione": "2018-03-02",
+          "stipendio_mensile": 3256.4
+        }
+      ],
+      "valutazioni": [
+        {
+          "id": 1,
+          "dipendente_id": 304,
+          "data_valutazione": "2024-08-30",
+          "punteggio": 83.21,
+          "commento": null
+        },
+        {
+          "id": 2,
+          "dipendente_id": 619,
+          "data_valutazione": "2024-11-20",
+          "punteggio": 59.34,
+          "commento": "Ottima collaborazione con il team e proattivita'."
+        },
+        {
+          "id": 3,
+          "dipendente_id": 699,
+          "data_valutazione": "2025-03-27",
+          "punteggio": 63.34,
+          "commento": "Risultati sotto le attese, piano di miglioramento avviato."
+        },
+        {
+          "id": 4,
+          "dipendente_id": 516,
+          "data_valutazione": "2025-02-14",
+          "punteggio": 64.58,
+          "commento": "Buone performance nel trimestre, obiettivi raggiunti."
+        },
+        {
+          "id": 5,
+          "dipendente_id": 543,
+          "data_valutazione": "2024-10-06",
+          "punteggio": 59.03,
+          "commento": "Risultati sotto le attese, piano di miglioramento avviato."
+        },
+        {
+          "id": 6,
+          "dipendente_id": 2797,
+          "data_valutazione": "2024-09-19",
+          "punteggio": 56.53,
+          "commento": "Necessario migliorare la gestione delle scadenze."
+        },
+        {
+          "id": 7,
+          "dipendente_id": 111,
+          "data_valutazione": "2025-05-31",
+          "punteggio": 62.39,
+          "commento": "Risultati sotto le attese, piano di miglioramento avviato."
+        },
+        {
+          "id": 8,
+          "dipendente_id": 1359,
+          "data_valutazione": "2024-09-21",
+          "punteggio": 54.79,
+          "commento": "Progressi costanti, buon potenziale di crescita."
+        }
+      ]
+    }
+  },
+  "story": "Alla Direzione Risorse Umane del gruppo, l'archivio denominato aziende custodisce le schede delle società del compendio societario: per ciascuna sono annotati la ragione sociale, la partita IVA e la città in cui insiste la sede. A fianco, il registro dipartimenti descrive ogni articolazione interna delle società, riportandone il nome e il budget annuo assegnato, cifre che negli ultimi esercizi si sono mosse tra circa 90.000 e quasi 1.098.000 euro. Il personale è censito nell'archivio dipendenti, dove ogni collaboratore è descritto mediante codice fiscale, nome, cognome, data di assunzione e stipendio mensile pattuito; infine, il registro valutazioni raccoglie gli esiti dei colloqui periodici di performance, con la data del giudizio, il punteggio conseguito su una scala da 0 a 100 e un eventuale commento, come «Ottima collaborazione con il team e proattivita'» oppure «Buone performance nel trimestre, obiettivi raggiunti». In occasione della revisione retributiva di fine anno, il Direttore del Personale ha richiesto un quadro economico completo dei collaboratori assunti dal 1 gennaio 2018 (data indicata nei documenti come 2018-01-01) nelle aziende con sede a Milano. Gli analisti hanno dunque percorso l'intera filiera dei registri: individuate nell'archivio aziende le società la cui sede risulta a Milano, vi hanno ricondotto i dipartimenti attivi in tali sedi e, attraverso questi, tutti i dipendenti la cui assunzione è avvenuta a partire dal 1 gennaio 2018. Su tale popolazione hanno calcolato lo stipendio mensile medio, lo stipendio mensile minimo e quello massimo — importi che nel gruppo oscillano tra circa 1840 e 4800 euro al mese — e ne hanno conteggiato il numero complessivo, incrociando infine il quadro economico con le più recenti valutazioni individuali per arricchire il dossier presentato al comitato di amministrazione."
+}

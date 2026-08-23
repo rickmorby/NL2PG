@@ -1,0 +1,34 @@
+{
+  "domain": "contabilità",
+  "n_tables": 5,
+  "hierarchy": "flat",
+  "sql_features": [
+    "in_condition"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "jargon"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "registrazioni_contabili",
+      "obsolete_value": "prima_nota_sintetica",
+      "description": "La tabella principale delle registrazioni contabili, che contiene gli attributi denormalizzati categoria_costo e fornitore_nome, viene denominata prima_nota_sintetica nella prosa aziendale interna."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "categoria_costo",
+      "obsolete_value": "voce_di_bilancio",
+      "description": "La colonna denormalizzata categoria_costo, sulla quale si applica il filtro WHERE ... IN (...), viene indicata con il sinonimo voce_di_bilancio nei documenti di budget e nei report interni."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "importo_imponibile",
+      "obsolete_value": "valore_al_netto_iva",
+      "description": "La colonna importo_imponibile viene chiamata con il gergo contabile valore_al_netto_iva, riflettendo la prassi del reparto amministrativo di riferirsi all'importo escluse le imposte indirette."
+    }
+  ],
+  "spec_hash": "fd8f7f847d34625d"
+}

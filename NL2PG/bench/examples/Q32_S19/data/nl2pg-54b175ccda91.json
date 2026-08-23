@@ -1,0 +1,319 @@
+{
+  "spec": {
+    "domain": "logistica",
+    "n_tables": 4,
+    "hierarchy": "multi_entity",
+    "sql_features": [
+      "values"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "spedizioni",
+        "obsolete_value": "movimenti_di_merce",
+        "description": "La tabella spedizioni viene denominata movimenti_di_merce nella prosa aziendale; il solver deve risalire alla corrispondenza per costruire il join con la tabella inline VALUES."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "magazzini",
+        "obsolete_value": "hub di smistamento",
+        "description": "La tabella magazzini viene indicata con il gergo logistico 'hub di smistamento'; occorre riconoscere che si tratta della stessa entità per filtrare o aggregare correttamente sulle chiavi pertinenti."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "peso_kg",
+        "obsolete_value": "massa del carico",
+        "description": "La colonna peso_kg della tabella colli viene riferita nella documentazione come 'massa del carico'; il solver deve mappare il sinonimo sulla colonna reale quando la tabella VALUES fornisce soglie o categorie di peso da confrontare."
+      }
+    ],
+    "spec_hash": "b8fdae65cb932613"
+  },
+  "schema_ddl": "CREATE TABLE magazzini (\n    id INT PRIMARY KEY,\n    codice_hub TEXT NOT NULL UNIQUE,\n    nome_impianto TEXT NOT NULL,\n    citta TEXT NOT NULL,\n    capienza_massima_colli INT NOT NULL CHECK (capienza_massima_colli > 0)\n);\n\nCREATE TABLE corrieri (\n    id INT PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL,\n    partita_iva TEXT NOT NULL UNIQUE,\n    telefono_contatto TEXT\n);\n\nCREATE TABLE spedizioni (\n    id INT PRIMARY KEY,\n    magazzino_partenza_id INT NOT NULL REFERENCES magazzini(id),\n    magazzino_arrivo_id INT NOT NULL REFERENCES magazzini(id),\n    corriere_id INT REFERENCES corrieri(id),\n    data_spedizione DATE NOT NULL,\n    data_consegna_prevista DATE,\n    stato TEXT NOT NULL CHECK (stato IN ('in_preparazione', 'in_transito', 'consegnata', 'rimandata')),\n    CHECK (data_consegna_prevista IS NULL OR data_consegna_prevista >= data_spedizione)\n);\n\nCREATE TABLE colli (\n    id INT PRIMARY KEY,\n    spedizione_id INT NOT NULL REFERENCES spedizioni(id),\n    peso_kg NUMERIC(8,2) NOT NULL CHECK (peso_kg > 0),\n    volume_litri NUMERIC(8,2) CHECK (volume_litri >= 0),\n    descrizione_contenuto TEXT NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "magazzini",
+        "nature": "lookup",
+        "min_rows": 6,
+        "max_rows": 10,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "codice_hub": "HUB-MIL-01",
+            "nome_impianto": "Hub Smistamento Zona Industriale",
+            "citta": "Milano",
+            "capienza_massima_colli": 45000
+          },
+          {
+            "id": 2,
+            "codice_hub": "HUB-ROM-01",
+            "nome_impianto": "Centro Distribuzione Nazionale",
+            "citta": "Roma",
+            "capienza_massima_colli": 60000
+          },
+          {
+            "id": 3,
+            "codice_hub": "HUB-NAP-01",
+            "nome_impianto": "Cross-docking Intermodale",
+            "citta": "Napoli",
+            "capienza_massima_colli": 28000
+          },
+          {
+            "id": 4,
+            "codice_hub": "HUB-TOR-01",
+            "nome_impianto": "Terminal Merci del Nord-Ovest",
+            "citta": "Torino",
+            "capienza_massima_colli": 35000
+          },
+          {
+            "id": 5,
+            "codice_hub": "HUB-BOL-01",
+            "nome_impianto": "Nodo Logistico dell'Appennino",
+            "citta": "Bologna",
+            "capienza_massima_colli": 22000
+          },
+          {
+            "id": 6,
+            "codice_hub": "HUB-PAL-01",
+            "nome_impianto": "Deposito Avanzato del Sud",
+            "citta": "Palermo",
+            "capienza_massima_colli": 18000
+          }
+        ],
+        "variations": {
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Milano",
+              "Roma",
+              "Napoli",
+              "Torino",
+              "Bologna",
+              "Palermo",
+              "Firenze",
+              "Verona"
+            ]
+          },
+          "capienza_massima_colli": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.6,
+            "factor_max": 1.8,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "corrieri",
+        "nature": "lookup",
+        "min_rows": 5,
+        "max_rows": 8,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "ragione_sociale": "Trasporti Alpina S.p.A.",
+            "partita_iva": "IT02345678901",
+            "telefono_contatto": "+39 02 1234567"
+          },
+          {
+            "id": 2,
+            "ragione_sociale": "Corriere Espresso Velox S.r.l.",
+            "partita_iva": "IT09876543210",
+            "telefono_contatto": "+39 06 9876543"
+          },
+          {
+            "id": 3,
+            "ragione_sociale": "Logistica Mediterranea S.p.A.",
+            "partita_iva": "IT04567891234",
+            "telefono_contatto": "+39 081 5566778"
+          },
+          {
+            "id": 4,
+            "ragione_sociale": "RapidCargo Italia S.r.l.",
+            "partita_iva": "IT03456789123",
+            "telefono_contatto": null
+          },
+          {
+            "id": 5,
+            "ragione_sociale": "Meridiana Trasporti S.c.a r.l.",
+            "partita_iva": "IT05678912345",
+            "telefono_contatto": "+39 055 4433221"
+          }
+        ],
+        "variations": {}
+      },
+      {
+        "table": "spedizioni",
+        "nature": "fact",
+        "min_rows": 400,
+        "max_rows": 700,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "magazzino_partenza_id": 1,
+            "magazzino_arrivo_id": 2,
+            "corriere_id": 1,
+            "data_spedizione": "2026-01-12",
+            "data_consegna_prevista": "2026-01-16",
+            "stato": "consegnata"
+          },
+          {
+            "id": 102,
+            "magazzino_partenza_id": 2,
+            "magazzino_arrivo_id": 3,
+            "corriere_id": 2,
+            "data_spedizione": "2026-01-20",
+            "data_consegna_prevista": "2026-01-24",
+            "stato": "consegnata"
+          },
+          {
+            "id": 103,
+            "magazzino_partenza_id": 3,
+            "magazzino_arrivo_id": 1,
+            "corriere_id": 3,
+            "data_spedizione": "2026-02-02",
+            "data_consegna_prevista": "2026-02-07",
+            "stato": "in_transito"
+          },
+          {
+            "id": 104,
+            "magazzino_partenza_id": 4,
+            "magazzino_arrivo_id": 5,
+            "corriere_id": null,
+            "data_spedizione": "2026-02-18",
+            "data_consegna_prevista": "2026-02-21",
+            "stato": "in_preparazione"
+          },
+          {
+            "id": 105,
+            "magazzino_partenza_id": 5,
+            "magazzino_arrivo_id": 6,
+            "corriere_id": 4,
+            "data_spedizione": "2026-01-28",
+            "data_consegna_prevista": null,
+            "stato": "rimandata"
+          }
+        ],
+        "variations": {
+          "data_spedizione": {
+            "axis": "shift",
+            "delta_min": -40.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "consegnata",
+              "consegnata",
+              "consegnata",
+              "consegnata",
+              "in_transito",
+              "in_transito",
+              "in_preparazione",
+              "rimandata"
+            ]
+          }
+        }
+      },
+      {
+        "table": "colli",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 2.5,
+        "templates": [
+          {
+            "id": 1001,
+            "spedizione_id": 101,
+            "peso_kg": 12.4,
+            "volume_litri": 45.0,
+            "descrizione_contenuto": "Componenti elettronici"
+          },
+          {
+            "id": 1002,
+            "spedizione_id": 102,
+            "peso_kg": 2.8,
+            "volume_litri": 12.5,
+            "descrizione_contenuto": "Abbigliamento e calzature"
+          },
+          {
+            "id": 1003,
+            "spedizione_id": 103,
+            "peso_kg": 48.75,
+            "volume_litri": 180.0,
+            "descrizione_contenuto": "Pezzi di ricambio industriali"
+          },
+          {
+            "id": 1004,
+            "spedizione_id": 104,
+            "peso_kg": 0.9,
+            "volume_litri": 3.2,
+            "descrizione_contenuto": "Documentazione e cancelleria"
+          },
+          {
+            "id": 1005,
+            "spedizione_id": 105,
+            "peso_kg": 22.0,
+            "volume_litri": null,
+            "descrizione_contenuto": "Prodotti alimentari confezionati"
+          }
+        ],
+        "variations": {
+          "peso_kg": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 4.0,
+            "pool": []
+          },
+          "volume_litri": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "descrizione_contenuto": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Componenti elettronici",
+              "Abbigliamento e calzature",
+              "Pezzi di ricambio industriali",
+              "Documentazione e cancelleria",
+              "Prodotti alimentari confezionati",
+              "Libri e materiale editoriale",
+              "Attrezzatura sportiva",
+              "Cosmetici e prodotti per la persona"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

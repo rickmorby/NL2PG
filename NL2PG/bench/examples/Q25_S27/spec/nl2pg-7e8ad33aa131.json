@@ -1,0 +1,34 @@
+{
+  "domain": "immobiliare",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "natural_join"
+  ],
+  "twist": [
+    "rename",
+    "synonym",
+    "rephrase"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "immobili",
+      "obsolete_value": "unita_abitative",
+      "description": "La tabella immobili viene denominata unita_abitative nella prosa aziendale. Le chiavi esterne sono implicite: colonne con lo stesso nome (es. immobile_id, agente_id) sono condivise tra le tabelle, cosi che il natural join risolva semanticamente le relazioni senza vincoli FK espliciti."
+    },
+    {
+      "twist_type": "synonym",
+      "target_value": "prezzo_richiesto",
+      "obsolete_value": "valore_di_listino",
+      "description": "La colonna prezzo_richiesto della tabella immobili viene indicata nella narrativa aziendale come valore_di_listino. Il lettore deve mappare il sinonimo alla colonna reale per formulare correttamente aggregazioni e confronti basati su natural join."
+    },
+    {
+      "twist_type": "rephrase",
+      "target_value": "visite",
+      "obsolete_value": "appuntamenti di visione degli immobili",
+      "description": "La tabella visite viene descritta nella prosa come appuntamenti di visione degli immobili. La perifrasi richiede di ricondurre la descrizione semantica al nome effettivo della tabella, le cui colonne condivise (cliente_id, agente_id, immobile_id) abilitano il join naturale con clienti, agenti e immobili."
+    }
+  ],
+  "spec_hash": "28cbd158407e767e"
+}

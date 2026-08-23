@@ -1,0 +1,4 @@
+{
+  "story": "Nell'unità operativa di gestione dei ricoveri, l'archivio denominato pazienti reparti raccoglie le schede dei degenti. Ogni scheda riporta il codice fiscale, il nome, il cognome, l'area clinica di assegnazione, la data di ricovero e la priorità. Durante una verifica richiesta dalla direzione sanitaria, gli operatori hanno consultato le schede per individuare i pazienti ricoverati nel reparto di cardiologia oppure con priorita massima pari a 5. Hanno quindi predisposto un elenco dettagliato per supportare le decisioni organizzative.",
+  "question": "Puoi fornirmi l'elenco dei pazienti ricoverati nel reparto di cardiologia oppure che presentano un livello di priorità massimo pari a 5, mostrando per ciascuno il nome, il cognome, il reparto di assegnazione e la data di ricovero?"
+}

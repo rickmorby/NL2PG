@@ -1,0 +1,139 @@
+{
+  "spec": {
+    "domain": "ecommerce",
+    "n_tables": 1,
+    "hierarchy": "flat",
+    "sql_features": [
+      "like"
+    ],
+    "twist": [
+      "rename",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "dettagli_prodotto",
+        "obsolete_value": "specifiche_articolo",
+        "description": "La colonna composita dettagli_prodotto viene denominata specifiche_articolo nella documentazione aziendale."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "descrizione",
+        "obsolete_value": "blurb",
+        "description": "Il campo testuale 'descrizione' all'interno del tipo composito viene riferito come 'blurb' nel gergo aziendale."
+      }
+    ],
+    "spec_hash": "24225716e9a98111"
+  },
+  "schema_ddl": "CREATE TYPE specifiche_articolo AS (\n    blurb TEXT,\n    peso_grammi INT,\n    altezza_cm NUMERIC(5,2),\n    larghezza_cm NUMERIC(5,2),\n    profondita_cm NUMERIC(5,2)\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    prezzo NUMERIC(10,2) NOT NULL CHECK (prezzo >= 0),\n    dettagli_prodotto specifiche_articolo,\n    codice_articolo TEXT NOT NULL UNIQUE\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "prodotti",
+        "nature": "dimension",
+        "min_rows": 100,
+        "max_rows": 160,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Smartwatch Classico",
+            "prezzo": 199.9,
+            "dettagli_prodotto": "(\"Orologio smart con cassa in acciaio\",120,4.50,4.50,1.20)",
+            "codice_articolo": "SKU-SW-0001"
+          },
+          {
+            "id": 2,
+            "nome": "Cuffie Bluetooth Pro",
+            "prezzo": 129.0,
+            "dettagli_prodotto": "(\"Cuffie over ear con cancellazione rumore\",210,19.00,16.50,8.00)",
+            "codice_articolo": "SKU-AU-0102"
+          },
+          {
+            "id": 3,
+            "nome": "Zaino Urbano",
+            "prezzo": 59.9,
+            "dettagli_prodotto": "(\"Zaino impermeabile porta laptop\",480,45.00,30.00,14.00)",
+            "codice_articolo": "SKU-BG-0203"
+          },
+          {
+            "id": 4,
+            "nome": "Lampada LED Smart",
+            "prezzo": 34.5,
+            "dettagli_prodotto": "(\"Lampada RGB controllabile da app\",180,22.00,10.00,10.00)",
+            "codice_articolo": "SKU-LT-0304"
+          },
+          {
+            "id": 5,
+            "nome": "Tastiera Meccanica",
+            "prezzo": 89.99,
+            "dettagli_prodotto": "(\"Tastiera compatta con switch brown\",850,35.50,13.50,3.80)",
+            "codice_articolo": "SKU-KB-0405"
+          },
+          {
+            "id": 6,
+            "nome": "Mouse Ergonomico",
+            "prezzo": 49.0,
+            "dettagli_prodotto": "(\"Mouse verticale wireless\",95,11.00,7.20,6.50)",
+            "codice_articolo": "SKU-MS-0506"
+          },
+          {
+            "id": 7,
+            "nome": "Monitor 27 Pollici",
+            "prezzo": 249.0,
+            "dettagli_prodotto": "(\"Monitor IPS QHD\",5200,61.50,36.50,18.00)",
+            "codice_articolo": "SKU-MN-0607"
+          },
+          {
+            "id": 8,
+            "nome": "Speaker Portatile",
+            "prezzo": 79.9,
+            "dettagli_prodotto": "(\"Speaker Bluetooth resistente acqua\",540,18.00,7.50,7.50)",
+            "codice_articolo": "SKU-SP-0708"
+          },
+          {
+            "id": 9,
+            "nome": "Webcam Full HD",
+            "prezzo": 69.9,
+            "dettagli_prodotto": "(\"Webcam con microfono integrato\",160,9.00,6.00,5.50)",
+            "codice_articolo": "SKU-WC-0809"
+          },
+          {
+            "id": 10,
+            "nome": "Hub USB-C",
+            "prezzo": 39.9,
+            "dettagli_prodotto": "(\"Hub multipporta in alluminio\",140,12.00,6.00,1.80)",
+            "codice_articolo": "SKU-HB-0910"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "fixed",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "prezzo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.8,
+            "factor_max": 1.4,
+            "pool": []
+          },
+          "dettagli_prodotto": {
+            "axis": "fixed",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      }
+    ]
+  }
+}

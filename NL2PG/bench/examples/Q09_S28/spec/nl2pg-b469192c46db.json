@@ -1,0 +1,35 @@
+{
+  "domain": "telecomunicazioni",
+  "n_tables": 5,
+  "hierarchy": "one_to_many",
+  "sql_features": [
+    "group_agg",
+    "having"
+  ],
+  "twist": [
+    "rename",
+    "jargon",
+    "ambiguity"
+  ],
+  "twist_rules": [
+    {
+      "twist_type": "rename",
+      "target_value": "cli",
+      "obsolete_value": "clienti",
+      "description": "La tabella 'cli' (abbreviazione aziendale) rappresenta i clienti, ma nel linguaggio comune viene chiamata 'clienti'."
+    },
+    {
+      "twist_type": "jargon",
+      "target_value": "srv",
+      "obsolete_value": "servizi_attivi",
+      "description": "La tabella 'srv' (jargon tecnico) si riferisce ai servizi attivi, ma nel contesto aziendale viene spesso citata come 'servizi_attivi'."
+    },
+    {
+      "twist_type": "ambiguity",
+      "target_value": "tot",
+      "obsolete_value": "totale_fatturato",
+      "description": "Il campo 'tot' (ambiguo) può essere interpretato come 'totale_fatturato' o 'totale_traffico', generando ambiguità nel contesto aziendale."
+    }
+  ],
+  "spec_hash": "bbdb8b0e34df5eba"
+}

@@ -1,0 +1,213 @@
+{
+  "schema_ddl": "CREATE TABLE pazienti (\n    id SERIAL PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    eta INT CHECK (eta >= 0 AND eta <= 120),\n    sesso TEXT CHECK (sesso IN ('M', 'F', 'Altro')),\n    data_nascita DATE,\n    gruppo_sanguigno TEXT CHECK (gruppo_sanguigno IN ('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', '0+', '0-')),\n    altezza_cm NUMERIC(5,2) CHECK (altezza_cm > 0),\n    peso_kg NUMERIC(5,2) CHECK (peso_kg > 0),\n    bmi NUMERIC(4,2) GENERATED ALWAYS AS (ROUND(peso_kg / (altezza_cm * altezza_cm / 10000)::NUMERIC, 2)) STORED\n);",
+  "data_profile": {
+    "profile": {
+      "pazienti": {
+        "row_count": 295,
+        "columns": {
+          "id": {
+            "distinct": 295,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 295
+          },
+          "nome": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro",
+              "Alex",
+              "Anna",
+              "Francesca",
+              "Giulia"
+            ]
+          },
+          "cognome": {
+            "distinct": 19,
+            "sample": [
+              "Bianchi",
+              "Bruno",
+              "Conti",
+              "Costa",
+              "De Luca"
+            ]
+          },
+          "eta": {
+            "distinct": 10,
+            "sample": [
+              "22",
+              "27",
+              "29",
+              "34",
+              "38"
+            ],
+            "min": 8,
+            "max": 70
+          },
+          "sesso": {
+            "distinct": 3,
+            "sample": [
+              "Altro",
+              "F",
+              "M"
+            ]
+          },
+          "data_nascita": {
+            "distinct": 10,
+            "sample": [
+              "1956-03-30",
+              "1963-02-18",
+              "1974-01-30",
+              "1981-05-09",
+              "1988-03-05"
+            ]
+          },
+          "gruppo_sanguigno": {
+            "distinct": 8,
+            "sample": [
+              "0+",
+              "0-",
+              "A+",
+              "A-",
+              "AB+"
+            ]
+          },
+          "altezza_cm": {
+            "distinct": 259,
+            "sample": [
+              "125.4",
+              "126.44",
+              "126.88",
+              "128.45",
+              "129.3"
+            ],
+            "min": 125.4,
+            "max": 191.0
+          },
+          "peso_kg": {
+            "distinct": 269,
+            "sample": [
+              "27.58",
+              "27.65",
+              "27.94",
+              "28.07",
+              "28.19"
+            ],
+            "min": 27.58,
+            "max": 90.53
+          },
+          "bmi": {
+            "distinct": 0,
+            "sample": []
+          }
+        }
+      }
+    },
+    "preview": {
+      "pazienti": [
+        {
+          "id": 1,
+          "nome": "Marco",
+          "cognome": "Moretti",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "B+",
+          "altezza_cm": 178.11,
+          "peso_kg": 68.89,
+          "bmi": null
+        },
+        {
+          "id": 2,
+          "nome": "Marco",
+          "cognome": "Ferrari",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "A+",
+          "altezza_cm": 176.74,
+          "peso_kg": 75.0,
+          "bmi": null
+        },
+        {
+          "id": 3,
+          "nome": "Marco",
+          "cognome": "Leone",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": null,
+          "gruppo_sanguigno": "A-",
+          "altezza_cm": 176.0,
+          "peso_kg": 80.05,
+          "bmi": null
+        },
+        {
+          "id": 4,
+          "nome": "Marco",
+          "cognome": "Conti",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "A+",
+          "altezza_cm": null,
+          "peso_kg": 83.04,
+          "bmi": null
+        },
+        {
+          "id": 5,
+          "nome": "Marco",
+          "cognome": "Costa",
+          "eta": null,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "B-",
+          "altezza_cm": 175.1,
+          "peso_kg": 81.88,
+          "bmi": null
+        },
+        {
+          "id": 6,
+          "nome": "Marco",
+          "cognome": "De Luca",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "0-",
+          "altezza_cm": 183.47,
+          "peso_kg": 81.39,
+          "bmi": null
+        },
+        {
+          "id": 7,
+          "nome": "Marco",
+          "cognome": "Bruno",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": "AB+",
+          "altezza_cm": 180.44,
+          "peso_kg": 78.56,
+          "bmi": null
+        },
+        {
+          "id": 8,
+          "nome": "Marco",
+          "cognome": "Rizzo",
+          "eta": 34,
+          "sesso": "M",
+          "data_nascita": "1992-03-12",
+          "gruppo_sanguigno": null,
+          "altezza_cm": 184.9,
+          "peso_kg": null,
+          "bmi": null
+        }
+      ]
+    }
+  },
+  "story": "Nel cuore del reparto di Medicina Preventiva dell'ospedale Santa Maria, l'archivio denominato *pazienti* rappresenta il fulcro delle attività di monitoraggio clinico. Ogni scheda, identificata da un numero progressivo, raccoglie con cura i dati anagrafici e fisici di chi si rivolge al servizio: nome, cognome, età, sesso, data di nascita, gruppo sanguigno, altezza in centimetri e peso in chilogrammi. Da queste informazioni, il sistema calcola automaticamente un indicatore fondamentale, il BMI, che aiuta i medici a classificare lo stato ponderale dei pazienti.\n\nDurante una recente riunione del team di epidemiologia, è emersa la necessità di approfondire la distribuzione delle categorie di peso tra gli assistiti. Gli specialisti hanno quindi estratto i dati relativi a 295 pazienti, escludendo coloro per i quali mancavano misurazioni essenziali come altezza o peso. Per ciascun paziente, è stata determinata la categoria di appartenenza: sottopeso per chi presentava un BMI inferiore a 18,5, normopeso tra 18,5 e 24,9, sovrappeso tra 25 e 29,9, e obesità per valori superiori a 30.\n\nL'analisi ha rivelato dettagli interessanti. Ad esempio, nella categoria dei pazienti con obesità, l'età media si attestava intorno ai 45 anni, con una prevalenza di individui di sesso maschile e una significativa presenza di gruppi sanguigni A+ e 0+. Per il sovrappeso, invece, l'età media scendeva a 38 anni, con una distribuzione più equilibrata tra i sessi e una maggiore varietà di gruppi sanguigni, tra cui spiccava il B-. La categoria normopeso, la più numerosa, mostrava un'età media di 32 anni e una predominanza di donne, con una netta prevalenza del gruppo sanguigno 0+.\n\nParticolare attenzione è stata riservata ai pazienti più giovani, come un bambino di 8 anni con un'altezza di 125,4 centimetri e un peso di 27,58 chilogrammi, il cui BMI rientrava nella fascia di sottopeso. Al contrario, un adulto di 70 anni con un'altezza di 191 centimetri e un peso di 90,53 chilogrammi rappresentava un caso emblematico di obesità.\n\nI risultati, ordinati per BMI medio crescente, hanno evidenziato come solo le categorie con più di 5 pazienti fossero rilevanti ai fini dello studio. Questo approccio ha permesso di concentrare le risorse su interventi mirati, come programmi di educazione alimentare per i pazienti in sovrappeso o percorsi di supporto nutrizionale per chi rientrava nella fascia di sottopeso. L'archivio *pazienti*, con la sua ricchezza di informazioni, si è rivelato uno strumento indispensabile per guidare le decisioni cliniche e migliorare la qualità dell'assistenza."
+}

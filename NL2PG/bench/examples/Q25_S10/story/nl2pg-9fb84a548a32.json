@@ -1,0 +1,404 @@
+{
+  "schema_ddl": "CREATE TABLE operatori (\n    operatore_id INT PRIMARY KEY,\n    nome_operatore TEXT NOT NULL UNIQUE,\n    paese_sede TEXT NOT NULL,\n    data_fondazione DATE,\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE piani_tariffari (\n    piano_id INT PRIMARY KEY,\n    operatore_id INT NOT NULL REFERENCES operatori(operatore_id),\n    nome_piano TEXT NOT NULL,\n    prezzo_mensile NUMERIC(8,2) NOT NULL CHECK (prezzo_mensile >= 0),\n    giga_inclusi INT NOT NULL CHECK (giga_inclusi >= 0),\n    minuti_inclusi INT NOT NULL CHECK (minuti_inclusi >= 0),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE contratti (\n    contratto_id INT PRIMARY KEY,\n    piano_id INT NOT NULL REFERENCES piani_tariffari(piano_id),\n    numero_telefono TEXT NOT NULL UNIQUE,\n    data_attivazione DATE NOT NULL,\n    stato_contratto TEXT NOT NULL CHECK (stato_contratto IN ('attivo', 'sospeso', 'disattivato')),\n    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP\n);",
+  "data_profile": {
+    "profile": {
+      "operatori": {
+        "row_count": 41,
+        "columns": {
+          "operatore_id": {
+            "distinct": 41,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 41
+          },
+          "nome_operatore": {
+            "distinct": 41,
+            "sample": [
+              "Fastweb Mobile",
+              "Fastweb Mobile1",
+              "Fastweb Mobile2",
+              "Fastweb Mobile3",
+              "Fastweb Mobile4"
+            ]
+          },
+          "paese_sede": {
+            "distinct": 4,
+            "sample": [
+              "Francia",
+              "Germania",
+              "Italia",
+              "Spagna"
+            ]
+          },
+          "data_fondazione": {
+            "distinct": 39,
+            "sample": [
+              "1983-05-01",
+              "1983-12-17",
+              "1984-02-12",
+              "1984-04-22",
+              "1989-01-25"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "piani_tariffari": {
+        "row_count": 217,
+        "columns": {
+          "piano_id": {
+            "distinct": 217,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 217
+          },
+          "operatore_id": {
+            "distinct": 41,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 41
+          },
+          "nome_piano": {
+            "distinct": 14,
+            "sample": [
+              "Basic",
+              "Black Premium",
+              "Business",
+              "Family",
+              "Iliad 50"
+            ]
+          },
+          "prezzo_mensile": {
+            "distinct": 203,
+            "sample": [
+              "10.08",
+              "10.49",
+              "10.5",
+              "10.55",
+              "10.57"
+            ],
+            "min": 5.59,
+            "max": 62.39
+          },
+          "giga_inclusi": {
+            "distinct": 9,
+            "sample": [
+              "10",
+              "100",
+              "15",
+              "150",
+              "20"
+            ],
+            "min": 15,
+            "max": 500
+          },
+          "minuti_inclusi": {
+            "distinct": 7,
+            "sample": [
+              "100",
+              "1000",
+              "2000",
+              "300",
+              "50"
+            ],
+            "min": 50,
+            "max": 2000
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      },
+      "contratti": {
+        "row_count": 1857,
+        "columns": {
+          "contratto_id": {
+            "distinct": 1857,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "1000",
+              "1001"
+            ],
+            "min": 1,
+            "max": 1857
+          },
+          "piano_id": {
+            "distinct": 217,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 217
+          },
+          "numero_telefono": {
+            "distinct": 1857,
+            "sample": [
+              "+39 320 9876543",
+              "+39 320 98765431",
+              "+39 320 987654310",
+              "+39 320 9876543100",
+              "+39 320 9876543101"
+            ]
+          },
+          "data_attivazione": {
+            "distinct": 1022,
+            "sample": [
+              "2021-02-15",
+              "2021-02-18",
+              "2021-02-20",
+              "2021-02-21",
+              "2021-02-22"
+            ]
+          },
+          "stato_contratto": {
+            "distinct": 3,
+            "sample": [
+              "attivo",
+              "disattivato",
+              "sospeso"
+            ]
+          },
+          "created_at": {
+            "distinct": 1,
+            "sample": [
+              "2000-01-01"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "operatori": [
+        {
+          "operatore_id": 1,
+          "nome_operatore": "TIM",
+          "paese_sede": "Italia",
+          "data_fondazione": "1990-08-24",
+          "created_at": "2000-01-01"
+        },
+        {
+          "operatore_id": 2,
+          "nome_operatore": "TIM1",
+          "paese_sede": "Italia",
+          "data_fondazione": "1993-08-22",
+          "created_at": "2000-01-01"
+        },
+        {
+          "operatore_id": 3,
+          "nome_operatore": "TIM2",
+          "paese_sede": "Italia",
+          "data_fondazione": "1989-07-02",
+          "created_at": "2000-01-01"
+        },
+        {
+          "operatore_id": 4,
+          "nome_operatore": "TIM3",
+          "paese_sede": "Italia",
+          "data_fondazione": "1993-04-25",
+          "created_at": "2000-01-01"
+        },
+        {
+          "operatore_id": 5,
+          "nome_operatore": "TIM4",
+          "paese_sede": "Francia",
+          "data_fondazione": null,
+          "created_at": "2000-01-01"
+        },
+        {
+          "operatore_id": 6,
+          "nome_operatore": "TIM5",
+          "paese_sede": "Francia",
+          "data_fondazione": "1992-09-02",
+          "created_at": "2000-01-01"
+        },
+        {
+          "operatore_id": 7,
+          "nome_operatore": "Vodafone Italia",
+          "paese_sede": "Italia",
+          "data_fondazione": "1994-12-31",
+          "created_at": "2000-01-01"
+        },
+        {
+          "operatore_id": 8,
+          "nome_operatore": "Vodafone Italia1",
+          "paese_sede": "Spagna",
+          "data_fondazione": "1990-10-03",
+          "created_at": "2000-01-01"
+        }
+      ],
+      "piani_tariffari": [
+        {
+          "piano_id": 1,
+          "operatore_id": 14,
+          "nome_piano": "Basic",
+          "prezzo_mensile": 15.5,
+          "giga_inclusi": "100",
+          "minuti_inclusi": "1000",
+          "created_at": "2000-01-01"
+        },
+        {
+          "piano_id": 2,
+          "operatore_id": 21,
+          "nome_piano": "Family",
+          "prezzo_mensile": 10.7,
+          "giga_inclusi": "50",
+          "minuti_inclusi": "600",
+          "created_at": "2000-01-01"
+        },
+        {
+          "piano_id": 3,
+          "operatore_id": 32,
+          "nome_piano": "Premium",
+          "prezzo_mensile": 7.96,
+          "giga_inclusi": "200",
+          "minuti_inclusi": "1000",
+          "created_at": "2000-01-01"
+        },
+        {
+          "piano_id": 4,
+          "operatore_id": 11,
+          "nome_piano": "Unlimited",
+          "prezzo_mensile": 12.4,
+          "giga_inclusi": "50",
+          "minuti_inclusi": "1000",
+          "created_at": "2000-01-01"
+        },
+        {
+          "piano_id": 5,
+          "operatore_id": 16,
+          "nome_piano": "Young",
+          "prezzo_mensile": 14.67,
+          "giga_inclusi": "100",
+          "minuti_inclusi": "100",
+          "created_at": "2000-01-01"
+        },
+        {
+          "piano_id": 6,
+          "operatore_id": 22,
+          "nome_piano": "Young",
+          "prezzo_mensile": 14.73,
+          "giga_inclusi": "10",
+          "minuti_inclusi": "300",
+          "created_at": "2000-01-01"
+        },
+        {
+          "piano_id": 7,
+          "operatore_id": 3,
+          "nome_piano": "Unlimited",
+          "prezzo_mensile": 8.47,
+          "giga_inclusi": "100",
+          "minuti_inclusi": "1000",
+          "created_at": "2000-01-01"
+        },
+        {
+          "piano_id": 8,
+          "operatore_id": 19,
+          "nome_piano": "Smart",
+          "prezzo_mensile": 17.85,
+          "giga_inclusi": "500",
+          "minuti_inclusi": "1000",
+          "created_at": "2000-01-01"
+        }
+      ],
+      "contratti": [
+        {
+          "contratto_id": 1,
+          "piano_id": 136,
+          "numero_telefono": "+39 333 1234567",
+          "data_attivazione": "2022-12-15",
+          "stato_contratto": "attivo",
+          "created_at": "2000-01-01"
+        },
+        {
+          "contratto_id": 2,
+          "piano_id": 54,
+          "numero_telefono": "+39 333 12345671",
+          "data_attivazione": "2023-08-11",
+          "stato_contratto": "sospeso",
+          "created_at": "2000-01-01"
+        },
+        {
+          "contratto_id": 3,
+          "piano_id": 93,
+          "numero_telefono": "+39 333 12345672",
+          "data_attivazione": "2024-05-01",
+          "stato_contratto": "attivo",
+          "created_at": "2000-01-01"
+        },
+        {
+          "contratto_id": 4,
+          "piano_id": 147,
+          "numero_telefono": "+39 333 12345673",
+          "data_attivazione": "2023-03-14",
+          "stato_contratto": "disattivato",
+          "created_at": "2000-01-01"
+        },
+        {
+          "contratto_id": 5,
+          "piano_id": 116,
+          "numero_telefono": "+39 333 12345674",
+          "data_attivazione": "2023-11-03",
+          "stato_contratto": "attivo",
+          "created_at": "2000-01-01"
+        },
+        {
+          "contratto_id": 6,
+          "piano_id": 149,
+          "numero_telefono": "+39 333 12345675",
+          "data_attivazione": "2022-12-19",
+          "stato_contratto": "attivo",
+          "created_at": "2000-01-01"
+        },
+        {
+          "contratto_id": 7,
+          "piano_id": 202,
+          "numero_telefono": "+39 333 12345676",
+          "data_attivazione": "2023-12-19",
+          "stato_contratto": "attivo",
+          "created_at": "2000-01-01"
+        },
+        {
+          "contratto_id": 8,
+          "piano_id": 37,
+          "numero_telefono": "+39 333 12345677",
+          "data_attivazione": "2023-05-16",
+          "stato_contratto": "sospeso",
+          "created_at": "2000-01-01"
+        }
+      ]
+    }
+  },
+  "story": "Presso la direzione commerciale di un gruppo attivo nel settore della telefonia mobile, l'archivio denominato operatori custodisce le schede anagrafiche di ciascun gestore presente sul mercato: in ogni scheda sono riportati il nome commerciale, il paese in cui ha sede la struttura organizzativa e la data di fondazione dell'azienda, oltre a un codice interno attribuito al momento dell'inserimento. Accanto a questo archivio, il registro intitolato piani tariffari descrive l'offerta commerciale di ogni gestore: per ciascuna proposta sono annotate la denominazione del piano, il prezzo mensile richiesto al cliente, i giga inclusi nella navigazione e i minuti di conversazione disponibili. Completa il quadro il registro contratti, che traccia l'intera vita commerciale della rete: ogni voce riporta il numero di telefono attivato, la data di avvio del servizio e lo stato contrattuale, che può risultare attivo, sospeso oppure disattivato. In occasione della chiusura trimestrale, l'ufficio analisi commerciale ha condotto una verifica dedicata al segmento delle offerte economiche. Gli incaricati hanno predisposto la classifica dei primi 15 operatori che vantano contratti in stato attivo oppure sospeso, riferiti a piani tariffari con un canone mensile non superiore a 30 euro. Per ciascun gestore inserito in graduatoria sono stati evidenziati lo stato contrattuale dei rapporti, il numero complessivo di contratti e il prezzo medio del piano sottoscritto; l'elenco è stato quindi ordinato per numero di contratti in ordine decrescente, così da mettere in luce i gestori più dinamici sulle fasce di prezzo più accessibili. Il direttore di area ha chiesto inoltre di confrontare questi risultati con le date di fondazione degli operatori, per capire se i player più recenti stiano conquistando quote di mercato proprio grazie ai canoni più contenuti, e ha disposto che l'esito della verifica venga allegato al dossier presentato al comitato vendite."
+}

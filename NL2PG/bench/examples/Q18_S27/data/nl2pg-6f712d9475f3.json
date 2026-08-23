@@ -1,0 +1,400 @@
+{
+  "spec": {
+    "domain": "contabilità",
+    "n_tables": 4,
+    "hierarchy": "implicit_fk",
+    "sql_features": [
+      "lateral"
+    ],
+    "twist": [
+      "rename",
+      "synonym",
+      "jargon"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "fatture",
+        "obsolete_value": "documenti_di_vendita_emessi",
+        "description": "La tabella fisica 'fatture' (con colonne id, cliente_id, data_fattura, importo_totale) viene denominata 'documenti_di_vendita_emessi' nella prosa aziendale. Le relazioni implicite si deducono dalla colonna cliente_id compatibile con clienti.id, senza vincolo REFERENCES dichiarato."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "importo_totale",
+        "obsolete_value": "valore_complessivo_dovuto",
+        "description": "La colonna 'importo_totale' della tabella fatture è indicata nella prosa aziendale come 'valore_complessivo_dovuto'. Il solver deve riconoscere il sinonimo per aggregare correttamente gli importi nelle subquery LATERAL."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "pagamenti",
+        "obsolete_value": "prima_nota_incassi",
+        "description": "La tabella fisica 'pagamenti' (con colonne id, fattura_id, data_pagamento, importo) è riferita con il gergo contabile 'prima_nota_incassi'. La correlazione con le fatture avviene tramite la colonna fattura_id compatibile con fatture.id, senza chiave esterna dichiarata."
+      }
+    ],
+    "spec_hash": "6c4af032c0331563"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    denominazione TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    partita_iva TEXT UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT\n);\n\nCREATE TABLE fatture (\n    id INT PRIMARY KEY,\n    numero_fattura TEXT NOT NULL UNIQUE,\n    cliente_id INT NOT NULL,\n    data_fattura DATE NOT NULL,\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    stato_fattura TEXT NOT NULL DEFAULT 'emessa' CHECK (stato_fattura IN ('emessa', 'pagata', 'parzialmente_pagata', 'annullata'))\n);\n\nCREATE TABLE pagamenti (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL,\n    data_pagamento DATE NOT NULL,\n    importo NUMERIC(12,2) NOT NULL CHECK (importo > 0),\n    metodo_pagamento TEXT NOT NULL DEFAULT 'bonifico'\n);\n\nCREATE TABLE rate (\n    id INT PRIMARY KEY,\n    fattura_id INT NOT NULL,\n    numero_rata INT NOT NULL,\n    data_scadenza DATE NOT NULL,\n    importo_rata NUMERIC(12,2) NOT NULL CHECK (importo_rata >= 0),\n    rata_saldata BOOLEAN NOT NULL DEFAULT FALSE\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": 150,
+        "max_rows": 250,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "denominazione": "Rossi & Figli SRL",
+            "codice_fiscale": "RSSMRA80A01H501X",
+            "partita_iva": "01234567890",
+            "citta": "Roma",
+            "email": "info@rossiefigli.it"
+          },
+          {
+            "id": 2,
+            "denominazione": "Bianchi Distribuzione SpA",
+            "codice_fiscale": "BNCDST75T15F205Z",
+            "partita_iva": "09876543210",
+            "citta": "Milano",
+            "email": "amministrazione@bianchidistribuzione.it"
+          },
+          {
+            "id": 3,
+            "denominazione": "Verdi Arredamenti SNC",
+            "codice_fiscale": "VRDRDN82D44L219W",
+            "partita_iva": "11223344556",
+            "citta": "Torino",
+            "email": "contabilita@verdiarredamenti.it"
+          },
+          {
+            "id": 4,
+            "denominazione": "Esposito Food Group SRL",
+            "codice_fiscale": "SPSFNC79B29H501Q",
+            "partita_iva": "22334455667",
+            "citta": "Napoli",
+            "email": "fatturazione@espositofood.it"
+          },
+          {
+            "id": 5,
+            "denominazione": "Lombardi Tecnologie SpA",
+            "codice_fiscale": "LMBTLN85C10A662Y",
+            "partita_iva": "33445566778",
+            "citta": "Bologna",
+            "email": "admin@lombarditech.it"
+          },
+          {
+            "id": 6,
+            "denominazione": "Conti Cartotecnica SAS",
+            "codice_fiscale": "CNTCRT88E22D969K",
+            "partita_iva": "44556677889",
+            "citta": "Firenze",
+            "email": "ufficio@conticartotecnica.it"
+          },
+          {
+            "id": 7,
+            "denominazione": "Greco Costruzioni SpA",
+            "codice_fiscale": "GRCCSR91F05G472P",
+            "partita_iva": "55667788990",
+            "citta": "Genova",
+            "email": "segreteria@grecocostruzioni.it"
+          },
+          {
+            "id": 8,
+            "denominazione": "Ferretti Moda SRL",
+            "codice_fiscale": "FRTMTN93G18M352X",
+            "partita_iva": "66778899001",
+            "citta": "Venezia",
+            "email": "ordini@ferrettimoda.it"
+          }
+        ],
+        "variations": {
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Venezia"
+            ]
+          }
+        }
+      },
+      {
+        "table": "fatture",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1001,
+            "numero_fattura": "2026/0001",
+            "cliente_id": 1,
+            "data_fattura": "2026-01-10",
+            "importo_totale": 1250.0,
+            "stato_fattura": "pagata"
+          },
+          {
+            "id": 1002,
+            "numero_fattura": "2026/0002",
+            "cliente_id": 2,
+            "data_fattura": "2026-01-18",
+            "importo_totale": 3400.5,
+            "stato_fattura": "emessa"
+          },
+          {
+            "id": 1003,
+            "numero_fattura": "2026/0003",
+            "cliente_id": 3,
+            "data_fattura": "2026-02-05",
+            "importo_totale": 890.75,
+            "stato_fattura": "parzialmente_pagata"
+          },
+          {
+            "id": 1004,
+            "numero_fattura": "2026/0004",
+            "cliente_id": 4,
+            "data_fattura": "2026-02-20",
+            "importo_totale": 5600.0,
+            "stato_fattura": "pagata"
+          },
+          {
+            "id": 1005,
+            "numero_fattura": "2026/0005",
+            "cliente_id": 5,
+            "data_fattura": "2026-03-03",
+            "importo_totale": 210.4,
+            "stato_fattura": "annullata"
+          },
+          {
+            "id": 1006,
+            "numero_fattura": "2026/0006",
+            "cliente_id": 6,
+            "data_fattura": "2026-03-15",
+            "importo_totale": 1875.3,
+            "stato_fattura": "emessa"
+          }
+        ],
+        "variations": {
+          "data_fattura": {
+            "axis": "shift",
+            "delta_min": -60.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo_totale": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.3,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "stato_fattura": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "pagata",
+              "pagata",
+              "emessa",
+              "emessa",
+              "parzialmente_pagata",
+              "annullata"
+            ]
+          }
+        }
+      },
+      {
+        "table": "pagamenti",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 5001,
+            "fattura_id": 1001,
+            "data_pagamento": "2026-02-09",
+            "importo": 1250.0,
+            "metodo_pagamento": "bonifico"
+          },
+          {
+            "id": 5002,
+            "fattura_id": 1002,
+            "data_pagamento": "2026-02-17",
+            "importo": 1700.25,
+            "metodo_pagamento": "assegno"
+          },
+          {
+            "id": 5003,
+            "fattura_id": 1003,
+            "data_pagamento": "2026-02-28",
+            "importo": 400.0,
+            "metodo_pagamento": "rid"
+          },
+          {
+            "id": 5004,
+            "fattura_id": 1004,
+            "data_pagamento": "2026-03-21",
+            "importo": 2800.0,
+            "metodo_pagamento": "bonifico"
+          },
+          {
+            "id": 5005,
+            "fattura_id": 1005,
+            "data_pagamento": "2026-03-30",
+            "importo": 105.2,
+            "metodo_pagamento": "contanti"
+          }
+        ],
+        "variations": {
+          "data_pagamento": {
+            "axis": "shift",
+            "delta_min": -45.0,
+            "delta_max": 45.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "metodo_pagamento": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "bonifico",
+              "bonifico",
+              "bonifico",
+              "assegno",
+              "rid",
+              "contanti"
+            ]
+          }
+        }
+      },
+      {
+        "table": "rate",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 9001,
+            "fattura_id": 1001,
+            "numero_rata": 1,
+            "data_scadenza": "2026-02-10",
+            "importo_rata": 625.0,
+            "rata_saldata": true
+          },
+          {
+            "id": 9002,
+            "fattura_id": 1001,
+            "numero_rata": 2,
+            "data_scadenza": "2026-04-10",
+            "importo_rata": 625.0,
+            "rata_saldata": false
+          },
+          {
+            "id": 9003,
+            "fattura_id": 1002,
+            "numero_rata": 1,
+            "data_scadenza": "2026-03-18",
+            "importo_rata": 1700.25,
+            "rata_saldata": true
+          },
+          {
+            "id": 9004,
+            "fattura_id": 1003,
+            "numero_rata": 1,
+            "data_scadenza": "2026-03-07",
+            "importo_rata": 445.38,
+            "rata_saldata": false
+          },
+          {
+            "id": 9005,
+            "fattura_id": 1003,
+            "numero_rata": 2,
+            "data_scadenza": "2026-06-07",
+            "importo_rata": 445.37,
+            "rata_saldata": false
+          },
+          {
+            "id": 9006,
+            "fattura_id": 1004,
+            "numero_rata": 3,
+            "data_scadenza": "2026-05-20",
+            "importo_rata": 1866.67,
+            "rata_saldata": true
+          }
+        ],
+        "variations": {
+          "numero_rata": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": -30.0,
+            "delta_max": 60.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "importo_rata": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "rata_saldata": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "true",
+              "false",
+              "false"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

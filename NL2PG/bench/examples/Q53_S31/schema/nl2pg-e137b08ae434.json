@@ -1,0 +1,37 @@
+{
+  "spec": {
+    "domain": "vendite",
+    "n_tables": 5,
+    "hierarchy": "denormalized",
+    "sql_features": [
+      "ordered_set_agg"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "vendite_flat",
+        "obsolete_value": "registro_transazioni_commerciali",
+        "description": "La tabella piatta denormalizzata vendite_flat, che incorpora gli attributi ridondanti category_name e supplier_name, viene denominata registro_transazioni_commerciali nella prosa aziendale. Il solver deve mappare la perifrasi sulla tabella dei fatti denormalizzata su cui eseguire direttamente l'aggregato ordered-set."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "percentile_cont",
+        "obsolete_value": "soglia distributiva P90",
+        "description": "Il requisito di calcolare percentile_cont(0.9) WITHIN GROUP (ORDER BY importo) direttamente sulla tabella denormalizzata viene espresso nella prosa aziendale con il gergo 'soglia distributiva P90'. Il solver deve riconoscere che si tratta di un aggregato ordered-set con PERCENTILE_CONT e non di un semplice filtro o aggregazione standard."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "supplier_name",
+        "obsolete_value": "ragione_sociale_partner",
+        "description": "La colonna denormalizzata supplier_name, incorporata ridondantemente nella tabella vendite_flat, viene indicata nella prosa aziendale come 'ragione_sociale_partner'. Il solver deve risolvere il sinonimo per raggruppare o ordinare correttamente i percentile per fornitore senza join aggiuntivi."
+      }
+    ],
+    "spec_hash": "bea5c462385ab78c"
+  },
+  "schema_ddl": "CREATE TABLE categorie_prodotti (\n    id SERIAL PRIMARY KEY,\n    nome_categoria TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE fornitori (\n    id SERIAL PRIMARY KEY,\n    ragione_sociale TEXT NOT NULL UNIQUE,\n    paese TEXT NOT NULL DEFAULT 'Italia'\n);\n\nCREATE TABLE prodotti (\n    id SERIAL PRIMARY KEY,\n    categoria_id INT NOT NULL REFERENCES categorie_prodotti(id),\n    fornitore_id INT NOT NULL REFERENCES fornitori(id),\n    nome_prodotto TEXT NOT NULL,\n    prezzo_listino NUMERIC(10,2) NOT NULL CHECK (prezzo_listino >= 0)\n);\n\nCREATE TABLE punti_vendita (\n    id SERIAL PRIMARY KEY,\n    nome_negozio TEXT NOT NULL,\n    citta TEXT NOT NULL\n);\n\nCREATE TABLE vendite_flat (\n    id BIGINT PRIMARY KEY,\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    punto_vendita_id INT NOT NULL REFERENCES punti_vendita(id),\n    data_vendita DATE NOT NULL,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo NUMERIC(12,2) NOT NULL CHECK (importo >= 0),\n    nome_categoria TEXT NOT NULL,\n    nome_fornitore TEXT NOT NULL\n);"
+}

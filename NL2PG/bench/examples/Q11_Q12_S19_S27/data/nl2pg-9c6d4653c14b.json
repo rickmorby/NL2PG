@@ -1,0 +1,412 @@
+{
+  "spec": {
+    "domain": "telecomunicazioni",
+    "n_tables": 4,
+    "hierarchy": "one_to_many",
+    "sql_features": [
+      "subquery",
+      "correlated_subquery",
+      "scalar_agg"
+    ],
+    "twist": [
+      "rename",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "abbonamenti",
+        "obsolete_value": "linee_contrattuali",
+        "description": "La tabella abbonamenti, che contiene i piani attivati dai clienti presso ciascun gestore, viene denominata nella prosa aziendale come linee_contrattuali. Il modello deve risalire al nome fisico reale della tabella senza che la chiave esterna verso gestori sia dichiarata esplicitamente."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "minuti_consumati",
+        "obsolete_value": "traffico_vocale_erogato",
+        "description": "La colonna minuti_consumati della tabella traffico_voce viene indicata nei documenti aziendali con il sinonimo tecnico traffico_vocale_erogato. Le query di confronto tra sottoinsiemi disgiunti di abbonamenti devono aggregare scalare su questa colonna riconoscendo l'equivalenza semantica."
+      }
+    ],
+    "spec_hash": "d8762458c01d0567"
+  },
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    data_nascita DATE,\n    email TEXT UNIQUE\n);\n\nCREATE TABLE gestori (\n    id INT PRIMARY KEY,\n    nome_gestore TEXT NOT NULL UNIQUE,\n    partita_iva TEXT NOT NULL UNIQUE,\n    sede_legale TEXT\n);\n\nCREATE TABLE abbonamenti (\n    id INT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    gestore_id INT NOT NULL REFERENCES gestori(id),\n    numero_telefono TEXT NOT NULL UNIQUE,\n    piano_tariffario TEXT NOT NULL,\n    data_attivazione DATE NOT NULL,\n    stato TEXT NOT NULL CHECK (stato IN ('attivo', 'sospeso', 'disdetto'))\n);\n\nCREATE TABLE traffico_voce (\n    id INT PRIMARY KEY,\n    abbonamento_id INT NOT NULL REFERENCES abbonamenti(id),\n    data_chiamata DATE NOT NULL,\n    minuti_consumati NUMERIC(8,2) NOT NULL CHECK (minuti_consumati >= 0),\n    costo_chiamata NUMERIC(8,2) NOT NULL CHECK (costo_chiamata >= 0),\n    destinazione TEXT\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "clienti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "Marco",
+            "cognome": "Rossi",
+            "codice_fiscale": "RSSMRC80A01H501U",
+            "citta": "Roma",
+            "data_nascita": "1980-01-15",
+            "email": "marco.rossi@example.com"
+          },
+          {
+            "id": 2,
+            "nome": "Laura",
+            "cognome": "Bianchi",
+            "codice_fiscale": "BNCLRA85C42F205X",
+            "citta": "Milano",
+            "data_nascita": "1985-03-22",
+            "email": "laura.bianchi@example.com"
+          },
+          {
+            "id": 3,
+            "nome": "Giuseppe",
+            "cognome": "Verdi",
+            "codice_fiscale": "VRDGPP78D05L219Q",
+            "citta": "Torino",
+            "data_nascita": "1978-04-05",
+            "email": "giuseppe.verdi@example.com"
+          },
+          {
+            "id": 4,
+            "nome": "Matteo",
+            "cognome": "Conti",
+            "codice_fiscale": "CNTMTT92E22A662Y",
+            "citta": "Napoli",
+            "data_nascita": "1992-05-22",
+            "email": "matteo.conti@example.com"
+          },
+          {
+            "id": 5,
+            "nome": "Federica",
+            "cognome": "Gallo",
+            "codice_fiscale": "GLLFDR88G31D969W",
+            "citta": "Bologna",
+            "data_nascita": "1988-07-31",
+            "email": "federica.gallo@example.com"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Marco",
+              "Laura",
+              "Giulia",
+              "Alessandro",
+              "Francesca",
+              "Luca",
+              "Sara",
+              "Davide",
+              "Chiara",
+              "Andrea"
+            ]
+          },
+          "cognome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Rossi",
+              "Bianchi",
+              "Verdi",
+              "Ferrari",
+              "Russo",
+              "Esposito",
+              "Colombo",
+              "Romano",
+              "Ricci",
+              "Marino"
+            ]
+          },
+          "citta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Napoli",
+              "Bologna",
+              "Firenze",
+              "Genova",
+              "Bari",
+              "Palermo",
+              "Brescia"
+            ]
+          },
+          "data_nascita": {
+            "axis": "shift",
+            "delta_min": -2500.0,
+            "delta_max": 2500.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          }
+        }
+      },
+      {
+        "table": "gestori",
+        "nature": "lookup",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome_gestore": "TIM S.p.A.",
+            "partita_iva": "IT09739820586",
+            "sede_legale": "Roma"
+          },
+          {
+            "id": 2,
+            "nome_gestore": "Vodafone Italia S.p.A.",
+            "partita_iva": "IT04182180007",
+            "sede_legale": "Milano"
+          },
+          {
+            "id": 3,
+            "nome_gestore": "WindTre S.p.A.",
+            "partita_iva": "IT10669320962",
+            "sede_legale": "Milano"
+          },
+          {
+            "id": 4,
+            "nome_gestore": "Iliad Italia S.p.A.",
+            "partita_iva": "IT09796870964",
+            "sede_legale": "Milano"
+          },
+          {
+            "id": 5,
+            "nome_gestore": "Fastweb Mobile S.p.A.",
+            "partita_iva": "IT09125950017",
+            "sede_legale": "Milano"
+          },
+          {
+            "id": 6,
+            "nome_gestore": "PosteMobile S.p.A.",
+            "partita_iva": "IT09798700154",
+            "sede_legale": "Roma"
+          },
+          {
+            "id": 7,
+            "nome_gestore": "Kena Mobile S.r.l.",
+            "partita_iva": "IT08976543210",
+            "sede_legale": "Bologna"
+          },
+          {
+            "id": 8,
+            "nome_gestore": "Very Mobile S.r.l.",
+            "partita_iva": "IT09876543211",
+            "sede_legale": "Torino"
+          }
+        ],
+        "variations": {
+          "sede_legale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Roma",
+              "Milano",
+              "Torino",
+              "Bologna",
+              "Napoli"
+            ]
+          }
+        }
+      },
+      {
+        "table": "abbonamenti",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 101,
+            "cliente_id": 1,
+            "gestore_id": 1,
+            "numero_telefono": "+393401234567",
+            "piano_tariffario": "Premium",
+            "data_attivazione": "2023-01-15",
+            "stato": "attivo"
+          },
+          {
+            "id": 102,
+            "cliente_id": 2,
+            "gestore_id": 2,
+            "numero_telefono": "+393331234568",
+            "piano_tariffario": "Base",
+            "data_attivazione": "2023-03-22",
+            "stato": "attivo"
+          },
+          {
+            "id": 103,
+            "cliente_id": 3,
+            "gestore_id": 3,
+            "numero_telefono": "+393201234569",
+            "piano_tariffario": "Smart",
+            "data_attivazione": "2022-11-05",
+            "stato": "sospeso"
+          },
+          {
+            "id": 104,
+            "cliente_id": 4,
+            "gestore_id": 4,
+            "numero_telefono": "+393471234570",
+            "piano_tariffario": "Unlimited",
+            "data_attivazione": "2023-06-30",
+            "stato": "disdetto"
+          },
+          {
+            "id": 105,
+            "cliente_id": 5,
+            "gestore_id": 1,
+            "numero_telefono": "+393381234571",
+            "piano_tariffario": "Business",
+            "data_attivazione": "2022-08-18",
+            "stato": "attivo"
+          }
+        ],
+        "variations": {
+          "piano_tariffario": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Base",
+              "Smart",
+              "Premium",
+              "Unlimited",
+              "Business"
+            ]
+          },
+          "data_attivazione": {
+            "axis": "shift",
+            "delta_min": -180.0,
+            "delta_max": 180.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "attivo",
+              "attivo",
+              "attivo",
+              "sospeso",
+              "disdetto"
+            ]
+          }
+        }
+      },
+      {
+        "table": "traffico_voce",
+        "nature": "fact",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 3.0,
+        "templates": [
+          {
+            "id": 1001,
+            "abbonamento_id": 101,
+            "data_chiamata": "2024-06-10",
+            "minuti_consumati": 12.5,
+            "costo_chiamata": 3.63,
+            "destinazione": "mobile nazionale"
+          },
+          {
+            "id": 1002,
+            "abbonamento_id": 102,
+            "data_chiamata": "2024-06-11",
+            "minuti_consumati": 3.75,
+            "costo_chiamata": 0.38,
+            "destinazione": "fisso nazionale"
+          },
+          {
+            "id": 1003,
+            "abbonamento_id": 103,
+            "data_chiamata": "2024-06-12",
+            "minuti_consumati": 45.0,
+            "costo_chiamata": 22.5,
+            "destinazione": "estero UE"
+          },
+          {
+            "id": 1004,
+            "abbonamento_id": 104,
+            "data_chiamata": "2024-06-13",
+            "minuti_consumati": 8.2,
+            "costo_chiamata": 24.6,
+            "destinazione": "extra UE"
+          },
+          {
+            "id": 1005,
+            "abbonamento_id": 105,
+            "data_chiamata": "2024-06-14",
+            "minuti_consumati": 1.5,
+            "costo_chiamata": 0.44,
+            "destinazione": "numerazione speciale"
+          }
+        ],
+        "variations": {
+          "data_chiamata": {
+            "axis": "shift",
+            "delta_min": -150.0,
+            "delta_max": 150.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "minuti_consumati": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.2,
+            "factor_max": 3.0,
+            "pool": []
+          },
+          "costo_chiamata": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.5,
+            "pool": []
+          },
+          "destinazione": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "mobile nazionale",
+              "fisso nazionale",
+              "estero UE",
+              "extra UE",
+              "numerazione speciale"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

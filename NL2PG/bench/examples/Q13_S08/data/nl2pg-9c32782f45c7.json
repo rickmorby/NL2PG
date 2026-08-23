@@ -1,0 +1,401 @@
+{
+  "spec": {
+    "domain": "finanza",
+    "n_tables": 3,
+    "hierarchy": "isa",
+    "sql_features": [
+      "exists"
+    ],
+    "twist": [
+      "rename",
+      "jargon",
+      "synonym"
+    ],
+    "twist_rules": [
+      {
+        "twist_type": "rename",
+        "target_value": "strumenti_finanziari",
+        "obsolete_value": "prodotti_di_investimento",
+        "description": "La tabella base della gerarchia ISA, strumenti_finanziari, viene denominata prodotti_di_investimento nella prosa aziendale. Il solver deve riconoscere che la tabella generica che contiene l'entita' padre e le chiavi primarie e' strumenti_finanziari."
+      },
+      {
+        "twist_type": "jargon",
+        "target_value": "obbligazioni",
+        "obsolete_value": "titoli di debito a reddito fisso",
+        "description": "La tabella sottotipo obbligazioni, collegata a strumenti_finanziari tramite FK verso la chiave primaria della tabella base, viene indicata con il gergo finanziario 'titoli di debito a reddito fisso'. Le query con NOT EXISTS devono verificare l'assenza di corrispondenza proprio su questa tabella specializzata."
+      },
+      {
+        "twist_type": "synonym",
+        "target_value": "azioni",
+        "obsolete_value": "quote di partecipazione societaria",
+        "description": "La tabella sottotipo azioni, anch'essa collegata a strumenti_finanziari tramite FK verso la chiave primaria della tabella base, viene descritta come 'quote di partecipazione societaria'. Il solver deve mappare questo sinonimo alla tabella azioni quando ricompone la gerarchia ISA o filtra sul discriminatore."
+      }
+    ],
+    "spec_hash": "e16a551e0d83c41a"
+  },
+  "schema_ddl": "CREATE TABLE strumenti_finanziari (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    codice_isin TEXT NOT NULL UNIQUE,\n    emittente TEXT NOT NULL,\n    data_emissione DATE NOT NULL,\n    valore_nominale NUMERIC(14,2) NOT NULL CHECK (valore_nominale > 0),\n    valuta CHAR(3) NOT NULL,\n    stato TEXT NOT NULL DEFAULT 'attivo' CHECK (stato IN ('attivo', 'sospeso', 'delistato'))\n);\n\nCREATE TABLE obbligazioni (\n    id INT PRIMARY KEY REFERENCES strumenti_finanziari(id) ON DELETE CASCADE,\n    tasso_cedola NUMERIC(6,3) NOT NULL CHECK (tasso_cedola >= 0),\n    tipo_tasso TEXT NOT NULL CHECK (tipo_tasso IN ('fisso', 'variabile')),\n    data_scadenza DATE NOT NULL,\n    rating TEXT CHECK (rating IN ('AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'CCC', 'D'))\n);\n\nCREATE TABLE azioni (\n    id INT PRIMARY KEY REFERENCES strumenti_finanziari(id) ON DELETE CASCADE,\n    ticker TEXT NOT NULL UNIQUE,\n    quantita_azioni_emesse BIGINT NOT NULL CHECK (quantita_azioni_emesse > 0),\n    dividendo_per_azione NUMERIC(10,4) NOT NULL DEFAULT 0 CHECK (dividendo_per_azione >= 0),\n    settore TEXT NOT NULL\n);",
+  "data_spec": {
+    "tables": [
+      {
+        "table": "strumenti_finanziari",
+        "nature": "dimension",
+        "min_rows": 300,
+        "max_rows": 500,
+        "per_parent_rows": null,
+        "templates": [
+          {
+            "id": 1,
+            "nome": "BTP Italia 2035",
+            "codice_isin": "IT0005239360",
+            "emittente": "Repubblica Italiana",
+            "data_emissione": "2025-03-15",
+            "valore_nominale": 1000.0,
+            "valuta": "EUR",
+            "stato": "attivo"
+          },
+          {
+            "id": 2,
+            "nome": "Azione Ordinaria Enel",
+            "codice_isin": "IT0003128367",
+            "emittente": "Enel SpA",
+            "data_emissione": "2018-06-20",
+            "valore_nominale": 1.0,
+            "valuta": "EUR",
+            "stato": "attivo"
+          },
+          {
+            "id": 3,
+            "nome": "Corporate Bond Telecom 2032",
+            "codice_isin": "IT0005345678",
+            "emittente": "Telecom Italia SpA",
+            "data_emissione": "2022-09-10",
+            "valore_nominale": 1000.0,
+            "valuta": "EUR",
+            "stato": "sospeso"
+          },
+          {
+            "id": 4,
+            "nome": "Azione Ordinaria Ferrari",
+            "codice_isin": "NL0011585146",
+            "emittente": "Ferrari NV",
+            "data_emissione": "2015-10-05",
+            "valore_nominale": 0.5,
+            "valuta": "EUR",
+            "stato": "attivo"
+          },
+          {
+            "id": 5,
+            "nome": "US Treasury Note 2030",
+            "codice_isin": "US912828YT56",
+            "emittente": "US Department of the Treasury",
+            "data_emissione": "2020-01-31",
+            "valore_nominale": 100.0,
+            "valuta": "USD",
+            "stato": "attivo"
+          },
+          {
+            "id": 6,
+            "nome": "Azione Ordinaria Apple",
+            "codice_isin": "US0378331005",
+            "emittente": "Apple Inc",
+            "data_emissione": "1980-12-12",
+            "valore_nominale": 0.01,
+            "valuta": "USD",
+            "stato": "attivo"
+          },
+          {
+            "id": 7,
+            "nome": "Eurobond Eni 2027",
+            "codice_isin": "XS2345678901",
+            "emittente": "Eni SpA",
+            "data_emissione": "2021-04-22",
+            "valore_nominale": 1000.0,
+            "valuta": "EUR",
+            "stato": "delistato"
+          }
+        ],
+        "variations": {
+          "nome": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "BTP Italia 2035",
+              "Corporate Bond Eni 2030",
+              "Azione Ordinaria Intesa",
+              "Azione Ordinaria Generali",
+              "Green Bond Enel 2033",
+              "Azione Ordinaria Stellantis",
+              "Obbligazione UniCredit 2029",
+              "Azione Ordinaria Luxottica",
+              "Buono Ordinario del Tesoro",
+              "Azione Ordinaria Eni"
+            ]
+          },
+          "emittente": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Repubblica Italiana",
+              "Enel SpA",
+              "Eni SpA",
+              "Intesa Sanpaolo SpA",
+              "Generali SpA",
+              "Telecom Italia SpA",
+              "Ferrari NV",
+              "Apple Inc",
+              "Stellantis NV",
+              "UniCredit SpA"
+            ]
+          },
+          "data_emissione": {
+            "axis": "shift",
+            "delta_min": -1825.0,
+            "delta_max": 0.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "valore_nominale": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "100.00",
+              "1000.00",
+              "1.00",
+              "5.00",
+              "0.50",
+              "0.01"
+            ]
+          },
+          "valuta": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "EUR",
+              "EUR",
+              "EUR",
+              "EUR",
+              "USD",
+              "GBP",
+              "CHF"
+            ]
+          },
+          "stato": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "attivo",
+              "attivo",
+              "attivo",
+              "attivo",
+              "sospeso",
+              "delistato"
+            ]
+          }
+        }
+      },
+      {
+        "table": "obbligazioni",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.45,
+        "templates": [
+          {
+            "id": 1,
+            "tasso_cedola": 3.25,
+            "tipo_tasso": "fisso",
+            "data_scadenza": "2035-03-15",
+            "rating": "A"
+          },
+          {
+            "id": 3,
+            "tasso_cedola": 1.75,
+            "tipo_tasso": "variabile",
+            "data_scadenza": "2032-09-10",
+            "rating": "BBB"
+          },
+          {
+            "id": 5,
+            "tasso_cedola": 2.125,
+            "tipo_tasso": "fisso",
+            "data_scadenza": "2030-01-31",
+            "rating": "AA"
+          },
+          {
+            "id": 7,
+            "tasso_cedola": 4.5,
+            "tipo_tasso": "variabile",
+            "data_scadenza": "2027-04-22",
+            "rating": "BB"
+          },
+          {
+            "id": 11,
+            "tasso_cedola": 0.0,
+            "tipo_tasso": "fisso",
+            "data_scadenza": "2029-06-30",
+            "rating": "BBB"
+          },
+          {
+            "id": 13,
+            "tasso_cedola": 6.875,
+            "tipo_tasso": "variabile",
+            "data_scadenza": "2033-11-15",
+            "rating": "B"
+          }
+        ],
+        "variations": {
+          "tasso_cedola": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "tipo_tasso": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "fisso",
+              "fisso",
+              "variabile"
+            ]
+          },
+          "data_scadenza": {
+            "axis": "shift",
+            "delta_min": 0.0,
+            "delta_max": 1095.0,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": []
+          },
+          "rating": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "AAA",
+              "AA",
+              "A",
+              "A",
+              "BBB",
+              "BBB",
+              "BB",
+              "B",
+              "CCC"
+            ]
+          }
+        }
+      },
+      {
+        "table": "azioni",
+        "nature": "dimension",
+        "min_rows": null,
+        "max_rows": null,
+        "per_parent_rows": 0.5,
+        "templates": [
+          {
+            "id": 2,
+            "ticker": "ENEL",
+            "quantita_azioni_emesse": 10000000000,
+            "dividendo_per_azione": 0.43,
+            "settore": "Energia"
+          },
+          {
+            "id": 4,
+            "ticker": "RACE",
+            "quantita_azioni_emesse": 178000000,
+            "dividendo_per_azione": 2.1,
+            "settore": "Lusso"
+          },
+          {
+            "id": 6,
+            "ticker": "AAPL",
+            "quantita_azioni_emesse": 15200000000,
+            "dividendo_per_azione": 0.96,
+            "settore": "Tecnologia"
+          },
+          {
+            "id": 9,
+            "ticker": "ISP",
+            "quantita_azioni_emesse": 14100000000,
+            "dividendo_per_azione": 0.0,
+            "settore": "Finanza"
+          },
+          {
+            "id": 12,
+            "ticker": "ENI",
+            "quantita_azioni_emesse": 3240000000,
+            "dividendo_per_azione": 0.94,
+            "settore": "Petrolio e Gas"
+          },
+          {
+            "id": 14,
+            "ticker": "LDO",
+            "quantita_azioni_emesse": 262000000,
+            "dividendo_per_azione": 1.15,
+            "settore": "Lusso"
+          }
+        ],
+        "variations": {
+          "quantita_azioni_emesse": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "dividendo_per_azione": {
+            "axis": "scale",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": 0.5,
+            "factor_max": 2.0,
+            "pool": []
+          },
+          "settore": {
+            "axis": "pool",
+            "delta_min": null,
+            "delta_max": null,
+            "factor_min": null,
+            "factor_max": null,
+            "pool": [
+              "Tecnologia",
+              "Energia",
+              "Finanza",
+              "Salute",
+              "Lusso",
+              "Petrolio e Gas",
+              "Telecomunicazioni",
+              "Retail",
+              "Automotive",
+              "Industria"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

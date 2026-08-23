@@ -1,0 +1,413 @@
+{
+  "schema_ddl": "CREATE TYPE dato_prezzo AS (\n    valore NUMERIC(18,6),\n    valuta TEXT\n);\n\nCREATE TABLE conti (\n    id INT PRIMARY KEY,\n    numero_conto TEXT NOT NULL UNIQUE,\n    intestatario TEXT NOT NULL,\n    divisa_conto TEXT NOT NULL DEFAULT 'EUR',\n    saldo_disponibile NUMERIC(16,2) NOT NULL DEFAULT 0 CHECK (saldo_disponibile >= 0),\n    data_apertura DATE NOT NULL\n);\n\nCREATE TABLE strumenti_finanziari (\n    id INT PRIMARY KEY,\n    codice_isin TEXT NOT NULL UNIQUE,\n    denominazione TEXT NOT NULL,\n    emittente TEXT NOT NULL,\n    mercato_quotazione TEXT NOT NULL\n);\n\nCREATE TABLE transazioni (\n    id INT PRIMARY KEY,\n    conto_id INT NOT NULL REFERENCES conti(id),\n    strumento_id INT NOT NULL REFERENCES strumenti_finanziari(id),\n    tipo_operazione TEXT NOT NULL CHECK (tipo_operazione IN ('acquisto', 'vendita')),\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_esecuzione dato_prezzo NOT NULL,\n    istante_esecuzione TIMESTAMP NOT NULL,\n    CHECK ((prezzo_esecuzione).valore >= 0),\n    CHECK ((prezzo_esecuzione).valuta IS NOT NULL AND char_length((prezzo_esecuzione).valuta) = 3)\n);",
+  "data_profile": {
+    "profile": {
+      "conti": {
+        "row_count": 160,
+        "columns": {
+          "id": {
+            "distinct": 160,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 160
+          },
+          "numero_conto": {
+            "distinct": 160,
+            "sample": [
+              "IT60X0542811101000000123456",
+              "IT60X05428111010000001234561",
+              "IT60X054281110100000012345610",
+              "IT60X054281110100000012345611",
+              "IT60X054281110100000012345612"
+            ]
+          },
+          "intestatario": {
+            "distinct": 10,
+            "sample": [
+              "Alessandro Neri",
+              "Chiara Gallo",
+              "Davide Rinaldi",
+              "Elena Fontana",
+              "Fabio Marino"
+            ]
+          },
+          "divisa_conto": {
+            "distinct": 4,
+            "sample": [
+              "CHF",
+              "EUR",
+              "GBP",
+              "USD"
+            ]
+          },
+          "saldo_disponibile": {
+            "distinct": 160,
+            "sample": [
+              "10007.68",
+              "10037.57",
+              "10058.89",
+              "10136.75",
+              "1035.18"
+            ],
+            "min": 314.58,
+            "max": 218671.75
+          },
+          "data_apertura": {
+            "distinct": 152,
+            "sample": [
+              "2018-09-24",
+              "2018-10-20",
+              "2018-10-22",
+              "2018-10-28",
+              "2018-11-06"
+            ]
+          }
+        }
+      },
+      "strumenti_finanziari": {
+        "row_count": 43,
+        "columns": {
+          "id": {
+            "distinct": 43,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 43
+          },
+          "codice_isin": {
+            "distinct": 43,
+            "sample": [
+              "DE0007236101",
+              "DE00072361011",
+              "DE00072361012",
+              "DE00072361013",
+              "DE00072361014"
+            ]
+          },
+          "denominazione": {
+            "distinct": 6,
+            "sample": [
+              "ASML Holding",
+              "Apple Inc.",
+              "Enel SpA",
+              "Intesa Sanpaolo",
+              "Siemens AG"
+            ]
+          },
+          "emittente": {
+            "distinct": 6,
+            "sample": [
+              "ASML Holding N.V.",
+              "Apple Inc.",
+              "Enel S.p.A.",
+              "Intesa Sanpaolo S.p.A.",
+              "Siemens AG"
+            ]
+          },
+          "mercato_quotazione": {
+            "distinct": 7,
+            "sample": [
+              "Borsa Italiana",
+              "Euronext Amsterdam",
+              "Euronext Paris",
+              "LSE",
+              "NASDAQ"
+            ]
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 2483,
+        "columns": {
+          "id": {
+            "distinct": 2483,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 3483
+          },
+          "conto_id": {
+            "distinct": 160,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 160
+          },
+          "strumento_id": {
+            "distinct": 43,
+            "sample": [
+              "1",
+              "10",
+              "11",
+              "12",
+              "13"
+            ],
+            "min": 1,
+            "max": 43
+          },
+          "tipo_operazione": {
+            "distinct": 2,
+            "sample": [
+              "acquisto",
+              "vendita"
+            ]
+          },
+          "quantita": {
+            "distinct": 10,
+            "sample": [
+              "10",
+              "100",
+              "150",
+              "200",
+              "25"
+            ],
+            "min": 10,
+            "max": 500
+          },
+          "prezzo_esecuzione": {
+            "distinct": 8,
+            "sample": [
+              "ROW(178.95, 'EUR')",
+              "ROW(192.15, 'USD')",
+              "ROW(228.40, 'USD')",
+              "ROW(24.60, 'EUR')",
+              "ROW(4.12, 'EUR')"
+            ]
+          },
+          "istante_esecuzione": {
+            "distinct": 543,
+            "sample": [
+              "2025-11-28 09:35:00",
+              "2025-11-29 09:35:00",
+              "2025-11-30 09:35:00",
+              "2025-12-01 09:35:00",
+              "2025-12-01 16:20:00"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "conti": [
+        {
+          "id": 1,
+          "numero_conto": "IT60X0542811101000000123456",
+          "intestatario": "Mario Rossi",
+          "divisa_conto": "EUR",
+          "saldo_disponibile": 36860.74,
+          "data_apertura": "2019-02-04"
+        },
+        {
+          "id": 2,
+          "numero_conto": "IT60X05428111010000001234561",
+          "intestatario": "Sara Conti",
+          "divisa_conto": "EUR",
+          "saldo_disponibile": 29171.41,
+          "data_apertura": "2019-04-18"
+        },
+        {
+          "id": 3,
+          "numero_conto": "IT60X05428111010000001234562",
+          "intestatario": "Sara Conti",
+          "divisa_conto": "EUR",
+          "saldo_disponibile": 14895.41,
+          "data_apertura": "2018-12-01"
+        },
+        {
+          "id": 4,
+          "numero_conto": "IT60X05428111010000001234563",
+          "intestatario": "Elena Fontana",
+          "divisa_conto": "EUR",
+          "saldo_disponibile": 17696.43,
+          "data_apertura": "2019-01-03"
+        },
+        {
+          "id": 5,
+          "numero_conto": "IT60X05428111010000001234564",
+          "intestatario": "Davide Rinaldi",
+          "divisa_conto": "USD",
+          "saldo_disponibile": 12885.09,
+          "data_apertura": "2019-02-25"
+        },
+        {
+          "id": 6,
+          "numero_conto": "IT60X05428111010000001234565",
+          "intestatario": "Mario Rossi",
+          "divisa_conto": "GBP",
+          "saldo_disponibile": 14375.61,
+          "data_apertura": "2018-12-31"
+        },
+        {
+          "id": 7,
+          "numero_conto": "IT60X05428111010000001234566",
+          "intestatario": "Davide Rinaldi",
+          "divisa_conto": "USD",
+          "saldo_disponibile": 38027.57,
+          "data_apertura": "2018-12-31"
+        },
+        {
+          "id": 8,
+          "numero_conto": "IT60X05428111010000001234567",
+          "intestatario": "Chiara Gallo",
+          "divisa_conto": "EUR",
+          "saldo_disponibile": 18177.56,
+          "data_apertura": "2018-12-19"
+        }
+      ],
+      "strumenti_finanziari": [
+        {
+          "id": 1,
+          "codice_isin": "IT0003128367",
+          "denominazione": "Enel SpA",
+          "emittente": "Enel S.p.A.",
+          "mercato_quotazione": "Euronext Amsterdam"
+        },
+        {
+          "id": 2,
+          "codice_isin": "IT00031283671",
+          "denominazione": "Enel SpA",
+          "emittente": "Enel S.p.A.",
+          "mercato_quotazione": "LSE"
+        },
+        {
+          "id": 3,
+          "codice_isin": "IT00031283672",
+          "denominazione": "Enel SpA",
+          "emittente": "Enel S.p.A.",
+          "mercato_quotazione": "LSE"
+        },
+        {
+          "id": 4,
+          "codice_isin": "IT00031283673",
+          "denominazione": "Enel SpA",
+          "emittente": "Enel S.p.A.",
+          "mercato_quotazione": "Borsa Italiana"
+        },
+        {
+          "id": 5,
+          "codice_isin": "IT00031283674",
+          "denominazione": "Enel SpA",
+          "emittente": "Enel S.p.A.",
+          "mercato_quotazione": "Euronext Amsterdam"
+        },
+        {
+          "id": 6,
+          "codice_isin": "IT00031283675",
+          "denominazione": "Enel SpA",
+          "emittente": "Enel S.p.A.",
+          "mercato_quotazione": "LSE"
+        },
+        {
+          "id": 7,
+          "codice_isin": "IT00031283676",
+          "denominazione": "Enel SpA",
+          "emittente": "Enel S.p.A.",
+          "mercato_quotazione": "Borsa Italiana"
+        },
+        {
+          "id": 8,
+          "codice_isin": "IT00031283677",
+          "denominazione": "Enel SpA",
+          "emittente": "Enel S.p.A.",
+          "mercato_quotazione": "Borsa Italiana"
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 1001,
+          "conto_id": 144,
+          "strumento_id": 24,
+          "tipo_operazione": "vendita",
+          "quantita": "50",
+          "prezzo_esecuzione": "ROW(6.85, 'EUR')",
+          "istante_esecuzione": "2026-02-08 09:35:00"
+        },
+        {
+          "id": 1002,
+          "conto_id": 145,
+          "strumento_id": 9,
+          "tipo_operazione": "acquisto",
+          "quantita": "200",
+          "prezzo_esecuzione": "ROW(228.40, 'USD')",
+          "istante_esecuzione": "2025-12-06 09:35:00"
+        },
+        {
+          "id": 1003,
+          "conto_id": 52,
+          "strumento_id": 23,
+          "tipo_operazione": "acquisto",
+          "quantita": 150,
+          "prezzo_esecuzione": "ROW(6.85, 'EUR')",
+          "istante_esecuzione": "2026-01-12 09:35:00"
+        },
+        {
+          "id": 1004,
+          "conto_id": 146,
+          "strumento_id": 41,
+          "tipo_operazione": "acquisto",
+          "quantita": "5",
+          "prezzo_esecuzione": "ROW(178.95, 'EUR')",
+          "istante_esecuzione": "2025-12-22 09:35:00"
+        },
+        {
+          "id": 1005,
+          "conto_id": 64,
+          "strumento_id": 36,
+          "tipo_operazione": "acquisto",
+          "quantita": "10",
+          "prezzo_esecuzione": "ROW(228.40, 'USD')",
+          "istante_esecuzione": "2025-12-23 09:35:00"
+        },
+        {
+          "id": 1006,
+          "conto_id": 132,
+          "strumento_id": 16,
+          "tipo_operazione": "acquisto",
+          "quantita": "500",
+          "prezzo_esecuzione": "ROW(4.12, 'EUR')",
+          "istante_esecuzione": "2025-12-13 09:35:00"
+        },
+        {
+          "id": 1007,
+          "conto_id": 1,
+          "strumento_id": 41,
+          "tipo_operazione": "acquisto",
+          "quantita": "500",
+          "prezzo_esecuzione": "ROW(4.12, 'EUR')",
+          "istante_esecuzione": "2026-02-19 09:35:00"
+        },
+        {
+          "id": 1008,
+          "conto_id": 62,
+          "strumento_id": 40,
+          "tipo_operazione": "vendita",
+          "quantita": "500",
+          "prezzo_esecuzione": "ROW(58.75, 'EUR')",
+          "istante_esecuzione": "2025-12-09 09:35:00"
+        }
+      ]
+    }
+  },
+  "story": "Presso la Direzione Operativa di una società di intermediazione con sede a Milano, il libro mastro denominato conti custodisce le schede di tutti i rapporti di conto aperti dalla clientela: in ciascuna scheda figurano il numero di conto in formato internazionale, l'intestatario — tra cui compaiono nomi come Mario Rossi, Sara Conti, Elena Fontana e Davide Rinaldi — la divisa di conto, che può essere EUR, USD, GBP o CHF, il saldo disponibile, sempre mantenuto non negativo, e la data di apertura del rapporto, con prime attivazioni risalenti al 2018-09-24. Accanto ad esso, l'archivio strumenti_finanziari cataloga i titoli negoziabili: ogni voce riporta il codice ISIN, la denominazione — Enel SpA, Apple Inc., Intesa Sanpaolo, Siemens AG o ASML Holding — l'emittente e il mercato di quotazione, che spazia dalla Borsa Italiana a Euronext Amsterdam, Euronext Paris, LSE e NASDAQ. Le operazioni di acquisto e vendita confluiscono invece nel registro_operativita, dove ogni movimento indica il conto di riferimento, lo strumento trattato, la natura dell'operazione — acquisto o vendita — la quantità scambiata, sempre superiore a zero, il controvalore di esecuzione, espresso in una dicitura che unisce importo e valuta di tre lettere, e l'istante in cui l'ordine è stato eseguito, come accaduto il 2025-12-06 alle 09:35 per un acquisto di 200 quote a 228,40 USD. In occasione della verifica trimestrale, il team di analisi ha svolto un controllo mirato: per ciascuno strumento finanziario, identificato dal proprio codice ISIN, gli analisti hanno estratto denominazione, emittente e mercato di quotazione, per poi conteggiare gli acquisti eseguiti esattamente al controvalore di esecuzione di 178,95 EUR — pari a 178.95 nella notazione dei listini internazionali. Il confronto è stato condotto sull'intera coppia importo-valuta, così da isolare soltanto le esecuzioni perfezionate in euro a quel prezzo preciso, escludendo eventuali corrispondenze in altre divise. Per ogni titolo sono stati determinati il numero di acquisti, la quantità totale accumulata e il controvalore complessivo delle operazioni, disponendo infine l'elenco in ordine decrescente di controvalore, dal più elevato al più contenuto, per mettere in evidenza i titoli con la maggiore concentrazione di spesa."
+}

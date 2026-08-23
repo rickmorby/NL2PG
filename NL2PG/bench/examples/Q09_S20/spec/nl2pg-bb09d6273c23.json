@@ -1,0 +1,12 @@
+{
+  "domain": "vendite",
+  "n_tables": 4,
+  "hierarchy": "star_schema",
+  "sql_features": [
+    "group_agg",
+    "having"
+  ],
+  "twist": [],
+  "twist_rules": [],
+  "spec_hash": "4465c335286da1c1"
+}

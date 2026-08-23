@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "domain": "università",
+    "n_tables": 2,
+    "hierarchy": "one_to_one",
+    "sql_features": [
+      "left_outer_join"
+    ],
+    "twist": [],
+    "twist_rules": [],
+    "spec_hash": "044660bb0326bac2"
+  },
+  "schema_ddl": "CREATE TABLE persone (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    email TEXT UNIQUE,\n    data_nascita DATE NOT NULL\n);\n\nCREATE TABLE studenti (\n    id INT PRIMARY KEY REFERENCES persone(id),\n    matricola TEXT NOT NULL UNIQUE,\n    corso_di_laurea TEXT NOT NULL,\n    anno_corso INT NOT NULL CHECK (anno_corso BETWEEN 1 AND 6),\n    data_immatricolazione DATE NOT NULL,\n    CHECK (data_immatricolazione >= '1950-01-01')\n);"
+}

@@ -1,0 +1,480 @@
+{
+  "schema_ddl": "CREATE TABLE clienti (\n    id INT PRIMARY KEY,\n    nome TEXT NOT NULL,\n    cognome TEXT NOT NULL,\n    codice_fiscale TEXT NOT NULL UNIQUE,\n    citta TEXT NOT NULL,\n    email TEXT UNIQUE,\n    data_registrazione DATE NOT NULL\n);\n\nCREATE TABLE prodotti (\n    id INT PRIMARY KEY,\n    nome_prodotto TEXT NOT NULL,\n    categoria TEXT NOT NULL,\n    prezzo_listino NUMERIC(10,2) NOT NULL CHECK (prezzo_listino >= 0),\n    giacenza_magazzino INT NOT NULL DEFAULT 0 CHECK (giacenza_magazzino >= 0)\n);\n\nCREATE TABLE transazioni (\n    id BIGINT PRIMARY KEY,\n    cliente_id INT NOT NULL REFERENCES clienti(id),\n    prodotto_id INT NOT NULL REFERENCES prodotti(id),\n    data_transazione DATE NOT NULL,\n    data_consegna DATE,\n    quantita INT NOT NULL CHECK (quantita > 0),\n    prezzo_unitario NUMERIC(10,2) NOT NULL CHECK (prezzo_unitario >= 0),\n    importo_totale NUMERIC(12,2) NOT NULL CHECK (importo_totale >= 0),\n    canale_vendita TEXT NOT NULL DEFAULT 'negozio',\n    CHECK (data_consegna IS NULL OR data_consegna >= data_transazione)\n);",
+  "data_profile": {
+    "profile": {
+      "clienti": {
+        "row_count": 605,
+        "columns": {
+          "id": {
+            "distinct": 605,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 605
+          },
+          "nome": {
+            "distinct": 5,
+            "sample": [
+              "Alessandro",
+              "Chiara",
+              "Giulia",
+              "Laura",
+              "Mario"
+            ]
+          },
+          "cognome": {
+            "distinct": 5,
+            "sample": [
+              "Bianchi",
+              "Ferrari",
+              "Rossi",
+              "Russo",
+              "Verdi"
+            ]
+          },
+          "codice_fiscale": {
+            "distinct": 605,
+            "sample": [
+              "BNCLRA90A45F205B",
+              "BNCLRA90A45F205C",
+              "BNCLRA90A45F205D",
+              "BNCLRA90A45F205E",
+              "BNCLRA90A45F205F"
+            ]
+          },
+          "citta": {
+            "distinct": 6,
+            "sample": [
+              "Bologna",
+              "Firenze",
+              "Milano",
+              "Napoli",
+              "Roma"
+            ]
+          },
+          "email": {
+            "distinct": 571,
+            "sample": [
+              "alessandro.ferrari100@example.com",
+              "alessandro.ferrari102@example.com",
+              "alessandro.ferrari103@example.com",
+              "alessandro.ferrari104@example.com",
+              "alessandro.ferrari105@example.com"
+            ]
+          },
+          "data_registrazione": {
+            "distinct": 379,
+            "sample": [
+              "2023-07-22",
+              "2023-07-23",
+              "2023-07-30",
+              "2023-08-03",
+              "2023-08-10"
+            ]
+          }
+        }
+      },
+      "prodotti": {
+        "row_count": 116,
+        "columns": {
+          "id": {
+            "distinct": 116,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 116
+          },
+          "nome_prodotto": {
+            "distinct": 6,
+            "sample": [
+              "Cuffie Bluetooth ANC",
+              "Laptop Pro 14",
+              "Monitor 27 4K",
+              "Mouse Wireless MX",
+              "Smartphone X5"
+            ]
+          },
+          "categoria": {
+            "distinct": 5,
+            "sample": [
+              "Accessori",
+              "Audio",
+              "Elettrodomestici",
+              "Informatica",
+              "Telefonia"
+            ]
+          },
+          "prezzo_listino": {
+            "distinct": 115,
+            "sample": [
+              "100.74",
+              "1016.94",
+              "102.55",
+              "104.65",
+              "105.08"
+            ],
+            "min": 22.45,
+            "max": 1661.06
+          },
+          "giacenza_magazzino": {
+            "distinct": 115,
+            "sample": [
+              "101.08",
+              "101.48",
+              "102.32",
+              "105.62",
+              "106.33"
+            ],
+            "min": 22.97,
+            "max": 631.78
+          }
+        }
+      },
+      "transazioni": {
+        "row_count": 1931,
+        "columns": {
+          "id": {
+            "distinct": 1931,
+            "sample": [
+              "1001",
+              "1002",
+              "1003",
+              "1004",
+              "1005"
+            ],
+            "min": 1001,
+            "max": 2931
+          },
+          "cliente_id": {
+            "distinct": 581,
+            "sample": [
+              "1",
+              "10",
+              "101",
+              "102",
+              "103"
+            ],
+            "min": 1,
+            "max": 605
+          },
+          "prodotto_id": {
+            "distinct": 116,
+            "sample": [
+              "1",
+              "10",
+              "100",
+              "101",
+              "102"
+            ],
+            "min": 1,
+            "max": 116
+          },
+          "data_transazione": {
+            "distinct": 343,
+            "sample": [
+              "2024-07-14",
+              "2024-07-15",
+              "2024-07-16",
+              "2024-07-17",
+              "2024-07-18"
+            ]
+          },
+          "data_consegna": {
+            "distinct": 115,
+            "sample": [
+              "2025-01-14",
+              "2025-01-15",
+              "2025-01-16",
+              "2025-01-17",
+              "2025-01-18"
+            ]
+          },
+          "quantita": {
+            "distinct": 5,
+            "sample": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "min": 1,
+            "max": 3
+          },
+          "prezzo_unitario": {
+            "distinct": 1782,
+            "sample": [
+              "100.01",
+              "100.18",
+              "100.27",
+              "100.28",
+              "100.41"
+            ],
+            "min": 23.92,
+            "max": 1558.8
+          },
+          "importo_totale": {
+            "distinct": 1801,
+            "sample": [
+              "100.04",
+              "100.21",
+              "100.27",
+              "100.35",
+              "100.41"
+            ],
+            "min": 71.76,
+            "max": 1677.6
+          },
+          "canale_vendita": {
+            "distinct": 3,
+            "sample": [
+              "negozio",
+              "online",
+              "telefono"
+            ]
+          }
+        }
+      }
+    },
+    "preview": {
+      "clienti": [
+        {
+          "id": 1,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501Z",
+          "citta": "Milano",
+          "email": "mario.rossi@example.com",
+          "data_registrazione": "2024-02-04"
+        },
+        {
+          "id": 2,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501B",
+          "citta": "Milano",
+          "email": "mario.rossi1@example.com",
+          "data_registrazione": "2024-01-23"
+        },
+        {
+          "id": 3,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501C",
+          "citta": "Napoli",
+          "email": "mario.rossi2@example.com",
+          "data_registrazione": "2024-06-10"
+        },
+        {
+          "id": 4,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501D",
+          "citta": "Napoli",
+          "email": "mario.rossi3@example.com",
+          "data_registrazione": "2024-03-13"
+        },
+        {
+          "id": 5,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501E",
+          "citta": "Bologna",
+          "email": "mario.rossi4@example.com",
+          "data_registrazione": "2023-11-02"
+        },
+        {
+          "id": 6,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501F",
+          "citta": "Napoli",
+          "email": "mario.rossi5@example.com",
+          "data_registrazione": "2024-05-25"
+        },
+        {
+          "id": 7,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501G",
+          "citta": "Torino",
+          "email": "mario.rossi6@example.com",
+          "data_registrazione": "2024-05-28"
+        },
+        {
+          "id": 8,
+          "nome": "Mario",
+          "cognome": "Rossi",
+          "codice_fiscale": "RSSMRA85M01H501H",
+          "citta": "Firenze",
+          "email": "mario.rossi7@example.com",
+          "data_registrazione": "2023-09-01"
+        }
+      ],
+      "prodotti": [
+        {
+          "id": 1,
+          "nome_prodotto": "Laptop Pro 14",
+          "categoria": "Accessori",
+          "prezzo_listino": 1300.56,
+          "giacenza_magazzino": 72.49
+        },
+        {
+          "id": 2,
+          "nome_prodotto": "Laptop Pro 14",
+          "categoria": "Elettrodomestici",
+          "prezzo_listino": 1224.61,
+          "giacenza_magazzino": 62.45
+        },
+        {
+          "id": 3,
+          "nome_prodotto": "Laptop Pro 14",
+          "categoria": "Accessori",
+          "prezzo_listino": 1122.09,
+          "giacenza_magazzino": 69.37
+        },
+        {
+          "id": 4,
+          "nome_prodotto": "Laptop Pro 14",
+          "categoria": "Accessori",
+          "prezzo_listino": 1084.51,
+          "giacenza_magazzino": 68.48
+        },
+        {
+          "id": 5,
+          "nome_prodotto": "Laptop Pro 14",
+          "categoria": "Audio",
+          "prezzo_listino": 1554.79,
+          "giacenza_magazzino": 45.82
+        },
+        {
+          "id": 6,
+          "nome_prodotto": "Laptop Pro 14",
+          "categoria": "Elettrodomestici",
+          "prezzo_listino": 1077.96,
+          "giacenza_magazzino": 61.27
+        },
+        {
+          "id": 7,
+          "nome_prodotto": "Laptop Pro 14",
+          "categoria": "Informatica",
+          "prezzo_listino": 1517.64,
+          "giacenza_magazzino": 24.43
+        },
+        {
+          "id": 8,
+          "nome_prodotto": "Laptop Pro 14",
+          "categoria": "Audio",
+          "prezzo_listino": 1367.02,
+          "giacenza_magazzino": 22.97
+        }
+      ],
+      "transazioni": [
+        {
+          "id": 1001,
+          "cliente_id": 288,
+          "prodotto_id": 32,
+          "data_transazione": "2024-12-29",
+          "data_consegna": "2025-02-11",
+          "quantita": "1",
+          "prezzo_unitario": 1141.84,
+          "importo_totale": 1121.23,
+          "canale_vendita": "telefono"
+        },
+        {
+          "id": 1002,
+          "cliente_id": 332,
+          "prodotto_id": 36,
+          "data_transazione": "2024-11-26",
+          "data_consegna": "2025-02-09",
+          "quantita": "3",
+          "prezzo_unitario": 1475.03,
+          "importo_totale": 1306.74,
+          "canale_vendita": "negozio"
+        },
+        {
+          "id": 1003,
+          "cliente_id": 217,
+          "prodotto_id": 63,
+          "data_transazione": "2024-11-09",
+          "data_consegna": "2025-01-27",
+          "quantita": "1",
+          "prezzo_unitario": 1204.38,
+          "importo_totale": 1135.51,
+          "canale_vendita": "negozio"
+        },
+        {
+          "id": 1004,
+          "cliente_id": 162,
+          "prodotto_id": 63,
+          "data_transazione": "2024-12-10",
+          "data_consegna": "2025-01-21",
+          "quantita": "1",
+          "prezzo_unitario": 1102.13,
+          "importo_totale": 1103.25,
+          "canale_vendita": "negozio"
+        },
+        {
+          "id": 1005,
+          "cliente_id": 86,
+          "prodotto_id": 5,
+          "data_transazione": "2024-09-25",
+          "data_consegna": "2025-02-05",
+          "quantita": "2",
+          "prezzo_unitario": 1277.23,
+          "importo_totale": 1351.28,
+          "canale_vendita": "negozio"
+        },
+        {
+          "id": 1006,
+          "cliente_id": 32,
+          "prodotto_id": 47,
+          "data_transazione": "2024-12-28",
+          "data_consegna": "2025-01-22",
+          "quantita": "5",
+          "prezzo_unitario": 1358.59,
+          "importo_totale": 1247.54,
+          "canale_vendita": "negozio"
+        },
+        {
+          "id": 1007,
+          "cliente_id": 467,
+          "prodotto_id": 10,
+          "data_transazione": "2024-09-10",
+          "data_consegna": "2025-01-14",
+          "quantita": "1",
+          "prezzo_unitario": 1092.56,
+          "importo_totale": 1504.08,
+          "canale_vendita": "online"
+        },
+        {
+          "id": 1008,
+          "cliente_id": 306,
+          "prodotto_id": 92,
+          "data_transazione": "2024-07-29",
+          "data_consegna": "2025-01-25",
+          "quantita": "2",
+          "prezzo_unitario": 1369.97,
+          "importo_totale": 1360.26,
+          "canale_vendita": "online"
+        }
+      ]
+    }
+  },
+  "feature_sql": [
+    "window",
+    "join",
+    "conjunctive"
+  ],
+  "query": "SELECT c.nome, c.cognome, c.citta, c.codice_fiscale, COUNT(*) AS numero_transazioni, ROUND(SUM(t.importo_totale), 2) AS totale_speso, RANK() OVER (ORDER BY SUM(t.importo_totale) DESC) AS posizione FROM clienti c JOIN transazioni t ON t.cliente_id = c.id WHERE c.citta = 'Milano' AND t.canale_vendita = 'online' GROUP BY c.nome, c.cognome, c.citta, c.codice_fiscale ORDER BY posizione ASC, totale_speso DESC, c.codice_fiscale ASC;"
+}
