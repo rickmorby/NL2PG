@@ -8,6 +8,10 @@ from bench.domain.exceptions import DatabaseClientError
 from bench.domain.models.base import AbstractDTO
 from bench.domain.models.sql import SchemaDDLDTO
 from bench.domain.ports.outbound.sandbox_port import SandboxPort
+from bench.domain.services.validation.identifier_policy import (
+    english_identifier_error,
+    find_english_identifiers,
+)
 from bench.domain.services.validation.schema_type_checker import SchemaTypeChecker
 
 from psycopg.errors import Error as PgError
@@ -28,6 +32,10 @@ class SchemaValidator(AbstractSandboxValidator):
         sql_text = self._extract_sql(dto).strip()
         if not sql_text:
             return ValidationResult(is_valid=False, error=self._empty_error_msg())
+        ident_hits = find_english_identifiers(sql_text)
+        ident_err = english_identifier_error(ident_hits)
+        if ident_err:
+            return ValidationResult(is_valid=False, error=ident_err)
         type_result = self._type_checker.check(sql_text, tipo_schema)
         if not type_result.is_valid:
             return ValidationResult(is_valid=False, error=type_result.error)
