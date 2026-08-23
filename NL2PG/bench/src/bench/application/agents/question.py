@@ -3,9 +3,16 @@
 :author: Riccardo Morabito
 """
 
+from logging import getLogger
+
 from bench.application.agents.base import AbstractAgent
 from bench.domain.models.nlp import QuestionDTO
 from bench.domain.models.state import TaskStateDTO
+from bench.domain.services.validation.order_sensitivity_policy import (
+    resolve_order_sensitive,
+)
+
+_log = getLogger("bench.application.agents")
 
 
 class QuestionAgent(AbstractAgent):
@@ -29,5 +36,20 @@ class QuestionAgent(AbstractAgent):
         return QuestionDTO
 
     def build_updates(self, output: QuestionDTO, state: TaskStateDTO) -> dict:
-        """Aggiorna lo stato con question e incrementa retry_question."""
-        return {"question": output, "retry_question": state.retry_question + 1}
+        """Aggiorna lo stato con question, retry e policy di coerenza order_sensitive."""
+        updates: dict = {"question": output, "retry_question": state.retry_question + 1}
+        if state.gold_query and state.gold_result:
+            resolved, reason = resolve_order_sensitive(
+                output.question,
+                state.gold_query.query,
+                state.gold_result.order_sensitive,
+            )
+            if reason:
+                _log.warning("nodo=question task=%s %s", state.task_id, reason)
+                updates["gold_query"] = state.gold_query.model_copy(
+                    update={"order_sensitive": resolved}
+                )
+                updates["gold_result"] = state.gold_result.model_copy(
+                    update={"order_sensitive": resolved}
+                )
+        return updates
