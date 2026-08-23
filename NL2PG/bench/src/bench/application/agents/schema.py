@@ -112,7 +112,7 @@ class SchemaAgent(AbstractAgent):
             return ""
         if not idents:
             return ""
-        sug = ", ".join(f"{k} → {self._EN_IDENTS[k]}" for k in sorted(idents)[:6])
+        sug = ", ".join(f"{k} -> {self._EN_IDENTS[k]}" for k in sorted(idents)[:6])
         return (
             "Il benchmark e' in italiano: gli identificatori devono essere italiani. "
             f"Trovati nomi inglesi non ammessi: {sug}. Rinominali con l'equivalente italiano."

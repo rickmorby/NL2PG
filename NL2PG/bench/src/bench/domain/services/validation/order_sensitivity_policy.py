@@ -2,10 +2,10 @@
 
 Le due regole allineano il flag alla semantica della question italiana:
 
-D1 — se la question richiede esplicitamente un ordinamento dell'OUTPUT (forme verbali
+D1 - se la question richiede esplicitamente un ordinamento dell'OUTPUT (forme verbali
      come "ordina l'elenco", "disponendo i risultati", "in ordine alfabetico") e la
      query gold possiede un ORDER BY esterno, il flag DEVE essere True;
-D2 — se la question non contiene alcun linguaggio d'ordinamento e la query non applica
+D2 - se la question non contiene alcun linguaggio d'ordinamento e la query non applica
      LIMIT/OFFSET (che impongono comunque determinismo), il flag deve essere False:
      i superlativi di selezione ("il cliente più recente...") non sono ordinamenti.
 
