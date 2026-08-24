@@ -175,7 +175,7 @@ def stacked_share(
             cumulative += segment
     bars = (
         alt.Chart(_data(rows))
-        .mark_bar()
+        .mark_bar(size=30)
         .encode(
             x=alt.X("count():Q", stack="normalize", title=xlabel),
             y=alt.Y(f"{cat}:N", sort=cat_order, title=None),
@@ -185,7 +185,7 @@ def stacked_share(
                 title=None,
             ).legend(orient="top"),
         )
-        .properties(width=width, height=alt.Step(44))
+        .properties(width=width, height=alt.Step(52))
     )
     inside = (
         alt.Chart(_data(inside_rows))
@@ -203,7 +203,7 @@ def stacked_share(
     )
     outside = (
         alt.Chart(_data(outside_rows))
-        .mark_text(baseline="bottom", dy=-16, fontSize=11, fontWeight="bold", color=theme.LABEL)
+        .mark_text(baseline="bottom", dy=-24, fontSize=11, fontWeight="bold", color=theme.LABEL)
         .encode(
             x=alt.X(
                 "center:Q",
