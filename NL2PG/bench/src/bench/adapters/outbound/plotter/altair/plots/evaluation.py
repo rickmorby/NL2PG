@@ -121,9 +121,17 @@ class GoldCardinalityPlot(Plot):
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre verticali su asse ordinale esplicito (bucket finale in coda)."""
+        modal = max(rows, key=lambda row: row["task"])
         return (
             alt.Chart(alt.Data(values=rows))
-            .mark_bar(color=theme.ACCENT)
+            .mark_bar()
+            .encode(
+                color=alt.condition(
+                    f"datum.cardinalita === '{modal['cardinalita']}'",
+                    alt.value(theme.ACCENT),
+                    alt.value(theme.NEUTRAL),
+                )
+            )
             .encode(
                 x=alt.X(
                     "cardinalita:O",

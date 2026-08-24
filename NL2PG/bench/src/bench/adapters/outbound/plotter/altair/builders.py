@@ -64,13 +64,23 @@ def hbar_values(
         )
         .properties(width=width, height=alt.Step(22))
     )
+    label_color = (
+        alt.condition(
+            f"datum.{cat} === '{accent_value}'",
+            alt.value(accent_color),
+            alt.value(theme.LABEL),
+        )
+        if accent_value is not None
+        else alt.value(theme.LABEL)
+    )
     labels = (
         alt.Chart(_data(rows))
-        .mark_text(align="left", dx=5, fontSize=11, color=theme.LABEL)
+        .mark_text(align="left", dx=5, fontSize=11)
         .encode(
             x=alt.X(f"{val}:Q", title=xlabel, scale=x_scale),
             y=y_encoding,
             text=alt.Text(f"{val}:Q", format=fmt),
+            color=label_color,
         )
     )
     return bars + labels
