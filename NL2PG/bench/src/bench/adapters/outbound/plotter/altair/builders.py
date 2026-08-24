@@ -33,6 +33,7 @@ def hbar_values(
     accent_value: str | None = None,
     accent_color: str = theme.ACCENT,
     order: list[str] | None = None,
+    label_limit: int = 160,
 ) -> alt.Chart:
     """Barre orizzontali ordinate per valore con etichetta a fine barra.
 
@@ -44,7 +45,9 @@ def hbar_values(
     """
     x_scale = alt.Scale(domain=domain) if domain else alt.Scale(zero=True)
     y_sort = order if order is not None else ("-x" if reverse else "x")
-    y_encoding = alt.Y(f"{cat}:N", sort=y_sort, title=None)
+    y_encoding = alt.Y(
+        f"{cat}:N", sort=y_sort, title=None, axis=alt.Axis(labelLimit=label_limit)
+    )
     color_encoding = (
         alt.condition(
             f"datum.{cat} === '{accent_value}'",

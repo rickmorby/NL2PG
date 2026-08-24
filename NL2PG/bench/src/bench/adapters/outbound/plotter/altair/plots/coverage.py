@@ -103,6 +103,68 @@ class RowsPerTablePlot(Plot):
 
 _MIN_COMPOUND_FEATURES = 2
 
+_QUERY_TYPE_NAMES = {
+    1: "Single-table selection",
+    2: "Scalar aggregation",
+    3: "Top-N query",
+    4: "Two-table join",
+    5: "Grouped aggregation",
+    6: "Conjunctive query",
+    7: "Multi-table join",
+    8: "Self-join",
+    9: "Grouped aggregation + HAVING",
+    10: "External knowledge grounding",
+    11: "Nested subquery",
+    12: "Correlated subquery",
+    13: "EXISTS clause",
+    14: "Set operation",
+    15: "Non-recursive CTE",
+    16: "Recursive query",
+    17: "Window function",
+    18: "LATERAL join",
+    19: "Full outer join",
+    20: "Right outer join",
+    21: "Cross join",
+    22: "DISTINCT ON",
+    23: "Filtered aggregation",
+    24: "Left outer join",
+    25: "Natural join / USING",
+    26: "Anti-join",
+    27: "GROUPING SETS / ROLLUP / CUBE",
+    28: "Range type query",
+    29: "Aggregazione con DISTINCT",
+    30: "Confronto tra row types",
+    31: "Query su tipo ENUM",
+    32: "VALUES inline",
+    33: "Pattern matching",
+    34: "Date/Time query",
+    35: "Espressione condizionale (CASE)",
+    36: "String manipulation",
+    37: "Funzioni matematiche",
+    38: "Quantified subquery",
+    39: "BETWEEN",
+    40: "IN condition",
+    41: "IS NULL / IS NOT NULL",
+    42: "Disjunctive query",
+    43: "Sorting query",
+    44: "Type casting",
+    45: "Underspecification",
+    46: "Relative time & durations",
+    48: "SELECT DISTINCT",
+    49: "IS DISTINCT FROM",
+    50: "Boolean predicates",
+    51: "OVERLAPS",
+    52: "OFFSET / FETCH",
+    53: "Ordered-set aggregate",
+}
+"""Nomi leggibili dei tipi-query; rispecchia ``config/categories.json``."""
+
+
+def _human_query_type(q_token: str) -> str:
+    """Restituisce il nome leggibile del tipo-query (il codice se sconosciuto)."""
+    number = int(q_token[1:]) if q_token[1:].isdigit() else 0
+    return _QUERY_TYPE_NAMES.get(number, q_token)
+
 
 class QueryTypeFeatureCoveragePlot(Plot):
     """18: matrice di copertura tipo-query (Qxx) x feature SQL."""
@@ -136,10 +198,14 @@ class QueryTypeFeatureCoveragePlot(Plot):
             ((q, f, n) for (q, f), n in counts.items() if q in compound),
             key=lambda item: -item[2],
         )
-        return [
-            {"combinazione": f"{q_token} + {feature}", "query": n}
-            for q_token, feature, n in pairs[: self._TOP]
-        ]
+        labels = []
+        for q_token, feature, n in pairs[: self._TOP]:
+            name = _human_query_type(q_token)
+            if feature.replace("_", " ") in name.lower():
+                labels.append({"combinazione": name, "query": n})
+            else:
+                labels.append({"combinazione": f"{name} + {feature}", "query": n})
+        return labels
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
         """Barre orizzontali: ogni coppia e' un dato, zero celle vuote."""
@@ -150,6 +216,7 @@ class QueryTypeFeatureCoveragePlot(Plot):
             "N. query",
             reverse=True,
             accent_value=rows[0]["combinazione"],
+            label_limit=320,
         )
 
     def evidence(self, rows: list[dict[str, Any]]) -> str | None:
