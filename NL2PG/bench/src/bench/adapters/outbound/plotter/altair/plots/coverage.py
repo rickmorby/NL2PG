@@ -110,52 +110,51 @@ class QueryTypeFeatureCoveragePlot(Plot):
     number = 18
     slug = "querytype_feature_coverage"
     title = "Copertura tipo-query x feature"
+    _TOP = 12
     subtitle = (
-        "Solo i tipi-query che combinano piu' feature (l'incrocio interessante); "
-        "i tipi a feature singola sono coperti dai grafici 01 e 09."
+        "Top 12 coppie dei tipi-query che combinano piu' feature; i tipi a feature "
+        "singola sono coperti dai grafici 01 e 09."
     )
 
     def rows(self, tasks: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        """Coppie (tipo-query, feature) solo per i tipi che combinano piu' feature."""
+        """Top 12 coppie (tipo-query, feature) dei tipi che combinano piu' feature."""
         per_type: dict = {}
-        for task in tasks:
-            tokens = set(re_findall(r"Q\d+", task.get("category", "")))
-            for q_token in tokens:
-                per_type.setdefault(q_token, set()).update(
-                    (task.get("spec") or {}).get("sql_features", [])
-                )
-        compound = {
-            q for q, features in per_type.items() if len(features) >= _MIN_COMPOUND_FEATURES
-        }
         counts: Counter = Counter()
         for task in tasks:
-            for q_token in set(re_findall(r"Q\d+", task.get("category", ""))) & compound:
-                for feature in (task.get("spec") or {}).get("sql_features", []):
+            tokens = set(re_findall(r"Q\d+", task.get("category", "")))
+            features = (task.get("spec") or {}).get("sql_features", [])
+            for q_token in tokens:
+                per_type.setdefault(q_token, set()).update(features)
+                for feature in features:
                     counts[(q_token, feature)] += 1
+        compound = {
+            q
+            for q, type_features in per_type.items()
+            if len(type_features) >= _MIN_COMPOUND_FEATURES
+        }
+        pairs = sorted(
+            ((q, f, n) for (q, f), n in counts.items() if q in compound),
+            key=lambda item: -item[2],
+        )
         return [
-            {"q_type": q_type, "feature": feature, "query": n}
-            for (q_type, feature), n in counts.items()
+            {"combinazione": f"{q_token} + {feature}", "query": n}
+            for q_token, feature, n in pairs[: self._TOP]
         ]
 
     def build(self, rows: list[dict[str, Any]]) -> alt.Chart:
-        """Heatmap con tipi-query in ascissa e feature in ordinata."""
-
-        def natural_key(code: str) -> tuple[int, ...]:
-            return tuple(int(part) for part in re_findall(r"\d+", code))
-
-        q_types = sorted({row["q_type"] for row in rows}, key=natural_key)
-        features = sorted(
-            {row["feature"] for row in rows},
-            key=lambda feature: -sum(row["query"] for row in rows if row["feature"] == feature),
-        )
-        return builders.heatmap(
+        """Barre orizzontali: ogni coppia e' un dato, zero celle vuote."""
+        return builders.hbar_values(
             rows,
-            "q_type",
-            "feature",
+            "combinazione",
             "query",
-            width=1240,
-            height=860,
-            x_sort=q_types,
-            y_sort=features,
-            legend_title="N. query",
+            "N. query",
+            reverse=True,
+            accent_value=rows[0]["combinazione"],
         )
+
+    def evidence(self, rows: list[dict[str, Any]]) -> str | None:
+        """Restituisce la coppia dominante."""
+        if not rows:
+            return None
+        top = rows[0]
+        return f"La combinazione piu' frequente e' '{top['combinazione']}' ({top['query']} query)."
