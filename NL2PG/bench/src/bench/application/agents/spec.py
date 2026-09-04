@@ -16,6 +16,7 @@ from bench.domain.ports.outbound.llm_port import LLMGeneratorPort
 from bench.domain.ports.outbound.prompt_port import PromptPort
 from bench.domain.ports.outbound.repository_port import MetaRepositoryPort
 from bench.domain.services.picking.domain_pool import DOMAIN_POOL
+from bench.domain.services.validation.narrative_repair import NarrativeRepair
 from bench.domain.services.validation.spec_validation import compute_spec_hash, validate_spec
 
 
@@ -33,6 +34,7 @@ class SpecAgent(AbstractAgent):
         """Inietta le porte per LLM, prompt, configurazione, esempi e repository metadati."""
         super().__init__(llm, prompts, config, examples)
         self._meta_repo = meta_repo
+        self._repair = NarrativeRepair()
 
     def prompt_name(self) -> str:
         """Restituisce 'spec' come nome del template prompt."""
@@ -69,6 +71,10 @@ class SpecAgent(AbstractAgent):
 
     def validate(self, output: SpecDTO, state: TaskStateDTO) -> tuple[bool, str, dict]:
         """Valida vocabolario categoria, target_domain e assenza di duplicati via spec_hash."""
+        if output.twist_rules:
+            for r in output.twist_rules:
+                r.obsolete_value = self._repair.repair_twist_value(r.obsolete_value)
+                r.description = self._repair.repair_twist_value(r.description)
         cat = self._config.load_categories().get(state.category, CategoryDTO())
         target = self._target_n_tables(state.task_id, state.category, cat.n_tables_range)
         ok, err = validate_spec(

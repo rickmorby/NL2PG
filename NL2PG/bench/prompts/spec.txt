@@ -16,7 +16,7 @@ Il JSON di output deve contenere esclusivamente le chiavi: "domain", "n_tables",
 5. **Generazione Regole Twist (`twist_rules`)**: Per OGNI elemento scelto in `twist`, DEVI creare esattamente un oggetto `TwistRule` contenente:
    - `twist_type`: il tipo di twist (es. "rename", "synonym", "jargon", "rephrase", "polysemy").
    - `target_value`: il nome reale dell'entità o colonna nel database (es. "studenti", "totale_speso").
-   - `obsolete_value`: la perifrasi o sinonimo usato nella prosa aziendale (es. "anagrafica_iscritti", "valore_complessivo").
+   - `obsolete_value`: la perifrasi o sinonimo usato nella prosa aziendale, RIGOROSAMENTE CON SPAZI E SENZA UNDERSCORE (es. "anagrafica iscritti", "valore complessivo").
    - `description`: spiegazione dettagliata dell'effetto del twist.
 6. **Sincronizzazione Obbligatoria**: Se `twist` contiene N elementi, `twist_rules` DEVE contenere esattamente N oggetti TwistRule.
 7. **FORMATO JSON PURO**: Rispondi esclusivamente in formato JSON puro. NON racchiudere l'output in blocchi di codice markdown (NON usare mai ```json o ```).
@@ -34,8 +34,8 @@ Il JSON di output deve contenere esclusivamente le chiavi: "domain", "n_tables",
     {
       "twist_type": "rename",
       "target_value": "clienti",
-      "obsolete_value": "anagrafica_iscritti",
-      "description": "La tabella clienti viene denominata anagrafica_iscritti."
+      "obsolete_value": "anagrafica iscritti",
+      "description": "La tabella clienti viene denominata anagrafica iscritti."
     }
   ],
   "spec_hash": ""

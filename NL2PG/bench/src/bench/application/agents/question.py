@@ -9,6 +9,7 @@ from bench.application.agents.base import AbstractAgent
 from bench.application.validators.query_validator import QueryValidator
 from bench.domain.models.nlp import QuestionDTO
 from bench.domain.models.state import TaskStateDTO
+from bench.domain.services.validation.narrative_repair import NarrativeRepair
 from bench.domain.services.validation.order_sensitivity_policy import (
     resolve_order_sensitive,
 )
@@ -26,10 +27,11 @@ class QuestionAgent(AbstractAgent):
     def __init__(
         self, llm, prompts, config, query_validator: QueryValidator | None = None, examples=None
     ) -> None:
-        """Inietta le dipendenze base e il validatore query per il tiebreaker."""
+        """Inietta le dipendenze base, il riparatore e il validatore query per il tiebreaker."""
         super().__init__(llm, prompts, config)
         self._query_validator = query_validator
         self._examples = examples
+        self._repair = NarrativeRepair()
 
     def prompt_name(self) -> str:
         """Restituisce 'question' come nome del template prompt."""
@@ -49,7 +51,9 @@ class QuestionAgent(AbstractAgent):
         return QuestionDTO
 
     def build_updates(self, output: QuestionDTO, state: TaskStateDTO) -> dict:
-        """Aggiorna lo stato con question, retry e policy di coerenza order_sensitive."""
+        """Aggiorna lo stato con question sanificata, retry e policy di coerenza order_sensitive."""
+        clean_quest = self._repair.repair_question(output.question)
+        output = QuestionDTO(question=clean_quest)
         updates: dict = {"question": output, "retry_question": state.retry_question + 1}
         if state.gold_query and state.gold_result:
             resolved, reason = resolve_order_sensitive(

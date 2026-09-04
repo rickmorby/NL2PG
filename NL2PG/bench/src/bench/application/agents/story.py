@@ -6,10 +6,16 @@
 from bench.application.agents.base import AbstractAgent
 from bench.domain.models.nlp import StoryDTO
 from bench.domain.models.state import TaskStateDTO
+from bench.domain.services.validation.narrative_repair import NarrativeRepair
 
 
 class StoryAgent(AbstractAgent):
     """Genera StoryDTO via LLM contestualizzando schema, dati e twist."""
+
+    def __init__(self, llm, prompts, config, examples=None) -> None:
+        """Inietta le dipendenze e il riparatore narrativo."""
+        super().__init__(llm, prompts, config, examples)
+        self._repair = NarrativeRepair()
 
     def prompt_name(self) -> str:
         """Restituisce 'story' come nome del template prompt."""
@@ -39,10 +45,12 @@ class StoryAgent(AbstractAgent):
         return StoryDTO
 
     def build_updates(self, output: StoryDTO, state: TaskStateDTO) -> dict:
-        """Aggiorna lo stato con story; resetta retry_story se e' un rigenero judge."""
+        """Aggiorna lo stato con story sanificata; resetta retry_story se e' un rigenero judge."""
+        clean_story = self._repair.repair_story(output.story)
+        cleaned_output = StoryDTO(story=clean_story)
         has_feedback = bool(state.judge_verdict and state.judge_verdict != "hard")
         retry = 0 if has_feedback else state.retry_story + 1
-        return {"story": output, "retry_story": retry}
+        return {"story": cleaned_output, "retry_story": retry}
 
     def _max_retries(self, _state: TaskStateDTO) -> int:
         return 1

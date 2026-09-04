@@ -8,16 +8,17 @@ Il JSON di output deve contenere esclusivamente il campo "story".
 </objective>
 
 <rules_and_guidelines>
-1. **REQUISITO COVERAGE TABELLE (LETTERALE ED INDEROGABILE)**:
-   - Per ciascuna tabella presente nel DDL, la parola esatta usata come nome di tabella (es. `anagrafica_clienti`) OPPURE il valore `obsolete_value` dai `twist_rules` DEVE comparire ESPLICITAMENTE nel testo della storia senza essere abbreviato o troncato.
+1. **REQUISITO COVERAGE TABELLE (LETTERALE CON SPAZI, SENZA UNDERSCORE)**:
+   - Per ciascuna tabella presente nel DDL, il nome della tabella scritto RIGOROSAMENTE CON SPAZI NATURALI (es. se la tabella è `anagrafica_clienti`, scrivi SEMPRE `anagrafica clienti`) OPPURE il valore `obsolete_value` dai `twist_rules` DEVE comparire ESPLICITAMENTE nel testo della storia senza essere abbreviato o troncato. È SEVERAMENTE VIETATO usare underscore `_` nella prosa.
    - Il numero di tabelle non è fisso (può variare da 1 a 12): la copertura resta OBBLIGATORIA per ciascuna tabella presente nel DDL.
-   - Usa espressioni gestionali naturali come "l'archivio denominato anagrafica clienti" o "il registro intitolato ordini". Se la tabella si chiama `anagrafica_fornitori`, puoi scrivere `anagrafica_fornitori` o la variante con spazio `anagrafica fornitori` se piu narrativa (MAI abbreviarla in `fornitori`).
+   - Usa espressioni gestionali naturali come "l'archivio denominato anagrafica clienti" o "il registro intitolato ordini". Se la tabella si chiama `anagrafica_fornitori`, scrivi SEMPRE `anagrafica fornitori` (MAI `anagrafica_fornitori` con l'underscore e MAI abbreviarla in `fornitori`).
 2. **REQUISITO COVERAGE LETTERALI (OBBLIGATORIO)**:
    - Ogni valore letterale presente nei filtri e nelle join della query (es. il valore `'24'`, `'Francia'`, `'2026-01-01'`, `'365'`) DEVE comparire ESPLICITAMENTE nel testo della storia come numero/testo identico (es. se la query contiene `365`, scrivi `365` o `365 giorni` nella prosa). Il `<data_profile>` contiene i valori reali presenti nel database (campioni, `sample`, `min`/`max`): usali per i valori letterali.
-3. **DIVIETO ASSOLUTO GERGO DB (PRINCIPIO PORTANTE)**:
+3. **DIVIETO ASSOLUTO GERGO DB E UNDERSCORE (PRINCIPIO PORTANTE)**:
    - NON USARE MAI parole come: *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*.
+   - NON USARE MAI il carattere underscore `_` nella storia: tutti i nomi di tabelle, registri, ruoli e stati composti devono usare lo spazio (es. 'anagrafica clienti', 'in attesa', 'piano dei conti', 'day hospital').
    - Usa termini di business come *archivio, registro, scheda, elemento, voce, sezione*.
-4. **Adattamento al dominio**: adatta il lessico a `spec.domain`. Usa il termine di registro piu naturale per quel dominio (sanita usa cartella clinica, logistica usa bolla o registro spedizioni, finanza usa libro mastro). Non usare mai tabella o colonna se il dominio non e tecnico. Se il dominio e tecnico puoi usare il gergo tecnico. Il nome tabella con underscore puo essere scritto con spazio se piu narrativo (anagrafica clienti).
+4. **Adattamento al dominio**: adatta il lessico a `spec.domain`. Usa il termine di registro piu naturale per quel dominio (sanita usa cartella clinica, logistica usa bolla o registro spedizioni, finanza usa libro mastro). Non usare mai tabella o colonna se il dominio non e tecnico. Se il dominio e tecnico puoi usare il gergo tecnico. I nomi di tabella devono essere scritti sempre con lo spazio (anagrafica clienti).
 5. **Perifrasi per le Colonne**:
    - Descrivi i campi mediante perifrasi aziendali naturali (es. "l'anno in cui l'allievo ha avviato il percorso", "la valutazione conseguita nell'esame").
 6. **Iniezione Distrattori e Narrazione Naturale**:
@@ -28,7 +29,7 @@ Il JSON di output deve contenere esclusivamente il campo "story".
 <positive_examples>
 <example>
 {
-  "story": "Presso la Segreteria Didattica dell'ateneo, l'archivio denominato studenti raccoglie le schede degli iscritti. In ciascuna scheda sono riportati il nome e l'identificativo dell'allievo. Parallelamente, il registro iscrizioni_corsi annota le valutazioni conseguite in ciascun esame. Durante un controllo sulle carriere con votazioni pari ad almeno 24, gli operatori hanno analizzato la media dei punteggi..."
+  "story": "Presso la Segreteria Didattica dell'ateneo, l'archivio denominato studenti raccoglie le schede degli iscritti. In ciascuna scheda sono riportati il nome e l'identificativo dell'allievo. Parallelamente, il registro iscrizioni corsi annota le valutazioni conseguite in ciascun esame. Durante un controllo sulle carriere con votazioni pari ad almeno 24, gli operatori hanno analizzato la media dei punteggi..."
 }
 </example>
 </positive_examples>
@@ -53,7 +54,8 @@ USO DI GERGO DB O TRONCAMENTO NOMI TABELLA (ERRATO):
 <forbidden_actions>
 - DIVIETO 1: NON racchiudere l'output JSON in blocchi di codice markdown (NON usare ```json o ```).
 - DIVIETO 2: NON usare MAI parole come *tabella, colonna, riga, campo, database, chiave, join, query, SQL, record*. SE SCRIVI LA PAROLA 'tabella', IL TASK VIENE INVALIDATO!
-- DIVIETO 3: NON abbreviare o modificare il nome letterale di una tabella del DDL o del relativo `obsolete_value`.
+- DIVIETO 3: NON usare MAI il carattere underscore '_' nella storia: usa esclusivamente spazi naturali per separare i termini composti (scrivi 'anagrafica clienti', mai 'anagrafica_clienti').
+- DIVIETO 4: NON abbreviare o modificare il nome di una tabella del DDL o del relativo `obsolete_value` (es. se la tabella è anagrafica_fornitori, scrivi 'anagrafica fornitori', mai solo 'fornitori').
 </forbidden_actions>
 
 <input_context>

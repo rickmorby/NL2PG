@@ -10,6 +10,7 @@ from bench.domain.services.picking.domain_pool import DOMAIN_POOL
 from bench.domain.services.picking.role_example_builder import RoleExampleBuilder
 from bench.domain.services.validation.coverage_validator import CoverageResult, CoverageValidator
 from bench.domain.services.validation.feature_checker import FeatureCheckResult, FeatureChecker
+from bench.domain.services.validation.narrative_repair import NarrativeRepair
 from bench.domain.services.validation.result_comparator import ResultComparator
 from bench.domain.services.validation.schema_type_checker import SchemaTypeChecker
 from bench.domain.services.validation.spec_validation import validate_spec
@@ -23,6 +24,7 @@ __all__: list[str] = [
     "CoverageValidator",
     "FeatureCheckResult",
     "FeatureChecker",
+    "NarrativeRepair",
     "PostgresSQLRepair",
     "ResultComparator",
     "RoleExampleBuilder",

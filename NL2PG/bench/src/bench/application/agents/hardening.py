@@ -7,15 +7,17 @@ from bench.application.agents.base import AbstractAgent
 from bench.domain.models.nlp import StoryDTO
 from bench.domain.models.state import TaskStateDTO
 from bench.domain.services.validation.coverage_validator import CoverageValidator
+from bench.domain.services.validation.narrative_repair import NarrativeRepair
 
 
 class HardeningAgent(AbstractAgent):
     """Migliora la storia via LLM finche' supera la copertura o raggiunge il max round."""
 
     def __init__(self, llm, prompts, config) -> None:
-        """Inietta le porte e il validatore di copertura (servizio di dominio)."""
+        """Inietta le porte, il validatore di copertura e il riparatore narrativo."""
         super().__init__(llm, prompts, config)
         self._coverage = CoverageValidator()
+        self._repair = NarrativeRepair()
 
     def prompt_name(self) -> str:
         """Restituisce 'hardening' come nome del template prompt."""
@@ -36,11 +38,13 @@ class HardeningAgent(AbstractAgent):
         return StoryDTO
 
     def validate(self, output: StoryDTO, state: TaskStateDTO) -> tuple[bool, str, dict]:
-        """Valida la copertura della nuova storia via CoverageValidator."""
+        """Valida la copertura della nuova storia (sanificata) via CoverageValidator."""
         if not state.spec or not state.gold_query or not state.question:
             return False, "stato incompleto (mancano spec, gold_query o question)", {}
+        clean_story = self._repair.repair_story(output.story)
+        cleaned_output = StoryDTO(story=clean_story)
         result = self._coverage.validate(
-            output,
+            cleaned_output,
             state.question,
             state.gold_query,
             state.spec,
@@ -48,8 +52,9 @@ class HardeningAgent(AbstractAgent):
         return (result.is_valid, result.error, {})
 
     def build_updates(self, output: StoryDTO, state: TaskStateDTO) -> dict:
-        """Aggiorna lo stato con story e incrementa retry_hardening."""
-        return {"story": output, "retry_hardening": state.retry_hardening + 1}
+        """Aggiorna lo stato con story sanificata e incrementa retry_hardening."""
+        clean_story = self._repair.repair_story(output.story)
+        return {"story": StoryDTO(story=clean_story), "retry_hardening": state.retry_hardening + 1}
 
     def run(self, state: TaskStateDTO, chain_role: str = "default") -> dict:
         """Esegue il retry loop solo se non ha superato max_rounds."""
