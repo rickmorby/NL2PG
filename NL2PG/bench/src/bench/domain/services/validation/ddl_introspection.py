@@ -21,15 +21,11 @@ def collect_pk_fk(create: exp.Create) -> tuple[set[str], set[str]]:
                 fk_cols.add(cd.name.lower())
     for cons in create.find_all(exp.PrimaryKey):
         pk_cols.update(
-            e.name.lower()
-            for e in cons.expressions
-            if isinstance(e, (exp.Column, exp.Identifier))
+            e.name.lower() for e in cons.expressions if isinstance(e, (exp.Column, exp.Identifier))
         )
     for ft in create.find_all(exp.ForeignKey):
         fk_cols.update(
-            e.name.lower()
-            for e in ft.expressions
-            if isinstance(e, (exp.Column, exp.Identifier))
+            e.name.lower() for e in ft.expressions if isinstance(e, (exp.Column, exp.Identifier))
         )
     return pk_cols, fk_cols
 

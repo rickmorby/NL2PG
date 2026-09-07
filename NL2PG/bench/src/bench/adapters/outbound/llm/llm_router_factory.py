@@ -15,20 +15,14 @@ from litellm import Router
 def enabled_models(config: dict[str, Any]) -> dict[str, dict[str, Any]]:
     """Restituisce i modelli abilitati della configurazione."""
     return {
-        model_id: mc
-        for model_id, mc in config.get("models", {}).items()
-        if mc.get("enabled", True)
+        model_id: mc for model_id, mc in config.get("models", {}).items() if mc.get("enabled", True)
     }
 
 
 def resolve_chain(config: dict[str, Any], role: str) -> list[str]:
     """Risolve la catena dei model_id abilitati per un ruolo."""
     chains = config.get("chains", {})
-    return [
-        model_id
-        for model_id in chains.get(role, [])
-        if model_id in enabled_models(config)
-    ]
+    return [model_id for model_id in chains.get(role, []) if model_id in enabled_models(config)]
 
 
 def primary_model_group(config: dict[str, Any], role: str) -> str:
@@ -48,7 +42,9 @@ def build_model_list(config: dict[str, Any]) -> list[dict[str, Any]]:
     models = enabled_models(config)
     ordered = list(
         dict.fromkeys(
-            model_id for chain in config.get("chains", {}).values() for model_id in chain
+            model_id
+            for chain in config.get("chains", {}).values()
+            for model_id in chain
             if model_id in models
         )
     )
@@ -96,9 +92,7 @@ def build_fallbacks(config: dict[str, Any]) -> list[dict[str, list[str]]]:
 def build_router(config: dict[str, Any], stream_timeout: int) -> Router:
     """Istanzia il Router LiteLLM con le policy derivate dalla configurazione."""
     retry_cfg = config.get("retry", {})
-    max_fallbacks = (
-        max((len(chain) for chain in config.get("chains", {}).values()), default=1) - 1
-    )
+    max_fallbacks = max((len(chain) for chain in config.get("chains", {}).values()), default=1) - 1
     return Router(
         model_list=build_model_list(config),
         fallbacks=build_fallbacks(config),

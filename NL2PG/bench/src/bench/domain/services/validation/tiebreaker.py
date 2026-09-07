@@ -16,9 +16,7 @@ from bench.domain.ports.outbound.sandbox_port import SandboxPort
 from psycopg.errors import Error as PgError
 
 
-def ensure_tiebreaker(
-    query: Any, tree: exp.Expression, schema: str, sandbox: SandboxPort
-) -> None:
+def ensure_tiebreaker(query: Any, tree: exp.Expression, schema: str, sandbox: SandboxPort) -> None:
     """Aggiunge un tiebreaker univoco (GROUP BY o colonna unica ASC) se necessario."""
     order = tree.args.get("order")
     if not order or not order.expressions:

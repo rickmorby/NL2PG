@@ -38,8 +38,6 @@ from bench.domain.services.validation.ddl_markers import (  # noqa: F401
 )
 
 
-
-
 def has_partition_by(ddl: str) -> bool:
     """Verifica la presenza della clausola PARTITION BY."""
     return bool(_RE_PARTITION_BY.search(ddl))
@@ -138,11 +136,7 @@ def has_isa_tables(ddl: str) -> bool:
                 for s in cd.find_all(exp.ColumnConstraint)
             )
             ref = next(
-                (
-                    s
-                    for s in cd.find_all(exp.ColumnConstraint)
-                    if isinstance(s.kind, exp.Reference)
-                ),
+                (s for s in cd.find_all(exp.ColumnConstraint) if isinstance(s.kind, exp.Reference)),
                 None,
             )
             if is_pk and ref is not None:
@@ -188,9 +182,7 @@ def has_fact_table(ddl: str) -> bool:
     for create in get_all_creates(ddl):
         fk_cols: set[str] = set()
         for cd in create.find_all(exp.ColumnDef):
-            if any(
-                isinstance(s.kind, exp.Reference) for s in cd.find_all(exp.ColumnConstraint)
-            ):
+            if any(isinstance(s.kind, exp.Reference) for s in cd.find_all(exp.ColumnConstraint)):
                 fk_cols.add(cd.name.lower())
         for ft in create.find_all(exp.ForeignKey):
             fk_cols.update(
