@@ -1,0 +1,19 @@
+[run]
+db_dsn = "postgresql://solver:solver@127.0.0.1:5433/solver_sandbox"
+sandbox_dsn = "postgresql://solver:solver@127.0.0.1:5433/solver_sandbox"
+default_benchmark_path = "./input/benchmark.json"
+
+[cli]
+max_consecutive_failures = 5
+
+[solver]
+max_tool_iterations = 20
+max_retries = 5
+temperature = 0.2
+runs = 1
+
+[rag]
+qdrant_url = "http://127.0.0.1:6333"
+collection_name = "doc_knowledge"
+embedding_model = "microsoft/harrier-oss-v1-0.6b"
+rag_dir = "./rag"
