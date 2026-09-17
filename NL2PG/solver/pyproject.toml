@@ -1,0 +1,77 @@
+[project]
+name = "solver"
+version = "0.1.0"
+description = "Natural Language to Database Solver & Benchmark Evaluator for SQL and Datalog"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.15.0",
+    "sqlglot>=30.17.0",
+    "psycopg[binary]>=3.3.4",
+    "psycopg-pool>=3.3.1",
+    "pyyaml>=6.0.3",
+    "tqdm>=4.70.0",
+    "rich>=15.0.0",
+    "typer>=0.27.1",
+    "litellm>=1.96.2",
+    "json-repair>=0.63.2",
+    "altair>=6.0.0",
+    "vl-convert-python>=1.7.0",
+    "clingo>=5.8.2",
+    "orjson>=3.12.0",
+    "qdrant-client>=1.19.0",
+    "fastembed>=0.8.0",
+    "langgraph>=1.2.11",
+    "langchain-core>=1.5.5",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.3",
+]
+
+[project.scripts]
+solver = "solver.adapters.inbound.cli.app:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/solver"]
+
+[tool.ruff]
+line-length = 100
+exclude = ["config/"]
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "BLE",
+    "SLF",
+    "D",
+    "B",
+    "SIM",
+    "PIE",
+    "RET",
+    "ARG",
+    "PL",
+    "RUF",
+    "A",
+    "C90",
+]
+ignore = [
+    "D203",
+    "D212",
+    "D213",
+    "D401",
+    "D105",
+    "PLR0913",
+    "PLR0917",
+    "PLW0108",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/solver/adapters/inbound/cli/app.py" = ["BLE001"]
